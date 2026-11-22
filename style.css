@@ -1,0 +1,157 @@
+:root{
+  --bg:#f3ece8; --bg2:#e2d4d0; --ink:#2b2329; --accent:#c9667f; --jade:#3f9f8a; --gold:#d4a24c;
+  --panel:#2a2428; --panelInk:#f4ebe6;
+  --tile:#fffaf0; --tileSide:#e9d8b8; --tileBack:#ff9cc2;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:"Nunito","Segoe UI",system-ui,sans-serif}
+body{background:radial-gradient(circle at 20% 10%,#fff 0,var(--bg) 40%,var(--bg2) 100%);background-attachment:fixed}
+body.bg-night{--bg:#1e1a33;--bg2:#2f2350;--ink:#f3e8ff;background:radial-gradient(circle at 20% 10%,#3b2f66 0,#1e1a33 60%)}
+body.bg-tea{--bg:#f1f7ef;--bg2:#d8ecd9;background:radial-gradient(circle at 80% 0%,#fff 0,#e6f2e3 50%,#cfe6d2 100%)}
+body.bg-beach{--bg:#e9f8ff;--bg2:#ffeac2;background:linear-gradient(180deg,#bfe9ff 0,#e9f8ff 55%,#ffe6b5 100%)}
+#app{max-width:1200px;margin:0 auto;padding:8px 12px 24px}
+#topbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.brand{font-weight:800;font-size:22px;color:var(--accent)}
+.wallet{background:#fff;border-radius:20px;padding:4px 12px;font-weight:700;box-shadow:0 2px 6px #0001;color:#4a2b3a}
+nav{margin-left:auto;display:flex;gap:6px}
+button{font:inherit;border:0;border-radius:14px;padding:8px 14px;background:#fff;color:#4a2b3a;cursor:pointer;box-shadow:0 2px 0 #0002;transition:transform .1s}
+button:active{transform:translateY(2px)}
+button.active,nav button:hover{background:var(--accent);color:#fff}
+.screen{display:none}.screen.active{display:block}
+#stage{display:flex;gap:12px;margin-top:10px;align-items:stretch}
+#boardWrap{flex:1;min-height:420px;position:relative;overflow:hidden}
+#board{position:absolute;left:0;top:0;transform-origin:0 0}
+.tile{position:absolute;width:48px;height:62px;border-radius:7px;background:var(--tile);
+  box-shadow:3px 4px 0 var(--tileSide),4px 5px 0 #b89c6a,5px 7px 8px #0003;
+  display:flex;align-items:center;justify-content:center;font-size:28px;cursor:pointer;user-select:none;
+  transition:transform .15s, filter .15s, opacity .3s}
+.tile::after{content:"";position:absolute;inset:3px;border-radius:5px;border:2px solid var(--tileBack);opacity:.55;pointer-events:none}
+.tile.blocked{filter:brightness(.82)}
+.tile.free:hover{transform:translateY(-3px)}
+.tile.sel{background:#fff1a8;transform:translateY(-4px) scale(1.04)}
+.tile.hint{animation:hint .6s ease-in-out 3}
+.tile.gone{animation:pop .35s forwards;pointer-events:none}
+@keyframes hint{50%{background:#c9ffe9;transform:translateY(-6px)}}
+@keyframes pop{to{transform:scale(1.4) rotate(12deg);opacity:0}}
+
+#heroine{width:280px;display:flex;flex-direction:column;align-items:center;gap:6px}
+#bubble{background:#fff;color:#4a2b3a;border-radius:16px;padding:10px 14px;min-height:46px;position:relative;box-shadow:0 3px 10px #0002;font-weight:600;width:100%;text-align:center}
+#bubble::after{content:"";position:absolute;bottom:-10px;left:50%;border:10px solid transparent;border-top-color:#fff;border-bottom:0;transform:translateX(-50%)}
+#bubble.pop{animation:bub .3s}
+@keyframes bub{0%{transform:scale(.85)}70%{transform:scale(1.05)}}
+#heroFrame{position:relative;width:240px;height:360px;border-radius:20px;overflow:hidden;background:linear-gradient(#ffe0ec,#fff);box-shadow:0 6px 18px #ff6fa533}
+#heroImg{width:100%;height:100%;object-fit:cover;object-position:top;animation:breathe 3.2s ease-in-out infinite;transform-origin:50% 100%}
+#heroImg.react{animation:hop .5s ease}
+#heroImg.big{animation:spin .8s ease}
+@keyframes breathe{50%{transform:scale(1.015) translateY(-2px)}}
+@keyframes hop{30%{transform:translateY(-14px) scale(1.03)}60%{transform:translateY(0) scale(.99)}}
+@keyframes spin{30%{transform:scale(1.08) rotate(-3deg)}60%{transform:scale(1.08) rotate(3deg)}}
+#heroAcc{position:absolute;top:6px;right:10px;font-size:40px;filter:drop-shadow(0 2px 2px #0004)}
+#sparkles{position:absolute;inset:0;pointer-events:none}
+.spark{position:absolute;font-size:20px;animation:spark 1s forwards}
+@keyframes spark{to{transform:translateY(-60px) scale(.3);opacity:0}}
+#heroName{font-weight:800}
+#heroName small{font-weight:600;opacity:.7}
+#affection{width:100%;height:18px;background:#fff;border-radius:9px;position:relative;overflow:hidden}
+#affBar{height:100%;background:linear-gradient(90deg,#ff9cc2,#ff6fa5);width:0;transition:width .4s}
+#affText{position:absolute;inset:0;text-align:center;font-size:12px;line-height:18px;font-weight:700;color:#4a2b3a}
+#controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+#levelInfo,#pairsLeft{font-weight:700}
+#combo{font-weight:800;color:var(--accent);min-width:90px}
+#quest{margin-top:8px;font-size:14px;opacity:.85}
+
+.banner{display:flex;gap:16px;background:#fff;color:#4a2b3a;border-radius:20px;padding:14px;margin-top:12px;box-shadow:0 4px 14px #0001;flex-wrap:wrap}
+.bannerArt{width:200px;height:280px;border-radius:14px;overflow:hidden;background:#ffe0ec}
+.bannerArt img{width:100%;height:100%;object-fit:cover;object-position:top}
+.bannerInfo{flex:1;min-width:240px}
+.pullBtns{display:flex;gap:10px;margin:10px 0}
+.pullBtns button{background:linear-gradient(135deg,#ff8fb8,#ff6fa5);color:#fff;font-weight:800;padding:12px 18px}
+.pullBtns small{display:block;font-weight:600}
+.note{font-size:13px;opacity:.7}
+#pullResult{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-top:14px}
+.card{height:170px;border-radius:14px;perspective:600px}
+.cardInner{position:relative;width:100%;height:100%;transition:transform .6s;transform-style:preserve-3d}
+.card.flip .cardInner{transform:rotateY(180deg)}
+.cardFace{position:absolute;inset:0;border-radius:14px;backface-visibility:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:6px;font-weight:700}
+.cardBack{background:repeating-linear-gradient(45deg,#ffb3cf 0 10px,#ff9cc2 10px 20px);color:#fff;font-size:34px}
+.cardFront{transform:rotateY(180deg);background:#fff;color:#4a2b3a;border:3px solid #ccc}
+.cardFront .ico{font-size:44px}
+.cardFront .rar{font-size:13px;margin-top:4px}
+.r-R .cardFront{border-color:#9ec5ff}
+.r-SR .cardFront{border-color:#c58bff;box-shadow:0 0 14px #c58bff}
+.r-SSR .cardFront{border-color:var(--gold);box-shadow:0 0 22px var(--gold);background:linear-gradient(#fff8dd,#fff)}
+.r-SSR .cardBack{background:repeating-linear-gradient(45deg,#ffd76a 0 10px,#f5b942 10px 20px);animation:glow .5s infinite alternate}
+@keyframes glow{to{filter:brightness(1.25)}}
+.dup{font-size:11px;opacity:.7}
+
+#wardrobe{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.wItem{background:#fff;color:#4a2b3a;border-radius:14px;padding:10px;text-align:center;border:3px solid transparent;cursor:pointer}
+.wItem.locked{opacity:.35;cursor:default}
+.wItem.equipped{border-color:var(--accent)}
+.wItem .ico{font-size:36px}
+.wCat{grid-column:1/-1;font-weight:800;margin-top:8px}
+
+#toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%) translateY(80px);background:#4a2b3a;color:#fff;padding:10px 16px;border-radius:12px;transition:transform .3s;z-index:20}
+#toast.show{transform:translateX(-50%) translateY(0)}
+.modal{position:fixed;inset:0;background:#0006;display:flex;align-items:center;justify-content:center;z-index:30}
+.modal.hidden{display:none}
+.modalCard{background:#fff;color:#4a2b3a;border-radius:20px;padding:24px;text-align:center;max-width:340px;animation:bub .4s}
+
+@media (max-width:760px){
+  #stage{flex-direction:column-reverse}
+  #heroine{width:100%;flex-direction:row;flex-wrap:wrap;justify-content:center}
+  #heroFrame{width:110px;height:160px}
+  #bubble{order:2;flex:1;min-width:160px}
+  #boardWrap{min-height:58vh}
+  nav{margin-left:0}
+}
+
+.thumb{width:100%;height:110px;background-size:cover;background-position:top center;border-radius:10px;margin-bottom:6px}
+.cardFront .thumb{height:96px}
+.card{height:190px}
+
+/* Взрослее: графитовые панели, пыльная роза, золото */
+#topbar{background:var(--panel);color:var(--panelInk);border-radius:16px;padding:8px 12px;border:1px solid #d4a24c55}
+.brand{color:#f0b8c6;letter-spacing:.5px}
+.wallet{background:#3a3236;color:var(--panelInk);box-shadow:inset 0 0 0 1px #d4a24c66}
+nav button{background:#3a3236;color:var(--panelInk);box-shadow:none}
+nav button.active,nav button:hover{background:var(--accent);color:#fff}
+#controls button{background:var(--panel);color:var(--panelInk);box-shadow:inset 0 0 0 1px #d4a24c55}
+.banner,.wItem,.modalCard{box-shadow:0 0 0 1px #d4a24c44,0 6px 18px #0002}
+.pullBtns button{background:linear-gradient(135deg,#d47a92,#a8506a);box-shadow:inset 0 0 0 1px #f3d08a}
+#heroFrame{box-shadow:0 0 0 2px #d4a24c88,0 8px 22px #0003;background:linear-gradient(#3a3236,#5a4650)}
+body{background:radial-gradient(circle at 20% 10%,#fbf6f3 0,var(--bg) 45%,var(--bg2) 100%)}
+body.bg-neon{--bg:#120f1f;--bg2:#1d1636;--ink:#e8f6ff;background:#120f1f center/cover no-repeat fixed}
+body.bg-neon #boardWrap{background:#0007;border-radius:16px}
+
+/* Лёд */
+.tile.iced{background:linear-gradient(135deg,#e6f6ff,#b9e3ff);filter:saturate(.6)}
+.tile .ice{position:absolute;right:2px;bottom:1px;font-size:11px;font-weight:800;color:#2a6f9e;background:#fffc;border-radius:6px;padding:0 3px}
+/* Фивер */
+body.fever #boardWrap{box-shadow:inset 0 0 40px #ff9a3c,0 0 30px #ff6fa5;border-radius:16px;animation:fever .5s infinite alternate}
+body.fever #combo{color:#ff7a1a;font-size:18px}
+@keyframes fever{to{box-shadow:inset 0 0 60px #ffcf4a,0 0 40px #ff3d7f}}
+/* Вспышка SSR */
+.ssrFlash{position:fixed;inset:0;z-index:40;pointer-events:none;background:radial-gradient(circle,#fff6c9 0,#f5b94299 40%,transparent 75%);animation:flash 1.6s forwards}
+@keyframes flash{0%{opacity:0}15%{opacity:1}100%{opacity:0}}
+/* VIP рамка */
+body.vip #heroFrame{box-shadow:0 0 0 3px #f3c75a,0 0 24px #f3c75a99}
+.stars{font-size:34px;color:#e0a100;letter-spacing:4px}
+/* Пропуск */
+#screen-pass h2{margin:14px 0 4px}
+#passTrack{display:flex;gap:8px;overflow-x:auto;padding:8px 2px}
+.pTier{min-width:120px;display:flex;flex-direction:column;gap:6px;align-items:stretch;opacity:.6}
+.pTier.reached{opacity:1}
+.pNum{text-align:center;font-weight:800}
+.pCell{min-height:70px;display:flex;flex-direction:column;justify-content:center;gap:4px;font-size:13px}
+.pCell.p{background:linear-gradient(135deg,#3a3236,#5a4650);color:#f3d08a}
+.pCell.got{opacity:.5}
+.pCell small{font-size:11px;opacity:.8}
+.passBtns{margin:8px 0}
+.vipCard{background:var(--panel);color:var(--panelInk);border-radius:16px;padding:14px;margin-top:12px;box-shadow:0 0 0 1px #d4a24c88}
+.vipCard h3{margin:0 0 6px;color:#f3d08a}
+
+/* Фишки-картинки (art/tiles/*): картинка поверх тела фишки, состояния видны через фильтры */
+.tile.art .face{position:absolute;inset:1px;background:center/contain no-repeat;border-radius:6px;pointer-events:none}
+.tile.art.sel .face{filter:drop-shadow(0 0 4px #ffd84a) brightness(1.08)}
+.tile.art.iced .face{opacity:.72}

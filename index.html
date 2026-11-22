@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tile Waifu — прототип</title>
+<meta name="theme-color" content="#2a2428">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Tile Waifu">
+<link rel="apple-touch-icon" href="art/ui/icon-180.png">
+<link rel="icon" type="image/png" sizes="192x192" href="art/ui/icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="content.css">
+<link rel="stylesheet" href="ui.css">
+</head>
+<body>
+<div id="app">
+  <header id="topbar">
+    <div class="brand">🀄 Tile Waifu</div>
+    <div class="wallet"><span id="gems">0</span> 💎</div>
+    <nav>
+      <button data-screen="play" class="active">Игра</button>
+      <button data-screen="gacha">Призыв</button>
+      <button data-screen="wardrobe">Гардероб</button>
+      <button data-screen="pass">Пропуск</button>
+    </nav>
+  </header>
+
+  <!-- PLAY -->
+  <section id="screen-play" class="screen active">
+    <div id="stage">
+      <div id="boardWrap"><div id="board"></div></div>
+      <aside id="heroine">
+        <div id="bubble">Привет! Я Маджонг-тян. Научу тебя играть~</div>
+        <div id="heroFrame">
+          <img id="heroImg" alt="Маджонг-тян">
+          <div id="heroAcc"></div>
+          <div id="sparkles"></div>
+        </div>
+        <div id="heroName">Маджонг-тян <small id="outfitName"></small></div>
+        <div id="affection"><div id="affBar"></div><span id="affText">Симпатия 1</span></div>
+      </aside>
+    </div>
+    <div id="controls">
+      <span id="levelInfo">Уровень 1</span>
+      <span id="pairsLeft"></span>
+      <span id="combo"></span>
+      <button id="btnHint">💡 Подсказка</button>
+      <button id="btnUndo">↩️ Отмена</button>
+      <button id="btnShuffle">🔀 Перемешать</button>
+      <button id="btnRestart">⟳ Заново</button>
+      <button id="btnSound">🔊</button>
+    </div>
+    <div id="quest"></div>
+  </section>
+
+  <!-- GACHA -->
+  <section id="screen-gacha" class="screen">
+    <div class="banner">
+      <div class="bannerArt"><img id="bannerImg" alt=""></div>
+      <div class="bannerInfo">
+        <h2>Баннер «Королева лунной ночи»</h2>
+        <p>Новые героини Рин, Хана и Юэ, наряды, скины фишек и фоны. SSR 3% · SR 15% · R 82%.</p>
+        <p>Гарант SSR через <b id="pity">60</b> призывов. В призыве ×10 минимум один SR.</p>
+        <div class="pullBtns">
+          <button id="pull1">Призыв ×1 <small>100 💎</small></button>
+          <button id="pull10">Призыв ×10 <small>900 💎</small></button>
+        </div>
+        <p class="note">Повторка превращается в 20 💎. Всё игровое, без реальных денег.</p>
+      </div>
+    </div>
+    <div id="pullResult"></div>
+  </section>
+
+  <!-- WARDROBE -->
+  <section id="screen-wardrobe" class="screen">
+    <h2>Гардероб</h2>
+    <div id="wardrobe"></div>
+  </section>
+
+  <!-- PASS -->
+  <section id="screen-pass" class="screen">
+    <h2>Сезон «Неоновая ночь»</h2>
+    <p id="passInfo"></p>
+    <div id="passTrack"></div>
+    <div class="passBtns"><button id="passPremBtn"></button></div>
+    <div class="vipCard">
+      <h3>VIP-подписка</h3>
+      <p>Безлимитные подсказки, +100 💎 каждый день, золотая рамка героини. Удобство и красота, на прохождение не влияет.</p>
+      <button id="vipBtn"></button>
+    </div>
+  </section>
+
+  <div id="toast"></div>
+  <div id="winModal" class="modal hidden">
+    <div class="modalCard">
+      <h2>Победа!</h2>
+      <p id="winText"></p>
+      <button id="btnNext">Следующий уровень</button>
+    </div>
+  </div>
+</div>
+<!-- сюжет, уровни, симпатия, ивент: до game.js, чтобы хуки и кнопки навигации были готовы -->
+<script src="levels.js"></script>
+<script src="story_main.js"></script>
+<script src="story_side.js"></script>
+<script src="story.js"></script>
+<script src="meta.js"></script>
+<script src="game.js"></script>
+<script src="voice.js"></script>
+<script src="anim.js"></script>
+<script src="ui.js"></script>
+</body>
+</html>
