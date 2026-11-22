@@ -1,5 +1,5 @@
 // Оффлайн-кэш: все файлы игры, включая арт, кладутся в кэш при установке.
-const C = 'tilewaifu-v6';
+const C = 'tilewaifu-v7';
 const CORE = ['./', 'index.html', 'style.css', 'game.js', 'manifest.webmanifest', 'icon.svg'];
 // Весь арт лежит локально в art/ и кладётся в кэш при установке — игра целиком работает без сети.
 const ART_FILES = [
@@ -147,6 +147,7 @@ CORE.push('ui.css', 'ui.js',
   'fonts/nunito-cyr.woff2', 'fonts/nunito-lat.woff2', 'fonts/playfair-i-cyr.woff2', 'fonts/playfair-i-lat.woff2',
   'art/ui/bg_menu.webp', 'art/ui/bg_menu_wide.webp', 'art/ui/bg_table.webp', 'art/ui/bg_summon.webp', 'art/ui/bg_victory.webp',
   'art/ui/card_back.webp', 'art/ui/mc_cut.webp', 'art/ui/logo_gold.webp',
+  'art/ui/bg_menu_sweet.webp', 'art/ui/bg_play_sweet.webp', 'art/ui/logo_sweet.webp', 'fonts/playfair-cyr.woff2', 'fonts/playfair-lat.woff2',
   'art/ui/icon-180.png', 'art/ui/icon-192.png', 'art/ui/icon-512.png', 'art/ui/icon-maskable-512.png');
 // Голоса и анимация героинь (тред озвучки): voice.js, anim.js, 80 японских реплик и 14 видеоклипов.
 CORE.push('voice.js', 'anim.js',
