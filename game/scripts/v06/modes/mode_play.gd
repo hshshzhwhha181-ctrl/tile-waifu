@@ -224,9 +224,9 @@ func _climb_strip() -> void :
 		p.add_child(av)
 		var n: = int(run.bless[id])
 		if n > 1:
-			var nb: = UI.rbox("pink", Rect2(30, 30, 24, 22), 11, 2, 2)
+			var nb: = UI.rbox("pink", Rect2(28, 28, 28, 24), 12, 2, 2)
 			av.add_child(nb)
-			nb.add_child(UI.center_label(UI.label(str(n), 13, Color.WHITE, Color("6a1020"), 2, "body", 900), Rect2(0, 0, 24, 22)))
+			nb.add_child(UI.center_label(UI.label(str(n), 16, Color.WHITE, Color("6a1020"), 2, "body", 900), Rect2(0, 0, 28, 24)))
 		if bx < 400:
 			break
 	if ids.is_empty():
@@ -283,6 +283,9 @@ func _climb_clear() -> void :
 	G.task_add("levels")
 	G.add_pass_xp(40)
 	var ca: = V8PlayRules.award("other", V8PlayRules.climb_rp(f), true)
+	# the run's rank points and rank-ups, for the rank card of the end window
+	run["rp"] = int(run.get("rp", 0)) + int(ca.get("rp", 0))
+	run["ups"] = (run.get("ups", []) as Array) + (ca.get("ups", []) as Array)
 	Sfx.play("win", 1.1)
 	Sfx.say(partner, "win")
 	_v8_end_overlays()
@@ -360,13 +363,14 @@ func _bless_card(root: Control, id: String, r: Rect2) -> Control:
 	halo.modulate = Color(col.r, col.g, col.b, 0.55)
 	card.add_child(halo)
 	card.add_child(Common.avatar(b.hero, Rect2(22, (r.size.y - 128) * 0.5, 128, 128), "gold" if plus else "plum"))
-	var hn: = UI.label(G.HEROES[b.hero].name.to_upper(), 15, col.lightened(0.45), Color(0, 0, 0, 0), 0, "body", 900)
+	var hn: = UI.label(G.HEROES[b.hero].name.to_upper(), 16, col.lightened(0.45), Color(0, 0, 0, 0), 0, "body", 900)
 	hn.position = Vector2(172, 18)
 	card.add_child(hn)
 	if plus:
-		var pb: = UI.rbox("gold", Rect2(r.size.x - 200, 14, 180, 28), 14, 2, 4)
+		var pw: = UI.font("body", 900).get_string_size("ОНА С ТОБОЙ · СИЛЬНЕЕ", HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x + 24.0
+		var pb: = UI.rbox("gold", Rect2(r.size.x - pw - 16, 14, pw, 28), 14, 2, 4)
 		card.add_child(pb)
-		pb.add_child(UI.center_label(UI.label("ОНА С ТОБОЙ · СИЛЬНЕЕ", 13, Color("4a2a06"), Color(0, 0, 0, 0), 0, "body", 900), Rect2(0, 0, 180, 28)))
+		pb.add_child(UI.center_label(UI.label("ОНА С ТОБОЙ · СИЛЬНЕЕ", 16, Color("4a2a06"), Color(0, 0, 0, 0), 0, "body", 900), Rect2(0, 0, pw, 28)))
 	var nm: = UI.title(b.name, 34, Color("fff6d8"), Color("3a1030"))
 	nm.position = Vector2(170, 38)
 	nm.size = Vector2(r.size.x - 190, 50)
@@ -380,7 +384,7 @@ func _bless_card(root: Control, id: String, r: Rect2) -> Control:
 	if have > 0:
 		var hb: = UI.rbox("pink", Rect2(r.size.x - 96, -12, 86, 28), 14, 2, 4)
 		card.add_child(hb)
-		hb.add_child(UI.center_label(UI.label("уже ×%d" % have, 14, Color.WHITE, Color("6a1020"), 2, "body", 900), Rect2(0, 0, 86, 28)))
+		hb.add_child(UI.center_label(UI.label("уже ×%d" % have, 16, Color.WHITE, Color("6a1020"), 2, "body", 900), Rect2(0, 0, 86, 28)))
 	card.gui_input.connect( func(e):
 		if e is InputEventMouseButton and e.pressed and not card.has_meta("used"):
 			card.set_meta("used", true)
@@ -438,13 +442,16 @@ func _climb_over(by_choice: bool) -> void :
 	for id in run.bless:
 		p.add_child(Common.avatar(V6ModesData.BLESS[id].hero, Rect2(bx, 324, 56, 56), "gold"))
 		bx += 62
-	var again: = JButton.make("Новое восхождение", "pink", Rect2(40, 410, 320, 96), null, 26)
+	# 0.8: main action (pink) on the right under the thumb; the rank card and league line as in every result
+	var again: = JButton.make("Новое восхождение", "pink", Rect2(300, 410, 320, 96), null, 26)
 	again.shine_every = 2.2
 	again.pressed.connect( func(): main.go("arena", {"mode": "climb", "partner": G.S.level_partner, "retry": randi()}))
 	p.add_child(again)
-	var back: = JButton.make("К режимам", "glass", Rect2(380, 410, 240, 96), null, 26)
+	var back: = JButton.make("К режимам", "glass", Rect2(40, 410, 240, 96), null, 26)
 	back.pressed.connect( func(): main.go("modes"))
 	p.add_child(back)
+	var ra: = {"rp": int(run.get("rp", 0)), "ups": run.get("ups", []), "gems": 0, "title": String(G.rank_of(int(G.S.rp)).title)}
+	_v8_popup_rank(p, 396.0, ra)
 
 
 func _etude_strip() -> void :
@@ -533,7 +540,7 @@ func _etude_clear() -> void :
 	sl.custom_minimum_size = Vector2(470, 0)
 	p.add_child(sl)
 	var last: = etude_i >= V6ModesData.ETUDES - 1
-	var nx: = JButton.make("Следующий этюд" if not last else "К этюдам", "pink", Rect2(40, 400, 320, 96), null, 26)
+	var nx: = JButton.make("Следующий этюд" if not last else "К этюдам", "pink", Rect2(300, 400, 320, 96), null, 26)
 	nx.shine_every = 2.2
 	nx.pressed.connect( func():
 		if last:
@@ -541,7 +548,7 @@ func _etude_clear() -> void :
 		else:
 			main.go("arena", {"mode": "etude", "etude": etude_i + 1, "partner": partner}))
 	p.add_child(nx)
-	var again: = JButton.make("Ещё раз", "glass", Rect2(380, 400, 240, 96), null, 26)
+	var again: = JButton.make("Ещё раз", "glass", Rect2(40, 400, 240, 96), null, 26)
 	again.pressed.connect( func(): main.go("arena", {"mode": "etude", "etude": etude_i, "partner": partner, "retry": randi()}))
 	p.add_child(again)
 	_v8_popup_rank(p, 388.0, ea)
@@ -587,17 +594,23 @@ func _seat_draw(i: int) -> void :
 	card.modulate = Color.WHITE
 	var col: Color = G.HEROES[s.hero].color
 	card.add_child(Common.avatar(s.hero, Rect2(6, 8, 74, 74), "gold" if G.hero_unlocked(s.hero) else "plum"))
-	card.add_child(UI.center_label(UI.label(G.HEROES[s.hero].name, 16, Color.WHITE, UI.DARK, 3, "body", 900), Rect2(0, 83, 86, 24)))
+	# 0.8: the name has its own line under the avatar and order (full card width), the category sits beside
+	# the order tile above it, so a long name («Маджонг-тян») never runs into the category
+	var nm: = UI.center_label(UI.label(G.HEROES[s.hero].name, 16, Color.WHITE, UI.DARK, 3, "body", 900), Rect2(4, 84, cw - 8, 22))
+	nm.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	nm.clip_text = true
+	card.add_child(nm)
 	var c: Array = G.CATS[s.cat]
-	var ic: = UI.tex(G.tile_tex(int(c[0])), Rect2(86, 10, 48, 62))
+	var ic: = UI.tex(G.tile_tex(int(c[0])), Rect2(86, 6, 44, 56))
 	card.add_child(ic)
 	var nl: = UI.label("×%d" % int(s.need), 28, Color("ffe7a6"), UI.DARK, 4, "body", 900)
-	nl.position = Vector2(cw - 54, 22)
+	nl.position = Vector2(cw - 54, 14)
 	nl.name = "Need"
 	card.add_child(nl)
 	var cl: = UI.label(str(c[3]), 16, Color("f3ecff"), UI.DARK, 2, "body", 900)
-	cl.position = Vector2(86, 74)
-	cl.size = Vector2(cw - 90, 24)
+	cl.position = Vector2(84, 60)
+	cl.size = Vector2(cw - 88, 22)
+	cl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	cl.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	cl.clip_text = true
 	card.add_child(cl)
@@ -673,12 +686,43 @@ func _seat_arrive(i: int) -> void :
 var _seat_bub: Control = null
 
 func _seat_bubble(i: int, text: String) -> void :
+	# 0.8: the line is said inside the guest's seat card (over her name and category, tail up to her face),
+	# never over the table under the strip
 	var card: Control = seats[i].node
 	if _seat_bub and is_instance_valid(_seat_bub):
 		_seat_bub.queue_free()
-	var gp: = strip.position + card.position + Vector2(2, strip_h - 6)
-	var b: = Common.bubble(self, text, gp, maxf(170.0, card.size.x - 4.0), true)
-	b.z_index = 45
+	var w: = card.size.x - 8.0
+	var f: = UI.font("body", 800)
+	var fs: = 17
+	var th: float = f.get_multiline_string_size(text, HORIZONTAL_ALIGNMENT_CENTER, w - 16.0, fs).y
+	while fs > 16 and th > 66.0:
+		fs -= 1
+		th = f.get_multiline_string_size(text, HORIZONTAL_ALIGNMENT_CENTER, w - 16.0, fs).y
+	var h: = clampf(th + 12.0, 40.0, card.size.y - 8.0)
+	var b: = Control.new()
+	b.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	b.position = Vector2(4, card.size.y - h - 4.0)
+	b.size = Vector2(w, h)
+	b.z_index = 6
+	var tail: = Polygon2D.new()
+	tail.color = Color(0.12, 0.11, 0.13, 0.97)
+	tail.polygon = PackedVector2Array([Vector2(30, 6), Vector2(52, 6), Vector2(38, -8)])
+	b.add_child(tail)
+	var box: = UI.rbox("cream", Rect2(0, 0, w, h), 16, 3, 6)
+	box.set_param("border_top", Color("e8c9a0")).set_param("border_bottom", Color("a8697a"))
+	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	b.add_child(box)
+	var l: = UI.label(text, fs, UI.INK)
+	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	l.position = Vector2(8, 2)
+	l.size = Vector2(w - 16, h - 4)
+	b.add_child(l)
+	card.add_child(b)
+	b.modulate.a = 0.0
+	var tin: = b.create_tween()
+	tin.tween_property(b, "modulate:a", 1.0, 0.12)
 	_seat_bub = b
 	var t: Tween = b.create_tween()
 	t.tween_interval(1.8)
@@ -835,11 +879,11 @@ func _shift_end() -> void :
 		var av: = Common.avatar(h, Rect2(hx, 318, 60, 60), "gold" if G.hero_unlocked(h) else "plum")
 		p.add_child(av)
 		hx += 68
-	var again: = JButton.make("Новая смена", "pink", Rect2(40, 410, 320, 96), null, 26)
+	var again: = JButton.make("Новая смена", "pink", Rect2(300, 410, 320, 96), null, 26)
 	again.shine_every = 2.2
 	again.pressed.connect( func(): main.go("arena", {"mode": "shift", "partner": partner, "retry": randi()}))
 	p.add_child(again)
-	var back: = JButton.make("К режимам", "glass", Rect2(380, 410, 240, 96), null, 26)
+	var back: = JButton.make("К режимам", "glass", Rect2(40, 410, 240, 96), null, 26)
 	back.pressed.connect( func(): main.go("modes"))
 	p.add_child(back)
 	_v8_popup_rank(p, 392.0, sa)

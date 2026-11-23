@@ -382,13 +382,15 @@ func finish() -> void :
 	G.add_aff(play.partner, 10)
 	G.add_pass_xp(60)
 	award = V8PlayRules.award("duel", V8PlayRules.duel_rp(win, draw), win)
+	# 0.8: saved: leaving during the pause below goes straight out and counts no extra lost game
+	play._v8_saved = true
 	stage.react("deny" if win else "win")
 	_end_line = V6Heroines.line(rival, "lose" if win else ("draw" if draw else "win"))
 	stage.say_text(_end_line, 3.0)
 	play.stage.react("win" if win else "fail")
 	Sfx.play("win" if win or draw else "deny", 1.0 if win else 0.8)
 	await get_tree().create_timer(1.2).timeout
-	if not is_inside_tree():
+	if not is_inside_tree() or not is_instance_valid(play) or not play.is_inside_tree():
 		return
 	_result(win, draw, gems, shard)
 
@@ -419,11 +421,12 @@ func _result(win: bool, draw: bool, gems: int, shard: bool) -> void :
 		var have: = mini(int(G.S.shards.get(rival, 0)), G.SHARDS_NEED)
 		Common.chip(p, null, "Осколок %s: %d/%d%s" % [G.HEROES[rival].name, have, G.SHARDS_NEED, " · она с тобой!" if have >= G.SHARDS_NEED else ""], Rect2(60, 318, 540, 36), "gold", 18)
 	var by: = 380.0 if shard else 336.0
-	var again: = JButton.make("Реванш", "pink", Rect2(40, by, 280, 92), null, 30)
+	# 0.8: main action (pink) on the right under the thumb
+	var again: = JButton.make("Реванш", "pink", Rect2(340, by, 280, 92), null, 30)
 	again.shine_every = 2.0
 	again.pressed.connect( func(): main.go("play", {"mode": "duel", "rival": rival, "partner": play.partner, "retry": randi()}))
 	p.add_child(again)
-	var back: = JButton.make("Режимы", "glass", Rect2(340, by, 280, 92), null, 28)
+	var back: = JButton.make("Режимы", "glass", Rect2(40, by, 280, 92), null, 28)
 	back.pressed.connect( func(): main.go("modes" if main.SCREENS.has("modes") else "home"))
 	p.add_child(back)
 	p.size.y = by + 92 + 40

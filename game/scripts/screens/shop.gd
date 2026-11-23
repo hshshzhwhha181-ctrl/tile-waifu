@@ -64,7 +64,7 @@ func _build_body() -> void :
 		0: _recommended()
 		1: _outfits()
 		2: _gems()
-	var note: = UI.center_label(UI.label(V6Txt.s("shop.test_note"), 15, Color.WHITE, Color(0.3, 0.1, 0.25), 3), Rect2(0, _note_y(), W, 24))
+	var note: = UI.center_label(UI.label(V6Txt.s("shop.test_note"), 16, Color.WHITE, Color(0.3, 0.1, 0.25), 3), Rect2(0, _note_y(), W, 24))
 	body.add_child(note)
 
 
@@ -229,7 +229,7 @@ func pass_popup() -> void :
 			pal = "lav"
 		var c: = UI.rbox(pal, Rect2(x, y, cw, 110), 16, 3, 6)
 		p.add_child(c)
-		c.add_child(UI.center_label(UI.label(str(k), 15, UI.INK, Color.WHITE, 3, "body", 900), Rect2(0, 2, cw, 20)))
+		c.add_child(UI.center_label(UI.label(str(k), 16, UI.INK, Color.WHITE, 3, "body", 900), Rect2(0, 2, cw, 20)))
 		if r.has("item"):
 			var a: = Common.card_art(G.art_tex(G.ITEM[r.item]), Rect2(6, 22, cw - 12, 82), Vector2(0.5, 0.25), 1.0, 10)
 			(a.material as ShaderMaterial).set_shader_parameter("holo", 0.5)
@@ -370,7 +370,7 @@ func _gems() -> void :
 		if first:
 			var b: = UI.rbox("mint", Rect2(cw - 92, -10, 100, 30), 12, 2, 6)
 			c.add_child(b)
-			b.add_child(UI.center_label(UI.label(V6Txt.s("shop.x2"), 15, Color.WHITE, Color("1f5e49"), 3, "body", 900), Rect2(0, 0, 100, 30)))
+			b.add_child(UI.center_label(UI.label(V6Txt.s("shop.x2"), 16, Color.WHITE, Color("1f5e49"), 3, "body", 900), Rect2(0, 0, 100, 30)))
 			var bl: = UI.center_label(UI.label(V6Txt.s("shop.bonus") % UI.fmt(p.gems), 16, Color("1f8a62"), Color.WHITE, 3, "body", 900), Rect2(0, 166, cw, 24))
 			c.add_child(bl)
 		if p.get("best", false):

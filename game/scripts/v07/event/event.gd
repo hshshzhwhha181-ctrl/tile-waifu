@@ -94,7 +94,7 @@ static func home_cards(home: Control, main) -> void :
 	if ev.daily != V7EventData.today_key():
 		var x2: = UI.rbox("red", Rect2(132, 44, 64, 26), 13, 2, 4)
 		c1.add_child(x2)
-		x2.add_child(UI.center_label(UI.label("×2", 15, Color.WHITE, Color("6a1020"), 2, "body", 900), Rect2(0, 0, 64, 26)))
+		x2.add_child(UI.center_label(UI.label("×2", 16, Color.WHITE, Color("6a1020"), 2, "body", 900), Rect2(0, 0, 64, 26)))
 	c1.gui_input.connect( func(e):
 		if e is InputEventMouseButton and e.pressed:
 			Sfx.play("pop")

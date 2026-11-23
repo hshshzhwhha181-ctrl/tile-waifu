@@ -214,6 +214,24 @@ static func my_quarter() -> Dictionary:
 	state().q_last = {"q": q.key, "place": place, "points": mine}
 	return {"place": place, "total": TOTAL, "points": mine, "key": q.key, "title": quarter_title(q), "left_secs": float(q.end) - at}
 
+# 0.8: one rule for every screen that shows the player's quarter place (victory, profile, modes, home):
+# the place is shown only inside the top 80% of the table. Below that cut a new player sees what the points
+# are for, never «#1 001 из 1 001».
+const Q_SHOW_FRAC: = 0.8
+const Q_HIDDEN: = "Очки ранга идут в рейтинг квартала"
+const Q_HIDDEN_SHORT: = "идут в рейтинг квартала"
+
+static func quarter_shown(q: Dictionary) -> bool:
+	var place: = int(q.get("place", 0))
+	var total: = int(q.get("total", TOTAL))
+	return place > 0 and place <= int(total * Q_SHOW_FRAC)
+
+# «#821 из 1 001», or "" below the cut
+static func quarter_place_text(q: Dictionary) -> String:
+	if not quarter_shown(q):
+		return ""
+	return "#%s из %s" % [UI.fmt(int(q.get("place", 0))), UI.fmt(int(q.get("total", TOTAL)))]
+
 # quarter place (1..1001) of a population player, counting the player in
 static func pop_quarter_place(id: int, at: = -1.0) -> int:
 	if at < 0.0:

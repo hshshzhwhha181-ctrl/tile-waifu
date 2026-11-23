@@ -132,7 +132,7 @@ func _panel() -> void :
 	nm.position = Vector2(18, 8)
 	nm.size = Vector2(320, 48)
 	panel.add_child(nm)
-	var rm: = UI.label(V7RoomData.ROOMS[h].name, 15, Color("d8c8b8"))
+	var rm: = UI.label(V7RoomData.ROOMS[h].name, 16, Color("d8c8b8"))
 	rm.position = Vector2(20, 56)
 	panel.add_child(rm)
 	var lv: = G.aff_level(h)
@@ -144,7 +144,7 @@ func _panel() -> void :
 	var aff: = int(G.S.aff.get(h, 0))
 	var frac: = 1.0 if lv >= 10 else float(aff % 100) / 100.0
 	Common.progress_bar(panel, Rect2(20, 120, 316, 20), frac, "pink")
-	var pv: = UI.label("макс." if lv >= 10 else "%d / 100" % (aff % 100), 14, Color.WHITE, UI.DARK, 3, "body", 900)
+	var pv: = UI.label("макс." if lv >= 10 else "%d / 100" % (aff % 100), 16, Color.WHITE, UI.DARK, 3, "body", 900)
 	pv.position = Vector2(20, 120)
 	pv.size = Vector2(316, 20)
 	pv.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -310,7 +310,7 @@ func _gift_popup() -> void :
 			for k in nh:
 				card.add_child(UI.tex(G.icon("heart"), Rect2(cw - 40 - k * 24, 4, 34, 34)))
 			if nh == 0:
-				var okl: = UI.label("ок", 15, Color("bfb3a8"), UI.DARK, 2, "body", 900)
+				var okl: = UI.label("ок", 16, Color("bfb3a8"), UI.DARK, 2, "body", 900)
 				okl.position = Vector2(cw - 36, 8)
 				card.add_child(okl)
 		else:
@@ -405,7 +405,7 @@ func _date_popup() -> void :
 		if V7RoomData.st().photos.get(h, {}).has(pid):
 			var ph: = UI.rbox("glass", Rect2(cw - 70, 10, 58, 32), 12, 2, 4)
 			card.add_child(ph)
-			ph.add_child(UI.center_label(UI.label("фото", 14, Color("ffe7a6"), UI.DARK, 2, "body", 900), Rect2(0, 0, 58, 32)))
+			ph.add_child(UI.center_label(UI.label("фото", 16, Color("ffe7a6"), UI.DARK, 2, "body", 900), Rect2(0, 0, 58, 32)))
 		card.gui_input.connect( func(e):
 			if e is InputEventMouseButton and e.pressed:
 				Sfx.play("pop")
@@ -541,7 +541,7 @@ func _scenes_popup() -> void :
 		if open and not seen:
 			var nb: = UI.rbox("red", Rect2(632 - 86, -10, 80, 28), 14, 2, 4)
 			row.add_child(nb)
-			nb.add_child(UI.center_label(UI.label("НОВОЕ", 14, Color.WHITE, Color("6a1020"), 2, "body", 900), Rect2(0, 0, 80, 28)))
+			nb.add_child(UI.center_label(UI.label("НОВОЕ", 16, Color.WHITE, Color("6a1020"), 2, "body", 900), Rect2(0, 0, 80, 28)))
 		row.gui_input.connect( func(e):
 			if e is InputEventMouseButton and e.pressed:
 				if not open:

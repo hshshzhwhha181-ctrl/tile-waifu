@@ -112,14 +112,14 @@ func _build_left() -> void :
 # «Рейтинг» uses the trophy too, so it gets a small quarter-place plate to tell it apart from «Поручения».
 func _rating_mark(b: Control) -> void :
 	var q: = _league_call("my_quarter")
-	# 0.8: no «#1 001» to a new player who has not opened the quarter table yet
-	var txt: = "#%s" % UI.fmt(int(q.place)) if q.has("place") and G.S.get("v8_q_seen", false) else "топ-100"
-	var fw: float = UI.font("body", 900).get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, 14).x + 14.0
-	var pl: = UI.rbox("gold", Rect2(84 - fw + 12, -6, fw, 22), 11, 2, 3)
+	# 0.8: the same rule as the victory window, profile and Режимы (V8League.quarter_shown): no «#1 001»
+	var txt: = "#%s" % UI.fmt(int(q.place)) if V8League.quarter_shown(q) else "топ-100"
+	var fw: float = UI.font("body", 900).get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x + 16.0
+	var pl: = UI.rbox("gold", Rect2(84 - fw + 14, -8, fw, 24), 12, 2, 3)
 	pl.colors(Color("fae4a6"), Color("c38f3c"))
 	pl.set_param("shadow_color", Color(0, 0, 0, 0.3))
 	b.add_child(pl)
-	pl.add_child(UI.center_label(UI.label(txt, 14, Color("3a2410"), Color(1, 1, 1, 0.4), 1, "body", 900), Rect2(0, 0, fw, 22)))
+	pl.add_child(UI.center_label(UI.label(txt, 16, Color("3a2410"), Color(1, 1, 1, 0.4), 1, "body", 900), Rect2(0, 0, fw, 24)))
 
 func refresh_badges() -> void :
 	for k in side_btns:
@@ -242,7 +242,7 @@ func _build_right() -> void :
 		if ev.daily != V7EventData.today_key():
 			var x2: = UI.rbox("red", Rect2(CARD_W - 66, 44, 64, 26), 13, 2, 4)
 			c1.add_child(x2)
-			x2.add_child(UI.center_label(UI.label("×2", 15, Color.WHITE, Color("6a1020"), 2, "body", 900), Rect2(0, 0, 64, 26)))
+			x2.add_child(UI.center_label(UI.label("×2", 16, Color.WHITE, Color("6a1020"), 2, "body", 900), Rect2(0, 0, 64, 26)))
 		c1.gui_input.connect( func(e):
 			if e is InputEventMouseButton and e.pressed:
 				Sfx.play("pop")

@@ -279,7 +279,7 @@ func settings() -> void :
 	var eg: = UI.label("Тайники найдены: %d из %d" % [V7Eggs.found_count(), V7Eggs.total()], 18, Color("d9c4e6"))
 	eg.position = Vector2(34, 820)
 	p.add_child(eg)
-	var vl: = UI.label(V6Txt.s("title.version") % G.version(), 15, Color(1, 1, 1, 0.45))
+	var vl: = UI.label(V6Txt.s("title.version") % G.version(), 16, Color(1, 1, 1, 0.45))
 	vl.position = Vector2(34, 852)
 	vl.size = Vector2(592, 24)
 	vl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
@@ -795,7 +795,8 @@ func leave_match() -> void :
 	if screen_id == "v7play" and pm is String and pm == "v7tourney":
 		to = "v7tourney"
 	var over = screen.get("_v8_over")
-	if over is bool and over:
+	var saved = screen.get("_v8_saved")
+	if (over is bool and over) or (saved is bool and saved):
 		go(to)
 		return
 	var sc: = screen

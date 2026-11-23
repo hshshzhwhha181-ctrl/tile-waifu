@@ -80,16 +80,24 @@ static func st() -> Dictionary:
 	var t: Dictionary = r.tour
 	var wd: = week_day()
 	var wk: = week_key(wd)
-	if not t.is_empty() and int(t.get("v8", 0)) < 1:
+	var migrating: = not t.is_empty() and int(t.get("v8", 0)) < 1
+	if migrating:
 		t["league"] = clampi(int(t.get("league", 0)), 0, LEAGUES.size() - 1)
 		t["v8"] = 1
 	var ls: = V8League.state()
+	# 0.8: the first week is the first week played in 0.8 (the current one), also for a 0.7 player whose last
+	# tournament week is stale: that week is protected from demotion, and so is the settling of the 0.7 week
 	if String(ls.first_week) == "":
-		ls.first_week = String(t.get("week", "")) if String(t.get("week", "")) != "" else wk
+		ls.first_week = wk
 	if t.get("week", "") != wk:
 		var league: = int(t.get("league", 0))
 		if t.get("week", "") != "":
+			# the 0.7 week is settled as a first week too (zone_in shows no «down» for it)
+			var keep: = String(ls.first_week)
+			if migrating:
+				ls.first_week = String(t.get("week", ""))
 			league = _settle(r, t)
+			ls.first_week = keep
 		t = {"week": wk, "start": wd, "league": league, "group": V8League.group_seed(), "best": [0, 0, 0], "runs": 0, 
 			"best_place": 0, "history": t.get("history", []), "v8": 1}
 		r.tour = t

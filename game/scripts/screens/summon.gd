@@ -81,7 +81,7 @@ func _build_banner() -> void :
 		if bb.get("newbie", false):
 			var sale: = UI.rbox("red", Rect2(tw - 62, -14, 70, 28), 12, 2, 4)
 			tb.add_child(sale)
-			sale.add_child(UI.center_label(UI.label("−20%", 15, Color.WHITE, Color("6a1020"), 3), Rect2(0, 0, 70, 28)))
+			sale.add_child(UI.center_label(UI.label("−20%", 16, Color.WHITE, Color("6a1020"), 3), Rect2(0, 0, 70, 28)))
 
 	var cr: = Rect2(24, TOP, W - 48, H - 132 - TOP - 196)
 	var frame: = UI.rbox("gold", cr, 30, 6, 16)
@@ -129,7 +129,7 @@ func _build_banner() -> void :
 	var g_text: = V6Txt.s("summon.guar_on") if G.S.guar else V6Txt.s("summon.guar_off")
 	if newbie:
 		g_text = V6Txt.s("summon.newbie_left") % int(G.S.newbie_left)
-	var rl: = UI.label(rules + "\n" + g_text, 15, Color("f4e6ff"), Color(0.2, 0.05, 0.2), 2)
+	var rl: = UI.label(rules + "\n" + g_text, 16, Color("f4e6ff"), Color(0.2, 0.05, 0.2), 2)
 	rl.position = Vector2(18, 124)
 	ip.add_child(rl)
 	if not newbie:
@@ -369,22 +369,27 @@ func _card(r: Dictionary, sz: Vector2) -> Control:
 	am.set_shader_parameter("holo", 0.6 if r.rar == "SSR" else 0.0)
 	am.set_shader_parameter("bottom_shade", 0.8)
 	front.add_child(art)
-	var fs: = 14 if sz.x < 200 else 26
+	var fs: = 16 if sz.x < 200 else 26
 	var rl: = UI.label(r.rar, fs + 8, Color.WHITE, col.darkened(0.5), 5, "title" if fs + 8 >= UI.TITLE_MIN else "body", 900)
 	rl.position = Vector2(8, 2)
 	front.add_child(rl)
 	var nl: = UI.label(r.name, fs, Color.WHITE, Color(0.2, 0.05, 0.2), 4, "body", 900)
 	# autowrap first: with it off, the label's minimum width is the whole line and size.x would grow past the card
-	nl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	nl.position = Vector2(6, sz.y - (44 if sz.x < 200 else 80))
-	nl.size = Vector2(sz.x - 12, 40 if sz.x < 200 else 70)
+	# 0.8: 16 px on the small cards too; word-bound wrapping only, the label as wide as the longest word
+	nl.autowrap_mode = TextServer.AUTOWRAP_WORD
+	var nw: = maxf(sz.x - 12.0, UI.longest_word_w(r.name, fs, "body", 900, 4) + 2.0)
+	nl.custom_minimum_size = Vector2(nw, 0)
+	nl.position = Vector2((sz.x - nw) * 0.5, sz.y - (50 if sz.x < 200 else 80))
+	nl.size = Vector2(nw, 46 if sz.x < 200 else 70)
 	nl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	nl.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
 	front.add_child(nl)
 	if r.get("new", false):
-		var nb: = UI.rbox("red", Rect2(sz.x - 84, -10, 90, 28), 13, 2, 4)
+		# 0.8: on the small cards the badge sits above the top edge, clear of the rarity tag («SSR», top-left)
+		var nr: = Rect2(sz.x - 74, -25, 80, 26) if sz.x < 200 else Rect2(sz.x - 84, -10, 90, 28)
+		var nb: = UI.rbox("red", nr, 13, 2, 4)
 		front.add_child(nb)
-		nb.add_child(UI.center_label(UI.label(V6Txt.s("common.new"), 15, Color.WHITE, Color("6a1020"), 2, "body", 900), Rect2(0, 0, 90, 28)))
+		nb.add_child(UI.center_label(UI.label(V6Txt.s("common.new"), 16, Color.WHITE, Color("6a1020"), 2, "body", 900), Rect2(Vector2.ZERO, nr.size)))
 	return c
 
 func _flip(c: Control, r: Dictionary) -> void :

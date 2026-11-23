@@ -94,6 +94,15 @@ static func label(text: String, size: = 28, color: = INK, outline: = Color(0, 0,
 	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	return l
 
+# width of the longest word of `text` at `size` px (plus the outline on both sides): a wrapped caption must be
+# at least this wide, or the line breaker cuts the word in the middle («Императриц / а»)
+static func longest_word_w(text: String, size: int, kind: = "body", weight: = 800, outline: = 0) -> float:
+	var f: = font_for(kind, size, weight)
+	var m: = 0.0
+	for w in text.replace("\n", " ").split(" ", false):
+		m = maxf(m, f.get_string_size(w, HORIZONTAL_ALIGNMENT_LEFT, -1, size).x)
+	return m + outline * 2.0
+
 static func title(text: String, size: = 44, color: = Color.WHITE, outline: = Color("b8406c")) -> Label:
 	return label(text, size, color, outline, max(6, size / 5), "title", 900)
 

@@ -210,10 +210,10 @@ static func chip(parent: Control, icon: Texture2D, text: String, rect: Rect2, pa
 	if icon:
 		b.add_child(UI.tex(icon, Rect2(-6, -8, rect.size.y + 16, rect.size.y + 16)))
 		x0 = rect.size.y + 8
-	# 0.8: shrink a long line to fit the pill (down to 14 px), never run past its border
+	# 0.8: shrink a long line to fit the pill (down to 16 px), then trim; never run past its border
 	var avail: = rect.size.x - x0 - 12.0
 	var fnt: = UI.font("body", 900)
-	while fsize > 14 and fnt.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, fsize).x > avail:
+	while fsize > 16 and fnt.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, fsize).x > avail:
 		fsize -= 1
 	var l: = UI.label(text, fsize, Color.WHITE if pal in ["plum", "pink", "lav", "red"] else UI.INK, Color(0.2, 0.05, 0.2, 0.9) if pal in ["plum", "pink", "lav", "red"] else Color.WHITE, 3, "body", 900)
 	l.position = Vector2(x0, 0)
@@ -313,7 +313,7 @@ static func skin_picker(main, on_done: Callable) -> void :
 		var nm: = UI.center_label(UI.label(it.name.replace("Фишки ", ""), 17, Color.WHITE, Color(0.1, 0.05, 0.2), 3, "body", 900), Rect2(0, 158, 190, 26))
 		card.add_child(nm)
 		var how: = V6Txt.s("skins.on") if on else (V6Txt.s("skins.pick") if own else G.skin_source(it.id))
-		var st: = UI.center_label(UI.label(how, 14, Color("ffd34d") if on else Color("d9c4e6")), Rect2(0, 184, 190, 22))
+		var st: = UI.center_label(UI.label(how, 16, Color("ffd34d") if on else Color("d9c4e6")), Rect2(0, 184, 190, 22))
 		card.add_child(st)
 		card.gui_input.connect( func(e):
 			if e is InputEventMouseButton and e.pressed:

@@ -69,8 +69,11 @@ func _build_strip() -> void :
 		l.position = Vector2(70, 6)
 		p.add_child(l)
 		var bonus: = "Героиня ивента рядом: +50%" if partner == def.hero else "С героиней ивента (%s) +50%%" % G.HEROES[def.hero].name
-		info_lbl = UI.label(bonus, 15, Color("a9d9c4") if partner == def.hero else Color("c9bdb0"))
-		info_lbl.position = Vector2(72, 34)
+		info_lbl = UI.label(bonus, 16, Color("a9d9c4") if partner == def.hero else Color("c9bdb0"))
+		info_lbl.position = Vector2(72, 33)
+		info_lbl.size = Vector2(strip.size.x - 72 - 150, 24)
+		info_lbl.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		info_lbl.clip_text = true
 		p.add_child(info_lbl)
 		score_lbl2 = UI.label("%d" % V7EventData.cur(), 24, Color.WHITE, UI.DARK, 4, "body", 900)
 		score_lbl2.position = Vector2(strip.size.x - 150, 0)
@@ -82,11 +85,11 @@ func _build_strip() -> void :
 		var t: = V7Ladder.st()
 		var L: Dictionary = V7Ladder.LEAGUES[int(t.league)]
 		p.add_child(UI.tex(G.icon("trophy"), Rect2(8, 4, 56, 56)))
-		var l: = UI.label("ОЧКИ", 13, Color("cbb5dc"), Color.WHITE, 0, "body", 900)
-		l.position = Vector2(72, 6)
+		var l: = UI.label("ОЧКИ", 16, Color("cbb5dc"), Color.WHITE, 0, "body", 900)
+		l.position = Vector2(72, 0)
 		p.add_child(l)
 		score_lbl2 = UI.label("0", 28, Color.WHITE, UI.DARK, 4, "body", 900)
-		score_lbl2.position = Vector2(72, 20)
+		score_lbl2.position = Vector2(72, 22)
 		score_lbl2.pivot_offset = Vector2(20, 18)
 		p.add_child(score_lbl2)
 		info_lbl = UI.label("Лучший: %d · %s" % [int(t.best[table_k]), L.short], 17, L.color, UI.DARK, 3, "body", 900)
@@ -198,6 +201,9 @@ func _event_clear() -> void :
 	if not is_inside_tree():
 		return
 	var root: = _overlay()
+	# 0.8 (spec 5): one column on a backing plate, the event heroine beside it (as the Path victory)
+	var vh: = _v8_result_hero(root, String(def.hero))
+	var plate: = _v8_result_plate(root)
 	var rib: = Common.ribbon(root, "Стол %d пройден" % (node_i + 1), Rect2(W * 0.5 - 250, 56, 500, 96), "pink", 40)
 	UI.pop_in(rib, 0.05, 0.4)
 	var srow: = []
@@ -208,19 +214,27 @@ func _event_clear() -> void :
 	# 0.8 (spec 5): under the stars, the rule they follow (the event allows one overflow for 2★)
 	var srt: String = V8PlayRules.T.star_rule_event
 	var srs: = 17
-	while srs > 13 and UI.font("body", 800).get_string_size(srt, HORIZONTAL_ALIGNMENT_LEFT, -1, srs).x > W - 48:
-		srs -= 1
-	root.add_child(UI.center_label(UI.label(srt, srs, UI.MUTED, UI.DARK, 2, "body", 800), Rect2(20, 290, W - 40, 26)))
-	var y: = 326.0
-	var panel: = UI.rbox("glass", Rect2(40, y, W - 80, 66 + rw.parts.size() * 36), 26, 3, 10)
+	if UI.font("body", 800).get_string_size(srt, HORIZONTAL_ALIGNMENT_LEFT, -1, srs).x > W - 80:
+		srs = 16
+	var srl: = UI.label(srt, srs, UI.MUTED, UI.DARK, 2, "body", 800)
+	if UI.font("body", 800).get_string_size(srt, HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x > W - 80:
+		# two lines at 16 px rather than one line under 16 px
+		srs = 16
+		srl = UI.label(srt.replace(" · ", "\n"), srs, UI.MUTED, UI.DARK, 2, "body", 800)
+	var srh: = 46.0 if "\n" in srl.text else 26.0
+	root.add_child(UI.center_label(srl, Rect2(40, 288, W - 80, srh)))
+	var y: = 290.0 + srh + 8.0
+	# one source of drops: the total says it all (no «Стол +66» under «+66 Лунные капли»)
+	var parts: Array = rw.parts if rw.parts.size() > 1 else []
+	var panel: = UI.rbox("glass", Rect2(40, y, W - 80, 66 + parts.size() * 36 + (8 if parts.size() > 0 else 0)), 26, 3, 10)
 	panel.borders(Color("ffe7a6"), Color("c58a2c"))
 	root.add_child(panel)
 	panel.add_child(UI.tex(V7Event.cur_icon(def), Rect2(16, 8, 54, 54)))
 	var tl: = UI.label("+%d  %s" % [int(rw.total), def.cur], 28, Color("ffe7a6"), UI.DARK, 4, "body", 900)
 	tl.position = Vector2(80, 12)
 	panel.add_child(tl)
-	for k in rw.parts.size():
-		var pr: Array = rw.parts[k]
+	for k in parts.size():
+		var pr: Array = parts[k]
 		var a: = UI.label(String(pr[0]), 18, Color("ddd2c4"))
 		a.position = Vector2(30, 64 + k * 36)
 		panel.add_child(a)
@@ -250,15 +264,17 @@ func _event_clear() -> void :
 		bub.add_child(bl)
 		UI.slide_in(bub, Vector2(0, 30), 0.8)
 		y += 132
+	_v8_result_close(plate, vh, String(def.hero), y)
 	var nxt: = node_i + 1
 	var has_next: = nxt < V7EventData.NODES
 	var bw: = (W - 100) * 0.5
-	var b1: = JButton.make("Следующий стол" if has_next else "Ещё раз", "pink", Rect2(40, H - 200, bw, 96), null, 26)
+	# 0.8: main action (pink) on the right under the thumb
+	var b1: = JButton.make("Следующий стол" if has_next else "Ещё раз", "pink", Rect2(60 + bw, H - 200, bw, 96), null, 26)
 	b1.shine_every = 2.2
 	b1.pressed.connect( func():
 		main.go("v7play", {"mode": "v7event", "node": nxt if has_next else node_i, "partner": partner, "retry": randi()}))
 	root.add_child(b1)
-	var b2: = JButton.make("К карте ивента", "glass", Rect2(60 + bw, b1.position.y, bw, 96), null, 24)
+	var b2: = JButton.make("К карте ивента", "glass", Rect2(40, b1.position.y, bw, 96), null, 24)
 	b2.pressed.connect( func(): main.go("v7event"))
 	root.add_child(b2)
 	Fx.burst(root, Vector2(W * 0.5, 300), "confetti", 60, Color.WHITE, 1.1)
@@ -300,6 +316,8 @@ func _tour_finish(cleared: bool) -> void :
 	if not is_inside_tree():
 		return
 	var root: = _overlay()
+	var vh: = _v8_result_hero(root, partner)
+	var plate: = _v8_result_plate(root)
 	var rib: = Common.ribbon(root, "Стол очищен" if cleared else "Партия окончена", Rect2(W * 0.5 - 250, 56, 500, 96), "gold" if cleared else "pink", 38)
 	UI.pop_in(rib, 0.05, 0.4)
 	var big: = UI.center_label(UI.title(str(total), 88, Color("ffe7a6"), UI.DARK), Rect2(0, 160, W, 110))
@@ -340,11 +358,12 @@ func _tour_finish(cleared: bool) -> void :
 	root.add_child(UI.center_label(UI.label(pl, 24, zc, UI.DARK, 3, "body", 900), Rect2(0, y, W, 36)))
 	y += 46
 	y = _v8_result_rank(root, y, maxi(0, int(res.best) - int(res.old)))
+	_v8_result_close(plate, vh, partner, y)
 	var bw: = (W - 100) * 0.5
-	var b1: = JButton.make("Ещё раз", "pink", Rect2(40, H - 200, bw, 96), null, 28)
+	var b1: = JButton.make("Ещё раз", "pink", Rect2(60 + bw, H - 200, bw, 96), null, 28)
 	b1.pressed.connect( func(): main.go("v7play", {"mode": "v7tourney", "table": table_k, "partner": partner, "retry": randi()}))
 	root.add_child(b1)
-	var b2: = JButton.make("К турниру", "glass", Rect2(60 + bw, b1.position.y, bw, 96), null, 26)
+	var b2: = JButton.make("К турниру", "glass", Rect2(40, b1.position.y, bw, 96), null, 26)
 	b2.pressed.connect( func(): main.go("v7tourney"))
 	root.add_child(b2)
 	if res.improved:
@@ -355,6 +374,34 @@ func _tour_finish(cleared: bool) -> void :
 			_animate_rank(_v8_rank_box)
 
 var _v8_rank_box: Control = null
+
+# 0.8 (spec 5): result windows of the event and the tournament share the Path victory layout: the heroine
+# behind, a backing plate under the ribbon, the content in one column on it, the buttons at the bottom.
+func _v8_result_hero(root: Control, hid: String) -> Hero:
+	if not Hero.RIGS.has(hid):
+		hid = partner if Hero.RIGS.has(partner) else "mc"
+	var vh: = Hero.new().setup(hid, V8_HERO_H)
+	vh.position = Vector2(W * 0.74, H + V8_HERO_DROP)
+	vh.interactive = false
+	vh.visible = false
+	root.add_child(vh)
+	return vh
+
+func _v8_result_plate(root: Control) -> RBox:
+	var plate: = UI.rbox("cream", Rect2(24, 150, W - 48, 200), 34, 5, 14)
+	plate.set_param("pattern", 1.0)
+	plate.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	root.add_child(plate)
+	return plate
+
+func _v8_result_close(plate: RBox, vh: Hero, hid: String, y: float) -> void :
+	plate.size.y = maxf(200.0, y - plate.position.y + 8.0)
+	if not Hero.RIGS.has(hid):
+		hid = partner if Hero.RIGS.has(partner) else "mc"
+	vh.visible = true
+	_v8_place_hero(vh, hid, plate.position.y + plate.size.y, H - 200.0)
+	if vh.visible:
+		vh.react("big")
 
 # 0.8 (spec 5): the same rank bar (was / now, +N, «Новый ранг» inside) and weekly-league / quarter row as the
 # Path victory window, under the result content. Returns the y under it.

@@ -138,7 +138,7 @@ func _build_chip() -> void :
 	chip.add_child(ring)
 	var av: = Common.avatar(h, Rect2(6, 6, r.size.x - 12, r.size.y - 12), "gold")
 	chip.add_child(av)
-	chip_val = UI.label("", 14, Color.WHITE, col.darkened(0.6), 4, "body", 900)
+	chip_val = UI.label("", 16, Color.WHITE, col.darkened(0.6), 4, "body", 900)
 	chip_val.position = Vector2(r.size.x - 22, -8)
 	chip_val.size = Vector2(30, 22)
 	chip_val.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER

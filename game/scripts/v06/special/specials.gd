@@ -247,13 +247,15 @@ func _intro_new() -> void :
 func _card(kind: String) -> void :
 	var W: float = play.size.x
 	var H: float = play.size.y
-	# 0.8: above the action buttons (they start at H - 172), like the intro tip
+	# 0.8: in the band of the action buttons under the table (play.v8_bottom_card), like the intro tip
 	var c: = UI.rbox("cream", Rect2(20, H - 186 - 112, W - 40, 112), 24, 3, 10)
 	c.add_to_group("v6_tip")
 	c.set_param("border_top", Color("ffe7a6")).set_param("border_bottom", Color("c58a2c"))
 	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	c.z_index = 35
 	play.add_child(c)
+	if play.has_method("v8_bottom_card"):
+		play.v8_bottom_card(c)
 
 	var holder: = Node2D.new()
 	holder.position = Vector2(64, 56)
@@ -301,7 +303,7 @@ func _on_special(kind: String, d: Dictionary) -> void :
 			var t: Tile = d.tile
 			var p: Vector2 = board.tile_layer.get_global_transform_with_canvas() * t.position
 			var s: Dictionary = board.spec.get(t, {})
-			var txt: = "Нужен ключ" if d.kind == "lock" else "Ещё %d пар" % int(s.get("n", 0))
+			var txt: = "Нужен ключ" if d.kind == "lock" else "Ещё %d %s" % [int(s.get("n", 0)), V8PlayRules.plural(int(s.get("n", 0)), "пара", "пары", "пар")]
 			Fx.float_text(_fx(), p + Vector2(0, -30), txt, Color("ffe7a6"), 24, Color("3f1a3a"))
 		"unlock":
 			Fx.float_text(_fx(), d.pos + Vector2(0, -40), "Замки открыты!", V6SpecIcon.group_color(int(d.group)).lightened(0.3), 32, Color("3f1a3a"))
@@ -435,7 +437,10 @@ func _open_box(pos: Vector2) -> void :
 			txt = "Умение готово"
 			if "skill_ready" in play and not play.skill_ready and play.has_method("_skill_ready"):
 				play.skill_charge = int(play.SKILL_NEED) if "SKILL_NEED" in play else 8
-				play._skill_ready()
+				# 0.8: the heroine says «… готово» once the reward float has faded, not at the same moment
+				get_tree().create_timer(1.6).timeout.connect( func():
+					if is_instance_valid(play) and play.is_inside_tree() and not play.skill_ready and not bool(play.get("_v8_over")):
+						play._skill_ready())
 			else:
 				_gems(40, pos)
 				txt = "40 кристаллов"
@@ -450,6 +455,13 @@ func _open_box(pos: Vector2) -> void :
 			txt = "Звёздный миг: 8 с ×2"
 			_starfall(8.0, 1.0, false)
 
+	# 0.8: a gift opened in the tray shows its reward over the top of the table and floats down into it,
+	# never up into the HUD band (goal plate, luck chip, gem counter)
+	var top: float = play.board_rect.position.y if "board_rect" in play else 0.0
+	var rise: = 90.0
+	if pos.y < top + 60.0:
+		pos = Vector2(clampf(pos.x, 160.0, play.size.x - 160.0), top + 70.0)
+		rise = -40.0
 	var box: = TextureRect.new()
 	box.texture = G.icon("gift")
 	box.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -481,17 +493,37 @@ func _open_box(pos: Vector2) -> void :
 		rw.z_index = 46
 		play.add_child(rw)
 		var r: Tween = rw.create_tween()
-		r.tween_property(rw, "position:y", rw.position.y - 90, 0.5).set_trans(Tween.TRANS_QUART).set_ease(Tween.EASE_OUT)
+		r.tween_property(rw, "position:y", rw.position.y - rise, 0.5).set_trans(Tween.TRANS_QUART).set_ease(Tween.EASE_OUT)
 		r.parallel().tween_property(rw, "scale", Vector2(1.2, 1.2), 0.25)
 		r.tween_interval(0.4)
 		r.tween_property(rw, "modulate:a", 0.0, 0.3)
 		r.tween_callback(rw.queue_free)
-		Fx.float_text(_fx(), pos + Vector2(0, -30), txt, Color("ffe7a6"), 28, Color("7a2346")))
+		if rise < 0.0:
+			_float_down(pos + Vector2(0, 60), txt)
+		else:
+			Fx.float_text(_fx(), pos + Vector2(0, -30), txt, Color("ffe7a6"), 28, Color("7a2346")))
 	t.tween_property(box, "scale", Vector2(1.6, 1.6), 0.12)
 	t.parallel().tween_property(box, "modulate:a", 0.0, 0.12)
 	t.tween_callback(box.queue_free)
 	# 0.8: the reward floats up from the box itself; no toast saying the same over the HUD
 	_refresh()
+
+
+func _float_down(at: Vector2, txt: String) -> void :
+	var l: = UI.label(txt, 28, Color("ffe7a6"), Color("7a2346"), 8, "body", 900)
+	l.position = at - Vector2(150, 30)
+	l.size = Vector2(300, 60)
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	l.pivot_offset = Vector2(150, 30)
+	l.scale = Vector2(0.3, 0.3)
+	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_fx().add_child(l)
+	var t: Tween = l.create_tween()
+	t.tween_property(l, "scale", Vector2(1.15, 1.15), 0.18).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	t.tween_property(l, "scale", Vector2.ONE, 0.1)
+	t.parallel().tween_property(l, "position:y", l.position.y + 40, 0.9).set_trans(Tween.TRANS_QUART).set_ease(Tween.EASE_OUT)
+	t.tween_property(l, "modulate:a", 0.0, 0.25)
+	t.tween_callback(l.queue_free)
 
 
 func _fire_event() -> void :

@@ -283,7 +283,7 @@ func _world_gate(w: int) -> void :
 	if L.fx == "rain":
 		var ev: = UI.rbox("pink", Rect2(g.size.x - 130, -16, 120, 34), 14, 3, 6)
 		g.add_child(ev)
-		ev.add_child(UI.center_label(UI.label("СОБЫТИЕ", 15, Color.WHITE, Color("7a2346"), 3), Rect2(0, 0, 120, 34)))
+		ev.add_child(UI.center_label(UI.label("СОБЫТИЕ", 16, Color.WHITE, Color("7a2346"), 3), Rect2(0, 0, 120, 34)))
 
 
 func _node_root(p: Vector2, sz: Vector2, pivot: Vector2) -> Control:
@@ -338,9 +338,9 @@ func _level_node(it: Dictionary) -> Control:
 			s.rotation = [-0.25, 0.0, 0.25][q]
 			c.add_child(s)
 	if hard > 0 and not locked:
-		var chip: = UI.rbox("red" if hard == 1 else "lav", Rect2(14, 122, 100, 28), 14, 2, 4)
+		var chip: = UI.rbox("red" if hard == 1 else "lav", Rect2(6, 122, 116, 28), 14, 2, 4)
 		c.add_child(chip)
-		chip.add_child(UI.center_label(UI.label("СЛОЖНО" if hard == 1 else "ОЧЕНЬ", 14, Color.WHITE, Color(0.3, 0.05, 0.15), 3, "body", 900), Rect2(0, 0, 100, 28)))
+		chip.add_child(UI.center_label(UI.label("СЛОЖНО" if hard == 1 else "ОЧЕНЬ", 16, Color.WHITE, Color(0.3, 0.05, 0.15), 3, "body", 900), Rect2(0, 0, 116, 28)))
 	if i == cur:
 		var t: Tween = c.create_tween().set_loops()
 		t.tween_property(c, "scale", Vector2(1.08, 1.08), 0.6).set_trans(Tween.TRANS_SINE)
@@ -752,7 +752,7 @@ func open_card(i: int) -> void :
 		rx += 66.0
 	var sh_h: String = lv.shard
 	p.add_child(Common.avatar(sh_h, Rect2(rx, y - 2, 56, 56), "pink"))
-	var shl: = UI.label("осколок\n%s" % G.HEROES[sh_h].name, 15, UI.INK, UI.DARK, 2, "body", 900)
+	var shl: = UI.label("осколок\n%s" % G.HEROES[sh_h].name, 16, UI.INK, UI.DARK, 2, "body", 900)
 	shl.position = Vector2(rx + 62, y)
 	p.add_child(shl)
 

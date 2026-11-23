@@ -48,24 +48,27 @@ func setup(p) -> V7Combo:
 	_sb_pill.set_border_width_all(3)
 	_sb_pill.shadow_size = 10
 	_sb_fill.set_corner_radius_all(22)
+	# 0.8: the pill lives in the HUD row under the goal plate (PILL_RECT), with its milestone line inside it,
+	# so it never covers a tile row of the table
 	pill = Control.new()
 	pill.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	pill.size = Vector2(300, 58)
+	pill.size = PILL_RECT.size
 	pill.pivot_offset = pill.size * 0.5
 	pill.visible = false
 	add_child(pill)
-	pill_lbl = UI.label("", 30, Color.WHITE, Color(0.1, 0.03, 0.12), 6, "title", 900)
+	pill_lbl = UI.label("", 26, Color.WHITE, Color(0.1, 0.03, 0.12), 5, "title", 900)
 	pill_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	pill_lbl.position = Vector2(0, 4)
-	pill_lbl.size = Vector2(300, 50)
+	pill_lbl.position = Vector2(0, -1)
+	pill_lbl.size = Vector2(PILL_RECT.size.x, 32)
 	pill_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	pill_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	pill.add_child(pill_lbl)
-	pill_sub = UI.label("", 17, Color("ffe7a6"), Color(0.1, 0.03, 0.12), 4, "body", 900)
+	pill_sub = UI.label("", 16, Color("ffe7a6"), Color(0.1, 0.03, 0.12), 4, "body", 900)
 	pill_sub.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	pill_sub.position = Vector2(0, 54)
-	pill_sub.size = Vector2(300, 24)
+	pill_sub.position = Vector2(0, 29)
+	pill_sub.size = Vector2(PILL_RECT.size.x, 22)
 	pill_sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	pill_sub.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	pill.add_child(pill_sub)
 	return self
 
@@ -170,12 +173,27 @@ func _draw() -> void :
 			_sb_fill.bg_color = Color(col.r, col.g, col.b, 0.42 * pill.modulate.a)
 			draw_style_box(_sb_fill, ir)
 
-# 0.8: the pill keeps the left side of the band under the tray; the right side under the portrait is the
-# heroine's speech bubble (see the layout note in play.gd)
+# 0.8: the pill sits in the HUD row between the gem counter and the passive chip and covers the note slot
+# while a combo runs; see the layout note in play.gd
+const PILL_RECT: = Rect2(132, 121, 266, 54)
+
 func _place_pill() -> void :
-	var r: = _frame_rect()
-	pill.position = Vector2(20.0, r.position.y - pill.size.y * 0.55)
-	pill.position.y = maxf(pill.position.y, 300.0)
+	pill.position = PILL_RECT.position
+
+func _fit_title() -> void :
+	var room: = PILL_RECT.size.x - 24.0
+	var f: = UI.font("title", 900)
+	var fs: = 26
+	while fs > 24 and f.get_string_size(pill_lbl.text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > room:
+		fs -= 1
+	if f.get_string_size(pill_lbl.text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > room:
+		# Playfair only from 24 px: a long tier name goes to Nunito instead of a smaller Playfair
+		f = UI.font("body", 900)
+		fs = 24
+		while fs > 18 and f.get_string_size(pill_lbl.text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > room:
+			fs -= 1
+	pill_lbl.add_theme_font_override("font", f)
+	pill_lbl.add_theme_font_size_override("font_size", fs)
 
 func _pill_in() -> void :
 	_place_pill()
@@ -210,6 +228,7 @@ func on_match(mid: Vector2, n: int, gain: int) -> void :
 		_pill_in()
 	_place_pill()
 	pill_lbl.text = "×%d · %s" % [n, t[1]]
+	_fit_title()
 	pill_lbl.add_theme_color_override("font_color", col.lightened(0.35))
 	var mult: = 1 + (n - 1) / 2
 	if G.time >= sub_hold_until:

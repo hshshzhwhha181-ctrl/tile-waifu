@@ -354,7 +354,7 @@ func _fill_sets() -> float:
 			card.add_child(rl)
 			card.add_child(UI.center_label(UI.label(it.name.replace("Фишки ", ""), 17, UI.INK if not on else Color("3a2410"), UI.DARK if not on else Color(1, 0.95, 0.8, 0.5), 3, "body", 900), Rect2(0, 182, cw, 26)))
 			var how: = "Выбран" if on else ("Играть им" if own else G.skin_source(it.id))
-			var hl: = UI.label(how, 13, Color("3a2410") if on else (UI.GOLD if own else UI.MUTED), Color(0, 0, 0, 0), 0, "body", 800)
+			var hl: = UI.label(how, 16, Color("3a2410") if on else (UI.GOLD if own else UI.MUTED), Color(0, 0, 0, 0), 0, "body", 800)
 			hl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 			hl.position = Vector2(6, 208)
 			hl.size = Vector2(cw - 12, 38)
@@ -417,7 +417,7 @@ func _fill_tables() -> float:
 			how = "Закреплён"
 		elif not unl:
 			how = _table_lock(tb)
-		var hl: = UI.label(how, 14, Color("3a2410") if on else (UI.MUTED if unl else Color("c9a0aa")), Color(0, 0, 0, 0), 0)
+		var hl: = UI.label(how, 16, Color("3a2410") if on else (UI.MUTED if unl else Color("c9a0aa")), Color(0, 0, 0, 0), 0)
 		hl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		hl.position = Vector2(8, 198)
 		hl.size = Vector2(cw - 16, 52)

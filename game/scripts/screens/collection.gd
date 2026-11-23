@@ -188,13 +188,22 @@ func _build() -> void :
 			var wl: = UI.rbox("pink", Rect2(cw * 0.5 - 36, 38, 72, 26), 13, 2, 4)
 			card.add_child(wl)
 			wl.add_child(UI.center_label(UI.label(V6Txt.s("coll.worn"), 16, Color.WHITE, Color("7a2346"), 3, "body", 900), Rect2(0, 0, 72, 26)))
-		# 0.8: name at 16 px (never smaller), up to three lines inside the card instead of an ellipsis
+		# 0.8: name at 16 px (never smaller), up to three lines inside the card instead of an ellipsis; the label
+		# is at least as wide as the longest word (it may overhang the card edge a little), and wraps on word
+		# bounds only, so a long word is never cut in the middle
 		var nfs: = 16
-		var nl: = UI.label(it.name, nfs, Color.WHITE, Color(0.2, 0.05, 0.2), 4, "body", 800)
-		nl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		nl.custom_minimum_size = Vector2(cw + 4, 0)
-		nl.position = Vector2(-2, 80)
-		nl.size = Vector2(cw + 4, 84)
+		var nwt: = 800
+		var nol: = 4
+		if UI.longest_word_w(it.name, nfs, "body", nwt, nol) > cw + 4.0:
+			# a long word («Императрица»): a lighter weight and a thinner outline before overhanging the card
+			nwt = 700
+			nol = 3
+		var nw: = maxf(cw + 4.0, UI.longest_word_w(it.name, nfs, "body", nwt, nol) + 4.0)
+		var nl: = UI.label(it.name, nfs, Color.WHITE, Color(0.2, 0.05, 0.2), nol, "body", nwt)
+		nl.autowrap_mode = TextServer.AUTOWRAP_WORD
+		nl.custom_minimum_size = Vector2(nw, 0)
+		nl.position = Vector2((cw - nw) * 0.5, 80)
+		nl.size = Vector2(nw, 84)
 		nl.max_lines_visible = 3
 		nl.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 		nl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER

@@ -38,7 +38,7 @@ static func login(main, home) -> void :
 		var today: = ready and k == week_pos
 		var c: = UI.rbox("gold" if big else ("pink" if today else ("cream" if not claimed else "mint")), Rect2(x, 64, cw, 150), 18, 3, 8)
 		p.add_child(c)
-		c.add_child(UI.center_label(UI.label(V6Txt.s("daily.day") % (k + 1), 15, UI.INK if not today else Color.WHITE, Color.WHITE if not today else Color("7a2346"), 3, "body", 900), Rect2(0, 4, cw, 24)))
+		c.add_child(UI.center_label(UI.label(V6Txt.s("daily.day") % (k + 1), 16, UI.INK if not today else Color.WHITE, Color.WHITE if not today else Color("7a2346"), 3, "body", 900), Rect2(0, 4, cw, 24)))
 		c.add_child(UI.tex(_reward_icon(r), Rect2(10, 30, cw - 20, cw - 20)))
 		var amount: int = r.get("gems", r.get("coins", 0))
 		c.add_child(UI.center_label(UI.label(UI.fmt(amount), 18, Color("f2799f") if r.has("gems") else Color("c58a2c"), Color.WHITE, 4, "body", 900), Rect2(0, 108, cw, 30)))
@@ -63,7 +63,7 @@ static func login(main, home) -> void :
 		var mb: = UI.rbox("gold" if got else "glass", Rect2(x - 40, 334, 72, 72), 16, 3, 6)
 		p.add_child(mb)
 		mb.add_child(UI.tex(_reward_icon(mr), Rect2(6, 6, 60, 60)))
-		p.add_child(UI.center_label(UI.label(V6Txt.s("daily.days") % d, 15, UI.INK), Rect2(x - 44, 408, 80, 22)))
+		p.add_child(UI.center_label(UI.label(V6Txt.s("daily.days") % d, 16, UI.INK), Rect2(x - 44, 408, 80, 22)))
 	var note: = UI.center_label(UI.label(V6Txt.s("daily.login_note"), 18, Color("8a5a7a")), Rect2(0, 448, 660, 28))
 	p.add_child(note)
 	var b: = JButton.make(V6Txt.s("common.claim") if ready else V6Txt.s("daily.login_wait"), "gold" if ready else "glass", Rect2(130, 500, 400, 100), null, 32)

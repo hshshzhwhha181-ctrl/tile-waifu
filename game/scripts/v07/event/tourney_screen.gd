@@ -205,7 +205,7 @@ func _tables(t: Dictionary) -> void :
 		var art: = Common.card_art(load("res://assets/bg/%s.webp" % cfg.bg), Rect2(4, 4, bw - 8, 56), Vector2(0.5, 0.5), 1.0, 18)
 		c.add_child(art)
 		c.add_child(UI.center_label(UI.label(["Стол I", "Стол II", "Стол III"][k], 22, Color.WHITE, UI.DARK, 4, "body", 900), Rect2(0, 10, bw, 34)))
-		var feat: = UI.label(V6Layouts.shape_name(cfg.shape) + (" · ★" if k == 2 else ""), 15, Color("ddd2c4"), UI.DARK, 2)
+		var feat: = UI.label(V6Layouts.shape_name(cfg.shape) + (" · ★" if k == 2 else ""), 16, Color("ddd2c4"), UI.DARK, 2)
 		feat.position = Vector2(0, 40)
 		feat.size = Vector2(bw, 22)
 		feat.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -281,7 +281,7 @@ func _divider(text: String, col: Color) -> Control:
 	var c: = Control.new()
 	c.custom_minimum_size = Vector2(W - 48, 26)
 	c.mouse_filter = Control.MOUSE_FILTER_PASS
-	var l: = UI.label(text, 15, col, UI.DARK, 2, "body", 900)
+	var l: = UI.label(text, 16, col, UI.DARK, 2, "body", 900)
 	l.position = Vector2(0, 2)
 	l.size = Vector2(W - 48, 22)
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER

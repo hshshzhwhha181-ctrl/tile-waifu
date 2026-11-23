@@ -96,7 +96,7 @@ static func best_for(lv: Dictionary) -> String:
 static func partner_row(row: Control, h: String, lv: Dictionary) -> void :
 	var d: = info(h)
 	var c: Color = d.col
-	var l: = UI.label("Стиль «%s»: %s" % [d.name, d.desc], 15, c.lightened(0.35), UI.DARK, 3, "body", 900)
+	var l: = UI.label("Стиль «%s»: %s" % [d.name, d.desc], 16, c.lightened(0.35), UI.DARK, 3, "body", 900)
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	l.label_settings.line_spacing = -3
 	l.position = Vector2(132, 104)
@@ -107,7 +107,7 @@ static func partner_row(row: Control, h: String, lv: Dictionary) -> void :
 		var tag: = UI.rbox("gold", Rect2(296, 16, 146, 30), 15, 2, 6)
 		tag.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		row.add_child(tag)
-		tag.add_child(UI.center_label(UI.label("★ для стола", 15, Color("4a2a06"), Color(1, 1, 1, 0.5), 2, "body", 900), Rect2(0, 0, 146, 30)))
+		tag.add_child(UI.center_label(UI.label("★ для стола", 16, Color("4a2a06"), Color(1, 1, 1, 0.5), 2, "body", 900), Rect2(0, 0, 146, 30)))
 		var tw: = tag.create_tween().set_loops()
 		tw.tween_property(tag, "modulate", Color(1.15, 1.1, 0.9), 0.6).set_trans(Tween.TRANS_SINE)
 		tw.tween_property(tag, "modulate", Color.WHITE, 0.6).set_trans(Tween.TRANS_SINE)

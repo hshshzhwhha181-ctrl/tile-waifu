@@ -202,7 +202,9 @@ func _tour_card(r: Rect2) -> Control:
 	card.add_child(il)
 	var ql: = V6ModesData.league("my_quarter")
 	if ql.has("place"):
-		var qt: = UI.label("Квартал: #%s из %s" % [UI.fmt(int(ql.place)), UI.fmt(int(ql.get("total", 1001)))], 17, Color("ddd2c4"), UI.DARK, 2, "body", 800)
+		# 0.8: the same rule as the victory window and profile (V8League.quarter_shown): no «#1 001 из 1 001»
+		var qtxt: = ("Квартал: " + V8League.quarter_place_text(ql)) if V8League.quarter_shown(ql) else V8League.Q_HIDDEN
+		var qt: = UI.label(qtxt, 17, Color("ddd2c4"), UI.DARK, 2, "body", 800)
 		qt.position = Vector2(130, 128)
 		qt.size = Vector2(r.size.x - 150, 24)
 		card.add_child(qt)

@@ -73,7 +73,7 @@ func _header() -> void :
 	card.add_child(shade)
 	var tag: = UI.rbox("pink", Rect2(18, 16, 186, 32), 14, 2, 6)
 	card.add_child(tag)
-	tag.add_child(UI.center_label(UI.label("ИВЕНТ · 2 НЕДЕЛИ", 15, Color.WHITE, Color("3d1624"), 3, "body", 900), Rect2(0, 0, 186, 32)))
+	tag.add_child(UI.center_label(UI.label("ИВЕНТ · 2 НЕДЕЛИ", 16, Color.WHITE, Color("3d1624"), 3, "body", 900), Rect2(0, 0, 186, 32)))
 	var left: = UI.label("До конца: " + V7EventData.left_text(V7EventData.left_secs()), 18, Color("ffd98a"), UI.DARK, 3, "body", 900)
 	left.position = Vector2(216, 16)
 	left.size = Vector2(240, 32)
@@ -98,7 +98,7 @@ func _header() -> void :
 	cur_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	cur_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	cp.add_child(cur_lbl)
-	var cn: = UI.label(def.cur, 14, Color("ddd2c4"), UI.DARK, 2)
+	var cn: = UI.label(def.cur, 16, Color("ddd2c4"), UI.DARK, 2)
 	cn.position = Vector2(r.size.x - 214, 78)
 	cn.size = Vector2(196, 22)
 	cn.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
@@ -279,7 +279,7 @@ func table_popup(i: int) -> void :
 		if h == def.hero:
 			var tg: = UI.rbox("mint", Rect2(x + 8, 286, 84, 26), 13, 2, 4)
 			p.add_child(tg)
-			tg.add_child(UI.center_label(UI.label("+50%", 15, Color.WHITE, Color("163a2d"), 2, "body", 900), Rect2(0, 0, 84, 26)))
+			tg.add_child(UI.center_label(UI.label("+50%", 16, Color.WHITE, Color("163a2d"), 2, "body", 900), Rect2(0, 0, 84, 26)))
 		var hh: String = h
 		a.gui_input.connect( func(e):
 			if e is InputEventMouseButton and e.pressed:
@@ -317,7 +317,7 @@ func _shop() -> void :
 	big.add_child(art)
 	var lim: = UI.rbox("red", Rect2(0, 18, 120, 30), 13, 2, 4)
 	big.add_child(lim)
-	lim.add_child(UI.center_label(UI.label("ЛИМИТ", 14, Color.WHITE, Color("42101a"), 2, "body", 900), Rect2(0, 0, 120, 30)))
+	lim.add_child(UI.center_label(UI.label("ЛИМИТ", 16, Color.WHITE, Color("42101a"), 2, "body", 900), Rect2(0, 0, 120, 30)))
 	var nm: = UI.title(it.name, 30, Color.WHITE, UI.DARK)
 	nm.position = Vector2(250, 20)
 	nm.size = Vector2(W - 32 - 270, 44)
@@ -359,7 +359,7 @@ func _shop() -> void :
 		var sub: = "осталось %d" % left
 		if s.kind == "shard":
 			sub += " · у тебя %d/%d" % [int(G.S.shards.get(def.hero, 0)), G.SHARDS_NEED]
-		var sl: = UI.label(sub, 15, Color("bfb3a8"))
+		var sl: = UI.label(sub, 16, Color("bfb3a8"))
 		sl.position = Vector2(102, 48)
 		row.add_child(sl)
 		var b: = JButton.make(str(int(s.price)), "gold" if left > 0 else "glass", Rect2(W - 32 - 190, 12, 176, 64), V7Event.cur_icon(def), 24)

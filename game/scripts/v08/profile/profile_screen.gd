@@ -159,7 +159,7 @@ func _rank() -> void :
 		nxt = V8ProfileUI.s("profile.rank_next") % [ri.into, ri.need, G.rank_title(k / 3, k % 3)]
 	_lbl(c, nxt, Vector2(170, 112), 18, Color("ffe7a6"), cw - 196)
 	_lbl(c, V8ProfileUI.s("profile.rank_total") % rp, Vector2(170, 138), 17, UI.MUTED, cw - 196)
-	var note: = _lbl(c, V8ProfileUI.s("profile.rank_note"), Vector2(24, 164), 15, Color(0.75, 0.7, 0.65, 0.75), cw - 48)
+	var note: = _lbl(c, V8ProfileUI.s("profile.rank_note"), Vector2(24, 164), 16, Color(0.75, 0.7, 0.65, 0.75), cw - 48)
 	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 
 
@@ -182,7 +182,12 @@ func _league() -> void :
 		tiles.append([V8ProfileUI.s("profile.week"), V8ProfileUI.s("profile.league_open"), V8ProfileUI.s("profile.league_none"), -1])
 	if info.has("quarter"):
 		var q: Dictionary = info.quarter
-		tiles.append([V8ProfileUI.s("profile.quarter"), V8ProfileUI.s("profile.place") % [UI.fmt(int(q.get("place", 0))), UI.fmt(int(q.get("total", 1001)))], _pts(int(q.get("points", 0))), -1])
+		# 0.8: below the 80% cut (a new player) the tile shows the points and what they are for, as the victory
+		# window does, never «#1 001 из 1 001» (V8League.quarter_shown)
+		if V8League.quarter_shown(q):
+			tiles.append([V8ProfileUI.s("profile.quarter"), V8ProfileUI.s("profile.place") % [UI.fmt(int(q.get("place", 0))), UI.fmt(int(q.get("total", 1001)))], _pts(int(q.get("points", 0))), -1])
+		else:
+			tiles.append([V8ProfileUI.s("profile.quarter"), _pts(int(q.get("points", 0))), V8League.Q_HIDDEN_SHORT, -1])
 	for i in tiles.size():
 		var tl: Array = tiles[i]
 		var wdt: = tw if tiles.size() > 1 else cw - 48

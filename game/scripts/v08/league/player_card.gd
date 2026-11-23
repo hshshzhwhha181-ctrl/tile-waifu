@@ -39,7 +39,11 @@ static func open(main, info: Dictionary) -> RBox:
 	chip.add_child(UI.center_label(UI.label(String(L.name), 21, lc.lightened(0.3), UI.DARK, 3, "body", 900), Rect2(0, 0, 330, 44)))
 	var tw: = (W - 72.0 - 16.0) * 0.5
 	var y0: = 266.0
-	_tile(p, Rect2(36, y0, tw, 116), "Место в квартале", "#%s" % UI.fmt(int(info.get("q_place", 0))), "из %s" % UI.fmt(V8League.TOTAL))
+	if bool(info.get("me", false)) and not V8League.quarter_shown({"place": int(info.get("q_place", 0))}):
+		# 0.8: the player's own card follows the victory / profile rule: no «#1 001» below the 80% cut
+		_tile(p, Rect2(36, y0, tw, 116), "Место в квартале", "топ-100", "впереди")
+	else:
+		_tile(p, Rect2(36, y0, tw, 116), "Место в квартале", "#%s" % UI.fmt(int(info.get("q_place", 0))), "из %s" % UI.fmt(V8League.TOTAL))
 	_tile(p, Rect2(52 + tw, y0, tw, 116), "Партий за неделю", str(int(info.get("games", 0))), "")
 	var fav: = String(info.get("fav", hero))
 	if not G.HEROES.has(fav):

@@ -95,12 +95,11 @@ func _build_full(opts: Dictionary) -> void :
 	var tag: String = opts.get("tag", "")
 	if tag != "":
 		var f: = UI.font("body", 900)
-		var fs: = 15
-		var maxw: = size.x - 20.0
-		while fs > 13 and f.get_string_size(tag, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x + 20.0 > maxw:
-			fs -= 1
+		# 0.8: 16 px (never smaller); the pill may grow to the full card width, longer tags trim with «…»
+		var fs: = 16
+		var maxw: = size.x - 4.0
 		var pw: = minf(maxw, f.get_string_size(tag, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x + 20.0)
-		var pill: = UI.rbox("plum", Rect2(size.x - pw - 8, size.y - COUNTER_H - 30, pw, 26), 13, 2, 4)
+		var pill: = UI.rbox("plum", Rect2(size.x - pw - 2, size.y - COUNTER_H - 30, pw, 26), 13, 2, 4)
 		pill.colors(Color(0.2, 0.1, 0.24, 0.94), Color(0.1, 0.05, 0.14, 0.96)).borders(Color("ffe7a6"), Color("c58a2c"))
 		add_child(pill)
 		var tl: = UI.label(tag, fs, Color("ffd98a"), Color(0.1, 0.05, 0.2), 2, "body", 900)
@@ -348,6 +347,19 @@ func say_text(text: String, dur: = 2.6, talk: = true) -> void :
 		_shared_bubble.queue_free()
 	var w: = 300.0
 	var left_side: = position.x > p.size.x * 0.5
+	if not compact and left_side and p.get("board_rect") is Rect2:
+		# 0.8: in a match the line is said inside the portrait card, over the name plate and skill gauge
+		# (tail up to her face): never over the HUD plates and never over a tile row of the table
+		bubble_node = _card_bubble(text)
+		_shared_bubble = bubble_node
+		var cb: = bubble_node
+		var ct: Tween = cb.create_tween()
+		ct.tween_interval(dur)
+		ct.tween_property(cb, "modulate:a", 0.0, 0.3)
+		ct.tween_callback(cb.queue_free)
+		if talk:
+			Sfx.voice_started.emit(hero_id, text, minf(dur * 0.6, 0.35 + text.length() * 0.05))
+		return
 	bubble_node = Common.bubble(p, text, Vector2.ZERO, w, not left_side)
 	bubble_node.z_index = 42
 	var hp: = head_pos()
@@ -375,6 +387,45 @@ func say_text(text: String, dur: = 2.6, talk: = true) -> void :
 	t.tween_callback(b.queue_free)
 	if talk:
 		Sfx.voice_started.emit(hero_id, text, minf(dur * 0.6, 0.35 + text.length() * 0.05))
+
+
+func _card_bubble(text: String) -> Control:
+	var w: = size.x + 4.0
+	var f: = UI.font("body", 800)
+	var fs: = 18
+	var th: float = f.get_multiline_string_size(text, HORIZONTAL_ALIGNMENT_CENTER, w - 24.0, fs).y
+	while fs > 16 and th > 3.0 * fs * 1.4:
+		fs -= 1
+		th = f.get_multiline_string_size(text, HORIZONTAL_ALIGNMENT_CENTER, w - 24.0, fs).y
+	var h: = maxf(COUNTER_H + 4.0, th + 18.0)
+	var root: = Control.new()
+	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	root.position = Vector2(-2, size.y - h)
+	root.size = Vector2(w, h)
+	root.z_index = 6
+	var tail: = Polygon2D.new()
+	tail.color = Color(0.12, 0.11, 0.13, 0.97)
+	tail.polygon = PackedVector2Array([Vector2(w * 0.5 - 18, 6), Vector2(w * 0.5 + 18, 6), Vector2(w * 0.5 + 6, -18)])
+	root.add_child(tail)
+	var b: = UI.rbox("cream", Rect2(0, 0, w, h), 20, 3, 8)
+	b.set_param("border_top", Color("e8c9a0")).set_param("border_bottom", Color("a8697a"))
+	b.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	root.add_child(b)
+	var l: = UI.label(text, fs, UI.INK)
+	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	l.position = Vector2(12, 6)
+	l.size = Vector2(w - 24, h - 12)
+	root.add_child(l)
+	add_child(root)
+	root.pivot_offset = Vector2(w * 0.5, 0)
+	root.scale = Vector2(0.6, 0.6)
+	root.modulate.a = 0.0
+	var t: = root.create_tween().set_parallel()
+	t.tween_property(root, "scale", Vector2.ONE, 0.25).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	t.tween_property(root, "modulate:a", 1.0, 0.12)
+	return root
 
 
 func say(kind: String) -> String:
