@@ -711,6 +711,8 @@ func _process(dt: float) -> void :
 		combo_lbl.text = ""
 
 func _on_match(mid: Vector2, combo: int, gold: bool, shard: String) -> void :
+	# the previous step's combo word goes at once (its count is stale now); a new one may follow below
+	_v8_clear_combo_word()
 	_v8_fold_fortune()
 	var fever: = now() < fever_until
 	var mult: = 1 + (combo - 1) / 2
@@ -753,7 +755,6 @@ func _on_match(mid: Vector2, combo: int, gold: bool, shard: String) -> void :
 	UI.punch(gems_lbl, 0.25)
 	if shard != "":
 		_shard_found(shard, mid)
-	_v8_clear_combo_word()
 	if combo >= 2:
 		charge = min(1.0, charge + 0.12 * combo)
 		combo_lbl.text = V6Txt.s("play.combo") % combo
@@ -861,9 +862,7 @@ func _v8_clear_combo_word() -> void :
 	_v8_band_node = null
 	_v8_band_combo = false
 	_v8_band_prio = 0
-	var t: Tween = n.create_tween()
-	t.tween_property(n, "modulate:a", 0.0, 0.08)
-	t.tween_callback(n.queue_free)
+	n.queue_free()
 
 # in-match notice (main.toast routes here while a match is on): a one-line plaque in the band slot, ~1.5 s
 # returns false while a result / modal is up: main.toast then shows its usual pill
@@ -1173,7 +1172,8 @@ func _v8_quick_deal() -> void :
 # 0.8 match overlay layout: each transient overlay has its own slot, so two never land on each other, and
 # none of them covers a tile of the table or takes a tap (mouse_filter IGNORE).
 #   y 126–166, x 136–396 : one note under the goal plate (luck chip or «Стиль: …»), newest replaces older
-#   y 121–175, x 132–398 : combo pill (V7Combo) with its milestone line («+1 к умению» …) inside
+#   y 121–175, x 132–398 : combo pill (V7Combo) with its milestone line («+1 к умению» …) inside; opaque, and
+#                          the note is hidden while it shows (V7Combo._hide_notes), never drawn through it
 #   inside the portrait   : the heroine's speech bubble (V6HeroStage.say_text), over her name plate
 #   over the empty tray   : the level ribbon at the start, then the luck strip before the first tap
 #   action-button band    : the intro tip and «Новинка» cards (v8_bottom_card; the buttons hide meanwhile)
@@ -1207,6 +1207,9 @@ func v8_note(text: String, col: = Color("ffe7a6"), secs: = 4.0) -> Control:
 	chip.add_to_group("v8_note")
 	chip.borders(Color("ffe7a6"), Color("c58a2c"))
 	add_child(chip)
+	# the combo pill owns this slot while it runs: the note waits hidden under it (V7Combo._hide_notes)
+	if v7combo and v7combo.shown and not v7combo.stopped:
+		chip.visible = false
 	var l: = UI.center_label(UI.label(text, fs, col, UI.DARK, 3, "body", 900), Rect2(0, 0, w, V8_NOTE_RECT.size.y))
 	l.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	l.clip_text = true
@@ -2219,7 +2222,8 @@ func _summon_unlocked() -> void :
 	p.add_child(s)
 	Sfx.play("reveal_sr")
 	Fx.burst(p, Vector2(330, 190), "sparkle", 60, Color(1, 0.85, 0.5), 1.6)
-	unlock_go_btn = JButton.make(V6Txt.s("play.unlock_go"), "gold", Rect2(130, 410, 400, 100), V8Art.cur("gem"), 36)
+	# the ten wishes are a gift: the wishes glyph (nav/wishes), not a gem that would read as a price; primary-art CTA
+	unlock_go_btn = JButton.make(V6Txt.s("play.unlock_go"), "pink", Rect2(130, 410, 400, 100), V8Art.nav("wishes"), 36)
 	unlock_go_btn.icon_rect.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	unlock_go_btn.shine_every = 1.6
 	unlock_go_btn.pulse = true
@@ -2279,6 +2283,10 @@ func dev_act(a: String) -> void :
 			_on_clear()
 		"fever":
 			_fever()
+		"toast":
+			main.toast("Под фишкой подарок: 64 кристалла", "gem")
+		"setband":
+			_yaku_banner(G.CATS[0][2], V6Txt.s("play.set3") + G.CATS[0][3])
 		"timeup":
 			blitz_left = 0.01
 		"cutin":

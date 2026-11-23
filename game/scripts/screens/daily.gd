@@ -128,7 +128,7 @@ static func tasks(main, home) -> void :
 			main.fly_gems(b.get_global_rect().get_center(), 5)
 			Sfx.play("win", 1.3, -6)
 			b.lbl.text = "✓"
-			b.box.colors(UI.PAL.mint[0], UI.PAL.mint[1])
+			b.set_pal("mint")
 			if home and home.has_method("refresh_badges"):
 				home.refresh_badges())
 		row.add_child(b)

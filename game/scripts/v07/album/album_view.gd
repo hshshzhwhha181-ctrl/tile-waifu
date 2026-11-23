@@ -61,7 +61,7 @@ func _build() -> void :
 	var tw: = (W - 60) / TABS.size()
 	for i in TABS.size():
 		var id: String = TABS[i][0]
-		var b: = JButton.make(TABS[i][1], "pink" if id == tab else "graphite", Rect2(30 + i * tw, TABS_Y, tw - 8, 58), null, 22)
+		var b: = JButton.make(TABS[i][1], "pink" if id == tab else "graphite", Rect2(30 + i * tw, TABS_Y, tw - 8, 58), null, 22, -1.0, false)
 		b.pressed.connect( func(): _switch(id))
 		add_child(b)
 		tab_nodes[id] = b
@@ -117,7 +117,7 @@ func _switch(id: String) -> void :
 	var tw: = (W - 60) / TABS.size()
 	for i in TABS.size():
 		var tid: String = TABS[i][0]
-		var b: = JButton.make(TABS[i][1], "pink" if tid == tab else "graphite", Rect2(30 + i * tw, TABS_Y, tw - 8, 58), null, 22)
+		var b: = JButton.make(TABS[i][1], "pink" if tid == tab else "graphite", Rect2(30 + i * tw, TABS_Y, tw - 8, 58), null, 22, -1.0, false)
 		b.pressed.connect( func(): _switch(tid))
 		add_child(b)
 		tab_nodes[tid] = b

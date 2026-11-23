@@ -110,7 +110,7 @@ func _tabs() -> void :
 	var bw: = (W - 32 - 20) / 3.0
 	for i in items.size():
 		var id: String = items[i][0]
-		var b: = JButton.make(items[i][1], "glass", Rect2(16 + i * (bw + 10), TABS_Y, bw, 62), null, 24)
+		var b: = JButton.make(items[i][1], "glass", Rect2(16 + i * (bw + 10), TABS_Y, bw, 62), null, 24, -1.0, false)
 		b.pressed.connect( func(): _show(id))
 		add_child(b)
 		tab_btns[id] = b

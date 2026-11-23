@@ -35,7 +35,7 @@ func build(m, args: Dictionary) -> void :
 	V8Header.make(self, main, "Лавка", main.back)
 	var tw: = (W - 48 - 20) / 3.0
 	for i in 3:
-		var b: = JButton.make(TABS[i], "pink" if i == tab else "glass", Rect2(24 + i * (tw + 10), TABS_Y, tw, 60), null, 23)
+		var b: = JButton.make(TABS[i], "pink" if i == tab else "glass", Rect2(24 + i * (tw + 10), TABS_Y, tw, 60), null, 23, -1.0, false)
 		var idx: = i
 		b.pressed.connect( func(): _set_tab(idx))
 		add_child(b)

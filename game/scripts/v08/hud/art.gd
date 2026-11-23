@@ -15,7 +15,7 @@ extends RefCounted
 #   V8Art.cur(name)                   cur/*: gem coin ticket
 #   V8Art.event_cur(icon_id)          cur/ev_<hero>: event currencies (V7Event.cur_icon wraps it)
 #   V8Art.frame(name)                 frame/*: avatar avatar_top card_r card_sr card_ssr (or a rarity "R"/"SR"/"SSR")
-#   V8Art.btn(name)                   btn/*: primary secondary play_title ribbon panel (raw texture)
+#   V8Art.btn(name)                   btn/*: primary primary_red secondary secondary_jade play_title ribbon panel (raw texture)
 #   V8Art.misc(name)                  misc/*: chest_closed chest_open node_cur node_done node_lock logo star_empty
 #   V8Art.star(on) / star_rect(on, r) rating star: nav/play filled, misc/star_empty (graphite copy) empty
 #   V8Art.bg(name)                    bg/*.webp: profile tourney
@@ -42,9 +42,12 @@ const CUR_ALIAS: = {"gems": "gem", "coins": "coin", "tickets": "ticket"}
 #   secondary 600×177: caps end at x≈80, uniform rows 71…113
 #   ribbon 600×121: tails + flowers occupy x 0…160 / 440…600, band uniform between; no vertical stretch room
 #   panel 600×433: sakura corner ornaments ≈ 80×64, gold rim 8 px, seigaiha fill tiles
+# primary_red / secondary_jade are recolours of primary / secondary (same geometry): boss CTAs and «on» / done states
 const NINE: = {
 	"primary": {"m": [124, 64, 124, 64], "fit": "h"},
+	"primary_red": {"m": [124, 64, 124, 64], "fit": "h"},
 	"secondary": {"m": [92, 60, 92, 56], "fit": "h"},
+	"secondary_jade": {"m": [92, 60, 92, 56], "fit": "h"},
 	"ribbon": {"m": [164, 56, 164, 58], "fit": "h"},
 	"panel": {"m": [92, 76, 92, 76], "fit": "box", "tile": true},
 }
@@ -127,8 +130,9 @@ static func cur(name: String) -> Texture2D:
 	return tex("cur/" + String(CUR_ALIAS.get(name, name)))
 
 
-# Event currency (event_data "icon": "cur_<hero>") -> cur/ev_<hero>: the v0.7 flat glyph set on a gold-rimmed
-# graphite disc so it sits with cur/gem and cur/coin. Falls back to the 0.7 file if a new event has no art yet.
+# Event currency (event_data "icon": "cur_<hero>") -> cur/ev_<hero>: glossy lacquered objects in the cur/gem and
+# cur/coin style (tea leaves, holo chip, firefly orb, medal, moon drop; gold filigree + sakura, light top-left).
+# Falls back to the 0.7 file if a new event has no art yet.
 static func event_cur(icon_id: String) -> Texture2D:
 	var n: = "cur/ev_" + icon_id.trim_prefix("cur_")
 	if has(n):
@@ -244,7 +248,7 @@ static func nine_content(name: String, size: Vector2) -> Rect2:
 	var spec: Dictionary = NINE.get(name, NINE.panel)
 	var k: = nine_scale(name, size)
 	var m: Array = spec.m
-	var pad: = {"primary": [0.55, 0.12, 0.55, 0.14], "secondary": [0.5, 0.12, 0.5, 0.12], "ribbon": [0.85, 0.05, 0.85, 0.3], "panel": [0.25, 0.25, 0.25, 0.25]}.get(name, [0.3, 0.3, 0.3, 0.3])
+	var pad: = {"primary": [0.55, 0.12, 0.55, 0.14], "primary_red": [0.55, 0.12, 0.55, 0.14], "secondary": [0.5, 0.12, 0.5, 0.12], "secondary_jade": [0.5, 0.12, 0.5, 0.12], "ribbon": [0.85, 0.05, 0.85, 0.3], "panel": [0.25, 0.25, 0.25, 0.25]}.get(name, [0.3, 0.3, 0.3, 0.3])
 	var l: float = m[0] * k * pad[0]
 	var t: float = size.y * pad[1] if spec.fit == "h" else m[1] * k * pad[1]
 	var rr: float = m[2] * k * pad[2]

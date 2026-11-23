@@ -25,7 +25,12 @@
 | btn/ | primary, secondary, play_title, ribbon, panel | кнопки (NinePatchRect), лента заголовков попапов, панели |
 | bg/ | profile.webp, tourney.webp (1080×1920) | фоны профиля и турнира/рейтинга |
 
-Наряды hana_gym, rin_after, rin_agent, rin_base перерисованы без впечатанного текста и рамок (те же имена файлов).
+Наряды hana_gym, rin_after, rin_agent, rin_base, nova_offline, nova_base, hana_street перерисованы без впечатанного
+текста и рамок (те же имена файлов): у nova_offline на худи вместо надписи — схемные дорожки, банка без логотипа;
+у nova_base вывески — абстрактный неон без иероглифов; у hana_street граффити — абстрактные муралы, плакаты без слов.
+Валюты ивентов `cur/ev_*` (mc — чайные листья, nova — голо-чип, rin — светлячок в шаре, hana — медаль, yue — лунная
+капля) — лаковые объекты в стиле cur/gem и cur/coin. Кнопки: `btn/primary_red` (босс) и `btn/secondary_jade`
+(«вкл» / получено) — перекраски primary / secondary с той же геометрией.
 
 ## Героини
 LoRA `tw_heroines_v1` (Z-Image Turbo, триггер `twaifu style`), обучена на 24 артах (5 героинь + 19 нарядов).

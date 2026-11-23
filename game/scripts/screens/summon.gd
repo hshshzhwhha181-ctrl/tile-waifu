@@ -72,7 +72,7 @@ func _build_banner() -> void :
 		var tfs: = 22
 		while tfs > 16 and UI.font("body", 900).get_string_size(bb.name, HORIZONTAL_ALIGNMENT_LEFT, -1, tfs).x > tw - 28:
 			tfs -= 1
-		var tb: = JButton.make(bb.name, "lav" if i == banner_i else "glass", Rect2(24 + k * (tw + 10), TABS_Y, tw, 60), null, tfs)
+		var tb: = JButton.make(bb.name, "lav" if i == banner_i else "glass", Rect2(24 + k * (tw + 10), TABS_Y, tw, 60), null, tfs, -1.0, false)
 		tb.pressed.connect( func():
 			if i != banner_i:
 				banner_i = i
@@ -383,12 +383,21 @@ func _card(r: Dictionary, sz: Vector2) -> Control:
 	front.add_child(rtag)
 	rtag.add_child(UI.center_label(UI.label(r.rar, rfs, col.lerp(Color.WHITE, 0.45), UI.DARK, 3, "body", 900), Rect2(0, -1, rw, rh)))
 	var nl: = UI.label(r.name, fs, Color.WHITE, Color(0.2, 0.05, 0.2), 4, "body", 900)
-	# 0.8: at most two lines inside the frame (16 px floor, lighter weight / hyphenation / «…» past that) — a
-	# third line («Фон» / «Чайный» / «сад»») used to run below the card's bottom edge
+	# 0.8: the name is fitted to the card (16 px floor, lighter weight / hyphenation / «…» past that) and its box
+	# grows UP from the frame's bottom rim by the wrapped height, so a third line («Фон» / «Чайный» / «сад»») stays
+	# inside the card instead of running below its bottom edge
 	var nw: = sz.x - 12.0
-	Common.fit_words(nl, nw, 2, 16)
-	nl.position = Vector2((sz.x - nw) * 0.5, sz.y - (54 if small else 86))
-	nl.size = Vector2(nw, 46 if small else 70)
+	var lines: = 3 if small else 2
+	Common.fit_words(nl, nw, lines, 16)
+	var ls: LabelSettings = nl.label_settings
+	var pad: = float(ls.outline_size)
+	var th: = ls.font.get_multiline_string_size(nl.text, HORIZONTAL_ALIGNMENT_CENTER, nw - pad, ls.font_size, -1, TextServer.BREAK_MANDATORY | TextServer.BREAK_WORD_BOUND).y
+	var lh: = ls.font.get_height(ls.font_size)
+	th = minf(th, lh * lines)
+	var nl_n: = int(round(th / lh))
+	var nh: = maxf(46.0 if small else 70.0, th + ls.line_spacing * maxf(0.0, nl_n - 1) + 4.0)
+	nl.position = Vector2((sz.x - nw) * 0.5, sz.y - 8.0 - nh if small else sz.y - 16.0 - nh)
+	nl.size = Vector2(nw, nh)
 	nl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	nl.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
 	front.add_child(nl)

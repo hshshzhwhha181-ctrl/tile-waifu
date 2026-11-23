@@ -208,12 +208,21 @@ func _actions() -> void :
 func _btn(text: String, sub: String, pal: String, r: Rect2, icon: String) -> JButton:
 	var b: = JButton.make(text, pal, r, null, 24)
 	b.set_sub(sub, 16)
-	var x0: = 60.0
+	# with the btn art the glyph sits inside the caps (clear of the gold rim and the sakura), as JButton's own icon
+	var ix: = 10.0
+	var isz: = 52.0
+	var x1: = 8.0
+	if b.art:
+		var cr: = V8Art.nine_content(b._art_name, r.size)
+		ix = maxf(cr.position.x - 4.0, 16.0)
+		isz = 44.0
+		x1 = maxf(r.size.x - cr.end.x - 10.0, 12.0)
+	var x0: = ix + isz + 4.0
 	b.lbl.position.x = x0
-	b.lbl.size.x = r.size.x - x0 - 8
-	UI.center_label(b.sub, Rect2(x0, r.size.y * 0.52, r.size.x - x0 - 8, r.size.y * 0.4))
+	b.lbl.size.x = r.size.x - x0 - x1
+	UI.center_label(b.sub, Rect2(x0, b.sub.position.y, r.size.x - x0 - x1, b.sub.size.y))
 	# 0.8: gift / heart / star are the gold glyphs of the 0.8 set (star = the sakura star, nav/play)
-	b.add_child(V8Art.rect(Common.ui_icon(icon), Rect2(10, (r.size.y - 52) * 0.5, 52, 52)))
+	b.add_child(V8Art.rect(Common.ui_icon(icon), Rect2(ix, (r.size.y - isz) * 0.5, isz, isz)))
 	return b
 
 

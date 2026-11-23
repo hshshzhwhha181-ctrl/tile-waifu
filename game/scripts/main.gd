@@ -257,7 +257,7 @@ func settings() -> void :
 				_v6_opt("v6_fx.flash", v)
 			G.save()
 			b.lbl.text = V6Txt.s("common.on") if v else V6Txt.s("common.off")
-			b.box.colors(UI.PAL["mint" if v else "glass"][0], UI.PAL["mint" if v else "glass"][1])
+			b.set_pal("mint" if v else "glass")
 			if key == "music":
 				Sfx.cur_music = ""
 				Sfx.music("menu" if v else "")
@@ -271,8 +271,8 @@ func settings() -> void :
 	var sl: = UI.label(V6Txt.s("settings.side"), 26, UI.INK, Color.WHITE, 3, "body", 900)
 	sl.position = Vector2(34, 744)
 	p.add_child(sl)
-	var fb: = JButton.make(V6Txt.s("settings.side_f"), "pink" if G.S.side == "f" else "glass", Rect2(220, 732, 196, 64), null, 22)
-	var mb: = JButton.make(V6Txt.s("settings.side_m"), "glass", Rect2(428, 732, 200, 64), null, 20)
+	var fb: = JButton.make(V6Txt.s("settings.side_f"), "pink" if G.S.side == "f" else "glass", Rect2(220, 732, 196, 64), null, 22, -1.0, false)
+	var mb: = JButton.make(V6Txt.s("settings.side_m"), "glass", Rect2(428, 732, 200, 64), null, 20, -1.0, false)
 	fb.pressed.connect( func():
 		G.S.side = "f"
 		G.save())

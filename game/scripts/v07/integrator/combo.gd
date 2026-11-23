@@ -163,7 +163,7 @@ func _draw() -> void :
 		pr = Rect2(c - sz * 0.5, sz)
 		_sb_pill.border_color = col
 		_sb_pill.shadow_color = Color(col.r, col.g, col.b, 0.45)
-		_sb_pill.bg_color.a = 0.93 * pill.modulate.a
+		_sb_pill.bg_color.a = pill.modulate.a
 		_sb_pill.border_color.a = pill.modulate.a
 		draw_style_box(_sb_pill, pr)
 		var f: = _left_frac()
@@ -174,7 +174,8 @@ func _draw() -> void :
 			draw_style_box(_sb_fill, ir)
 
 # 0.8: the pill sits in the HUD row between the gem counter (ends x 126, room for a 4–5 digit value) and the
-# passive chip (x 404), above the tray frame (y ≈ 176), and covers the note slot while a combo runs; see the
+# passive chip (x 404), above the tray frame (y ≈ 176), and takes the note slot while a combo runs (the note is
+# hidden meanwhile, _hide_notes); see the
 # layout note in play.gd. It is never scaled past 1.0 (no overshoot), so its box stays inside this rect.
 const PILL_RECT: = Rect2(134, 122, 262, 52)
 
@@ -201,8 +202,18 @@ func _fit_title() -> void :
 		ls.font_size = fs
 		ls.outline_size = 5 if fs >= 24 else 4
 
+# The pill takes the note slot (V8_NOTE_RECT in play.gd) while a combo runs: the luck / style note under it is
+# hidden, not drawn through the pill, and comes back when the pill has gone (play.v8_note hides a new note too).
+func _hide_notes(h: bool) -> void :
+	if not is_inside_tree():
+		return
+	for n in get_tree().get_nodes_in_group("v8_note"):
+		if is_instance_valid(n) and n is CanvasItem:
+			(n as CanvasItem).visible = not h
+
 func _pill_in() -> void :
 	_place_pill()
+	_hide_notes(true)
 	pill.visible = true
 	pill.modulate.a = 0.0
 	# fade in at full size: a scale-in would overshoot the HUD row and shrink the 16 px sub-line
@@ -220,7 +231,9 @@ func _pill_out() -> void :
 	t.tween_property(pill, "scale", Vector2(0.8, 0.8), 0.3)
 	t.chain().tween_callback( func():
 		if not shown:
-			pill.visible = false)
+			pill.visible = false
+			if not stopped:
+				_hide_notes(false))
 	last_n = 0
 
 func on_match(mid: Vector2, n: int, gain: int) -> void :
