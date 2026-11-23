@@ -1,0 +1,904 @@
+extends Control
+
+
+
+
+
+
+const SH: = 1560.0
+const FADE: = 160.0
+const BOTTOM_PAD: = 230.0
+const GAPS: = [270.0, 118.0, 118.0, 118.0, 115.0, 115.0, 118.0, 118.0, 240.0, 170.0]
+
+const ORDER: = [0, 1, 2, 3, "mid", 4, 5, 6, 7, "star"]
+
+var main
+var W: = 720.0
+var H: = 1280.0
+var map_root: Control
+var map_h: = 0.0
+var items: Array = []
+var level_item: = {}
+var panels: Array = []
+var path_pts: PackedVector2Array
+var path_dist: PackedFloat32Array
+var path_len: = 0.0
+var path_mat: ShaderMaterial
+var marker: Control
+var play_btn: JButton
+var partner_go_btn: JButton
+var partner_rows: = {}
+var sel: = 0
+var cur: = 0
+var _drag: = false
+var _drag_y: = 0.0
+var _vel: = 0.0
+var _moved: = 0.0
+var _anim: = false
+var _txt = null
+
+
+
+func _t(key: String, fallback: String) -> String:
+	if _txt == null and ResourceLoader.exists("res://scripts/v06/story/txt.gd"):
+		_txt = load("res://scripts/v06/story/txt.gd")
+	if _txt:
+		var v = _txt.s(key)
+		if v is String and v != key and v != "":
+			return v
+	return fallback
+
+
+func build(m, args: Dictionary) -> void :
+	main = m
+	W = size.x
+	H = size.y
+	main.show_chrome(true, true)
+	Sfx.music("menu")
+	var st: = V6Worlds.state()
+	cur = clampi(int(G.S.unlocked) - 1, 0, G.LEVELS.size() - 1)
+	sel = clampi(int(args.get("select", cur)), 0, cur)
+	var bgc: = ColorRect.new()
+	bgc.size = size
+	bgc.color = Color(0.1, 0.05, 0.16)
+	bgc.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(bgc)
+	var nw: = V6Worlds.world_count()
+	map_h = SH * nw + BOTTOM_PAD
+	map_root = Control.new()
+	map_root.size = Vector2(W, map_h)
+	map_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(map_root)
+	for w in nw:
+		_world_panel(w)
+	_layout_items(nw)
+	_build_path()
+	for w in nw:
+		_world_gate(w)
+	for k in items.size():
+		var it: Dictionary = items[k]
+		if it.kind == "lv":
+			it.node = _boss_node(it) if G.LEVELS[it.level].get("boss", false) else _level_node(it)
+		else:
+			it.node = _chest_node(it)
+	_build_marker()
+	_build_overlays()
+	_build_modes_bar()
+	_build_play_button()
+
+	var seen: = clampi(int(st.get("seen", int(G.S.unlocked))), 1, int(G.S.unlocked))
+	if seen < int(G.S.unlocked) and not G.demo:
+		_scroll_to_level(seen - 1, false)
+		_set_progress(seen - 1)
+		_place_marker(seen - 1)
+		_play_progress(seen - 1, cur, args.get("pick", false))
+	else:
+		_scroll_to_level(sel, false)
+		_set_progress(cur)
+		_place_marker(cur)
+		st.seen = int(G.S.unlocked)
+		if args.get("pick", false):
+			await get_tree().create_timer(0.5).timeout
+			if is_inside_tree():
+				pick_partner(sel)
+
+
+func _world_top(w: int) -> float:
+	return map_h - BOTTOM_PAD - (w + 1) * SH
+
+func _world_panel(w: int) -> void :
+	var look: Dictionary = V6Worlds.LOOK[w]
+	var tex: Texture2D = load("res://assets/v06/map/%s.webp" % look.art)
+	var top: = _world_top(w)
+	var h: = SH + (FADE if w > 0 else BOTTOM_PAD)
+	var r: = TextureRect.new()
+	r.texture = tex
+	r.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	r.stretch_mode = TextureRect.STRETCH_SCALE
+	r.position = Vector2(0, top)
+	r.size = Vector2(W, h)
+	r.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var m: = ShaderMaterial.new()
+	m.shader = preload("res://shaders/v06/map/world.gdshader")
+	m.set_shader_parameter("size", r.size)
+	m.set_shader_parameter("fade_bottom", FADE if w > 0 else 1.0)
+	m.set_shader_parameter("fog", look.fog)
+	var open: = V6Worlds.world_open(w)
+	m.set_shader_parameter("gray", 0.0 if open else 0.8)
+	m.set_shader_parameter("bright", 1.0 if open else 0.62)
+	m.set_shader_parameter("fog_amt", 0.0 if open else 0.6)
+	r.material = m
+	map_root.add_child(r)
+	panels.append(r)
+
+	var side: = ColorRect.new()
+	side.size = r.size
+	side.position = r.position
+	side.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var sm: = ShaderMaterial.new()
+	sm.shader = preload("res://shaders/overlay.gdshader")
+	sm.set_shader_parameter("tint", Color(look.deep.r, look.deep.g, look.deep.b, 1.0))
+	sm.set_shader_parameter("vignette", 0.28)
+	side.material = sm
+	map_root.add_child(side)
+	if open:
+		var amb: = Fx.ambient(map_root, G.LOCS[w].fx, Vector2(W, SH))
+		amb.position = Vector2(0, top)
+
+func _layout_items(nw: int) -> void :
+	items.clear()
+	level_item.clear()
+	var n: = 0
+	for w in nw:
+		var y: = _world_top(w) + SH
+		for k in ORDER.size():
+			y -= GAPS[k]
+			var o = ORDER[k]
+			var x: = W * 0.5 + 196.0 * sin(n * 0.92 + 0.35 + w * 0.6)
+			var it: = {"w": w, "node": null, "dist": 0.0}
+			if o is String:
+				it.kind = "chest"
+				it.chest = o
+				it.level = -1
+			else:
+				it.kind = "lv"
+				it.level = V6Worlds.level_index(w, o)
+				if o == V6Worlds.BOSS_AT:
+					x = W * 0.5
+				level_item[it.level] = items.size()
+			it.pos = Vector2(x, y)
+			items.append(it)
+			n += 1
+
+func _build_path() -> void :
+
+	var pts: = PackedVector2Array()
+	var dist: = PackedFloat32Array()
+	var total: = 0.0
+	var P: Array = items.map( func(it): return it.pos)
+	for i in P.size():
+		if pts.size() > 0:
+			total += (P[i] as Vector2).distance_to(pts[pts.size() - 1])
+		items[i].dist = total
+		var p0: Vector2 = P[maxi(0, i - 1)]
+		var p1: Vector2 = P[i]
+		if i == P.size() - 1:
+			pts.append(p1)
+			dist.append(total)
+			break
+		var p2: Vector2 = P[i + 1]
+		var p3: Vector2 = P[mini(P.size() - 1, i + 2)]
+		var steps: = 14
+		for s in steps:
+			var t: = float(s) / steps
+			var t2: = t * t
+			var t3: = t2 * t
+			var q: = 0.5 * ((2.0 * p1) + ( - p0 + p2) * t + (2.0 * p0 - 5.0 * p1 + 4.0 * p2 - p3) * t2 + ( - p0 + 3.0 * p1 - 3.0 * p2 + p3) * t3)
+			if s > 0:
+				total += q.distance_to(pts[pts.size() - 1])
+			pts.append(q)
+			dist.append(total)
+	path_pts = pts
+	path_dist = dist
+	path_len = total
+	var road: = Line2D.new()
+	road.points = pts
+	road.width = 50
+	road.default_color = Color(0.16, 0.04, 0.16, 0.38)
+	road.joint_mode = Line2D.LINE_JOINT_ROUND
+	road.begin_cap_mode = Line2D.LINE_CAP_ROUND
+	road.end_cap_mode = Line2D.LINE_CAP_ROUND
+	map_root.add_child(road)
+	var stones: = Line2D.new()
+	stones.points = pts
+	stones.width = 32
+	stones.texture = G.fx("white")
+	stones.texture_mode = Line2D.LINE_TEXTURE_STRETCH
+	stones.joint_mode = Line2D.LINE_JOINT_ROUND
+	path_mat = ShaderMaterial.new()
+	path_mat.shader = preload("res://shaders/v06/map/path.gdshader")
+	path_mat.set_shader_parameter("len", total)
+	path_mat.set_shader_parameter("width", 32.0)
+	stones.material = path_mat
+	map_root.add_child(stones)
+
+func _point_at(d: float) -> Vector2:
+	if path_pts.is_empty():
+		return Vector2.ZERO
+	var lo: = 0
+	var hi: = path_dist.size() - 1
+	if d <= 0.0:
+		return path_pts[0]
+	if d >= path_dist[hi]:
+		return path_pts[hi]
+	while hi - lo > 1:
+		var mid: = (lo + hi) / 2
+		if path_dist[mid] < d:
+			lo = mid
+		else:
+			hi = mid
+	var t: float = (d - path_dist[lo]) / maxf(0.001, path_dist[hi] - path_dist[lo])
+	return path_pts[lo].lerp(path_pts[hi], t)
+
+func _level_dist(i: int) -> float:
+	return items[level_item.get(i, 0)].dist
+
+func _set_progress(i: int) -> void :
+	path_mat.set_shader_parameter("progress", _level_dist(i) + 1.0)
+
+
+func _world_gate(w: int) -> void :
+	var L: Dictionary = G.LOCS[w]
+	var look: Dictionary = V6Worlds.LOOK[w]
+	var open: = V6Worlds.world_open(w)
+	var y: = _world_top(w) + SH - 150.0
+	var g: = UI.rbox("glass", Rect2(70, y, W - 140, 140), 30, 4, 12)
+	g.borders(look.accent.lerp(Color.WHITE, 0.4), look.deep)
+	g.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	map_root.add_child(g)
+	var boss: Dictionary = V6Worlds.BOSS[w]
+	var av: = Common.avatar(boss.hero, Rect2(16, 18, 104, 104), "gold" if open else "plum")
+	g.add_child(av)
+	if not open:
+		((av.get_node("Pic") as TextureRect).material as ShaderMaterial).set_shader_parameter("gray", 1.0)
+	var sub: = UI.label(look.sub.to_upper(), 17, look.accent.lerp(Color.WHITE, 0.25), UI.DARK, 3, "body", 900)
+	sub.position = Vector2(136, 14)
+	g.add_child(sub)
+	var t: = UI.title(L.name, 34, Color("fff1dc"), look.deep)
+	t.position = Vector2(134, 34)
+	g.add_child(t)
+	if open:
+		var ws: = V6Worlds.world_stars(w)
+		var max_st: = V6Worlds.PER_WORLD * 3
+		g.add_child(UI.tex(G.fx("star"), Rect2(132, 92, 34, 34)))
+		var sl: = UI.label("%d/%d" % [ws, max_st], 19, Color.WHITE, UI.DARK, 3, "body", 900)
+		sl.position = Vector2(168, 94)
+		g.add_child(sl)
+		Common.progress_bar(g, Rect2(236, 100, g.size.x - 260, 18), float(ws) / max_st, "gold")
+	else:
+		g.add_child(UI.tex(G.icon("lock"), Rect2(132, 92, 32, 32)))
+		var ll: = UI.label("Победи босса главы %d" % w, 19, Color("e0cdee"), UI.DARK, 3, "body", 900)
+		ll.position = Vector2(170, 94)
+		g.add_child(ll)
+	if L.fx == "rain":
+		var ev: = UI.rbox("pink", Rect2(g.size.x - 130, -16, 120, 34), 14, 3, 6)
+		g.add_child(ev)
+		ev.add_child(UI.center_label(UI.label("СОБЫТИЕ", 15, Color.WHITE, Color("7a2346"), 3), Rect2(0, 0, 120, 34)))
+
+
+func _node_root(p: Vector2, sz: Vector2, pivot: Vector2) -> Control:
+	var c: = Control.new()
+	c.size = sz
+	c.position = p - pivot
+	c.pivot_offset = pivot
+	c.mouse_filter = Control.MOUSE_FILTER_STOP
+	map_root.add_child(c)
+	return c
+
+func _tap(c: Control, cb: Callable) -> void :
+	c.gui_input.connect( func(e):
+		if e is InputEventMouseButton and not e.pressed and e.button_index == MOUSE_BUTTON_LEFT and _moved < 14.0 and not _anim:
+			cb.call())
+
+func _level_node(it: Dictionary) -> Control:
+	var i: int = it.level
+	var lv: Dictionary = G.LEVELS[i]
+	var c: = _node_root(it.pos, Vector2(128, 170), Vector2(64, 64))
+	var locked: = i > cur
+	var stars: = G.level_stars(i)
+	var hard: = int(lv.hard)
+	var key: = "node_lock"
+	if not locked:
+		if i == cur:
+			key = "node_cur"
+		elif hard == 2:
+			key = "node_vhard"
+		elif hard == 1:
+			key = "node_hard"
+		elif stars == 0:
+			key = "node_open"
+		else:
+			key = "node_done"
+	if i == cur:
+		var r: = Common.rays(c, Vector2(64, 60), 300, Color(1, 0.88, 0.6, 0.85), 12, 0.07, 0.7)
+		r.show_behind_parent = true
+	c.add_child(UI.tex(load("res://assets/v06/map/%s.png" % key), Rect2(0, 0, 128, 140), false))
+	var face_col: = Color("5a2346") if not locked else Color("f1e8ff")
+	if hard > 0 and not locked:
+		face_col = Color("8a1830") if hard == 1 else Color("4a2390")
+	var num: = UI.center_label(UI.title(str(lv.stage + 1), 44, face_col, Color(1, 1, 1, 0.85) if not locked else Color(0.15, 0.08, 0.2)), Rect2(0, 6, 128, 104))
+	num.label_settings.outline_size = 4
+	c.add_child(num)
+	if locked:
+		c.add_child(UI.tex(G.icon("lock"), Rect2(84, 70, 36, 36)))
+	elif i < cur or stars > 0:
+		for q in 3:
+			var s: = UI.tex(G.fx("star" if q < stars else "star_empty"), Rect2([10.0, 46.0, 82.0][q], [-6.0, -20.0, -6.0][q], 36, 36))
+			s.pivot_offset = Vector2(18, 18)
+			s.rotation = [-0.25, 0.0, 0.25][q]
+			c.add_child(s)
+	if hard > 0 and not locked:
+		var chip: = UI.rbox("red" if hard == 1 else "lav", Rect2(14, 122, 100, 28), 14, 2, 4)
+		c.add_child(chip)
+		chip.add_child(UI.center_label(UI.label("СЛОЖНО" if hard == 1 else "ОЧЕНЬ", 14, Color.WHITE, Color(0.3, 0.05, 0.15), 3, "body", 900), Rect2(0, 0, 100, 28)))
+	if i == cur:
+		var t: Tween = c.create_tween().set_loops()
+		t.tween_property(c, "scale", Vector2(1.08, 1.08), 0.6).set_trans(Tween.TRANS_SINE)
+		t.tween_property(c, "scale", Vector2.ONE, 0.6).set_trans(Tween.TRANS_SINE)
+	_tap(c, func():
+		Sfx.play("pop")
+		UI.punch(c, 0.1)
+		open_card(i))
+	return c
+
+func _boss_node(it: Dictionary) -> Control:
+	var i: int = it.level
+	var lv: Dictionary = G.LEVELS[i]
+	var c: = _node_root(it.pos, Vector2(220, 300), Vector2(110, 132))
+	var locked: = i > cur
+	if not locked:
+		var r: = Common.rays(c, Vector2(110, 132), 420, Color(1, 0.5, 0.6, 0.7) if i == cur else Color(1, 0.85, 0.5, 0.45), 16, 0.05, 0.6)
+		r.show_behind_parent = true
+
+	var hero: String = lv.get("boss_hero", lv.hero)
+	var pic: = UI.tex(load("res://assets/hero/%s.png" % hero), Rect2(34, 56, 152, 152), false)
+	var m: = ShaderMaterial.new()
+	m.shader = preload("res://shaders/card.gdshader")
+	var rig: Dictionary = Hero.RIGS[hero]
+	m.set_shader_parameter("size", pic.size)
+	m.set_shader_parameter("radius", 76.0)
+	m.set_shader_parameter("tex_size", Vector2(848, 1264))
+	m.set_shader_parameter("focus", Vector2(rig.head_c.x / 848.0, (rig.head_c.y + 30) / 1264.0))
+	m.set_shader_parameter("zoom", 3.4)
+	m.set_shader_parameter("bottom_shade", 0.0)
+	m.set_shader_parameter("gray", 0.9 if locked else 0.0)
+	pic.material = m
+	var back: = UI.rbox("plum", Rect2(36, 58, 148, 148), 74, 0, 4)
+	back.colors(V6Worlds.LOOK[it.w].accent.lerp(Color.WHITE, 0.3), V6Worlds.LOOK[it.w].deep)
+	c.add_child(back)
+	c.add_child(pic)
+	c.add_child(UI.tex(load("res://assets/v06/map/boss_frame.png"), Rect2(0, 0, 220, 236), false))
+	var rib: = UI.rbox("red", Rect2(40, 200, 140, 40), 18, 3, 6)
+	c.add_child(rib)
+	rib.add_child(UI.center_label(UI.label("БОСС", 22, Color.WHITE, Color("6a1020"), 4, "body", 900), Rect2(0, 0, 140, 40)))
+	var stars: = G.level_stars(i)
+	if locked:
+		c.add_child(UI.tex(G.icon("lock"), Rect2(88, 108, 44, 44)))
+	else:
+		for q in 3:
+			c.add_child(UI.tex(G.fx("star" if q < stars else "star_empty"), Rect2(52 + q * 40, 242, 38, 38)))
+	c.add_child(UI.center_label(UI.label(lv.get("boss_title", ""), 17, Color("fff1dc"), UI.DARK, 4, "body", 900), Rect2(-40, 276, 300, 26)))
+	if i == cur:
+		var t: Tween = c.create_tween().set_loops()
+		t.tween_property(c, "scale", Vector2(1.06, 1.06), 0.7).set_trans(Tween.TRANS_SINE)
+		t.tween_property(c, "scale", Vector2.ONE, 0.7).set_trans(Tween.TRANS_SINE)
+	_tap(c, func():
+		Sfx.play("pop")
+		UI.punch(c, 0.08)
+		open_card(i))
+	return c
+
+func _chest_node(it: Dictionary) -> Control:
+	var w: int = it.w
+	var kind: String = it.chest
+	var c: = _node_root(it.pos, Vector2(140, 150), Vector2(70, 62))
+	_refresh_chest(c, w, kind)
+	_tap(c, func(): _chest_tap(c, w, kind))
+	return c
+
+func _refresh_chest(c: Control, w: int, kind: String) -> void :
+	for ch in c.get_children():
+		ch.queue_free()
+	var opened: = V6Worlds.chest_opened(w, kind)
+	var ready: = V6Worlds.chest_ready(w, kind)
+	if ready:
+		var r: = Common.rays(c, Vector2(70, 62), 260, Color(1, 0.9, 0.5, 0.9), 10, 0.1, 0.8)
+		r.show_behind_parent = true
+	var img: = UI.tex(load("res://assets/v06/map/%s.png" % ("chest_open" if opened else "chest_closed")), Rect2(-14, -10, 168, 150), false)
+	img.pivot_offset = Vector2(84, 130)
+	c.add_child(img)
+	if kind == "star":
+		var chip: = UI.rbox("plum", Rect2(28, 116, 84, 30), 15, 2, 4)
+		chip.borders(Color("ffe7a6"), Color("c58a2c"))
+		c.add_child(chip)
+		chip.add_child(UI.tex(G.fx("star"), Rect2(2, -1, 30, 30)))
+		chip.add_child(UI.center_label(UI.label(str(V6Worlds.STAR_NEED), 16, Color.WHITE, UI.DARK, 3, "body", 900), Rect2(30, 0, 50, 30)))
+	if opened:
+		img.modulate = Color(0.85, 0.8, 0.9, 0.85)
+	elif ready:
+		var t: Tween = img.create_tween().set_loops()
+		t.tween_property(img, "rotation", 0.08, 0.12)
+		t.tween_property(img, "rotation", -0.08, 0.12)
+		t.tween_property(img, "rotation", 0.0, 0.1)
+		t.tween_interval(1.2)
+		Common.badge(c, 0, Vector2(108, 4))
+	elif not V6Worlds.world_open(w):
+		img.modulate = Color(0.6, 0.58, 0.68)
+
+func _chest_tap(c: Control, w: int, kind: String) -> void :
+	if V6Worlds.chest_opened(w, kind):
+		main.toast("Сундук уже открыт", "gift")
+		return
+	if not V6Worlds.chest_ready(w, kind):
+		Sfx.play("deny")
+		UI.punch(c, 0.08)
+		main.toast(V6Worlds.chest_need_text(w, kind), "gift")
+		return
+	var r: = V6Worlds.open_chest(w, kind)
+	Sfx.play("reveal_sr")
+	Fx.burst(map_root, c.position + Vector2(70, 50), "sparkle", 40, Color(1, 0.85, 0.4), 1.4)
+	Fx.ring(map_root, c.position + Vector2(70, 50), Color(1, 0.9, 0.6), 2.2, 0.6)
+	_refresh_chest(c, w, kind)
+	_chest_popup(r, kind)
+	main.refresh_currency(true)
+
+func _chest_popup(r: Dictionary, kind: String) -> void :
+	var p: = Common.popup(main, "Сундук главы" if kind == "mid" else "Звёздный сундук", 560)
+	Common.rays(p, Vector2(330, 160), 420, Color(1, 0.88, 0.5, 0.8), 14, 0.08, 0.8)
+	var img: = UI.tex(load("res://assets/v06/map/chest_open.png"), Rect2(206, 60, 248, 222), false)
+	p.add_child(img)
+	UI.pop_in(img, 0.1, 0.3)
+	var y: = 300.0
+	Common.chip(p, G.icon("gem"), "+%d" % int(r.gems), Rect2(50, y, 170, 58), "plum", 24)
+	Common.chip(p, G.icon("coin"), "+%s" % UI.fmt(int(r.coins)), Rect2(232, y, 170, 58), "plum", 24)
+	var hero: String = r.hero
+	var sh: = int(G.S.shards.get(hero, 0))
+	p.add_child(Common.avatar(hero, Rect2(418, y - 4, 66, 66), "pink"))
+	var sl: = UI.label("+%d осколок\n%s %d/%d" % [int(r.shard), G.HEROES[hero].name, mini(sh, G.SHARDS_NEED), G.SHARDS_NEED], 17, UI.INK, UI.DARK, 3, "body", 900)
+	sl.position = Vector2(492, y - 2)
+	p.add_child(sl)
+	var b: = JButton.make("Забрать", "pink", Rect2(150, 410, 360, 96), null, 34)
+	b.shine_every = 2.0
+	b.pressed.connect( func():
+		main.fly_gems(b.get_global_rect().get_center(), 6)
+		Common.close_popup(p))
+	p.add_child(b)
+
+
+func _build_marker() -> void :
+	marker = Control.new()
+	marker.size = Vector2(90, 110)
+	marker.pivot_offset = Vector2(45, 110)
+	marker.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	map_root.add_child(marker)
+	var bob: = Control.new()
+	bob.size = marker.size
+	bob.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	marker.add_child(bob)
+	var pin: = Polygon2D.new()
+	pin.polygon = PackedVector2Array([Vector2(30, 80), Vector2(60, 80), Vector2(45, 104)])
+	pin.color = Color("f2799f")
+	bob.add_child(pin)
+	var hero: String = G.S.level_partner if G.hero_unlocked(G.S.level_partner) else "mc"
+	bob.add_child(Common.avatar(hero, Rect2(4, 0, 82, 82), "pink"))
+	var t: Tween = bob.create_tween().set_loops()
+	t.tween_property(bob, "position:y", -10.0, 0.5).set_trans(Tween.TRANS_SINE)
+	t.tween_property(bob, "position:y", 0.0, 0.5).set_trans(Tween.TRANS_SINE)
+
+func _marker_pos(p: Vector2, boss: = false) -> Vector2:
+
+	return p - Vector2(45, 110) + (Vector2(-140, 30) if boss else Vector2(0, -70))
+
+func _place_marker(i: int) -> void :
+	var it: Dictionary = items[level_item.get(i, 0)]
+	marker.position = _marker_pos(it.pos, G.LEVELS[i].get("boss", false))
+
+func _build_overlays() -> void :
+	for spec in [[0.0, 270.0, Color(0.12, 0.04, 0.16, 0.85), Color(0.12, 0.04, 0.16, 0.0)], [H - 380.0, 380.0, Color(0.12, 0.04, 0.16, 0.0), Color(0.12, 0.04, 0.16, 0.9)]]:
+		var g: = Gradient.new()
+		g.set_color(0, spec[2])
+		g.set_color(1, spec[3])
+		var gt: = GradientTexture2D.new()
+		gt.gradient = g
+		gt.fill_from = Vector2(0, 0)
+		gt.fill_to = Vector2(0, 1)
+		gt.width = 4
+		gt.height = 64
+		add_child(UI.tex(gt, Rect2(0, spec[0], W, spec[1]), false))
+
+func _build_modes_bar() -> void :
+	var rect: = Rect2(14, 126, W - 28, 74)
+	if ResourceLoader.exists("res://scripts/screens/modes.gd"):
+		var mod = load("res://scripts/screens/modes.gd")
+		if mod and mod.has_method("build_bar"):
+			mod.build_bar(self, main, rect)
+			return
+	_build_modes()
+
+func _build_play_button() -> void :
+	var lv: Dictionary = G.LEVELS[cur]
+	var boss: bool = lv.get("boss", false)
+	play_btn = JButton.make(("Босс %s" if boss else "Партия %s") % lv.code, "red" if boss else "pink", Rect2(W * 0.5 - 220, H - 132 - 122, 440, 104), null, 36)
+	play_btn.set_sub(G.LOCS[lv.loc].name, 19)
+	play_btn.shine_every = 2.2
+	play_btn.pressed.connect( func():
+		_scroll_to_level(cur, true)
+		open_card(cur))
+	add_child(play_btn)
+	UI.slide_in(play_btn, Vector2(0, 60), 0.15, 0.4)
+
+
+func _clamp_y(y: float) -> float:
+	return clampf(y, H - map_h, 0.0)
+
+func _scroll_to_level(i: int, animate: bool) -> void :
+	var it: Dictionary = items[level_item.get(i, 0)]
+	_scroll_to(it.pos.y, animate)
+
+func _scroll_to(y: float, animate: bool, dur: = 0.5) -> void :
+	var target: = _clamp_y(H * 0.52 - y)
+	_vel = 0.0
+	if animate:
+		create_tween().tween_property(map_root, "position:y", target, dur).set_trans(Tween.TRANS_QUART).set_ease(Tween.EASE_OUT)
+	else:
+		map_root.position.y = target
+
+func _popup_open() -> bool:
+	for c in main.overlay.get_children():
+		if c.has_meta("popup") and not c.has_meta("closing"):
+			return true
+	return false
+
+func _input(e: InputEvent) -> void :
+	if not is_visible_in_tree() or _anim:
+		return
+	if e is InputEventScreenTouch:
+		if e.pressed and e.position.y > 205 and e.position.y < H - 132 and not _popup_open():
+			_drag = true
+			_drag_y = e.position.y
+			_moved = 0.0
+			_vel = 0.0
+		elif not e.pressed:
+			_drag = false
+	elif e is InputEventScreenDrag and _drag:
+		var dy: float = e.position.y - _drag_y
+		_drag_y = e.position.y
+		_moved += abs(dy)
+		_vel = dy / max(0.001, get_process_delta_time())
+		map_root.position.y = _clamp_y(map_root.position.y + dy)
+
+func _process(dt: float) -> void :
+	if not _drag and abs(_vel) > 5.0:
+		map_root.position.y = _clamp_y(map_root.position.y + _vel * dt)
+		_vel *= pow(0.03, dt)
+
+
+func _play_progress(from_i: int, to_i: int, pick: bool) -> void :
+	_anim = true
+	await get_tree().create_timer(0.55).timeout
+	if not is_inside_tree():
+		return
+	var d0: = _level_dist(from_i)
+	var d1: = _level_dist(to_i)
+	var boss_to: bool = G.LEVELS[to_i].get("boss", false)
+	var to_it: Dictionary = items[level_item[to_i]]
+	var new_node: Control = to_it.node
+	if new_node:
+		new_node.modulate.a = 0.35
+	var dur: = clampf((d1 - d0) / 420.0, 0.8, 2.2)
+	_scroll_to(to_it.pos.y, true, dur)
+	Sfx.play("sparkle")
+	var t: = create_tween()
+	t.tween_method( func(d: float):
+		path_mat.set_shader_parameter("progress", d)
+		marker.position = _marker_pos(_point_at(d), false), d0, d1, dur).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	await t.finished
+	if not is_inside_tree():
+		return
+	_place_marker(to_i)
+	UI.punch(marker, 0.2)
+	if new_node:
+		new_node.modulate.a = 1.0
+		UI.punch(new_node, 0.25, 0.5)
+		Fx.burst(map_root, to_it.pos, "sparkle", 30, Color(1, 0.9, 0.6), 1.2)
+		Fx.ring(map_root, to_it.pos, Color(1, 0.9, 0.6), 2.0, 0.5)
+	Sfx.play("star1")
+
+	var w_from: int = G.LEVELS[from_i].loc
+	var w_to: int = G.LEVELS[to_i].loc
+	if w_to != w_from and w_to < panels.size():
+		var m: ShaderMaterial = panels[w_to].material
+		var ft: = create_tween().set_parallel()
+		ft.tween_property(m, "shader_parameter/fog_amt", 0.0, 1.2)
+		ft.tween_property(m, "shader_parameter/gray", 0.0, 1.2)
+		ft.tween_property(m, "shader_parameter/bright", 1.0, 1.2)
+		Sfx.play("reveal_ssr")
+		var rib: = Common.ribbon(self, "Глава %d · %s" % [w_to + 1, G.LOCS[w_to].name], Rect2(W * 0.5 - 300, H * 0.36, 600, 96), "pink", 34)
+		UI.pop_in(rib, 0.0, 0.5)
+		var rt: = rib.create_tween()
+		rt.tween_interval(1.8)
+		rt.tween_property(rib, "modulate:a", 0.0, 0.4)
+		rt.tween_callback(rib.queue_free)
+		await get_tree().create_timer(1.6).timeout
+	elif boss_to:
+		main.toast("Впереди босс: %s" % G.LEVELS[to_i].get("boss_title", ""), "star")
+	V6Worlds.state().seen = int(G.S.unlocked)
+	G.save()
+	_anim = false
+	_refresh_states()
+	if pick and is_inside_tree():
+		await get_tree().create_timer(0.35).timeout
+		if is_inside_tree():
+			pick_partner(sel)
+
+func _refresh_states() -> void :
+	for it in items:
+		if it.kind == "chest" and it.node:
+			_refresh_chest(it.node, it.w, it.chest)
+
+
+func open_card(i: int) -> void :
+	if i > cur:
+		main.toast(_t("levels.locked", "Сначала сыграй партию %s") % G.LEVELS[i - 1].code, "star")
+		return
+	sel = i
+	var lv: Dictionary = G.LEVELS[i]
+	var w: int = lv.loc
+	var look: Dictionary = V6Worlds.LOOK[w]
+	var boss: bool = lv.get("boss", false)
+	var ph: = 960.0 if boss else 860.0
+	var p: = Common.popup(main, ("Босс %s" if boss else "Партия %s") % lv.code, ph)
+	var y: = 52.0
+	if boss:
+		p.add_child(Common.avatar(lv.boss_hero, Rect2(30, y, 130, 130), "gold"))
+		var bl: = UI.label(_t("levels.boss", "Хозяйка стола").to_upper(), 16, Color("ff9fb8"), UI.DARK, 3, "body", 900)
+		bl.position = Vector2(180, y - 4)
+		p.add_child(bl)
+		var tt: = UI.title(lv.boss_title, 32, Color("fff1dc"), look.deep)
+		tt.position = Vector2(178, y + 14)
+		p.add_child(tt)
+		var q: = UI.label("«%s»" % lv.boss_line, 19, Color("ffd9e6"), UI.DARK, 2, "body", 800)
+		q.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		q.custom_minimum_size = Vector2(450, 0)
+		q.position = Vector2(180, y + 60)
+		q.size = Vector2(450, 84)
+		p.add_child(q)
+		y += 142.0
+	else:
+		var wl: = UI.label("%s · %s" % [look.sub, G.LOCS[w].name], 20, look.accent.lerp(Color.WHITE, 0.3), UI.DARK, 3, "body", 900)
+		wl.position = Vector2(0, y)
+		wl.size = Vector2(660, 30)
+		wl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		p.add_child(wl)
+		y += 34.0
+
+	var stn: = G.level_stars(i)
+	for q in 3:
+		var big: = q == 1
+		var sz: = 74.0 if big else 60.0
+		var s: = UI.tex(G.fx("star" if q < stn else "star_empty"), Rect2(330 - 115 + q * 115 - sz * 0.5, y + (0.0 if big else 12.0), sz, sz))
+		p.add_child(s)
+		if q < stn:
+			UI.pop_in(s, 0.1 + q * 0.08, 0.3)
+	y += 84.0
+
+	var pb: = UI.rbox("glass", Rect2(30, y, 600, 370), 26, 3, 8)
+	pb.borders(look.accent.lerp(Color.WHITE, 0.3), look.deep)
+	p.add_child(pb)
+	var pv: = V6LayoutPreview.new()
+	pv.position = Vector2(20, 14)
+	pv.size = Vector2(560, 300)
+	pb.add_child(pv)
+	pv.setup(lv.duplicate(true), look.accent)
+	var nt: = pv.pos.size() - pv.pos.size() % 2
+	Common.chip(pb, null, "%d фишек" % nt, Rect2(14, 322, 150, 36), "plum", 17)
+	y += 382.0
+
+	var tags: Array = [[V6Layouts.shape_name(lv.shape), "lav"]]
+	if lv.gold > 0:
+		tags.append(["Золото", "gold"])
+	if lv.ice > 0:
+		tags.append(["Лёд", "sky"])
+	if lv.hidden:
+		tags.append(["Тайные", "plum"])
+	if lv.get("upper", "") != "":
+		tags.append([V6Layouts.UPPER_NAMES.get(lv.upper, ""), "mint"])
+	tags.append(["%d слоёв" % lv.layers if lv.layers >= 5 else "%d слоя" % lv.layers, "plum"])
+	if int(lv.hard) > 0:
+		tags.append([_t("levels.hard%d" % lv.hard, G.HARD_NAMES[lv.hard]), "red"])
+	var x: = 30.0
+	var ty: = y
+	for tg in tags:
+		var tw: float = UI.font("body", 900).get_string_size(tg[0], HORIZONTAL_ALIGNMENT_LEFT, -1, 18).x + 34.0
+		if x + tw > 630.0:
+			x = 30.0
+			ty += 46.0
+		var ch: = UI.rbox(tg[1], Rect2(x, ty, tw, 38), 19, 2, 4)
+		p.add_child(ch)
+		var light: bool = tg[1] in ["gold", "sky", "mint", "lav"]
+		ch.add_child(UI.center_label(UI.label(tg[0], 18, Color("3a1a30") if light else Color.WHITE, Color(1, 1, 1, 0.5) if light else UI.DARK, 2, "body", 900), Rect2(0, 0, tw, 38)))
+		x += tw + 8.0
+	y = ty + 56.0
+
+	var rl: = UI.label("Награда", 18, Color("cbb5dc"), UI.DARK, 2, "body", 900)
+	rl.position = Vector2(34, y + 14)
+	p.add_child(rl)
+	Common.chip(p, G.icon("gem"), str(lv.reward.gems), Rect2(130, y, 150, 52), "plum", 22)
+	var rx: = 296.0
+	if lv.reward.has("item"):
+		var itd: Dictionary = G.ITEM[lv.reward.item]
+		var ib: = UI.rbox("gold" if not G.owns(itd.id) else "plum", Rect2(rx, y - 2, 56, 56), 14, 3, 4)
+		p.add_child(ib)
+		ib.add_child(UI.tex(G.item_tex(itd), Rect2(5, 5, 46, 46)))
+		rx += 66.0
+	var sh_h: String = lv.shard
+	p.add_child(Common.avatar(sh_h, Rect2(rx, y - 2, 56, 56), "pink"))
+	var shl: = UI.label("осколок\n%s" % G.HEROES[sh_h].name, 15, UI.INK, UI.DARK, 2, "body", 900)
+	shl.position = Vector2(rx + 62, y)
+	p.add_child(shl)
+
+	var skin_btn: = JButton.make(_t("levels.skins", "Фишки"), "lav", Rect2(30, ph - 122, 190, 92), G.tile_tex(G.ITEM[G.S.get("skin", "s_sakura")].tile), 22)
+	skin_btn.pressed.connect( func(): Common.skin_picker(main, func(): pass))
+	p.add_child(skin_btn)
+	var go: = JButton.make(_t("levels.sit", "Сесть за стол"), "red" if boss else "pink", Rect2(232, ph - 122, 398, 92), null, 32)
+	go.shine_every = 2.0
+	go.pressed.connect( func():
+		Common.close_popup(p)
+		pick_partner(i))
+	p.add_child(go)
+
+func pick_skin() -> void :
+	Common.skin_picker(main, func(): pass)
+
+
+func pick_partner(level: int) -> void :
+	var heroes: Array = G.HERO_ORDER
+	var rh: = 150.0
+	var p: = Common.popup(main, _t("levels.partner_t", "Кто сядет рядом?"), 90 + heroes.size() * (rh + 10) + 130)
+	var cur_h: = [G.S.level_partner if G.hero_unlocked(G.S.level_partner) else "mc"]
+	partner_rows.clear()
+	for i in heroes.size():
+		var h: String = heroes[i]
+		var unl: = G.hero_unlocked(h)
+		var row: = UI.rbox("glass", Rect2(24, 60 + i * (rh + 10), 612, rh), 24, 3, 8)
+		row.mouse_filter = Control.MOUSE_FILTER_STOP
+		p.add_child(row)
+		var av: = Common.avatar(h, Rect2(10, 8, 100, 100), "gold" if unl else "plum")
+		row.add_child(av)
+		if not unl:
+			((av.get_node("Pic") as TextureRect).material as ShaderMaterial).set_shader_parameter("gray", 1.0)
+			av.add_child(UI.tex(G.fx("lock"), Rect2(34, 34, 32, 32)))
+			var nl0: = UI.label(G.HEROES[h].name, 24, Color("9a8a9a"), Color.WHITE, 3, "body", 900)
+			nl0.position = Vector2(128, 10)
+			row.add_child(nl0)
+			var sh: = mini(int(G.S.shards.get(h, 0)), G.SHARDS_NEED)
+			var hl0: = UI.label(_t("levels.shards", "Портрет: %d/%d осколков · или Желания") % [sh, G.SHARDS_NEED], 18, Color("9a6a8a"))
+			hl0.position = Vector2(128, 48)
+			row.add_child(hl0)
+			Common.progress_bar(row, Rect2(128, 78, 300, 18), float(sh) / G.SHARDS_NEED, "gold")
+			row.modulate = Color(1, 1, 1, 0.85)
+			continue
+		var nl: = UI.label(G.HEROES[h].name, 26, UI.INK, Color.WHITE, 3, "body", 900)
+		nl.position = Vector2(132, 12)
+		row.add_child(nl)
+		Common.chip(row, G.icon("heart"), "ур. %d" % G.aff_level(h), Rect2(450, 14, 140, 40), "pink", 18)
+		var pk: = UI.label(_t("levels.skill", "Умение «%s»: %s") % [G.SKILLS[h].name, G.SKILLS[h].desc], 17, Color("ffd98a"), UI.DARK, 2, "body", 900)
+		pk.position = Vector2(132, 52)
+		pk.size = Vector2(460, 28)
+		row.add_child(pk)
+		var bonus: = UI.label(_t("levels.perk", "Перк: %s") % G.PERKS[h], 16, Color("9a6a8a"))
+		bonus.position = Vector2(132, 84)
+		row.add_child(bonus)
+		V7Passives.partner_row(row, h, G.LEVELS[level])
+		partner_rows[h] = row
+		row.gui_input.connect( func(e):
+			if e is InputEventMouseButton and e.pressed:
+				Sfx.play("pop")
+				cur_h[0] = h
+				Sfx.say(h, "greet")
+				for k in partner_rows:
+					var r: RBox = partner_rows[k]
+					if not G.hero_unlocked(k):
+						continue
+					r.colors(UI.PAL["rose" if k == h else "glass"][0], UI.PAL["rose" if k == h else "glass"][1])
+				UI.punch(row, 0.06))
+		if h == cur_h[0]:
+			row.colors(UI.PAL.rose[0], UI.PAL.rose[1])
+	partner_go_btn = JButton.make(_t("levels.deal", "Раздать фишки"), "pink", Rect2(130, p.size.y - 120, 400, 96), null, 32)
+	partner_go_btn.shine_every = 2.0
+	partner_go_btn.pressed.connect( func():
+		G.S.level_partner = cur_h[0]
+		G.current_level = level
+		G.save()
+		main.go("play", {"level": level, "partner": cur_h[0]}))
+	p.add_child(partner_go_btn)
+
+
+func _build_modes() -> void :
+	var modes: = [
+		["path", "Путь", "%d партий" % G.LEVELS.size()], 
+		["blitz", "Блиц", "рекорд %d" % int(G.S.get("blitz_best", 0))], 
+		["zen", "Сад", "без таймера"], 
+		["daily", "Раскладка дня", "готово" if G.daily_done_today() else "новая"], 
+	]
+	var x: = 14.0
+	var ws: = [140.0, 150.0, 150.0, 236.0]
+	for i in modes.size():
+		var m: Array = modes[i]
+		var on: bool = m[0] == "path"
+		var b: = UI.rbox("gold" if on else "plum", Rect2(x, 126, ws[i] - 8, 74), 22, 3, 8)
+		if not on:
+			b.borders(Color("ffe7a6"), Color("c58a2c"))
+		b.mouse_filter = Control.MOUSE_FILTER_STOP
+		add_child(b)
+		b.add_child(UI.center_label(UI.label(m[1], 22, Color.WHITE if not on else Color("4a2a06"), UI.DARK if not on else Color(1, 1, 1, 0.6), 3, "body", 900), Rect2(0, 6, ws[i] - 8, 32)))
+		b.add_child(UI.center_label(UI.label(m[2], 15, Color("e9dcff") if not on else Color("6a4a16")), Rect2(0, 38, ws[i] - 8, 26)))
+		var id: String = m[0]
+		b.gui_input.connect( func(e):
+			if e is InputEventMouseButton and e.pressed:
+				Sfx.play("pop")
+				UI.punch(b, 0.08)
+				_open_mode(id))
+		UI.slide_in(b, Vector2(0, -30), 0.05 * i)
+		x += ws[i]
+
+func _open_mode(id: String) -> void :
+	match id:
+		"blitz":
+			_mode_popup("Блиц", "Две минуты, столы сменяют друг друга. Чистый стол даёт +10 секунд, переполненный лоток отнимает 10. Очки растут с комбо.", "Рекорд: %d" % int(G.S.get("blitz_best", 0)), func(): main.go("play", {"mode": "blitz", "partner": G.S.level_partner}))
+		"zen":
+			_mode_popup("Сад без спешки", "Бесконечные столы, шесть мест в лотке и никакого проигрыша: если лоток заполнится, три фишки тихо вернутся. +30 кристаллов за каждый стол.", "Для вечера после работы", func(): main.go("play", {"mode": "zen", "partner": G.S.level_partner}))
+		"daily":
+			Daily.calendar(main)
+
+func _mode_popup(title: String, text: String, sub: String, go_cb: Callable) -> void :
+	var p: = Common.popup(main, title, 420)
+	var l: = UI.label(text, 22, UI.INK)
+	l.position = Vector2(40, 70)
+	l.size = Vector2(580, 160)
+	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	p.add_child(l)
+	var sl: = UI.label(sub, 20, Color("ffd98a"), UI.DARK, 3, "body", 900)
+	sl.position = Vector2(40, 236)
+	p.add_child(sl)
+	var b: = JButton.make("Начать", "pink", Rect2(130, 290, 400, 96), null, 34)
+	b.shine_every = 2.0
+	b.pressed.connect(go_cb)
+	p.add_child(b)
+
+
+func dev_act(a: String) -> void :
+	match a:
+		"pick":
+			pick_partner(sel)
+		"skin":
+			pick_skin()
+		"card":
+			open_card(cur)
+		"top":
+			_scroll_to(0.0, false)
+		_:
+			if a.begins_with("w") and a.length() == 2:
+				_scroll_to(_world_top(int(a.substr(1))) + SH * 0.5, false)
+			elif a.begins_with("y"):
+				map_root.position.y = _clamp_y( - float(a.substr(1)))
+			elif a.begins_with("lv"):
+				var i: = int(a.substr(2))
+				_scroll_to_level(i, false)
+				open_card(i)
+			elif a.begins_with("chest"):
+				var w: = int(a.substr(5))
+				for it in items:
+					if it.kind == "chest" and it.w == w and it.chest == "mid":
+						_scroll_to(it.pos.y, false)
+						_chest_tap(it.node, w, "mid")

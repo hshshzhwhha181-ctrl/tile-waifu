@@ -1,0 +1,65 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="Tile Waifu"
+config/description="Mahjong solitaire + gacha"
+run/main_scene="res://main.tscn"
+config/features=PackedStringArray("4.5", "GL Compatibility")
+boot_splash/bg_color=Color(0.99, 0.91, 0.93, 1)
+boot_splash/show_image=false
+config/icon="res://assets/ui/app_icon.png"
+
+[autoload]
+
+G="*res://scripts/g.gd"
+Sfx="*res://scripts/sfx.gd"
+V6Story="*res://scripts/v06/story/story.gd"
+V6Fx="*res://scripts/v06/fx/v6fx.gd"
+V7Haptics="*res://scripts/v07/haptics/haptics.gd"
+V7DayNight="*res://scripts/v07/daynight/daynight.gd"
+V7Eggs="*res://scripts/v07/eggs/eggs.gd"
+V7Album="*res://scripts/v07/album/album.gd"
+V7Event="*res://scripts/v07/event/event.gd"
+
+[debug]
+
+gdscript/warnings/unused_parameter=0
+gdscript/warnings/shadowed_variable=0
+gdscript/warnings/integer_division=0
+gdscript/warnings/narrowing_conversion=0
+gdscript/warnings/inference_on_variant=0
+
+[display]
+
+window/size/viewport_width=720
+window/size/viewport_height=1280
+window/size/window_width_override=405
+window/size/window_height_override=877
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+window/handheld/orientation=1
+
+[editor_overrides]
+
+text_editor/behavior/indent/type=0
+text_editor/behavior/indent/size=4
+
+[input_devices]
+
+pointing/emulate_touch_from_mouse=true
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+textures/vram_compression/import_etc2_astc=true
+environment/defaults/default_clear_color=Color(0.99, 0.91, 0.93, 1)
