@@ -122,7 +122,7 @@ func _build_main(nick0: String) -> void :
 	page_main.add_child(who_lbl)
 	_on_pick(avatar)
 
-	play_btn = JButton.make(V8ProfileUI.s("card.play"), "gold", Rect2(x, 520, w, 116), null, 34)
+	play_btn = JButton.make(V8ProfileUI.s("card.play"), "pink", Rect2(x, 520, w, 116), null, 34)
 	play_btn.set_sub(V8ProfileUI.s("card.play_sub"), 19)
 	play_btn.shine_every = 2.6
 	play_btn.pressed.connect(_on_play)
@@ -133,7 +133,7 @@ func _build_main(nick0: String) -> void :
 	note.position = Vector2(x, 648)
 	note.size = Vector2(w, 52)
 	page_main.add_child(note)
-	var code_btn: = JButton.make(V8ProfileUI.s("card.have_code"), "glass", Rect2(PW * 0.5 - 170, 726, 340, 76), null, 24)
+	var code_btn: = JButton.make(V8ProfileUI.s("card.have_code"), "graphite", Rect2(PW * 0.5 - 170, 726, 340, 76), null, 24)
 	code_btn.pressed.connect(_show_code)
 	page_main.add_child(code_btn)
 

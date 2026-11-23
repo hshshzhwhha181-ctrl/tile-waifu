@@ -62,7 +62,14 @@ static func login(main, home) -> void :
 		var got: = n >= int(d)
 		var mb: = UI.rbox("gold" if got else "glass", Rect2(x - 40, 334, 72, 72), 16, 3, 6)
 		p.add_child(mb)
-		mb.add_child(V8Art.rect(_reward_icon(mr), Rect2(6, 6, 60, 60)))
+		if mr.has("item"):
+			# an outfit is a full-body picture: at 60 px show her head and shoulders (mipmapped crop), not the
+			# whole figure squeezed into a stair-stepped 40×60 sliver
+			var ca: = Common.card_art(_reward_icon(mr), Rect2(6, 6, 60, 60), Vector2(0.5, 0.2), 2.2, 12)
+			(ca.material as ShaderMaterial).set_shader_parameter("bottom_shade", 0.0)
+			mb.add_child(ca)
+		else:
+			mb.add_child(V8Art.rect(_reward_icon(mr), Rect2(6, 6, 60, 60)))
 		p.add_child(UI.center_label(UI.label(V6Txt.s("daily.days") % d, 16, UI.INK), Rect2(x - 44, 408, 80, 22)))
 	var note: = UI.center_label(UI.label(V6Txt.s("daily.login_note"), 18, Color("8a5a7a")), Rect2(0, 448, 660, 28))
 	p.add_child(note)
@@ -160,7 +167,7 @@ static func calendar(main) -> void :
 		p.add_child(c)
 		c.add_child(UI.center_label(UI.label(str(d), 20, Color.WHITE if pal in ["pink", "mint"] else UI.INK, Color("7a2346") if pal == "pink" else (Color("1f5e49") if pal == "mint" else Color.WHITE), 3, "body", 900), Rect2(4, 2, 34, 28)))
 		if is_done:
-			c.add_child(UI.tex(G.fx("star"), Rect2(36, 22, 44, 44)))
+			c.add_child(V8Art.star_rect(true, Rect2(36, 22, 44, 44)))
 		elif d > today_d:
 			c.modulate.a = 0.6
 	var solved: = done.size()

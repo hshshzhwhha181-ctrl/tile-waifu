@@ -53,6 +53,8 @@ static func rays(parent: Node, pos: Vector2, size: float, color: Color, count: =
 
 static func card_art(tex: Texture2D, r: Rect2, focus: = Vector2(0.5, 0.3), zoom: = 1.0, radius: = 16.0) -> TextureRect:
 	var t: = UI.tex(tex, r, false)
+	# outfit / hero art is 700…1300 px and drawn at 40…340 px: sample the mipmaps or the outlines stair-step
+	t.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	var m: = ShaderMaterial.new()
 	m.shader = preload("res://shaders/card.gdshader")
 	m.set_shader_parameter("size", r.size)

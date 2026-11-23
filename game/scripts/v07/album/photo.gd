@@ -34,11 +34,11 @@ static func victory_hook(p, root: Control, st: int, s: float) -> void :
 	var h: float = p.size.y
 	var by: = h - 150.0 - 76.0
 	if V7Replay.has_log(p.board):
-		var rb: = JButton.make("Повтор", "graphite", Rect2(w * 0.5 - 230, by, 220, 62), V8Art.nav("play"), 22)
+		var rb: = JButton.make("Повтор", "graphite", Rect2(w * 0.5 - 230, by, 220, 62), V8Art.icon("undo"), 22)
 		rb.pressed.connect( func(): V7Replay.run(p, root))
 		root.add_child(rb)
 		UI.pop_in(rb, 1.1)
-	var fb: = JButton.make("Фото", "graphite", Rect2(w * 0.5 + 10, by, 220, 62), V8Art.icon("star"), 22)
+	var fb: = JButton.make("Фото", "graphite", Rect2(w * 0.5 + 10, by, 220, 62), null, 22)
 	fb.pressed.connect( func(): V7Photo.open(p, root, st, s))
 	root.add_child(fb)
 	UI.pop_in(fb, 1.15)
@@ -219,7 +219,7 @@ func _captions(fd: Dictionary) -> void :
 	var lvn: = ("%s · %s" % [code, play.cfg.get("name", "")]) if code != "" else String(play.cfg.get("name", ""))
 	plate.add_child(UI.center_label(UI.label(lvn, 24, UI.INK, UI.DARK, 3, "title", 800), Rect2(0, 8, 560, 34)))
 	for i in 3:
-		var s: = UI.tex(G.fx("star" if i < stars else "star_empty"), Rect2(280 - 30 + (i - 1) * 66, 42 + (0 if i == 1 else 6), 60, 60))
+		var s: = V8Art.star_rect(i < stars, Rect2(280 - 30 + (i - 1) * 66, 42 + (0 if i == 1 else 6), 60, 60))
 		plate.add_child(s)
 	var bits: = ["%d с" % int(secs)]
 	if play.max_combo >= 2:

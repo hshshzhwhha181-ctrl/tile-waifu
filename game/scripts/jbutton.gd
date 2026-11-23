@@ -7,6 +7,9 @@ var box: RBox
 var lbl: Label
 var sub: Label
 var icon_rect: TextureRect
+# 0.8 art: call-to-action and secondary buttons draw btn/primary or btn/secondary (NinePatchRect) instead of the
+# procedural pill; `box` stays (hidden) so pressed/shine/colors() calls keep working
+var art: NinePatchRect
 var sound: = "pop"
 var shine_every: = 0.0
 var pulse: = false
@@ -21,6 +24,17 @@ static func make(text: String, pal: String, rect: Rect2, icon: Texture2D = null,
 	b.build(text, pal, icon, font_size, radius)
 	return b
 
+# palette -> btn art. Small toggles, tags, tabs and round icon buttons keep the procedural palettes.
+const ART_PAL: = {"pink": "primary", "graphite": "secondary", "lav": "secondary"}
+const ART_MIN_H: = 60.0
+
+static func art_for(pal: String, sz: Vector2, text: String, radius: float) -> String:
+	if text == "" or radius >= 0.0 or not ART_PAL.has(pal):
+		return ""
+	if sz.y < ART_MIN_H or sz.x < sz.y * 1.8:
+		return ""
+	return ART_PAL[pal]
+
 func build(text: String, pal: String, icon: Texture2D, font_size: int, radius: float) -> void :
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	pivot_offset = size * 0.5
@@ -29,12 +43,27 @@ func build(text: String, pal: String, icon: Texture2D, font_size: int, radius: f
 	box.size = size
 	box.setup(p[0], p[1], size.y * 0.5 if radius < 0 else radius, 4.0, 14.0)
 	add_child(box)
+	var art_name: = art_for(pal, size, text, radius)
 	var x0: = 0.0
+	var x1: = 0.0
+	if art_name != "":
+		art = V8Art.nine(art_name, Rect2(Vector2.ZERO, size))
+		add_child(art)
+		box.visible = false
+		var cr: = V8Art.nine_content(art_name, size)
+		x0 = cr.position.x
+		x1 = size.x - cr.end.x
 	if icon:
 		var s: = size.y * 0.92
-		icon_rect = UI.tex(icon, Rect2(size.y * 0.06 + 4, (size.y - s) * 0.5, s, s))
+		var ix: = size.y * 0.06 + 4
+		if art:
+			s = size.y * 0.6
+			ix = maxf(x0 - 4.0, size.y * 0.16)
+		icon_rect = UI.tex(icon, Rect2(ix, (size.y - s) * 0.5, s, s))
+		if art:
+			icon_rect.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 		add_child(icon_rect)
-		x0 = s + 6
+		x0 = ix + s + 6
 	if text != "":
 		var outline: Color = p[2]
 		var col: = Color.WHITE
@@ -45,8 +74,22 @@ func build(text: String, pal: String, icon: Texture2D, font_size: int, radius: f
 			col = Color("3a2410")
 			outline = Color(1.0, 0.95, 0.8, 0.55)
 		lbl = UI.label(text, font_size, col, outline, 6 if col == Color.WHITE else (2 if pal == "gold" else 4), "body", 900)
-		UI.center_label(lbl, Rect2(x0, 0, size.x - x0, size.y))
+		UI.center_label(lbl, Rect2(x0, 0, size.x - x0 - x1, size.y))
+		if art and not "\n" in text:
+			_fit_label(size.x - x0 - x1)
 		add_child(lbl)
+
+# the art's caps leave less room than the pill: shrink the caption (never below 16 px) until it fits on one line
+func _fit_label(w: float) -> void :
+	var ls: LabelSettings = lbl.label_settings
+	var f: Font = ls.font if ls.font else UI.font("body", 900)
+	var fs: = ls.font_size
+	while fs > 16 and f.get_string_size(lbl.text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > w:
+		fs -= 1
+	if fs != ls.font_size:
+		ls = ls.duplicate()
+		ls.font_size = fs
+		lbl.label_settings = ls
 
 func set_sub(text: String, size_px: = 20) -> void :
 	if sub == null:

@@ -460,7 +460,7 @@ func _etude_btn(p: Control, i: int, r: Rect2) -> void :
 	else:
 		b.add_child(UI.center_label(UI.title(str(i + 1), 36, Color.WHITE if stars < 3 else Color("fff6d8"), Color("5a1a6a") if stars < 3 else Color("9a5a0a")), Rect2(0, 6, r.size.x, 56)))
 	for k in 3:
-		var st: = UI.tex(G.fx("star" if k < stars else "star_empty"), Rect2(r.size.x * 0.5 - 45 + k * 30, 66, 30, 30))
+		var st: = V8Art.star_rect(k < stars, Rect2(r.size.x * 0.5 - 45 + k * 30, 66, 30, 30))
 		b.add_child(st)
 	b.gui_input.connect( func(e):
 		if e is InputEventMouseButton and e.pressed:

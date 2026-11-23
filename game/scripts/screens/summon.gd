@@ -383,11 +383,10 @@ func _card(r: Dictionary, sz: Vector2) -> Control:
 	front.add_child(rtag)
 	rtag.add_child(UI.center_label(UI.label(r.rar, rfs, col.lerp(Color.WHITE, 0.45), UI.DARK, 3, "body", 900), Rect2(0, -1, rw, rh)))
 	var nl: = UI.label(r.name, fs, Color.WHITE, Color(0.2, 0.05, 0.2), 4, "body", 900)
-	# autowrap first: with it off, the label's minimum width is the whole line and size.x would grow past the card
-	# 0.8: 16 px on the small cards too; word-bound wrapping only, the label as wide as the longest word
-	nl.autowrap_mode = TextServer.AUTOWRAP_WORD
-	var nw: = maxf(sz.x - 12.0, UI.longest_word_w(r.name, fs, "body", 900, 4) + 2.0)
-	nl.custom_minimum_size = Vector2(nw, 0)
+	# 0.8: at most two lines inside the frame (16 px floor, lighter weight / hyphenation / «…» past that) — a
+	# third line («Фон» / «Чайный» / «сад»») used to run below the card's bottom edge
+	var nw: = sz.x - 12.0
+	Common.fit_words(nl, nw, 2, 16)
 	nl.position = Vector2((sz.x - nw) * 0.5, sz.y - (54 if small else 86))
 	nl.size = Vector2(nw, 46 if small else 70)
 	nl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER

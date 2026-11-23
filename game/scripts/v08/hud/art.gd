@@ -13,9 +13,11 @@ extends RefCounted
 #                                     falls back to V8Art.old_icon(). G.icon() and Common.ui_icon() route here too.
 #   V8Art.nav(name)                   nav/*: home wardrobe play wishes shop
 #   V8Art.cur(name)                   cur/*: gem coin ticket
+#   V8Art.event_cur(icon_id)          cur/ev_<hero>: event currencies (V7Event.cur_icon wraps it)
 #   V8Art.frame(name)                 frame/*: avatar avatar_top card_r card_sr card_ssr (or a rarity "R"/"SR"/"SSR")
 #   V8Art.btn(name)                   btn/*: primary secondary play_title ribbon panel (raw texture)
-#   V8Art.misc(name)                  misc/*: chest_closed chest_open node_cur node_done node_lock logo
+#   V8Art.misc(name)                  misc/*: chest_closed chest_open node_cur node_done node_lock logo star_empty
+#   V8Art.star(on) / star_rect(on, r) rating star: nav/play filled, misc/star_empty (graphite copy) empty
 #   V8Art.bg(name)                    bg/*.webp: profile tourney
 #   V8Art.rect(tex, r, keep = true)   TextureRect like UI.tex() but sampled with mipmaps (crisp when drawn small)
 #   V8Art.nine(name, r)               NinePatchRect for btn primary/secondary/ribbon/panel sized to r; children are NOT
@@ -125,6 +127,15 @@ static func cur(name: String) -> Texture2D:
 	return tex("cur/" + String(CUR_ALIAS.get(name, name)))
 
 
+# Event currency (event_data "icon": "cur_<hero>") -> cur/ev_<hero>: the v0.7 flat glyph set on a gold-rimmed
+# graphite disc so it sits with cur/gem and cur/coin. Falls back to the 0.7 file if a new event has no art yet.
+static func event_cur(icon_id: String) -> Texture2D:
+	var n: = "cur/ev_" + icon_id.trim_prefix("cur_")
+	if has(n):
+		return tex(n)
+	return tex("res://assets/v07/event/%s.png" % icon_id)
+
+
 static func frame(name: String) -> Texture2D:
 	var n: = name
 	if name.to_upper() in ["R", "SR", "SSR"]:
@@ -138,6 +149,17 @@ static func btn(name: String) -> Texture2D:
 
 static func misc(name: String) -> Texture2D:
 	return tex("misc/" + name)
+
+
+# Star rating: the gold sakura star (nav/play) when earned, its graphite copy (misc/star_empty) when not.
+# Every star rating (victory, map nodes, chests, event tables, modes, album) uses this — never assets/fx/star*.
+static func star(on: = true) -> Texture2D:
+	return tex("nav/play" if on else "misc/star_empty")
+
+
+# TextureRect with the rating star, mipmapped so it stays crisp at 26…104 px.
+static func star_rect(on: bool, r: Rect2) -> TextureRect:
+	return rect(star(on), r)
 
 
 static func bg(name: String) -> Texture2D:

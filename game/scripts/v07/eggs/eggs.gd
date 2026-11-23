@@ -168,10 +168,10 @@ func _dress_star(t: Node2D) -> void :
 		fs.self_modulate = fs.self_modulate * Color(1.0, 0.9, 0.62)
 
 	var s: = Sprite2D.new()
-	s.texture = G.fx("star")
+	s.texture = V8Art.star(true)
+	s.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	s.position = Vector2(Tile.TW * 0.34, - Tile.TH * 0.38)
 	s.scale = Vector2(0.5, 0.5)
-	s.modulate = Color(1.0, 0.78, 0.18)
 	n.add_child(s)
 	var sh: = Sprite2D.new()
 	sh.texture = G.fx("sparkle")

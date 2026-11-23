@@ -461,7 +461,7 @@ func _etude_strip() -> void :
 	p.add_child(rule)
 	etude_star_nodes.clear()
 	for i in 3:
-		var s: = UI.tex(G.fx("star"), Rect2(w - 168 + i * 52, 6, 52, 52))
+		var s: = V8Art.star_rect(true, Rect2(w - 168 + i * 52, 6, 52, 52))
 		p.add_child(s)
 		etude_star_nodes.append(s)
 	var best: = V6ModesData.etude_stars(etude_i)
@@ -481,8 +481,8 @@ func _etude_update() -> void :
 	for i in etude_star_nodes.size():
 		var s: TextureRect = etude_star_nodes[i]
 		var on: = i < n
-		if not on and s.texture != G.fx("star_empty"):
-			s.texture = G.fx("star_empty")
+		if not on and s.texture != V8Art.star(false):
+			s.texture = V8Art.star(false)
 			UI.punch(s, 0.3)
 
 func _etude_stuck() -> void :

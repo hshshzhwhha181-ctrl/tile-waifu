@@ -690,7 +690,10 @@ func tile_tex(i: int) -> Texture2D:
 func icon(name: String) -> Texture2D:
 	return Common.ui_icon(name)
 
+# particles only (glow, sparkle, petal …). Rating stars are 0.8 art: V8Art.star(); the old fx star names redirect.
 func fx(name: String) -> Texture2D:
+	if name == "star" or name == "star_empty":
+		return V8Art.star(name == "star")
 	return load("res://assets/fx/%s.png" % name)
 
 func rar_color(r: String) -> Color:

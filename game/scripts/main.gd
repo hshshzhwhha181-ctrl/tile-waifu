@@ -859,6 +859,11 @@ func toast(text: String, icon: = "") -> void :
 	# action buttons, so a toast sits at the very bottom, over the buttons' captions (it takes no tap), and there
 	# is one slot only: a new toast replaces the one before instead of stacking up into the tiles
 	var in_match: = PLAY_BACK.has(screen_id) and not (topbar and topbar.visible)
+	# 0.8: in a match the notice is a slim one-line plaque in the strip between the table and the action buttons
+	# (play.v8_notice): it covers neither tiles nor the buttons' captions and counters
+	if in_match and screen and is_instance_valid(screen) and screen.has_method("v8_notice"):
+		if screen.v8_notice(text, art_icon(icon) if icon != "" else null):
+			return
 	if in_match:
 		y = get_viewport_rect().size.y - 74.0
 	for c in overlay.get_children():
@@ -883,11 +888,12 @@ func toast(text: String, icon: = "") -> void :
 	if UI.font("body", 800).get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > (w - x0 - 16) * 2.0:
 		fs = 19
 	var l: = UI.label(text, fs, Color.WHITE, Color(0.2, 0.05, 0.2), 3)
+	# wrap mode first: a Label sized before autowrap is on keeps the one-line width and runs past the pill
+	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	l.position = Vector2(x0, 0)
 	l.size = Vector2(w - x0 - 16, 70)
 	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	p.add_child(l)
 	UI.slide_in(p, Vector2(0, -60), 0.0, 0.35)
 	var t: Tween = p.create_tween()

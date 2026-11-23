@@ -74,8 +74,9 @@ static func is_open() -> bool:
 		return true
 	return int(G.S.unlocked) >= UNLOCK_AT
 
+# 0.8: event currencies in the cur/ family (gold rim, graphite lacquer, sakura) through the V8Art cache
 static func cur_icon(def: Dictionary) -> Texture2D:
-	return load("res://assets/v07/event/%s.png" % def.icon)
+	return V8Art.event_cur(String(def.icon))
 
 static func art(def: Dictionary, wide: = false) -> Texture2D:
 	return load("res://assets/v07/event/%s_%s.webp" % [def.art, "wide" if wide else "card"])

@@ -753,6 +753,7 @@ func _on_match(mid: Vector2, combo: int, gold: bool, shard: String) -> void :
 	UI.punch(gems_lbl, 0.25)
 	if shard != "":
 		_shard_found(shard, mid)
+	_v8_clear_combo_word()
 	if combo >= 2:
 		charge = min(1.0, charge + 0.12 * combo)
 		combo_lbl.text = V6Txt.s("play.combo") % combo
@@ -806,33 +807,41 @@ func _combo_banner(word: String, combo: int) -> void :
 	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	l.pivot_offset = Vector2(280, 22)
 	l.rotation = deg_to_rad(randf_range(-1.5, 1.5))
-	v8_band(l, 0.4, true)
+	v8_band(l, 0.4, true, 0, true)
+	if not l.is_inside_tree():
+		return
 	l.scale = Vector2(1.3, 1.3)
 	var t: Tween = l.create_tween()
 	t.tween_property(l, "scale", Vector2.ONE, 0.16).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 
-# 0.8: one transient plaque at a time (combo word, yaku, fever, riichi) under the table: it never covers a tile
-# and lets every tap through (mouse_filter IGNORE). The newest replaces the one before; it fades out after `hold`
-# seconds. `gap` = the slim strip between the table frame and the tops of the action buttons (the combo word),
-# otherwise the band of the action buttons (ribbons: fever, yaku, riichi).
+# 0.8: one transient plaque at a time (combo word, notices, yaku, fever, riichi) in the slim strip between the
+# table frame and the tops of the action buttons: it never covers a tile, an action button or its caption, and it
+# lets every tap through (mouse_filter IGNORE). It fades out after `hold` seconds. The newest replaces the one
+# before unless that one has a higher `prio` (combo word 0 < ribbons 1 < notices 2), then the newcomer is dropped.
+# Every caller keeps its plaque ≤ 52 px high so it fits the strip.
 var _v8_band_node: Control = null
+var _v8_band_prio: = 0
+var _v8_band_combo: = false
 
-func v8_band(n: Control, hold: float, gap: = false) -> void :
+const V8_BAND_H: = 52.0
+
+func v8_band(n: Control, hold: float, _gap: = true, prio: = 0, combo_word: = false) -> void :
 	if _v8_over or _v8_modal:
 		n.queue_free()
 		return
-	if _v8_band_node and is_instance_valid(_v8_band_node):
+	if _v8_band_node and is_instance_valid(_v8_band_node) and not _v8_band_node.is_queued_for_deletion():
+		if _v8_band_prio > prio and _v8_band_node.modulate.a > 0.05:
+			n.queue_free()
+			return
 		_v8_band_node.queue_free()
 	_v8_band_node = n
-	var top: = board_rect.end.y + 2.0
-	if gap:
-		# the frame's outer rim ends ≈ 12 px above board_rect.end, the buttons start 14 px below it
-		var mid: = board_rect.end.y - 4.0
-		n.position = Vector2((W - n.size.x) * 0.5, mid - n.size.y * 0.5)
-	else:
-		var bh: = H - top
-		n.position = Vector2((W - n.size.x) * 0.5, top + maxf(0.0, (bh - n.size.y) * 0.5) - 14.0)
+	_v8_band_prio = prio
+	_v8_band_combo = combo_word
+	# the frame's outer rim ends ≈ 12 px above board_rect.end, the buttons start 14 px below it
+	var mid: = board_rect.end.y - 4.0
+	n.position = Vector2((W - n.size.x) * 0.5, mid - n.size.y * 0.5)
+	n.pivot_offset = n.size * 0.5
 	n.z_index = 45
 	_v8_ignore(n)
 	add_child(n)
@@ -842,6 +851,49 @@ func v8_band(n: Control, hold: float, gap: = false) -> void :
 	t.tween_interval(hold)
 	t.tween_property(n, "modulate:a", 0.0, 0.2)
 	t.tween_callback(n.queue_free)
+
+# the combo word belongs to one combo step: the next match (or a broken combo) takes it away at once, so the
+# plaque never shows «Трио ×3» while the combo pill already reads ×4
+func _v8_clear_combo_word() -> void :
+	if not _v8_band_combo or _v8_band_node == null or not is_instance_valid(_v8_band_node):
+		return
+	var n: = _v8_band_node
+	_v8_band_node = null
+	_v8_band_combo = false
+	_v8_band_prio = 0
+	var t: Tween = n.create_tween()
+	t.tween_property(n, "modulate:a", 0.0, 0.08)
+	t.tween_callback(n.queue_free)
+
+# in-match notice (main.toast routes here while a match is on): a one-line plaque in the band slot, ~1.5 s
+# returns false while a result / modal is up: main.toast then shows its usual pill
+func v8_notice(text: String, icon: Texture2D = null) -> bool:
+	if _v8_over or _v8_modal or not is_inside_tree():
+		return false
+	var w: = W - 60.0
+	var p: = UI.rbox("plum", Rect2(0, 0, w, 48), 24, 3, 8)
+	p.colors(Color(0.2, 0.1, 0.2, 0.96), Color(0.1, 0.05, 0.11, 0.96)).borders(Color("ffe7a6"), Color("c58a2c"))
+	p.name = "V8Notice"
+	var x0: = 18.0
+	if icon:
+		p.add_child(V8Art.rect(icon, Rect2(10, 5, 38, 38)))
+		x0 = 54.0
+	var aw: = w - x0 - 16.0
+	var fs: = 20
+	var f: = UI.font("body", 800)
+	while fs > 16 and f.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > aw:
+		fs -= 1
+	var l: = UI.label(text, fs, Color.WHITE, Color(0.2, 0.05, 0.2), 3)
+	l.position = Vector2(x0, 0)
+	l.size = Vector2(aw, 48)
+	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	l.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	p.add_child(l)
+	v8_band(p, 1.5, true, 2)
+	if p.is_inside_tree():
+		UI.pop_in(p, 0.0, 0.85)
+	return true
 
 
 func _cutin() -> void :
@@ -854,10 +906,11 @@ func _fever() -> void :
 	charge = 1.0
 	stage.react("big")
 	Sfx.play("fever")
-	var rib: = Common.ribbon(self, V6Txt.s("play.fever"), Rect2(0, 0, 380, 76), "gold", 36)
+	var rib: = Common.ribbon(self, V6Txt.s("play.fever"), Rect2(0, 0, 400, V8_BAND_H), "gold", 30)
 	remove_child(rib)
-	v8_band(rib, 1.0)
-	UI.pop_in(rib, 0.0, 0.4)
+	v8_band(rib, 1.0, true, 1)
+	if rib.is_inside_tree():
+		UI.pop_in(rib, 0.0, 0.6)
 	fever_fx = Fx.ambient(self, "embers", size)
 	var m: ShaderMaterial = fever_overlay.material
 	m.set_shader_parameter("pulse", 1.0)
@@ -1325,14 +1378,30 @@ func _track_set(mid: Vector2) -> void :
 		Fx.float_text(fx_layer, mid + Vector2(0, -50), "+15", Color("ffd34d"), 36)
 
 func _yaku_banner(name: String, sub: String) -> void :
-	var rib: = UI.rbox("plum", Rect2(0, 0, 520, 104), 30, 4, 12)
+	# one slim line in the band slot: the set name (Playfair) + what it was (Nunito)
+	var tf: = UI.font_for("title", 30, 900)
+	var bf: = UI.font("body", 800)
+	var tw_: = tf.get_string_size(name, HORIZONTAL_ALIGNMENT_LEFT, -1, 30).x
+	var sw: = bf.get_string_size(sub, HORIZONTAL_ALIGNMENT_LEFT, -1, 18).x
+	var w: = minf(W - 40.0, tw_ + sw + 18.0 + 56.0)
+	var rib: = UI.rbox("plum", Rect2(0, 0, w, V8_BAND_H), V8_BAND_H * 0.5, 3, 8)
 	rib.colors(Color(0.16, 0.08, 0.3, 0.96), Color(0.08, 0.04, 0.16, 0.96)).borders(Color("fff0b8"), Color("c58a2c"))
-	var t: = UI.center_label(UI.title(name, 42, Color("ffe7a6"), Color("5a1a6a")), Rect2(0, 6, 520, 58))
+	var x: = (w - tw_ - sw - 18.0) * 0.5
+	var t: = UI.title(name, 30, Color("ffe7a6"), Color("5a1a6a"))
+	t.position = Vector2(x, 0)
+	t.size = Vector2(tw_ + 4.0, V8_BAND_H)
+	t.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	rib.add_child(t)
-	rib.add_child(UI.center_label(UI.label(sub, 18, Color("e9dcff")), Rect2(0, 64, 520, 30)))
-	v8_band(rib, 1.3)
-	UI.pop_in(rib, 0.0, 1.3)
-	rib.shine(0.15)
+	var sl: = UI.label(sub, 18, Color("e9dcff"), UI.DARK, 2, "body", 800)
+	sl.position = Vector2(x + tw_ + 18.0, 0)
+	sl.size = Vector2(maxf(10.0, w - (x + tw_ + 18.0) - 20.0), V8_BAND_H)
+	sl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	sl.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	rib.add_child(sl)
+	v8_band(rib, 1.3, true, 1)
+	if rib.is_inside_tree():
+		UI.pop_in(rib, 0.0, 1.2)
+		rib.shine(0.15)
 	Sfx.play("reveal_sr", 1.1)
 	if talk_cd <= 0.0:
 		talk_cd = 3.0
@@ -1370,10 +1439,11 @@ func _declare_riichi() -> void :
 	riichi_btn.queue_free()
 	riichi_btn = null
 	Sfx.play("fever", 1.15)
-	var rib: = Common.ribbon(self, V6Txt.s("play.riichi"), Rect2(0, 0, 400, 96), "red", 54)
+	var rib: = Common.ribbon(self, V6Txt.s("play.riichi"), Rect2(0, 0, 400, V8_BAND_H), "red", 34)
 	remove_child(rib)
-	v8_band(rib, 1.0)
-	UI.pop_in(rib, 0.0, 1.4)
+	v8_band(rib, 1.0, true, 1)
+	if rib.is_inside_tree():
+		UI.pop_in(rib, 0.0, 1.2)
 	Fx.burst(fx_layer, rib.position + rib.size * 0.5, "sparkle", 50, Color(1, 0.5, 0.5), 1.6)
 	UI.punch(portrait, 0.3)
 	_bubble(Sfx.say(partner, "riichi"))
@@ -1646,7 +1716,7 @@ func v8_res_stars(ctx: Dictionary, rule: String) -> Array:
 	var nodes: = []
 	var pw: float = ctx.w
 	for i in 3:
-		var s: = UI.tex(G.fx("star_empty"), Rect2(pw * 0.5 - 52 + (i - 1) * 132, ctx.y + (0 if i == 1 else 16), 104, 104))
+		var s: = V8Art.star_rect(false, Rect2(pw * 0.5 - 52 + (i - 1) * 132, ctx.y + (0 if i == 1 else 16), 104, 104))
 		(ctx.plate as Control).add_child(s)
 		nodes.append(s)
 	ctx.y += 122.0
@@ -1667,7 +1737,7 @@ func v8_res_light_stars(ctx: Dictionary, nodes: Array, n: int) -> void :
 		if not is_inside_tree():
 			return
 		var s: TextureRect = nodes[i]
-		s.texture = G.fx("star")
+		s.texture = V8Art.star(true)
 		UI.pop_in(s, 0.0, 2.2)
 		Sfx.play("star%d" % i)
 		var plate: Control = ctx.plate
@@ -1869,7 +1939,7 @@ func _victory(stars: int, reward: int, secs: float, first: bool) -> void :
 		else:
 			main.go("home")
 	var btns: = v8_res_close(ctx, partner, next_text, go_next, V6Txt.s("play.wishes") if summon_ok else V6Txt.s("common.to_home"), go_alt,
-		null, V8Art.cur("gem") if summon_ok else V8Art.nav("home"))
+		null, V8Art.nav("wishes") if summon_ok else V8Art.nav("home"))
 	victory_next_btn = btns[0]
 	victory_summon_btn = btns[1]
 	_v8_photo_row(root, stars, secs, ctx.plate_end, ctx.by)

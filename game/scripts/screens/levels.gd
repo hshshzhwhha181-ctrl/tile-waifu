@@ -25,6 +25,7 @@ var path_dist: PackedFloat32Array
 var path_len: = 0.0
 var path_mat: ShaderMaterial
 var marker: Control
+var marker_pin: Polygon2D
 var play_btn: JButton
 var partner_go_btn: JButton
 var partner_rows: = {}
@@ -270,7 +271,7 @@ func _world_gate(w: int) -> void :
 	if open:
 		var ws: = V6Worlds.world_stars(w)
 		var max_st: = V6Worlds.PER_WORLD * 3
-		g.add_child(UI.tex(G.fx("star"), Rect2(132, 92, 34, 34)))
+		g.add_child(V8Art.star_rect(true, Rect2(132, 92, 34, 34)))
 		var sl: = UI.label("%d/%d" % [ws, max_st], 19, Color.WHITE, UI.DARK, 3, "body", 900)
 		sl.position = Vector2(168, 94)
 		g.add_child(sl)
@@ -332,7 +333,7 @@ func _level_node(it: Dictionary) -> Control:
 		plq.add_child(UI.center_label(UI.title(num_txt, 26, Color("fff1c2") if not locked else Color("cfc6bd"), UI.DARK), Rect2(0, -1, pw, 34)))
 	if not locked and (i < cur or stars > 0):
 		for q in 3:
-			var s: = UI.tex(G.fx("star" if q < stars else "star_empty"), Rect2([10.0, 46.0, 82.0][q], [-6.0, -20.0, -6.0][q], 36, 36))
+			var s: = V8Art.star_rect(q < stars, Rect2([10.0, 46.0, 82.0][q], [-6.0, -20.0, -6.0][q], 36, 36))
 			s.pivot_offset = Vector2(18, 18)
 			s.rotation = [-0.25, 0.0, 0.25][q]
 			c.add_child(s)
@@ -373,7 +374,7 @@ func _boss_node(it: Dictionary) -> Control:
 		c.add_child(V8Art.rect(V8Art.icon("lock"), Rect2(83, 65, 52, 52)))
 	else:
 		for q in 3:
-			c.add_child(UI.tex(G.fx("star" if q < stars else "star_empty"), Rect2(52 + q * 40, 242, 38, 38)))
+			c.add_child(V8Art.star_rect(q < stars, Rect2(52 + q * 40, 242, 38, 38)))
 	c.add_child(UI.center_label(UI.label(lv.get("boss_title", ""), 17, Color("fff1dc"), UI.DARK, 4, "body", 900), Rect2(-40, 276, 300, 26)))
 	if i == cur:
 		var t: Tween = c.create_tween().set_loops()
@@ -408,7 +409,7 @@ func _refresh_chest(c: Control, w: int, kind: String) -> void :
 		var chip: = UI.rbox("plum", Rect2(28, 116, 84, 30), 15, 2, 4)
 		chip.borders(Color("ffe7a6"), Color("c58a2c"))
 		c.add_child(chip)
-		chip.add_child(UI.tex(G.fx("star"), Rect2(2, -1, 30, 30)))
+		chip.add_child(V8Art.star_rect(true, Rect2(2, -1, 30, 30)))
 		chip.add_child(UI.center_label(UI.label(str(V6Worlds.STAR_NEED), 16, Color.WHITE, UI.DARK, 3, "body", 900), Rect2(30, 0, 50, 30)))
 	if opened:
 		img.modulate = Color(0.85, 0.8, 0.9, 0.85)
@@ -472,23 +473,68 @@ func _build_marker() -> void :
 	bob.size = marker.size
 	bob.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	marker.add_child(bob)
-	var pin: = Polygon2D.new()
-	pin.polygon = PackedVector2Array([Vector2(30, 80), Vector2(60, 80), Vector2(45, 104)])
-	pin.color = Color("f2799f")
-	bob.add_child(pin)
+	marker_pin = Polygon2D.new()
+	marker_pin.polygon = PackedVector2Array(PIN_DOWN)
+	marker_pin.color = Color("f2799f")
+	bob.add_child(marker_pin)
 	var hero: String = G.S.level_partner if G.hero_unlocked(G.S.level_partner) else "mc"
-	bob.add_child(Common.avatar(hero, Rect2(4, 0, 82, 82), "pink"))
+	# 0.8: the heroine in the gold avatar frame (V8Art), like every other portrait
+	var av: = V8Art.avatar(bob, hero, Rect2(0, -4, 90, 90))
+	av.name = "MarkerAvatar"
 	var t: Tween = bob.create_tween().set_loops()
 	t.tween_property(bob, "position:y", -10.0, 0.5).set_trans(Tween.TRANS_SINE)
 	t.tween_property(bob, "position:y", 0.0, 0.5).set_trans(Tween.TRANS_SINE)
 
+# pin shapes: under the avatar pointing down, or at its side pointing at the node
+const PIN_DOWN: = [Vector2(30, 74), Vector2(60, 74), Vector2(45, 100)]
+const PIN_LEFT: = [Vector2(8, 26), Vector2(8, 56), Vector2(-14, 41)]
+const PIN_RIGHT: = [Vector2(82, 26), Vector2(82, 56), Vector2(104, 41)]
+
+# while walking along the path the marker floats above the point it passes
 func _marker_pos(p: Vector2, boss: = false) -> Vector2:
 
 	return p - Vector2(45, 110) + (Vector2(-140, 30) if boss else Vector2(0, -70))
 
-func _place_marker(i: int) -> void :
+# Resting spot next to level i's node: above it when that is clear, otherwise beside it on the side away from the
+# path, so the marker never sits on the neighbouring (locked) node and hides its lock. Returns [position, pin].
+func _marker_rest(i: int) -> Array:
 	var it: Dictionary = items[level_item.get(i, 0)]
-	marker.position = _marker_pos(it.pos, G.LEVELS[i].get("boss", false))
+	var p: Vector2 = it.pos
+	if G.LEVELS[i].get("boss", false):
+		return [_marker_pos(p, true), PIN_DOWN]
+	var cands: = [
+		[p + Vector2(-45, -180), PIN_DOWN],
+		[p + Vector2(66, -49), PIN_LEFT],
+		[p + Vector2(-156, -49), PIN_RIGHT],
+	]
+	# neighbouring nodes (disc + stars above + number plaque below)
+	var others: = []
+	for j in [i - 2, i - 1, i + 1, i + 2]:
+		if j >= 0 and j < G.LEVELS.size() and level_item.has(j):
+			var np: Vector2 = items[level_item[j]].pos
+			var big: bool = G.LEVELS[j].get("boss", false)
+			others.append(Rect2(np - Vector2(100, 110), Vector2(200, 240)) if big else Rect2(np - Vector2(64, 86), Vector2(128, 222)))
+	var best: Array = cands[0]
+	var best_score: = INF
+	for k in cands.size():
+		var r: = Rect2(cands[k][0] + Vector2(0, -10), Vector2(90, 110))
+		var score: = 0.0
+		for o in others:
+			var ov: Rect2 = r.intersection(o)
+			score += ov.get_area()
+		if r.position.x < 6.0 or r.end.x > W - 6.0:
+			score += 100000.0
+		score += float(k) * 50.0
+		if score < best_score:
+			best_score = score
+			best = cands[k]
+	return best
+
+func _place_marker(i: int) -> void :
+	var rest: = _marker_rest(i)
+	marker.position = rest[0]
+	if marker_pin:
+		marker_pin.polygon = PackedVector2Array(rest[1])
 
 func _build_overlays() -> void :
 	for spec in [[0.0, 270.0, Color(0.12, 0.04, 0.16, 0.85), Color(0.12, 0.04, 0.16, 0.0)], [H - 380.0, 380.0, Color(0.12, 0.04, 0.16, 0.0), Color(0.12, 0.04, 0.16, 0.9)]]:
@@ -597,6 +643,7 @@ func _play_progress(from_i: int, to_i: int, pick: bool) -> void :
 	var t: = create_tween()
 	t.tween_method( func(d: float):
 		path_mat.set_shader_parameter("progress", d)
+		marker_pin.polygon = PackedVector2Array(PIN_DOWN)
 		marker.position = _marker_pos(_point_at(d), false), d0, d1, dur).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	await t.finished
 	if not is_inside_tree():
@@ -682,7 +729,7 @@ func open_card(i: int) -> void :
 	for q in 3:
 		var big: = q == 1
 		var sz: = 74.0 if big else 60.0
-		var s: = UI.tex(G.fx("star" if q < stn else "star_empty"), Rect2(330 - 115 + q * 115 - sz * 0.5, y + (0.0 if big else 12.0), sz, sz))
+		var s: = V8Art.star_rect(q < stn, Rect2(330 - 115 + q * 115 - sz * 0.5, y + (0.0 if big else 12.0), sz, sz))
 		p.add_child(s)
 		if q < stn:
 			UI.pop_in(s, 0.1 + q * 0.08, 0.3)

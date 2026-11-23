@@ -110,7 +110,7 @@ func _tabs() -> void :
 	var bw: = (W - 32 - 20) / 3.0
 	for i in items.size():
 		var id: String = items[i][0]
-		var b: = JButton.make(items[i][1], "pink" if id == tab else "glass", Rect2(16 + i * (bw + 10), TABS_Y, bw, 62), null, 24)
+		var b: = JButton.make(items[i][1], "glass", Rect2(16 + i * (bw + 10), TABS_Y, bw, 62), null, 24)
 		b.pressed.connect( func(): _show(id))
 		add_child(b)
 		tab_btns[id] = b
@@ -212,24 +212,32 @@ func _node(i: int, p: Vector2, current: bool) -> Control:
 		var gt: = g.create_tween().set_loops()
 		gt.tween_property(g, "modulate:a", 0.25, 0.8).set_trans(Tween.TRANS_SINE)
 		gt.tween_property(g, "modulate:a", 0.7, 0.8).set_trans(Tween.TRANS_SINE)
-	var ring: = UI.rbox("gold" if (boss or stars == 3) else ("glass" if open else "plum"), Rect2(Vector2.ZERO, c.size), s * 0.5, 4, 10)
-	if open and not boss and stars < 3:
-		ring.borders(Color("ffe7a6"), Color("c58a2c"))
-	c.add_child(ring)
-	var inner: = UI.rbox("plum", Rect2(8, 8, s - 16, s - 16), (s - 16) * 0.5, 2, 4)
-	inner.colors(Color(def.color.darkened(0.45), 0.95) if open else Color(0.15, 0.13, 0.16, 0.95), Color(def.color.darkened(0.75), 0.98) if open else Color(0.08, 0.07, 0.09, 0.98))
-	inner.set_param("shadow_color", Color(0, 0, 0, 0))
-	c.add_child(inner)
+	# 0.8: the same misc/node_* art as the Path map — pink orb for the table to play, gold sakura coin for a
+	# played one, dark lock for a closed one
+	var key: = "node_lock"
 	if open:
-		c.add_child(UI.center_label(UI.title(str(i + 1), 40 if boss else 34, Color.WHITE, UI.DARK), Rect2(0, -4, s, s)))
+		key = "node_done" if stars > 0 and not current else "node_cur"
+	var art: = V8Art.rect(V8Art.misc(key), Rect2(Vector2.ZERO, c.size))
+	art.name = "Node"
+	c.add_child(art)
+	var num_txt: = str(i + 1)
+	if key == "node_cur":
+		var num: = UI.center_label(UI.title(num_txt, 40 if boss else 34, Color("fff6ea"), Color("4a1428")), Rect2(0, -4, s, s))
+		num.label_settings.outline_size = 8
+		c.add_child(num)
 	else:
-		c.add_child(V8Art.rect(V8Art.icon("lock"), Rect2(s * 0.5 - 21, s * 0.5 - 22, 42, 42)))
+		# the sakura / lock stay visible: the number goes on a small graphite badge at the top-left
+		var plq: = UI.rbox("graphite", Rect2(-8, 4, 38, 38), 19, 2, 4)
+		plq.borders(Color("ffe7a6") if open else Color("9a8a7a"), Color("8a5a1a") if open else Color("3a3236"))
+		c.add_child(plq)
+		plq.add_child(UI.center_label(UI.title(num_txt, 24, Color("fff1c2") if open else Color("cfc6bd"), UI.DARK), Rect2(0, -1, 38, 38)))
 	if boss:
-		var cr: = UI.rbox("red", Rect2(s * 0.5 - 52, -18, 104, 28), 14, 2, 4)
+		var cr: = UI.rbox("red", Rect2(s * 0.5 - 52, -24, 104, 28), 14, 2, 4)
 		c.add_child(cr)
 		cr.add_child(UI.center_label(UI.label("СЛОЖНЫЙ" if i < V7EventData.NODES - 1 else "ФИНАЛ", 16, Color.WHITE, Color("42101a"), 2, "body", 900), Rect2(0, 0, 104, 28)))
-	for k in 3:
-		c.add_child(UI.tex(G.fx("star" if k < stars else "star_empty"), Rect2(s * 0.5 - 39 + k * 26, s - 18, 26, 26)))
+	if open:
+		for k in 3:
+			c.add_child(V8Art.star_rect(k < stars, Rect2(s * 0.5 - 39 + k * 26, s - 18, 26, 26)))
 	if current:
 		var av: = Common.avatar(def.hero, Rect2(s - 34, -18, 50, 50), "pink")
 		c.add_child(av)
@@ -254,7 +262,7 @@ func table_popup(i: int) -> void :
 	fl.position = Vector2(40, 60)
 	p.add_child(fl)
 	for k in 3:
-		p.add_child(UI.tex(G.fx("star" if k < stars else "star_empty"), Rect2(500 + k * 40, 52, 40, 40)))
+		p.add_child(V8Art.star_rect(k < stars, Rect2(500 + k * 40, 52, 40, 40)))
 	var est: = V7EventData.clear_reward(i, 3, stars == 0, "", def)
 	var rl: = UI.label(("Первая победа: до %d" if stars == 0 else "Повтор: до %d") % int(est.total), 20, Color("ffd98a"), UI.DARK, 3, "body", 900)
 	rl.position = Vector2(92, 106)
