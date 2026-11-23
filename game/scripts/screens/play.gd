@@ -337,7 +337,9 @@ func _build_hud() -> void :
 	if mode == "duel":
 		stage = V6HeroStage.new().setup(partner, Rect2(98, 22, 92, 92), {"compact": true})
 	else:
-		stage = V6HeroStage.new().setup(partner, Rect2(W - stage_w - 8, 66, stage_w, 240), {"tag": V6Heroines.bond_text(partner)})
+		# 0.8: only «Симпатия N» on the stage tag — the skill threshold is on the «умение 0/N» bar, and the long
+		# bond_text («… · умение за 7 пар · наряд +N») ran past the right screen edge
+		stage = V6HeroStage.new().setup(partner, Rect2(W - stage_w - 8, 66, stage_w, 240), {"tag": "Симпатия %d" % G.aff_level(partner)})
 	add_child(stage)
 	stage.pressed.connect( func():
 		if skill_ready and board.input_on:
@@ -795,25 +797,28 @@ func _shard_found(h: String, mid: Vector2) -> void :
 		UI.punch(shard_lbl, 0.4)
 
 func _combo_banner(word: String, combo: int) -> void :
-	# 0.8: the big combo word plays in the band of the action buttons (v8_band), never over a tile row
-	var l: = UI.title(word, 40 + mini(combo, 6) * 2, Color("fff6d8"), Color("e0457b"))
-	l.size = Vector2(560, 80)
+	# 0.8: the combo word is a slim plaque in the strip between the table frame and the action buttons
+	# (v8_band gap slot): it never covers a tile, a button or a caption, and it is gone before the next combo step
+	var fs: = 30 + mini(combo, 6)
+	var l: = UI.title(word, fs, Color("fff6d8"), Color("e0457b"))
+	l.size = Vector2(560, 44)
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	l.pivot_offset = Vector2(280, 40)
-	l.rotation = deg_to_rad(randf_range(-3, 3))
-	v8_band(l, 0.55)
-	l.scale = Vector2(1.6, 1.6)
+	l.pivot_offset = Vector2(280, 22)
+	l.rotation = deg_to_rad(randf_range(-1.5, 1.5))
+	v8_band(l, 0.4, true)
+	l.scale = Vector2(1.3, 1.3)
 	var t: Tween = l.create_tween()
-	t.tween_property(l, "scale", Vector2.ONE, 0.2).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	t.tween_property(l, "scale", Vector2.ONE, 0.16).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 
-# 0.8: one transient plaque at a time (combo word, yaku, fever, riichi) in the band of the action buttons under
-# the table: it never covers a tile and lets every tap through (mouse_filter IGNORE). The newest replaces the
-# one before; it fades out after `hold` seconds.
+# 0.8: one transient plaque at a time (combo word, yaku, fever, riichi) under the table: it never covers a tile
+# and lets every tap through (mouse_filter IGNORE). The newest replaces the one before; it fades out after `hold`
+# seconds. `gap` = the slim strip between the table frame and the tops of the action buttons (the combo word),
+# otherwise the band of the action buttons (ribbons: fever, yaku, riichi).
 var _v8_band_node: Control = null
 
-func v8_band(n: Control, hold: float) -> void :
+func v8_band(n: Control, hold: float, gap: = false) -> void :
 	if _v8_over or _v8_modal:
 		n.queue_free()
 		return
@@ -821,8 +826,13 @@ func v8_band(n: Control, hold: float) -> void :
 		_v8_band_node.queue_free()
 	_v8_band_node = n
 	var top: = board_rect.end.y + 2.0
-	var bh: = H - top
-	n.position = Vector2((W - n.size.x) * 0.5, top + maxf(0.0, (bh - n.size.y) * 0.5) - 14.0)
+	if gap:
+		# the frame's outer rim ends ≈ 12 px above board_rect.end, the buttons start 14 px below it
+		var mid: = board_rect.end.y - 4.0
+		n.position = Vector2((W - n.size.x) * 0.5, mid - n.size.y * 0.5)
+	else:
+		var bh: = H - top
+		n.position = Vector2((W - n.size.x) * 0.5, top + maxf(0.0, (bh - n.size.y) * 0.5) - 14.0)
 	n.z_index = 45
 	_v8_ignore(n)
 	add_child(n)
@@ -830,7 +840,7 @@ func v8_band(n: Control, hold: float) -> void :
 	var t: Tween = n.create_tween()
 	t.tween_property(n, "modulate:a", 1.0, 0.1)
 	t.tween_interval(hold)
-	t.tween_property(n, "modulate:a", 0.0, 0.25)
+	t.tween_property(n, "modulate:a", 0.0, 0.2)
 	t.tween_callback(n.queue_free)
 
 
@@ -1114,8 +1124,9 @@ func _v8_quick_deal() -> void :
 #   inside the portrait   : the heroine's speech bubble (V6HeroStage.say_text), over her name plate
 #   over the empty tray   : the level ribbon at the start, then the luck strip before the first tap
 #   action-button band    : the intro tip and «Новинка» cards (v8_bottom_card; the buttons hide meanwhile)
-#                           and the transient plaques: combo word, yaku, fever, riichi (v8_band, one at a time)
-#   above the buttons     : toasts (main.toast stacks them upward while a match is on)
+#                           and the transient ribbons: yaku, fever, riichi (v8_band, one at a time)
+#   frame–buttons strip   : the combo word (v8_band gap slot, shares the one-at-a-time slot with the ribbons)
+#   bottom edge           : toasts (main.toast, one at a time while a match is on, over the button captions)
 # The luck strip shows only before the first tap and folds into the chip at once when play starts.
 const V8_NOTE_RECT: = Rect2(136, 126, 260, 40)
 
@@ -1938,7 +1949,9 @@ func _v8_narrow_chip(chip: Control, w: float) -> void :
 			lb.label_settings.font_size = fs
 		lb.clip_text = true
 	for c in chip.get_children():
-		if c != l and c is Control and (c as Control).position.x > w - 40.0:
+		if c is Control and c.name == "Hit":
+			(c as Control).size.x = w
+		elif c != l and c is Control and (c as Control).position.x > w - 40.0:
 			(c as Control).position.x = w - 26.0
 
 # the heroine of a result window: her face in the free column right of the content, between `top` (the end of

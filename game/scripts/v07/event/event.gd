@@ -107,7 +107,7 @@ static func home_cards(home: Control, main) -> void :
 	var L: Dictionary = V7Ladder.LEAGUES[int(t.league)]
 	var sub: String = ("#%d · %s" % [place, L.short]) if V7Ladder.my_score(t) > 0 else String(L.name)
 	var c2: Control = home._banner_card(Rect2(W - 214, y + 168, 198, 156), load("res://assets/v07/event/cg_finale_card.webp"), "ТУРНИР", "Неделя", sub, "gold", Vector2(0.5, 0.3))
-	c2.add_child(UI.tex(G.icon("trophy"), Rect2(150, 4, 44, 44)))
+	c2.add_child(V8Art.rect(V8Art.icon("trophy"), Rect2(150, 4, 44, 44)))
 	c2.gui_input.connect( func(e):
 		if e is InputEventMouseButton and e.pressed:
 			Sfx.play("pop")
@@ -151,7 +151,7 @@ static func _tour_result(main, it: Dictionary) -> void :
 		move = "Новая неделя в лиге: %s" % NL.name
 		mc = Color("e3a3b2")
 	p.add_child(UI.center_label(UI.label(move, 24, mc, UI.DARK, 3, "body", 900), Rect2(0, 216, 660, 36)))
-	Common.chip(p, G.icon("gem"), "+%d кристаллов" % (int(it.gems) + int(it.prize_gems)), Rect2(150, 276, 360, 56), "plum", 22)
+	Common.chip(p, V8Art.cur("gem"), "+%d кристаллов" % (int(it.gems) + int(it.prize_gems)), Rect2(150, 276, 360, 56), "plum", 22)
 	if String(it.prize) != "":
 		var pi: Dictionary = G.ITEM[it.prize]
 		var a: = Common.card_art(G.art_tex(pi), Rect2(60, 350, 150, 200), Vector2(0.5, 0.3), 1.0, 18)

@@ -208,7 +208,7 @@ func _claim_row(parent: Control, x: Dictionary, r: Rect2) -> void :
 	parent.add_child(txt)
 	var br: = Rect2(r.end.x - 180, r.position.y + (r.size.y - 50) * 0.5, 180, 50)
 	if x.claimed:
-		var ok: = Common.chip(parent, G.icon("star"), "Бонус активен", br, "mint", 16)
+		var ok: = Common.chip(parent, V8Art.icon("star"), "Бонус активен", br, "mint", 16)
 		ok.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	elif x.ready:
 		var b: = _button("Забрать %d" % x.gems, "gold", br, func(): _claim(x.id, br, parent), 19)
@@ -544,7 +544,7 @@ func _fill_photos() -> float:
 
 
 static func collection_button(strip: Control, m, rebuild: Callable) -> void :
-	var b: = JButton.make("Альбом", "gold", Rect2(strip.size.x - 236, 2, 222, 40), G.icon("star"), 19)
+	var b: = JButton.make("Альбом", "gold", Rect2(strip.size.x - 236, 2, 222, 40), V8Art.icon("star"), 19)
 	b.shine_every = 3.0
 	b.pressed.connect( func(): V7AlbumView.open(m, "stamps", rebuild))
 	strip.add_child(b)

@@ -32,7 +32,7 @@ const FACES: = {
 	"mc_dragon": [0.46, 0.2, 4.8], "mc_tutor": [0.47, 0.2, 4.6], "nova_base": [0.5, 0.2, 4.8], "nova_offline": [0.5, 0.21, 5.0],
 	"nova_ssr": [0.56, 0.25, 5.2], "rin_after": [0.55, 0.2, 5.0], "rin_agent": [0.5, 0.16, 4.8], "rin_base": [0.48, 0.17, 4.6],
 	"rin_idol": [0.46, 0.19, 4.6], "rin_maid": [0.49, 0.14, 4.6], "rin_yukata": [0.52, 0.14, 4.8], "yue_ball": [0.5, 0.15, 4.8],
-	"yue_base": [0.5, 0.16, 4.8], "yue_duel": [0.5, 0.21, 5.0], "yue_queen": [0.52, 0.21, 5.0],
+	"yue_base": [0.5, 0.16, 4.8], "yue_duel": [0.5, 0.21, 5.0], "yue_queen": [0.52, 0.18, 4.3],
 }
 const AVATARS: = ["hana_base", "hana_street", "hana_winter", "mc_base", "mc_cafe", "mc_cozy", "mc_dragon", "mc_tutor",
 	"nova_base", "nova_offline", "rin_after", "rin_agent", "rin_base", "rin_idol", "rin_maid", "rin_yukata",

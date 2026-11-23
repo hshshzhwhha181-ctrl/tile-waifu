@@ -100,6 +100,7 @@ func _build_full(opts: Dictionary) -> void :
 		var maxw: = size.x - 4.0
 		var pw: = minf(maxw, f.get_string_size(tag, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x + 20.0)
 		var pill: = UI.rbox("plum", Rect2(size.x - pw - 2, size.y - COUNTER_H - 30, pw, 26), 13, 2, 4)
+		tag_pill = pill
 		pill.colors(Color(0.2, 0.1, 0.24, 0.94), Color(0.1, 0.05, 0.14, 0.96)).borders(Color("ffe7a6"), Color("c58a2c"))
 		add_child(pill)
 		var tl: = UI.label(tag, fs, Color("ffd98a"), Color(0.1, 0.05, 0.2), 2, "body", 900)
@@ -353,6 +354,9 @@ func say_text(text: String, dur: = 2.6, talk: = true) -> void :
 		bubble_node = _card_bubble(text)
 		_shared_bubble = bubble_node
 		var cb: = bubble_node
+		# the opaque bubble hides the bond tag for its lifetime (a two-line bubble and its tail would cut the
+		# «Симпатия N» pill in half); the tag comes back when the bubble is gone
+		_tag_hide(cb)
 		var ct: Tween = cb.create_tween()
 		ct.tween_interval(dur)
 		ct.tween_property(cb, "modulate:a", 0.0, 0.3)
@@ -387,6 +391,21 @@ func say_text(text: String, dur: = 2.6, talk: = true) -> void :
 	t.tween_callback(b.queue_free)
 	if talk:
 		Sfx.voice_started.emit(hero_id, text, minf(dur * 0.6, 0.35 + text.length() * 0.05))
+
+
+var tag_pill: Control = null
+
+func _tag_hide(b: Control) -> void :
+	if tag_pill == null or not is_instance_valid(tag_pill):
+		return
+	tag_pill.visible = false
+	b.tree_exited.connect( func():
+		if not is_instance_valid(tag_pill):
+			return
+		var nb: = _shared_bubble
+		# keep it hidden only while a newer bubble of THIS card is up
+		if nb == null or not is_instance_valid(nb) or nb == b or nb.is_queued_for_deletion() or nb.get_parent() != self:
+			tag_pill.visible = true)
 
 
 func _card_bubble(text: String) -> Control:

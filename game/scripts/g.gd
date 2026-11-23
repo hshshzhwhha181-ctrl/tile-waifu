@@ -685,11 +685,10 @@ func tile_tex(i: int) -> Texture2D:
 		i = posmod(i, TILE_NAMES.size())
 	return load("res://assets/tiles/%02d_%s.png" % [i, TILE_NAMES[i]])
 
+# 0.8: every icon goes through the one V8Art cache (cur/*, nav/*, icon/*); a name with no 0.8 art falls back to the
+# old v06/hud or assets/icons texture inside V8Art.old_icon()
 func icon(name: String) -> Texture2D:
-
-	if ResourceLoader.exists("res://assets/v06/hud/icons/%s.png" % name):
-		return load("res://assets/v06/hud/icons/%s.png" % name)
-	return load("res://assets/icons/%s.png" % name)
+	return Common.ui_icon(name)
 
 func fx(name: String) -> Texture2D:
 	return load("res://assets/fx/%s.png" % name)

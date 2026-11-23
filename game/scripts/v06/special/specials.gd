@@ -463,7 +463,7 @@ func _open_box(pos: Vector2) -> void :
 		pos = Vector2(clampf(pos.x, 160.0, play.size.x - 160.0), top + 70.0)
 		rise = -40.0
 	var box: = TextureRect.new()
-	box.texture = G.icon("gift")
+	box.texture = V8Art.icon("gift")
 	box.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	box.size = Vector2(96, 96)
 	box.pivot_offset = Vector2(48, 48)
@@ -484,7 +484,7 @@ func _open_box(pos: Vector2) -> void :
 		Fx.burst(_fx(), pos, "sparkle", 20, Color(1, 0.85, 0.95), 1.0)
 		Sfx.play("reveal_sr", 1.2, -2)
 		var rw: = TextureRect.new()
-		rw.texture = G.icon(icon)
+		rw.texture = Common.ui_icon(icon)
 		rw.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		rw.size = Vector2(84, 84)
 		rw.pivot_offset = Vector2(42, 42)
@@ -588,7 +588,7 @@ func _fire_event() -> void :
 
 func _drop_from_sky(to: Vector2) -> void :
 	var g: = TextureRect.new()
-	g.texture = G.icon("gift")
+	g.texture = V8Art.icon("gift")
 	g.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	g.size = Vector2(70, 70)
 	g.pivot_offset = Vector2(35, 35)

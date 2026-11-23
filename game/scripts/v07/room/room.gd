@@ -101,7 +101,7 @@ func _tabs() -> void :
 			c.add_child(V8Art.rect(V8Art.icon("lock"), Rect2(d * 0.26, d * 0.26, d * 0.48, d * 0.48)))
 		elif V7RoomData.fresh_scenes(id).size() > 0:
 			Common.badge(c, 0, Vector2(d - 22, -4))
-		var nm: = UI.center_label(UI.label(G.HEROES[id].name, 15 if not sel else 17, Color("ffe7a6") if sel else UI.INK, UI.DARK, 4, "body", 900), Rect2(-20, d - 4, d + 40, 26))
+		var nm: = UI.center_label(UI.label(G.HEROES[id].name, 16 if not sel else 17, Color("ffe7a6") if sel else UI.INK, UI.DARK, 4, "body", 900), Rect2(-20, d - 4, d + 40, 26))
 		c.add_child(nm)
 		UI.slide_in(c, Vector2(0, -24), 0.03 * i, 0.35)
 		c.gui_input.connect( func(e):
@@ -155,17 +155,17 @@ func _panel() -> void :
 	nx.size = Vector2(320, 24)
 	panel.add_child(nx)
 	var bt2: = V6Heroines.bond_text(h)
-	var perk: = _fit_label("За столом: " + bt2.substr(bt2.find("·") + 2) if "·" in bt2 else "Симпатия 4 / 7 / 10 ускоряет её умение", 15, Color("cfc3d8"), 320.0)
+	var perk: = _fit_label("За столом: " + bt2.substr(bt2.find("·") + 2) if "·" in bt2 else "Симпатия 4 / 7 / 10 ускоряет её умение", 16, Color("cfc3d8"), 320.0)
 	perk.position = Vector2(20, 174)
 	perk.size = Vector2(320, 24)
 	panel.add_child(perk)
 	UI.slide_in(panel, Vector2(-40, 0), 0.08, 0.4)
 
 
-# shrinks the font (down to 12 px) instead of cutting the text; ellipsis only as a last resort.
+# shrinks the font (never below 16 px) instead of cutting the text; ellipsis only as a last resort.
 func _fit_label(text: String, fs: int, col: Color, w: float) -> Label:
 	var f: = UI.font("body", 800)
-	while fs > 12 and f.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > w:
+	while fs > 16 and f.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > w:
 		fs -= 1
 	var l: = UI.label(text, fs, col)
 	l.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
@@ -207,13 +207,13 @@ func _actions() -> void :
 
 func _btn(text: String, sub: String, pal: String, r: Rect2, icon: String) -> JButton:
 	var b: = JButton.make(text, pal, r, null, 24)
-	b.set_sub(sub, 15)
+	b.set_sub(sub, 16)
 	var x0: = 60.0
 	b.lbl.position.x = x0
 	b.lbl.size.x = r.size.x - x0 - 8
 	UI.center_label(b.sub, Rect2(x0, r.size.y * 0.52, r.size.x - x0 - 8, r.size.y * 0.4))
-	# 0.8: gift / heart are the new gold glyphs; «star» has no 0.8 art and keeps the old icon
-	b.add_child(V8Art.rect(G.icon(icon) if icon == "star" else Common.ui_icon(icon), Rect2(10, (r.size.y - 52) * 0.5, 52, 52)))
+	# 0.8: gift / heart / star are the gold glyphs of the 0.8 set (star = the sakura star, nav/play)
+	b.add_child(V8Art.rect(Common.ui_icon(icon), Rect2(10, (r.size.y - 52) * 0.5, 52, 52)))
 	return b
 
 
@@ -403,7 +403,7 @@ func _date_popup() -> void :
 		nm.position = Vector2(16, ch - 46)
 		card.add_child(nm)
 		if V7RoomData.place_known(h, pid) and V7RoomData.FAV[h] == pid:
-			Common.chip(card, V8Art.icon("heart"), "Её любимое", Rect2(10, 10, 170, 32), "pink", 15).mouse_filter = Control.MOUSE_FILTER_IGNORE
+			Common.chip(card, V8Art.icon("heart"), "Её любимое", Rect2(10, 10, 170, 32), "pink", 16).mouse_filter = Control.MOUSE_FILTER_IGNORE
 		if V7RoomData.st().photos.get(h, {}).has(pid):
 			var ph: = UI.rbox("glass", Rect2(cw - 70, 10, 58, 32), 12, 2, 4)
 			card.add_child(ph)

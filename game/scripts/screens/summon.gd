@@ -96,7 +96,7 @@ func _build_banner() -> void :
 	banner_root.add_child(tag)
 	tag.add_child(UI.center_label(UI.label(V6Txt.s("summon.rate_up") if not newbie else V6Txt.s("summon.newbie_tag"), 21, Color.WHITE, Color("7a2346"), 5, "body", 900), Rect2(0, 0, 230, 44)))
 	if not newbie:
-		var trial: = JButton.make(V6Txt.s("summon.trial"), "lav", Rect2(cr.end.x - 250, cr.position.y + 18, 236, 62), G.icon("star"), 21)
+		var trial: = JButton.make(V6Txt.s("summon.trial"), "lav", Rect2(cr.end.x - 250, cr.position.y + 18, 236, 62), V8Art.icon("star"), 21)
 		trial.shine_every = 3.0
 		trial.pressed.connect( func(): main.go("play", {"trial": b.hero}))
 		banner_root.add_child(trial)

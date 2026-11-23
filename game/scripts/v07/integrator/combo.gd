@@ -173,13 +173,16 @@ func _draw() -> void :
 			_sb_fill.bg_color = Color(col.r, col.g, col.b, 0.42 * pill.modulate.a)
 			draw_style_box(_sb_fill, ir)
 
-# 0.8: the pill sits in the HUD row between the gem counter and the passive chip and covers the note slot
-# while a combo runs; see the layout note in play.gd
-const PILL_RECT: = Rect2(132, 121, 266, 54)
+# 0.8: the pill sits in the HUD row between the gem counter (ends x 126, room for a 4–5 digit value) and the
+# passive chip (x 404), above the tray frame (y ≈ 176), and covers the note slot while a combo runs; see the
+# layout note in play.gd. It is never scaled past 1.0 (no overshoot), so its box stays inside this rect.
+const PILL_RECT: = Rect2(134, 122, 262, 52)
 
 func _place_pill() -> void :
 	pill.position = PILL_RECT.position
 
+# 0.8: the label draws from its LabelSettings (UI.label), which win over theme overrides — so font, size and
+# colour are set on label_settings, not with add_theme_*_override
 func _fit_title() -> void :
 	var room: = PILL_RECT.size.x - 24.0
 	var f: = UI.font("title", 900)
@@ -192,17 +195,20 @@ func _fit_title() -> void :
 		fs = 24
 		while fs > 18 and f.get_string_size(pill_lbl.text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > room:
 			fs -= 1
-	pill_lbl.add_theme_font_override("font", f)
-	pill_lbl.add_theme_font_size_override("font_size", fs)
+	var ls: LabelSettings = pill_lbl.label_settings
+	if ls.font != f or ls.font_size != fs:
+		ls.font = f
+		ls.font_size = fs
+		ls.outline_size = 5 if fs >= 24 else 4
 
 func _pill_in() -> void :
 	_place_pill()
 	pill.visible = true
 	pill.modulate.a = 0.0
-	pill.scale = Vector2(0.6, 0.6)
-	var t: = pill.create_tween().set_parallel()
-	t.tween_property(pill, "modulate:a", 1.0, 0.12)
-	t.tween_property(pill, "scale", Vector2.ONE, 0.25).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	# fade in at full size: a scale-in would overshoot the HUD row and shrink the 16 px sub-line
+	pill.scale = Vector2.ONE
+	var t: = pill.create_tween()
+	t.tween_property(pill, "modulate:a", 1.0, 0.14)
 
 func _pill_out() -> void :
 	var n: = last_n
@@ -229,12 +235,13 @@ func on_match(mid: Vector2, n: int, gain: int) -> void :
 	_place_pill()
 	pill_lbl.text = "×%d · %s" % [n, t[1]]
 	_fit_title()
-	pill_lbl.add_theme_color_override("font_color", col.lightened(0.35))
+	pill_lbl.label_settings.font_color = col.lightened(0.35)
 	var mult: = 1 + (n - 1) / 2
 	if G.time >= sub_hold_until:
 		pill_sub.text = "кристаллы ×%d" % mult if mult > 1 else "держи темп"
-		pill_sub.add_theme_color_override("font_color", Color("ffe7a6"))
-	UI.punch(pill, 0.22 + mini(n, 10) * 0.02)
+		pill_sub.label_settings.font_color = Color("ffe7a6")
+	# punch the title only: the pill box itself never grows past PILL_RECT
+	UI.punch(pill_lbl, 0.1 + mini(n, 10) * 0.01)
 
 	var dst: = pill.position + pill.size * 0.5
 	_spark(mid, dst)
@@ -304,9 +311,9 @@ func _milestone(n: int, at: Vector2) -> void :
 	# 0.8: the milestone reward is said inside the pill (its second line), not as a float that would rise into
 	# the yaku plaque or the luck strip
 	pill_sub.text = what
-	pill_sub.add_theme_color_override("font_color", Color("9fe8d0"))
+	pill_sub.label_settings.font_color = Color("9fe8d0")
 	sub_hold_until = G.time + 1.4
-	UI.punch(pill_sub, 0.3)
+	UI.punch(pill_sub, 0.15)
 	if icon != "" and target and is_instance_valid(target):
 		var ic: = Sprite2D.new()
 		# 0.8 art: currencies from cur/*, the rest from icon/* (V8Art caches them)

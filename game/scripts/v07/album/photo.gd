@@ -38,20 +38,27 @@ static func victory_hook(p, root: Control, st: int, s: float) -> void :
 		rb.pressed.connect( func(): V7Replay.run(p, root))
 		root.add_child(rb)
 		UI.pop_in(rb, 1.1)
-	var fb: = JButton.make("Фото", "graphite", Rect2(w * 0.5 + 10, by, 220, 62), G.icon("star"), 22)
+	var fb: = JButton.make("Фото", "graphite", Rect2(w * 0.5 + 10, by, 220, 62), V8Art.icon("star"), 22)
 	fb.pressed.connect( func(): V7Photo.open(p, root, st, s))
 	root.add_child(fb)
 	UI.pop_in(fb, 1.15)
 	var nw: = V7Album.take_new()
 	if nw.size() > 0:
-		var names: = nw.slice(0, 3).map( func(f): return D.FACE_NAMES[f] if f >= 0 and f < 36 else "?")
-		var txt: = "Альбом: %s%s" % [", ".join(names), (" и ещё %d" % (nw.size() - 3)) if nw.size() > 3 else ""]
-		var ch: = Common.chip(root, G.icon("star"), txt, Rect2(w * 0.5 - 250, by - 56, 500, 44), "plum", 18)
-		ch.mouse_filter = Control.MOUSE_FILTER_STOP
-		ch.gui_input.connect( func(e):
+		# 0.8: a count, not a list of tile names — the names never fit the left column at 16 px
+		var txt: = "Альбом: +%d %s" % [nw.size(), V8PlayRules.plural(nw.size(), "марка", "марки", "марок")]
+		var ch: = Common.chip(root, V8Art.icon("star"), txt, Rect2(w * 0.5 - 250, by - 56, 500, 44), "plum", 18)
+		ch.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		# 64 px high touch target around the 44 px chip (play._v8_narrow_chip keeps its width in step)
+		var hit: = Control.new()
+		hit.name = "Hit"
+		hit.position = Vector2(0, -16)
+		hit.size = Vector2(ch.size.x, 64)
+		hit.mouse_filter = Control.MOUSE_FILTER_STOP
+		hit.gui_input.connect( func(e):
 			if e is InputEventMouseButton and e.pressed:
 				Sfx.play("pop")
 				V7AlbumView.open(p.main, "stamps"))
+		ch.add_child(hit)
 		UI.pop_in(ch, 1.3)
 		if V7Album.claimable() > 0:
 			Common.badge(ch, 0, Vector2(486, -10))

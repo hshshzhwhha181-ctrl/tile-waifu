@@ -77,13 +77,25 @@ func _process(dt: float) -> void :
 		var s: = 1.0 + 0.025 * sin(G.time * 3.2)
 		scale = Vector2(s, s)
 
+# 0.8: a touch target is never smaller than MIN_HIT × MIN_HIT, even when the art is (price tags, tabs, the
+# currency «+»): the hit rect grows evenly around the drawn box, the box itself keeps its size
+const MIN_HIT: = 64.0
+
+func hit_rect() -> Rect2:
+	var gx: = maxf(0.0, (MIN_HIT - size.x) * 0.5)
+	var gy: = maxf(0.0, (MIN_HIT - size.y) * 0.5)
+	return Rect2(Vector2.ZERO, size).grow_individual(gx, gy, gx, gy)
+
+func _has_point(p: Vector2) -> bool:
+	return hit_rect().has_point(p)
+
 func _gui_input(e: InputEvent) -> void :
 	if e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT:
 		if e.pressed:
 			_press_down()
 		elif _down:
 			_down = false
-			_release(Rect2(Vector2.ZERO, size).has_point(e.position))
+			_release(hit_rect().has_point(e.position))
 		accept_event()
 
 func _press_down() -> void :

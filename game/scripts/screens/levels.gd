@@ -360,29 +360,17 @@ func _boss_node(it: Dictionary) -> Control:
 		r.show_behind_parent = true
 
 	var hero: String = lv.get("boss_hero", lv.hero)
-	var pic: = UI.tex(load("res://assets/hero/%s.png" % hero), Rect2(34, 56, 152, 152), false)
-	var m: = ShaderMaterial.new()
-	m.shader = preload("res://shaders/card.gdshader")
-	var rig: Dictionary = Hero.RIGS[hero]
-	m.set_shader_parameter("size", pic.size)
-	m.set_shader_parameter("radius", 76.0)
-	m.set_shader_parameter("tex_size", Vector2(848, 1264))
-	m.set_shader_parameter("focus", Vector2(rig.head_c.x / 848.0, (rig.head_c.y + 30) / 1264.0))
-	m.set_shader_parameter("zoom", 3.4)
-	m.set_shader_parameter("bottom_shade", 0.0)
-	m.set_shader_parameter("gray", 0.9 if locked else 0.0)
-	pic.material = m
-	var back: = UI.rbox("plum", Rect2(36, 58, 148, 148), 74, 0, 4)
-	back.colors(V6Worlds.LOOK[it.w].accent.lerp(Color.WHITE, 0.3), V6Worlds.LOOK[it.w].deep)
-	c.add_child(back)
-	c.add_child(pic)
-	c.add_child(UI.tex(load("res://assets/v06/map/boss_frame.png"), Rect2(0, 0, 220, 236), false))
+	# 0.8: the boss wears the ornate Dragon/Celestial avatar frame (V8Art), the red «БОСС» ribbon stays under it
+	var av: = V8Art.avatar(c, hero, Rect2(-10, -8, 240, 240), true)
+	var pic: = av.get_node_or_null("Pic") as TextureRect
+	if locked and pic != null and pic.material is ShaderMaterial:
+		(pic.material as ShaderMaterial).set_shader_parameter("gray", 0.9)
 	var rib: = UI.rbox("red", Rect2(40, 200, 140, 40), 18, 3, 6)
 	c.add_child(rib)
 	rib.add_child(UI.center_label(UI.label("БОСС", 22, Color.WHITE, Color("6a1020"), 4, "body", 900), Rect2(0, 0, 140, 40)))
 	var stars: = G.level_stars(i)
 	if locked:
-		c.add_child(V8Art.rect(V8Art.icon("lock"), Rect2(84, 104, 52, 52)))
+		c.add_child(V8Art.rect(V8Art.icon("lock"), Rect2(83, 65, 52, 52)))
 	else:
 		for q in 3:
 			c.add_child(UI.tex(G.fx("star" if q < stars else "star_empty"), Rect2(52 + q * 40, 242, 38, 38)))

@@ -102,7 +102,7 @@ static func popup(main) -> RBox:
 	p.add_child(t)
 	var lines: = [["gem", T.gems], ["wardrobe", T.outfit], ["calendar", T.left % left_text()]]
 	for i in lines.size():
-		Common.chip(p, G.icon(lines[i][0]), lines[i][1], Rect2(310, 140 + i * 74, 320, 56), "glass", 18)
+		Common.chip(p, Common.ui_icon(lines[i][0]), lines[i][1], Rect2(310, 140 + i * 74, 320, 56), "glass", 18)
 	var info: = UI.label(T.info, 17, UI.MUTED)
 	info.position = Vector2(312, 370)
 	p.add_child(info)

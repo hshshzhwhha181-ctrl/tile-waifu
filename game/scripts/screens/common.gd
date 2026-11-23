@@ -212,6 +212,12 @@ static func fit_words(l: Label, width: float, lines: = 2, min_fs: = 16) -> Label
 			ls.outline_size = mini(ls.outline_size, 3 if wt == 700 else 2)
 			pad = ls.outline_size * 1.0
 	if _longest_word(text, ls.font, fs) + pad > width:
+		# a word still wider than the box is hyphenated across two lines («Импера-» / «трица») while the
+		# line budget allows it; only past that it is trimmed with «…»
+		var hy: = _hyphenate(text, ls.font, fs, width - pad)
+		if hy != text and ls.font.get_multiline_string_size(hy, HORIZONTAL_ALIGNMENT_LEFT, width - pad, fs, -1, TextServer.BREAK_MANDATORY | TextServer.BREAK_WORD_BOUND).y <= ls.font.get_height(fs) * lines + 1.0:
+			text = hy
+	if _longest_word(text, ls.font, fs) + pad > width:
 		var words: = text.split(" ", false)
 		for k in words.size():
 			var w: String = words[k]
@@ -226,6 +232,35 @@ static func fit_words(l: Label, width: float, lines: = 2, min_fs: = 16) -> Label
 	l.custom_minimum_size.x = width
 	l.max_lines_visible = lines
 	return l
+
+const _VOWELS: = "аеёиоуыэюяaeiouy"
+
+# Splits every word wider than `width` once: the longest head that fits with a «-» (at least 3 letters, at
+# least 2 left over, preferably right after a vowel and never before ь/ъ/й) goes on its own line.
+static func _hyphenate(text: String, f: Font, fs: int, width: float) -> String:
+	var out: = []
+	for w in text.split(" ", false):
+		if f.get_string_size(w, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x <= width or w.length() < 6:
+			out.append(w)
+			continue
+		var best: = -1
+		var any: = -1
+		for k in range(w.length() - 2, 2, -1):
+			if f.get_string_size(w.left(k) + "-", HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > width:
+				continue
+			if w[k].to_lower() in ["ь", "ъ", "й"]:
+				continue
+			if any < 0:
+				any = k
+			if _VOWELS.contains(w[k - 1].to_lower()) and not _VOWELS.contains(w[k].to_lower()):
+				best = k
+				break
+		var k2: = best if best > 0 else any
+		if k2 < 0:
+			out.append(w)
+		else:
+			out.append(w.left(k2) + "-\n" + w.substr(k2))
+	return " ".join(out).replace("\n ", "\n")
 
 static func _longest_word(text: String, f: Font, fs: int) -> float:
 	var m: = 0.0

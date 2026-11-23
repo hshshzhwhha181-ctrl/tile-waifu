@@ -25,7 +25,9 @@ func play(id: String) -> void :
 	H = vs.y
 	size = vs
 	mouse_filter = Control.MOUSE_FILTER_STOP
-	z_index = 40
+	# above the match result window (play.gd V8Result z 300) and main.overlay (400 in a match): post-level scenes
+	# play from before_go() while the victory screen is still alive
+	z_index = 460
 	auto = "--autotap=1" in OS.get_cmdline_user_args() or "--story_auto=1" in OS.get_cmdline_user_args()
 	gui_input.connect(_on_input)
 	_build(d, id)

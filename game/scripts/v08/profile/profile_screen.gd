@@ -267,7 +267,7 @@ func _stats() -> void :
 	_stat_row(c, y, "Всего", total, cols, false, true)
 	y += rh
 	if empty:
-		_lbl(c, V8ProfileUI.s("profile.stats_new"), Vector2(24, y + 4), 15, Color(0.75, 0.7, 0.65, 0.75), cw - 48)
+		_lbl(c, V8ProfileUI.s("profile.stats_new"), Vector2(24, y + 4), 16, Color(0.75, 0.7, 0.65, 0.75), cw - 48)
 
 
 func _stat_row(c: Control, y: float, name: String, st: Dictionary, cols: Array, zebra: bool, bold: bool) -> void :
@@ -315,11 +315,11 @@ func _ladder() -> void :
 		row.add_child(gl)
 		row.add_child(V8Art.rect(V8Art.cur("gem"), Rect2(cw - 82, 6, 44, 44)))
 		if t < ri.tier:
-			var ok: = _lbl(row, V6Txt.s("rank.passed"), Vector2(cw - 190, 60), 15, Color("9fe8d0"), 150)
+			var ok: = _lbl(row, V6Txt.s("rank.passed"), Vector2(cw - 190, 60), 16, Color("9fe8d0"), 150)
 			ok.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 		elif t == ri.tier:
 			Common.progress_bar(row, Rect2(112, 74, cw - 330, 16), float(ri.into) / maxf(1.0, ri.need), "gold")
-			var pl: = _lbl(row, "%d/%d" % [ri.into, ri.need], Vector2(cw - 210, 68), 15, Color("ffe7a6"), 120)
+			var pl: = _lbl(row, "%d/%d" % [ri.into, ri.need], Vector2(cw - 210, 68), 16, Color("ffe7a6"), 120)
 			pl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 		y += rowh + 8
 	ladder_c = c

@@ -68,15 +68,16 @@ func _tabs() -> void :
 	for i in 2:
 		var id: String = ["week", "quarter"][i]
 		var c: = Control.new()
-		c.position = Vector2(4 + i * bw, 4)
-		c.size = Vector2(bw, 56)
+		# 0.8: the tap target is the full 64 px height of the segment; the gold pill inside stays 56 px
+		c.position = Vector2(4 + i * bw, 0)
+		c.size = Vector2(bw, 64)
 		c.mouse_filter = Control.MOUSE_FILTER_STOP
 		seg.add_child(c)
-		var pill: = UI.rbox("gold", Rect2(0, 0, bw, 56), 28, 2, 4)
+		var pill: = UI.rbox("gold", Rect2(0, 4, bw, 56), 28, 2, 4)
 		pill.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		pill.name = "Pill"
 		c.add_child(pill)
-		var l: = UI.center_label(UI.label(V8League.TXT[id], 24, UI.INK, UI.DARK, 3, "body", 900), Rect2(0, 0, bw, 56))
+		var l: = UI.center_label(UI.label(V8League.TXT[id], 24, UI.INK, UI.DARK, 3, "body", 900), Rect2(0, 4, bw, 56))
 		l.name = "L"
 		c.add_child(l)
 		c.gui_input.connect(func(e):

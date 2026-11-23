@@ -144,9 +144,18 @@ func _build_chip() -> void :
 	chip_val.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	chip_val.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	chip.add_child(chip_val)
-	chip.gui_input.connect( func(e):
+	# 0.8: 64×64 touch target around the 54 px badge (the badge art keeps its size)
+	chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var hit: = Control.new()
+	hit.name = "Hit"
+	hit.position = Vector2(-5, -6)
+	hit.size = Vector2(64, 64)
+	hit.mouse_filter = Control.MOUSE_FILTER_STOP
+	hit.tooltip_text = d.name
+	chip.add_child(hit)
+	hit.gui_input.connect( func(e):
 		if (e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT) or (e is InputEventScreenTouch and e.pressed):
-			chip.accept_event()
+			hit.accept_event()
 			Sfx.play("pop")
 			UI.punch(chip, 0.12)
 			_pulse(d.name)

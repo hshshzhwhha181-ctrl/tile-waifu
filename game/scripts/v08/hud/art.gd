@@ -9,7 +9,8 @@ extends RefCounted
 #   V8Art.league(tier)                weekly league crest (same 6 tiers)    — Common.league_emblem wraps it
 #   V8Art.icon(name)                  icon/*: circle icons (tasks visits letters rating profile back help settings)
 #                                     and gold glyphs (hint undo shuffle sound sound_off lock gift heart close plus trophy);
-#                                     old names are aliased (mail -> letters …); a name with no new art falls back to V8Art.old_icon()
+#                                     old names are aliased (mail -> letters, star -> nav/play …); a name with no new art
+#                                     falls back to V8Art.old_icon(). G.icon() and Common.ui_icon() route here too.
 #   V8Art.nav(name)                   nav/*: home wardrobe play wishes shop
 #   V8Art.cur(name)                   cur/*: gem coin ticket
 #   V8Art.frame(name)                 frame/*: avatar avatar_top card_r card_sr card_ssr (or a rarity "R"/"SR"/"SSR")
@@ -25,10 +26,12 @@ extends RefCounted
 
 const ROOT: = "res://assets/v08/ui/"
 const TIER_NAMES: = ["bamboo", "jade", "pearl", "gold", "dragon", "celestial"]
-const ICON_ALIAS: = {"mail": "letters", "letter": "letters", "star": "rating", "rank": "rating", "cup": "trophy",
+const ICON_ALIAS: = {"mail": "letters", "letter": "letters", "rank": "rating", "cup": "trophy",
 	"settings_flat": "settings", "back_flat": "back", "close_flat": "close", "gift_flat": "gift", "heart_flat": "heart",
 	"hint_flat": "hint", "lock_flat": "lock", "plus_flat": "plus", "undo_flat": "undo", "shuffle_flat": "shuffle",
 	"sound_flat": "sound", "trophy_flat": "trophy", "task": "tasks", "quests": "tasks", "visit": "visits", "mute": "sound_off"}
+# glyph names whose 0.8 art lives outside icon/: the gold sakura star (nav/play) is THE star glyph everywhere
+const GLYPH_ALIAS: = {"star": "nav/play", "star_flat": "nav/play"}
 const NAV_ALIAS: = {"wardrobe": "wardrobe", "closet": "wardrobe", "summon": "wishes", "wish": "wishes", "modes": "play"}
 const CUR_ALIAS: = {"gems": "gem", "coins": "coin", "tickets": "ticket"}
 
@@ -94,14 +97,16 @@ static func league(tier: int) -> Texture2D:
 
 
 static func icon(name: String) -> Texture2D:
+	if GLYPH_ALIAS.has(name):
+		return tex(GLYPH_ALIAS[name])
 	var n: String = ICON_ALIAS.get(name, name)
 	if has("icon/" + n):
 		return tex("icon/" + n)
 	return old_icon(name)
 
 
-# Pre-0.8 icon (assets/v06/hud/icons, then assets/icons). Loaded here directly — not via G.icon — so G.icon can be
-# redirected to V8Art without a loop. Used only when a name has no 0.8 art (e.g. "star").
+# Pre-0.8 icon (assets/v06/hud/icons, then assets/icons). Loaded here directly — not via G.icon — because G.icon is
+# redirected to V8Art. Used only when a name has no 0.8 art (event currencies and the like).
 static func old_icon(name: String) -> Texture2D:
 	for p in ["res://assets/v06/hud/icons/%s.png" % name, "res://assets/icons/%s.png" % name]:
 		if ResourceLoader.exists(p):

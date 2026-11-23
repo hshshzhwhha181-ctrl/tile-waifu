@@ -435,7 +435,7 @@ func _tex(name: String) -> Texture2D:
 					img.set_pixel(x, y, Color(shade, shade * 0.98, shade * 0.93, a))
 			t = ImageTexture.create_from_image(img)
 		"coin", "gem", "heart_i", "star_i":
-			t = G.icon(name.trim_suffix("_i"))
+			t = Common.ui_icon(name.trim_suffix("_i"))
 		_:
 			t = G.fx(name)
 	texs[name] = t
@@ -936,7 +936,7 @@ func reward_fly(from: Vector2, to: Vector2, kind: = "coin", n: = 6, on_arrive: =
 	sound("reward_pop", 1.0, -8.0)
 	for i in n:
 		var s: = Sprite2D.new()
-		s.texture = G.icon(kind)
+		s.texture = Common.ui_icon(kind)
 		var sc: = 52.0 / maxf(1.0, s.texture.get_width())
 		s.scale = Vector2.ONE * sc * 0.2
 		s.position = from

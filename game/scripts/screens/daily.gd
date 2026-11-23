@@ -95,7 +95,7 @@ static func tasks(main, home) -> void :
 		p.add_child(row)
 		# 0.8: trophy / heart are the new gold glyphs; «star» has no 0.8 art and keeps the old icon
 		var ic_name: String = ["star", "trophy", "heart"][i]
-		var ic_tex: Texture2D = G.icon(ic_name) if ic_name == "star" else V8Art.icon(ic_name)
+		var ic_tex: Texture2D = V8Art.icon(ic_name)
 		row.add_child(V8Art.rect(ic_tex, Rect2(14, 20, 80, 80)))
 		var nl: = UI.label(td.name, 24, UI.INK, Color.WHITE, 3, "body", 900)
 		nl.position = Vector2(110, 14)

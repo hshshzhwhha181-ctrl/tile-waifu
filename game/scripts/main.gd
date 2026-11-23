@@ -536,24 +536,21 @@ func _currency(r: Rect2, icon: String, val: int) -> Label:
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	topbar.add_child(l)
 	_fit_currency(l)
-	var plus: = JButton.make("", "graphite", Rect2(r.end.x - 40, r.position.y + 9, 36, 36), null, 22)
+	# 0.8: the whole currency pill (64 px high hit rect) is the tap target; the 36 px «+» art sits at its right end
+	var hr: = Rect2(r.position.x, r.get_center().y - 32.0, r.size.x, 64.0)
+	var plus: = JButton.make("", "graphite", hr, null, 22)
 	plus.box.visible = false
-	plus.add_child(V8Art.rect(V8Art.icon("plus"), Rect2(0, 0, 36, 36)))
+	plus.add_child(V8Art.rect(V8Art.icon("plus"), Rect2(hr.size.x - 40.0, 14.0, 36, 36)))
 	plus.pressed.connect( func(): go("shop", {"tab": 2} if icon == "gem" else {}))
 	topbar.add_child(plus)
 	return l
 
-# Icon for toast(..., icon) and other callers that pass an old icon name: currencies -> cur/*, names with 0.8 art
-# -> icon/* (V8Art aliases), anything else (star, event currencies) keeps its old texture.
+# Icon for toast(..., icon) and other callers that pass an old icon name: currencies -> cur/*, nav names -> nav/*,
+# glyphs -> icon/* (V8Art aliases, star -> the sakura star); names with no 0.8 art keep their old texture.
 func art_icon(name: String) -> Texture2D:
 	if name == "":
 		return null
-	if name in ["gem", "gems", "coin", "coins", "ticket", "tickets"]:
-		return V8Art.cur(name)
-	var n: String = V8Art.ICON_ALIAS.get(name, name)
-	if name != "star" and V8Art.has("icon/" + n):
-		return V8Art.icon(n)
-	return V8Art.old_icon(name)
+	return Common.ui_icon(name)
 
 # currency amount between the coin art and the «+»: shrink the font for big numbers instead of running under the «+»
 func _fit_currency(l: Label) -> void :
@@ -858,15 +855,19 @@ func _unhandled_key_input(e: InputEvent) -> void :
 func toast(text: String, icon: = "") -> void :
 	var w: = 560.0
 	var y: = V8Header.CONTENT_Y + 12.0 if topbar and topbar.visible else 130.0
-	# 0.8: during a match the top of the screen is the HUD (goal, gems, tray): toasts sit just above the
-	# action buttons and stack upward, so they never cover the tray, the counters or the speech bubble
+	# 0.8: during a match the top of the screen is the HUD (goal, gems, tray) and the table reaches down to the
+	# action buttons, so a toast sits at the very bottom, over the buttons' captions (it takes no tap), and there
+	# is one slot only: a new toast replaces the one before instead of stacking up into the tiles
 	var in_match: = PLAY_BACK.has(screen_id) and not (topbar and topbar.visible)
 	if in_match:
-		y = get_viewport_rect().size.y - 172.0 - 82.0
+		y = get_viewport_rect().size.y - 74.0
 	for c in overlay.get_children():
 		if c.has_meta("v8_toast") and not c.is_queued_for_deletion() and not c.has_meta("fading"):
 			if in_match:
-				y = minf(y, float(c.get_meta("v8_toast")) - 82.0)
+				c.set_meta("fading", true)
+				var ft: Tween = c.create_tween()
+				ft.tween_property(c, "modulate:a", 0.0, 0.12)
+				ft.tween_callback(c.queue_free)
 			else:
 				y = maxf(y, float(c.get_meta("v8_toast")) + 82.0)
 	var p: = UI.rbox("plum", Rect2((W - w) * 0.5, y, w, 70), 35, 3, 12)
