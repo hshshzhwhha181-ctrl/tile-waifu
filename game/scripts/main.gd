@@ -20,7 +20,8 @@ const SCREENS: = {
 	"room": preload("res://scripts/v07/room/room.gd"), 
 	"v7event": preload("res://scripts/v07/event/event_screen.gd"), 
 	"v7tourney": preload("res://scripts/v07/event/tourney_screen.gd"), 
-	"v7play": preload("res://scripts/v07/event/event_play.gd"), 
+	"v7play": preload("res://scripts/v07/event/event_play.gd"),
+	"profile": preload("res://scripts/v08/profile/profile_screen.gd"),
 }
 
 var W: = 720.0
@@ -82,7 +83,11 @@ func _splash() -> void :
 	if "--shots" in args and not "--splash" in args:
 		return
 	if "--splash" in args:
+		# --fresh: clean install (no profile, intro not seen); --v07: a 0.7 player (intro seen, no profile yet)
 		G.S.intro_done = "--fresh" not in args
+		if "--fresh" in args or "--v07" in args:
+			G.S.profile = G.new_profile()
+			G.S.profile_done = false
 	if G.demo:
 		return
 	var sp: = Control.new()
@@ -106,32 +111,53 @@ func _splash() -> void :
 	var tag: = UI.center_label(UI.label(V6Txt.s("title.tag"), 22, Color("ffe7c4"), UI.DARK, 4, "body", 900), Rect2(0, H * 0.05 + 300, W, 34))
 	sp.add_child(tag)
 	UI.slide_in(tag, Vector2(0, 20), 0.5)
-	var plate: = UI.rbox("plum", Rect2(W * 0.5 - 250, H - 230, 500, 76), 38, 3, 10)
-	plate.colors(Color(0.15, 0.06, 0.22, 0.88), Color(0.08, 0.03, 0.14, 0.9)).borders(Color("fff0b8"), Color("c58a2c"))
+	var fades: Array = [logo, tag]
+	var has_profile: = bool(G.S.get("profile_done", false))
+	if has_profile:
+		var chip: = V8ProfileUI.title_chip(Rect2(0, H * 0.05 + 346, W, 64))
+		sp.add_child(chip)
+		UI.slide_in(chip, Vector2(0, 16), 0.6)
+		fades.append(chip)
+	var plate: = UI.rbox("gold", Rect2(W * 0.5 - 230, H - 250, 460, 104), 52, 4, 14)
 	sp.add_child(plate)
-	plate.add_child(UI.center_label(UI.label(V6Txt.s("title.tap"), 24, Color("fff1dc"), UI.DARK, 3, "body", 900), Rect2(0, 0, 500, 76)))
-	plate.pivot_offset = Vector2(250, 38)
+	plate.add_child(UI.center_label(UI.label(V6Txt.s("title.tap"), 40, Color("3a2410"), Color(1.0, 0.95, 0.8, 0.55), 2, "body", 900), Rect2(0, 0, 460, 104)))
+	plate.pivot_offset = Vector2(230, 52)
+	plate.shine(1.2)
+	UI.pop_in(plate, 0.7, 0.7)
 	var pt: = plate.create_tween().set_loops()
-	pt.tween_property(plate, "modulate:a", 0.55, 0.9).set_trans(Tween.TRANS_SINE)
-	pt.tween_property(plate, "modulate:a", 1.0, 0.9).set_trans(Tween.TRANS_SINE)
-	var ver: = UI.center_label(UI.label(V6Txt.s("title.version"), 15, Color(1, 1, 1, 0.6)), Rect2(0, H - 52, W, 24))
+	pt.tween_property(plate, "scale", Vector2(1.04, 1.04), 0.8).set_trans(Tween.TRANS_SINE)
+	pt.tween_property(plate, "scale", Vector2.ONE, 0.8).set_trans(Tween.TRANS_SINE)
+	var ver: = UI.center_label(UI.label(V6Txt.s("title.version") % G.version(), 16, Color(1, 1, 1, 0.65), UI.DARK, 2, "body", 800), Rect2(0, H - 56, W, 26))
 	sp.add_child(ver)
+	fades.append_array([plate, ver])
 	Sfx.music("menu")
 	await get_tree().create_timer(0.8).timeout
 	await _wait_tap(sp)
 	Sfx.play("reveal_sr", 0.9)
 	hero.react("big")
-	if not G.S.get("intro_done", false):
+	var need_card: = not has_profile
+	var need_intro: = not G.S.get("intro_done", false)
+	if need_card or need_intro:
 		pt.kill()
 		var t0: = create_tween().set_parallel()
-		for n in [logo, tag, plate, ver]:
+		for n in fades:
 			t0.tween_property(n, "modulate:a", 0.0, 0.3)
 		await t0.finished
+	var imported: = false
+	if need_card:
+		var card: = V8ProfileCard.make(self, sp)
+		await card.finished
+		imported = card.imported
+		need_intro = not G.S.get("intro_done", false)
+	if need_intro:
 		await V6Story.play("intro")
 		G.S.intro_done = true
 		G.save()
 		go("play", {"level": 0, "partner": "mc"}, false)
 	else:
+		if imported or need_card:
+			screen_id = ""
+			go("home", {}, false)
 		Sfx.say(G.S.partner, "greet")
 	var t: = create_tween()
 	t.tween_property(sp, "modulate:a", 0.0, 0.45)
@@ -155,7 +181,7 @@ func _wait_tap(n: Control) -> void :
 func _meet_scene(sp: Control, hero: Hero) -> void :
 	var lines: = [
 		"Ой, гость! Заходи, на улице фонари, а у нас тепло. Я Маджонг-тян, хозяйка этой маленькой чайной.", 
-		"Здесь играют по-своему: фишка уходит в лоток на четыре места, две одинаковые исчезают. Держи лоток свободным.", 
+		"Здесь играют по-своему: фишка уходит в лоток, две одинаковые исчезают. Держи лоток свободным.", 
 		"Перед каждой партией я гадаю на омикудзи. А девушки квартала, если подружишься, помогут своими умениями.", 
 		"Ну что, садись напротив. Первую партию сыграем вместе, я подскажу.", 
 	]
@@ -247,6 +273,11 @@ func settings() -> void :
 	var eg: = UI.label("Тайники найдены: %d из %d" % [V7Eggs.found_count(), V7Eggs.total()], 18, Color("d9c4e6"))
 	eg.position = Vector2(34, 820)
 	p.add_child(eg)
+	var vl: = UI.label(V6Txt.s("title.version") % G.version(), 15, Color(1, 1, 1, 0.45))
+	vl.position = Vector2(34, 852)
+	vl.size = Vector2(592, 24)
+	vl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	p.add_child(vl)
 
 
 func _v6_opt(key: String, v = null) -> bool:
@@ -263,46 +294,8 @@ func _v6_opt(key: String, v = null) -> bool:
 
 
 func rank_ladder() -> void :
-	var p: = Common.popup(self, V6Txt.s("rank.title"), 1000)
-	var ri: = G.rank_of(int(G.S.rp))
-	var head: = UI.label(V6Txt.s("rank.head") % [ri.title, int(G.S.rp)], 24, UI.INK, UI.DARK, 3, "body", 900)
-	head.position = Vector2(34, 58)
-	p.add_child(head)
-	var note: = UI.label(V6Txt.s("rank.note"), 17, Color("d9c4e6"))
-	note.position = Vector2(34, 94)
-	p.add_child(note)
-	var y: = 160.0
-	for t in G.RANKS.size():
-		var rk: Dictionary = G.RANKS[t]
-		var row: = UI.rbox("gold" if t == ri.tier else "glass", Rect2(26, y, 608, 108), 24, 3, 8)
-		if t == ri.tier:
-			row.colors(Color(0.34, 0.22, 0.5, 0.95), Color(0.18, 0.1, 0.3, 0.95))
-		p.add_child(row)
-		Common.rank_emblem(row, Rect2(12, 10, 88, 88), t, 0 if t > ri.tier else (ri.sub if t == ri.tier else 2))
-		var nl: = UI.label(rk.name, 28, rk.color if t <= ri.tier else Color("8a7a9a"), UI.DARK, 4, "title", 900)
-		nl.position = Vector2(116, 10)
-		row.add_child(nl)
-		var sub: = V6Txt.s("rank.sub") % rk.per if t < G.RANKS.size() - 1 else V6Txt.s("rank.sub_top") % rk.per
-		var sl: = UI.label(sub, 17, Color("d9c4e6"))
-		sl.position = Vector2(118, 52)
-		row.add_child(sl)
-		var gl: = UI.label("+%d" % rk.gems, 20, Color("ffd34d"), UI.DARK, 3, "body", 900)
-		gl.position = Vector2(500, 18)
-		row.add_child(gl)
-		row.add_child(UI.tex(G.icon("gem"), Rect2(548, 8, 48, 48)))
-		if t < ri.tier:
-			var ok: = UI.label(V6Txt.s("rank.passed"), 15, Color("9fe8d0"))
-			ok.position = Vector2(506, 66)
-			row.add_child(ok)
-		elif t == ri.tier:
-			Common.progress_bar(row, Rect2(118, 78, 360, 16), float(ri.into) / ri.need, "gold")
-			var pl: = UI.label("%d/%d" % [ri.into, ri.need], 15, Color("ffe7a6"))
-			pl.position = Vector2(490, 72)
-			row.add_child(pl)
-		y += 118
-	var yk: = UI.label(V6Txt.s("rank.yaku") % [G.S.yaku_seen.size(), G.YAKU.size() - 1], 18, Color("ffe7a6"), UI.DARK, 3, "body", 900)
-	yk.position = Vector2(34, y + 6)
-	p.add_child(yk)
+	# 0.8: the rank ladder lives in the profile screen.
+	go("profile", {"from": screen_id if screen_id != "" else "home"})
 
 
 func maybe_offer() -> void :

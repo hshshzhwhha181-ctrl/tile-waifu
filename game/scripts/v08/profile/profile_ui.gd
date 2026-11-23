@@ -117,6 +117,38 @@ static func league_info() -> Dictionary:
 	return out
 
 
+# ---- title screen ----------------------------------------------------------------------------
+
+# Centered pill under the logo: avatar + nick + rank. rect = area to center in.
+static func title_chip(rect: Rect2) -> Control:
+	var c: = Control.new()
+	c.position = rect.position
+	c.size = rect.size
+	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var nick: = G.nick()
+	var rk: = G.rank_of(int(G.S.get("rp", 0)))
+	var h: = rect.size.y
+	var f: = UI.font("body", 900)
+	var nw: = minf(f.get_string_size(nick, HORIZONTAL_ALIGNMENT_LEFT, -1, 26).x, 300.0)
+	var rw: = f.get_string_size(rk.title, HORIZONTAL_ALIGNMENT_LEFT, -1, 18).x
+	var w: = h + 14 + maxf(nw, rw) + 30
+	var x0: = (rect.size.x - w) * 0.5
+	var pill: = UI.rbox("plum", Rect2(x0, 0, w, h), h * 0.5, 3, 8)
+	pill.set_param("border_top", Color("ffe7a6")).set_param("border_bottom", Color("c58a2c"))
+	pill.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	c.add_child(pill)
+	c.add_child(Common.avatar(str(G.profile().get("avatar", "mc")), Rect2(x0 + 4, 4, h - 8, h - 8), "gold"))
+	var nl: = UI.label(nick, 26, Color.WHITE, UI.DARK, 3, "body", 900)
+	nl.position = Vector2(x0 + h + 8, 0)
+	nl.size = Vector2(maxf(nw, rw) + 10, 36)
+	nl.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	c.add_child(nl)
+	var rl: = UI.label(rk.title, 18, G.RANKS[rk.tier].color, UI.DARK, 2, "body", 900)
+	rl.position = Vector2(x0 + h + 9, 33)
+	c.add_child(rl)
+	return c
+
+
 # ---- inputs ----------------------------------------------------------------------------------
 
 static func _box_style(focus: bool) -> StyleBoxFlat:
