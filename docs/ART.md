@@ -30,3 +30,10 @@
 ## Героини
 LoRA `tw_heroines_v1` (Z-Image Turbo, триггер `twaifu style`), обучена на 24 артах (5 героинь + 19 нарядов).
 Используется для эмоций и аватаров героинь.
+
+## Эмоции героинь (game/assets/v08/emotions)
+`<hero>_<emotion>.webp`, hero ∈ mc, hana, rin, yue, nova; emotion ∈ happy, sad, surprised, pout, shy.
+Поясные портреты с прозрачным фоном (~600×800), сгенерированы LoRA `tw_heroines_v1` (Z-Image Turbo, L40S, 1500 шагов),
+фон убран rembg isnet-anime. Использовать в реакциях на победу/поражение/комбо, в сюжетных сценах и комнате.
+Файл LoRA (170 МБ) хранится в /workspace/tw/output/tw_heroines_v1 на GPU-хранилище Higgsfield (переживает аренды).
+Обучение: 24 арта (без 4 с текстом), rank 32, lr 1e-4, 768–1024 px, триггер `twaifu style`.
