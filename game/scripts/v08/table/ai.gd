@@ -269,7 +269,7 @@ static func _seen_all(r) -> Array:
 	return c
 
 
-static func call(r, s: int, opts: Dictionary) -> Dictionary:
+static func decide_call(r, s: int, opts: Dictionary) -> Dictionary:
 	if opts.ron:
 		return {"a": "ron"}
 	var st: = style_of(r, s)

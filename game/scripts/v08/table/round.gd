@@ -232,7 +232,7 @@ func turn_options(s: int) -> Dictionary:
 		if not riichi[s] and _closed(s) and scores[s] >= 1000 and wall_left() >= 4:
 			var seen: = {}
 			for t in hands[s]:
-				var k: = t >> 2
+				var k: int = t >> 2
 				if seen.has(k):
 					continue
 				seen[k] = true
@@ -367,7 +367,7 @@ func _after_kakan() -> Dictionary:
 			call_queue.pop_front()
 			continue
 		var ev: = win_eval(o, chankan_tile, false, {"chankan": true})
-		var can: = not ev.is_empty() and (ev.han > 0 or ev.yakuman > 0) and not is_furiten(o)
+		var can: bool = not ev.is_empty() and (ev.han > 0 or ev.yakuman > 0) and not is_furiten(o)
 		if not can:
 			ask_answers[o] = {"a": "pass", "seat": o}
 			continue
@@ -442,7 +442,7 @@ func _after_discard() -> Dictionary:
 			ask = {"ev": "ask", "kind": "call", "seat": o, "tile": last_discard, "from": last_from, "opts": opts, "resume": "after_discard"}
 			state = "ask"
 			return ask
-		var a: Dictionary = V8AI.call(self, o, opts)
+		var a: Dictionary = V8AI.decide_call(self, o, opts)
 		a["seat"] = o
 		ask_answers[o] = a
 	return _resolve_calls()

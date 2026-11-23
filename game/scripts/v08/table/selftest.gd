@@ -1,6 +1,8 @@
 extends SceneTree
 
-
+# Riichi table engine selftest (rules, scoring, all-AI simulation).
+# Run: godot --headless --path game -s res://scripts/v08/table/selftest.gd -- --games=12
+# Prints PASS/FAIL lines, SIM stats and "TABLE SELFTEST OK|FAILED n".
 
 var fails: = 0
 
@@ -54,11 +56,12 @@ func _shanten_tests() -> void :
 	check("kokushi tenpai", V8Mj.shanten(V8Mj.counts(parse("19m19p19s1234567z")), 0), 0)
 	check("waits 23m", V8Mj.waits(V8Mj.counts(parse("23m456p789s11z555s")), 0), [0, 3])
 	check("nobetan", V8Mj.waits(V8Mj.counts(parse("1234m567p234s666z")), 0), [0, 3])
-	check("6-shanten worst-ish", V8Mj.shanten(V8Mj.counts(parse("159m159p159s1234z")), 0) >= 5, true)
+	check("kokushi 3-shanten (10 yaochu kinds, no pair)", V8Mj.shanten(V8Mj.counts(parse("159m159p159s1234z")), 0), 3)
+	check("regular 6-shanten", V8Mj.shanten_regular(V8Mj.counts(parse("147m258p369s1357z")), 0) >= 5, true)
 
 func _ev(closed: String, win: String, ctx: Dictionary, melds: = []) -> Dictionary:
 	var cl: = parse(closed)
-	var w: = parse(win)[0]
+	var w: int = parse(win)[0]
 
 	for t in cl:
 		if t >> 2 == w >> 2:
@@ -75,7 +78,7 @@ func _names(ev: Dictionary) -> Array:
 	return a
 
 func _score_tests() -> void :
-	var e: = _ev("234m567p234s56788s", "8s", {"tsumo": true, "riichi": true})
+	var e: = _ev("234m567p234s56788s", "5s", {"tsumo": true, "riichi": true})
 	check("riichi pinfu tsumo tanyao", _names(e), ["pinfu", "riichi", "tanyao", "tsumo"])
 	check(" ... 20 fu", e.fu, 20)
 	check(" ... 4 han nondealer tsumo base", e.base, 1280)
@@ -86,7 +89,9 @@ func _score_tests() -> void :
 	e = _ev("123456789m11z", "9m", {"tsumo": false}, [{"type": "pon", "tiles": parse("555z")}])
 	check("open honitsu ittsu haku", _names(e), ["haku", "honitsu", "ittsu"])
 	e = _ev("111m999p111s11z", "1z", {"tsumo": true}, [{"type": "pon", "tiles": parse("777z")}])
-	check("toitoi chun honroutou", _names(e), ["chun", "honroutou", "toitoi"])
+	check("toitoi chun honroutou sanankou", _names(e), ["chun", "honroutou", "sanankou", "toitoi"])
+	e = _ev("234m567p234s56788s", "8s", {"tsumo": true, "riichi": true})
+	check("nobetan 8s: no pinfu, 30 fu", [_names(e), e.fu, e.base], [["riichi", "tanyao", "tsumo"], 30, 960])
 	e = _ev("19m19p19s12345677z", "7z", {"tsumo": false})
 	check("kokushi", [e.yakuman, e.base], [1, 8000])
 	e = _ev("11122233344455m", "5m", {"tsumo": true})
@@ -95,7 +100,7 @@ func _score_tests() -> void :
 	check("no-yaku open-shape? closed ron sanshoku tanyao", _names(e).has("sanshoku"), true)
 	e = _ev("123m456m789m2345p", "5p", {"tsumo": false}, [{"type": "chi", "tiles": parse("789s")}])
 	check("open yakuless", e.han, 0)
-	e = _ev("22m345p345p66s789s", "9s", {"tsumo": false, "riichi": true, "dora_ind": [parse("1m")[0]]})
+	e = _ev("22m345p345p666s789s", "9s", {"tsumo": false, "riichi": true, "dora_ind": [parse("1m")[0]]})
 	check("iipeikou riichi dora2", [e.han >= 4, _names(e).has("iipeikou")], [true, true])
 
 func _sim(games: int) -> void :

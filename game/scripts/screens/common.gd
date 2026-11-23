@@ -320,6 +320,140 @@ static func skin_picker(main, on_done: Callable) -> void :
 
 
 
+# 0.8: confirmation before spending currency (spec: no spend without Common.confirm).
+#   Common.confirm(main, title, text, price_icon, price, on_yes, opts) -> RBox (null if skipped via skip_key)
+#   price_icon: G.icon name ("gem", "coin", "ticket"…) or "" for no price row; price: amount shown.
+#   opts: skip_key: String  — shows «Не спрашивать в этой партии»; when ticked and confirmed, later calls with
+#                             the same key call on_yes at once. Make the key per match, e.g. "hint_%d" % get_instance_id().
+#         on_no: Callable   — called on «Отмена», ×, or tap outside.
+#         yes_text / no_text: String — button captions (default «Да» / «Отмена»).
+#         balance_check: bool (default true) — for gem/coin prices: if the player cannot pay, «Да» is disabled.
+# The callback never spends anything itself: on_yes does the spending.
+static var confirm_skips: = {}
+
+static func confirm_skip_reset(prefix: = "") -> void :
+	if prefix == "":
+		confirm_skips.clear()
+		return
+	for k in confirm_skips.keys():
+		if str(k).begins_with(prefix):
+			confirm_skips.erase(k)
+
+
+static func confirm(main, title: String, text: String, price_icon: String, price: int, on_yes: Callable, opts: = {}) -> RBox:
+	var skip_key: String = str(opts.get("skip_key", ""))
+	if skip_key != "" and confirm_skips.get(skip_key, false):
+		on_yes.call()
+		return null
+	var w: = 600.0
+	var tw: = w - 80.0
+	var tsize: = 24
+	var text_h: float = UI.font("body", 800).get_multiline_string_size(text, HORIZONTAL_ALIGNMENT_CENTER, tw, tsize).y + 8.0
+	var has_price: = price_icon != "" and price > 0
+	var balance: = -1
+	if has_price and opts.get("balance_check", true):
+		if price_icon == "gem":
+			balance = int(G.S.gems)
+		elif price_icon == "coin":
+			balance = int(G.S.coins)
+	var short: = balance >= 0 and balance < price
+	var h: = 64.0 + text_h + 24.0
+	if has_price:
+		h += 70.0 + (34.0 if balance >= 0 else 0.0) + 14.0
+	if skip_key != "":
+		h += 62.0
+	h += 92.0 + 34.0
+	var p: = popup(main, title, h, "cream", w)
+	var root: Control = p.get_meta("root")
+	var done: = [false]
+	var y: = 64.0
+	var tl: = UI.label(text, tsize, UI.INK, UI.DARK, 3, "body", 800)
+	tl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	tl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	tl.position = Vector2(40, y)
+	tl.size = Vector2(tw, text_h)
+	p.add_child(tl)
+	y += text_h + 24.0
+	if has_price:
+		var num: = UI.fmt(price)
+		var nw: float = UI.font("body", 900).get_string_size(num, HORIZONTAL_ALIGNMENT_LEFT, -1, 34).x
+		var pw: = clampf(nw + 112.0, 170.0, 360.0)
+		var pill: = UI.rbox("plum", Rect2((w - pw) * 0.5, y, pw, 64), 32, 3, 8)
+		pill.set_param("border_top", Color("ffe7a6")).set_param("border_bottom", Color("c58a2c"))
+		p.add_child(pill)
+		pill.add_child(UI.tex(G.icon(price_icon), Rect2(10, 2, 60, 60)))
+		var pl: = UI.label(num, 34, Color("ff9a9a") if short else Color.WHITE, Color(0.2, 0.05, 0.2), 4, "body", 900)
+		pl.position = Vector2(76, 0)
+		pl.size = Vector2(pw - 92, 64)
+		pl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		pl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		pill.add_child(pl)
+		y += 70.0
+		if balance >= 0:
+			var bt: String = ("Не хватает: у тебя %s" if short else "У тебя: %s") % UI.fmt(balance)
+			p.add_child(UI.center_label(UI.label(bt, 19, Color("ff9a9a") if short else UI.MUTED, UI.DARK, 2, "body", 800), Rect2(0, y, w, 30)))
+			y += 34.0
+		y += 14.0
+	var skip: = [false]
+	if skip_key != "":
+		var row: = Control.new()
+		row.position = Vector2(0, y)
+		row.size = Vector2(w, 52)
+		row.mouse_filter = Control.MOUSE_FILTER_STOP
+		p.add_child(row)
+		var cap: = "Не спрашивать в этой партии"
+		var cw: float = UI.font("body", 800).get_string_size(cap, HORIZONTAL_ALIGNMENT_LEFT, -1, 21).x
+		var x0: = (w - (44.0 + 14.0 + cw)) * 0.5
+		var box: = UI.rbox("glass", Rect2(x0, 4, 44, 44), 12, 3, 6)
+		box.set_param("border_top", Color("ffe7a6")).set_param("border_bottom", Color("c58a2c"))
+		row.add_child(box)
+		var mark: = UI.center_label(UI.label("✓", 30, Color("ffd34d"), UI.DARK, 3, "body", 900), Rect2(0, 0, 44, 44))
+		mark.visible = false
+		box.add_child(mark)
+		var cl: = UI.label(cap, 21, UI.INK, UI.DARK, 2, "body", 800)
+		cl.position = Vector2(x0 + 58, 0)
+		cl.size = Vector2(cw + 8, 52)
+		cl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		row.add_child(cl)
+		row.gui_input.connect( func(e):
+			if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT:
+				skip[0] = not skip[0]
+				mark.visible = skip[0]
+				Sfx.play("tap")
+				UI.punch(box, 0.15))
+		y += 62.0
+	var bw: = (w - 60.0 - 20.0) * 0.5
+	var no: = JButton.make(str(opts.get("no_text", "Отмена")), "glass", Rect2(30, y + 4, bw, 84), null, 28)
+	p.add_child(no)
+	var yes: = JButton.make(str(opts.get("yes_text", "Да")), "glass" if short else "gold", Rect2(50 + bw, y + 4, bw, 84), null, 30)
+	if short:
+		yes.modulate = Color(1, 1, 1, 0.55)
+	else:
+		yes.shine_every = 2.6
+	p.add_child(yes)
+	root.set_meta("on_close", func():
+		if not done[0]:
+			done[0] = true
+			var cb_no = opts.get("on_no")
+			if cb_no is Callable and (cb_no as Callable).is_valid():
+				(cb_no as Callable).call())
+	no.pressed.connect( func(): close_popup(p))
+	yes.pressed.connect( func():
+		if done[0]:
+			return
+		if short:
+			UI.punch(yes, 0.12)
+			if main.has_method("toast"):
+				main.toast("Не хватает %s" % ("кристаллов" if price_icon == "gem" else "монет"), price_icon)
+			return
+		done[0] = true
+		if skip[0] and skip_key != "":
+			confirm_skips[skip_key] = true
+		close_popup(p)
+		on_yes.call())
+	return p
+
+
 static func living_art(parent: Control, tex: Texture2D, r: Rect2, focus: = Vector2(0.5, 0.35)) -> TextureRect:
 	var art: = card_art(tex, r, focus, 1.0, 0.0)
 	(art.material as ShaderMaterial).set_shader_parameter("bottom_shade", 0.0)

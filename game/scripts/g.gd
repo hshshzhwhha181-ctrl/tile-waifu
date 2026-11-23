@@ -1,7 +1,32 @@
 extends Node
 
+# G — global game state (autoload). 0.8 core API (Stream A):
+#   G.version() -> String                 build version from project.godot ("0.8.0")
+#   G.save()                              atomic write: save.tmp.json -> save.json, previous file kept as save.bak.json
+#   G.load_game()                         main file -> interrupted temp -> backup; never crashes on bad/missing files
+#   G.apply_state(d) -> bool              replace S with a loaded/imported dict (merged over defaults + migrated)
+#   G.add_rp(n, source="other") -> Array  the ONLY way to give rank points; returns rank-ups [{tier, sub, gems}]
+#                                         n may be negative but rp never drops below the start of the current step
+#   G.record_game(source, won)            per-mode game/win counters for the profile (S.stats)
+#   G.set_profile(nick, avatar, done=true) -> bool, G.nick_error(nick) -> String, G.nick() -> String
+#   Signals: profile_changed, rank_changed(old_index, new_index), rp_changed(old_rp, new_rp)
+#   Save keys added in v6: S.profile {nick, avatar, frame, created, id}, S.profile_done, S.stats {source: {games, wins, rp}}
+# add_rp / record_game / set_* do not write to disk except set_profile; call G.save() after a batch of changes.
+
+signal profile_changed
+signal rank_changed(old_index: int, new_index: int)
+signal rp_changed(old_rp: int, new_rp: int)
 
 const SAVE_PATH: = "user://save.json"
+const SAVE_VER: = 6
+const RP_SOURCES: = ["path", "daily", "duel", "blitz", "zen", "etude", "event", "tourney", "table", "other"]
+const NICK_MIN: = 3
+const NICK_MAX: = 16
+
+var save_path: = SAVE_PATH
+var loaded_from: = ""
+var save_ok: = true
+var _main_ok: = false
 
 const HEROES: = {
 	"mc": {"name": "Маджонг-тян", "title": "Хозяйка «Пяти ветров»", "color": Color("ff8fb8")}, 
@@ -57,7 +82,7 @@ const TILE_NAMES: = ["sakura", "plum", "chrysanthemum", "sunflower", "tulip", "c
 
 const LOCS: = [
 	{"name": "Чайный сад", "bg": "play", "fx": "petals", "tint": Color(1, 1, 1), "hero": "mc", "shard": "rin", "item": "s_mint", 
-		"intro": "Свободная фишка уходит в лоток, две одинаковые исчезают. Мест четыре — держи хотя бы одно пустым.", 
+		"intro": "Свободная фишка уходит в лоток, две одинаковые исчезают. Держи в лотке хотя бы одно место пустым.",
 		"stages": [["rect", 5, 6, 2, 0.7, 6, "", 0], ["heart", 5, 6, 2, 0.75, 7, "", 0], ["diamond", 5, 6, 3, 0.6, 8, "gold", 0], ["butterfly", 6, 6, 3, 0.65, 9, "hidden", 1]]}, 
 	{"name": "Чайная во льду", "bg": "bg_teahouse", "fx": "snow", "tint": Color(0.92, 0.97, 1.0), "hero": "rin", "shard": "rin", "item": "b_tea", 
 		"intro": "Фишки рубашкой вверх: первое касание переворачивает фишку, второе берёт её в лоток.", 
@@ -152,18 +177,132 @@ func rank_index(rp: int) -> int:
 	return r.tier * 3 + r.sub
 
 
-func add_rp(n: int) -> Array:
-	var before: = rank_index(int(S.rp))
-	S.rp = int(S.rp) + n
+func rank_floor(rp: int) -> int:
+	return maxi(0, rp - int(rank_of(rp).into))
+
+
+func add_rp(n: int, source: = "other") -> Array:
+	if not source in RP_SOURCES:
+		push_warning("G.add_rp: unknown source '%s', counted as 'other'" % source)
+		source = "other"
+	var old_rp: = int(S.get("rp", 0))
+	var before: = rank_index(old_rp)
+	var new_rp: = old_rp + n
+	if n < 0:
+		new_rp = maxi(new_rp, rank_floor(old_rp))
+	new_rp = maxi(0, new_rp)
+	S.rp = new_rp
+	var st: = _stat(source)
+	st.rp = int(st.rp) + (new_rp - old_rp)
 	var ups: = []
-	var after: = rank_index(int(S.rp))
+	var after: = rank_index(new_rp)
 	for k in range(before + 1, after + 1):
 		var t: = mini(k / 3, RANKS.size() - 1)
 		var s: = k - t * 3
 		var g: int = RANKS[t].gems if s == 0 else 50 * (t + 1)
 		S.gems += g
 		ups.append({"tier": t, "sub": s, "gems": g})
+	if new_rp != old_rp:
+		rp_changed.emit(old_rp, new_rp)
+	if after != before:
+		rank_changed.emit(before, after)
 	return ups
+
+
+func record_game(source: String, won: bool) -> void :
+	if not source in RP_SOURCES:
+		push_warning("G.record_game: unknown source '%s', counted as 'other'" % source)
+		source = "other"
+	var st: = _stat(source)
+	st.games = int(st.games) + 1
+	if won:
+		st.wins = int(st.wins) + 1
+
+
+func stats_of(source: String) -> Dictionary:
+	var st = S.get("stats", {}).get(source, {})
+	if not (st is Dictionary):
+		st = {}
+	return {"games": int(st.get("games", 0)), "wins": int(st.get("wins", 0)), "rp": int(st.get("rp", 0))}
+
+
+func _stat(source: String) -> Dictionary:
+	if not (S.get("stats") is Dictionary):
+		S.stats = {}
+	var st = S.stats.get(source)
+	if not (st is Dictionary):
+		st = {}
+		S.stats[source] = st
+	for k in ["games", "wins", "rp"]:
+		st[k] = int(st.get(k, 0))
+	return st
+
+
+func version() -> String:
+	return str(ProjectSettings.get_setting("application/config/version", "0.8.0"))
+
+
+func new_profile() -> Dictionary:
+	return {"nick": "", "avatar": "mc", "frame": "", "created": int(Time.get_unix_time_from_system()), "id": "%08x" % (randi() & 0xffffffff)}
+
+
+func profile() -> Dictionary:
+	_ensure_profile()
+	return S.profile
+
+
+func nick() -> String:
+	var n: String = str(profile().get("nick", "")).strip_edges()
+	return n if n != "" else "Гость"
+
+
+func nick_error(text: String) -> String:
+	var n: = text.strip_edges()
+	if n == "":
+		return "Введи ник"
+	if n.length() < NICK_MIN:
+		return "Ник короче %d символов" % NICK_MIN
+	if n.length() > NICK_MAX:
+		return "Ник длиннее %d символов" % NICK_MAX
+	for ch in n:
+		if ch.unicode_at(0) < 32:
+			return "Недопустимые символы в нике"
+	return ""
+
+
+func set_profile(new_nick: String, avatar: = "", done: = true) -> bool:
+	if nick_error(new_nick) != "":
+		return false
+	var p: = profile()
+	p.nick = " ".join(new_nick.strip_edges().split(" ", false))
+	if avatar != "" and HEROES.has(avatar):
+		p.avatar = avatar
+	if done:
+		S.profile_done = true
+	save()
+	profile_changed.emit()
+	return true
+
+
+func set_avatar(avatar: String) -> void :
+	if not HEROES.has(avatar):
+		return
+	profile().avatar = avatar
+	save()
+	profile_changed.emit()
+
+
+func _ensure_profile() -> void :
+	var d: = new_profile()
+	if not (S.get("profile") is Dictionary):
+		S.profile = d
+		return
+	for k in d:
+		if not S.profile.has(k):
+			S.profile[k] = d[k]
+	S.profile.created = int(S.profile.created)
+	if not HEROES.has(str(S.profile.avatar)):
+		S.profile.avatar = "mc"
 
 
 const CATS: = [[0, 6, "Букет", "цветы"], [7, 14, "Небосвод", "небо"], [15, 22, "Сладкоежка", "сладости"], [23, 28, "Сокровищница", "сокровища"], [29, 35, "Зверинец", "звери"]]
@@ -292,6 +431,49 @@ func _ready() -> void :
 	demo = "--demo" in OS.get_cmdline_user_args()
 	rng.randomize()
 	load_game()
+	var args: = OS.get_cmdline_user_args()
+	if "--recovery_selftest=1" in args:
+		_recovery_selftest.call_deferred()
+	if "--v8_confirm_demo=1" in args:
+		_confirm_demo.call_deferred()
+	if "--v8_header_demo=1" in args:
+		_header_demo.call_deferred()
+
+
+func _recovery_selftest() -> void :
+	var fails: int = V8RecoverySelftest.run()
+	get_tree().quit(1 if fails > 0 else 0)
+
+
+func _header_demo() -> void :
+	for i in 30:
+		await get_tree().process_frame
+	var main = get_tree().current_scene
+	if main == null or not ("screen" in main) or main.screen == null:
+		return
+	var bg: = ColorRect.new()
+	bg.color = Color(0.1, 0.09, 0.11)
+	bg.position = Vector2(0, V8Header.TOP)
+	bg.size = Vector2(main.W, main.H - V8Header.TOP)
+	main.screen.add_child(bg)
+	V8Header.make(main.screen, main, "Турнир недели", func(): main.toast("Назад", ""), func(): main.toast("Справка", ""))
+	var l: = UI.label("Контент начинается с V8Header.CONTENT_Y = %d" % int(V8Header.CONTENT_Y), 22, UI.INK)
+	l.position = Vector2(24, V8Header.CONTENT_Y + 8)
+	main.screen.add_child(l)
+	var line: = ColorRect.new()
+	line.color = Color(1, 0.8, 0.3, 0.8)
+	line.position = Vector2(0, V8Header.CONTENT_Y)
+	line.size = Vector2(main.W, 2)
+	main.screen.add_child(line)
+
+
+func _confirm_demo() -> void :
+	for i in 30:
+		await get_tree().process_frame
+	var main = get_tree().current_scene
+	if main == null or not ("overlay" in main):
+		return
+	Common.confirm(main, "Подсказка", "Подсказки на эту партию закончились. Взять ещё одну за кристаллы?", "gem", 30, func(): main.toast("Подсказка куплена", "gem"), {"skip_key": "demo_hint"})
 
 func default_state() -> Dictionary:
 	var owned: = {}
@@ -312,11 +494,14 @@ func default_state() -> Dictionary:
 		"pass": {"owned": false, "xp": 0, "claimed": 0}, 
 		"month_card": {"until": "", "last": ""}, 
 		"modest": false, "cutins": true, "voice": true, "first_buy": {}, "shards": {}, "side": "f", 
-		"rp": 0, "ver": 5, "yaku_seen": {}, "blitz_best": 0, "next_great": false, "intro_done": false, 
+		"rp": 0, "ver": SAVE_VER, "yaku_seen": {}, "blitz_best": 0, "next_great": false, "intro_done": false,
+		"profile": new_profile(), "profile_done": false, "stats": {},
 	}
 
 func load_game() -> void :
 	S = default_state()
+	loaded_from = ""
+	_main_ok = false
 	if demo:
 
 		S.unlocked = 3
@@ -326,38 +511,125 @@ func load_game() -> void :
 		S.owned["b_tea"] = true
 		S.tut_done = true
 		S.level_partner = "mc"
+		S.profile_done = true
+		S.profile.nick = "Гость"
 		return
-	if FileAccess.file_exists(SAVE_PATH):
-		var f: = FileAccess.open(SAVE_PATH, FileAccess.READ)
-		var d = JSON.parse_string(f.get_as_text())
-		if d is Dictionary:
-			for k in d:
-				S[k] = d[k]
-			if int(d.get("ver", 0)) < 4:
+	for p in [save_path, _tmp_path(), _bak_path()]:
+		var d = read_save_file(p)
+		if d is Dictionary and apply_state(d):
+			loaded_from = p
+			_main_ok = p == save_path
+			if p != save_path:
+				push_warning("G.load_game: main save unreadable, restored from %s" % p)
+			return
+		elif FileAccess.file_exists(p):
+			push_warning("G.load_game: save file %s is damaged, skipped" % p)
 
-				var old_unl: = int(S.unlocked)
-				var ns: = {}
-				for k in S.stars:
-					ns[str(int(k) * 4)] = S.stars[k]
-				S.stars = ns
-				S.unlocked = mini(1 + (old_unl - 1) * 4, LEVELS.size())
-				S.ver = 4
 
-			if int(S.get("ver", 0)) < 5:
-				var ns5: = {}
-				for k in S.stars:
-					ns5[str(V6Worlds.migrate_index(int(k)))] = S.stars[k]
-				S.stars = ns5
-				S.unlocked = mini(V6Worlds.migrate_index(maxi(0, int(S.unlocked) - 1)) + 1, LEVELS.size())
-				S["v6_map"] = {"chests": {}, "seen": int(S.unlocked)}
-				S.ver = 5
+func read_save_file(path: String) -> Variant:
+	if not FileAccess.file_exists(path):
+		return null
+	var f: = FileAccess.open(path, FileAccess.READ)
+	if f == null:
+		return null
+	var txt: = f.get_as_text()
+	f.close()
+	if txt.strip_edges() == "":
+		return null
+	var j: = JSON.new()
+	if j.parse(txt) != OK:
+		return null
+	return j.data if j.data is Dictionary else null
+
+
+func apply_state(d: Dictionary) -> bool:
+	if not d.has("gems") or not d.has("unlocked"):
+		return false
+	var st: = default_state()
+	for k in d:
+		st[k] = d[k]
+	st.ver = int(d.get("ver", 0))
+	var prev: = S
+	S = st
+	_migrate()
+	if not (S.get("stars") is Dictionary) or not (S.get("owned") is Dictionary):
+		S = prev
+		return false
+	return true
+
+
+func _migrate() -> void :
+	if int(S.ver) < 4:
+		var old_unl: = int(S.unlocked)
+		var ns: = {}
+		for k in S.stars:
+			ns[str(int(k) * 4)] = S.stars[k]
+		S.stars = ns
+		S.unlocked = mini(1 + (old_unl - 1) * 4, LEVELS.size())
+		S.ver = 4
+	if int(S.ver) < 5:
+		var ns5: = {}
+		for k in S.stars:
+			ns5[str(V6Worlds.migrate_index(int(k)))] = S.stars[k]
+		S.stars = ns5
+		S.unlocked = mini(V6Worlds.migrate_index(maxi(0, int(S.unlocked) - 1)) + 1, LEVELS.size())
+		S["v6_map"] = {"chests": {}, "seen": int(S.unlocked)}
+		S.ver = 5
+	if int(S.ver) < 6:
+		S.profile = new_profile()
+		S.profile.avatar = str(S.get("partner", "mc"))
+		S.profile_done = false
+		S.stats = {}
+		S.ver = 6
+	_ensure_profile()
+	S.profile_done = bool(S.get("profile_done", false))
+	if not (S.get("stats") is Dictionary):
+		S.stats = {}
+
+
+func _tmp_path() -> String:
+	return save_path.get_basename() + ".tmp.json"
+
+func _bak_path() -> String:
+	return save_path.get_basename() + ".bak.json"
 
 
 func save() -> void :
 	if demo:
 		return
-	var f: = FileAccess.open(SAVE_PATH, FileAccess.WRITE)
-	f.store_string(JSON.stringify(S))
+	save_ok = write_atomic(save_path, JSON.stringify(S), _main_ok)
+	if save_ok:
+		_main_ok = true
+
+
+func write_atomic(path: String, text: String, keep_backup: = true) -> bool:
+	var tmp: = path.get_basename() + ".tmp.json"
+	var bak: = path.get_basename() + ".bak.json"
+	var f: = FileAccess.open(tmp, FileAccess.WRITE)
+	if f == null:
+		push_error("G.save: cannot open %s (%s)" % [tmp, error_string(FileAccess.get_open_error())])
+		return false
+	f.store_string(text)
+	f.flush()
+	var werr: = f.get_error()
+	f.close()
+	if werr != OK:
+		push_error("G.save: write failed (%s)" % error_string(werr))
+		return false
+	if FileAccess.file_exists(path):
+		if keep_backup:
+			if FileAccess.file_exists(bak):
+				DirAccess.remove_absolute(bak)
+			if DirAccess.rename_absolute(path, bak) != OK:
+				DirAccess.copy_absolute(path, bak)
+	var err: = DirAccess.rename_absolute(tmp, path)
+	if err != OK:
+		DirAccess.remove_absolute(path)
+		err = DirAccess.rename_absolute(tmp, path)
+	if err != OK:
+		push_error("G.save: rename failed (%s)" % error_string(err))
+		return false
+	return true
 
 func level_stars(i: int) -> int:
 	return int(S.stars.get(str(i), 0))

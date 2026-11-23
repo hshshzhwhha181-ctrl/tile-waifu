@@ -281,7 +281,7 @@ static func _near(c: Array, k: int) -> bool:
 		return c[k] > 0 or true
 	var b: = k - k % 9
 	for d in [-2, -1, 1, 2]:
-		var j: = k + d
+		var j: int = k + d
 		if j >= b and j < b + 9 and c[j] > 0:
 			return true
 	return is_term(k)
@@ -674,7 +674,7 @@ static func _score_one(cd: Dictionary, c: Array, menzen: bool, wk: int, all_tile
 	else:
 		var dora: = 0
 		for ind in ctx.get("dora_ind", []):
-			var dk: = dora_of(ind if ind < 34 else ind >> 2)
+			var dk: = dora_of(ind >> 2)
 			for k in kinds_all:
 				if k == dk:
 					dora += 1
@@ -685,7 +685,7 @@ static func _score_one(cd: Dictionary, c: Array, menzen: bool, wk: int, all_tile
 		var ura: = 0
 		if ctx.get("riichi", false):
 			for ind in ctx.get("ura_ind", []):
-				var uk: = dora_of(ind if ind < 34 else ind >> 2)
+				var uk: = dora_of(ind >> 2)
 				for k in kinds_all:
 					if k == uk:
 						ura += 1
