@@ -22,6 +22,7 @@ var _press: = {}
 
 const Y_TABS: = V8Header.CONTENT_Y + 8.0
 const Y_PAGE: = Y_TABS + 76.0
+const ROW_H: = 68.0
 
 
 func build(m, args: Dictionary) -> void :
@@ -30,9 +31,10 @@ func build(m, args: Dictionary) -> void :
 	H = size.y
 	main.show_chrome(true, true)
 	Sfx.music("menu")
-	Common.backdrop(self, "bg_festival", size, 2.6, 0.55, Color(1, 0.95, 0.95))
+	# 0.8 art: the tournament hall (bg/tourney.webp); its dark carpet runs under the tables and the board
+	V8ProfileUI.backdrop(self, "tourney", size, 0.8, 0.72, Color(1, 0.96, 0.96), Vector2(0.5, 0.35))
 	Fx.ambient(self, "lanterns", size)
-	Common.vignette(self, size, Color(0.08, 0.04, 0.1), 0.65)
+	Common.vignette(self, size, Color(0.08, 0.04, 0.1), 0.55)
 	header = V8Header.make(self, main, "Турнир", main.back, rules)
 	var dev: = _dev()
 	tab = String(args.get("tab", dev.get("league_tab", last_tab)))
@@ -134,10 +136,9 @@ func _week_card(t: Dictionary, L: Dictionary, place: int) -> void :
 	card.colors(Color(0.12, 0.06, 0.16, 0.97), Color(0.08, 0.04, 0.1, 0.98)).borders(Color("ffe7a6"), Color("c58a2c"))
 	page.add_child(card)
 	var lc: Color = L.color
-	var crest: = UI.rbox("gold", Rect2(18, 16, 92, 92), 46, 4, 8)
-	crest.colors(lc.lightened(0.1), lc.darkened(0.45)).borders(Color(1, 1, 1, 0.7), lc.darkened(0.6))
-	card.add_child(crest)
-	crest.add_child(UI.tex(G.icon("trophy"), Rect2(14, 12, 64, 64)))
+	# 0.8 art: the league crest of this week's tier
+	var crest: = Common.league_emblem(card, Rect2(10, 4, 108, 108), int(t.league))
+	UI.pop_in(crest, 0.15, 0.6)
 	var ln: = UI.label(String(L.name), 28, lc.lightened(0.25), UI.DARK, 4, "body", 900)
 	ln.position = Vector2(126, 12)
 	ln.size = Vector2(r.size.x - 126 - 190, 40)
@@ -275,7 +276,7 @@ func _board(t: Dictionary, rows: Array) -> void :
 func _scroll_to(i: int) -> void :
 	await get_tree().process_frame
 	if is_inside_tree() and scroll and is_instance_valid(scroll):
-		scroll.scroll_vertical = maxi(0, int((i - 3) * 70.0))
+		scroll.scroll_vertical = maxi(0, int((i - 3) * (ROW_H + 6.0)))
 
 func _divider(text: String, col: Color) -> Control:
 	var c: = Control.new()
@@ -292,11 +293,11 @@ func _divider(text: String, col: Color) -> Control:
 func _row(r: Dictionary, place: int, z: String, value: String, tier: int, ctx: Dictionary) -> Control:
 	var c: = Control.new()
 	var rw: = W - 48
-	c.custom_minimum_size = Vector2(rw, 64)
-	c.size = Vector2(rw, 64)
+	c.custom_minimum_size = Vector2(rw, ROW_H)
+	c.size = Vector2(rw, ROW_H)
 	c.mouse_filter = Control.MOUSE_FILTER_PASS
 	var me: bool = r.me
-	var bg: = UI.rbox("pink" if me else "plum", Rect2(0, 0, rw, 64), 20, 2 if me else 1, 4)
+	var bg: = UI.rbox("pink" if me else "plum", Rect2(0, 0, rw, ROW_H), 20, 2 if me else 1, 4)
 	if not me:
 		bg.colors(Color(0.16, 0.14, 0.17, 0.85), Color(0.1, 0.09, 0.11, 0.9))
 		bg.borders(Color("a9d9c4") if z == "up" else (Color("e3a3b2") if z == "down" else Color(1, 1, 1, 0.08)), Color(0, 0, 0, 0.3))
@@ -307,28 +308,30 @@ func _row(r: Dictionary, place: int, z: String, value: String, tier: int, ctx: D
 	# Playfair only from 24 px up (spec): places 100+ are set in Nunito
 	var pl: = UI.label(ps, 26 if place < 100 else (22 if place < 1000 else 18), pc, UI.DARK, 3, "title" if place < 100 else "body", 900)
 	pl.position = Vector2(4, 0)
-	pl.size = Vector2(60, 64)
+	pl.size = Vector2(60, ROW_H)
 	pl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	pl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	c.add_child(pl)
-	c.add_child(V8Population.avatar_view(String(r.get("avatar", "mc_base")), String(r.get("hero", "mc")), Rect2(68, 6, 52, 52)))
+	# 0.8 art: round portrait in the gold frame; Дракон / Небожитель players wear the ornate frame
+	var rt: = int(r.get("tier", tier))
+	c.add_child(V8Population.avatar_view(String(r.get("avatar", "mc_base")), String(r.get("hero", "mc")), Rect2(62, 0, ROW_H, ROW_H), 0.0, rt >= 0 and V8Art.top_tier(rt)))
 	var x_end: = rw - 140.0
 	if tier >= 0:
-		Common.rank_emblem(c, Rect2(rw - 186, 12, 40, 40), tier, 0).get_child(-1).visible = false
-		x_end = rw - 190.0
+		Common.rank_emblem(c, Rect2(rw - 190, (ROW_H - 48) * 0.5, 48, 48), tier, 0).get_child(-1).visible = false
+		x_end = rw - 194.0
 	elif place <= 3 and int(r.get("score", 0)) > 0:
-		c.add_child(UI.tex(G.icon("trophy"), Rect2(rw - 186, 10, 44, 44)))
-		x_end = rw - 190.0
+		c.add_child(V8Art.rect(V8Art.icon("trophy"), Rect2(rw - 188, (ROW_H - 44) * 0.5, 44, 44)))
+		x_end = rw - 194.0
 	var nm: = UI.label(String(r.name), 21, Color.WHITE, UI.DARK, 3, "body", 900)
-	nm.position = Vector2(132, 0)
-	nm.size = Vector2(x_end - 132, 64)
+	nm.position = Vector2(62 + ROW_H + 6, 0)
+	nm.size = Vector2(x_end - nm.position.x, ROW_H)
 	nm.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	nm.clip_text = true
 	nm.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	c.add_child(nm)
 	var sc: = UI.label(value, 22, Color("ffe7a6"), UI.DARK, 3, "body", 900)
 	sc.position = Vector2(rw - 140, 0)
-	sc.size = Vector2(124, 64)
+	sc.size = Vector2(124, ROW_H)
 	sc.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	sc.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	c.add_child(sc)
@@ -400,7 +403,7 @@ func _quarter_page() -> void :
 	var rows: Array = q_data.rows
 	var in_top: = int(me.place) <= rows.size()
 	_frame(top, bottom, V8League.TXT.top)
-	var list_h: = bottom - top - 50 - (0.0 if in_top else 86.0)
+	var list_h: = bottom - top - 50 - (0.0 if in_top else ROW_H + 22.0)
 	_make_scroll(top + 40, list_h)
 	var me_i: = 0
 	for i in rows.size():
@@ -418,7 +421,7 @@ func _quarter_page() -> void :
 		dots.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		page.add_child(dots)
 		var mr: = _row(me, int(me.place), "", UI.fmt(int(me.points)), int(me.tier), {})
-		mr.position = Vector2(24, bottom - 74)
+		mr.position = Vector2(24, bottom - ROW_H - 10)
 		page.add_child(mr)
 
 

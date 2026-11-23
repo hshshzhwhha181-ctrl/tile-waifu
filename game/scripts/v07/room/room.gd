@@ -283,7 +283,7 @@ func _level_up(lv: int) -> void :
 
 
 func _gift_popup() -> void :
-	var p: = Common.popup(main, "Подарок · %s" % G.HEROES[h].name, 860, "cream", 680)
+	var p: = Common.popup(main, "Подарок · %s" % G.HEROES[h].name, 890, "cream", 680)
 	var left: = V7RoomData.gifts_left(h)
 	var info: = UI.center_label(UI.label("Сегодня можно подарить ещё %d · монеты: %s" % [left, UI.fmt(int(G.S.coins))], 18, Color("e9dcff")), Rect2(0, 48, 680, 30))
 	p.add_child(info)
@@ -334,7 +334,8 @@ func _gift_popup() -> void :
 					Common.confirm(main, "Подарок", "Подарить %s «%s»?" % [G.HEROES[h].name, gd.name], "coin", int(gd.price), func():
 						Common.close_popup(p)
 						_give(gid), {"yes_text": "Подарить"}))
-	var hint: = UI.center_label(UI.label("Два сердца — любимое, одно — нравится. Вкус узнаёшь, когда подаришь.", 16, Color("cfc3d8")), Rect2(0, 92 + 4 * (ch + 12) + 4, 680, 26))
+	var hint: = UI.center_label(UI.label("Два сердца — любимое, одно — нравится. Вкус узнаёшь, когда подаришь.", 16, Color("cfc3d8")), Rect2(40, 92 + 4 * (ch + 12) + 6, 600, 26))
+	Common.fit_line(hint, 600)
 	p.add_child(hint)
 
 func _give(gid: String) -> void :

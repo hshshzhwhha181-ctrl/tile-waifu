@@ -14,29 +14,25 @@ static func open(main, info: Dictionary) -> RBox:
 	var p: = Common.popup(main, "Карточка игрока", h)
 	p.name = "V8PlayerCard"
 	var hero: = String(info.get("hero", "mc"))
-	var av: = V8Population.avatar_view(String(info.get("avatar", "mc_base")), hero, Rect2(36, 66, 168, 168), 5.0)
+	var tier: = clampi(int(info.get("tier", 0)), 0, G.RANKS.size() - 1)
+	var rk: Dictionary = G.RANKS[tier]
+	# 0.8 art: round portrait in the gold frame (the ornate one for Дракон / Небожитель), rank medallion and
+	# league crest side by side with the name
+	var av: = V8Population.avatar_view(String(info.get("avatar", "mc_base")), hero, Rect2(26, 54, 188, 188), 0.0, V8Art.top_tier(tier))
 	p.add_child(av)
 	UI.pop_in(av, 0.05, 0.7)
 	var nm: = UI.label(String(info.get("name", "")), 34, Color.WHITE, UI.DARK, 4, "body", 900)
-	nm.position = Vector2(226, 64)
+	nm.position = Vector2(226, 60)
 	nm.size = Vector2(W - 226 - 30, 48)
 	nm.clip_text = true
 	nm.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	p.add_child(nm)
-	var tier: = clampi(int(info.get("tier", 0)), 0, G.RANKS.size() - 1)
-	var rk: Dictionary = G.RANKS[tier]
-	Common.rank_emblem(p, Rect2(226, 118, 70, 70), tier, int(info.get("sub", 0)))
-	var rl: = UI.label(String(info.get("rank", rk.name)), 26, rk.color.lightened(0.2), UI.DARK, 3, "body", 900)
-	rl.position = Vector2(308, 118)
-	rl.size = Vector2(W - 308 - 30, 70)
-	rl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	p.add_child(rl)
-	var L: = V7Ladder.league_def(int(info.get("league", 0)))
-	var lc: Color = L.color
-	var chip: = UI.rbox("plum", Rect2(226, 198, 330, 44), 22, 3, 6)
-	chip.colors(Color(lc.darkened(0.55), 0.95), Color(lc.darkened(0.8), 0.95)).borders(lc, lc.darkened(0.4))
-	p.add_child(chip)
-	chip.add_child(UI.center_label(UI.label(String(L.name), 21, lc.lightened(0.3), UI.DARK, 3, "body", 900), Rect2(0, 0, 330, 44)))
+	_emblem_line(p, 112.0, "Ранг", String(info.get("rank", rk.name)), rk.color.lightened(0.2))
+	Common.rank_emblem(p, Rect2(222, 110, 66, 66), tier, int(info.get("sub", 0)))
+	var lt: = clampi(int(info.get("league", 0)), 0, V7Ladder.LEAGUES.size() - 1)
+	var L: = V7Ladder.league_def(lt)
+	_emblem_line(p, 182.0, "Лига недели", String(L.name), (L.color as Color).lightened(0.3))
+	Common.league_emblem(p, Rect2(222, 180, 66, 66), lt)
 	var tw: = (W - 72.0 - 16.0) * 0.5
 	var y0: = 266.0
 	if bool(info.get("me", false)) and not V8League.quarter_shown({"place": int(info.get("q_place", 0))}):
@@ -65,6 +61,19 @@ static func open(main, info: Dictionary) -> RBox:
 			main.go("profile", {"from": String(main.screen_id) if "screen_id" in main and String(main.screen_id) != "" else "home"}))
 		p.add_child(b)
 	return p
+
+# caption + value to the right of a 66 px emblem at x 222
+static func _emblem_line(p: Control, y: float, cap: String, val: String, col: Color) -> void:
+	var c: = UI.label(cap, 16, UI.MUTED, UI.DARK, 2, "body", 800)
+	c.position = Vector2(298, y + 2)
+	c.size = Vector2(W - 298 - 30, 24)
+	p.add_child(c)
+	var v: = UI.label(val, 26, col, UI.DARK, 3, "body", 900)
+	v.position = Vector2(298, y + 24)
+	v.size = Vector2(W - 298 - 30, 38)
+	Common.fit_line(v, v.size.x, 18)
+	p.add_child(v)
+
 
 static func _tile(parent: Control, r: Rect2, cap: String, val: String, sub: String) -> RBox:
 	var b: = UI.rbox("glass", r, 22, 2, 6)

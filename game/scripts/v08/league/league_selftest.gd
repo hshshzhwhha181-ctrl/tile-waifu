@@ -211,7 +211,9 @@ static func _quarter() -> void:
 		var prev: = 0
 		if V8Population.rp_at(id, float(q.start)) != 0:
 			zero_start = false
-		var fin: = maxi(1, V8Population.rp_at(id, float(q.end) - 1.0))
+		# 0.8: late starters (V8Population.q_join) play a shorter quarter at their usual pace, so a step is measured
+		# against the player's full-quarter pace (q_total), not against their smaller final total
+		var fin: = maxi(1, int(V8Population.q_total(id, String(q.key))))
 		var s: = float(q.start)
 		while s < float(q.end):
 			var v: = V8Population.rp_at(id, s)
@@ -222,7 +224,7 @@ static func _quarter() -> void:
 			s += 3 * 3600.0
 	_check("quarter rp starts at 0", zero_start)
 	_check("quarter rp monotonic", mono)
-	_check("quarter rp smooth (3-hour step < 1.5% of quarter)", worst < 0.015, "%.4f" % worst)
+	_check("quarter rp smooth (3-hour step < 1.5% of the quarter pace)", worst < 0.015, "%.4f" % worst)
 	var sum_night: = 0
 	var sum_eve: = 0
 	for id in range(0, 1000, 5):
@@ -263,7 +265,7 @@ static func _fresh_quarter() -> void:
 	var qs: = float(q.start)
 	var days: = (float(q.end) - qs) / 86400.0
 	for d in [1.0, 3.0, 7.0, 30.0, 53.0, days - 0.5]:
-		var at: = qs + d * 86400.0
+		var at: float = qs + float(d) * 86400.0
 		var src: = V8Population.quarter_rows(at)
 		var zeros: = src.filter(func(x): return int(x[1]) == 0).size()
 		_check("quarter day %d: someone has not played yet" % int(d), zeros >= 10, str(zeros))

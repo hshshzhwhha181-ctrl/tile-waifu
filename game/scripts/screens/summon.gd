@@ -440,20 +440,23 @@ func _showcase(r: Dictionary) -> void :
 	var ah: = aw * 512.0 / 344.0
 	var fr: = Rect2((W - aw) * 0.5, H * 0.42 - ah * 0.5, aw, ah)
 	var inner: = Common.card_inner(r.rar, fr.size)
-	var art: = Common.card_art(G.art_tex(r), Rect2(fr.position + inner.position, inner.size), Vector2(0.5, 0.45), 1.0, Common.card_radius(r.rar, fr.size))
+	# art + frame zoom in together through one holder (the frame node itself is scaled down to its size)
+	var card: = Control.new()
+	card.position = fr.position
+	card.size = fr.size
+	card.pivot_offset = fr.size * 0.5
+	card.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	showcase.add_child(card)
+	var art: = Common.card_art(G.art_tex(r), inner, Vector2(0.5, 0.45), 1.0, Common.card_radius(r.rar, fr.size))
 	(art.material as ShaderMaterial).set_shader_parameter("holo", 0.45)
 	(art.material as ShaderMaterial).set_shader_parameter("bottom_shade", 0.6)
-	showcase.add_child(art)
-	var frame: = Common.card_frame(showcase, r.rar, fr)
-	frame.pivot_offset = frame.size * 0.5
-	art.pivot_offset = fr.size * 0.5 - inner.position
-	for n in [frame, art]:
-		var s1: Vector2 = n.scale
-		n.scale = s1 * 1.6
-		n.modulate.a = 0
-		var t: Tween = n.create_tween().set_parallel()
-		t.tween_property(n, "scale", s1, 0.6).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_OUT)
-		t.tween_property(n, "modulate:a", 1.0, 0.25)
+	card.add_child(art)
+	Common.card_frame(card, r.rar, Rect2(Vector2.ZERO, fr.size))
+	card.scale = Vector2(1.6, 1.6)
+	card.modulate.a = 0
+	var ct0: Tween = card.create_tween().set_parallel()
+	ct0.tween_property(card, "scale", Vector2.ONE, 0.6).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_OUT)
+	ct0.tween_property(card, "modulate:a", 1.0, 0.25)
 	var ssr: = UI.title("SSR", 120, Color("fff1b8"), Color("c0661a"))
 	ssr.position = Vector2(30, H * 0.42 - ah * 0.5 - 70)
 	ssr.rotation = deg_to_rad(-8)

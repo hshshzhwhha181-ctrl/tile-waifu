@@ -36,7 +36,7 @@ const T: = {
 	"code.done": "Прогресс перенесён",
 	"profile.title": "Профиль",
 	"profile.nick_edit": "Сменить ник",
-	"profile.avatar_edit": "Сменить",
+	"profile.avatar_edit": "Сменить аватар",
 	"profile.avatar_t": "Аватар",
 	"profile.nick_t": "Ник",
 	"profile.save": "Сохранить",
@@ -100,6 +100,39 @@ static func league_info() -> Dictionary:
 	return {"week": V8League.my_week(), "quarter": V8League.my_quarter()}
 
 
+# ---- 0.8 art backdrop ------------------------------------------------------------------------
+
+# Full-screen backdrop from the 0.8 art set (V8Art.bg: "profile", "tourney"), drawn like Common.backdrop
+# (blur / brightness / tint / slow drift) — Common.backdrop only knows res://assets/bg.
+static func backdrop(parent: Control, bg: String, size: Vector2, blur: = 0.0, bright: = 1.0, tint: = Color.WHITE, focus: = Vector2(0.5, 0.5)) -> TextureRect:
+	var tex: = V8Art.bg(bg)
+	var r: = UI.tex(tex, Rect2(Vector2.ZERO, size), false)
+	r.name = "Backdrop"
+	if tex != null:
+		var m: = ShaderMaterial.new()
+		m.shader = preload("res://shaders/blurbg.gdshader")
+		m.set_shader_parameter("size", size)
+		m.set_shader_parameter("tex_size", Vector2(tex.get_width(), tex.get_height()))
+		m.set_shader_parameter("blur", blur)
+		m.set_shader_parameter("bright", bright)
+		m.set_shader_parameter("tint", tint)
+		m.set_shader_parameter("focus", focus)
+		m.set_shader_parameter("zoom", 1.04)
+		m.set_shader_parameter("drift", Vector2(1, 1))
+		r.material = m
+	parent.add_child(r)
+	return r
+
+
+# The player's own avatar (profile hero id) in the gold frame; the ornate frame from Дракон up.
+static func my_avatar(parent: Control, r: Rect2, hero: = "") -> Control:
+	if hero == "":
+		hero = str(G.profile().get("avatar", "mc"))
+	if not G.HEROES.has(hero):
+		hero = "mc"
+	return V8Art.avatar(parent, hero, r, V8Art.top_tier(V8League.my_tier()))
+
+
 # ---- title screen ----------------------------------------------------------------------------
 
 # Centered pill under the logo: avatar + nick + rank. rect = area to center in.
@@ -120,7 +153,7 @@ static func title_chip(rect: Rect2) -> Control:
 	pill.set_param("border_top", Color("ffe7a6")).set_param("border_bottom", Color("c58a2c"))
 	pill.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	c.add_child(pill)
-	c.add_child(Common.avatar(str(G.profile().get("avatar", "mc")), Rect2(x0 + 4, 4, h - 8, h - 8), "gold"))
+	my_avatar(c, Rect2(x0 - 6, -8, h + 12, h + 12))
 	var nl: = UI.label(nick, 26, Color.WHITE, UI.DARK, 3, "body", 900)
 	nl.position = Vector2(x0 + h + 8, 0)
 	nl.size = Vector2(maxf(nw, rw) + 10, 36)
@@ -276,14 +309,19 @@ class AvatarRow extends Control:
 			hit.mouse_filter = Control.MOUSE_FILTER_STOP
 			add_child(hit)
 			if on:
-				var glow: = UI.rbox("gold", Rect2(x - 6, 2, av + 12, av + 12), (av + 12) * 0.5, 0, 12)
-				glow.modulate = Color(1, 1, 1, 0.55)
-				glow.mouse_filter = Control.MOUSE_FILTER_IGNORE
+				# soft gold glow behind the chosen one (the frame hole sits a little above the box centre)
+				var hr: = V8Art.hole_rect(Vector2(av, av))
+				var glow: = Sprite2D.new()
+				glow.texture = G.fx("glow")
+				glow.material = Fx.add_mat()
+				glow.position = Vector2(x, 8) + hr.get_center()
+				glow.scale = Vector2.ONE * av / 70.0
+				glow.modulate = Color(1.0, 0.82, 0.45, 0.55)
 				add_child(glow)
-			var a: = Common.avatar(h, Rect2(x, 8, av, av), "gold" if on else "glass")
+			var a: = V8Art.avatar(self, h, Rect2(x, 8, av, av))
 			if not on:
-				a.modulate = Color(0.78, 0.74, 0.72, 0.9)
-			add_child(a)
+				a.modulate = Color(0.62, 0.58, 0.6, 0.92)
+				a.scale = Vector2(0.9, 0.9)
 			var nm: = UI.center_label(UI.label(G.HEROES[h].name, 16, UI.GOLD if on else UI.MUTED, UI.DARK, 3, "body", 900), Rect2(i * slot - 4, av + 14, slot + 8, 26))
 			add_child(nm)
 			hit.gui_input.connect( func(e):

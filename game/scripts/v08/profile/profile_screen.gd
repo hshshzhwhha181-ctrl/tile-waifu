@@ -23,8 +23,9 @@ func build(m, args: Dictionary) -> void :
 	Sfx.music("menu")
 	var f: = str(args.get("from", "home"))
 	back_to = f if f in main.SCREENS and not f in ["profile", "play", "arena", "v7play"] else "home"
-	Common.backdrop(self, "bg_festival", size, 2.6, 0.5, Color(1, 0.95, 0.95))
-	Common.vignette(self, size, Color(0.06, 0.04, 0.08), 0.7)
+	# 0.8 art: the profile room (bg/profile.webp), dimmed so the gold-rimmed sections read on top
+	V8ProfileUI.backdrop(self, "profile", size, 1.2, 0.62, Color(1, 0.96, 0.96), Vector2(0.5, 0.4))
+	Common.vignette(self, size, Color(0.06, 0.04, 0.08), 0.6)
 	V8Header.make(self, main, V8ProfileUI.s("profile.title"), main.back)
 	var top: = V8Header.CONTENT_Y + 6
 	var bottom: = H - 112.0
@@ -98,35 +99,40 @@ func _identity() -> void :
 	var c: = _section(206, "plum")
 	var p: = G.profile()
 	var av: String = str(p.get("avatar", "mc"))
-	var a: = Common.avatar(av, Rect2(22, 20, 150, 150), "gold")
-	c.add_child(a)
-	var ab: = JButton.make(V8ProfileUI.s("profile.avatar_edit"), "graphite", Rect2(36, 150, 122, 44), null, 18)
-	ab.pressed.connect(_avatar_popup)
-	c.add_child(ab)
+	# 0.8 art: the round portrait in the gold avatar frame (V8Art.avatar; the ornate frame from Дракон up)
+	var a: = V8ProfileUI.my_avatar(c, Rect2(8, 6, 184, 184), av)
+	a.name = "Avatar"
 	var hit: = Control.new()
-	hit.position = Vector2(22, 20)
-	hit.size = Vector2(150, 126)
+	hit.position = Vector2(20, 10)
+	hit.size = Vector2(160, 160)
 	hit.mouse_filter = Control.MOUSE_FILTER_STOP
 	hit.gui_input.connect( func(e):
 		if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT:
+			UI.punch(a, 0.06)
 			_avatar_popup())
 	c.add_child(hit)
+	var x: = 204.0
 	var nk: = UI.label(G.nick(), 36, Color.WHITE, UI.DARK, 5, "title", 900)
-	nk.position = Vector2(196, 22)
-	nk.size = Vector2(cw - 216, 50)
+	nk.position = Vector2(x, 18)
+	nk.size = Vector2(cw - x - 20, 50)
 	nk.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	_fit(nk, "title", 36, 26)
 	c.add_child(nk)
 	var hero: Dictionary = G.HEROES.get(av, G.HEROES.mc)
-	_lbl(c, "Аватар: %s" % hero.name, Vector2(198, 76), 18, UI.MUTED, cw - 220)
-	var nb: = JButton.make(V8ProfileUI.s("profile.nick_edit"), "glass", Rect2(196, 108, 230, 60), null, 21)
+	_lbl(c, "Аватар: %s" % hero.name, Vector2(x + 2, 70), 18, UI.MUTED, cw - x - 24)
+	var bw: = (cw - x - 20 - 12) * 0.5
+	var nb: = JButton.make(V8ProfileUI.s("profile.nick_edit"), "glass", Rect2(x, 104, bw, 58), null, 20)
 	nb.pressed.connect(_nick_popup)
 	c.add_child(nb)
+	var ab: = JButton.make(V8ProfileUI.s("profile.avatar_edit"), "glass", Rect2(x + bw + 12, 104, bw, 58), null, 20)
+	ab.pressed.connect(_avatar_popup)
+	c.add_child(ab)
 	var since: = Time.get_date_string_from_unix_time(int(p.get("created", 0)))
 	var dp: = since.split("-")
 	if dp.size() == 3:
 		since = "%s.%s.%s" % [dp[2], dp[1], dp[0]]
-	_lbl(c, V8ProfileUI.s("profile.since") % [str(p.get("id", "")), since], Vector2(198, 174), 15, Color(0.75, 0.7, 0.65, 0.7), cw - 220)
+	var sl: = _lbl(c, V8ProfileUI.s("profile.since") % [str(p.get("id", "")), since], Vector2(x + 2, 172), 16, Color(0.75, 0.7, 0.65, 0.8), cw - x - 24)
+	sl.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 
 
 func _fit(l: Label, kind: String, big: int, small: int) -> void :
@@ -144,22 +150,23 @@ func _rank() -> void :
 	var rp: = int(G.S.get("rp", 0))
 	var ri: = G.rank_of(rp)
 	var rk: Dictionary = G.RANKS[ri.tier]
-	Common.rank_emblem(c, Rect2(18, 22, 128, 128), ri.tier, ri.sub)
+	# 0.8 art: the rank medallion large (256 px art drawn at 150)
+	Common.rank_emblem(c, Rect2(12, 6, 150, 150), ri.tier, ri.sub)
 	var t: = UI.label(ri.title, 36, rk.color, UI.DARK, 5, "title", 900)
-	t.position = Vector2(166, 20)
-	t.size = Vector2(cw - 190, 50)
+	t.position = Vector2(176, 20)
+	t.size = Vector2(cw - 200, 50)
 	c.add_child(t)
 	var last: bool = int(ri.tier) == G.RANKS.size() - 1
-	Common.progress_bar(c, Rect2(168, 82, cw - 196, 24), 1.0 if last else float(ri.into) / maxf(1.0, ri.need), "gold")
+	Common.progress_bar(c, Rect2(178, 82, cw - 206, 24), 1.0 if last else float(ri.into) / maxf(1.0, ri.need), "gold")
 	var nxt: = ""
 	if last:
 		nxt = V8ProfileUI.s("profile.rank_top")
 	else:
 		var k: int = int(ri.tier) * 3 + int(ri.sub) + 1
 		nxt = V8ProfileUI.s("profile.rank_next") % [ri.into, ri.need, G.rank_title(k / 3, k % 3)]
-	_lbl(c, nxt, Vector2(170, 112), 18, Color("ffe7a6"), cw - 196)
-	_lbl(c, V8ProfileUI.s("profile.rank_total") % rp, Vector2(170, 138), 17, UI.MUTED, cw - 196)
-	var note: = _lbl(c, V8ProfileUI.s("profile.rank_note"), Vector2(24, 164), 16, Color(0.75, 0.7, 0.65, 0.75), cw - 48)
+	_lbl(c, nxt, Vector2(180, 112), 18, Color("ffe7a6"), cw - 206)
+	_lbl(c, V8ProfileUI.s("profile.rank_total") % rp, Vector2(180, 138), 17, UI.MUTED, cw - 206)
+	var note: = _lbl(c, V8ProfileUI.s("profile.rank_note"), Vector2(24, 166), 16, Color(0.75, 0.7, 0.65, 0.75), cw - 48)
 	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 
 
@@ -185,9 +192,9 @@ func _league() -> void :
 		# 0.8: below the 80% cut (a new player) the tile shows the points and what they are for, as the victory
 		# window does, never «#1 001 из 1 001» (V8League.quarter_shown)
 		if V8League.quarter_shown(q):
-			tiles.append([V8ProfileUI.s("profile.quarter"), V8ProfileUI.s("profile.place") % [UI.fmt(int(q.get("place", 0))), UI.fmt(int(q.get("total", 1001)))], _pts(int(q.get("points", 0))), -1])
+			tiles.append([V8ProfileUI.s("profile.quarter"), V8ProfileUI.s("profile.place") % [UI.fmt(int(q.get("place", 0))), UI.fmt(int(q.get("total", 1001)))], _pts(int(q.get("points", 0))), -2])
 		else:
-			tiles.append([V8ProfileUI.s("profile.quarter"), _pts(int(q.get("points", 0))), V8League.Q_HIDDEN_SHORT, -1])
+			tiles.append([V8ProfileUI.s("profile.quarter"), _pts(int(q.get("points", 0))), V8League.Q_HIDDEN_SHORT, -2])
 	for i in tiles.size():
 		var tl: Array = tiles[i]
 		var wdt: = tw if tiles.size() > 1 else cw - 48
@@ -199,9 +206,13 @@ func _league() -> void :
 		c.add_child(b)
 		var x0: = 18.0
 		if int(tl[3]) >= 0:
-			# a league has no sub-step: hide the numeral, as on the home league card
-			Common.rank_emblem(b, Rect2(8, 12, 74, 74), int(tl[3]), 0).get_child(-1).visible = false
-			x0 = 88.0
+			# 0.8 art: the weekly league crest (not the rank medallion)
+			Common.league_emblem(b, Rect2(6, 8, 82, 82), int(tl[3]))
+			x0 = 92.0
+		elif int(tl[3]) == -2:
+			# quarter rating: the round «Рейтинг» icon, as on the home column
+			b.add_child(V8Art.rect(V8Art.icon("rating"), Rect2(10, 13, 72, 72)))
+			x0 = 92.0
 		_lbl(b, tl[0], Vector2(x0, 8), 16, UI.MUTED, wdt - x0 - 10).text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 		# 0.8: the big value shrinks to the tile instead of running into its border
 		var fs1: = 26
@@ -302,7 +313,7 @@ func _ladder() -> void :
 		gl.size = Vector2(70, 30)
 		gl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 		row.add_child(gl)
-		row.add_child(UI.tex(G.icon("gem"), Rect2(cw - 80, 6, 44, 44)))
+		row.add_child(V8Art.rect(V8Art.cur("gem"), Rect2(cw - 82, 6, 44, 44)))
 		if t < ri.tier:
 			var ok: = _lbl(row, V6Txt.s("rank.passed"), Vector2(cw - 190, 60), 15, Color("9fe8d0"), 150)
 			ok.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
@@ -331,7 +342,9 @@ func _code() -> void :
 
 func _settings() -> void :
 	var c: = _section(92, "")
-	var b: = JButton.make(V8ProfileUI.s("profile.settings"), "graphite", Rect2(0, 4, cw, 84), G.icon("settings"), 28)
+	var b: = JButton.make(V8ProfileUI.s("profile.settings"), "graphite", Rect2(0, 4, cw, 84), null, 28)
+	# 0.8 art: round settings icon (192 px), drawn with mipmaps instead of JButton's plain icon rect
+	b.add_child(V8Art.rect(V8Art.icon("settings"), Rect2(8, 4, 76, 76)))
 	b.pressed.connect( func(): main.settings())
 	c.add_child(b)
 

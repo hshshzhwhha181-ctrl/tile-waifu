@@ -237,7 +237,7 @@ func pass_popup() -> void :
 			(a.material as ShaderMaterial).set_shader_parameter("holo", 0.5)
 			c.add_child(a)
 		else:
-			c.add_child(V8Art.rect(V8Art.cur("gem" if r.has("gems") else "coin"), Rect2(16, 22, cw - 32, cw - 32)))
+			c.add_child(V8Art.rect(V8Art.cur("gem" if r.has("gems") else "coin"), Rect2(20, 23, cw - 40, cw - 40)))
 			c.add_child(UI.center_label(UI.label(UI.fmt(r.get("gems", r.get("coins", 0))), 16, Color("f2799f") if r.has("gems") else Color("c58a2c"), Color.WHITE, 3, "body", 900), Rect2(0, 82, cw, 24)))
 		if got:
 			c.add_child(UI.center_label(UI.label("✓", 30, Color.WHITE, Color("1f5e49"), 4), Rect2(0, 20, cw, 60)))

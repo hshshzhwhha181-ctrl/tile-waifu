@@ -159,9 +159,9 @@ func _build() -> void :
 	st.position = Vector2(20, 8)
 	strip.add_child(st)
 	V7AlbumView.collection_button(strip, main, _build)
-	var cx: = 16.0
+	var cx: = 10.0
 	var n_items: = G.ITEMS.filter( func(x): return x.get("hero", "") == cur).size()
-	var cw: = clampf((strip.size.x - 32.0 - (n_items - 1) * 8.0) / maxf(1.0, n_items), 96.0, 118.0)
+	var cw: = clampf((strip.size.x - 20.0 - (n_items - 1) * 5.0) / maxf(1.0, n_items), 96.0, 118.0)
 	for it in G.ITEMS:
 		if it.get("hero", "") != cur:
 			continue
@@ -204,9 +204,9 @@ func _build() -> void :
 		# 0.8: name at 16 px (never smaller), up to three lines inside the frame; it wraps between words only —
 		# a word that is still too wide is drawn lighter and, as the last resort, trimmed with «…», never cut in two
 		var nl: = UI.label(it.name, 16, Color.WHITE, Color(0.2, 0.05, 0.2), 4, "body", 800)
-		var nw: = cw - 6.0
+		var nw: = cw - 2.0
 		Common.fit_words(nl, nw, 3, 16)
-		nl.position = Vector2(3, 76)
+		nl.position = Vector2(1, 76)
 		nl.size = Vector2(nw, 84)
 		nl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		nl.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
@@ -221,7 +221,7 @@ func _build() -> void :
 				else:
 					main.toast(V6Txt.s("coll.missing") % itc.name, "wardrobe"))
 		UI.pop_in(card, 0.1 + cx / 2000.0, 0.8)
-		cx += cw + 8
+		cx += cw + 5
 
 func _preview(it: Dictionary) -> void :
 	var root: = Control.new()

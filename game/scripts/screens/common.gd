@@ -197,7 +197,8 @@ static func fit_words(l: Label, width: float, lines: = 2, min_fs: = 16) -> Label
 	var ls: LabelSettings = l.label_settings
 	var fs: = ls.font_size
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD
-	var pad: = ls.outline_size * 2.0
+	# the outline reaches about half its size past the glyphs on each side
+	var pad: = ls.outline_size * 1.0
 	var text: = l.text
 	while true:
 		var lw: = _longest_word(text, ls.font, fs)
@@ -205,10 +206,11 @@ static func fit_words(l: Label, width: float, lines: = 2, min_fs: = 16) -> Label
 		if fs <= min_fs or (lw + pad <= width and h <= ls.font.get_height(fs) * lines + 1.0):
 			break
 		fs -= 1
-	if _longest_word(text, ls.font, fs) + pad > width:
-		ls.font = UI.font("body", 700)
-		ls.outline_size = mini(ls.outline_size, 3)
-		pad = ls.outline_size * 2.0
+	for wt in [700, 600]:
+		if _longest_word(text, ls.font, fs) + pad > width:
+			ls.font = UI.font("body", wt)
+			ls.outline_size = mini(ls.outline_size, 3 if wt == 700 else 2)
+			pad = ls.outline_size * 1.0
 	if _longest_word(text, ls.font, fs) + pad > width:
 		var words: = text.split(" ", false)
 		for k in words.size():

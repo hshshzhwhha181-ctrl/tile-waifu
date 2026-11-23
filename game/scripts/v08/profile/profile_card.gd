@@ -61,6 +61,11 @@ func _build() -> void :
 	var y: = clampf((size.y - PH) * 0.5 + 40.0, 150.0, 400.0)
 	panel = UI.rbox("cream", Rect2((size.x - PW) * 0.5, y, PW, PH), 34, 5, 16)
 	panel.set_param("pattern", 1.0)
+	# 0.8 art: the btn/panel nine-patch (graphite, gold rim, sakura corners), as in Common.popup
+	panel.cr.visible = false
+	var art: = V8Art.nine("panel", Rect2(Vector2.ZERO, Vector2(PW, PH)))
+	art.name = "PanelArt"
+	panel.add_child(art)
 	panel.mouse_filter = Control.MOUSE_FILTER_STOP
 	panel.gui_input.connect(_on_bg_input)
 	add_child(panel)
@@ -68,11 +73,6 @@ func _build() -> void :
 	UI.pop_in(panel, 0.05, 0.85)
 	var rib: = Common.ribbon(panel, V8ProfileUI.s("card.title"), Rect2(PW * 0.5 - 220, -38, 440, 72), "pink", 30)
 	rib.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	for sx in [-1, 1]:
-		var dmd: = UI.rbox("gold", Rect2(PW * 0.5 + sx * 236 - 9, -11, 18, 18), 3, 2, 4)
-		dmd.pivot_offset = Vector2(9, 9)
-		dmd.rotation = PI * 0.25
-		panel.add_child(dmd)
 	page_main = Control.new()
 	page_main.size = panel.size
 	page_main.mouse_filter = Control.MOUSE_FILTER_IGNORE
