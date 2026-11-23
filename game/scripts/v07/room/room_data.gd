@@ -352,7 +352,7 @@ static func next_unlock(h: String) -> String:
 	for id in V7RoomScenes.for_hero(h):
 		var need: = int(V7RoomScenes.SCENES[id].lv)
 		if need > lv:
-			return "Связь %d · сцена «%s»" % [need, V7RoomScenes.SCENES[id].title]
+			return "Симпатия %d · сцена «%s»" % [need, V7RoomScenes.SCENES[id].title]
 	return "Все сцены открыты"
 
 
@@ -373,3 +373,31 @@ static func build_date(h: String, pid: String) -> Dictionary:
 		opts.shuffle()
 		lines.append({"who": h, "q": m.q, "date": opts})
 	return {"bg_path": p.bg, "fx": p.fx, "focus": p.focus, "title": "Свидание · " + p.name, "cast": [h], "lines": lines}
+
+
+# ---- 0.8 «Письма»: messages the heroines really sent (after dates), newest last. No fake entries.
+const MAIL_MAX: = 30
+
+static func mail() -> Array:
+	var s: = st()
+	if not (s.get("mail") is Array):
+		s["mail"] = []
+	return s.mail
+
+static func add_mail(h: String, text: String, kind: = "date", extra: = "") -> void :
+	var m: = mail()
+	m.append({"h": h, "text": text, "kind": kind, "extra": extra, "t": int(Time.get_unix_time_from_system()), "read": false})
+	while m.size() > MAIL_MAX:
+		m.pop_front()
+
+static func unread_mail() -> int:
+	var n: = 0
+	for e in mail():
+		if e is Dictionary and not bool(e.get("read", false)):
+			n += 1
+	return n
+
+static func mark_mail_read() -> void :
+	for e in mail():
+		if e is Dictionary:
+			e["read"] = true

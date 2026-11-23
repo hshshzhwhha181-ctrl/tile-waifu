@@ -247,7 +247,8 @@ func _intro_new() -> void :
 func _card(kind: String) -> void :
 	var W: float = play.size.x
 	var H: float = play.size.y
-	var c: = UI.rbox("cream", Rect2(20, H - 184, W - 40, 112), 24, 3, 10)
+	# 0.8: above the action buttons (they start at H - 172), like the intro tip
+	var c: = UI.rbox("cream", Rect2(20, H - 186 - 112, W - 40, 112), 24, 3, 10)
 	c.add_to_group("v6_tip")
 	c.set_param("border_top", Color("ffe7a6")).set_param("border_bottom", Color("c58a2c"))
 	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -489,7 +490,7 @@ func _open_box(pos: Vector2) -> void :
 	t.tween_property(box, "scale", Vector2(1.6, 1.6), 0.12)
 	t.parallel().tween_property(box, "modulate:a", 0.0, 0.12)
 	t.tween_callback(box.queue_free)
-	_toast("Шкатулка: " + txt, icon)
+	# 0.8: the reward floats up from the box itself; no toast saying the same over the HUD
 	_refresh()
 
 
@@ -543,7 +544,9 @@ func _fire_event() -> void :
 		"challenge":
 			ch_count = 0
 			ch_until = G.time + 12.0 + 1.5
-			ch_pill = UI.rbox("pink", Rect2(W * 0.5 - 150, 306, 300, 48), 24, 3, 8)
+			# 0.8: left column under the combo pill (the band right of it belongs to the speech bubble)
+			var cy: float = maxf(384.0, float(play.board_rect.position.y) + 66.0) if "board_rect" in play else 384.0
+			ch_pill = UI.rbox("pink", Rect2(20, cy, 300, 48), 24, 3, 8)
 			ch_pill.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			ch_pill.z_index = 33
 			play.add_child(ch_pill)

@@ -76,6 +76,25 @@ func music(name: String, fade: = 1.2) -> void :
 		t.tween_property(old, "volume_db", -40.0, fade)
 		t.tween_callback(old.stop)
 
+# 0.8: «С возвращением» / «Опять пришёл?» only to a player whose last session was on an earlier day; on the
+# first visit and for the rest of the same day the greeting is a plain one.
+const RETURN_MARKS: = ["возвращ", "Опять", "снова", "Я тебя ждала", "каждый день", "и этой ночью"]
+var _greet_ok = null
+
+func _is_return_line(t: String) -> bool:
+	for m in RETURN_MARKS:
+		if t.contains(m):
+			return true
+	return false
+
+func _greet_returning() -> bool:
+	if _greet_ok == null:
+		var prev: = String(G.S.get("v8_last_day", ""))
+		_greet_ok = prev != "" and prev != G.today()
+		G.S["v8_last_day"] = G.today()
+		G.save()
+	return bool(_greet_ok)
+
 func say(hero: String, kind: String) -> String:
 
 	var src: Dictionary = V6Txt.LINES
@@ -86,6 +105,10 @@ func say(hero: String, kind: String) -> String:
 	var arr: Array = src[hero][kind]
 	if kind in ["match", "combo", "fever", "win", "lose", "hint"] and VOICED.has(hero) and VOICED[hero].has(kind):
 		arr = VOICED[hero][kind]
+	if kind == "greet" and not _greet_returning():
+		var fresh: = arr.filter( func(x): return not _is_return_line(String(x)))
+		if not fresh.is_empty():
+			arr = fresh
 	var i: = randi() % arr.size()
 	var key: String = hero + kind
 	if arr.size() > 1 and last_voice.get(key, -1) == i:

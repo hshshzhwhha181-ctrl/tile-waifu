@@ -12,9 +12,17 @@ extends RefCounted
 
 
 
+# 0.8: the weekly league uses the six G.RANKS tiers (Бамбук … Небожитель) instead of Медная … Лунная.
+# Group = the player + 19 players of V8Population with a close rank, picked by week and profile id (V8League).
+# Promotion: top UP; demotion: bottom DOWN, never in the first league week and never below
+# (the player's G.RANKS tier − 1). A week without a single table keeps the league.
+# backend: socket for a future server. If set and it has group(t, prog) -> Array of rows
+# {name, hero, score, me[, avatar, pid]}, its rows replace the population; submit(t, k, score, best) is called
+# after every table. quarter(t) -> {rows, me} may replace the quarter table (see V8League.quarter_table).
+
 const GROUP: = 20
 const UP: = 5
-const DOWN: = 5
+const DOWN: = 3
 const TABLES: = 3
 
 
@@ -30,21 +38,16 @@ const OVERFLOW: = 150
 const BOOSTER: = 40
 
 const LEAGUES: = [
-	{"name": "Медная лига", "short": "Медь", "color": Color("d99a6c"), "f": [0.22, 0.8], "idle": 0.3, "gems": [300, 220, 160, 90, 40]}, 
-	{"name": "Серебряная лига", "short": "Серебро", "color": Color("d6dce8"), "f": [0.35, 0.9], "idle": 0.22, "gems": [450, 320, 230, 130, 60]}, 
-	{"name": "Золотая лига", "short": "Золото", "color": Color("ffc93c"), "f": [0.5, 0.98], "idle": 0.15, "gems": [650, 460, 330, 180, 80]}, 
-	{"name": "Нефритовая лига", "short": "Нефрит", "color": Color("3fd6b0"), "f": [0.62, 1.04], "idle": 0.1, "gems": [900, 640, 450, 250, 110]}, 
-	{"name": "Лунная лига", "short": "Луна", "color": Color("c9a2ff"), "f": [0.72, 1.1], "idle": 0.06, "gems": [1300, 900, 620, 340, 150]}, 
+	{"name": "Лига Бамбука", "short": "Бамбук", "color": Color("7fd18b"), "f": [0.22, 0.8], "idle": 0.3, "gems": [300, 220, 160, 90, 40]}, 
+	{"name": "Лига Нефрита", "short": "Нефрит", "color": Color("3fd6b0"), "f": [0.35, 0.9], "idle": 0.22, "gems": [450, 320, 230, 130, 60]}, 
+	{"name": "Лига Жемчуга", "short": "Жемчуг", "color": Color("e9e4ff"), "f": [0.5, 0.98], "idle": 0.15, "gems": [650, 460, 330, 180, 80]}, 
+	{"name": "Лига Золота", "short": "Золото", "color": Color("ffc93c"), "f": [0.62, 1.04], "idle": 0.1, "gems": [900, 640, 450, 250, 110]}, 
+	{"name": "Лига Дракона", "short": "Дракон", "color": Color("ff5a7a"), "f": [0.72, 1.1], "idle": 0.06, "gems": [1300, 900, 620, 340, 150]}, 
+	{"name": "Лига Небожителей", "short": "Небожитель", "color": Color("c9a2ff"), "f": [0.8, 1.14], "idle": 0.04, "gems": [1700, 1200, 820, 450, 200]}, 
 ]
 
 const PRIZES: = ["h_winter", "r_yukata", "o_cozy", "n_offline"]
 const PRIZE_OWNED_GEMS: = 300
-
-const NAMES: = ["Сакура_77", "КотЧай", "ЛуннаяЛиса", "Тофу", "Мандаринка", "Дракончик", "Неон_Рэй", "Маття", "Кицунэ", "Бамбук", 
-	"Пион", "Звёздочка", "Ветерок", "Хокку", "Мидори", "Акира", "Юки", "Сора", "Рэн", "Тихий_Пруд", "Фонарщик", "Пельмень", 
-	"Чайник", "Шиба", "ОблачныйКит", "Иней", "Ласточка", "Корица", "Марципан", "Кайто", "Харуто", "Наоми", "Ирис", "Мира", 
-	"Тэцу", "Лотос", "Ворон", "Кедр", "Северянка", "Momo", "Riku", "Nyan", "Ли_Мэй", "Чжу", "Ханами", "Фуго", "Данго", 
-	"Капучино", "Полночь", "Синица", "Сэнсэй_Ку", "Аки", "Нори", "Рамэн", "Сливка", "Фея_пар", "Феникс", "Тануки"]
 
 static var backend = null
 
@@ -69,18 +72,28 @@ static func prize_of(start_day: int) -> String:
 	return PRIZES[posmod(start_day / 7, PRIZES.size())]
 
 
+static func league_def(i: int) -> Dictionary:
+	return LEAGUES[clampi(i, 0, LEAGUES.size() - 1)]
+
 static func st() -> Dictionary:
 	var r: = V7EventData.root()
 	var t: Dictionary = r.tour
 	var wd: = week_day()
 	var wk: = week_key(wd)
+	if not t.is_empty() and int(t.get("v8", 0)) < 1:
+		t["league"] = clampi(int(t.get("league", 0)), 0, LEAGUES.size() - 1)
+		t["v8"] = 1
+	var ls: = V8League.state()
+	if String(ls.first_week) == "":
+		ls.first_week = String(t.get("week", "")) if String(t.get("week", "")) != "" else wk
 	if t.get("week", "") != wk:
 		var league: = int(t.get("league", 0))
 		if t.get("week", "") != "":
 			league = _settle(r, t)
-		t = {"week": wk, "start": wd, "league": league, "group": randi() % 100000, "best": [0, 0, 0], "runs": 0, 
-			"best_place": 0, "history": t.get("history", [])}
+		t = {"week": wk, "start": wd, "league": league, "group": V8League.group_seed(), "best": [0, 0, 0], "runs": 0, 
+			"best_place": 0, "history": t.get("history", []), "v8": 1}
 		r.tour = t
+		V8League.snap_week(wk)
 	return t
 
 static func my_score(t: Dictionary) -> int:
@@ -136,41 +149,6 @@ static func score_finish(cleared: bool, secs: float, boosters: int, overflows: i
 	return {"total": n, "parts": parts}
 
 
-static func _bots(t: Dictionary) -> Array:
-	var rng: = RandomNumberGenerator.new()
-	rng.seed = hash("%s|%d|%d" % [t.week, int(t.league), int(t.group)])
-	var L: Dictionary = LEAGUES[int(t.league)]
-	var names: Array = NAMES.duplicate()
-	var out: = []
-	for i in GROUP - 1:
-		var ni: = rng.randi() % names.size()
-		var nm: String = names[ni]
-		names.remove_at(ni)
-		var f: = rng.randf_range(L.f[0], L.f[1])
-		var idle: = rng.randf() < float(L.idle)
-		var tables: = TABLES if not idle else rng.randi_range(0, 1)
-		var early: = rng.randf() < 0.5
-		var ev: = []
-		for k in tables:
-			var tt: = rng.randf_range(0.02, 0.55) if early else rng.randf_range(0.25, 0.97)
-			var pts: = int(table_par(k, int(t.start)) * f * rng.randf_range(0.86, 1.08) * (0.5 if idle else 1.0))
-			if rng.randf() < 0.35:
-				var imp: = int(pts * rng.randf_range(0.05, 0.15))
-				ev.append([tt, pts - imp])
-				ev.append([minf(0.99, tt + rng.randf_range(0.1, 0.4)), imp])
-			else:
-				ev.append([tt, pts])
-		out.append({"name": nm, "hero": G.HERO_ORDER[rng.randi() % G.HERO_ORDER.size()], "ev": ev})
-	return out
-
-static func _bot_score(b: Dictionary, prog: float) -> int:
-	var n: = 0
-	for e in b.ev:
-		if float(e[0]) <= prog:
-			n += int(e[1])
-	return n
-
-
 static func group(t: Dictionary, prog: = -1.0) -> Array:
 	if prog < 0.0:
 		prog = progress_of(t)
@@ -178,15 +156,7 @@ static func group(t: Dictionary, prog: = -1.0) -> Array:
 		var g = backend.group(t, prog)
 		if g is Array and not g.is_empty():
 			return g
-	var rows: = []
-	for b in _bots(t):
-		rows.append({"name": b.name, "hero": b.hero, "score": _bot_score(b, prog), "me": false})
-	rows.append({"name": "Ты", "hero": G.S.partner, "score": my_score(t), "me": true})
-	rows.sort_custom( func(a, b):
-		if int(a.score) == int(b.score):
-			return a.me
-		return int(a.score) > int(b.score))
-	return rows
+	return V8League.group_rows(t, int(t.start) * 86400.0 + prog * 7.0 * 86400.0)
 
 static func place_of(rows: Array) -> int:
 	for i in rows.size():
@@ -211,14 +181,17 @@ static func submit(k: int, score: int) -> Dictionary:
 	return {"best": int(t.best[k]), "improved": score > old, "old": old, "place_before": before, "place_after": after}
 
 static func zone(place: int, league: int) -> String:
+	return zone_in(place, league, week_key(week_day()))
+
+static func zone_in(place: int, league: int, wk: String) -> String:
 	if place <= UP and league < LEAGUES.size() - 1:
 		return "up"
-	if place > GROUP - DOWN and league > 0:
+	if place > GROUP - DOWN and V8League.can_demote(league, wk):
 		return "down"
 	return ""
 
 static func place_gems(place: int, league: int) -> int:
-	var g: Array = LEAGUES[league].gems
+	var g: Array = league_def(league).gems
 	if place == 1:
 		return g[0]
 	if place <= 3:
@@ -248,8 +221,9 @@ static func _settle(r: Dictionary, t: Dictionary) -> int:
 			G.give(prize)
 			prize_new = true
 	G.S.gems += gems + prize_gems
-	var z: = zone(place, league)
+	var z: = zone_in(place, league, String(t.week))
 	var nl: = league + (1 if z == "up" else (-1 if z == "down" else 0))
+	nl = clampi(nl, 0, LEAGUES.size() - 1)
 	var h: Array = t.get("history", [])
 	h.append({"week": t.week, "league": league, "place": place, "score": score})
 	while h.size() > 12:

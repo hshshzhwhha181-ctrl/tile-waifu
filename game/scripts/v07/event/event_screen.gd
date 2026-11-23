@@ -11,6 +11,11 @@ var cur_lbl: Label
 var tab_btns: = {}
 var node_btns: Array = []
 
+const CARD_Y: = V8Header.CONTENT_Y + 8.0
+const CARD_H: = 172.0
+const TABS_Y: = CARD_Y + CARD_H + 12.0
+const BODY_Y: = TABS_Y + 62.0 + 14.0
+
 func build(m, args: Dictionary) -> void :
 	main = m
 	W = size.x
@@ -26,11 +31,12 @@ func build(m, args: Dictionary) -> void :
 	Common.backdrop(self, def.bg, size, 2.4, 0.6, def.tint)
 	Fx.ambient(self, def.fx, size)
 	Common.vignette(self, size, Color(0.1, 0.04, 0.12), 0.6)
+	V8Header.make(self, main, def.name, main.back, _rules)
 	_header()
 	_tabs()
 	body = Control.new()
-	body.position = Vector2(0, 470)
-	body.size = Vector2(W, H - 470 - 136)
+	body.position = Vector2(0, BODY_Y)
+	body.size = Vector2(W, H - BODY_Y - 136)
 	body.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(body)
 	_show(tab)
@@ -46,7 +52,7 @@ func build(m, args: Dictionary) -> void :
 		V7Event.show_pending(self, main)
 
 func _header() -> void :
-	var r: = Rect2(16, 124, W - 32, 252)
+	var r: = Rect2(16, CARD_Y, W - 32, CARD_H)
 	var card: = UI.rbox("plum", r, 28, 4, 10)
 	card.colors(Color(0.12, 0.06, 0.16, 1.0), Color(0.08, 0.04, 0.1, 1.0)).borders(Color("ffe7a6"), Color("c58a2c"))
 	add_child(card)
@@ -65,23 +71,21 @@ func _header() -> void :
 	shade.size = r.size - Vector2(8, 8)
 	shade.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	card.add_child(shade)
-	var tag: = UI.rbox("pink", Rect2(18, 16, 150, 32), 14, 2, 6)
+	var tag: = UI.rbox("pink", Rect2(18, 16, 186, 32), 14, 2, 6)
 	card.add_child(tag)
-	tag.add_child(UI.center_label(UI.label("ИВЕНТ · 2 НЕДЕЛИ", 13, Color.WHITE, Color("3d1624"), 3, "body", 900), Rect2(0, 0, 150, 32)))
-	var t: = UI.label(def.name, 38, Color("fff3dc"), UI.DARK, 6, "title", 900)
-	t.position = Vector2(20, 54)
-	t.size = Vector2(420, 54)
-	card.add_child(t)
+	tag.add_child(UI.center_label(UI.label("ИВЕНТ · 2 НЕДЕЛИ", 15, Color.WHITE, Color("3d1624"), 3, "body", 900), Rect2(0, 0, 186, 32)))
 	var left: = UI.label("До конца: " + V7EventData.left_text(V7EventData.left_secs()), 18, Color("ffd98a"), UI.DARK, 3, "body", 900)
-	left.position = Vector2(22, 110)
+	left.position = Vector2(216, 16)
+	left.size = Vector2(240, 32)
+	left.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	card.add_child(left)
 
-	card.add_child(Common.avatar(def.hero, Rect2(18, 146, 86, 86), "gold"))
-	var fl: = UI.label("Героиня ивента: %s" % G.HEROES[def.hero].name, 19, Color.WHITE, UI.DARK, 3, "body", 900)
-	fl.position = Vector2(114, 156)
+	card.add_child(Common.avatar(def.hero, Rect2(18, 64, 92, 92), "gold"))
+	var fl: = UI.label("Героиня ивента: %s" % G.HEROES[def.hero].name, 20, Color.WHITE, UI.DARK, 3, "body", 900)
+	fl.position = Vector2(124, 82)
 	card.add_child(fl)
-	var fs: = UI.label("с ней в паре +50% валюты и двойная симпатия", 15, Color("ddd2c4"), UI.DARK, 2)
-	fs.position = Vector2(114, 188)
+	var fs: = UI.label("с ней в паре +50% валюты и двойная симпатия", 16, Color("ddd2c4"), UI.DARK, 2)
+	fs.position = Vector2(124, 114)
 	card.add_child(fs)
 
 	var cp: = UI.rbox("plum", Rect2(r.size.x - 220, 16, 200, 58), 29, 3, 8)
@@ -99,9 +103,6 @@ func _header() -> void :
 	cn.size = Vector2(196, 22)
 	cn.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	card.add_child(cn)
-	var info: = JButton.make("?", "graphite", Rect2(r.size.x - 70, r.size.y - 70, 54, 54), null, 28)
-	info.pressed.connect(_rules)
-	card.add_child(info)
 	UI.slide_in(card, Vector2(0, -20), 0.0, 0.4)
 
 func _tabs() -> void :
@@ -109,7 +110,7 @@ func _tabs() -> void :
 	var bw: = (W - 32 - 20) / 3.0
 	for i in items.size():
 		var id: String = items[i][0]
-		var b: = JButton.make(items[i][1], "pink" if id == tab else "glass", Rect2(16 + i * (bw + 10), 390, bw, 66), null, 24)
+		var b: = JButton.make(items[i][1], "pink" if id == tab else "glass", Rect2(16 + i * (bw + 10), TABS_Y, bw, 62), null, 24)
 		b.pressed.connect( func(): _show(id))
 		add_child(b)
 		tab_btns[id] = b
@@ -224,9 +225,9 @@ func _node(i: int, p: Vector2, current: bool) -> Control:
 	else:
 		c.add_child(UI.tex(G.fx("lock"), Rect2(s * 0.5 - 20, s * 0.5 - 22, 40, 40)))
 	if boss:
-		var cr: = UI.rbox("red", Rect2(s * 0.5 - 44, -16, 88, 26), 13, 2, 4)
+		var cr: = UI.rbox("red", Rect2(s * 0.5 - 52, -18, 104, 28), 14, 2, 4)
 		c.add_child(cr)
-		cr.add_child(UI.center_label(UI.label("СЛОЖНЫЙ" if i < V7EventData.NODES - 1 else "ФИНАЛ", 12, Color.WHITE, Color("42101a"), 2, "body", 900), Rect2(0, 0, 88, 26)))
+		cr.add_child(UI.center_label(UI.label("СЛОЖНЫЙ" if i < V7EventData.NODES - 1 else "ФИНАЛ", 16, Color.WHITE, Color("42101a"), 2, "body", 900), Rect2(0, 0, 104, 28)))
 	for k in 3:
 		c.add_child(UI.tex(G.fx("star" if k < stars else "star_empty"), Rect2(s * 0.5 - 39 + k * 26, s - 18, 26, 26)))
 	if current:
@@ -336,7 +337,7 @@ func _shop() -> void :
 		bb.disabled = true
 	else:
 		bb.shine_every = 2.4
-		bb.pressed.connect( func(): _buy(V7EventData.SHOP[0], bb))
+		bb.pressed.connect( func(): _ask_buy(V7EventData.SHOP[0], bb, "наряд «%s»" % it.name))
 	big.add_child(bb)
 	var y: = 346.0
 	for k in range(1, V7EventData.SHOP.size()):
@@ -365,9 +366,16 @@ func _shop() -> void :
 		if left <= 0:
 			b.disabled = true
 		else:
-			b.pressed.connect( func(): _buy(s, b))
+			b.pressed.connect( func(): _ask_buy(s, b, t))
 		row.add_child(b)
 		y += 98
+
+# 0.8: no spending of the event currency on one tap: every row of the event shop asks first (spec: Common.confirm)
+func _ask_buy(s: Dictionary, b: Control, what: String) -> void :
+	var price: = int(s.get("price", V7EventData.OUTFIT_PRICE if s.get("kind", "") == "outfit" else 0))
+	Common.confirm(main, "Лавка ивента", "Купить %s?" % what, "event", price, func():
+		if is_instance_valid(b):
+			_buy(s, b), {"price_tex": V7Event.cur_icon(def), "balance": V7EventData.cur(), "yes_text": "Купить"})
 
 func _buy(s: Dictionary, b: Control) -> void :
 	var why: = V7EventData.buy(s)
@@ -468,3 +476,5 @@ func dev_act(a: String) -> void :
 		"rich":
 			V7EventData.add_cur(2000)
 			_show(tab)
+		"buyask":
+			_ask_buy(V7EventData.SHOP[0], self, "наряд «%s»" % G.ITEM[def.outfit.id].name)

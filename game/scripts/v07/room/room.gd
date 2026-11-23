@@ -12,6 +12,9 @@ var bubble: Control
 var panel: Control
 var actions: Control
 
+const TABS_Y: = V8Header.CONTENT_Y + 6.0
+const PANEL_Y: = TABS_Y + 118.0
+
 func build(m, args: Dictionary) -> void :
 	main = m
 	W = size.x
@@ -65,6 +68,8 @@ func _render(greet: = false) -> void :
 	root.add_child(hero)
 	hero.tapped.connect(_on_hero_tap)
 	UI.slide_in(hero, Vector2(40, 40), 0.05, 0.55)
+	V8Header.make(root, main, "Комната", main.back)
+	set_meta("v8_back", main.back)
 	_tabs()
 	_panel()
 	_actions()
@@ -84,7 +89,7 @@ func _tabs() -> void :
 		var open: = G.hero_unlocked(id)
 		var d: = 84.0 if sel else 70.0
 		var c: = Control.new()
-		c.position = Vector2(x0 + i * step + (84 - d) * 0.5, 126 + (84 - d) * 0.5)
+		c.position = Vector2(x0 + i * step + (84 - d) * 0.5, TABS_Y + (84 - d) * 0.5)
 		c.size = Vector2(d, d + 26)
 		c.pivot_offset = Vector2(d * 0.5, d * 0.5)
 		c.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -118,7 +123,7 @@ func _pick(id: String, c: Control) -> void :
 
 
 func _panel() -> void :
-	var r: = Rect2(16, 236, 356, 214)
+	var r: = Rect2(16, PANEL_Y, 356, 214)
 	panel = UI.rbox("glass", r, 26, 3, 12)
 	panel.borders(Color("f3dca0"), Color("8a6424"))
 	root.add_child(panel)
@@ -131,7 +136,7 @@ func _panel() -> void :
 	rm.position = Vector2(20, 56)
 	panel.add_child(rm)
 	var lv: = G.aff_level(h)
-	var bt: = UI.label("%s · связь %d" % [V7RoomData.bond_title(h), lv], 20, Color("ffd2de"), UI.DARK, 3, "body", 900)
+	var bt: = UI.label("%s · симпатия %d" % [V7RoomData.bond_title(h), lv], 20, Color("ffd2de"), UI.DARK, 3, "body", 900)
 	bt.position = Vector2(56, 84)
 	bt.size = Vector2(290, 28)
 	panel.add_child(bt)
@@ -145,18 +150,27 @@ func _panel() -> void :
 	pv.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	pv.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	panel.add_child(pv)
-	var nx: = UI.label(V7RoomData.next_unlock(h), 16, Color("ffe7a6"))
+	var nx: = _fit_label(V7RoomData.next_unlock(h), 16, Color("ffe7a6"), 320.0)
 	nx.position = Vector2(20, 148)
 	nx.size = Vector2(320, 24)
-	nx.clip_text = true
 	panel.add_child(nx)
 	var bt2: = V6Heroines.bond_text(h)
-	var perk: = UI.label("За столом: " + bt2.substr(bt2.find("·") + 2) if "·" in bt2 else "Связь 4 / 7 / 10 ускоряет её умение", 15, Color("cfc3d8"))
+	var perk: = _fit_label("За столом: " + bt2.substr(bt2.find("·") + 2) if "·" in bt2 else "Симпатия 4 / 7 / 10 ускоряет её умение", 15, Color("cfc3d8"), 320.0)
 	perk.position = Vector2(20, 174)
 	perk.size = Vector2(320, 24)
-	perk.clip_text = true
 	panel.add_child(perk)
 	UI.slide_in(panel, Vector2(-40, 0), 0.08, 0.4)
+
+
+# shrinks the font (down to 12 px) instead of cutting the text; ellipsis only as a last resort.
+func _fit_label(text: String, fs: int, col: Color, w: float) -> Label:
+	var f: = UI.font("body", 800)
+	while fs > 12 and f.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > w:
+		fs -= 1
+	var l: = UI.label(text, fs, col)
+	l.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	return l
 
 
 func _actions() -> void :
@@ -215,7 +229,7 @@ func _say(text: String) -> void :
 	if bubble and is_instance_valid(bubble):
 		bubble.queue_free()
 	var head: = hero.head_global()
-	bubble = Common.bubble(root, text, Vector2(16, 474), 300, false)
+	bubble = Common.bubble(root, text, Vector2(16, PANEL_Y + 226), 300, false)
 	var b: = bubble
 	var t: Tween = b.create_tween()
 	t.tween_interval(4.0)
@@ -247,10 +261,10 @@ func _level_up(lv: int) -> void :
 	hero.react("big")
 	var scene_id: = "%s_%d" % [h, lv]
 	if not V7RoomScenes.SCENES.has(scene_id):
-		main.toast("Связь с героиней: %d · «%s»" % [lv, V7RoomData.bond_title(h)], "heart")
+		main.toast("Симпатия: %d · «%s»" % [lv, V7RoomData.bond_title(h)], "heart")
 		return
 	var sc: Dictionary = V7RoomScenes.SCENES[scene_id]
-	var p: = Common.popup(main, "Связь %d" % lv, 420, "cream", 600)
+	var p: = Common.popup(main, "Симпатия %d" % lv, 420, "cream", 600)
 	var t: = UI.center_label(UI.label("%s · «%s»" % [G.HEROES[h].name, V7RoomData.bond_title(h)], 26, Color("ffd2de"), UI.DARK, 3, "body", 900), Rect2(20, 54, 560, 40))
 	p.add_child(t)
 	var l: = UI.center_label(UI.label("Открыта сцена «%s»" % sc.title, 24, UI.INK), Rect2(20, 110, 560, 40))
@@ -316,8 +330,9 @@ func _gift_popup() -> void :
 					Sfx.play("deny")
 					main.toast("Не хватает монет. Их дают за партии и поручения.", "coin")
 				else:
-					Common.close_popup(p)
-					_give(gid))
+					Common.confirm(main, "Подарок", "Подарить %s «%s»?" % [G.HEROES[h].name, gd.name], "coin", int(gd.price), func():
+						Common.close_popup(p)
+						_give(gid), {"yes_text": "Подарить"}))
 	var hint: = UI.center_label(UI.label("Два сердца — любимое, одно — нравится. Вкус узнаёшь, когда подаришь.", 16, Color("cfc3d8")), Rect2(0, 92 + 4 * (ch + 12) + 4, 680, 26))
 	p.add_child(hint)
 
@@ -406,17 +421,18 @@ func _date_popup() -> void :
 	if inv <= 0 and int(s.get("bought", 0)) < V7RoomData.EXTRA_INVITES_MAX:
 		var buy: = JButton.make("Ещё приглашение · %d" % V7RoomData.EXTRA_INVITE_GEMS, "gold", Rect2(150, yb, 380, 72), G.icon("gem"), 22)
 		buy.pressed.connect( func():
-			if int(G.S.gems) < V7RoomData.EXTRA_INVITE_GEMS:
-				Sfx.play("deny")
-				main.toast("Не хватает кристаллов.", "gem")
-				return
-			G.S.gems = int(G.S.gems) - V7RoomData.EXTRA_INVITE_GEMS
-			s.invites = int(s.invites) + 1
-			s.bought = int(s.bought) + 1
-			G.save()
-			main.refresh_currency(true)
-			Common.close_popup(p)
-			_date_popup())
+			Common.confirm(main, "Ещё приглашение", "Купить ещё одно приглашение на свидание на сегодня?", "gem", V7RoomData.EXTRA_INVITE_GEMS, func():
+				if int(G.S.gems) < V7RoomData.EXTRA_INVITE_GEMS:
+					Sfx.play("deny")
+					main.toast("Не хватает кристаллов.", "gem")
+					return
+				G.S.gems = int(G.S.gems) - V7RoomData.EXTRA_INVITE_GEMS
+				s.invites = int(s.invites) + 1
+				s.bought = int(s.bought) + 1
+				G.save()
+				main.refresh_currency(true)
+				Common.close_popup(p)
+				_date_popup(), {"yes_text": "Купить"}))
 		p.add_child(buy)
 	else:
 		p.add_child(UI.center_label(UI.label("Угадай её любимое место: там свидание теплее.", 16, Color("cfc3d8")), Rect2(0, yb + 10, 680, 26)))
@@ -445,6 +461,8 @@ func _go_date(pid: String) -> void :
 
 func _date_result(pid: String, grade: int, aff: int, fav: bool, fav_new: bool, photo_new: bool) -> void :
 	var titles: = ["Чудесное свидание", "Хорошее свидание", "Неловкое свидание"]
+	V7RoomData.add_mail(h, V7RoomData.ENDINGS[h][grade], "date", pid)
+	G.save()
 	var p: = Common.popup(main, titles[grade], 560, "cream", 640)
 	var av: = Common.avatar(h, Rect2(30, 60, 120, 120), "gold")
 	p.add_child(av)
@@ -477,7 +495,7 @@ func _scenes_popup() -> void :
 	var ids: = V7RoomScenes.for_hero(h)
 	var p: = Common.popup(main, "Сцены · %s" % G.HEROES[h].name, 860, "cream", 680)
 	var ph: = V7RoomData.photos(h)
-	p.add_child(UI.center_label(UI.label("Связь открывает сцены · фото со свиданий: %d из %d" % [ph, V7RoomData.PLACE_ORDER.size()], 17, Color("e9dcff")), Rect2(0, 48, 680, 30)))
+	p.add_child(UI.center_label(UI.label("Симпатия открывает сцены · фото со свиданий: %d из %d" % [ph, V7RoomData.PLACE_ORDER.size()], 17, Color("e9dcff")), Rect2(0, 48, 680, 30)))
 	var rh: = 166.0
 	for i in ids.size():
 		var id: String = ids[i]
@@ -507,12 +525,12 @@ func _scenes_popup() -> void :
 		tl.size = Vector2(360, 40)
 		tl.clip_text = true
 		row.add_child(tl)
-		var sub: = UI.label("Связь %d · %s" % [lv, V7RoomData.BOND[lv - 1]], 17, Color("ffd2de") if open else Color("8f8790"))
+		var sub: = UI.label("Симпатия %d · %s" % [lv, V7RoomData.BOND[lv - 1]], 17, Color("ffd2de") if open else Color("8f8790"))
 		sub.position = Vector2(258, 60)
 		row.add_child(sub)
 		var st_txt: = ""
 		if not open:
-			st_txt = "Откроется на связи %d" % lv
+			st_txt = "Откроется на симпатии %d" % lv
 		elif not seen:
 			st_txt = "Новая · +%d кристаллов" % V7RoomData.SCENE_GEMS.get(lv, 0)
 		else:
@@ -529,7 +547,7 @@ func _scenes_popup() -> void :
 				if not open:
 					Sfx.play("deny")
 					UI.punch(row, 0.05)
-					main.toast("Нужна связь %d. Подарки и свидания её поднимают." % lv, "heart")
+					main.toast("Нужна симпатия %d. Подарки и свидания её поднимают." % lv, "heart")
 					return
 				Sfx.play("pop")
 				Common.close_popup(p)

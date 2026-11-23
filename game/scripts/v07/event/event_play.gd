@@ -187,22 +187,32 @@ func _event_clear() -> void :
 	G.task_add("levels")
 	G.add_pass_xp(100)
 	G.S.xp = int(G.S.xp) + 40
-	G.save()
+	rp_before = int(G.S.rp)
+	var ea: = V8PlayRules.award("event", V8PlayRules.event_rp(stars), true)
+	rp_gain = int(ea.rp)
+	rank_ups = ea.ups
+	_v8_end_overlays()
 	print("V7EVENT CLEAR node=%d stars=%d cur=+%d" % [node_i, stars, int(rw.total)])
 	Sfx.play("win")
 	await get_tree().create_timer(0.4).timeout
 	if not is_inside_tree():
 		return
 	var root: = _overlay()
-	var rib: = Common.ribbon(root, "Стол %d пройден" % (node_i + 1), Rect2(W * 0.5 - 250, 150, 500, 96), "pink", 40)
+	var rib: = Common.ribbon(root, "Стол %d пройден" % (node_i + 1), Rect2(W * 0.5 - 250, 56, 500, 96), "pink", 40)
 	UI.pop_in(rib, 0.05, 0.4)
 	var srow: = []
 	for i in 3:
-		var st: = UI.tex(G.fx("star_empty"), Rect2(W * 0.5 - 60 + (i - 1) * 140, 262 + (0 if i == 1 else 20), 120, 120))
+		var st: = UI.tex(G.fx("star_empty"), Rect2(W * 0.5 - 55 + (i - 1) * 130, 160 + (0 if i == 1 else 16), 110, 110))
 		root.add_child(st)
 		srow.append(st)
-	var y: = 410.0
-	var panel: = UI.rbox("glass", Rect2(60, y, W - 120, 70 + rw.parts.size() * 40), 26, 3, 10)
+	# 0.8 (spec 5): under the stars, the rule they follow (the event allows one overflow for 2★)
+	var srt: String = V8PlayRules.T.star_rule_event
+	var srs: = 17
+	while srs > 13 and UI.font("body", 800).get_string_size(srt, HORIZONTAL_ALIGNMENT_LEFT, -1, srs).x > W - 48:
+		srs -= 1
+	root.add_child(UI.center_label(UI.label(srt, srs, UI.MUTED, UI.DARK, 2, "body", 800), Rect2(20, 290, W - 40, 26)))
+	var y: = 326.0
+	var panel: = UI.rbox("glass", Rect2(40, y, W - 80, 66 + rw.parts.size() * 36), 26, 3, 10)
 	panel.borders(Color("ffe7a6"), Color("c58a2c"))
 	root.add_child(panel)
 	panel.add_child(UI.tex(V7Event.cur_icon(def), Rect2(16, 8, 54, 54)))
@@ -212,20 +222,23 @@ func _event_clear() -> void :
 	for k in rw.parts.size():
 		var pr: Array = rw.parts[k]
 		var a: = UI.label(String(pr[0]), 18, Color("ddd2c4"))
-		a.position = Vector2(30, 66 + k * 40)
+		a.position = Vector2(30, 64 + k * 36)
 		panel.add_child(a)
 		var b: = UI.label(("×2" if String(pr[0]).begins_with("Первая") else "+%d" % int(pr[1])), 18, Color("a9d9c4"), UI.DARK, 2, "body", 900)
-		b.position = Vector2(panel.size.x - 110, 66 + k * 40)
+		b.position = Vector2(panel.size.x - 110, 64 + k * 36)
 		panel.add_child(b)
-	y += panel.size.y + 18
+	y += panel.size.y + 10
+	y = _v8_result_rank(root, y, 0)
 	for m in miles:
-		var c: = Common.chip(root, G.icon("gift"), "Веха %d: %s" % [int(m.at), V7EventData.mile_text(m, def)], Rect2(80, y, W - 160, 52), "plum", 18)
+		var c: = Common.chip(root, G.icon("gift"), "Веха %d: %s" % [int(m.at), V7EventData.mile_text(m, def)], Rect2(60, y, W - 120, 50), "plum", 18)
 		UI.pop_in(c, 0.6)
-		y += 60
+		y += 56
 
 	var beat: = {0: 0, 5: 1, 11: 2}
 	if first and beat.has(node_i):
 		var line: String = def.lines[beat[node_i]]
+		if y + 132 > H - 210:
+			y = H - 342.0
 		var bub: = UI.rbox("cream", Rect2(40, y + 4, W - 80, 118), 24, 3, 10)
 		root.add_child(bub)
 		bub.add_child(Common.avatar(def.hero, Rect2(12, 12, 94, 94), "gold"))
@@ -240,7 +253,7 @@ func _event_clear() -> void :
 	var nxt: = node_i + 1
 	var has_next: = nxt < V7EventData.NODES
 	var bw: = (W - 100) * 0.5
-	var b1: = JButton.make("Следующий стол" if has_next else "Ещё раз", "pink", Rect2(40, minf(y + 30, H - 200), bw, 96), null, 26)
+	var b1: = JButton.make("Следующий стол" if has_next else "Ещё раз", "pink", Rect2(40, H - 200, bw, 96), null, 26)
 	b1.shine_every = 2.2
 	b1.pressed.connect( func():
 		main.go("v7play", {"mode": "v7event", "node": nxt if has_next else node_i, "partner": partner, "retry": randi()}))
@@ -258,6 +271,8 @@ func _event_clear() -> void :
 		UI.pop_in(st, 0.0, 2.0)
 		Sfx.play("star%d" % i)
 		await get_tree().create_timer(0.3).timeout
+	if is_inside_tree() and _v8_rank_box:
+		_animate_rank(_v8_rank_box)
 
 
 func _tour_finish(cleared: bool) -> void :
@@ -274,16 +289,20 @@ func _tour_finish(cleared: bool) -> void :
 	G.task_add("levels")
 	G.add_pass_xp(80)
 	G.add_aff(partner, 5)
-	G.save()
+	rp_before = int(G.S.rp)
+	var ta: = V8PlayRules.award("tourney", V8PlayRules.tourney_rp(cleared, total, int(res.place_before) - int(res.place_after)), cleared)
+	rp_gain = int(ta.rp)
+	rank_ups = ta.ups
+	_v8_end_overlays()
 	print("V7TOURNEY table=%d score=%d cleared=%s place %d->%d" % [table_k, total, str(cleared), int(res.place_before), int(res.place_after)])
 	Sfx.play("win" if cleared else "deny", 1.0 if cleared else 0.7)
 	await get_tree().create_timer(0.4).timeout
 	if not is_inside_tree():
 		return
 	var root: = _overlay()
-	var rib: = Common.ribbon(root, "Стол очищен" if cleared else "Партия окончена", Rect2(W * 0.5 - 250, 150, 500, 96), "gold" if cleared else "pink", 38)
+	var rib: = Common.ribbon(root, "Стол очищен" if cleared else "Партия окончена", Rect2(W * 0.5 - 250, 56, 500, 96), "gold" if cleared else "pink", 38)
 	UI.pop_in(rib, 0.05, 0.4)
-	var big: = UI.center_label(UI.title(str(total), 88, Color("ffe7a6"), UI.DARK), Rect2(0, 260, W, 110))
+	var big: = UI.center_label(UI.title(str(total), 88, Color("ffe7a6"), UI.DARK), Rect2(0, 160, W, 110))
 	root.add_child(big)
 	UI.pop_in(big, 0.2, 1.6)
 	var rows: = [["Пары и серии", score + overflows * V7Ladder.OVERFLOW]]
@@ -291,18 +310,18 @@ func _tour_finish(cleared: bool) -> void :
 		rows.append(["Переполнения ×%d" % overflows, - overflows * V7Ladder.OVERFLOW])
 	for pr in fin.parts:
 		rows.append(pr)
-	var panel: = UI.rbox("glass", Rect2(70, 390, W - 140, 24 + rows.size() * 38), 24, 3, 10)
+	var panel: = UI.rbox("glass", Rect2(40, 286, W - 80, 20 + rows.size() * 36), 24, 3, 10)
 	panel.borders(Color("ffe7a6"), Color("c58a2c"))
 	root.add_child(panel)
 	for k in rows.size():
 		var a: = UI.label(String(rows[k][0]), 18, Color("ddd2c4"))
-		a.position = Vector2(26, 12 + k * 38)
+		a.position = Vector2(26, 10 + k * 36)
 		panel.add_child(a)
 		var v: = int(rows[k][1])
 		var b: = UI.label(("+%d" % v) if v >= 0 else str(v), 18, Color("a9d9c4") if v >= 0 else Color("e3a3b2"), UI.DARK, 2, "body", 900)
-		b.position = Vector2(panel.size.x - 110, 12 + k * 38)
+		b.position = Vector2(panel.size.x - 110, 10 + k * 36)
 		panel.add_child(b)
-	var y: = panel.position.y + panel.size.y + 20
+	var y: = panel.position.y + panel.size.y + 14
 	var t: = V7Ladder.st()
 	var line: = ("Новый рекорд стола! Было %d" % int(res.old)) if res.improved else ("Лучший результат стола: %d" % int(res.best))
 	root.add_child(UI.center_label(UI.label(line, 22, Color("a9d9c4") if res.improved else Color("ddd2c4"), UI.DARK, 3, "body", 900), Rect2(0, y, W, 34)))
@@ -319,9 +338,10 @@ func _tour_finish(cleared: bool) -> void :
 		pl += " · зона понижения"
 		zc = Color("e3a3b2")
 	root.add_child(UI.center_label(UI.label(pl, 24, zc, UI.DARK, 3, "body", 900), Rect2(0, y, W, 36)))
-	y += 60
+	y += 46
+	y = _v8_result_rank(root, y, maxi(0, int(res.best) - int(res.old)))
 	var bw: = (W - 100) * 0.5
-	var b1: = JButton.make("Ещё раз", "pink", Rect2(40, minf(y + 10, H - 200), bw, 96), null, 28)
+	var b1: = JButton.make("Ещё раз", "pink", Rect2(40, H - 200, bw, 96), null, 28)
 	b1.pressed.connect( func(): main.go("v7play", {"mode": "v7tourney", "table": table_k, "partner": partner, "retry": randi()}))
 	root.add_child(b1)
 	var b2: = JButton.make("К турниру", "glass", Rect2(60 + bw, b1.position.y, bw, 96), null, 26)
@@ -329,6 +349,39 @@ func _tour_finish(cleared: bool) -> void :
 	root.add_child(b2)
 	if res.improved:
 		Fx.burst(root, Vector2(W * 0.5, 310), "confetti", 60, Color.WHITE, 1.1)
+	if _v8_rank_box:
+		await get_tree().create_timer(0.5).timeout
+		if is_inside_tree():
+			_animate_rank(_v8_rank_box)
+
+var _v8_rank_box: Control = null
+
+# 0.8 (spec 5): the same rank bar (was / now, +N, «Новый ранг» inside) and weekly-league / quarter row as the
+# Path victory window, under the result content. Returns the y under it.
+func _v8_result_rank(root: Control, y: float, week_gain: int) -> float:
+	var x: = 40.0
+	var w: = W - 80.0
+	_v8_rank_box = _v8_rank_block(root, Rect2(x, y, w, 0))
+	y += _v8_rank_box.size.y + 8
+	var li: = V8PlayRules.league_info()
+	if not li.is_empty():
+		_v8_league_row(root, Rect2(x, y, w, 58), li, week_gain)
+		y += 66
+	return y
+
+# 0.8: «+N к рангу» (and «Новый ранг» when there is one) inside the result window, under its content
+func _v8_rank_line(root: Control, y: float, a: Dictionary) -> float:
+	var t: = V8PlayRules.award_text(a)
+	var up: = V8PlayRules.rankup_text(a)
+	if up != "":
+		t = up if t == "" else t + " · " + up
+	if t == "":
+		return y
+	var c: = Common.chip(root, G.icon("trophy"), t, Rect2(60, y, W - 120, 44), "plum", 19)
+	UI.pop_in(c, 0.5)
+	if up != "":
+		Sfx.say(partner, "rankup")
+	return y + 54
 
 func _overlay() -> Control:
 	var root: = Control.new()

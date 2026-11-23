@@ -185,6 +185,8 @@ func add_rp(n: int, source: = "other") -> Array:
 	if not source in RP_SOURCES:
 		push_warning("G.add_rp: unknown source '%s', counted as 'other'" % source)
 		source = "other"
+	# 0.8: a new quarter starts before the points land, so they count for the quarter they were earned in
+	V8League._roll_quarter(V8League.now())
 	var old_rp: = int(S.get("rp", 0))
 	var before: = rank_index(old_rp)
 	var new_rp: = old_rp + n
@@ -306,16 +308,17 @@ func _ensure_profile() -> void :
 
 
 const CATS: = [[0, 6, "Букет", "цветы"], [7, 14, "Небосвод", "небо"], [15, 22, "Сладкоежка", "сладости"], [23, 28, "Сокровищница", "сокровища"], [29, 35, "Зверинец", "звери"]]
+# 0.8: yaku rank points scaled to the single-rank economy (a Path win ≈ 25–45 points, see V8PlayRules.path_rp)
 const YAKU: = {
-	"clean": {"name": "Чистая рука", "rp": 15, "desc": "без помощи и переполнений"}, 
-	"calm": {"name": "Пустой лоток", "rp": 12, "desc": "в лотке не больше двух фишек"}, 
-	"sharp": {"name": "Без промаха", "rp": 8, "desc": "ни одного касания по закрытой"}, 
-	"swift": {"name": "Молния", "rp": 10, "desc": "очень быстрая победа"}, 
-	"riichi": {"name": "Риичи", "rp": 20, "desc": "объявлено и выиграно, награда ×2"}, 
-	"dragon": {"name": "Пробуждение дракона", "rp": 15, "desc": "комбо ×7"}, 
-	"goldvein": {"name": "Золотая жила", "rp": 6, "desc": "все золотые пары"}, 
-	"finale": {"name": "Финальный аккорд", "rp": 6, "desc": "последняя пара в комбо"}, 
-	"set": {"name": "Тройка", "rp": 8, "desc": "три пары одной масти подряд"}, 
+	"clean": {"name": "Чистая рука", "rp": 4, "desc": "без помощи и переполнений"}, 
+	"calm": {"name": "Пустой лоток", "rp": 3, "desc": "в лотке не больше двух фишек"}, 
+	"sharp": {"name": "Без промаха", "rp": 2, "desc": "ни одного касания по закрытой"}, 
+	"swift": {"name": "Молния", "rp": 3, "desc": "очень быстрая победа"}, 
+	"riichi": {"name": "Риичи", "rp": 6, "desc": "объявлено и выиграно, награда ×2"}, 
+	"dragon": {"name": "Пробуждение дракона", "rp": 4, "desc": "комбо ×7"}, 
+	"goldvein": {"name": "Золотая жила", "rp": 2, "desc": "все золотые пары"}, 
+	"finale": {"name": "Финальный аккорд", "rp": 2, "desc": "последняя пара в комбо"}, 
+	"set": {"name": "Тройка", "rp": 2, "desc": "три пары одной масти подряд"}, 
 }
 
 func face_cat(f: int) -> int:
@@ -430,8 +433,24 @@ func _ready() -> void :
 	_build_levels()
 	demo = "--demo" in OS.get_cmdline_user_args()
 	rng.randomize()
-	load_game()
 	var args: = OS.get_cmdline_user_args()
+	# --save=user://pt_save.json: use another save file (playtests, dev runs); --save_wipe=1 deletes it first.
+	# A playtest (--pt=) always runs on its own wiped save, user://pt_save.json unless --save= says otherwise.
+	var pt: = false
+	for a in args:
+		if a.begins_with("--pt="):
+			pt = true
+			save_path = "user://pt_save.json"
+	for a in args:
+		if a.begins_with("--save="):
+			var sp: = a.substr(7)
+			if sp.begins_with("user://") and sp.ends_with(".json"):
+				save_path = sp
+	if save_path != SAVE_PATH and ("--save_wipe=1" in args or pt):
+		for p in [save_path, _tmp_path(), _bak_path()]:
+			if FileAccess.file_exists(p):
+				DirAccess.remove_absolute(ProjectSettings.globalize_path(p))
+	load_game()
 	if "--recovery_selftest=1" in args:
 		_recovery_selftest.call_deferred()
 	if "--v8_confirm_demo=1" in args:
@@ -661,6 +680,9 @@ func item_tex(it: Dictionary) -> Texture2D:
 	return null
 
 func tile_tex(i: int) -> Texture2D:
+	if i < 0 or i >= TILE_NAMES.size():
+		push_warning("tile_tex: face %d has no tile texture" % i)
+		i = posmod(i, TILE_NAMES.size())
 	return load("res://assets/tiles/%02d_%s.png" % [i, TILE_NAMES[i]])
 
 func icon(name: String) -> Texture2D:

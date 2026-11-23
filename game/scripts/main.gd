@@ -80,7 +80,12 @@ func _ready() -> void :
 
 func _splash() -> void :
 	var args: = " ".join(OS.get_cmdline_user_args())
-	if "--shots" in args and not "--splash" in args:
+	if "--profile_selftest=1" in args:
+		await get_tree().process_frame
+		var f: = V8ProfileSelftest.run(self)
+		get_tree().quit(1 if f > 0 else 0)
+		return
+	if "--shots" in args and not "--splash" in args and not "--pt=" in args:
 		return
 	if "--splash" in args:
 		# --fresh: clean install (no profile, intro not seen); --v07: a 0.7 player (intro seen, no profile yet)
@@ -119,6 +124,7 @@ func _splash() -> void :
 		UI.slide_in(chip, Vector2(0, 16), 0.6)
 		fades.append(chip)
 	var plate: = UI.rbox("gold", Rect2(W * 0.5 - 230, H - 250, 460, 104), 52, 4, 14)
+	plate.colors(UI.PAL.gold[0], UI.PAL.gold[1])
 	sp.add_child(plate)
 	plate.add_child(UI.center_label(UI.label(V6Txt.s("title.tap"), 40, Color("3a2410"), Color(1.0, 0.95, 0.8, 0.55), 2, "body", 900), Rect2(0, 0, 460, 104)))
 	plate.pivot_offset = Vector2(230, 52)
@@ -136,7 +142,7 @@ func _splash() -> void :
 	Sfx.play("reveal_sr", 0.9)
 	hero.react("big")
 	var need_card: = not has_profile
-	var need_intro: = not G.S.get("intro_done", false)
+	var need_intro: bool = not G.S.get("intro_done", false)
 	if need_card or need_intro:
 		pt.kill()
 		var t0: = create_tween().set_parallel()
@@ -299,32 +305,8 @@ func rank_ladder() -> void :
 
 
 func maybe_offer() -> void :
-	if G.offer_shown or G.owns("o_dragon"):
-		return
-	G.offer_shown = true
-	var p: = Common.popup(self, V6Txt.s("offer.title"), 620, "lav")
-	var art: = Common.card_art(G.art_tex(G.ITEM["o_dragon"]), Rect2(30, 60, 260, 380), Vector2(0.5, 0.3), 1.0, 20)
-	(art.material as ShaderMaterial).set_shader_parameter("holo", 0.35)
-	p.add_child(art)
-	var t: = UI.title(V6Txt.s("offer.name"), 36, Color.WHITE, Color("3f2a7a"))
-	t.position = Vector2(310, 66)
-	p.add_child(t)
-	var lines: = [["gem", V6Txt.s("offer.gems")], ["ticket", V6Txt.s("offer.tickets")], ["wardrobe", V6Txt.s("offer.outfit")]]
-	for i in lines.size():
-		var c: = Common.chip(p, G.icon(lines[i][0]), lines[i][1], Rect2(310, 140 + i * 74, 320, 56), "glass", 18)
-	var info: = UI.label(V6Txt.s("offer.info"), 17, Color("3f2a7a"))
-	info.position = Vector2(312, 370)
-	p.add_child(info)
-	var buy: = JButton.make(V6Txt.s("offer.buy"), "gold", Rect2(60, 470, 540, 96), null, 34)
-	buy.shine_every = 2.0
-	buy.pressed.connect( func():
-		G.S.gems += 1200
-		G.give("o_dragon")
-		G.save()
-		fly_gems(buy.get_global_rect().get_center(), 8)
-		toast(V6Txt.s("offer.got"), "gift")
-		Common.close_popup(p))
-	p.add_child(buy)
+	# 0.8 (Stream E): «Набор первого гостя» — once, after the 3rd Path win, valid 72 h (scripts/v08/play/starter.gd).
+	V8Starter.maybe_show(self)
 
 func _dev_args() -> void :
 
@@ -347,6 +329,10 @@ func _dev_args() -> void :
 		G.S.partner = it.hero
 	if a.has("fuzz"):
 		V7Fuzz.run(self, int(a.fuzz))
+		return
+	if a.has("pt"):
+		# 0.8 playtest runner (scripts/v08/devtools/playtest.gd): plays from the title with touch input
+		V8Playtest.start(self, a)
 		return
 	if a.has("selftest"):
 		_selftest()
@@ -424,47 +410,94 @@ func _dev_act(act: String) -> void :
 		screen.dev_act(act)
 
 
+# ---- 0.8 top bar (Stream D): player avatar + nick + rank on the left (tap -> profile), two currencies right.
+var prof_root: Control
+var _prof_key: = ""
+var history: Array = []
+const NO_HISTORY: = ["play", "arena", "v7play"]
+const PLAY_BACK: = {"play": "home", "arena": "modes", "v7play": "v7event"}
+
 func _build_topbar() -> void :
 	topbar = Control.new()
 	topbar.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(topbar)
-
-	var plate: = UI.rbox("glass", Rect2(96, 22, 250, 78), 26, 3, 10)
-	topbar.add_child(plate)
-	var ri: = G.rank_of(int(G.S.rp))
-	rank_lbl = UI.label(ri.title, 21, UI.INK, UI.DARK, 3, "body", 900)
-	rank_lbl.position = Vector2(176, 28)
-	rank_lbl.size = Vector2(160, 28)
-	rank_lbl.clip_text = true
-	topbar.add_child(rank_lbl)
-	var xpbg: = UI.rbox("cream", Rect2(178, 62, 150, 16), 8, 2, 4)
-	xpbg.set_param("shadow_color", Color(0, 0, 0, 0))
-	topbar.add_child(xpbg)
-	rank_bar = UI.rbox("gold", Rect2(180, 64, 146 * clampf(float(ri.into) / ri.need, 0.06, 1.0), 12), 6, 0, 3)
-	rank_bar.set_param("shadow_color", Color(0, 0, 0, 0))
-	topbar.add_child(rank_bar)
-	var ring: = UI.rbox("gold", Rect2(16, 14, 96, 96), 48, 4, 10)
-	topbar.add_child(ring)
-	var av: = _avatar(G.S.partner, Rect2(22, 20, 84, 84))
-	topbar.add_child(av)
-	rank_em = Common.rank_emblem(topbar, Rect2(104, 26, 66, 66), ri.tier, ri.sub)
-	var lv: = UI.rbox("pink", Rect2(12, 86, 52, 30), 15, 3, 6)
-	topbar.add_child(lv)
-	lv.add_child(UI.center_label(UI.label(str(int(G.S.player_lv)), 19, Color.WHITE, Color("7a2346"), 4), Rect2(0, 0, 52, 30)))
-	var hit: = Control.new()
-	hit.position = Vector2(10, 10)
-	hit.size = Vector2(340, 100)
-	hit.mouse_filter = Control.MOUSE_FILTER_STOP
-	hit.gui_input.connect( func(e):
-		if e is InputEventMouseButton and e.pressed:
-			Sfx.play("pop")
-			rank_ladder())
-	topbar.add_child(hit)
-
+	prof_root = Control.new()
+	prof_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	topbar.add_child(prof_root)
+	_build_profile_chip()
 	var gp: = _currency(Rect2(W - 338, 32, 160, 54), "gem", G.S.gems)
 	gems_lbl = gp
 	var cp: = _currency(Rect2(W - 166, 32, 150, 54), "coin", G.S.coins)
 	coins_lbl = cp
+	for sig in [G.profile_changed, G.rank_changed, G.rp_changed]:
+		if not (sig as Signal).is_connected(_on_profile_signal):
+			(sig as Signal).connect(_on_profile_signal)
+
+func _on_profile_signal(_a = null, _b = null) -> void :
+	_refresh_profile_chip()
+
+func _profile_key() -> String:
+	var ri: = G.rank_of(int(G.S.rp))
+	return "%s|%s|%s|%d" % [G.nick(), str(G.profile().get("avatar", "mc")), ri.title, int(ri.into)]
+
+func _refresh_profile_chip() -> void :
+	if prof_root and is_instance_valid(prof_root) and _profile_key() != _prof_key:
+		_build_profile_chip()
+
+func _build_profile_chip() -> void :
+	for c in prof_root.get_children():
+		prof_root.remove_child(c)
+		c.queue_free()
+	_prof_key = _profile_key()
+	var ri: = G.rank_of(int(G.S.rp))
+	var plate: = UI.rbox("glass", Rect2(96, 22, 270, 82), 26, 3, 10)
+	prof_root.add_child(plate)
+	var ring: = UI.rbox("gold", Rect2(16, 14, 96, 96), 48, 4, 10)
+	prof_root.add_child(ring)
+	var av_id: = str(G.profile().get("avatar", "mc"))
+	if not Hero.RIGS.has(av_id):
+		av_id = "mc"
+	prof_root.add_child(_avatar(av_id, Rect2(22, 20, 84, 84)))
+	var nick: = G.nick()
+	var nx: = 122.0
+	var nw: = 366.0 - nx - 14.0
+	var fs: = 24
+	var f: = UI.font("body", 900)
+	while fs > 18 and f.get_string_size(nick, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > nw:
+		fs -= 1
+	var nl: = UI.label(nick, fs, Color("fff6ea"), UI.DARK, 3, "body", 900)
+	nl.position = Vector2(nx, 24)
+	nl.size = Vector2(nw, 32)
+	nl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	nl.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	nl.clip_text = true
+	prof_root.add_child(nl)
+	rank_em = Common.rank_emblem(prof_root, Rect2(nx - 2, 60, 38, 38), ri.tier, ri.sub)
+	rank_lbl = UI.label(ri.title, 18, Color(G.RANKS[ri.tier].color).lerp(Color("fff6ea"), 0.45), UI.DARK, 3, "body", 900)
+	rank_lbl.position = Vector2(nx + 44, 58)
+	rank_lbl.size = Vector2(nw - 44, 22)
+	rank_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	rank_lbl.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	rank_lbl.clip_text = true
+	prof_root.add_child(rank_lbl)
+	var bw: = nw - 48.0
+	var xpbg: = UI.rbox("cream", Rect2(nx + 46, 84, bw, 10), 5, 1, 3)
+	xpbg.set_param("shadow_color", Color(0, 0, 0, 0))
+	prof_root.add_child(xpbg)
+	rank_bar = UI.rbox("gold", Rect2(nx + 47, 85, (bw - 2) * clampf(float(ri.into) / ri.need, 0.06, 1.0), 8), 4, 0, 2)
+	rank_bar.set_param("shadow_color", Color(0, 0, 0, 0))
+	prof_root.add_child(rank_bar)
+	var hit: = Control.new()
+	hit.position = Vector2(10, 10)
+	hit.size = Vector2(360, 104)
+	hit.mouse_filter = Control.MOUSE_FILTER_STOP
+	hit.gui_input.connect( func(e):
+		if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT:
+			Sfx.play("pop")
+			UI.punch(ring, 0.08)
+			if screen_id != "profile":
+				go("profile", {"from": screen_id if screen_id != "" else "home"}))
+	prof_root.add_child(hit)
 
 func _avatar(hero: String, r: Rect2) -> TextureRect:
 	var t: = UI.tex(load("res://assets/hero/%s.png" % hero), r, false)
@@ -492,21 +525,13 @@ func _currency(r: Rect2, icon: String, val: int) -> Label:
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	topbar.add_child(l)
 	var plus: = JButton.make("+", "gold", Rect2(r.end.x - 38, r.position.y + 12, 30, 30), null, 22)
-	plus.pressed.connect( func(): go("shop"))
+	plus.pressed.connect( func(): go("shop", {"tab": 2} if icon == "gem" else {}))
 	topbar.add_child(plus)
 	return l
 
 func refresh_currency(punch: = false) -> void :
 	gems_lbl.text = UI.fmt(G.S.gems)
-	var ri: = G.rank_of(int(G.S.rp))
-	if rank_lbl and rank_lbl.text != ri.title:
-		rank_lbl.text = ri.title
-		var p: = rank_em.position
-		rank_em.queue_free()
-		rank_em = Common.rank_emblem(topbar, Rect2(p, Vector2(66, 66)), ri.tier, ri.sub)
-		topbar.move_child(rank_em, rank_bar.get_index() + 2)
-	if rank_bar:
-		rank_bar.size.x = 146 * clampf(float(ri.into) / ri.need, 0.06, 1.0)
+	_refresh_profile_chip()
 	coins_lbl.text = UI.fmt(G.S.coins)
 	if punch:
 		UI.punch(gems_lbl, 0.25)
@@ -647,18 +672,26 @@ func show_chrome(top: bool, nav: bool) -> void :
 	navbar.visible = nav
 
 
-func go(id: String, args: = {}, animate: = true) -> void :
+func go(id: String, args: = {}, animate: = true, remember: = true) -> void :
 	if busy or (id == screen_id and args.is_empty()):
 		return
 	if id == "summon" and not G.summon_open():
 		toast(V6Txt.s("summon.locked"), "gem")
 		UI.punch(tab_nodes["summon"], 0.12)
 		return
+	var from_id: = screen_id
+	var from_args: Dictionary = screen.get_meta("v8_args", {}) if screen and is_instance_valid(screen) else {}
 	await V6Story.before_go(self, id, args)
 	for p in overlay.get_children():
-		if p.has_meta("popup"):
+		if p.has_meta("popup") or p.has_meta("v8_back"):
 			p.queue_free()
 	busy = true
+	if id == "home":
+		history.clear()
+	elif remember and from_id != "" and from_id != id and not from_id in NO_HISTORY:
+		history.append([from_id, from_args])
+		if history.size() > 12:
+			history.pop_front()
 	if animate:
 		Sfx.play("whoosh", 1.0, -4)
 		var t: = create_tween()
@@ -667,10 +700,17 @@ func go(id: String, args: = {}, animate: = true) -> void :
 	if screen:
 		screen.queue_free()
 	screen_id = id
+	# 0.8: in a match, popups and toasts draw above everything of the table, also above tiles lifted into the
+	# tray (z 200+) or flying specials (z 160), so nothing from the match shows through a window. Elsewhere the
+	# overlay stays at z 0 under views added straight to main (title, story scenes).
+	var match_z: = PLAY_BACK.has(id)
+	overlay.z_index = 400 if match_z else 0
+	trans.z_index = 450 if match_z else 0
 	screen = Control.new()
 	screen.set_script(SCREENS[id])
 	screen.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	screen.size = Vector2(W, H)
+	screen.set_meta("v8_args", args.duplicate())
 	screen_root.add_child(screen)
 	screen.call("build", self, args)
 	if tab_nodes.has(id):
@@ -682,16 +722,126 @@ func go(id: String, args: = {}, animate: = true) -> void :
 		t2.tween_method( func(v): trans_mat.set_shader_parameter("progress", v), 1.0, 0.0, 0.4).set_trans(Tween.TRANS_QUAD)
 	busy = false
 
+# «назад» of a V8Header: previous screen from the history (play screens are never returned to), else home.
+func back() -> void :
+	if busy:
+		return
+	while not history.is_empty():
+		var e: Array = history.pop_back()
+		var id: String = e[0]
+		if id == screen_id or not SCREENS.has(id):
+			continue
+		go(id, e[1], true, false)
+		return
+	if screen_id != "home":
+		go("home")
+
+# Android «назад» (and Esc on desktop): close the top popup, else the screen's own back, else the previous screen.
+func android_back() -> void :
+	if busy:
+		return
+	# full-screen views added straight to main (title, story and date scenes, profile card): only their own back
+	for i in range(get_child_count() - 1, -1, -1):
+		var v: Node = get_child(i)
+		if v in [screen_root, topbar, navbar, overlay, trans, finger] or not (v is CanvasItem and (v as CanvasItem).visible):
+			continue
+		if v.has_meta("v8_back"):
+			var cbv = v.get_meta("v8_back")
+			if cbv is Callable and (cbv as Callable).is_valid():
+				(cbv as Callable).call()
+		return
+	for i in range(overlay.get_child_count() - 1, -1, -1):
+		var r: Node = overlay.get_child(i)
+		if r.has_meta("closing") or not (r is CanvasItem and (r as CanvasItem).visible):
+			continue
+		if r.has_meta("v8_back"):
+			var cb = r.get_meta("v8_back")
+			if cb is Callable and (cb as Callable).is_valid():
+				(cb as Callable).call()
+			return
+		if r.has_meta("popup"):
+			if not r.get_meta("closable", true):
+				return
+			for c in r.get_children():
+				if c is RBox and c.has_meta("root"):
+					Common.close_popup(c)
+					return
+			r.queue_free()
+			return
+	if screen == null or not is_instance_valid(screen):
+		return
+	if screen.has_method("handle_back") and screen.call("handle_back"):
+		return
+	if screen.has_meta("v8_back"):
+		var cb2 = screen.get_meta("v8_back")
+		if cb2 is Callable and (cb2 as Callable).is_valid():
+			(cb2 as Callable).call()
+			return
+	if screen_id == "home":
+		return
+	if PLAY_BACK.has(screen_id):
+		leave_match()
+		return
+	back()
+
+# 0.8: leaving a running match (Android back or the house button of the match HUD): ask first, count the
+# table as a game without a win, then go to the screen the match came from. With the result window up
+# (the game is already saved) leave at once.
+func leave_match() -> void :
+	if busy or screen == null or not is_instance_valid(screen):
+		return
+	var to: String = PLAY_BACK.get(screen_id, "home")
+	var pm = screen.get("mode")
+	if screen_id == "v7play" and pm is String and pm == "v7tourney":
+		to = "v7tourney"
+	var over = screen.get("_v8_over")
+	if over is bool and over:
+		go(to)
+		return
+	var sc: = screen
+	Common.confirm(self, "Выйти из партии?", "Прогресс этой партии не сохранится.", "", 0, func():
+		if is_instance_valid(sc) and sc.has_method("_v8_record_loss"):
+			sc.call("_v8_record_loss")
+		go(to), {"yes_text": "Выйти", "no_text": "Играть"})
+
+func _notification(what: int) -> void :
+	if what == NOTIFICATION_READY:
+		get_tree().quit_on_go_back = false
+	elif what == NOTIFICATION_WM_GO_BACK_REQUEST:
+		android_back()
+
+func _unhandled_key_input(e: InputEvent) -> void :
+	if e is InputEventKey and e.pressed and not e.echo and e.keycode == KEY_ESCAPE:
+		android_back()
+		get_viewport().set_input_as_handled()
+
 func toast(text: String, icon: = "") -> void :
 	var w: = 560.0
-	var p: = UI.rbox("plum", Rect2((W - w) * 0.5, 130, w, 70), 35, 3, 12)
+	var y: = V8Header.CONTENT_Y + 12.0 if topbar and topbar.visible else 130.0
+	# 0.8: during a match the top of the screen is the HUD (goal, gems, tray): toasts sit just above the
+	# action buttons and stack upward, so they never cover the tray, the counters or the speech bubble
+	var in_match: = PLAY_BACK.has(screen_id) and not (topbar and topbar.visible)
+	if in_match:
+		y = get_viewport_rect().size.y - 172.0 - 82.0
+	for c in overlay.get_children():
+		if c.has_meta("v8_toast") and not c.is_queued_for_deletion() and not c.has_meta("fading"):
+			if in_match:
+				y = minf(y, float(c.get_meta("v8_toast")) - 82.0)
+			else:
+				y = maxf(y, float(c.get_meta("v8_toast")) + 82.0)
+	var p: = UI.rbox("plum", Rect2((W - w) * 0.5, y, w, 70), 35, 3, 12)
 	p.set_param("border_top", Color("ffe7a6")).set_param("border_bottom", Color("c58a2c"))
+	p.set_meta("v8_toast", y)
+	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	overlay.add_child(p)
 	var x0: = 20.0
 	if icon != "":
 		p.add_child(UI.tex(G.icon(icon), Rect2(8, 4, 62, 62)))
 		x0 = 72
-	var l: = UI.label(text, 22, Color.WHITE, Color(0.2, 0.05, 0.2), 3)
+	var fs: = 22
+	if UI.font("body", 800).get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > (w - x0 - 16) * 2.0:
+		fs = 19
+	var l: = UI.label(text, fs, Color.WHITE, Color(0.2, 0.05, 0.2), 3)
 	l.position = Vector2(x0, 0)
 	l.size = Vector2(w - x0 - 16, 70)
 	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -701,6 +851,7 @@ func toast(text: String, icon: = "") -> void :
 	UI.slide_in(p, Vector2(0, -60), 0.0, 0.35)
 	var t: Tween = p.create_tween()
 	t.tween_interval(2.0)
+	t.tween_callback(func(): p.set_meta("fading", true))
 	t.tween_property(p, "modulate:a", 0.0, 0.3)
 	t.tween_callback(p.queue_free)
 

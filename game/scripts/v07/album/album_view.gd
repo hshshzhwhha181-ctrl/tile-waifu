@@ -6,7 +6,9 @@ extends Control
 
 const D: = preload("res://scripts/v07/album/album_data.gd")
 const TABS: = [["stamps", "Марки"], ["sets", "Сервизы"], ["tables", "Столы"], ["photos", "Снимки"]]
-const TOP: = 214.0
+const HEAD_Y: = 24.0
+const TABS_Y: = HEAD_Y + 96.0 + 46.0
+const TOP: = TABS_Y + 58.0 + 14.0
 
 var main
 var W: = 720.0
@@ -30,6 +32,7 @@ static func open(m, which: = "stamps", closed: = Callable()) -> V7AlbumView:
 	var vs: Vector2 = m.get_viewport_rect().size
 	v.size = vs
 	v.set_meta("popup", true)
+	v.set_meta("v8_back", v.close)
 	m.overlay.add_child(v)
 	v._build()
 	return v
@@ -45,24 +48,20 @@ func _build() -> void :
 	add_child(bg)
 	bg.create_tween().tween_property(bg, "color:a", 0.94, 0.25)
 	Common.vignette(self, size, Color(0.35, 0.12, 0.2), 0.45)
-	var panel: = UI.rbox("graphite", Rect2(14, 64, W - 28, H - 84), 34, 4, 14)
+	var panel: = UI.rbox("graphite", Rect2(14, HEAD_Y + 100.0, W - 28, H - HEAD_Y - 120.0), 34, 4, 14)
 	panel.set_param("pattern", 1.0)
 	add_child(panel)
-	var rib: = Common.ribbon(self, "Альбом", Rect2(W * 0.5 - 200, 30, 400, 72), "pink", 34)
-	rib.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var x: = JButton.make("", "graphite", Rect2(W - 86, 34, 64, 64), null, 30)
-	x.add_child(UI.tex(G.icon("close"), Rect2(15, 15, 34, 34)))
-	x.pressed.connect(close)
-	add_child(x)
+	var hd: = V8Header.make(self, main, "Альбом", close)
+	hd.position.y = HEAD_Y
 
-	var sm: = UI.center_label(UI.label(_summary(), 18, UI.MUTED, UI.DARK, 3), Rect2(30, 108, W - 60, 28))
+	var sm: = UI.center_label(UI.label(_summary(), 18, UI.MUTED, UI.DARK, 3), Rect2(30, HEAD_Y + 106.0, W - 60, 28))
 	sm.name = "Summary"
 	add_child(sm)
 
 	var tw: = (W - 60) / TABS.size()
 	for i in TABS.size():
 		var id: String = TABS[i][0]
-		var b: = JButton.make(TABS[i][1], "pink" if id == tab else "graphite", Rect2(30 + i * tw, 140, tw - 8, 58), null, 22)
+		var b: = JButton.make(TABS[i][1], "pink" if id == tab else "graphite", Rect2(30 + i * tw, TABS_Y, tw - 8, 58), null, 22)
 		b.pressed.connect( func(): _switch(id))
 		add_child(b)
 		tab_nodes[id] = b
@@ -113,12 +112,12 @@ func _switch(id: String) -> void :
 		tab_nodes[k].queue_free()
 	tab_nodes.clear()
 	for c in get_children():
-		if c is JButton and c.position.y == 140:
+		if c is JButton and c.position.y == TABS_Y:
 			c.queue_free()
 	var tw: = (W - 60) / TABS.size()
 	for i in TABS.size():
 		var tid: String = TABS[i][0]
-		var b: = JButton.make(TABS[i][1], "pink" if tid == tab else "graphite", Rect2(30 + i * tw, 140, tw - 8, 58), null, 22)
+		var b: = JButton.make(TABS[i][1], "pink" if tid == tab else "graphite", Rect2(30 + i * tw, TABS_Y, tw - 8, 58), null, 22)
 		b.pressed.connect( func(): _switch(tid))
 		add_child(b)
 		tab_nodes[tid] = b
@@ -299,8 +298,7 @@ func _stamp(parent: Control, f: int, r: Rect2) -> void :
 		if on:
 			pip.colors(D.TIER_COLORS[k], D.TIER_COLORS[k].darkened(0.35))
 		card.add_child(pip)
-	var nl: = UI.center_label(UI.label(D.FACE_NAMES[f] if t > 0 else "", 12, UI.INK, UI.DARK, 3, "body", 900), Rect2(-4, r.size.y - 46, r.size.x + 8, 20))
-	card.add_child(nl)
+	# 0.8: no 12 px caption over the tile art — the stamp's name shows on tap (toast below)
 	_on_tap(card, func():
 		Sfx.play("pop")
 		var nxt: = 0
@@ -351,7 +349,7 @@ func _fill_sets() -> float:
 			tile.build(G.SKIN_LOOK.get(it.id, {}))
 			if not own:
 				tile.modulate = Color(0.4, 0.38, 0.45)
-			var rl: = UI.label(it.rar, 18, Color.WHITE, G.rar_color(it.rar).darkened(0.5), 4, "title", 900)
+			var rl: = UI.label(it.rar, 18, Color.WHITE, G.rar_color(it.rar).darkened(0.5), 4, "body", 900)
 			rl.position = Vector2(10, 6)
 			card.add_child(rl)
 			card.add_child(UI.center_label(UI.label(it.name.replace("Фишки ", ""), 17, UI.INK if not on else Color("3a2410"), UI.DARK if not on else Color(1, 0.95, 0.8, 0.5), 3, "body", 900), Rect2(0, 182, cw, 26)))

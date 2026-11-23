@@ -196,3 +196,56 @@ static func shift_cfg(table: int, partner: String) -> Dictionary:
 		"goal": "Выполняй заказы гостий · чаевые = кристаллы", 
 		"intro": "Гостьи заказывают пары из своей категории: цветы, небо, сладости, сокровища или зверей. Собери пару нужной категории, и заказ уйдёт к ней.", 
 	}
+
+
+# ---- 0.8: modes open by the player's single rank (G.RANKS). [tier, sub]; "daily" is open from the start.
+const GATES: = {
+	"daily": [0, 0], 
+	"blitz": [0, 2], 
+	"zen": [1, 0], 
+	"duel": [1, 1], 
+	"etude": [1, 2], 
+	"shift": [2, 0], 
+	"climb": [2, 1], 
+}
+
+static func gate_index(id: String) -> int:
+	var g: Array = GATES.get(id, [0, 0])
+	return int(g[0]) * 3 + int(g[1])
+
+static func gate_title(id: String) -> String:
+	var g: Array = GATES.get(id, [0, 0])
+	return G.rank_title(int(g[0]), int(g[1]))
+
+# a 0.7 player who already has progress in a mode keeps it open (no taking away what was played)
+static func _played(id: String) -> bool:
+	var s: = st()
+	match id:
+		"blitz":
+			return int(G.S.get("blitz_best", 0)) > 0
+		"climb":
+			return int(s.climb_runs) > 0 or int(s.climb_best) > 0
+		"etude":
+			return etude_total() > 0
+		"shift":
+			return int(s.shift_runs) > 0 or int(s.shift_best) > 0
+		"duel":
+			var hs = G.S.get("v6_heroines", {})
+			return hs is Dictionary and not (hs.get("duel_wins", {}) as Dictionary).is_empty()
+	return false
+
+static func mode_open(id: String) -> bool:
+	return G.rank_index(int(G.S.get("rp", 0))) >= gate_index(id) or _played(id)
+
+static func locked_text(id: String) -> String:
+	return "Откроется на ранге %s" % gate_title(id)
+
+
+# V8League (Stream B): "my_week" / "my_quarter".
+static func league(fn: String) -> Dictionary:
+	match fn:
+		"my_week":
+			return V8League.my_week()
+		"my_quarter":
+			return V8League.my_quarter()
+	return {}

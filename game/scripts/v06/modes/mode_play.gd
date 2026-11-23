@@ -196,17 +196,17 @@ func _set_lamp(c: Control, lit: bool, animate: = true) -> void :
 func _climb_strip() -> void :
 	var w: = strip.size.x
 	var p: = _panel(Rect2(0, 0, w, strip_h))
-	var fl: = UI.label("ЭТАЖ", 13, Color("cbb5dc"), Color.WHITE, 0, "body", 900)
-	fl.position = Vector2(18, 6)
+	var fl: = UI.label("ЭТАЖ", 16, Color("cbb5dc"), Color.WHITE, 0, "body", 900)
+	fl.position = Vector2(18, 2)
 	p.add_child(fl)
 	var fn: = UI.title(str(int(run.floor)), 40, Color("ffe7a6"), Color("5a1a6a"))
-	fn.position = Vector2(16, 14)
+	fn.position = Vector2(16, 18)
 	fn.size = Vector2(80, 50)
 	p.add_child(fn)
 	if int(run.floor) % 5 == 0:
 		var g: = UI.rbox("red", Rect2(84, 10, 86, 26), 13, 2, 4)
 		p.add_child(g)
-		g.add_child(UI.center_label(UI.label("СТРАЖ", 14, Color.WHITE, Color("6a1020"), 3, "body", 900), Rect2(0, 0, 86, 26)))
+		g.add_child(UI.center_label(UI.label("СТРАЖ", 16, Color.WHITE, Color("6a1020"), 3, "body", 900), Rect2(0, 0, 86, 26)))
 
 	lamp_nodes.clear()
 	var lx: = 186.0
@@ -230,8 +230,10 @@ func _climb_strip() -> void :
 		if bx < 400:
 			break
 	if ids.is_empty():
-		var hl: = UI.label("благословения появятся после этажа", 14, Color("cbb5dc"))
-		hl.position = Vector2(w - 300, 24)
+		var hl: = UI.label("благословения появятся после этажа", 16, Color("cbb5dc"))
+		hl.size = Vector2(310, 26)
+		hl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		hl.position = Vector2(w - 324, 22)
 		p.add_child(hl)
 
 func _climb_fail() -> void :
@@ -280,14 +282,15 @@ func _climb_clear() -> void :
 	G.add_aff(partner, 4)
 	G.task_add("levels")
 	G.add_pass_xp(40)
-	G.save()
+	var ca: = V8PlayRules.award("other", V8PlayRules.climb_rp(f), true)
 	Sfx.play("win", 1.1)
 	Sfx.say(partner, "win")
+	_v8_end_overlays()
 	await get_tree().create_timer(0.35).timeout
 	if is_inside_tree():
-		_floor_overlay(f, gems, chest, mile_gems, record)
+		_floor_overlay(f, gems, chest, mile_gems, record, ca)
 
-func _floor_overlay(f: int, gems: int, chest: bool, mile_gems: int, record: bool) -> void :
+func _floor_overlay(f: int, gems: int, chest: bool, mile_gems: int, record: bool, ca: = {}) -> void :
 	var root: = Control.new()
 	root.size = size
 	root.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -307,10 +310,15 @@ func _floor_overlay(f: int, gems: int, chest: bool, mile_gems: int, record: bool
 		line += " · сундук стража · фонарь +1"
 	if mile_gems > 0:
 		line += " · веха +%d" % mile_gems
+	if int(ca.get("rp", 0)) > 0:
+		line += " · " + V8PlayRules.award_text(ca)
 	var rl: = UI.center_label(UI.label(line, 22, Color("ffe7a6"), UI.DARK, 4, "body", 900), Rect2(20, 176, W - 40, 34))
 	root.add_child(rl)
-	if record:
-		root.add_child(UI.center_label(UI.label("Новый рекорд лестницы!", 20, Color("9fe8d0"), UI.DARK, 3, "body", 900), Rect2(20, 210, W - 40, 30)))
+	var note: = V8PlayRules.rankup_text(ca)
+	if note == "" and record:
+		note = "Новый рекорд лестницы!"
+	if note != "":
+		root.add_child(UI.center_label(UI.label(note, 20, Color("ffd34d") if V8PlayRules.rankup_text(ca) != "" else Color("9fe8d0"), UI.DARK, 3, "body", 900), Rect2(20, 210, W - 40, 30)))
 	if chest:
 		Fx.burst(root, Vector2(W * 0.5, 190), "confetti", 70, Color.WHITE, 1.2)
 		Sfx.play("reveal_ssr", 1.1, -2)
@@ -411,7 +419,8 @@ func _climb_over(by_choice: bool) -> void :
 	var reached: = int(run.floor) - (0 if by_choice else 1)
 	run.gems = int(run.gems) + gained
 	gained = 0
-	G.save()
+	_v8_end_overlays()
+	V8PlayRules.award("other", 0, maxi(0, reached) > 0)
 	Sfx.play("win" if by_choice else "deny", 1.0 if by_choice else 0.6)
 	var p: = Common.popup(main, "Восхождение окончено", 600, "cream", 660.0, false)
 	p.add_child(UI.center_label(UI.label("пройдено этажей", 20, Color("cbb5dc")), Rect2(0, 54, 660, 30)))
@@ -457,7 +466,7 @@ func _etude_strip() -> void :
 		etude_star_nodes.append(s)
 	var best: = V6ModesData.etude_stars(etude_i)
 	if best > 0:
-		var bl: = UI.label("лучшее: %s" % "★".repeat(best), 14, Color("ffd98a"))
+		var bl: = UI.label("лучшее: %s" % "★".repeat(best), 16, Color("ffd98a"))
 		bl.position = Vector2(w - 330, 22)
 		p.add_child(bl)
 
@@ -501,7 +510,8 @@ func _etude_clear() -> void :
 	G.add_aff("mc", 3)
 	G.task_add("levels")
 	G.add_pass_xp(50)
-	G.save()
+	var ea: = V8PlayRules.award("etude", V8PlayRules.etude_rp(stars), true)
+	_v8_end_overlays()
 	Sfx.play("win")
 	await get_tree().create_timer(0.3).timeout
 	if not is_inside_tree():
@@ -534,6 +544,7 @@ func _etude_clear() -> void :
 	var again: = JButton.make("Ещё раз", "glass", Rect2(380, 400, 240, 96), null, 26)
 	again.pressed.connect( func(): main.go("arena", {"mode": "etude", "etude": etude_i, "partner": partner, "retry": randi()}))
 	p.add_child(again)
+	_v8_popup_rank(p, 388.0, ea)
 	if gems > 0:
 		main.fly_gems(p.position + Vector2(330, 240), 6)
 	await get_tree().create_timer(0.5).timeout
@@ -561,7 +572,7 @@ func _shift_strip() -> void :
 	tb.add_child(UI.tex(G.icon("gem"), Rect2(tw * 0.5 - 26, 8, 52, 52)))
 	tips_lbl = UI.center_label(UI.label("0", 30, Color("ffe7a6"), UI.DARK, 4, "body", 900), Rect2(0, 58, tw, 40))
 	tb.add_child(tips_lbl)
-	tb.add_child(UI.center_label(UI.label("чаевые", 15, Color("e8d2a8")), Rect2(0, 96, tw, 24)))
+	tb.add_child(UI.center_label(UI.label("чаевые", 16, Color("e8d2a8")), Rect2(0, 96, tw, 24)))
 
 func _seat_draw(i: int) -> void :
 	var s: Dictionary = seats[i]
@@ -576,7 +587,7 @@ func _seat_draw(i: int) -> void :
 	card.modulate = Color.WHITE
 	var col: Color = G.HEROES[s.hero].color
 	card.add_child(Common.avatar(s.hero, Rect2(6, 8, 74, 74), "gold" if G.hero_unlocked(s.hero) else "plum"))
-	card.add_child(UI.center_label(UI.label(G.HEROES[s.hero].name, 14, Color.WHITE, UI.DARK, 3, "body", 900), Rect2(0, 84, 86, 22)))
+	card.add_child(UI.center_label(UI.label(G.HEROES[s.hero].name, 16, Color.WHITE, UI.DARK, 3, "body", 900), Rect2(0, 83, 86, 24)))
 	var c: Array = G.CATS[s.cat]
 	var ic: = UI.tex(G.tile_tex(int(c[0])), Rect2(86, 10, 48, 62))
 	card.add_child(ic)
@@ -584,9 +595,10 @@ func _seat_draw(i: int) -> void :
 	nl.position = Vector2(cw - 54, 22)
 	nl.name = "Need"
 	card.add_child(nl)
-	var cl: = UI.label(str(c[3]), 14, Color("e9dcff"))
-	cl.position = Vector2(88, 76)
-	cl.size = Vector2(cw - 92, 22)
+	var cl: = UI.label(str(c[3]), 16, Color("f3ecff"), UI.DARK, 2, "body", 900)
+	cl.position = Vector2(86, 74)
+	cl.size = Vector2(cw - 90, 24)
+	cl.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	cl.clip_text = true
 	card.add_child(cl)
 	var bar_bg: = UI.rbox("plum", Rect2(8, strip_h - 20, cw - 16, 10), 5, 1, 2)
@@ -657,11 +669,17 @@ func _seat_arrive(i: int) -> void :
 	var lines: Array = V6ModesData.ORDER_LINES[h]
 	_seat_bubble(i, lines[randi() % lines.size()])
 
+# 0.8: one guest bubble at a time, no wider than her seat, so two never cover each other
+var _seat_bub: Control = null
+
 func _seat_bubble(i: int, text: String) -> void :
 	var card: Control = seats[i].node
-	var gp: = strip.position + card.position + Vector2(10, strip_h - 6)
-	var b: = Common.bubble(self, text, gp, 260, true)
+	if _seat_bub and is_instance_valid(_seat_bub):
+		_seat_bub.queue_free()
+	var gp: = strip.position + card.position + Vector2(2, strip_h - 6)
+	var b: = Common.bubble(self, text, gp, maxf(170.0, card.size.x - 4.0), true)
 	b.z_index = 45
+	_seat_bub = b
 	var t: Tween = b.create_tween()
 	t.tween_interval(1.8)
 	t.tween_property(b, "modulate:a", 0.0, 0.3)
@@ -802,14 +820,15 @@ func _shift_end() -> void :
 	G.S.gems += tips
 	G.task_add("levels")
 	G.add_aff(partner, 6)
-	G.save()
+	var sa: = V8PlayRules.award("other", V8PlayRules.shift_rp(served), served > missed)
+	_v8_end_overlays()
 	Sfx.play("win")
 	Sfx.say(partner, "win")
 	var p: = Common.popup(main, "Смена закрыта", 560, "cream", 660.0, false)
 	p.add_child(UI.center_label(UI.label("чаевые", 20, Color("cbb5dc")), Rect2(0, 54, 660, 30)))
 	p.add_child(UI.center_label(UI.title(str(tips), 84, Color("ffe7a6"), Color("5a1a6a")), Rect2(0, 80, 660, 110)))
 	p.add_child(UI.center_label(UI.label("Гостий обслужено: %d · ушли без заказа: %d" % [served, missed], 21, Color("fff1dc")), Rect2(0, 196, 660, 30)))
-	p.add_child(UI.center_label(UI.label("Новый рекорд чайной!" if record else "Рекорд: %d" % int(s.shift_best), 22, Color("ffd34d") if record else Color("d9c4e6"), UI.DARK, 3, "body", 900), Rect2(0, 234, 660, 34)))
+	p.add_child(UI.center_label(UI.label(("Новый рекорд чайной!" if record else "Рекорд: %d" % int(s.shift_best)), 22, Color("ffd34d") if record else Color("d9c4e6"), UI.DARK, 3, "body", 900), Rect2(0, 234, 660, 34)))
 	p.add_child(UI.center_label(UI.label("Каждая гостья: +5 симпатии · твои героини дают чаевые ×1,5", 17, Color("cbb5dc")), Rect2(0, 276, 660, 28)))
 	var hx: = 330.0 - 5 * 34.0
 	for h in V6ModesData.GUESTS:
@@ -823,6 +842,7 @@ func _shift_end() -> void :
 	var back: = JButton.make("К режимам", "glass", Rect2(380, 410, 240, 96), null, 26)
 	back.pressed.connect( func(): main.go("modes"))
 	p.add_child(back)
+	_v8_popup_rank(p, 392.0, sa)
 	if tips > 0:
 		main.fly_gems(p.position + Vector2(330, 140), 8)
 

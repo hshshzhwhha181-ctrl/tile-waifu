@@ -219,7 +219,13 @@ func _process(dt: float) -> void :
 
 func _on_deal() -> void :
 	_refresh_chip()
-	_pulse("Стиль: %s" % d.name)
+	# 0.8: the style name sits in the note slot under the goal plate (ends left of the style chip, above the
+	# tray), not as a float over the portrait card and the tray
+	if play.has_method("v8_note"):
+		UI.punch(chip, 0.16)
+		play.v8_note("Стиль: %s" % d.name, col.lightened(0.55), 2.4)
+	else:
+		_pulse("Стиль: %s" % d.name, chip.position + Vector2(chip.size.x * 0.5, 130))
 	if h == "yue":
 		await get_tree().create_timer(0.5).timeout
 		if is_instance_valid(board):

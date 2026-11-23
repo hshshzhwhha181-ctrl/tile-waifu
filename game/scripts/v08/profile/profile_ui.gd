@@ -26,7 +26,8 @@ const T: = {
 	"code.go": "Перенести прогресс",
 	"code.back": "Назад",
 	"code.empty": "Сначала вставь код",
-	"code.show_d": "Введи этот код на новом телефоне: «Профиль» → «Ввести код». Не показывай его другим, по нему можно забрать твой прогресс.",
+	"code.show_d": "Нажми «Скопировать» и сохрани код в заметках или отправь себе в мессенджер. На новом телефоне: «Профиль» → «Ввести код» → «Вставить». Не показывай код другим: по нему можно забрать твой прогресс.",
+	"code.len": "%d %s · переносится копированием, вручную не набирается",
 	"code.copy": "Скопировать",
 	"code.copied": "Код скопирован",
 	"code.confirm_t": "Перенести прогресс?",
@@ -42,15 +43,15 @@ const T: = {
 	"profile.saved": "Профиль сохранён",
 	"profile.since": "ID %s · в чайной с %s",
 	"profile.rank_total": "Очки ранга: %d",
-	"profile.rank_next": "%d / %d до %s",
+	"profile.rank_next": "%d / %d до ранга %s",
 	"profile.rank_top": "Высшая ступень",
 	"profile.rank_note": "Очки ранга дают все режимы. Ниже начала ступени ранг не опускается.",
 	"profile.league": "Лига и квартал",
 	"profile.week": "Лига недели",
 	"profile.quarter": "Квартал",
-	"profile.place": "#%d из %d",
-	"profile.pts": "%d очк.",
-	"profile.league_none": "Сыграй в турнире недели",
+	"profile.place": "#%s из %s",
+	"profile.pts": "%s очк.",
+	"profile.league_none": "Сыграй стол турнира",
 	"profile.league_open": "Открыть турнир",
 	"profile.stats": "Статистика",
 	"profile.stats_sum": "Пройдено столов Пути: %d · звёзд: %d · яку: %d из %d",
@@ -90,31 +91,13 @@ static func cls(name: String) -> Script:
 
 
 static func random_nick() -> String:
-	var pop: = cls("V8Population")
-	if pop != null:
-		for m in ["random_nick", "nick_random", "make_nick", "gen_nick", "new_nick"]:
-			if pop.has_method(m):
-				var n = pop.call(m)
-				if n is String and G.nick_error(n) == "":
-					return n
-	return V8Nicks.random()
+	# shared with the population generator (Stream B): same style, never a population nick
+	return V8Population.random_nick()
 
 
-# {week: {league_tier, place, points, group_size}, quarter: {place, total, points}} — keys present only when available.
+# {week: {league_tier, place, points, group_size, ...}, quarter: {place, total, points, ...}}
 static func league_info() -> Dictionary:
-	var out: = {}
-	var L: = cls("V8League")
-	if L == null:
-		return out
-	if L.has_method("my_week"):
-		var w = L.call("my_week")
-		if w is Dictionary and w.has("place"):
-			out["week"] = w
-	if L.has_method("my_quarter"):
-		var q = L.call("my_quarter")
-		if q is Dictionary and q.has("place"):
-			out["quarter"] = q
-	return out
+	return {"week": V8League.my_week(), "quarter": V8League.my_quarter()}
 
 
 # ---- title screen ----------------------------------------------------------------------------
@@ -336,13 +319,15 @@ static func show_code_popup(main) -> RBox:
 	var d: = UI.label(s("code.show_d"), 20, UI.INK, UI.DARK, 2, "body", 800)
 	d.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	d.position = Vector2(36, 60)
-	d.size = Vector2(w - 72, 100)
+	d.size = Vector2(w - 72, 140)
 	p.add_child(d)
-	var te: = code_field(Rect2(36, 176, w - 72, 400), false)
+	var te: = code_field(Rect2(36, 212, w - 72, 356), false)
 	te.text = code
 	p.add_child(te)
-	var info: = UI.label("%d символов" % code.length(), 16, UI.MUTED)
-	info.position = Vector2(40, 584)
+	var info: = UI.label(s("code.len") % [code.length(), V8PlayRules.plural(code.length(), "символ", "символа", "символов")], 16, UI.MUTED)
+	info.position = Vector2(40, 580)
+	info.size = Vector2(w - 80, 24)
+	info.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	p.add_child(info)
 	var cp: = JButton.make(s("code.copy"), "gold", Rect2(60, 630, w - 120, 96), null, 30)
 	cp.pressed.connect( func(): copy_code(main, code))

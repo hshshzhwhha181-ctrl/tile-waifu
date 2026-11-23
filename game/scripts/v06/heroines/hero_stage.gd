@@ -87,26 +87,43 @@ func _build_full(opts: Dictionary) -> void :
 	add_child(counter)
 	var nm: = UI.label(G.HEROES[hero_id].name, 17, Color.WHITE, Color(0.2, 0.05, 0.2), 3, "body", 900)
 	nm.position = Vector2(12, 2)
-	nm.size = Vector2(size.x - 70, 24)
+	nm.size = Vector2(size.x - 24, 24)
+	nm.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	nm.clip_text = true
 	counter.add_child(nm)
+	# 0.8: the bond tag («Симпатия N · …») gets its own pill above the name plate, never on the name's line
 	var tag: String = opts.get("tag", "")
 	if tag != "":
-		var tl: = UI.label(tag, 12, Color("ffd98a"), Color(0.1, 0.05, 0.2), 2, "body", 900)
-		tl.position = Vector2(size.x - 120, 6)
-		tl.size = Vector2(110, 20)
-		tl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-		counter.add_child(tl)
-	var gb: = UI.rbox("plum", Rect2(12, 32, size.x - 24, 16), 8, 1, 2)
+		var f: = UI.font("body", 900)
+		var fs: = 15
+		var maxw: = size.x - 20.0
+		while fs > 13 and f.get_string_size(tag, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x + 20.0 > maxw:
+			fs -= 1
+		var pw: = minf(maxw, f.get_string_size(tag, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x + 20.0)
+		var pill: = UI.rbox("plum", Rect2(size.x - pw - 8, size.y - COUNTER_H - 30, pw, 26), 13, 2, 4)
+		pill.colors(Color(0.2, 0.1, 0.24, 0.94), Color(0.1, 0.05, 0.14, 0.96)).borders(Color("ffe7a6"), Color("c58a2c"))
+		add_child(pill)
+		var tl: = UI.label(tag, fs, Color("ffd98a"), Color(0.1, 0.05, 0.2), 2, "body", 900)
+		tl.position = Vector2(8, 0)
+		tl.size = Vector2(pw - 16, 26)
+		tl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		tl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		tl.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		tl.clip_text = true
+		pill.add_child(tl)
+	var gb: = UI.rbox("plum", Rect2(12, 29, size.x - 24, 22), 11, 1, 2)
 	gb.colors(Color(0, 0, 0, 0.5), Color(0, 0, 0, 0.35)).set_param("shadow_color", Color(0, 0, 0, 0))
 	counter.add_child(gb)
 	gauge_w = gb.size.x - 4
-	gauge = UI.rbox("gold", Rect2(2, 2, 8, 12), 6, 0, 2)
+	gauge = UI.rbox("gold", Rect2(2, 2, 8, 18), 9, 0, 2)
 	gauge.colors(Color("fff0b8"), col).set_param("shadow_color", Color(0, 0, 0, 0))
 	gb.add_child(gauge)
-	gauge_lbl = UI.label("", 12, Color.WHITE, Color(0.1, 0.03, 0.12), 3, "body", 900)
+	# 0.8: 16 px (was 12), readable at arm's length
+	gauge_lbl = UI.label("", 16, Color.WHITE, Color(0.1, 0.03, 0.12), 4, "body", 900)
 	gauge_lbl.size = gb.size
-	gauge_lbl.position = Vector2(0, -3)
+	gauge_lbl.position = Vector2(0, -1)
+	gauge_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	gauge_lbl.clip_text = true
 	gauge_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	gb.add_child(gauge_lbl)
 	_sparks = Fx.particles("sparkle", 14, 1.0)
@@ -158,7 +175,7 @@ func set_charge(cur: int, total: int) -> void :
 		queue_redraw()
 	elif gauge:
 		gauge.create_tween().tween_property(gauge, "size:x", maxf(8.0, gauge_w * f), 0.25).set_trans(Tween.TRANS_QUAD)
-		gauge_lbl.text = "КОСНИСЬ: УМЕНИЕ" if cur >= need else "умение %d/%d" % [cur, need]
+		gauge_lbl.text = ("КОСНИСЬ: УМЕНИЕ" if size.x > 220.0 else "УМЕНИЕ!") if cur >= need else "умение %d/%d" % [cur, need]
 	if cur >= need and not is_ready:
 		_set_ready(true)
 	elif cur < need and is_ready:
@@ -324,6 +341,9 @@ func say_text(text: String, dur: = 2.6, talk: = true) -> void :
 	if text == "":
 		return
 	var p: Control = get_parent()
+	# 0.8: no speech over a window (overflow / result) of the match
+	if p and (p.get("_v8_modal") == true or p.get("_v8_over") == true):
+		return
 	if _shared_bubble and is_instance_valid(_shared_bubble):
 		_shared_bubble.queue_free()
 	var w: = 300.0
@@ -335,6 +355,18 @@ func say_text(text: String, dur: = 2.6, talk: = true) -> void :
 	bubble_node.position = Vector2(clampf(bx, 6.0, p.size.x - w - 6.0), clampf(hp.y - bubble_node.size.y - 4.0, 4.0, 400.0))
 	if compact:
 		bubble_node.position = Vector2(position.x + size.x * 0.6, position.y + 2.0)
+	elif left_side:
+		# 0.8: in a match the bubble hangs under the portrait card (tail up), never over the goal / shard plate
+		# at HUD height; the combo pill keeps the left side of that band.
+		var top: = position.y + size.y + 16.0
+		var br = p.get("board_rect")
+		if br is Rect2:
+			top = maxf(top, (br as Rect2).position.y + 6.0)
+		bubble_node.position = Vector2(clampf(position.x + size.x - w, 6.0, p.size.x - w - 6.0), top)
+		bubble_node.pivot_offset = Vector2(w * 0.8, 0)
+		for c in bubble_node.get_children():
+			if c is Polygon2D:
+				(c as Polygon2D).polygon = PackedVector2Array([Vector2(w - 84, 6), Vector2(w - 44, 6), Vector2(w - 40, -22)])
 	_shared_bubble = bubble_node
 	var b: = bubble_node
 	var t: Tween = b.create_tween()

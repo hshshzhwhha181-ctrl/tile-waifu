@@ -19,6 +19,9 @@ var pity_lbl: Label
 var trial_btn: JButton
 var last_n: = 10
 
+const TABS_Y: = V8Header.CONTENT_Y + 8.0
+const TOP: = TABS_Y + 60.0 + 12.0
+
 func build(m, args: Dictionary) -> void :
 	main = m
 	W = size.x
@@ -54,6 +57,8 @@ func _build_banner() -> void :
 	add_child(banner_root)
 	var b: Dictionary = G.BANNERS[banner_i]
 	var newbie: bool = b.get("newbie", false)
+	V8Header.make(banner_root, main, "Желания", main.back)
+	set_meta("v8_back", main.back)
 
 	var shown: Array = []
 	for i in G.BANNERS.size():
@@ -64,7 +69,10 @@ func _build_banner() -> void :
 	for k in shown.size():
 		var i: int = shown[k]
 		var bb: Dictionary = G.BANNERS[i]
-		var tb: = JButton.make(bb.name, "lav" if i == banner_i else "glass", Rect2(24 + k * (tw + 10), 124, tw, 60), null, 22)
+		var tfs: = 22
+		while tfs > 16 and UI.font("body", 900).get_string_size(bb.name, HORIZONTAL_ALIGNMENT_LEFT, -1, tfs).x > tw - 28:
+			tfs -= 1
+		var tb: = JButton.make(bb.name, "lav" if i == banner_i else "glass", Rect2(24 + k * (tw + 10), TABS_Y, tw, 60), null, tfs)
 		tb.pressed.connect( func():
 			if i != banner_i:
 				banner_i = i
@@ -75,7 +83,7 @@ func _build_banner() -> void :
 			tb.add_child(sale)
 			sale.add_child(UI.center_label(UI.label("−20%", 15, Color.WHITE, Color("6a1020"), 3), Rect2(0, 0, 70, 28)))
 
-	var cr: = Rect2(24, 198, W - 48, H - 132 - 198 - 196)
+	var cr: = Rect2(24, TOP, W - 48, H - 132 - TOP - 196)
 	var frame: = UI.rbox("gold", cr, 30, 6, 16)
 	banner_root.add_child(frame)
 	var it: Dictionary = G.ITEM[b.item]
@@ -132,7 +140,7 @@ func _build_banner() -> void :
 		var ev: = UI.label("%d / %d" % [mini(ex, G.EXCHANGE_COST), G.EXCHANGE_COST], 24, Color.WHITE, Color(0.2, 0.05, 0.2), 4, "body", 900)
 		ev.position = Vector2(pw - 250, 32)
 		ip.add_child(ev)
-		var xb: = JButton.make(V6Txt.s("summon.exchange_btn"), "gold" if ex >= G.EXCHANGE_COST else "glass", Rect2(pw - 250, 72, 232, 50), null, 19)
+		var xb: = JButton.make(V6Txt.s("summon.exchange_btn") % G.EXCHANGE_COST, "gold" if ex >= G.EXCHANGE_COST else "glass", Rect2(pw - 250, 72, 232, 50), null, 19)
 		xb.pressed.connect( func(): _exchange())
 		ip.add_child(xb)
 	UI.pop_in(frame, 0.0, 0.92)
@@ -169,6 +177,12 @@ func _exchange() -> void :
 		return
 	if G.owns(b.item):
 		main.toast(V6Txt.s("summon.have") % G.ITEM[b.item].name, "wardrobe")
+		return
+	# 0.8: no currency is spent without a question (spec «Общие правила кода»)
+	Common.confirm(main, V6Txt.s("summon.exchange"), "Обменять %d звёзд обмена на «%s»?" % [G.EXCHANGE_COST, G.ITEM[b.item].name], "ticket", G.EXCHANGE_COST, func(): _exchange_do(b), {"balance_check": false, "yes_text": "Обменять"})
+
+func _exchange_do(b: Dictionary) -> void :
+	if int(G.S.ex) < G.EXCHANGE_COST or G.owns(b.item):
 		return
 	G.S.ex = int(G.S.ex) - G.EXCHANGE_COST
 	G.give(b.item)
@@ -356,20 +370,21 @@ func _card(r: Dictionary, sz: Vector2) -> Control:
 	am.set_shader_parameter("bottom_shade", 0.8)
 	front.add_child(art)
 	var fs: = 14 if sz.x < 200 else 26
-	var rl: = UI.label(r.rar, fs + 8, Color.WHITE, col.darkened(0.5), 5, "title", 900)
+	var rl: = UI.label(r.rar, fs + 8, Color.WHITE, col.darkened(0.5), 5, "title" if fs + 8 >= UI.TITLE_MIN else "body", 900)
 	rl.position = Vector2(8, 2)
 	front.add_child(rl)
 	var nl: = UI.label(r.name, fs, Color.WHITE, Color(0.2, 0.05, 0.2), 4, "body", 900)
+	# autowrap first: with it off, the label's minimum width is the whole line and size.x would grow past the card
+	nl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	nl.position = Vector2(6, sz.y - (44 if sz.x < 200 else 80))
 	nl.size = Vector2(sz.x - 12, 40 if sz.x < 200 else 70)
-	nl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	nl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	nl.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
 	front.add_child(nl)
 	if r.get("new", false):
-		var nb: = UI.rbox("red", Rect2(sz.x - 58, -10, 64, 26), 12, 2, 4)
+		var nb: = UI.rbox("red", Rect2(sz.x - 84, -10, 90, 28), 13, 2, 4)
 		front.add_child(nb)
-		nb.add_child(UI.center_label(UI.label("NEW", 14, Color.WHITE), Rect2(0, 0, 64, 26)))
+		nb.add_child(UI.center_label(UI.label(V6Txt.s("common.new"), 15, Color.WHITE, Color("6a1020"), 2, "body", 900), Rect2(0, 0, 90, 28)))
 	return c
 
 func _flip(c: Control, r: Dictionary) -> void :
@@ -401,6 +416,7 @@ func _showcase(r: Dictionary) -> void :
 	var bg: = ColorRect.new()
 	bg.size = size
 	bg.color = Color(0.06, 0.02, 0.1, 0.92)
+	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	showcase.add_child(bg)
 	Common.rays(showcase, Vector2(W * 0.5, H * 0.42), 1500, Color(1, 0.82, 0.35, 0.8), 18, 0.05, 1.0)
 	Common.rays(showcase, Vector2(W * 0.5, H * 0.42), 900, Color(1, 0.6, 0.85, 0.5), 9, -0.08, 0.7)
@@ -442,6 +458,9 @@ func _showcase(r: Dictionary) -> void :
 	var tt: Tween = tap.create_tween().set_loops()
 	tt.tween_property(tap, "modulate:a", 0.3, 0.6)
 	tt.tween_property(tap, "modulate:a", 1.0, 0.6)
+	# 0.8: a tap anywhere continues (the backdrop and art used to swallow the tap, found by the --pt playtest)
+	for c in showcase.find_children("*", "Control", true, false):
+		(c as Control).mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var done: = [false]
 	showcase.gui_input.connect( func(e):
 		if e is InputEventMouseButton and e.pressed:
@@ -489,6 +508,14 @@ func _close_seq() -> void :
 	main.refresh_currency()
 	Sfx.music("summon")
 	_build_banner()
+
+# Android «назад» during the pull sequence: close the results when they are shown, otherwise ignore.
+func handle_back() -> bool:
+	if seq and is_instance_valid(seq):
+		if results_shown and not flipping:
+			_close_seq()
+		return true
+	return false
 
 func demo_skip() -> bool:
 

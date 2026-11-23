@@ -72,8 +72,9 @@ static func bubble(parent: Control, text: String, pos: Vector2, width: = 300.0, 
 	l.size = Vector2(width - 36, 0)
 	l.custom_minimum_size = Vector2(width - 36, 0)
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	var lines: float = max(1.0, ceil(UI.font().get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, 22).x / (width - 40)))
-	var h: float = 26.0 + lines * 30.0
+	# 0.8: size the bubble from the wrapped text (same font, weight and width as the label), not a width guess
+	var th: float = UI.font("body", 800).get_multiline_string_size(text, HORIZONTAL_ALIGNMENT_CENTER, width - 40, 22, -1, TextServer.BREAK_MANDATORY | TextServer.BREAK_WORD_BOUND | TextServer.BREAK_ADAPTIVE).y
+	var h: float = maxf(56.0, 30.0 + th)
 	var tail: = Polygon2D.new()
 	tail.color = Color(0.12, 0.11, 0.13, 0.97)
 	tail.polygon = PackedVector2Array([Vector2(40, h - 6), Vector2(80, h - 6), Vector2(30, h + 22)]) if tail_left else PackedVector2Array([Vector2(width - 80, h - 6), Vector2(width - 40, h - 6), Vector2(width - 30, h + 22)])
@@ -104,7 +105,7 @@ static func ribbon(parent: Control, text: String, rect: Rect2, pal: = "pink", si
 	b.add_child(l)
 	return b
 
-static func icon_button(parent: Control, icon: String, text: String, rect: Rect2, cb: Callable, badge: = false) -> Control:
+static func icon_button(parent: Control, icon: String, text: String, rect: Rect2, cb: Callable, badge: = false, fsize: = 16) -> Control:
 	var c: = Control.new()
 	c.position = rect.position
 	c.size = rect.size
@@ -117,7 +118,7 @@ static func icon_button(parent: Control, icon: String, text: String, rect: Rect2
 	c.add_child(disc)
 	c.add_child(UI.tex(G.icon(icon), Rect2(rect.size.x * 0.21, rect.size.x * 0.2, rect.size.x * 0.58, rect.size.x * 0.58)))
 	if text != "":
-		c.add_child(UI.center_label(UI.label(text, 16, UI.INK, UI.DARK, 4), Rect2(-20, rect.size.x - 10, rect.size.x + 40, 24)))
+		c.add_child(UI.center_label(UI.label(text, fsize, UI.INK, UI.DARK, 4, "body", 900 if fsize > 16 else 800), Rect2(-24, rect.size.x - 10, rect.size.x + 48, fsize + 8)))
 	if badge:
 		var d: = UI.rbox("gold", Rect2(rect.size.x - 18, 2, 14, 14), 7, 1, 3)
 		d.colors(Color("ffe7a6"), Color("ff8fb0"))
@@ -152,6 +153,7 @@ static func popup(main, title: String, h: float, pal: = "cream", w: = 660.0, clo
 	root.size = vs
 	root.mouse_filter = Control.MOUSE_FILTER_STOP
 	root.set_meta("popup", true)
+	root.set_meta("closable", closable)
 	main.overlay.add_child(root)
 	var dim: = ColorRect.new()
 	dim.size = vs
@@ -208,10 +210,16 @@ static func chip(parent: Control, icon: Texture2D, text: String, rect: Rect2, pa
 	if icon:
 		b.add_child(UI.tex(icon, Rect2(-6, -8, rect.size.y + 16, rect.size.y + 16)))
 		x0 = rect.size.y + 8
+	# 0.8: shrink a long line to fit the pill (down to 14 px), never run past its border
+	var avail: = rect.size.x - x0 - 12.0
+	var fnt: = UI.font("body", 900)
+	while fsize > 14 and fnt.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, fsize).x > avail:
+		fsize -= 1
 	var l: = UI.label(text, fsize, Color.WHITE if pal in ["plum", "pink", "lav", "red"] else UI.INK, Color(0.2, 0.05, 0.2, 0.9) if pal in ["plum", "pink", "lav", "red"] else Color.WHITE, 3, "body", 900)
 	l.position = Vector2(x0, 0)
 	l.size = Vector2(rect.size.x - x0 - 10, rect.size.y)
 	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	l.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	l.name = "L"
 	b.add_child(l)
 	return b
@@ -277,7 +285,8 @@ static func rank_emblem(parent: Control, r: Rect2, tier: int, sub: int) -> Contr
 	gem.modulate = Color(1, 1, 1, 0.9)
 	c.add_child(gem)
 	var txt: String = G.ROMAN[sub] if tier < G.RANKS.size() - 1 else str(sub + 1)
-	var l: = UI.center_label(UI.label(txt, int(r.size.x * 0.3), Color.WHITE, rk.dark, 4, "title", 900), Rect2(0, r.size.y * 0.36, r.size.x, r.size.y * 0.5))
+	var nfs: = maxi(11, int(r.size.x * 0.3))
+	var l: = UI.center_label(UI.label(txt, nfs, Color.WHITE, rk.dark, 4 if nfs >= 16 else 3, "title" if nfs >= UI.TITLE_MIN else "body", 900), Rect2(0, r.size.y * 0.36, r.size.x, r.size.y * 0.5))
 	c.add_child(l)
 	return c
 
@@ -351,7 +360,10 @@ static func confirm(main, title: String, text: String, price_icon: String, price
 	var text_h: float = UI.font("body", 800).get_multiline_string_size(text, HORIZONTAL_ALIGNMENT_CENTER, tw, tsize).y + 8.0
 	var has_price: = price_icon != "" and price > 0
 	var balance: = -1
-	if has_price and opts.get("balance_check", true):
+	if has_price and opts.has("balance"):
+		# a currency outside G.S.gems / coins (event currency): the caller passes the balance
+		balance = int(opts.balance)
+	elif has_price and opts.get("balance_check", true):
 		if price_icon == "gem":
 			balance = int(G.S.gems)
 		elif price_icon == "coin":
@@ -381,7 +393,8 @@ static func confirm(main, title: String, text: String, price_icon: String, price
 		var pill: = UI.rbox("plum", Rect2((w - pw) * 0.5, y, pw, 64), 32, 3, 8)
 		pill.set_param("border_top", Color("ffe7a6")).set_param("border_bottom", Color("c58a2c"))
 		p.add_child(pill)
-		pill.add_child(UI.tex(G.icon(price_icon), Rect2(10, 2, 60, 60)))
+		var ptex: Texture2D = opts.get("price_tex") if opts.get("price_tex") is Texture2D else G.icon(price_icon)
+		pill.add_child(UI.tex(ptex, Rect2(10, 2, 60, 60)))
 		var pl: = UI.label(num, 34, Color("ff9a9a") if short else Color.WHITE, Color(0.2, 0.05, 0.2), 4, "body", 900)
 		pl.position = Vector2(76, 0)
 		pl.size = Vector2(pw - 92, 64)

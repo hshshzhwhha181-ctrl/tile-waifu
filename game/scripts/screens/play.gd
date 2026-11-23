@@ -155,6 +155,41 @@ func build(m, args: Dictionary) -> void :
 		duel.setup(self, _v6_rival(args0))
 	_refresh()
 	_intro()
+	_v8_dev()
+
+
+# dev: --v8_win=1 opens the victory window as soon as the table is playable (for screenshots),
+# --v8_rankup=1 puts the rank 5 points below the next step first. Dev runs save to a separate file.
+func _v8_dev() -> void :
+	var ua: = OS.get_cmdline_user_args()
+	if "--v8_devsave=1" in ua or "--v8_win=1" in ua or "--v8_hintpay=1" in ua:
+		G.save_path = "user://dev_v8_play.json"
+	if not ("--v8_win=1" in ua or "--v8_hintpay=1" in ua):
+		return
+	for a in ua:
+		if a.begins_with("--v8_rp="):
+			G.S.rp = int(a.substr(8))
+	if "--v8_rankup=1" in ua:
+		var r: = G.rank_of(int(G.S.rp))
+		G.S.rp = int(G.S.rp) + int(r.need) - int(r.into) - 5
+	while is_inside_tree() and not board.input_on:
+		await get_tree().create_timer(0.05).timeout
+	if not is_inside_tree():
+		return
+	if "--v8_hintpay=1" in ua:
+		hint_n = 0
+		await get_tree().create_timer(0.3).timeout
+		_hint()
+		return
+	if "--v8_yaku=1" in ua:
+		riichi = true
+		sets_done = [0, 2]
+		max_combo = 7
+		last_combo = 4
+	for t in board.tiles:
+		t.alive = false
+		t.hide()
+	_on_clear()
 
 
 func _v6_rival(args: Dictionary) -> String:
@@ -253,7 +288,7 @@ func _apply_perk() -> void :
 
 
 func _build_hud() -> void :
-	Common.icon_button(self, "home", "", Rect2(12, 22, 70, 70), func(): main.go("home"))
+	Common.icon_button(self, "home", "", Rect2(12, 22, 70, 70), func(): main.leave_match())
 
 	var gp: = UI.rbox("cream", Rect2(92, 16, W - 92 - 258, 104), 26, 4, 12)
 	add_child(gp)
@@ -268,13 +303,13 @@ func _build_hud() -> void :
 		if hard == 2:
 			ht.colors(Color("b07cff"), Color("6a3fd0"))
 		gp.add_child(ht)
-		ht.add_child(UI.center_label(UI.label(G.HARD_NAMES[hard].to_upper(), 14, Color.WHITE, Color(0.2, 0.0, 0.1), 3, "body", 900), Rect2(0, 0, 140, 30)))
-	var gl: = UI.label(V6Txt.s("play.goal"), 14, Color("9a6a8a"), Color.WHITE, 2, "body", 900)
-	gl.position = Vector2(16, 36)
+		ht.add_child(UI.center_label(UI.label(G.HARD_NAMES[hard].to_upper(), 16, Color.WHITE, Color(0.2, 0.0, 0.1), 3, "body", 900), Rect2(0, 0, 140, 30)))
+	var gl: = UI.label(V6Txt.s("play.goal"), 16, Color("9a6a8a"), Color.WHITE, 2, "body", 900)
+	gl.position = Vector2(16, 32)
 	gp.add_child(gl)
-	gp.add_child(UI.tex(G.tile_tex(0), Rect2(14, 54, 44, 44)))
+	gp.add_child(UI.tex(G.tile_tex(0), Rect2(14, 58, 40, 40)))
 	tiles_lbl = UI.label("0", 26, UI.INK, Color.WHITE, 4, "body", 900)
-	tiles_lbl.position = Vector2(62, 58)
+	tiles_lbl.position = Vector2(60, 60)
 	gp.add_child(tiles_lbl)
 	if cfg.has("shard"):
 		var sh: String = cfg.shard
@@ -282,8 +317,8 @@ func _build_hud() -> void :
 		shard_lbl = UI.label("0/1", 24, Color("c58a2c"), Color.WHITE, 4, "body", 900)
 		shard_lbl.position = Vector2(gp.size.x - 108, 56)
 		gp.add_child(shard_lbl)
-		var sl: = UI.label(V6Txt.s("play.shard"), 13, Color("9a6a8a"))
-		sl.position = Vector2(gp.size.x - 108, 36)
+		var sl: = UI.label(V6Txt.s("play.shard"), 16, Color("9a6a8a"), Color.WHITE, 2, "body", 900)
+		sl.position = Vector2(gp.size.x - 108, 32)
 		gp.add_child(sl)
 	if mode in ["blitz", "zen"]:
 		timer_lbl = UI.label("2:00" if mode == "blitz" else "∞", 26, Color("ffd98a"), UI.DARK, 4, "body", 900)
@@ -405,6 +440,12 @@ func _refresh() -> void :
 	tray_box.borders(Color("ff8a9a") if danger else Color("ffe7a6"), Color("e8455f") if danger else Color("c58a2c"))
 
 func _intro() -> void :
+	# 0.8: hold the «v6_tip» slot until the intro tip is shown, so a specials card never comes first and
+	# then gets the intro tip drawn over it
+	var hold: = Control.new()
+	hold.visible = false
+	hold.add_to_group("v6_tip")
+	add_child(hold)
 	var rib: = Common.ribbon(self, (V6Txt.s("play.ribbon") % cfg.get("code", "")) if mode == "" else cfg.name, Rect2(W * 0.5 - 230, H * 0.4, 460, 92), "pink", 42 if mode == "" else 30)
 	rib.pivot_offset = rib.size * 0.5
 	var sub: = UI.center_label(UI.label(cfg.get("goal", V6Txt.s("play.goal_clear")), 22, Color.WHITE, Color("7a2346"), 6, "body", 900), Rect2(-40, 92, 540, 40))
@@ -417,47 +458,68 @@ func _intro() -> void :
 	t.parallel().tween_property(rib, "scale", Vector2(1.3, 1.3), 0.3)
 	t.tween_callback(rib.queue_free)
 	board.visible = false
-	await get_tree().create_timer(1.1).timeout
+	var boss: bool = mode == "" and cfg.get("boss", false)
+	# 0.8: with a luck card (every story level after the tutorial, e.g. 1-6) the table is dealt at once
+	# and is playable in under a second; the omikuji shows as a small strip that does not block the board.
+	var quick: = not fortune.is_empty() and not boss
+	await get_tree().create_timer(0.1 if quick else 1.1).timeout
 	if not is_inside_tree():
 		return
-	if mode == "" and cfg.get("boss", false):
+	if boss:
 		await V6BossIntro.run(self, cfg)
 		if not is_inside_tree():
 			return
-	if not fortune.is_empty():
-		await _show_fortune()
-		if not is_inside_tree():
-			return
 	board.visible = true
-	board.deal()
+	if not fortune.is_empty():
+		_v8_quick_deal()
+	else:
+		board.deal()
 	await get_tree().create_timer(0.6).timeout
-	_tip(cfg.intro)
+	if not is_inside_tree():
+		return
 	Sfx.say(partner, "greet")
 	UI.punch(portrait, 0.15)
 	start_t = G.time
+	# 0.8: one overlay at a time — level banner, then the luck strip, then the intro tip
+	if not fortune.is_empty():
+		await get_tree().create_timer(0.9).timeout
+		if not is_inside_tree() or _v8_over:
+			return
+		_show_fortune()
+		await get_tree().create_timer(V8_FORTUNE_SECS + 0.35).timeout
+		if not is_inside_tree() or _v8_over:
+			return
+	if is_instance_valid(hold):
+		hold.queue_free()
+	_tip(cfg.intro)
 	if tut:
 		await get_tree().create_timer(1.4).timeout
 		_tutorial()
 
 
 func _tip(text: String) -> void :
-	var tc: = UI.rbox("cream", Rect2(20, H - 178, W - 40, 104), 24, 3, 10)
+	# 0.8: sized from the wrapped text and kept above the action buttons (they start at H - 172)
+	var tw_: = W - 170.0
+	var th: float = UI.font("body", 800).get_multiline_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, tw_, 18).y
+	var h: = maxf(104.0, 36.0 + th + 14.0)
+	var tc: = UI.rbox("cream", Rect2(20, H - 186 - h, W - 40, h), 24, 3, 10)
 	tc.add_to_group("v6_tip")
 	tc.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	tc.z_index = 35
 	tc.set_param("border_top", Color("e8c9a0")).set_param("border_bottom", Color("a8697a"))
 	add_child(tc)
 	tc.add_child(Common.avatar("mc", Rect2(8, 8, 84, 84), "gold"))
-	var nm: = UI.label(V6Txt.s("play.perk_tip") % [G.HEROES[partner].name, G.PERKS[partner]], 15, Color("b8406c"), Color.WHITE, 3, "body", 900)
+	var nm: = UI.label(V6Txt.s("play.perk_tip") % [G.HEROES[partner].name, G.PERKS[partner]], 16, Color("b8406c"), Color.WHITE, 3, "body", 900)
 	nm.position = Vector2(102, 8)
-	nm.size = Vector2(W - 170, 22)
+	nm.size = Vector2(W - 170, 24)
+	nm.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	nm.clip_text = true
 	tc.add_child(nm)
 	var l: = UI.label(text, 18, UI.INK)
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	l.custom_minimum_size = Vector2(W - 170, 0)
-	l.position = Vector2(102, 32)
-	l.size = Vector2(W - 170, 64)
+	l.position = Vector2(102, 34)
+	l.size = Vector2(W - 170, h - 44)
 	tc.add_child(l)
 	UI.slide_in(tc, Vector2(0, 40), 0.0, 0.35)
 	var t: Tween = tc.create_tween()
@@ -511,8 +573,10 @@ func now() -> float:
 
 func _process(dt: float) -> void :
 	talk_cd -= dt
-	if mode == "blitz" and board and board.input_on and blitz_left > 0.0:
-		blitz_left -= dt
+	if _fortune_close.is_valid() and board and (board.tray.size() > 0 or board.combo > 0):
+		_v8_fold_fortune()
+	if mode == "blitz" and board and board.input_on and not _blitz_done:
+		blitz_left = maxf(0.0, blitz_left - dt)
 		timer_lbl.text = "%d:%02d" % [int(blitz_left) / 60, int(blitz_left) % 60]
 		if blitz_left <= 0.0:
 			_blitz_end()
@@ -529,6 +593,7 @@ func _process(dt: float) -> void :
 		combo_lbl.text = ""
 
 func _on_match(mid: Vector2, combo: int, gold: bool, shard: String) -> void :
+	_v8_fold_fortune()
 	var fever: = now() < fever_until
 	var mult: = 1 + (combo - 1) / 2
 	var gain: = int(round(mult * (2 if fever else 1) * (gold_mult if gold else 1) * (1.0 + gem_bonus)))
@@ -616,7 +681,7 @@ func _shard_found(h: String, mid: Vector2) -> void :
 func _combo_banner(word: String, combo: int) -> void :
 	var l: = UI.title(word, 44 + min(combo, 6) * 4, Color("fff6d8"), Color("e0457b"))
 	l.size = Vector2(500, 80)
-	l.position = Vector2(W * 0.5 - 250, board_rect.get_center().y - 120)
+	l.position = Vector2(W * 0.5 - 250, maxf(board_rect.get_center().y - 120, V8_SLOT_BANNER))
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	l.pivot_offset = Vector2(250, 40)
 	l.rotation = deg_to_rad(randf_range(-4, 4))
@@ -642,7 +707,7 @@ func _fever() -> void :
 	charge = 1.0
 	stage.react("big")
 	Sfx.play("fever")
-	var rib: = Common.ribbon(self, V6Txt.s("play.fever"), Rect2(W * 0.5 - 190, 330, 380, 76), "gold", 36)
+	var rib: = Common.ribbon(self, V6Txt.s("play.fever"), Rect2(W * 0.5 - 190, V8_SLOT_FEVER, 380, 76), "gold", 36)
 	rib.z_index = 30
 	UI.pop_in(rib, 0.0, 0.4)
 	var t: Tween = rib.create_tween()
@@ -679,6 +744,11 @@ func _on_fail() -> void :
 		if mode == "blitz":
 			blitz_left = maxf(0.0, blitz_left - 10.0)
 			Fx.float_text(fx_layer, Vector2(W * 0.5, 260), "−10 с", Color("ff8a9a"), 36)
+			# the overflow ate the last seconds: the run ends here (the countdown only runs while time is left)
+			if blitz_left <= 0.0:
+				timer_lbl.text = "0:00"
+				_blitz_end()
+				return
 		Fx.shake(tray_box, 6, 0.3)
 		await get_tree().create_timer(0.2).timeout
 		board.return_tray(3)
@@ -689,40 +759,75 @@ func _on_fail() -> void :
 	Sfx.play("deny", 0.7)
 	Fx.shake(tray_box, 10, 0.4)
 	Sfx.say(partner, "lose")
+	_v8_modal_open()
 	await get_tree().create_timer(0.5).timeout
+	if not is_inside_tree():
+		return
+	_v8_modal_open()
 	var p: = Common.popup(main, V6Txt.s("play.full_t"), 440, "cream", 660.0, false)
 	p.add_child(Common.avatar(partner, Rect2(30, 60, 120, 120), "pink"))
 	var l: = UI.label(V6Txt.s("play.full_d"), 21, UI.INK)
 	l.position = Vector2(170, 70)
 	p.add_child(l)
-	var price: = 0 if rescue_free else 60
-	var rb: = JButton.make(V6Txt.s("play.return3") + ("" if price == 0 else " · 60"), "gold", Rect2(60, 210, 540, 92), G.icon("undo") if price == 0 else G.icon("gem"), 30)
+	var price: = 0 if rescue_free else V8PlayRules.RESCUE_PRICE
+	var rb: = JButton.make(V6Txt.s("play.return3") + ("" if price == 0 else " · %d" % price), "gold", Rect2(60, 210, 540, 92), G.icon("undo") if price == 0 else G.icon("gem"), 30)
 	rb.shine_every = 2.0
-	rb.pressed.connect( func():
+	var do_rescue: = func():
+		if not is_instance_valid(p) or not is_inside_tree():
+			return
 		if price > 0:
-			if G.S.gems < price:
-				main.toast(V6Txt.s("play.need60"), "gem")
+			if not _v8_can_pay(price):
 				return
-			G.S.gems -= price
+			_v8_spend(price)
 		rescue_free = false
 		boosters_used += 1
 		if riichi:
 			riichi = false
 			main.toast(V6Txt.s("play.riichi_burnt"), "heart")
 		Common.close_popup(p)
+		_v8_modal_close()
 		board.return_tray(3)
-		_refresh())
+		_refresh()
+	rb.pressed.connect( func():
+		if price > 0:
+			_v8_pay("rescue", V8PlayRules.T.rescue_t, V8PlayRules.T.rescue_d, price, do_rescue)
+		else:
+			do_rescue.call())
 	p.add_child(rb)
 	fail_retry_btn = JButton.make(V6Txt.s("play.redeal"), "pink", Rect2(60, 320, 260, 84), null, 24)
 	fail_retry_btn.pressed.connect( func():
 		Common.close_popup(p)
+		_v8_record_loss()
 		var a: = args0.duplicate()
 		a["retry"] = randi()
 		main.go("play", a))
 	p.add_child(fail_retry_btn)
 	var hb: = JButton.make(V6Txt.s("common.to_home"), "glass", Rect2(340, 320, 260, 84), null, 28)
-	hb.pressed.connect( func(): main.go("home"))
+	hb.pressed.connect( func():
+		_v8_record_loss()
+		main.go("home"))
 	p.add_child(hb)
+
+# a lost Path / daily table (left from the overflow window or the house button) counts as a game without a
+# win; so does a duel or a blitz run left before its end (zen counts every cleared board on its own)
+var _v8_loss_done: = false
+
+func _v8_record_loss() -> void :
+	if _v8_loss_done or _v8_over:
+		return
+	var src: = _v8_source()
+	if src in ["path", "daily", "duel", "blitz"]:
+		_v8_loss_done = true
+		G.record_game(src, false)
+		G.save()
+
+func _v8_source() -> String:
+	match mode:
+		"":
+			return "path"
+		"daily", "duel", "blitz", "zen":
+			return mode
+	return "other"
 
 func _hint() -> void :
 	if not board.input_on:
@@ -730,16 +835,28 @@ func _hint() -> void :
 	if riichi:
 		main.toast(V6Txt.s("play.riichi_locked"), "star")
 		return
+	if _v8_hint_active():
+		main.toast(V8PlayRules.T.hint_on, "hint")
+		return
 	if hint_n <= 0:
-		if G.S.gems < 30:
-			main.toast(V6Txt.s("play.need30"), "gem")
-			return
-		G.S.gems -= 30
+		_v8_pay("hint", V8PlayRules.T.hint_t, V8PlayRules.T.hint_d, V8PlayRules.HELP_PRICE, func(): _v8_do_hint(true))
+		return
+	_v8_do_hint(false)
+
+func _v8_do_hint(paid: bool) -> void :
+	if not is_inside_tree() or not board.input_on or riichi or _v8_hint_active():
+		return
+	if paid and not _v8_can_pay(V8PlayRules.HELP_PRICE):
+		return
+	if not board.hint():
+		_refresh()
+		return
+	if paid:
+		_v8_spend(V8PlayRules.HELP_PRICE)
 	else:
 		hint_n -= 1
 	boosters_used += 1
-	if board.hint():
-		_bubble(Sfx.say(partner, "hint"))
+	_bubble(Sfx.say(partner, "hint"))
 	_refresh()
 
 func _undo() -> void :
@@ -748,14 +865,24 @@ func _undo() -> void :
 	if riichi:
 		main.toast(V6Txt.s("play.riichi_locked"), "star")
 		return
+	if board.history.is_empty():
+		main.toast(V8PlayRules.T.undo_none, "undo")
+		return
 	if undo_n <= 0:
-		if G.S.gems < 30:
-			main.toast(V6Txt.s("play.need30"), "gem")
-			return
-		G.S.gems -= 30
-		undo_n += 1
+		_v8_pay("undo", V8PlayRules.T.undo_t, V8PlayRules.T.undo_d, V8PlayRules.HELP_PRICE, func(): _v8_do_undo(true))
+		return
+	_v8_do_undo(false)
+
+func _v8_do_undo(paid: bool) -> void :
+	if not is_inside_tree() or not board.input_on or riichi:
+		return
+	if paid and not _v8_can_pay(V8PlayRules.HELP_PRICE):
+		return
 	if board.undo():
-		undo_n -= 1
+		if paid:
+			_v8_spend(V8PlayRules.HELP_PRICE)
+		else:
+			undo_n -= 1
 		boosters_used += 1
 		Sfx.play("whoosh", 1.3)
 	_refresh()
@@ -767,10 +894,17 @@ func _shuffle() -> void :
 		main.toast(V6Txt.s("play.riichi_locked"), "star")
 		return
 	if shuffle_n <= 0:
-		if G.S.gems < 30:
-			main.toast(V6Txt.s("play.need30"), "gem")
+		_v8_pay("shuffle", V8PlayRules.T.shuffle_t, V8PlayRules.T.shuffle_d, V8PlayRules.HELP_PRICE, func(): _v8_do_shuffle(true))
+		return
+	_v8_do_shuffle(false)
+
+func _v8_do_shuffle(paid: bool) -> void :
+	if not is_inside_tree() or not board.input_on or riichi:
+		return
+	if paid:
+		if not _v8_can_pay(V8PlayRules.HELP_PRICE):
 			return
-		G.S.gems -= 30
+		_v8_spend(V8PlayRules.HELP_PRICE)
 	else:
 		shuffle_n -= 1
 	boosters_used += 1
@@ -778,68 +912,174 @@ func _shuffle() -> void :
 	_refresh()
 
 
+# ---- 0.8: every paid help goes through Common.confirm with «Не спрашивать в этой партии».
+# The skip key is per match (this play node), so a new match always asks again.
+func _v8_skip_prefix() -> String:
+	return "m%d_" % get_instance_id()
 
-func _show_fortune() -> void :
-	var root: = Control.new()
-	root.size = size
-	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	root.z_index = 50
-	add_child(root)
-	var cw: = 300.0
-	var chh: = 420.0
-	var card: = UI.rbox("gold", Rect2(W * 0.5 - cw * 0.5, H * 0.3, cw, chh), 26, 5, 14)
-	card.colors(Color("3a3038"), Color("1e1a22")).borders(Color("fff0b8"), Color("b07a2a"))
-	root.add_child(card)
-	card.pivot_offset = Vector2(cw * 0.5, chh * 0.5)
-	var back: = UI.rbox("plum", Rect2(10, 10, cw - 20, chh - 20), 20, 3, 4)
-	back.colors(Color(0.42, 0.1, 0.2), Color(0.24, 0.05, 0.12)).borders(Color("ffe7a6"), Color("c58a2c"))
-	card.add_child(back)
-	back.add_child(UI.center_label(UI.title("おみくじ", 40, Color("ffe7a6"), Color(0.2, 0.02, 0.08)), Rect2(0, 120, cw - 20, 60)))
-	back.add_child(UI.center_label(UI.label(V6Txt.s("play.omikuji_sub"), 18, Color("ffd0dc")), Rect2(0, 190, cw - 20, 30)))
-	UI.pop_in(card, 0.0, 0.5)
-	Sfx.play("whoosh", 0.9)
-	await get_tree().create_timer(0.7).timeout
-	if not is_inside_tree():
+func _v8_pay(kind: String, title: String, text: String, price: int, on_yes: Callable) -> void :
+	if G.demo:
+		on_yes.call()
 		return
-	var t: = create_tween()
-	t.tween_property(card, "scale:x", 0.0, 0.14).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-	t.tween_callback( func():
-		back.queue_free()
-		var lvl_l: = UI.center_label(UI.title(fortune.rank, 30, Color("f2a5bd"), Color(0.15, 0.03, 0.08)), Rect2(0, 30, cw, 50))
-		card.add_child(lvl_l)
-		var nm: = UI.center_label(UI.title(fortune.name, 34, Color("ffe7a6"), Color(0.2, 0.05, 0.02)), Rect2(0, 110, cw, 60))
-		card.add_child(nm)
-		var d: = UI.label(fortune.desc, 20, Color("f3e6dc"))
-		d.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		d.custom_minimum_size = Vector2(cw - 48, 0)
-		d.position = Vector2(24, 190)
-		d.size = Vector2(cw - 48, 160)
-		d.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		card.add_child(d))
-	t.tween_property(card, "scale:x", 1.0, 0.18).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	Sfx.play("reveal_sr", 1.15)
-	await get_tree().create_timer(0.4).timeout
-	Fx.burst(root, Vector2(W * 0.5, H * 0.3 + 200), "sparkle", 30, Color(1, 0.85, 0.5), 1.2)
-	await get_tree().create_timer(1.7).timeout
-	if not is_inside_tree():
-		return
+	_v6_clear_tips()
+	Common.confirm(main, title, text, "gem", price, on_yes, {"skip_key": _v8_skip_prefix() + kind})
 
-	var t2: = create_tween().set_parallel()
-	t2.tween_property(card, "scale", Vector2(0.2, 0.2), 0.35).set_trans(Tween.TRANS_QUAD)
-	t2.tween_property(card, "position", Vector2(60, 150) - Vector2(cw, chh) * 0.4, 0.35).set_trans(Tween.TRANS_QUAD)
-	t2.tween_property(card, "modulate:a", 0.0, 0.35)
-	await t2.finished
-	root.queue_free()
-	var chip: = UI.rbox("plum", Rect2(136, 132, 260, 44), 22, 2, 8)
+func _v8_can_pay(price: int) -> bool:
+	if int(G.S.gems) < price:
+		main.toast(V6Txt.s("play.need60") if price >= 60 else V6Txt.s("play.need30"), "gem")
+		return false
+	return true
+
+func _v8_spend(price: int) -> void :
+	G.S.gems = int(G.S.gems) - price
+	G.save()
+	UI.punch(gems_lbl, 0.3)
+
+func _v8_hint_active() -> bool:
+	for t in board.tiles:
+		if t.alive and t.get("_hint_tw") != null:
+			return true
+	return false
+
+func _exit_tree() -> void :
+	Common.confirm_skip_reset(_v8_skip_prefix())
+
+
+
+# 0.8: fast deal for the luck-card levels: every tile lands within ~0.75 s and input opens right after.
+func _v8_quick_deal() -> void :
+	board.input_on = false
+	var order: Array = board.tiles.duplicate()
+	var n: = order.size()
+	var step: = minf(0.004, 0.32 / maxf(1.0, n))
+	for i in n:
+		var t: Tile = order[i]
+		t.position = t.home + Vector2(0, -60)
+		t.modulate.a = 0.0
+		var d: = step * i + t.gz * 0.05
+		var tw: Tween = t.create_tween().set_parallel()
+		tw.tween_property(t, "position", t.home, 0.26).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT).set_delay(d)
+		tw.tween_property(t, "modulate:a", 1.0, 0.14).set_delay(d)
+		if i % 8 == 0:
+			get_tree().create_timer(d + 0.16).timeout.connect( func(): Sfx.play("clack%d" % (randi() % 3), randf_range(0.9, 1.1), -8))
+	var maxz: = 0
+	for t in order:
+		maxz = maxi(maxz, int(t.gz))
+	await get_tree().create_timer(step * n + maxz * 0.05 + 0.3).timeout
+	if not is_inside_tree() or not is_instance_valid(board):
+		return
+	board.input_on = true
+	board.reveal_free()
+
+# 0.8 match overlay layout: each transient overlay has its own slot, so two never land on each other.
+#   y 126–166, x 136–396 : one note under the goal plate (luck chip or «Стиль: …»), newest replaces older
+#   y 300–374, left       : combo pill (V7Combo) with its milestone line inside the pill
+#   under the portrait    : the heroine's speech bubble (V6HeroStage.say_text)
+#   V8_SLOT_YAKU          : yaku plaque · V8_SLOT_BANNER: big combo word · V8_SLOT_FEVER: fever ribbon
+#   above the buttons     : toasts (main.toast stacks them upward while a match is on)
+# The luck strip shows only before the first tap and folds into the chip at once when play starts.
+const V8_SLOT_YAKU: = 448.0
+const V8_SLOT_BANNER: = 576.0
+const V8_SLOT_FEVER: = 664.0
+const V8_NOTE_RECT: = Rect2(136, 126, 260, 40)
+
+var _fortune_close: = Callable()
+
+func _v8_fold_fortune() -> void :
+	if _fortune_close.is_valid():
+		var c: = _fortune_close
+		_fortune_close = Callable()
+		c.call()
+
+# one note in the slot under the goal plate: the newest replaces the one before
+func v8_note(text: String, col: = Color("ffe7a6"), secs: = 4.0) -> Control:
+	if _v8_over:
+		return null
+	get_tree().call_group("v8_note", "queue_free")
+	var f: = UI.font("body", 900)
+	var fs: = 17
+	while fs > 15 and f.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x + 28.0 > V8_NOTE_RECT.size.x:
+		fs -= 1
+	var w: = clampf(f.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x + 28.0, 120.0, V8_NOTE_RECT.size.x)
+	var chip: = UI.rbox("plum", Rect2(V8_NOTE_RECT.end.x - w, V8_NOTE_RECT.position.y, w, V8_NOTE_RECT.size.y), 20, 2, 8)
+	chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	chip.add_to_group("v6_chip")
+	chip.add_to_group("v8_note")
 	chip.borders(Color("ffe7a6"), Color("c58a2c"))
 	add_child(chip)
-	chip.add_child(UI.center_label(UI.label("%s · %s" % [fortune.rank, fortune.name], 16, Color("ffe7a6"), UI.DARK, 3, "body", 900), Rect2(0, 0, 260, 44)))
+	var l: = UI.center_label(UI.label(text, fs, col, UI.DARK, 3, "body", 900), Rect2(0, 0, w, V8_NOTE_RECT.size.y))
+	l.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	l.clip_text = true
+	chip.add_child(l)
 	var ct: = chip.create_tween()
-	ct.tween_interval(4.0)
-	ct.tween_property(chip, "modulate:a", 0.0, 0.6)
+	ct.tween_interval(secs)
+	ct.tween_property(chip, "modulate:a", 0.0, 0.5)
 	ct.tween_callback(chip.queue_free)
 	UI.pop_in(chip, 0.0, 0.6)
+	return chip
+
+# 0.8: the omikuji is a strip over the top of the table (tap to hide), it then folds into the chip.
+func _show_fortune() -> void :
+	# play already started (a tile in the tray or a pair taken): no strip over the board, only the chip
+	if board and (board.tray.size() > 0 or not board.history.is_empty() or board.combo > 0):
+		_v8_fortune_chip()
+		return
+	var root: = Control.new()
+	root.size = Vector2(W - 40, 118)
+	root.position = Vector2(20, board_rect.position.y + 6)
+	root.mouse_filter = Control.MOUSE_FILTER_STOP
+	# z 0 on purpose: popups (main.overlay, z 0) must stay above it; it is added after the board anyway
+	root.z_index = 0
+	add_child(root)
+	var card: = UI.rbox("gold", Rect2(Vector2.ZERO, root.size), 26, 4, 10)
+	card.colors(Color("3a3038"), Color("1e1a22")).borders(Color("fff0b8"), Color("b07a2a"))
+	card.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	root.add_child(card)
+	root.pivot_offset = root.size * 0.5
+	var seal: = UI.rbox("plum", Rect2(12, 12, 94, 94), 20, 3, 4)
+	seal.colors(Color(0.42, 0.1, 0.2), Color(0.24, 0.05, 0.12)).borders(Color("ffe7a6"), Color("c58a2c"))
+	card.add_child(seal)
+	seal.add_child(UI.center_label(UI.title("吉", 50, Color("ffe7a6"), Color(0.2, 0.02, 0.08)), Rect2(0, 0, 94, 94)))
+	var nm: = UI.label("%s · %s" % [fortune.rank, fortune.name], 26, Color("ffe7a6"), Color(0.2, 0.05, 0.02), 4, "title", 900)
+	nm.position = Vector2(122, 8)
+	nm.size = Vector2(root.size.x - 140, 40)
+	nm.clip_text = true
+	card.add_child(nm)
+	var d: = UI.label(fortune.desc, 18, Color("f3e6dc"))
+	d.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	d.position = Vector2(122, 46)
+	d.size = Vector2(root.size.x - 140, 64)
+	card.add_child(d)
+	UI.slide_in(root, Vector2(0, -30), 0.0, 0.3)
+	Sfx.play("reveal_sr", 1.15)
+	Fx.burst(self, root.position + Vector2(60, 60), "sparkle", 18, Color(1, 0.85, 0.5), 1.0)
+	var closed: = [false]
+	# the strip may already be freed when the timer fires: keep it in an array, never capture the node itself
+	var box: = [root]
+	var close: = func():
+		if closed[0] or not is_instance_valid(box[0]):
+			return
+		closed[0] = true
+		var rr: Control = box[0]
+		rr.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var t2: = rr.create_tween().set_parallel()
+		t2.tween_property(rr, "scale", Vector2(0.3, 0.3), 0.3).set_trans(Tween.TRANS_QUAD)
+		t2.tween_property(rr, "position", V8_NOTE_RECT.position - rr.size * 0.35, 0.3).set_trans(Tween.TRANS_QUAD)
+		t2.tween_property(rr, "modulate:a", 0.0, 0.3)
+		t2.chain().tween_callback(rr.queue_free)
+		_v8_fortune_chip()
+	root.gui_input.connect( func(e):
+		if e is InputEventMouseButton and e.pressed:
+			close.call())
+	_fortune_close = close
+	await get_tree().create_timer(V8_FORTUNE_SECS).timeout
+	if is_inside_tree():
+		_v8_fold_fortune()
+
+const V8_FORTUNE_SECS: = 2.4
+
+func _v8_fortune_chip() -> void :
+	v8_note("%s · %s" % [fortune.rank, fortune.name])
 
 func _skill_ready() -> void :
 	skill_ready = true
@@ -885,7 +1125,12 @@ func _open_gift(mid: Vector2) -> void :
 	main.toast(text, "gift")
 	_refresh()
 
+var _blitz_done: = false
+
 func _blitz_end() -> void :
+	if _blitz_done:
+		return
+	_blitz_done = true
 	board.input_on = false
 	var best: = int(G.S.get("blitz_best", 0))
 	var record: = blitz_score > best
@@ -893,19 +1138,25 @@ func _blitz_end() -> void :
 		G.S.blitz_best = blitz_score
 	var gems: = mini(150, blitz_score / 20)
 	G.S.gems += gems
-	G.save()
+	var ba: = V8PlayRules.award("blitz", V8PlayRules.blitz_rp(blitz_score), boards_done > 0)
+	_v8_end_overlays()
 	Sfx.play("win")
 	var p: = Common.popup(main, V6Txt.s("play.time_up"), 520, "cream", 660.0, false)
 	p.add_child(UI.center_label(UI.title(str(blitz_score), 72, Color("ffe7a6"), Color("5a1a6a")), Rect2(0, 70, 660, 100)))
 	p.add_child(UI.center_label(UI.label(V6Txt.s("play.boards") % boards_done, 22, UI.INK), Rect2(0, 170, 660, 30)))
 	p.add_child(UI.center_label(UI.label(V6Txt.s("play.record_new") if record else V6Txt.s("play.record") % best, 24, Color("ffd34d") if record else Color("d9c4e6"), UI.DARK, 3, "body", 900), Rect2(0, 214, 660, 34)))
-	p.add_child(UI.center_label(UI.label(V6Txt.s("common.plus_gems") % gems, 22, Color("9fe8d0")), Rect2(0, 256, 660, 30)))
-	var again: = JButton.make(V6Txt.s("common.again"), "pink", Rect2(60, 330, 260, 90), null, 30)
+	var by: = 260.0
+	if gems > 0:
+		p.add_child(UI.center_label(UI.label(V6Txt.s("common.plus_gems") % gems, 22, Color("9fe8d0"), UI.DARK, 3, "body", 900), Rect2(0, 256, 660, 30)))
+		by = 296.0
+	var again: = JButton.make(V6Txt.s("common.again"), "pink", Rect2(60, by + 24, 260, 90), null, 30)
 	again.pressed.connect( func(): main.go("play", {"mode": "blitz", "partner": partner, "retry": randi()}))
 	p.add_child(again)
-	var home: = JButton.make(V6Txt.s("common.to_home"), "glass", Rect2(340, 330, 260, 90), null, 28)
+	var home: = JButton.make(V6Txt.s("common.to_home"), "glass", Rect2(340, by + 24, 260, 90), null, 28)
 	home.pressed.connect( func(): main.go("home"))
 	p.add_child(home)
+	p.size.y = by + 24 + 90 + 40
+	_v8_popup_rank(p, by, ba)
 
 
 
@@ -928,7 +1179,7 @@ func _track_set(mid: Vector2) -> void :
 		Fx.float_text(fx_layer, mid + Vector2(0, -50), "+15", Color("ffd34d"), 36)
 
 func _yaku_banner(name: String, sub: String) -> void :
-	var rib: = UI.rbox("plum", Rect2(W * 0.5 - 250, 420, 500, 112), 30, 4, 12)
+	var rib: = UI.rbox("plum", Rect2(W * 0.5 - 250, V8_SLOT_YAKU, 500, 112), 30, 4, 12)
 	rib.colors(Color(0.16, 0.08, 0.3, 0.96), Color(0.08, 0.04, 0.16, 0.96)).borders(Color("fff0b8"), Color("c58a2c"))
 	rib.z_index = 32
 	add_child(rib)
@@ -1048,6 +1299,9 @@ func _on_clear() -> void :
 			G.S.gems += 30
 			gained += 30
 			Fx.float_text(fx_layer, Vector2(W * 0.5, 600), V6Txt.s("play.clear30"), Color("ffe7a6"), 40)
+			var za: = V8PlayRules.award("zen", V8PlayRules.zen_rp(boards_done), true)
+			Fx.float_text(fx_layer, Vector2(W * 0.5, 660), V8PlayRules.award_text(za), Color("a9d9c4"), 30)
+			_v8_rank_float(za, Vector2(W * 0.5, 720))
 		Sfx.play("win", 1.2, -6)
 		Fx.burst(fx_layer, Vector2(W * 0.5, 600), "confetti", 50, Color.WHITE, 1.0)
 		await get_tree().create_timer(0.8).timeout
@@ -1059,7 +1313,7 @@ func _on_clear() -> void :
 		_refresh()
 		return
 	var secs: = now() - start_t
-	var stars: = 3 if fails == 0 and boosters_used == 0 else (2 if fails == 0 and boosters_used <= 2 else 1)
+	var stars: = V8PlayRules.story_stars(fails, boosters_used)
 	if G.demo:
 		stars = 3
 	if riichi_btn:
@@ -1077,8 +1331,6 @@ func _on_clear() -> void :
 		if first and lvl == 2:
 			first_unlock_summon = true
 			G.S.free10 = true
-		if lvl >= 1:
-			G.set_meta("pending_offer", true)
 	elif mode == "daily":
 		reward = cfg.reward.gems + stars * 20
 		var dm: = G.dailymap()
@@ -1087,14 +1339,19 @@ func _on_clear() -> void :
 			dm.done.append(d)
 	if riichi:
 		reward = reward * 2 + gained
+	rp_before = int(G.S.rp)
 	if mode != "trial":
-		rp_before = int(G.S.rp)
-		rp_gain = 20 + stars * 5 + (int(cfg.get("hard", 0)) * 15 if mode == "" else 0)
+		var yrp: = 0
 		for y in yaku_list:
-			rp_gain += _yaku_rp(y)
+			yrp += _yaku_rp(y)
 			if not y.begins_with("set:"):
 				G.S.yaku_seen[y] = int(G.S.yaku_seen.get(y, 0)) + 1
-		rank_ups = G.add_rp(rp_gain)
+		rp_gain = V8PlayRules.path_rp(stars, int(cfg.get("hard", 0)) if mode == "" else 0, yrp)
+		var src: = "daily" if mode == "daily" else "path"
+		rank_ups = G.add_rp(rp_gain, src)
+		G.record_game(src, true)
+		if src == "path":
+			V8Starter.on_path_win()
 	if mode != "trial":
 		G.add_aff(partner, 10)
 		G.task_add("levels")
@@ -1106,81 +1363,209 @@ func _on_clear() -> void :
 	await get_tree().create_timer(0.4).timeout
 	_victory(stars, reward, secs, first)
 
+# 0.8: nothing from the match may draw over a result window (combo pill, banners, chips, speech bubbles).
+var _v8_over: = false
+# a window over the running match (the overflow window): combo pill, banners, floats, toasts and the bubble go
+var _v8_modal: = false
+var _v8_modal_hidden: = []
+
+func _v8_modal_open() -> void :
+	_v8_modal = true
+	_v8_fold_fortune()
+	if v7combo:
+		v7combo.stop()
+	_v6_clear_tips()
+	# banners and plaques drawn above the board (z ≥ 30) would show through the window: hide them until it closes
+	for c in get_children():
+		if c is Control and (c as Control).visible and (c as Control).z_index >= 30 and c != v7combo and c != riichi_btn and not c is JButton:
+			(c as Control).visible = false
+			_v8_modal_hidden.append(c)
+	if fx_layer:
+		for c in fx_layer.get_children():
+			if c is Label:
+				c.queue_free()
+	var bub = V6HeroStage._shared_bubble
+	if bub and is_instance_valid(bub):
+		bub.queue_free()
+	if main and main.overlay:
+		for c in main.overlay.get_children():
+			if c.has_meta("v8_toast"):
+				c.queue_free()
+
+func _v8_modal_close() -> void :
+	_v8_modal = false
+	for c in _v8_modal_hidden:
+		if is_instance_valid(c):
+			(c as Control).visible = true
+	_v8_modal_hidden.clear()
+	if v7combo and not _v8_over:
+		v7combo.resume()
+
+func _v8_end_overlays() -> void :
+	_v8_over = true
+	for b in [btn_hint, btn_undo, btn_shuffle]:
+		if b:
+			b.visible = false
+	if v7combo:
+		v7combo.stop()
+	_v6_clear_tips()
+	get_tree().call_group("v6_chip", "queue_free")
+	# a hidden member of «v6_tip» keeps queued intro cards (V6Specials) from popping up over the result
+	var blk: = Control.new()
+	blk.name = "V8TipBlock"
+	blk.visible = false
+	blk.add_to_group("v6_tip")
+	add_child(blk)
+	for c in get_children():
+		if c is CanvasItem and (c as CanvasItem).z_index > 0 and c != v7combo:
+			(c as CanvasItem).visible = false
+	if fx_layer:
+		for c in fx_layer.get_children():
+			if c is CanvasItem and (c as CanvasItem).z_index > 0:
+				(c as CanvasItem).visible = false
+	if stage:
+		stage.visible = false
+	if riichi_btn:
+		riichi_btn.visible = false
+
+# 0.8 (spec 5): the mode result popups (Блиц, Дуэль, Этюды, Смена) get the same rank bar (was / now, +N,
+# «Новый ранг» inside) and weekly-league / quarter row as the Path victory. Everything of the popup at or below
+# `at_y` moves down by the block's height and the popup grows to fit. Returns the height added.
+func _v8_popup_rank(p: Control, at_y: float, a: Dictionary) -> float:
+	if not is_instance_valid(p):
+		return 0.0
+	rp_gain = int(a.get("rp", 0))
+	rp_before = int(G.S.rp) - rp_gain
+	rank_ups = a.get("ups", [])
+	var n0: = p.get_child_count()
+	var w: = p.size.x - 60.0
+	var box: = _v8_rank_block(p, Rect2(30, at_y, w, 0))
+	var h: = box.size.y + 10.0
+	var li: = V8PlayRules.league_info()
+	if not li.is_empty():
+		_v8_league_row(p, Rect2(30, at_y + h, w, 58), li)
+		h += 66.0
+	for i in n0:
+		var c: = p.get_child(i)
+		if c is Control and (c as Control).position.y >= at_y - 1.0:
+			(c as Control).position.y += h
+	p.size.y += h
+	var vh: float = main.get_viewport_rect().size.y
+	p.position.y = maxf(110.0, (vh - p.size.y) * 0.5)
+	p.pivot_offset = p.size * 0.5
+	var bx: = [box]
+	get_tree().create_timer(0.7).timeout.connect( func():
+		if is_inside_tree() and is_instance_valid(bx[0]):
+			_animate_rank(bx[0]))
+	return h
+
+# zen has no result window: a rank-up shows as a float over the table, never as a toast over the HUD
+func _v8_rank_float(a: Dictionary, at: Vector2) -> void :
+	var t: = V8PlayRules.rankup_text(a)
+	if t != "":
+		Fx.float_text(fx_layer, at, t, Color("ffd34d"), 28)
+		Sfx.say(partner, "rankup")
+
+
+# 0.8 victory: one column, nothing overlaps. Title → stars (+ star rule) → reward → unified rank bar
+# (was / now, +N, «Новый ранг» inside) → weekly league line → compact yaku → album / photo → buttons.
+# The heroine stands behind the plate in the lower right.
 func _victory(stars: int, reward: int, secs: float, first: bool) -> void :
 	print("VICTORY stars=%d" % stars)
 	Sfx.music("")
 	Sfx.play("win")
+	_v8_end_overlays()
 	var root: = Control.new()
+	root.name = "V8Victory"
 	root.size = size
 	root.mouse_filter = Control.MOUSE_FILTER_STOP
 	add_child(root)
 	var dim: = ColorRect.new()
 	dim.size = size
-	dim.color = Color(0.22, 0.06, 0.16, 0.0)
+	dim.color = Color(0.06, 0.04, 0.07, 0.0)
 	dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.add_child(dim)
-	dim.create_tween().tween_property(dim, "color:a", 0.6, 0.4)
-	var rays: = Common.rays(root, Vector2(W * 0.5, H * 0.3), 1100, Color(1, 0.9, 0.6, 0.6), 14, 0.06, 0.7)
+	dim.create_tween().tween_property(dim, "color:a", 0.78, 0.4)
+	var rays: = Common.rays(root, Vector2(W * 0.5, 150), 1100, Color(1, 0.9, 0.6, 0.5), 14, 0.06, 0.6)
 	rays.modulate.a = 0
 	rays.create_tween().tween_property(rays, "modulate:a", 1.0, 0.5)
 	Fx.burst(root, Vector2(W * 0.2, H), "confetti", 70, Color.WHITE, 1.1)
 	Fx.burst(root, Vector2(W * 0.8, H), "confetti", 70, Color.WHITE, 1.1)
 
-	var vh: = Hero.new().setup(partner, 700.0)
-	vh.position = Vector2(W * 0.5, H + 40)
+	var vh: = Hero.new().setup(partner, V8_HERO_H)
+	vh.position = Vector2(W * 0.74, H + V8_HERO_DROP)
 	vh.interactive = false
 	root.add_child(vh)
-	UI.slide_in(vh, Vector2(0, 200), 0.2, 0.6)
+	UI.slide_in(vh, Vector2(120, 0), 0.2, 0.6)
 	vh.react("big")
 
-	var pw: = 600.0
-	var py: = H * 0.06
-	var title: = Common.ribbon(root, V6Txt.s("play.win") if not riichi else V6Txt.s("play.win_riichi"), Rect2(W * 0.5 - 260, py, 520, 104), "pink" if not riichi else "red", 56 if not riichi else 44)
+	var title: = Common.ribbon(root, V6Txt.s("play.win") if not riichi else V6Txt.s("play.win_riichi"), Rect2(W * 0.5 - 260, 34, 520, 100), "pink" if not riichi else "red", 54 if not riichi else 42)
 	UI.pop_in(title, 0.1, 0.3)
-	var card: = UI.rbox("cream", Rect2((W - pw) * 0.5, py + 130, pw, 360), 34, 5, 14)
-	card.set_param("pattern", 1.0)
-	root.add_child(card)
-	UI.pop_in(card, 0.25, 0.7)
+
+	var px: = 24.0
+	var pw: = W - px * 2.0
+	var plate: = UI.rbox("cream", Rect2(px, 150, pw, 200), 34, 5, 14)
+	plate.set_param("pattern", 1.0)
+	root.add_child(plate)
+	var y: = 12.0
 	var star_nodes: = []
 	for i in 3:
-		var s: = UI.tex(G.fx("star_empty"), Rect2(pw * 0.5 - 60 + (i - 1) * 150, 18 + (0 if i == 1 else 22), 120, 120))
-		card.add_child(s)
+		var s: = UI.tex(G.fx("star_empty"), Rect2(pw * 0.5 - 55 + (i - 1) * 140, y + (0 if i == 1 else 18), 110, 110))
+		plate.add_child(s)
 		star_nodes.append(s)
-	var tl: = UI.center_label(UI.label(V6Txt.s("play.stats") % [int(secs), boosters_used, fails], 20, UI.INK), Rect2(0, 156, pw, 30))
-	card.add_child(tl)
+	y += 132
+	var rule: = UI.center_label(UI.label(V8PlayRules.T.star_rule, 17, UI.MUTED, UI.DARK, 2, "body", 800), Rect2(10, y, pw - 20, 24))
+	plate.add_child(rule)
+	y += 26
+	plate.add_child(UI.center_label(UI.label(V8PlayRules.T.stats % [int(secs), boosters_used, fails], 19, UI.INK, UI.DARK, 3, "body", 900), Rect2(10, y, pw - 20, 28)))
+	y += 38
 
-	var rr: = UI.rbox("glass", Rect2(30, 196, pw - 60, 120), 24, 3, 8)
-	card.add_child(rr)
-	rr.add_child(UI.tex(G.icon("gem"), Rect2(16, 14, 90, 90)))
+	var rr: = UI.rbox("glass", Rect2(20, y, pw - 40, 92), 24, 3, 8)
+	plate.add_child(rr)
+	rr.add_child(UI.tex(G.icon("gem"), Rect2(12, 8, 76, 76)))
 	var gl: = UI.label("+0", 40, Color("f2799f"), Color.WHITE, 6, "title", 900)
-	gl.position = Vector2(110, 24)
+	gl.position = Vector2(96, 2)
 	rr.add_child(gl)
+	if mode != "trial":
+		var hl: = UI.label(V6Txt.s("play.aff10"), 18, Color("e0457b"), Color.WHITE, 3, "body", 900)
+		hl.position = Vector2(98, 56)
+		rr.add_child(hl)
 	if first and cfg.reward.has("item"):
 		var it: Dictionary = G.ITEM[cfg.reward.item]
-		var ib: = UI.rbox("gold", Rect2(pw - 60 - 250, 10, 236, 100), 20, 3, 6)
+		var ib: = UI.rbox("gold", Rect2(rr.size.x - 248, 8, 236, 76), 20, 3, 6)
 		rr.add_child(ib)
-		ib.add_child(UI.tex(G.item_tex(it), Rect2(8, 8, 84, 84)))
-		var il: = UI.label(it.name, 18, Color.WHITE, Color("7a4a0c"), 4, "body", 900)
-		il.position = Vector2(98, 14)
-		il.size = Vector2(130, 70)
+		ib.add_child(UI.tex(G.item_tex(it), Rect2(6, 4, 68, 68)))
+		var il: = UI.label(it.name, 17, Color.WHITE, Color("7a4a0c"), 4, "body", 900)
+		il.position = Vector2(80, 6)
+		il.size = Vector2(148, 64)
 		il.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		il.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		ib.add_child(il)
-		var nb: = UI.rbox("red", Rect2(150, -14, 80, 28), 14, 2, 4)
+		var nb: = UI.rbox("red", Rect2(150, -12, 80, 26), 13, 2, 4)
 		ib.add_child(nb)
-		nb.add_child(UI.center_label(UI.label(V6Txt.s("common.new"), 15, Color.WHITE), Rect2(0, 0, 80, 28)))
+		nb.add_child(UI.center_label(UI.label(V6Txt.s("common.new"), 14, Color.WHITE), Rect2(0, 0, 80, 26)))
+	y += 100
 	if shards_found > 0 and cfg.has("shard"):
 		var sh: String = cfg.shard
 		var have: = mini(int(G.S.shards.get(sh, 0)), G.SHARDS_NEED)
-		var sc: = Common.chip(card, null, V6Txt.s("play.shard_chip") % [G.HEROES[sh].name, have, G.SHARDS_NEED, V6Txt.s("play.shard_full") if have >= G.SHARDS_NEED else ""], Rect2(30, 322, pw - 60, 34), "gold", 17)
+		Common.chip(plate, null, V6Txt.s("play.shard_chip") % [G.HEROES[sh].name, have, G.SHARDS_NEED, V6Txt.s("play.shard_full") if have >= G.SHARDS_NEED else ""], Rect2(20, y, pw - 40, 34), "gold", 17)
+		y += 42
+
+	var rank_box: Control = null
 	if mode != "trial":
-		var hl: = UI.label(V6Txt.s("play.aff10"), 18, Color("e0457b"), Color.WHITE, 3, "body", 900)
-		hl.position = Vector2(112, 74)
-		rr.add_child(hl)
+		rank_box = _v8_rank_block(plate, Rect2(20, y, pw - 40, 0))
+		y += rank_box.size.y + 10
+		var li: = V8PlayRules.league_info()
+		if not li.is_empty():
+			_v8_league_row(plate, Rect2(20, y, pw - 40, 58), li)
+			y += 66
+	y = _v8_yaku_chips(plate, 20.0, y, pw - 40) + 16
+	plate.size.y = y
+	plate.pivot_offset = plate.size * 0.5
+	UI.pop_in(plate, 0.2, 0.85)
+	var plate_end: = plate.position.y + y
 
-	var yh: = 44.0 + maxi(1, mini(yaku_list.size(), 8)) * 30 + 104
-	var yp: = _yaku_panel(root, Rect2((W - pw) * 0.5, py + 500, pw, yh))
-
-	var by: = H - 150.0
+	var by: = H - 132.0
 	var next_text: = V6Txt.s("play.next") if mode == "" else (V6Txt.s("common.to_home") if mode == "daily" else V6Txt.s("play.to_banner"))
 	victory_next_btn = JButton.make(next_text, "pink", Rect2(W * 0.5 - 290, by, 280, 96), null, 26)
 	victory_next_btn.shine_every = 2.5
@@ -1203,7 +1588,7 @@ func _victory(stars: int, reward: int, secs: float, first: bool) -> void :
 	root.add_child(victory_summon_btn)
 	UI.pop_in(victory_next_btn, 0.9)
 	UI.pop_in(victory_summon_btn, 1.0)
-	V7Photo.victory_hook(self, root, stars, secs)
+	_v8_photo_row(root, stars, secs, plate_end, by)
 
 	await get_tree().create_timer(0.7).timeout
 	for i in stars:
@@ -1213,91 +1598,199 @@ func _victory(stars: int, reward: int, secs: float, first: bool) -> void :
 		s.texture = G.fx("star")
 		UI.pop_in(s, 0.0, 2.2)
 		Sfx.play("star%d" % i)
-		Fx.burst(root, card.position + s.position + s.size * 0.5, "sparkle", 26, Color(1, 0.85, 0.4), 1.2)
+		Fx.burst(root, plate.position + s.position + s.size * 0.5, "sparkle", 26, Color(1, 0.85, 0.4), 1.2)
 		await get_tree().create_timer(0.32).timeout
+	if not is_inside_tree():
+		return
 	Sfx.say(partner, "win")
 
 	var tw: = create_tween()
 	tw.tween_method( func(v): gl.text = "+%d" % int(v), 0.0, float(reward + gained), 0.8)
 	if reward + gained > 0:
-		main.fly_gems(card.position + Vector2(80, 260), 8)
-	await _animate_rank(yp)
+		main.fly_gems(plate.position + rr.position + Vector2(50, 46), 8)
+	if rank_box:
+		await _animate_rank(rank_box)
 	Sfx.music("menu")
 	if first_unlock_summon:
 		await get_tree().create_timer(1.6).timeout
 		if is_inside_tree():
 			_summon_unlocked()
 
-func _yaku_panel(root: Control, r: Rect2) -> Control:
-	var box: = UI.rbox("cream", r, 30, 4, 12)
-	root.add_child(box)
-	UI.pop_in(box, 0.45, 0.8)
-	var hd: = UI.label(V6Txt.s("play.yaku_head"), 17, Color("ffd98a"), Color(0.1, 0.05, 0.2), 3, "body", 900)
-	hd.position = Vector2(24, 12)
-	box.add_child(hd)
-	var shown: = yaku_list.slice(0, 8)
-	for i in shown.size():
-		var y: String = shown[i]
-		var nm: = UI.label(_yaku_name(y), 21, Color("fff1dc"), Color(0.1, 0.05, 0.2), 3, "title", 800)
-		nm.position = Vector2(24, 40 + i * 30)
-		box.add_child(nm)
-		var pts: = UI.label("+%d" % _yaku_rp(y), 20, Color("ffd34d"), Color(0.1, 0.05, 0.2), 3, "body", 900)
-		pts.position = Vector2(r.size.x - 90, 42 + i * 30)
-		box.add_child(pts)
-		nm.modulate.a = 0
-		pts.modulate.a = 0
-		var tw: Tween = nm.create_tween()
-		tw.tween_interval(1.4 + i * 0.22)
-		tw.tween_property(nm, "modulate:a", 1.0, 0.15)
-		tw.parallel().tween_property(pts, "modulate:a", 1.0, 0.15)
-		tw.tween_callback( func(): Sfx.play("star%d" % mini(i, 2), 1.2, -6))
-	if shown.is_empty():
-		var nl: = UI.label(V6Txt.s("play.no_yaku"), 18, Color("d9c4e6"))
-		nl.position = Vector2(24, 44)
-		box.add_child(nl)
-	var by: = r.size.y - 92
-	var info: = G.rank_of(rp_before)
-	var em: = Common.rank_emblem(box, Rect2(18, by, 76, 76), info.tier, info.sub)
+const V8_HERO_H: = 760.0
+const V8_HERO_DROP: = 250.0
+
+# album chip, replay and photo buttons (V7Photo.victory_hook) moved into the column under the plate
+func _v8_photo_row(root: Control, stars: int, secs: float, plate_end: float, by: float) -> void :
+	var n0: = root.get_child_count()
+	V7Photo.victory_hook(self, root, stars, secs)
+	var btns: = []
+	var chip: Control = null
+	for i in range(n0, root.get_child_count()):
+		var c: = root.get_child(i)
+		if c is JButton:
+			btns.append(c)
+		elif c is Control and chip == null:
+			chip = c
+	var row_y: = by - 76.0
+	if chip:
+		chip.position = Vector2(W * 0.5 - chip.size.x * 0.5, minf(plate_end + 12.0, row_y - 54.0))
+	var x0: = 24.0
+	for b in btns:
+		var jb: JButton = b
+		jb.position = Vector2(x0, row_y)
+		x0 += jb.size.x + 12.0
+
+func _v8_rank_block(parent: Control, r: Rect2) -> Control:
+	var before: = G.rank_of(rp_before)
+	var after: = G.rank_of(int(G.S.rp))
+	var up: = rank_ups.size() > 0
+	var opened: = V8PlayRules.modes_opened(rp_before, int(G.S.rp)) if up else []
+	var h: = 112.0 + (46.0 if up else 0.0) + (40.0 if not opened.is_empty() else 0.0)
+	var box: = UI.rbox("glass", Rect2(r.position, Vector2(r.size.x, h)), 24, 3, 8)
+	box.borders(Color("ffe7a6"), Color("c58a2c"))
+	parent.add_child(box)
+	var em: = Common.rank_emblem(box, Rect2(12, 12, 84, 84), after.tier, after.sub)
 	em.name = "Em"
-	var tl: = UI.label(info.title, 22, Color("fff1dc"), Color(0.1, 0.05, 0.2), 3, "body", 900)
-	tl.name = "T"
-	tl.position = Vector2(106, by + 2)
+	var tl: = UI.label(after.title, 26, Color("fff1dc"), UI.DARK, 3, "body", 900)
+	tl.position = Vector2(108, 6)
+	tl.size = Vector2(r.size.x - 108 - 196, 36)
+	tl.clip_text = true
 	box.add_child(tl)
-	var gl: = UI.label(V6Txt.s("play.rp_gain") % rp_gain, 20, Color("ffd34d"), Color(0.1, 0.05, 0.2), 3, "body", 900)
-	gl.position = Vector2(r.size.x - 130, by + 4)
+	var gl: = UI.label(V8PlayRules.T.rank_gain % [rp_gain, V8PlayRules.points_word(rp_gain)], 19, Color("ffd34d"), UI.DARK, 3, "body", 900)
+	gl.position = Vector2(r.size.x - 206, 10)
+	gl.size = Vector2(192, 30)
+	gl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	box.add_child(gl)
-	var bar: = Common.progress_bar(box, Rect2(106, by + 40, r.size.x - 130, 20), float(info.into) / info.need, "gold")
+	var bw: = r.size.x - 108 - 16
+	var f0: = 0.0 if up else clampf(float(before.into) / maxf(1.0, before.need), 0.0, 1.0)
+	var f1: = clampf(float(after.into) / maxf(1.0, after.need), 0.0, 1.0)
+	var bar: = Common.progress_bar(box, Rect2(108, 46, bw, 22), f0, "gold")
+	var sub_t: = (V8PlayRules.T.rank_was % [before.title, int(before.into), int(before.need)]) + "   ·   " + (V8PlayRules.T.rank_now % [after.title, int(after.into), int(after.need)]) if up else (V8PlayRules.T.rank_now % [after.title, int(after.into), int(after.need)])
+	var sub: = UI.label(sub_t, 16, UI.MUTED, UI.DARK, 2, "body", 800)
+	sub.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	sub.position = Vector2(108, 74)
+	sub.size = Vector2(bw, 26)
+	sub.clip_text = true
+	box.add_child(sub)
+	if up:
+		var gems: = 0
+		for u in rank_ups:
+			gems += int(u.gems)
+		var pill: = UI.rbox("gold", Rect2(12, 108, r.size.x - 24, 38), 19, 2, 4)
+		box.add_child(pill)
+		pill.add_child(UI.center_label(UI.label(V8PlayRules.T.rank_up % [after.title, gems], 19, Color("3f2808"), Color(0, 0, 0, 0), 0, "body", 900), Rect2(0, 0, r.size.x - 24, 38)))
+		pill.modulate.a = 0.0
+		box.set_meta("pill", pill)
+		if not opened.is_empty():
+			var ol: = UI.center_label(UI.label(V8PlayRules.T.mode_open % ", ".join(opened), 18, Color("a9d9c4"), UI.DARK, 3, "body", 900), Rect2(12, 150, r.size.x - 24, 32))
+			ol.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+			box.add_child(ol)
 	box.set_meta("bar", bar)
-	box.set_meta("bar_w", r.size.x - 130 - 6)
-	box.set_meta("by", by)
+	box.set_meta("bar_w", bw - 6.0)
+	box.set_meta("f1", f1)
 	return box
+
+# weekly league + quarter, two lines. Week points come from the tournament tables only, so with none yet the
+# row says where they come from instead of showing a bare last place.
+func _v8_league_row(parent: Control, r: Rect2, li: Dictionary, week_gain: = 0) -> void :
+	var row: = UI.rbox("glass", r, 24, 2, 6)
+	parent.add_child(row)
+	row.add_child(UI.tex(G.icon("trophy"), Rect2(8, (r.size.y - 44) * 0.5, 44, 44)))
+	var col: Color = li.color if li.color is Color else Color("ffd98a")
+	var t1: String
+	if int(li.get("points", 0)) <= 0:
+		t1 = V8PlayRules.T.league_none % [li.league_name, int(li.place), int(li.group_size)]
+	else:
+		t1 = V8PlayRules.T.league % [li.league_name, int(li.place), int(li.group_size)]
+		if week_gain > 0:
+			t1 += V8PlayRules.T.league_gain % [week_gain, V8PlayRules.points_word(week_gain)]
+	var a: = UI.label(t1, 18, col.lightened(0.2), UI.DARK, 3, "body", 900)
+	a.position = Vector2(60, 4)
+	a.size = Vector2(r.size.x - 72, 26)
+	a.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	a.clip_text = true
+	row.add_child(a)
+	# near the bottom of the quarter table (a new player) the row says what the points are for, not «1001 из 1001»
+	var qt: = int(li.get("q_total", 1001))
+	var t2: String = V8PlayRules.T.quarter % [UI.fmt(int(li.q_place)), UI.fmt(qt)] if int(li.q_place) > 0 and int(li.q_place) <= int(qt * 0.8) else V8PlayRules.T.quarter_new
+	if rp_gain > 0:
+		t2 += V8PlayRules.T.quarter_gain % [rp_gain, V8PlayRules.points_word(rp_gain)]
+	var b: = UI.label(t2, 16, Color("a9d9c4"), UI.DARK, 3, "body", 900)
+	b.position = Vector2(60, 30)
+	b.size = Vector2(r.size.x - 72, 24)
+	b.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	b.clip_text = true
+	row.add_child(b)
+
+# compact yaku: one wrapped row of chips «Риичи +10»; returns the y under it
+func _v8_yaku_chips(parent: Control, x: float, y: float, w: float) -> float:
+	var hd: = UI.label(V8PlayRules.T.yaku_head, 15, Color("ffd98a"), UI.DARK, 2, "body", 900)
+	hd.position = Vector2(x + 6, y)
+	parent.add_child(hd)
+	y += 24
+	if yaku_list.is_empty():
+		var nl: = UI.label(V8PlayRules.T.no_yaku, 17, UI.MUTED)
+		nl.position = Vector2(x + 6, y)
+		nl.size = Vector2(w - 12, 26)
+		nl.clip_text = true
+		parent.add_child(nl)
+		return y + 28
+	var f: = UI.font("body", 900)
+	var cx: = x
+	var rows: = 1
+	# 0.8: the chips add up to the rank points of the bar: «Победа +N» (stars / difficulty) and then each yaku
+	var parts: = []
+	var ysum: = 0
+	for yk in yaku_list:
+		ysum += _yaku_rp(yk)
+		parts.append("%s  +%d" % [_yaku_name(yk), _yaku_rp(yk)])
+	var base: = rp_gain - mini(ysum, V8PlayRules.PATH_YAKU_CAP)
+	if base > 0 and ysum <= V8PlayRules.PATH_YAKU_CAP:
+		parts.push_front("Победа  +%d" % base)
+	for i in parts.size():
+		var txt: String = parts[i]
+		var cw: = f.get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, 17).x + 30.0
+		if cx + cw > x + w and cx > x:
+			if rows >= 3:
+				break
+			rows += 1
+			cx = x
+			y += 42
+		var c: = UI.rbox("plum", Rect2(cx, y, cw, 36), 18, 2, 4)
+		c.borders(Color("ffe7a6"), Color("8a6a3a"))
+		parent.add_child(c)
+		c.add_child(UI.center_label(UI.label(txt, 17, Color("ffe7a6"), UI.DARK, 2, "body", 900), Rect2(0, 0, cw, 36)))
+		c.modulate.a = 0.0
+		var tw: Tween = c.create_tween()
+		tw.tween_interval(1.3 + i * 0.16)
+		tw.tween_property(c, "modulate:a", 1.0, 0.15)
+		tw.tween_callback( func(): Sfx.play("star%d" % mini(i, 2), 1.2, -6))
+		cx += cw + 8.0
+	return y + 36
 
 func _animate_rank(box: Control) -> void :
 	if not is_inside_tree() or mode == "trial":
 		return
-	await get_tree().create_timer(0.3 + yaku_list.size() * 0.22).timeout
-	if not is_inside_tree():
+	await get_tree().create_timer(0.2).timeout
+	if not is_inside_tree() or not is_instance_valid(box):
 		return
-	var info: = G.rank_of(int(G.S.rp))
 	var fill: Control = box.get_meta("bar")
+	if fill:
+		var w: float = maxf(fill.size.y, float(box.get_meta("bar_w")) * float(box.get_meta("f1")))
+		fill.create_tween().tween_property(fill, "size:x", w, 0.6).set_trans(Tween.TRANS_QUAD)
 	if rank_ups.size() > 0:
 		var up: Dictionary = rank_ups[-1]
-		var em: Control = box.get_node("Em")
-		var by: float = box.get_meta("by")
-		em.queue_free()
-		var em2: = Common.rank_emblem(box, Rect2(18, by, 76, 76), info.tier, info.sub)
-		UI.pop_in(em2, 0.0, 2.0)
-		(box.get_node("T") as Label).text = info.title
-		Sfx.play("reveal_ssr" if up.sub == 0 else "reveal_sr")
-		Fx.burst(box, Vector2(56, by + 38), "sparkle", 40, G.RANKS[info.tier].color, 1.4)
-		var gems: = 0
-		for u in rank_ups:
-			gems += int(u.gems)
-		main.toast(V6Txt.s("play.rankup") % [info.title, gems], "trophy")
+		var em: Control = box.get_node_or_null("Em")
+		if em:
+			UI.pop_in(em, 0.0, 2.0)
+			Fx.burst(box, em.position + em.size * 0.5, "sparkle", 40, G.RANKS[int(up.tier)].color, 1.4)
+		var pill: Control = box.get_meta("pill", null)
+		if pill:
+			pill.create_tween().tween_property(pill, "modulate:a", 1.0, 0.25)
+			UI.pop_in(pill, 0.0, 0.8)
+		Sfx.play("reveal_ssr" if int(up.sub) == 0 else "reveal_sr")
 		Sfx.say(partner, "rankup")
-	if fill:
-		var w: float = maxf(14.0, float(box.get_meta("bar_w")) * clampf(float(info.into) / info.need, 0.0, 1.0))
-		fill.create_tween().tween_property(fill, "size:x", w, 0.6).set_trans(Tween.TRANS_QUAD)
+	await get_tree().create_timer(0.6).timeout
 
 func _banner_of(h: String) -> int:
 	for i in G.BANNERS.size():
@@ -1316,7 +1809,7 @@ func _summon_unlocked() -> void :
 	Common.rays(p, Vector2(330, 190), 700, Color(1, 0.9, 0.6, 0.6), 12, 0.05, 0.7)
 	var t: = UI.center_label(UI.title(V6Txt.s("play.unlock_name"), 40, Color.WHITE, Color("3f2a7a")), Rect2(0, 230, 660, 60))
 	p.add_child(t)
-	var s: = UI.center_label(UI.label(V6Txt.s("play.unlock_d"), 19, Color("3f2a7a")), Rect2(0, 330, 660, 30))
+	var s: = UI.center_label(UI.label(V6Txt.s("play.unlock_d"), 19, Color("ffe7c4"), UI.DARK, 3, "body", 800), Rect2(20, 330, 620, 30))
 	p.add_child(s)
 	Sfx.play("reveal_sr")
 	Fx.burst(p, Vector2(330, 190), "sparkle", 60, Color(1, 0.85, 0.5), 1.6)
@@ -1379,5 +1872,7 @@ func dev_act(a: String) -> void :
 			_on_clear()
 		"fever":
 			_fever()
+		"timeup":
+			blitz_left = 0.01
 		"cutin":
 			_cutin()

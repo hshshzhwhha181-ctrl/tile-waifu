@@ -23,6 +23,7 @@ var finished: = false
 var started: = false
 var casting: = false
 var taunt_cd: = 0.0
+var award: = {}
 var panel: RBox
 var score_me: Label
 var score_her: Label
@@ -65,20 +66,20 @@ func _build_panel(W: float) -> void :
 	var pw: = panel.size.x
 	var pc: Color = G.HEROES[play.partner].color
 	var rc: Color = G.HEROES[rival].color
-	var l1: = UI.label("ТЫ", 13, Color("cbb5dc"), Color(0.1, 0.05, 0.2), 2, "body", 900)
-	l1.position = Vector2(108, 6)
+	var l1: = UI.label("ТЫ", 16, Color("cbb5dc"), Color(0.1, 0.05, 0.2), 2, "body", 900)
+	l1.position = Vector2(108, 2)
 	panel.add_child(l1)
 	score_me = UI.label("0", 40, Color.WHITE, Color(0.1, 0.05, 0.2), 5, "title", 900)
 	score_me.position = Vector2(106, 16)
 	score_me.size = Vector2(80, 50)
 	score_me.pivot_offset = Vector2(20, 25)
 	panel.add_child(score_me)
-	var vs: = UI.label("пары", 13, Color("cbb5dc"), Color(0.1, 0.05, 0.2), 2, "body", 900)
-	vs.position = Vector2(pw * 0.5 + 30, 30)
+	var vs: = UI.label("пары", 16, Color("cbb5dc"), Color(0.1, 0.05, 0.2), 2, "body", 900)
+	vs.position = Vector2(pw * 0.5 + 22, 30)
 	panel.add_child(vs)
-	var l2: = UI.label(G.HEROES[rival].name.to_upper(), 13, rc.lightened(0.3), Color(0.1, 0.05, 0.2), 2, "body", 900)
-	l2.position = Vector2(pw - 150, 6)
-	l2.size = Vector2(136, 20)
+	var l2: = UI.label(G.HEROES[rival].name.to_upper(), 16, rc.lightened(0.3), Color(0.1, 0.05, 0.2), 2, "body", 900)
+	l2.position = Vector2(pw - 150, 2)
+	l2.size = Vector2(136, 22)
 	l2.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	panel.add_child(l2)
 	score_her = UI.label("0", 40, rc.lightened(0.45), Color(0.1, 0.05, 0.2), 5, "title", 900)
@@ -96,10 +97,13 @@ func _build_panel(W: float) -> void :
 	bar_fill.colors(pc.lightened(0.35), pc).set_param("shadow_color", Color(0, 0, 0, 0))
 	bb.add_child(bar_fill)
 
-	var gl: = UI.label(rv.skill_name, 12, Color("ffd98a"), Color(0.1, 0.05, 0.2), 2, "body", 900)
+	var gl: = UI.label(rv.skill_name, 16, Color("ffd98a"), Color(0.1, 0.05, 0.2), 3, "body", 900)
 	gl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	gl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	gl.clip_text = true
+	gl.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	stage.gauge.get_parent().add_child(gl)
-	gl.position = Vector2(0, -3)
+	gl.position = Vector2(0, -1)
 	gl.size = stage.gauge.get_parent().size
 	her_gauge = stage.gauge
 	her_gauge_w = stage.gauge_w
@@ -377,9 +381,10 @@ func finish() -> void :
 	G.add_aff(rival, 20 if win else (10 if draw else 5))
 	G.add_aff(play.partner, 10)
 	G.add_pass_xp(60)
-	G.save()
+	award = V8PlayRules.award("duel", V8PlayRules.duel_rp(win, draw), win)
 	stage.react("deny" if win else "win")
-	stage.say_text(V6Heroines.line(rival, "lose" if win else "win"), 3.0)
+	_end_line = V6Heroines.line(rival, "lose" if win else ("draw" if draw else "win"))
+	stage.say_text(_end_line, 3.0)
 	play.stage.react("win" if win else "fail")
 	Sfx.play("win" if win or draw else "deny", 1.0 if win else 0.8)
 	await get_tree().create_timer(1.2).timeout
@@ -387,8 +392,11 @@ func finish() -> void :
 		return
 	_result(win, draw, gems, shard)
 
+var _end_line: = ""
+
 func _result(win: bool, draw: bool, gems: int, shard: bool) -> void :
 	var main = play.main
+	play._v8_end_overlays()
 	var title: = "Победа!" if win else ("Ничья" if draw else "Победа за ней")
 	var p: = Common.popup(main, title, 560, "cream", 660.0, false)
 	if win:
@@ -397,25 +405,28 @@ func _result(win: bool, draw: bool, gems: int, shard: bool) -> void :
 	p.add_child(Common.avatar(play.partner, Rect2(60, 70, 130, 130), "gold" if win else "pink"))
 	p.add_child(Common.avatar(rival, Rect2(470, 70, 130, 130), "pink" if win else "gold"))
 	p.add_child(UI.center_label(UI.title("%d : %d" % [me, her], 64, Color("ffe7a6"), Color("5a1a6a")), Rect2(190, 90, 280, 90)))
-	var q: = UI.label("«%s»" % V6Heroines.line(rival, "lose" if win else "win"), 20, rc.lightened(0.5), Color(0.1, 0.05, 0.2), 3, "body", 800)
+	var q: = UI.label("«%s»" % (_end_line if _end_line != "" else V6Heroines.line(rival, "lose" if win else ("draw" if draw else "win"))), 20, rc.lightened(0.5), Color(0.1, 0.05, 0.2), 3, "body", 800)
 	q.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	q.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	q.position = Vector2(40, 214)
 	q.size = Vector2(580, 56)
 	p.add_child(q)
-	var rew: = "+%d кристаллов · ♥ %s" % [gems, G.HEROES[rival].name]
+	var rew: = ("+%d кристаллов · ♥ %s" % [gems, G.HEROES[rival].name]) if gems > 0 else ("♥ %s" % G.HEROES[rival].name)
 	if steals > 0:
 		rew += " · перехватов: %d" % steals
 	p.add_child(UI.center_label(UI.label(rew, 21, UI.INK), Rect2(0, 278, 660, 30)))
 	if shard:
 		var have: = mini(int(G.S.shards.get(rival, 0)), G.SHARDS_NEED)
 		Common.chip(p, null, "Осколок %s: %d/%d%s" % [G.HEROES[rival].name, have, G.SHARDS_NEED, " · она с тобой!" if have >= G.SHARDS_NEED else ""], Rect2(60, 318, 540, 36), "gold", 18)
-	var again: = JButton.make("Реванш", "pink", Rect2(40, 380, 280, 92), null, 30)
+	var by: = 380.0 if shard else 336.0
+	var again: = JButton.make("Реванш", "pink", Rect2(40, by, 280, 92), null, 30)
 	again.shine_every = 2.0
 	again.pressed.connect( func(): main.go("play", {"mode": "duel", "rival": rival, "partner": play.partner, "retry": randi()}))
 	p.add_child(again)
-	var back: = JButton.make("Режимы", "glass", Rect2(340, 380, 280, 92), null, 28)
+	var back: = JButton.make("Режимы", "glass", Rect2(340, by, 280, 92), null, 28)
 	back.pressed.connect( func(): main.go("modes" if main.SCREENS.has("modes") else "home"))
 	p.add_child(back)
+	p.size.y = by + 92 + 40
+	play._v8_popup_rank(p, by - 14.0, award)
 	play.set_meta("v6_duel_result", {"win": win, "me": me, "her": her})
 	print("DUEL %s %d:%d" % ["WIN" if win else ("DRAW" if draw else "LOSE"), me, her])

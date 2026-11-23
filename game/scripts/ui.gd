@@ -33,6 +33,13 @@ const T_H3: = 26
 const T_BODY: = 22
 const T_SMALL: = 18
 const T_TINY: = 15
+const TITLE_MIN: = 24
+
+# font for a caption of `size` px: Playfair («title») only from TITLE_MIN px, Nunito below.
+static func font_for(kind: String, size: int, weight: = 800) -> FontVariation:
+	if kind != "body" and size < TITLE_MIN:
+		return font("body", maxi(weight, 800))
+	return font(kind, weight)
 
 static var _fonts: = {}
 
@@ -69,6 +76,10 @@ static func label(text: String, size: = 28, color: = INK, outline: = Color(0, 0,
 	elif outline.a > 0.0 and outline.s > 0.35 and outline.v > 0.25 and (outline.h > 0.7 or outline.h < 0.05):
 		outline = Color(0.16, 0.06, 0.1, outline.a)
 
+	# 0.8: the Playfair display face is only for captions of TITLE_MIN px and up; smaller text is Nunito.
+	if kind != "body" and size < TITLE_MIN:
+		kind = "body"
+		weight = maxi(weight, 800)
 	var ls: = LabelSettings.new()
 	ls.font = font(kind, weight)
 	ls.font_size = size

@@ -7,7 +7,7 @@ extends Control
 
 const SH: = 1560.0
 const FADE: = 160.0
-const BOTTOM_PAD: = 230.0
+const BOTTOM_PAD: = 310.0  # 0.8: the chapter card at the map bottom can scroll clear of the CTA and the navbar
 const GAPS: = [270.0, 118.0, 118.0, 118.0, 115.0, 115.0, 118.0, 118.0, 240.0, 170.0]
 
 const ORDER: = [0, 1, 2, 3, "mid", 4, 5, 6, 7, "star"]
@@ -83,7 +83,7 @@ func build(m, args: Dictionary) -> void :
 			it.node = _chest_node(it)
 	_build_marker()
 	_build_overlays()
-	_build_modes_bar()
+	V8Header.make(self, main, "Путь · " + G.LOCS[G.LEVELS[sel].loc].name, main.back, _help)
 	_build_play_button()
 
 	var seen: = clampi(int(st.get("seen", int(G.S.unlocked))), 1, int(G.S.unlocked))
@@ -516,19 +516,19 @@ func _build_overlays() -> void :
 		gt.height = 64
 		add_child(UI.tex(gt, Rect2(0, spec[0], W, spec[1]), false))
 
-func _build_modes_bar() -> void :
-	var rect: = Rect2(14, 126, W - 28, 74)
-	if ResourceLoader.exists("res://scripts/screens/modes.gd"):
-		var mod = load("res://scripts/screens/modes.gd")
-		if mod and mod.has_method("build_bar"):
-			mod.build_bar(self, main, rect)
-			return
-	_build_modes()
+func _help() -> void :
+	var p: = Common.popup(main, "Путь", 520)
+	var l: = UI.label("Партии идут по главам. Звёзды: без переполнений лотка и без помощи (подсказка, отмена, перемешать) — три, с одной-двумя — две, иначе одна.\n\nСундук в середине главы открывается после её четвёртой партии, второй — за звёзды главы. В конце главы ждёт босс — хозяйка стола. Победа даёт очки ранга, кристаллы и осколки героинь.", 21, UI.INK)
+	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	l.position = Vector2(40, 64)
+	l.size = Vector2(580, 380)
+	l.custom_minimum_size = Vector2(580, 0)
+	p.add_child(l)
 
 func _build_play_button() -> void :
 	var lv: Dictionary = G.LEVELS[cur]
 	var boss: bool = lv.get("boss", false)
-	play_btn = JButton.make(("Босс %s" if boss else "Партия %s") % lv.code, "red" if boss else "pink", Rect2(W * 0.5 - 220, H - 132 - 122, 440, 104), null, 36)
+	play_btn = JButton.make(("Босс %s" if boss else "Партия %s") % lv.code, "red" if boss else "pink", Rect2(W * 0.5 - 220, H - 132 - 134, 440, 104), null, 36)
 	play_btn.set_sub(G.LOCS[lv.loc].name, 19)
 	play_btn.shine_every = 2.2
 	play_btn.pressed.connect( func():
@@ -546,7 +546,16 @@ func _scroll_to_level(i: int, animate: bool) -> void :
 	_scroll_to(it.pos.y, animate)
 
 func _scroll_to(y: float, animate: bool, dur: = 0.5) -> void :
-	var target: = _clamp_y(H * 0.52 - y)
+	# 0.8: focus a bit above the middle — the CTA and navbar cover the bottom 270 px; when a chapter card
+	# (at the bottom of each chapter) would land behind them, scroll it up clear of the CTA
+	var t: = H * 0.44 - y
+	var cta_top: = H - 132.0 - 134.0 - 12.0
+	for w in V6Worlds.world_count():
+		var gy: = _world_top(w) + SH - 150.0
+		var top: = t + gy
+		if top < H and top + 140.0 > cta_top:
+			t -= top + 140.0 - cta_top
+	var target: = _clamp_y(t)
 	_vel = 0.0
 	if animate:
 		create_tween().tween_property(map_root, "position:y", target, dur).set_trans(Tween.TRANS_QUART).set_ease(Tween.EASE_OUT)
@@ -563,7 +572,7 @@ func _input(e: InputEvent) -> void :
 	if not is_visible_in_tree() or _anim:
 		return
 	if e is InputEventScreenTouch:
-		if e.pressed and e.position.y > 205 and e.position.y < H - 132 and not _popup_open():
+		if e.pressed and e.position.y > V8Header.CONTENT_Y and e.position.y < H - 132 and not _popup_open():
 			_drag = true
 			_drag_y = e.position.y
 			_moved = 0.0
@@ -792,13 +801,23 @@ func pick_partner(level: int) -> void :
 		nl.position = Vector2(132, 12)
 		row.add_child(nl)
 		Common.chip(row, G.icon("heart"), "ур. %d" % G.aff_level(h), Rect2(450, 14, 140, 40), "pink", 18)
-		var pk: = UI.label(_t("levels.skill", "Умение «%s»: %s") % [G.SKILLS[h].name, G.SKILLS[h].desc], 17, Color("ffd98a"), UI.DARK, 2, "body", 900)
+		var pk_t: String = _t("levels.skill", "Умение «%s»: %s") % [G.SKILLS[h].name, G.SKILLS[h].desc]
+		var pk_fs: = 17
+		while pk_fs > 14 and UI.font("body", 900).get_string_size(pk_t, HORIZONTAL_ALIGNMENT_LEFT, -1, pk_fs).x > 452.0:
+			pk_fs -= 1
+		var pk: = UI.label(pk_t, pk_fs, Color("ffd98a"), UI.DARK, 2, "body", 900)
 		pk.position = Vector2(132, 52)
-		pk.size = Vector2(460, 28)
+		pk.size = Vector2(452, 28)
+		pk.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		pk.clip_text = true
 		row.add_child(pk)
-		var bonus: = UI.label(_t("levels.perk", "Перк: %s") % G.PERKS[h], 16, Color("9a6a8a"))
+		var bonus: = UI.label(_t("levels.perk", "Перк: %s") % G.PERKS[h], 16, Color("e9cfe0"), UI.DARK, 2, "body", 800)
 		bonus.position = Vector2(132, 84)
+		bonus.size = Vector2(452, 24)
+		bonus.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		bonus.clip_text = true
 		row.add_child(bonus)
+		row.set_meta("b0", [row.mat.get_shader_parameter("border_top"), row.mat.get_shader_parameter("border_bottom")])
 		V7Passives.partner_row(row, h, G.LEVELS[level])
 		partner_rows[h] = row
 		row.gui_input.connect( func(e):
@@ -810,10 +829,10 @@ func pick_partner(level: int) -> void :
 					var r: RBox = partner_rows[k]
 					if not G.hero_unlocked(k):
 						continue
-					r.colors(UI.PAL["rose" if k == h else "glass"][0], UI.PAL["rose" if k == h else "glass"][1])
+					_pick_style(r, k == h)
 				UI.punch(row, 0.06))
 		if h == cur_h[0]:
-			row.colors(UI.PAL.rose[0], UI.PAL.rose[1])
+			_pick_style(row, true)
 	partner_go_btn = JButton.make(_t("levels.deal", "Раздать фишки"), "pink", Rect2(130, p.size.y - 120, 400, 96), null, 32)
 	partner_go_btn.shine_every = 2.0
 	partner_go_btn.pressed.connect( func():
@@ -824,58 +843,15 @@ func pick_partner(level: int) -> void :
 	p.add_child(partner_go_btn)
 
 
-func _build_modes() -> void :
-	var modes: = [
-		["path", "Путь", "%d партий" % G.LEVELS.size()], 
-		["blitz", "Блиц", "рекорд %d" % int(G.S.get("blitz_best", 0))], 
-		["zen", "Сад", "без таймера"], 
-		["daily", "Раскладка дня", "готово" if G.daily_done_today() else "новая"], 
-	]
-	var x: = 14.0
-	var ws: = [140.0, 150.0, 150.0, 236.0]
-	for i in modes.size():
-		var m: Array = modes[i]
-		var on: bool = m[0] == "path"
-		var b: = UI.rbox("gold" if on else "plum", Rect2(x, 126, ws[i] - 8, 74), 22, 3, 8)
-		if not on:
-			b.borders(Color("ffe7a6"), Color("c58a2c"))
-		b.mouse_filter = Control.MOUSE_FILTER_STOP
-		add_child(b)
-		b.add_child(UI.center_label(UI.label(m[1], 22, Color.WHITE if not on else Color("4a2a06"), UI.DARK if not on else Color(1, 1, 1, 0.6), 3, "body", 900), Rect2(0, 6, ws[i] - 8, 32)))
-		b.add_child(UI.center_label(UI.label(m[2], 15, Color("e9dcff") if not on else Color("6a4a16")), Rect2(0, 38, ws[i] - 8, 26)))
-		var id: String = m[0]
-		b.gui_input.connect( func(e):
-			if e is InputEventMouseButton and e.pressed:
-				Sfx.play("pop")
-				UI.punch(b, 0.08)
-				_open_mode(id))
-		UI.slide_in(b, Vector2(0, -30), 0.05 * i)
-		x += ws[i]
-
-func _open_mode(id: String) -> void :
-	match id:
-		"blitz":
-			_mode_popup("Блиц", "Две минуты, столы сменяют друг друга. Чистый стол даёт +10 секунд, переполненный лоток отнимает 10. Очки растут с комбо.", "Рекорд: %d" % int(G.S.get("blitz_best", 0)), func(): main.go("play", {"mode": "blitz", "partner": G.S.level_partner}))
-		"zen":
-			_mode_popup("Сад без спешки", "Бесконечные столы, шесть мест в лотке и никакого проигрыша: если лоток заполнится, три фишки тихо вернутся. +30 кристаллов за каждый стол.", "Для вечера после работы", func(): main.go("play", {"mode": "zen", "partner": G.S.level_partner}))
-		"daily":
-			Daily.calendar(main)
-
-func _mode_popup(title: String, text: String, sub: String, go_cb: Callable) -> void :
-	var p: = Common.popup(main, title, 420)
-	var l: = UI.label(text, 22, UI.INK)
-	l.position = Vector2(40, 70)
-	l.size = Vector2(580, 160)
-	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	p.add_child(l)
-	var sl: = UI.label(sub, 20, Color("ffd98a"), UI.DARK, 3, "body", 900)
-	sl.position = Vector2(40, 236)
-	p.add_child(sl)
-	var b: = JButton.make("Начать", "pink", Rect2(130, 290, 400, 96), null, 34)
-	b.shine_every = 2.0
-	b.pressed.connect(go_cb)
-	p.add_child(b)
-
+# 0.8: the chosen partner card stays dark (light text keeps its contrast) with a pink rim
+func _pick_style(r: RBox, on: bool) -> void :
+	if on:
+		r.colors(Color(0.36, 0.15, 0.26, 0.95), Color(0.2, 0.07, 0.15, 0.96)).borders(Color("ffb3c8"), Color("e0457b"))
+	else:
+		r.colors(UI.PAL.glass[0], UI.PAL.glass[1])
+		var b0: Array = r.get_meta("b0", [])
+		if b0.size() == 2 and b0[0] is Color and b0[1] is Color:
+			r.borders(b0[0], b0[1])
 
 func dev_act(a: String) -> void :
 	match a:
@@ -887,6 +863,10 @@ func dev_act(a: String) -> void :
 			open_card(cur)
 		"top":
 			_scroll_to(0.0, false)
+		"back":
+			main.android_back()
+		"help":
+			_help()
 		_:
 			if a.begins_with("w") and a.length() == 2:
 				_scroll_to(_world_top(int(a.substr(1))) + SH * 0.5, false)

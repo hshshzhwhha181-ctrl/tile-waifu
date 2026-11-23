@@ -36,7 +36,7 @@ func enabled() -> bool:
 	var a: = _args()
 	if a.has("story_off"):
 		return false
-	if a.has("shots") and not a.has("story_shots"):
+	if a.has("shots") and not a.has("story_shots") and not a.has("pt"):
 		return false
 	return true
 

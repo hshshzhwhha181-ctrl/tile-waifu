@@ -247,4 +247,4 @@ static func to_play(id: String) -> Dictionary:
 	var d: Dictionary = SCENES[id]
 	var h: String = d.hero
 	var src: Dictionary = V7RoomData.ROOMS[h] if d.bg == "room" else V7RoomData.PLACES[d.bg]
-	return {"bg_path": src.bg, "fx": src.fx, "focus": src.focus, "title": "Связь %d · %s" % [d.lv, d.title], "cast": [h], "lines": d.lines}
+	return {"bg_path": src.bg, "fx": src.fx, "focus": src.focus, "title": "Симпатия %d · %s" % [d.lv, d.title], "cast": [h], "lines": d.lines}

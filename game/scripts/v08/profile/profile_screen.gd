@@ -25,7 +25,7 @@ func build(m, args: Dictionary) -> void :
 	back_to = f if f in main.SCREENS and not f in ["profile", "play", "arena", "v7play"] else "home"
 	Common.backdrop(self, "bg_festival", size, 2.6, 0.5, Color(1, 0.95, 0.95))
 	Common.vignette(self, size, Color(0.06, 0.04, 0.08), 0.7)
-	V8Header.make(self, main, V8ProfileUI.s("profile.title"), func(): main.go(back_to))
+	V8Header.make(self, main, V8ProfileUI.s("profile.title"), main.back)
 	var top: = V8Header.CONTENT_Y + 6
 	var bottom: = H - 112.0
 	cw = W - 48
@@ -47,7 +47,7 @@ func build(m, args: Dictionary) -> void :
 	_code()
 	_settings()
 	var pad: = Control.new()
-	pad.custom_minimum_size = Vector2(cw, 40)
+	pad.custom_minimum_size = Vector2(cw, 60)
 	pad.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	list.add_child(pad)
 	var i: = 0
@@ -149,13 +149,13 @@ func _rank() -> void :
 	t.position = Vector2(166, 20)
 	t.size = Vector2(cw - 190, 50)
 	c.add_child(t)
-	var last: = ri.tier == G.RANKS.size() - 1
+	var last: bool = int(ri.tier) == G.RANKS.size() - 1
 	Common.progress_bar(c, Rect2(168, 82, cw - 196, 24), 1.0 if last else float(ri.into) / maxf(1.0, ri.need), "gold")
 	var nxt: = ""
 	if last:
 		nxt = V8ProfileUI.s("profile.rank_top")
 	else:
-		var k: = ri.tier * 3 + ri.sub + 1
+		var k: int = int(ri.tier) * 3 + int(ri.sub) + 1
 		nxt = V8ProfileUI.s("profile.rank_next") % [ri.into, ri.need, G.rank_title(k / 3, k % 3)]
 	_lbl(c, nxt, Vector2(170, 112), 18, Color("ffe7a6"), cw - 196)
 	_lbl(c, V8ProfileUI.s("profile.rank_total") % rp, Vector2(170, 138), 17, UI.MUTED, cw - 196)
@@ -172,15 +172,21 @@ func _league() -> void :
 	if info.has("week"):
 		var w: Dictionary = info.week
 		var lt: = clampi(int(w.get("league_tier", 0)), 0, G.RANKS.size() - 1)
-		tiles.append([V8ProfileUI.s("profile.week") + " · " + G.RANKS[lt].name, V8ProfileUI.s("profile.place") % [int(w.get("place", 0)), int(w.get("group_size", 20))], V8ProfileUI.s("profile.pts") % int(w.get("points", 0)), lt])
+		if int(w.get("points", 0)) > 0:
+			tiles.append([V8ProfileUI.s("profile.week") + " · " + G.RANKS[lt].name, V8ProfileUI.s("profile.place") % [UI.fmt(int(w.get("place", 0))), UI.fmt(int(w.get("group_size", 20)))], _pts(int(w.get("points", 0))), lt])
+		else:
+			# no tournament table played this week: the same «#19 из 20» as the home league card, with where
+			# week points come from
+			tiles.append([V8ProfileUI.s("profile.week") + " · " + G.RANKS[lt].name, V8ProfileUI.s("profile.place") % [UI.fmt(int(w.get("place", 0))), UI.fmt(int(w.get("group_size", 20)))], V8ProfileUI.s("profile.league_none"), lt])
 	else:
 		tiles.append([V8ProfileUI.s("profile.week"), V8ProfileUI.s("profile.league_open"), V8ProfileUI.s("profile.league_none"), -1])
 	if info.has("quarter"):
 		var q: Dictionary = info.quarter
-		tiles.append([V8ProfileUI.s("profile.quarter"), V8ProfileUI.s("profile.place") % [int(q.get("place", 0)), int(q.get("total", 1001))], V8ProfileUI.s("profile.pts") % int(q.get("points", 0)), -1])
+		tiles.append([V8ProfileUI.s("profile.quarter"), V8ProfileUI.s("profile.place") % [UI.fmt(int(q.get("place", 0))), UI.fmt(int(q.get("total", 1001)))], _pts(int(q.get("points", 0))), -1])
 	for i in tiles.size():
 		var tl: Array = tiles[i]
 		var wdt: = tw if tiles.size() > 1 else cw - 48
+		var tab: = "week" if i == 0 else "quarter"
 		var b: = UI.rbox("plum", Rect2(24 + i * (tw + 14), 60, wdt, 98), 22, 3, 8)
 		b.set_param("border_top", Color("ffe7a6")).set_param("border_bottom", Color("c58a2c"))
 		b.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -188,16 +194,24 @@ func _league() -> void :
 		c.add_child(b)
 		var x0: = 18.0
 		if int(tl[3]) >= 0:
-			Common.rank_emblem(b, Rect2(8, 12, 74, 74), int(tl[3]), 2)
+			# a league has no sub-step: hide the numeral, as on the home league card
+			Common.rank_emblem(b, Rect2(8, 12, 74, 74), int(tl[3]), 0).get_child(-1).visible = false
 			x0 = 88.0
 		_lbl(b, tl[0], Vector2(x0, 8), 16, UI.MUTED, wdt - x0 - 10).text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-		_lbl(b, tl[1], Vector2(x0, 30), 26, Color.WHITE, wdt - x0 - 10)
-		_lbl(b, tl[2], Vector2(x0, 66), 16, Color("ffe7a6"), wdt - x0 - 10)
+		# 0.8: the big value shrinks to the tile instead of running into its border
+		var fs1: = 26
+		while fs1 > 18 and UI.font("body", 900).get_string_size(String(tl[1]), HORIZONTAL_ALIGNMENT_LEFT, -1, fs1).x > wdt - x0 - 12:
+			fs1 -= 1
+		_lbl(b, tl[1], Vector2(x0, 30 + (26 - fs1) * 0.5), fs1, Color.WHITE, wdt - x0 - 10)
+		var fs2: = 16
+		var l2: = _lbl(b, tl[2], Vector2(x0, 66), fs2, Color("ffe7a6"), wdt - x0 - 10)
+		l2.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		l2.clip_text = true
 		b.gui_input.connect( func(e):
 			if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT:
 				Sfx.play("pop")
 				UI.punch(b, 0.06)
-				main.go("v7tourney"))
+				main.go("v7tourney", {"tab": tab}))
 
 
 func _stats() -> void :
@@ -223,7 +237,7 @@ func _stats() -> void :
 	var sm: = _lbl(c, V8ProfileUI.s("profile.stats_sum") % [passed, stars, G.S.get("yaku_seen", {}).size(), G.YAKU.size() - 1], Vector2(24, 60), 17, Color("ffe7a6"), cw - 48)
 	sm.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	var y: = 98.0
-	var cols: = [cw - 330, cw - 214, cw - 104]
+	var cols: = [cw - 360, cw - 246, cw - 136]
 	_lbl(c, V8ProfileUI.s("profile.col_mode"), Vector2(24, y), 16, UI.MUTED)
 	var heads: = [V8ProfileUI.s("profile.col_games"), V8ProfileUI.s("profile.col_wins"), V8ProfileUI.s("profile.col_rp")]
 	for j in 3:
@@ -276,7 +290,7 @@ func _ladder() -> void :
 		var nl: = UI.label(rk.name, 28, rk.color if t <= ri.tier else Color("8a7a9a"), UI.DARK, 4, "title", 900)
 		nl.position = Vector2(110, 8)
 		row.add_child(nl)
-		var sub: = V6Txt.s("rank.sub") % rk.per if t < G.RANKS.size() - 1 else V6Txt.s("rank.sub_top") % rk.per
+		var sub: String = V6Txt.s("rank.sub") % rk.per if t < G.RANKS.size() - 1 else V6Txt.s("rank.sub_top") % rk.per
 		_lbl(row, sub, Vector2(112, 50), 16, UI.MUTED, cw - 300)
 		var gl: = UI.label("+%d" % rk.gems, 20, Color("ffd34d"), UI.DARK, 3, "body", 900)
 		gl.position = Vector2(cw - 150, 14)
@@ -384,3 +398,7 @@ func dev_act(act: String) -> void :
 			_nick_popup()
 		"avatar":
 			_avatar_popup()
+
+
+static func _pts(n: int) -> String:
+	return "%s %s" % [UI.fmt(n), V8PlayRules.points_word(n)]

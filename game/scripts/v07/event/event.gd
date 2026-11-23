@@ -11,6 +11,13 @@ func _ready() -> void :
 			G.ITEM[it.id] = it
 	if "--event_selftest=1" in OS.get_cmdline_user_args():
 		_selftest.call_deferred()
+	if "--league_selftest=1" in OS.get_cmdline_user_args():
+		_league_selftest.call_deferred()
+
+
+func _league_selftest() -> void :
+	var fails: = V8LeagueSelftest.run()
+	get_tree().quit(1 if fails > 0 else 0)
 
 
 func _selftest() -> void :

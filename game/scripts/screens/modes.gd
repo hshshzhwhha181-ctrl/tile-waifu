@@ -1,53 +1,28 @@
 extends Control
 
-
+# 0.8 «Режимы»: V8Header; two big entries (Путь, Турнир недели); «Стол риичи» closed «Скоро»;
+# other modes as a compact list, opened by the single rank (V6ModesData.GATES).
 
 const DUEL_SCRIPT: = "res://scripts/v06/heroines/duel.gd"
+const Y0: = V8Header.CONTENT_Y + 12.0
+
+const LIST: = [
+	["daily", "Раскладка дня", "bg_street"], 
+	["blitz", "Блиц", "bg_festival"], 
+	["zen", "Сад", "play"], 
+	["duel", "Дуэль", "bg_neon"], 
+	["etude", "Этюды", "bg_shrine"], 
+	["shift", "Смена в чайной", "bg_teahouse"], 
+	["climb", "Лунная лестница", "bg_palace"], 
+]
 
 var main
 var W: = 720.0
 var H: = 1280.0
+var path_card: Control
+var tour_card: Control
+var mode_tiles: = {}
 
-
-static func build_bar(screen: Control, main, rect: Rect2) -> void :
-	var items: = [
-		["path", "Путь", "%d партий" % G.LEVELS.size(), 0.22], 
-		["modes", "Режимы", "дуэль · лестница · этюды", 0.44], 
-		["daily", "Раскладка дня", "готово" if G.daily_done_today() else "новая", 0.34], 
-	]
-	var x: = rect.position.x
-	for i in items.size():
-		var it: Array = items[i]
-		var w: float = rect.size.x * float(it[3]) - 8
-		var on: bool = it[0] == "path"
-		var hot: bool = it[0] == "modes"
-		var b: = UI.rbox("gold" if on else "plum", Rect2(x, rect.position.y, w, rect.size.y), 22, 3, 8)
-		if not on:
-			b.borders(Color("ffe7a6"), Color("c58a2c"))
-		if hot:
-			b.colors(Color(0.42, 0.18, 0.36, 0.95), Color(0.24, 0.08, 0.22, 0.96))
-		b.mouse_filter = Control.MOUSE_FILTER_STOP
-		b.pivot_offset = b.size * 0.5
-		screen.add_child(b)
-		b.add_child(UI.center_label(UI.label(it[1], 22, Color.WHITE if not on else Color("4a2a06"), UI.DARK if not on else Color(1, 1, 1, 0.6), 3, "body", 900), Rect2(0, 6, w, 32)))
-		b.add_child(UI.center_label(UI.label(it[2], 15, Color("e9dcff") if not on else Color("6a4a16")), Rect2(0, 38, w, 26)))
-		if hot:
-			b.shine(0.6)
-			if not "hub" in V6ModesData.st().seen:
-				var nb: = UI.rbox("red", Rect2(w - 66, -12, 72, 26), 13, 2, 4)
-				b.add_child(nb)
-				nb.add_child(UI.center_label(UI.label("НОВОЕ", 13, Color.WHITE, Color("6a1020"), 2, "body", 900), Rect2(0, 0, 72, 26)))
-		var id: String = it[0]
-		b.gui_input.connect( func(e):
-			if e is InputEventMouseButton and e.pressed:
-				Sfx.play("pop")
-				UI.punch(b, 0.08)
-				if id == "modes":
-					main.go("modes")
-				elif id == "daily":
-					Daily.calendar(main))
-		UI.slide_in(b, Vector2(0, -30), 0.05 * i)
-		x += w + 8
 
 func build(m, args: Dictionary) -> void :
 	main = m
@@ -61,43 +36,69 @@ func build(m, args: Dictionary) -> void :
 		G.save()
 	Common.backdrop(self, "menu", size, 2.4, 0.7)
 	Common.vignette(self, size, Color(0.2, 0.06, 0.18), 0.55)
-	var hd: = UI.title("Режимы", 46, Color("ffe7a6"), Color("5a1a6a"))
-	hd.position = Vector2(24, 122)
-	hd.size = Vector2(300, 60)
-	add_child(hd)
-	var sub: = UI.label("Каждый стол со своей целью и наградой", 18, Color("e9dcff"))
-	sub.position = Vector2(26, 178)
-	add_child(sub)
-	var back: = JButton.make("К карте", "glass", Rect2(W - 196, 128, 176, 64), null, 22)
-	back.pressed.connect( func(): main.go("levels"))
-	add_child(back)
+	V8Header.make(self, main, "Режимы", main.back, _help)
 
-	var dh: = clampf((H - 150.0 - 214.0) * 0.24, 206.0, 280.0)
-	_duel_card(Rect2(20, 214, W - 40, dh))
-	var cw: = (W - 40 - 14) * 0.5
-	var y0: = 214.0 + dh + 14.0
-	var ch: = clampf((H - 150.0 - y0 - 28.0) / 3.0, 200.0, 320.0)
-	var cards: = [
-		["climb", "Лунная лестница", "Этаж за этажом, три фонаря. После этажа героиня дарит благословение.", "bg_palace", "Рекорд: этаж %d" % int(s.climb_best), true], 
-		["etude", "Этюды", "30 задач Маджонг-тян. Все пары разные, лоток на три места.", "bg_shrine", "★ %d / %d" % [V6ModesData.etude_total(), V6ModesData.ETUDES * 3], true], 
-		["shift", "Смена в чайной", "Героини заказывают пары своей категории. Чаевые = кристаллы.", "bg_teahouse", "Рекорд чаевых: %d" % int(s.shift_best), true], 
-		["blitz", "Блиц", "Две минуты, столы сменяют друг друга, очки растут с комбо.", "bg_festival", "Рекорд: %d" % int(G.S.get("blitz_best", 0)), false], 
-		["zen", "Сад", "Бесконечные столы, шесть мест в лотке и никакого проигрыша.", "play", "+30 за стол", false], 
-		["daily", "Раскладка дня", "Одна раскладка на всех. Звезда в календаре.", "bg_street", "Сегодня: готово" if G.daily_done_today() else "Сегодня: новая", false], 
-	]
-	for i in cards.size():
-		var c: Array = cards[i]
-		var r: = Rect2(20 + (i % 2) * (cw + 14), y0 + (i / 2) * (ch + 14), cw, ch)
-		var card: = _card(r, c[0], c[1], c[2], c[3], c[4], c[5])
-		UI.slide_in(card, Vector2(0, 40), 0.06 * i + 0.1, 0.4)
+	var y: = Y0
+	path_card = _path_card(Rect2(20, y, W - 40, 204))
+	UI.slide_in(path_card, Vector2(0, 30), 0.0, 0.4)
+	y += 204 + 12
+	tour_card = _tour_card(Rect2(20, y, W - 40, 160))
+	UI.slide_in(tour_card, Vector2(0, 30), 0.06, 0.4)
+	y += 160 + 12
+	var rc: = _riichi_card(Rect2(20, y, W - 40, 70))
+	UI.slide_in(rc, Vector2(0, 30), 0.1, 0.4)
+	y += 70 + 12
+	var hl: = UI.label("Другие режимы", 20, Color("ffe7a6"), UI.DARK, 3, "body", 900)
+	hl.position = Vector2(26, y)
+	add_child(hl)
+	var ri: = G.rank_of(int(G.S.get("rp", 0)))
+	var rl: = UI.label("твой ранг: %s" % ri.title, 17, UI.MUTED, UI.DARK, 2, "body", 800)
+	rl.position = Vector2(W - 346, y + 2)
+	rl.size = Vector2(320, 24)
+	rl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	add_child(rl)
+	y += 32
+	var tw: = (W - 40 - 12) * 0.5
+	var th: = 80.0
+	for i in LIST.size():
+		var it: Array = LIST[i]
+		var r: = Rect2(20 + (i % 2) * (tw + 12), y + (i / 2) * (th + 10), tw, th)
+		var t: = _tile(r, it[0], it[1], it[2])
+		mode_tiles[it[0]] = t
+		UI.slide_in(t, Vector2(0, 30), 0.12 + 0.03 * i, 0.35)
 	var open: String = args.get("open", args.get("mode", ""))
 	if open != "":
 		await get_tree().create_timer(0.35).timeout
 		if is_inside_tree():
 			_open(open)
 
-func _art(parent: Control, bg: String, r: Rect2, focus: = Vector2(0.5, 0.5)) -> void :
-	var path: = "res://assets/bg/%s.webp" % bg
+
+func _help() -> void :
+	var ri: = G.rank_of(int(G.S.get("rp", 0)))
+	var lines: = ["Путь — карта партий с главами и боссами. Турнир недели — твоя группа из 20 игроков, очки недели дают три стола турнира, а очки ранга идут из всех режимов.", 
+		"Остальные режимы открываются по мере роста ранга. Ранг один на всю игру: очки ранга дают Путь, раскладка дня, турнир и режимы.", 
+		"Сейчас твой ранг: %s." % ri.title]
+	var p: = Common.popup(main, "Режимы", 560)
+	var l: = UI.label("\n\n".join(lines), 21, UI.INK)
+	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	l.position = Vector2(40, 64)
+	l.size = Vector2(580, 300)
+	l.custom_minimum_size = Vector2(580, 0)
+	p.add_child(l)
+	var gates: = []
+	for k in [["blitz", "Блиц"], ["zen", "Сад"], ["duel", "Дуэль"], ["etude", "Этюды"], ["shift", "Смена в чайной"], ["climb", "Лунная лестница"]]:
+		gates.append("%s — %s" % [k[1], V6ModesData.gate_title(k[0])])
+	var gl: = UI.label("%s · %s\n%s · %s\n%s · %s" % gates, 18, Color("ffd98a"), UI.DARK, 2, "body", 900)
+	gl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	gl.position = Vector2(40, 396)
+	gl.size = Vector2(580, 130)
+	gl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	gl.custom_minimum_size = Vector2(580, 0)
+	p.add_child(gl)
+
+
+func _art(parent: Control, bg: String, r: Rect2, focus: = Vector2(0.5, 0.5), shade_top: = 0.15, shade_bottom: = 0.92) -> TextureRect:
+	var path: = "res://assets/bg/%s.webp" % bg if not bg.begins_with("res://") else bg
 	if not ResourceLoader.exists(path):
 		path = "res://assets/bg/menu.webp"
 	var art: = Common.card_art(load(path), Rect2(Vector2(4, 4), r.size - Vector2(8, 8)), focus, 1.0, 24)
@@ -106,8 +107,8 @@ func _art(parent: Control, bg: String, r: Rect2, focus: = Vector2(0.5, 0.5)) -> 
 	var shade: = TextureRect.new()
 	var g: = GradientTexture2D.new()
 	g.gradient = Gradient.new()
-	g.gradient.set_color(0, Color(0.08, 0.03, 0.12, 0.15))
-	g.gradient.set_color(1, Color(0.08, 0.03, 0.12, 0.92))
+	g.gradient.set_color(0, Color(0.06, 0.03, 0.08, shade_top))
+	g.gradient.set_color(1, Color(0.06, 0.03, 0.08, shade_bottom))
 	g.fill_from = Vector2(0, 0)
 	g.fill_to = Vector2(0, 1)
 	shade.texture = g
@@ -115,71 +116,197 @@ func _art(parent: Control, bg: String, r: Rect2, focus: = Vector2(0.5, 0.5)) -> 
 	shade.size = r.size - Vector2(8, 8)
 	shade.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	parent.add_child(shade)
+	return art
 
-func _frame(r: Rect2) -> RBox:
-	var card: = UI.rbox("plum", r, 28, 4, 10)
+func _frame(r: Rect2, radius: = 28.0) -> RBox:
+	var card: = UI.rbox("plum", r, radius, 4, 10)
 	card.colors(Color(0.12, 0.06, 0.16, 1.0), Color(0.08, 0.04, 0.1, 1.0)).borders(Color("ffe7a6"), Color("c58a2c"))
 	card.mouse_filter = Control.MOUSE_FILTER_STOP
 	card.pivot_offset = r.size * 0.5
 	add_child(card)
 	return card
 
-func _card(r: Rect2, id: String, title: String, desc: String, bg: String, status: String, fresh: bool) -> Control:
+func _tap(card: Control, cb: Callable) -> void :
+	card.gui_input.connect( func(e):
+		if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT:
+			Sfx.play("pop")
+			UI.punch(card, 0.05)
+			cb.call())
+
+
+func _path_card(r: Rect2) -> Control:
 	var card: = _frame(r)
-	_art(card, bg, r, Vector2(0.5, 0.45))
-	var t: = UI.title(title, 30, Color.WHITE, Color("5a1a6a"))
-	t.position = Vector2(18, r.size.y - 154)
-	t.size = Vector2(r.size.x - 30, 44)
+	var cur: = clampi(int(G.S.unlocked) - 1, 0, G.LEVELS.size() - 1)
+	var lv: Dictionary = G.LEVELS[cur]
+	var look: Dictionary = V6Worlds.LOOK[clampi(int(lv.loc), 0, V6Worlds.LOOK.size() - 1)]
+	var art_path: = "res://assets/v06/map/%s.webp" % look.art
+	_art(card, art_path if ResourceLoader.exists(art_path) else "map_town", r, Vector2(0.5, 0.55), 0.05, 0.9)
+	var tag: = UI.rbox("gold", Rect2(18, 18, 168, 34), 14, 3, 6)
+	tag.colors(UI.PAL.gold[0], UI.PAL.gold[1])
+	card.add_child(tag)
+	tag.add_child(UI.center_label(UI.label("ГЛАВНЫЙ ПУТЬ", 16, Color("3a2410"), Color(1, 1, 1, 0.4), 1, "body", 900), Rect2(0, 0, 168, 34)))
+	var t: = UI.title("Путь", 48, Color("fff6ea"), Color("3a1620"))
+	t.position = Vector2(24, r.size.y - 140)
+	t.size = Vector2(400, 62)
 	card.add_child(t)
-	var d: = UI.label(desc, 15, Color("f1e6ff"), UI.DARK, 3)
-	d.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	d.position = Vector2(20, r.size.y - 108)
-	d.size = Vector2(r.size.x - 36, 56)
-	d.custom_minimum_size = Vector2(r.size.x - 36, 0)
-	card.add_child(d)
-	Common.chip(card, null, status, Rect2(14, r.size.y - 44, r.size.x - 28, 34), "plum", 16)
-	if fresh:
-		var nb: = UI.rbox("red", Rect2(r.size.x - 86, 12, 74, 26), 13, 2, 4)
-		card.add_child(nb)
-		nb.add_child(UI.center_label(UI.label("НОВОЕ", 13, Color.WHITE, Color("6a1020"), 2, "body", 900), Rect2(0, 0, 74, 26)))
+	var sub: = UI.label("Партия %s · %s" % [lv.code, G.LOCS[lv.loc].name], 21, Color("ffe7a6"), UI.DARK, 3, "body", 900)
+	sub.position = Vector2(26, r.size.y - 78)
+	sub.size = Vector2(r.size.x - 260, 28)
+	sub.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	card.add_child(sub)
+	var stars: = 0
+	for i in cur + 1:
+		stars += G.level_stars(i)
+	var dl: = UI.label("Пройдено %d из %d партий · ★ %d" % [cur, G.LEVELS.size(), stars], 17, Color("ddd2c4"), UI.DARK, 2, "body", 800)
+	dl.position = Vector2(26, r.size.y - 46)
+	dl.size = Vector2(r.size.x - 260, 24)
+	card.add_child(dl)
+	var go: = JButton.make("Играть", "pink", Rect2(r.size.x - 222, r.size.y - 100, 200, 82), null, 30)
+	go.shine_every = 2.6
+	go.pressed.connect( func(): main.go("levels", {"select": cur}))
+	card.add_child(go)
+	_tap(card, func(): main.go("levels", {"select": cur}))
+	return card
+
+
+func _tour_card(r: Rect2) -> Control:
+	var card: = _frame(r)
+	_art(card, "res://assets/v07/event/cg_finale_card.webp", r, Vector2(0.5, 0.3), 0.35, 0.9)
+	var w: = V6ModesData.league("my_week")
+	var tier: = clampi(int(w.get("league_tier", G.rank_of(int(G.S.rp)).tier)), 0, G.RANKS.size() - 1)
+	var em: = Common.rank_emblem(card, Rect2(20, 20, 92, 92), tier, 0)
+	em.get_child(-1).visible = false
+	var t: = UI.title("Турнир недели", 36, Color("fff6ea"), Color("3a1620"))
+	t.position = Vector2(128, 16)
+	t.size = Vector2(r.size.x - 150, 50)
+	card.add_child(t)
+	var lname: = str(w.get("league_name", G.RANKS[tier].name))
+	var place: = int(w.get("place", 0))
+	var line: = lname if lname.begins_with("Лига") else "Лига: %s" % lname
+	if place > 0:
+		line += " · #%d из %d" % [place, int(w.get("group_size", 20))]
+	var ll: = UI.label(line, 21, Color("ffe7a6"), UI.DARK, 3, "body", 900)
+	ll.position = Vector2(130, 70)
+	ll.size = Vector2(r.size.x - 150, 28)
+	ll.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	card.add_child(ll)
+	var pts: = int(w.get("points", 0))
+	var left: = float(w.get("left_secs", 0.0))
+	var info: = ("%s очков недели" % UI.fmt(pts)) if pts > 0 else "Очки недели — за три стола турнира"
+	if left > 0.0:
+		info += " · ещё " + V7EventData.left_text(left)
+	var il: = UI.label(info, 17, Color("ddd2c4"), UI.DARK, 2, "body", 800)
+	il.position = Vector2(130, 102)
+	il.size = Vector2(r.size.x - 150, 24)
+	il.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	card.add_child(il)
+	var ql: = V6ModesData.league("my_quarter")
+	if ql.has("place"):
+		var qt: = UI.label("Квартал: #%s из %s" % [UI.fmt(int(ql.place)), UI.fmt(int(ql.get("total", 1001)))], 17, Color("ddd2c4"), UI.DARK, 2, "body", 800)
+		qt.position = Vector2(130, 128)
+		qt.size = Vector2(r.size.x - 150, 24)
+		card.add_child(qt)
+	_tap(card, func(): main.go("v7tourney", {"tab": "week"}))
+	return card
+
+
+func _riichi_card(r: Rect2) -> Control:
+	var card: = UI.rbox("graphite", r, 24, 3, 8)
+	card.borders(Color(1, 1, 1, 0.18), Color(0, 0, 0, 0.35))
+	card.mouse_filter = Control.MOUSE_FILTER_STOP
+	card.pivot_offset = r.size * 0.5
+	add_child(card)
+	card.add_child(UI.tex(G.fx("lock"), Rect2(20, (r.size.y - 40) * 0.5, 40, 40)))
+	var t: = UI.label("Стол риичи", 24, Color("c9bdb0"), UI.DARK, 3, "body", 900)
+	t.position = Vector2(74, 0)
+	t.size = Vector2(300, r.size.y)
+	t.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	card.add_child(t)
+	var c: = Common.chip(card, null, "Скоро", Rect2(r.size.x - 150, (r.size.y - 40) * 0.5, 130, 40), "glass", 19)
+	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	card.gui_input.connect( func(e):
 		if e is InputEventMouseButton and e.pressed:
-			Sfx.play("pop")
+			Sfx.play("deny")
+			UI.punch(card, 0.04)
+			main.toast("Стол риичи появится в одном из следующих обновлений", "lock"))
+	return card
+
+
+func _status(id: String) -> String:
+	var s: = V6ModesData.st()
+	match id:
+		"daily":
+			return "Сегодня: готово" if G.daily_done_today() else "Сегодня: новая"
+		"blitz":
+			return "Рекорд: %d" % int(G.S.get("blitz_best", 0))
+		"zen":
+			return "Без проигрыша"
+		"duel":
+			var hs = G.S.get("v6_heroines", {})
+			var n: = 0
+			if hs is Dictionary:
+				for k in hs.get("duel_wins", {}):
+					n += int(hs.duel_wins[k])
+			return "Побед: %d" % n
+		"etude":
+			return "★ %d / %d" % [V6ModesData.etude_total(), V6ModesData.ETUDES * 3]
+		"shift":
+			return "Рекорд чаевых: %d" % int(s.shift_best)
+		"climb":
+			return "Рекорд: этаж %d" % int(s.climb_best)
+	return ""
+
+
+func _tile(r: Rect2, id: String, title: String, bg: String) -> Control:
+	var open: = V6ModesData.mode_open(id)
+	var card: = UI.rbox("glass" if open else "graphite", r, 22, 3, 8)
+	if open:
+		card.borders(Color("ffe7a6"), Color("c58a2c"))
+	else:
+		card.borders(Color(1, 1, 1, 0.15), Color(0, 0, 0, 0.35))
+	card.mouse_filter = Control.MOUSE_FILTER_STOP
+	card.pivot_offset = r.size * 0.5
+	add_child(card)
+	var path: = "res://assets/bg/%s.webp" % bg
+	if not ResourceLoader.exists(path):
+		path = "res://assets/bg/menu.webp"
+	var th: = Common.card_art(load(path), Rect2(9, 9, r.size.y - 18, r.size.y - 18), Vector2(0.5, 0.45), 1.0, 14)
+	if not open:
+		(th.material as ShaderMaterial).set_shader_parameter("gray", 1.0)
+	card.add_child(th)
+	if not open:
+		card.add_child(UI.tex(G.fx("lock"), Rect2(r.size.y * 0.5 - 18, r.size.y * 0.5 - 18, 36, 36)))
+	var tx: = 86.0
+	var tw: = r.size.x - tx - 10.0
+	var t: = UI.label(title, 21, UI.INK if open else Color("a39a92"), UI.DARK, 3, "body", 900)
+	t.position = Vector2(tx, 10)
+	t.size = Vector2(tw, 30)
+	t.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	card.add_child(t)
+	var st: = _status(id) if open else V6ModesData.locked_text(id)
+	var fs: = 16
+	while fs > 12 and UI.font("body", 800).get_string_size(st, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > tw:
+		fs -= 1
+	var sl: = UI.label(st, fs, Color("ffd98a") if open else Color("bfb3a8"), UI.DARK, 2, "body", 800)
+	sl.position = Vector2(tx, 42)
+	sl.size = Vector2(tw, 26)
+	sl.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	card.add_child(sl)
+	card.gui_input.connect( func(e):
+		if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT:
 			UI.punch(card, 0.06)
 			_open(id))
 	return card
 
-func _duel_card(r: Rect2) -> void :
-	var card: = _frame(r)
-	_art(card, "bg_neon", r, Vector2(0.5, 0.4))
-	var t: = UI.title("Дуэль", 40, Color("ffe7a6"), Color("5a1a6a"))
-	t.position = Vector2(22, 20)
-	t.size = Vector2(300, 56)
-	card.add_child(t)
-	var d: = UI.label("Героиня садится напротив и берёт пары с того же стола. Кто соберёт больше, тот и выиграл.", 16, Color("f1e6ff"), UI.DARK, 3)
-	d.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	d.position = Vector2(24, 78)
-	d.size = Vector2(320, 80)
-	d.custom_minimum_size = Vector2(320, 0)
-	card.add_child(d)
-	var ready: = ResourceLoader.exists(DUEL_SCRIPT)
-	Common.chip(card, null, "Выбрать соперницу" if ready else "Скоро", Rect2(20, r.size.y - 48, 300, 36), "pink" if ready else "plum", 17)
-	var x: = r.size.x - 20.0
-	var order: Array = G.HERO_ORDER.duplicate()
-	order.reverse()
-	for i in order.size():
-		var h: String = order[i]
-		x -= 58
-		var av: = Common.avatar(h, Rect2(x - 12, r.size.y * 0.5 - 70 + (i % 2) * 60, 76, 76), "gold" if G.hero_unlocked(h) else "plum")
-		card.add_child(av)
-	card.gui_input.connect( func(e):
-		if e is InputEventMouseButton and e.pressed:
-			Sfx.play("pop")
-			UI.punch(card, 0.05)
-			_open("duel"))
-
 
 func _open(id: String) -> void :
+	if V6ModesData.GATES.has(id) and not V6ModesData.mode_open(id):
+		Sfx.play("deny")
+		main.toast("%s · %s" % [_mode_name(id), V6ModesData.locked_text(id)], "lock")
+		if mode_tiles.has(id):
+			UI.punch(mode_tiles[id], 0.08)
+		return
+	Sfx.play("pop")
 	match id:
 		"duel":
 			_duel_pick()
@@ -207,6 +334,21 @@ func _open(id: String) -> void :
 				"Для вечера после работы", "Начать", func(): main.go("play", {"mode": "zen", "partner": G.S.level_partner}))
 		"daily":
 			Daily.calendar(main)
+
+func _mode_name(id: String) -> String:
+	for it in LIST:
+		if it[0] == id:
+			return it[1]
+	return id
+
+func dev_act(a: String) -> void :
+	match a:
+		"back":
+			main.android_back()
+		"help":
+			_help()
+		_:
+			_open(a)
 
 func _info(title: String, text: String, sub: String, go_text: String, go_cb: Callable) -> void :
 	var p: = Common.popup(main, title, 500)

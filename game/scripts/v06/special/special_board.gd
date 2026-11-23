@@ -282,7 +282,11 @@ func _joker_turn(j: Tile, like: Tile) -> void :
 	spec.erase(j)
 	var ic: V6SpecIcon = icons.get(j)
 	icons.erase(j)
-	j.set_face(like.face)
+	if like.shard != "":
+		# 0.8: a joker that copies a portrait-shard tile becomes that shard tile (face 100 has no tile texture)
+		j.set_shard(like.shard)
+	else:
+		j.set_face(like.face)
 	j.face_spr.visible = true
 	if ic and is_instance_valid(ic):
 		ic.release()

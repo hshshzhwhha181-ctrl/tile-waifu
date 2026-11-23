@@ -29,6 +29,8 @@ var shown: = false
 var last_n: = 0
 var aura_t: = 0.0
 var best: = 0
+var stopped: = false
+var sub_hold_until: = 0.0
 var _sb_frame: = StyleBoxFlat.new()
 var _sb_pill: = StyleBoxFlat.new()
 var _sb_fill: = StyleBoxFlat.new()
@@ -59,10 +61,10 @@ func setup(p) -> V7Combo:
 	pill_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	pill_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	pill.add_child(pill_lbl)
-	pill_sub = UI.label("", 15, Color("ffe7a6"), Color(0.1, 0.03, 0.12), 4, "body", 900)
+	pill_sub = UI.label("", 17, Color("ffe7a6"), Color(0.1, 0.03, 0.12), 4, "body", 900)
 	pill_sub.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	pill_sub.position = Vector2(0, 52)
-	pill_sub.size = Vector2(300, 22)
+	pill_sub.position = Vector2(0, 54)
+	pill_sub.size = Vector2(300, 24)
 	pill_sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	pill.add_child(pill_sub)
 	return self
@@ -91,7 +93,25 @@ func _left_frac() -> float:
 		return 0.0
 	return clampf(1.0 - (b.now() - b.last_match) / maxf(0.5, b.combo_window), 0.0, 1.0)
 
+# 0.8: the final result window hides the combo pill and the board glow at once (no «×22» over the stars).
+func stop() -> void :
+	stopped = true
+	shown = false
+	last_n = 0
+	glow = 0.0
+	glow_target = 0.0
+	if pill:
+		pill.visible = false
+	visible = false
+	queue_redraw()
+
+func resume() -> void :
+	stopped = false
+	visible = true
+
 func _process(dt: float) -> void :
+	if stopped:
+		return
 	if play == null or not is_instance_valid(play.board):
 		return
 	var b: TrayBoard = play.board
@@ -115,6 +135,8 @@ func _process(dt: float) -> void :
 	queue_redraw()
 
 func _draw() -> void :
+	if stopped:
+		return
 	if glow > 0.01:
 		var r: = _frame_rect()
 		var pulse: = 0.75 + 0.25 * sin(G.time * (4.0 + glow * 6.0))
@@ -148,9 +170,11 @@ func _draw() -> void :
 			_sb_fill.bg_color = Color(col.r, col.g, col.b, 0.42 * pill.modulate.a)
 			draw_style_box(_sb_fill, ir)
 
+# 0.8: the pill keeps the left side of the band under the tray; the right side under the portrait is the
+# heroine's speech bubble (see the layout note in play.gd)
 func _place_pill() -> void :
 	var r: = _frame_rect()
-	pill.position = Vector2(r.get_center().x - pill.size.x * 0.5, r.position.y - pill.size.y * 0.55)
+	pill.position = Vector2(20.0, r.position.y - pill.size.y * 0.55)
 	pill.position.y = maxf(pill.position.y, 300.0)
 
 func _pill_in() -> void :
@@ -176,7 +200,7 @@ func _pill_out() -> void :
 	last_n = 0
 
 func on_match(mid: Vector2, n: int, gain: int) -> void :
-	if n < 2:
+	if n < 2 or stopped:
 		return
 	last_n = n
 	var t: = _tier(n)
@@ -188,7 +212,9 @@ func on_match(mid: Vector2, n: int, gain: int) -> void :
 	pill_lbl.text = "×%d · %s" % [n, t[1]]
 	pill_lbl.add_theme_color_override("font_color", col.lightened(0.35))
 	var mult: = 1 + (n - 1) / 2
-	pill_sub.text = "кристаллы ×%d" % mult if mult > 1 else "держи темп"
+	if G.time >= sub_hold_until:
+		pill_sub.text = "кристаллы ×%d" % mult if mult > 1 else "держи темп"
+		pill_sub.add_theme_color_override("font_color", Color("ffe7a6"))
 	UI.punch(pill, 0.22 + mini(n, 10) * 0.02)
 
 	var dst: = pill.position + pill.size * 0.5
@@ -256,9 +282,12 @@ func _milestone(n: int, at: Vector2) -> void :
 			target = play.gems_lbl
 	if what == "":
 		return
-	var l: = Fx.float_text(play.fx_layer, at + Vector2(0, 62), what, col.lightened(0.3), 30)
-	if l:
-		l.z_index = 45
+	# 0.8: the milestone reward is said inside the pill (its second line), not as a float that would rise into
+	# the yaku plaque or the luck strip
+	pill_sub.text = what
+	pill_sub.add_theme_color_override("font_color", Color("9fe8d0"))
+	sub_hold_until = G.time + 1.4
+	UI.punch(pill_sub, 0.3)
 	if icon != "" and target and is_instance_valid(target):
 		var ic: = Sprite2D.new()
 		ic.texture = G.icon(icon)
