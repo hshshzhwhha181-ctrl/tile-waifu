@@ -308,7 +308,7 @@ func _floor_overlay(f: int, gems: int, chest: bool, mile_gems: int, record: bool
 	Common.rays(root, Vector2(W * 0.5, 170), 900, Color(0.75, 0.8, 1.0, 0.45), 12, 0.04, 0.6)
 	var rib: = Common.ribbon(root, "Этаж %d пройден" % f, Rect2(W * 0.5 - 250, 70, 500, 96), "gold" if chest else "pink", 40)
 	UI.pop_in(rib, 0.05, 0.4)
-	var line: = "+%d кристаллов" % gems
+	var line: = "+" + gems_text(gems)
 	if chest:
 		line += " · сундук стража · фонарь +1"
 	if mile_gems > 0:
@@ -423,35 +423,28 @@ func _climb_over(by_choice: bool) -> void :
 	var reached: = int(run.floor) - (0 if by_choice else 1)
 	run.gems = int(run.gems) + gained
 	gained = 0
-	_v8_end_overlays()
-	V8PlayRules.award("other", 0, maxi(0, reached) > 0)
+	# 0.8: every cleared floor was already counted as a won game (V8PlayRules.award in _climb_clear). Ending the
+	# run by choice adds no game; a run lost on its last lantern counts that one floor as a lost game.
+	var ra: = {"rp": int(run.get("rp", 0)), "ups": run.get("ups", []), "gems": 0, "title": String(G.rank_of(int(G.S.rp)).title)}
+	if not by_choice:
+		V8PlayRules.award("other", 0, false)
+	else:
+		G.save()
+	_v8_saved = true
 	Sfx.play("win" if by_choice else "deny", 1.0 if by_choice else 0.6)
-	var p: = Common.popup(main, "Восхождение окончено", 600, "cream", 660.0, false)
-	p.add_child(UI.center_label(UI.label("пройдено этажей", 20, Color("cbb5dc")), Rect2(0, 54, 660, 30)))
-	p.add_child(UI.center_label(UI.title(str(maxi(0, reached)), 84, Color("ffe7a6"), Color("5a1a6a")), Rect2(0, 80, 660, 110)))
+	var ctx: = v8_res_open("Восхождение окончено", "pink", 40)
+	v8_res_big(ctx, str(maxi(0, reached)), "пройдено этажей")
 	var best: = int(s.climb_best)
-	p.add_child(UI.center_label(UI.label("Рекорд: %d · сундуков: %d" % [best, int(run.chests)], 22, Color("fff1dc"), UI.DARK, 3, "body", 900), Rect2(0, 196, 660, 32)))
-	p.add_child(UI.center_label(UI.label("+%d кристаллов за забег" % int(run.gems), 24, Color("9fe8d0"), UI.DARK, 3, "body", 900), Rect2(0, 236, 660, 34)))
-
+	v8_res_line(ctx, "Рекорд: %s · сундуков: %d" % [pl(best, "этаж", "этажа", "этажей"), int(run.chests)], 20, Color("fff1dc"), 4.0)
+	v8_res_reward(ctx, int(run.gems), "", "gem", "за забег")
 	for m in V6ModesData.CLIMB_MILES:
 		if not int(m[0]) in s.climb_miles.map( func(x): return int(x)):
-			p.add_child(UI.center_label(UI.label("Следующая веха: этаж %d · +%d" % [int(m[0]), int(m[1])], 19, Color("ffd98a")), Rect2(0, 280, 660, 30)))
+			v8_res_line(ctx, "Следующая веха: этаж %d · +%s" % [int(m[0]), gems_text(int(m[1]))], 18, Color("ffd98a"))
 			break
-
-	var bx: float = 330.0 - run.bless.size() * 31.0
-	for id in run.bless:
-		p.add_child(Common.avatar(V6ModesData.BLESS[id].hero, Rect2(bx, 324, 56, 56), "gold"))
-		bx += 62
-	# 0.8: main action (pink) on the right under the thumb; the rank card and league line as in every result
-	var again: = JButton.make("Новое восхождение", "pink", Rect2(300, 410, 320, 96), null, 26)
-	again.shine_every = 2.2
-	again.pressed.connect( func(): main.go("arena", {"mode": "climb", "partner": G.S.level_partner, "retry": randi()}))
-	p.add_child(again)
-	var back: = JButton.make("К режимам", "glass", Rect2(40, 410, 240, 96), null, 26)
-	back.pressed.connect( func(): main.go("modes"))
-	p.add_child(back)
-	var ra: = {"rp": int(run.get("rp", 0)), "ups": run.get("ups", []), "gems": 0, "title": String(G.rank_of(int(G.S.rp)).title)}
-	_v8_popup_rank(p, 396.0, ra)
+	v8_res_avatars(ctx, run.bless.keys().map( func(id): return V6ModesData.BLESS[id].hero), 56.0)
+	v8_res_rank(ctx, ra)
+	v8_res_close(ctx, partner, "Новое восхождение", func(): main.go("arena", {"mode": "climb", "partner": G.S.level_partner, "retry": randi()}),
+		"К режимам", func(): main.go("modes"))
 
 
 func _etude_strip() -> void :
@@ -496,8 +489,11 @@ func _etude_stuck() -> void :
 	stuck = true
 	Sfx.play("deny", 0.8)
 	Fx.shake(tray_box, 8, 0.3)
-	var rib: = Common.ribbon(self, "Тупик · отмени ход", Rect2(W * 0.5 - 220, H * 0.42, 440, 80), "red", 32)
+	# 0.8: over the etude strip above the table (never over a tile row), and it lets taps through
+	var sr: = Rect2(strip.position, strip.size) if strip else Rect2(10, board_rect.position.y - 70, W - 20, 64)
+	var rib: = Common.ribbon(self, "Тупик · отмени ход", Rect2(sr.position.x + 40, sr.position.y - 4, sr.size.x - 80, sr.size.y + 8), "red", 32)
 	rib.z_index = 40
+	_v8_ignore(rib)
 	rib.name = "StuckRib"
 	UI.pop_in(rib, 0.0, 0.5)
 	btn_undo.pulse = true
@@ -518,51 +514,33 @@ func _etude_clear() -> void :
 	G.task_add("levels")
 	G.add_pass_xp(50)
 	var ea: = V8PlayRules.award("etude", V8PlayRules.etude_rp(stars), true)
+	_v8_saved = true
 	_v8_end_overlays()
 	Sfx.play("win")
 	await get_tree().create_timer(0.3).timeout
 	if not is_inside_tree():
 		return
-	var p: = Common.popup(main, "Этюд %d решён" % (etude_i + 1), 560, "cream", 660.0, false)
-	var row: = []
-	for i in 3:
-		var st: = UI.tex(G.fx("star_empty"), Rect2(330 - 60 + (i - 1) * 140, 50 + (0 if i == 1 else 20), 120, 120))
-		p.add_child(st)
-		row.append(st)
-	p.add_child(UI.center_label(UI.label("Отмен: %d" % etude_undos, 22, Color("fff1dc")), Rect2(0, 186, 660, 30)))
-	p.add_child(UI.center_label(UI.label("+%d кристаллов" % gems if gems > 0 else "Награда уже получена · попробуй без отмен", 22, Color("9fe8d0") if gems > 0 else Color("cbb5dc"), UI.DARK, 3, "body", 900), Rect2(0, 224, 660, 34)))
-	p.add_child(Common.avatar("mc", Rect2(40, 280, 96, 96), "pink"))
+	var ctx: = v8_res_open("Этюд %d решён" % (etude_i + 1), "pink", 44)
+	var row: = v8_res_stars(ctx, "0 отмен — 3★ · до 3 отмен — 2★")
+	v8_res_line(ctx, "Отмен: %d" % etude_undos, 20, Color("fff1dc"), 4.0)
+	if gems > 0:
+		v8_res_reward(ctx, gems)
+	else:
+		v8_res_line(ctx, "Награда уже получена · попробуй без отмен", 18, Color("cbb5dc"))
 	var said: String = ["Красиво решено. Видишь, как близнецы прятались?", "Ты думаешь на два хода вперёд, мне нравится.", "Чистое решение. Следующий этюд хитрее."][stars - 1] if stars > 0 else ""
-	var sl: = UI.label(said, 20, UI.INK)
-	sl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	sl.position = Vector2(150, 296)
-	sl.size = Vector2(470, 70)
-	sl.custom_minimum_size = Vector2(470, 0)
-	p.add_child(sl)
+	v8_res_say(ctx, "mc", said)
+	v8_res_rank(ctx, ea)
 	var last: = etude_i >= V6ModesData.ETUDES - 1
-	var nx: = JButton.make("Следующий этюд" if not last else "К этюдам", "pink", Rect2(300, 400, 320, 96), null, 26)
-	nx.shine_every = 2.2
-	nx.pressed.connect( func():
+	var go_next: = func():
 		if last:
 			main.go("modes", {"open": "etude"})
 		else:
-			main.go("arena", {"mode": "etude", "etude": etude_i + 1, "partner": partner}))
-	p.add_child(nx)
-	var again: = JButton.make("Ещё раз", "glass", Rect2(40, 400, 240, 96), null, 26)
-	again.pressed.connect( func(): main.go("arena", {"mode": "etude", "etude": etude_i, "partner": partner, "retry": randi()}))
-	p.add_child(again)
-	_v8_popup_rank(p, 388.0, ea)
+			main.go("arena", {"mode": "etude", "etude": etude_i + 1, "partner": partner})
+	v8_res_close(ctx, "mc", "Следующий этюд" if not last else "К этюдам", go_next,
+		"Ещё раз", func(): main.go("arena", {"mode": "etude", "etude": etude_i, "partner": partner, "retry": randi()}))
 	if gems > 0:
-		main.fly_gems(p.position + Vector2(330, 240), 6)
-	await get_tree().create_timer(0.5).timeout
-	for i in stars:
-		if not is_inside_tree():
-			return
-		var st: TextureRect = row[i]
-		st.texture = G.fx("star")
-		UI.pop_in(st, 0.0, 2.0)
-		Sfx.play("star%d" % i)
-		await get_tree().create_timer(0.3).timeout
+		main.fly_gems(Vector2(W * 0.5, 480), 6)
+	v8_res_light_stars(ctx, row, stars)
 
 
 func _shift_strip() -> void :
@@ -576,7 +554,7 @@ func _shift_strip() -> void :
 		_seat_draw(i)
 	var tb: = _panel(Rect2(w - tw, 0, tw, strip_h))
 	tb.colors(Color(0.32, 0.2, 0.08, 0.92), Color(0.18, 0.1, 0.04, 0.94))
-	tb.add_child(UI.tex(G.icon("gem"), Rect2(tw * 0.5 - 26, 8, 52, 52)))
+	tb.add_child(V8Art.rect(V8Art.cur("gem"), Rect2(tw * 0.5 - 28, 6, 56, 56)))
 	tips_lbl = UI.center_label(UI.label("0", 30, Color("ffe7a6"), UI.DARK, 4, "body", 900), Rect2(0, 58, tw, 40))
 	tb.add_child(tips_lbl)
 	tb.add_child(UI.center_label(UI.label("чаевые", 16, Color("e8d2a8")), Rect2(0, 96, tw, 24)))
@@ -865,30 +843,22 @@ func _shift_end() -> void :
 	G.task_add("levels")
 	G.add_aff(partner, 6)
 	var sa: = V8PlayRules.award("other", V8PlayRules.shift_rp(served), served > missed)
-	_v8_end_overlays()
+	_v8_saved = true
 	Sfx.play("win")
 	Sfx.say(partner, "win")
-	var p: = Common.popup(main, "Смена закрыта", 560, "cream", 660.0, false)
-	p.add_child(UI.center_label(UI.label("чаевые", 20, Color("cbb5dc")), Rect2(0, 54, 660, 30)))
-	p.add_child(UI.center_label(UI.title(str(tips), 84, Color("ffe7a6"), Color("5a1a6a")), Rect2(0, 80, 660, 110)))
-	p.add_child(UI.center_label(UI.label("Гостий обслужено: %d · ушли без заказа: %d" % [served, missed], 21, Color("fff1dc")), Rect2(0, 196, 660, 30)))
-	p.add_child(UI.center_label(UI.label(("Новый рекорд чайной!" if record else "Рекорд: %d" % int(s.shift_best)), 22, Color("ffd34d") if record else Color("d9c4e6"), UI.DARK, 3, "body", 900), Rect2(0, 234, 660, 34)))
-	p.add_child(UI.center_label(UI.label("Каждая гостья: +5 симпатии · твои героини дают чаевые ×1,5", 17, Color("cbb5dc")), Rect2(0, 276, 660, 28)))
-	var hx: = 330.0 - 5 * 34.0
-	for h in V6ModesData.GUESTS:
-		var av: = Common.avatar(h, Rect2(hx, 318, 60, 60), "gold" if G.hero_unlocked(h) else "plum")
-		p.add_child(av)
-		hx += 68
-	var again: = JButton.make("Новая смена", "pink", Rect2(300, 410, 320, 96), null, 26)
-	again.shine_every = 2.2
-	again.pressed.connect( func(): main.go("arena", {"mode": "shift", "partner": partner, "retry": randi()}))
-	p.add_child(again)
-	var back: = JButton.make("К режимам", "glass", Rect2(40, 410, 240, 96), null, 26)
-	back.pressed.connect( func(): main.go("modes"))
-	p.add_child(back)
-	_v8_popup_rank(p, 392.0, sa)
+	var ctx: = v8_res_open("Смена закрыта", "pink", 44)
+	v8_res_big(ctx, str(tips), "чаевые")
+	v8_res_line(ctx, "Обслужено: %s · ушли без заказа: %d" % [pl(served, "гостья", "гостьи", "гостий"), missed], 20, Color("fff1dc"), 2.0)
+	v8_res_line(ctx, ("Новый рекорд чайной!" if record else "Рекорд: %d" % int(s.shift_best)), 22, Color("ffd34d") if record else Color("d9c4e6"), 4.0)
 	if tips > 0:
-		main.fly_gems(p.position + Vector2(330, 140), 8)
+		v8_res_reward(ctx, tips, "+5 симпатии от каждой гостьи", "gem", "чаевые")
+	v8_res_line(ctx, "Твои героини дают чаевые ×1,5", 17, Color("cbb5dc"), 2.0)
+	v8_res_avatars(ctx, V6ModesData.GUESTS, 56.0, func(h): return "gold" if G.hero_unlocked(String(h)) else "plum")
+	v8_res_rank(ctx, sa)
+	v8_res_close(ctx, partner, "Новая смена", func(): main.go("arena", {"mode": "shift", "partner": partner, "retry": randi()}),
+		"К режимам", func(): main.go("modes"))
+	if tips > 0:
+		main.fly_gems(Vector2(W * 0.5, 420), 8)
 
 
 func _process(dt: float) -> void :

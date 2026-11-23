@@ -271,7 +271,7 @@ func _milestone(n: int, at: Vector2) -> void :
 				if play.skill_charge >= play.SKILL_NEED:
 					play._skill_ready()
 				what = "+1 к умению"
-				icon = "star"
+				icon = "rating"
 				target = st
 		5:
 			what = "Лихорадка: кристаллы ×2"
@@ -296,7 +296,7 @@ func _milestone(n: int, at: Vector2) -> void :
 			if str(play.get("mode")) != "trial":
 				G.S.gems += g
 				play.gained += g
-			what = "+%d кристаллов" % g
+			what = "+%d %s" % [g, V8PlayRules.plural(g, "кристалл", "кристалла", "кристаллов")]
 			icon = "gem"
 			target = play.gems_lbl
 	if what == "":
@@ -309,7 +309,9 @@ func _milestone(n: int, at: Vector2) -> void :
 	UI.punch(pill_sub, 0.3)
 	if icon != "" and target and is_instance_valid(target):
 		var ic: = Sprite2D.new()
-		ic.texture = G.icon(icon)
+		# 0.8 art: currencies from cur/*, the rest from icon/* (V8Art caches them)
+		ic.texture = V8Art.cur(icon) if icon in ["gem", "coin", "ticket"] else V8Art.icon(icon)
+		ic.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 		ic.scale = Vector2.ONE * (56.0 / maxf(1.0, ic.texture.get_width()))
 		ic.position = at
 		ic.z_index = 46

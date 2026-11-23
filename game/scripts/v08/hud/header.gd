@@ -1,7 +1,7 @@
 class_name V8Header
 extends Control
 
-# One screen header for 0.8: «назад» (arrow) on the left, title centred (Playfair 28–34), «?» on the right
+# One screen header for 0.8: «назад» (V8Art icon/back) on the left, title centred (Playfair 28–34), «?» (icon/help) on the right
 # when on_help is given. Sits right under the global top bar.
 #   var h: = V8Header.make(screen, main, "Режимы", func(): main.go("home"), func(): show_help())
 #   content starts at V8Header.CONTENT_Y (= TOP + HEIGHT)
@@ -45,19 +45,28 @@ func _build(title: String, on_back: Callable, on_help: Callable) -> void :
 	add_child(plate)
 	var by: = (HEIGHT - BTN) * 0.5
 	if on_back.is_valid():
-		back_btn = JButton.make("", "graphite", Rect2(SIDE, by, BTN, BTN), null, 30, BTN * 0.5)
-		back_btn.add_child(UI.tex(G.icon("back"), Rect2(BTN * 0.2, BTN * 0.2, BTN * 0.6, BTN * 0.6)))
+		back_btn = _round_btn(Rect2(SIDE, by, BTN, BTN), "back")
 		back_btn.sound = "tap"
 		back_btn.pressed.connect(on_back)
 		back_btn.name = "Back"
 		add_child(back_btn)
 	if on_help.is_valid():
-		help_btn = JButton.make("", "graphite", Rect2(_w - SIDE - BTN, by, BTN, BTN), null, 30, BTN * 0.5)
-		help_btn.add_child(UI.center_label(UI.label("?", 40, UI.GOLD, UI.DARK, 3, "body", 900), Rect2(0, -2, BTN, BTN)))
+		help_btn = _round_btn(Rect2(_w - SIDE - BTN, by, BTN, BTN), "help")
 		help_btn.pressed.connect(on_help)
 		help_btn.name = "Help"
 		add_child(help_btn)
 	set_title(title)
+
+
+# 0.8: the round icon (V8Art icon/back, icon/help: 192 px gold-rimmed disc) is the whole button, so the
+# JButton's own drawn disc is hidden; the JButton still gives the press animation and sound.
+func _round_btn(r: Rect2, icon: String) -> JButton:
+	var b: = JButton.make("", "graphite", r, null, 30, r.size.y * 0.5)
+	b.box.visible = false
+	var art: = V8Art.rect(V8Art.icon(icon), Rect2(Vector2.ZERO, r.size))
+	art.name = "Icon"
+	b.add_child(art)
+	return b
 
 
 func set_title(text: String) -> void :

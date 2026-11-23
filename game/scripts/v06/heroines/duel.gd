@@ -398,38 +398,40 @@ var _end_line: = ""
 
 func _result(win: bool, draw: bool, gems: int, shard: bool) -> void :
 	var main = play.main
-	play._v8_end_overlays()
-	var title: = "Победа!" if win else ("Ничья" if draw else "Победа за ней")
-	var p: = Common.popup(main, title, 560, "cream", 660.0, false)
+	# 0.8 (spec 5): the shared result window of play.gd (panel, rank bar, league line, main action bottom right)
+	var ctx: Dictionary = play.v8_res_open("Победа!" if win else ("Ничья" if draw else "Победа за ней"), "pink" if win else "red", 46)
+	var plate: Control = ctx.plate
+	var pw: float = ctx.w
 	if win:
-		Fx.burst(p, Vector2(330, 80), "confetti", 60, Color.WHITE, 1.1)
+		Fx.burst(ctx.root, Vector2(play.W * 0.5, 200), "confetti", 60, Color.WHITE, 1.1)
 	var rc: Color = G.HEROES[rival].color
-	p.add_child(Common.avatar(play.partner, Rect2(60, 70, 130, 130), "gold" if win else "pink"))
-	p.add_child(Common.avatar(rival, Rect2(470, 70, 130, 130), "pink" if win else "gold"))
-	p.add_child(UI.center_label(UI.title("%d : %d" % [me, her], 64, Color("ffe7a6"), Color("5a1a6a")), Rect2(190, 90, 280, 90)))
-	var q: = UI.label("«%s»" % (_end_line if _end_line != "" else V6Heroines.line(rival, "lose" if win else ("draw" if draw else "win"))), 20, rc.lightened(0.5), Color(0.1, 0.05, 0.2), 3, "body", 800)
+	var y0: float = ctx.y
+	plate.add_child(Common.avatar(play.partner, Rect2(40, y0, 120, 120), "gold" if win else "pink"))
+	plate.add_child(Common.avatar(rival, Rect2(pw - 160, y0, 120, 120), "pink" if win else "gold"))
+	var tl: = UI.label("ТЫ", 16, Color("cbb5dc"), Color(0.1, 0.05, 0.2), 2, "body", 900)
+	plate.add_child(UI.center_label(tl, Rect2(40, y0 + 120, 120, 24)))
+	var rl: = UI.label(G.HEROES[rival].name, 16, rc.lightened(0.45), Color(0.1, 0.05, 0.2), 2, "body", 900)
+	plate.add_child(UI.center_label(rl, Rect2(pw - 180, y0 + 120, 160, 24)))
+	plate.add_child(UI.center_label(UI.title("%d : %d" % [me, her], 64, Color("ffe7a6"), Color("5a1a6a")), Rect2(170, y0 + 12, pw - 340, 90)))
+	plate.add_child(UI.center_label(UI.label(V8PlayRules.plural(maxi(me, her), "пара", "пары", "пар"), 18, Color("cbb5dc"), UI.DARK, 2, "body", 900), Rect2(170, y0 + 96, pw - 340, 26)))
+	ctx.y = y0 + 152.0
+	var line: String = _end_line if _end_line != "" else V6Heroines.line(rival, "lose" if win else ("draw" if draw else "win"))
+	var q: = UI.label("«%s»" % line, 19, rc.lightened(0.5), Color(0.1, 0.05, 0.2), 3, "body", 800)
 	q.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	q.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	q.position = Vector2(40, 214)
-	q.size = Vector2(580, 56)
-	p.add_child(q)
-	var rew: = ("+%d кристаллов · ♥ %s" % [gems, G.HEROES[rival].name]) if gems > 0 else ("♥ %s" % G.HEROES[rival].name)
-	if steals > 0:
-		rew += " · перехватов: %d" % steals
-	p.add_child(UI.center_label(UI.label(rew, 21, UI.INK), Rect2(0, 278, 660, 30)))
+	q.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	q.position = Vector2(30, ctx.y)
+	q.size = Vector2(pw - 60, 54)
+	plate.add_child(q)
+	ctx.y += 60.0
+	var aff: = "+%d симпатии · %s" % [20 if win else (10 if draw else 5), G.HEROES[rival].name]
+	play.v8_res_reward(ctx, gems, aff, "gem", ("перехватов: %d" % steals) if steals > 0 else "")
 	if shard:
 		var have: = mini(int(G.S.shards.get(rival, 0)), G.SHARDS_NEED)
-		Common.chip(p, null, "Осколок %s: %d/%d%s" % [G.HEROES[rival].name, have, G.SHARDS_NEED, " · она с тобой!" if have >= G.SHARDS_NEED else ""], Rect2(60, 318, 540, 36), "gold", 18)
-	var by: = 380.0 if shard else 336.0
-	# 0.8: main action (pink) on the right under the thumb
-	var again: = JButton.make("Реванш", "pink", Rect2(340, by, 280, 92), null, 30)
-	again.shine_every = 2.0
-	again.pressed.connect( func(): main.go("play", {"mode": "duel", "rival": rival, "partner": play.partner, "retry": randi()}))
-	p.add_child(again)
-	var back: = JButton.make("Режимы", "glass", Rect2(40, by, 280, 92), null, 28)
-	back.pressed.connect( func(): main.go("modes" if main.SCREENS.has("modes") else "home"))
-	p.add_child(back)
-	p.size.y = by + 92 + 40
-	play._v8_popup_rank(p, by - 14.0, award)
+		Common.chip(plate, null, "Осколок %s: %d/%d%s" % [G.HEROES[rival].name, have, G.SHARDS_NEED, " · она с тобой!" if have >= G.SHARDS_NEED else ""], Rect2(play.V8_RES_PAD, ctx.y, pw - play.V8_RES_PAD * 2.0, 36), "gold", 18)
+		ctx.y += 44.0
+	play.v8_res_rank(ctx, award)
+	play.v8_res_close(ctx, rival, "Реванш", func(): main.go("play", {"mode": "duel", "rival": rival, "partner": play.partner, "retry": randi()}),
+		"Режимы", func(): main.go("modes" if main.SCREENS.has("modes") else "home"))
 	play.set_meta("v6_duel_result", {"win": win, "me": me, "her": her})
 	print("DUEL %s %d:%d" % ["WIN" if win else ("DRAW" if draw else "LOSE"), me, her])

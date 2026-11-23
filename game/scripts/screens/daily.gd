@@ -9,7 +9,7 @@ const MILESTONES: = {7: {"gems": 200}, 14: {"gems": 300}, 21: {"gems": 400}, 28:
 static func _reward_icon(r: Dictionary) -> Texture2D:
 	if r.has("item"):
 		return G.art_tex(G.ITEM[r.item])
-	return G.icon("gem" if r.has("gems") else "coin")
+	return V8Art.cur("gem" if r.has("gems") else "coin")
 
 static func _give(main, r: Dictionary, from: Vector2) -> void :
 	if r.has("gems"):
@@ -39,7 +39,7 @@ static func login(main, home) -> void :
 		var c: = UI.rbox("gold" if big else ("pink" if today else ("cream" if not claimed else "mint")), Rect2(x, 64, cw, 150), 18, 3, 8)
 		p.add_child(c)
 		c.add_child(UI.center_label(UI.label(V6Txt.s("daily.day") % (k + 1), 16, UI.INK if not today else Color.WHITE, Color.WHITE if not today else Color("7a2346"), 3, "body", 900), Rect2(0, 4, cw, 24)))
-		c.add_child(UI.tex(_reward_icon(r), Rect2(10, 30, cw - 20, cw - 20)))
+		c.add_child(V8Art.rect(_reward_icon(r), Rect2(10, 30, cw - 20, cw - 20)))
 		var amount: int = r.get("gems", r.get("coins", 0))
 		c.add_child(UI.center_label(UI.label(UI.fmt(amount), 18, Color("f2799f") if r.has("gems") else Color("c58a2c"), Color.WHITE, 4, "body", 900), Rect2(0, 108, cw, 30)))
 		if claimed:
@@ -62,7 +62,7 @@ static func login(main, home) -> void :
 		var got: = n >= int(d)
 		var mb: = UI.rbox("gold" if got else "glass", Rect2(x - 40, 334, 72, 72), 16, 3, 6)
 		p.add_child(mb)
-		mb.add_child(UI.tex(_reward_icon(mr), Rect2(6, 6, 60, 60)))
+		mb.add_child(V8Art.rect(_reward_icon(mr), Rect2(6, 6, 60, 60)))
 		p.add_child(UI.center_label(UI.label(V6Txt.s("daily.days") % d, 16, UI.INK), Rect2(x - 44, 408, 80, 22)))
 	var note: = UI.center_label(UI.label(V6Txt.s("daily.login_note"), 18, Color("8a5a7a")), Rect2(0, 448, 660, 28))
 	p.add_child(note)
@@ -93,7 +93,10 @@ static func tasks(main, home) -> void :
 		var y: = 64.0 + i * 140
 		var row: = UI.rbox("glass", Rect2(24, y, 612, 124), 24, 3, 8)
 		p.add_child(row)
-		row.add_child(UI.tex(G.icon(["star", "trophy", "heart"][i]), Rect2(8, 14, 92, 92)))
+		# 0.8: trophy / heart are the new gold glyphs; «star» has no 0.8 art and keeps the old icon
+		var ic_name: String = ["star", "trophy", "heart"][i]
+		var ic_tex: Texture2D = G.icon(ic_name) if ic_name == "star" else V8Art.icon(ic_name)
+		row.add_child(V8Art.rect(ic_tex, Rect2(14, 20, 80, 80)))
 		var nl: = UI.label(td.name, 24, UI.INK, Color.WHITE, 3, "body", 900)
 		nl.position = Vector2(110, 14)
 		row.add_child(nl)
@@ -102,7 +105,7 @@ static func tasks(main, home) -> void :
 		var vl: = UI.label("%d/%d" % [v, td.goal], 18, UI.INK)
 		vl.position = Vector2(370, 60)
 		row.add_child(vl)
-		var rw: = Common.chip(row, G.icon("gem"), "%d" % td.gems, Rect2(112, 90, 110, 30), "plum", 17)
+		var rw: = Common.chip(row, V8Art.cur("gem"), "%d" % td.gems, Rect2(112, 90, 110, 30), "plum", 17)
 		var done: bool = v >= td.goal
 		var claimed: bool = t.claimed[i]
 		var b: = JButton.make("✓" if claimed else (V6Txt.s("common.claim") if done else V6Txt.s("daily.in_progress")), "mint" if claimed else ("gold" if done else "glass"), Rect2(440, 26, 156, 72), null, 24)
@@ -136,8 +139,13 @@ static func calendar(main) -> void :
 	var days_in: int = [31, 29 if year % 4 == 0 else 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][mi - 1]
 	var today_d: = int(G.today().substr(8, 2))
 	var done: Array = dm.done.map( func(x): return int(x))
-	var hl: = UI.center_label(UI.title("%s %d" % [MONTHS[mi - 1], year], 30, UI.INK, Color.WHITE), Rect2(0, 48, 660, 44))
+	var htxt: = "%s %d" % [MONTHS[mi - 1], year]
+	var hl: = UI.center_label(UI.title(htxt, 30, UI.INK, Color.WHITE), Rect2(0, 48, 660, 44))
 	p.add_child(hl)
+	# 0.8: the calendar glyph next to the month (icon/calendar; the art may be missing in older builds)
+	if V8Art.has("icon/calendar"):
+		var hw: float = UI.font_for("title", 30, 900).get_string_size(htxt, HORIZONTAL_ALIGNMENT_LEFT, -1, 30).x
+		p.add_child(V8Art.rect(V8Art.icon("calendar"), Rect2(330 - hw * 0.5 - 52, 50, 42, 42)))
 	var names: = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]
 	var cw: = 84.0
 	for k in 7:
@@ -158,7 +166,7 @@ static func calendar(main) -> void :
 	var solved: = done.size()
 	var tr: = UI.rbox("gold", Rect2(24, 576, 612, 86), 22, 3, 8)
 	p.add_child(tr)
-	tr.add_child(UI.tex(G.icon("trophy"), Rect2(6, 2, 82, 82)))
+	tr.add_child(V8Art.rect(V8Art.icon("trophy"), Rect2(8, 4, 78, 78)))
 	var tt: = UI.label(V6Txt.s("daily.trophy") % mini(solved, 20), 22, Color.WHITE, Color("7a4a0c"), 4, "body", 900)
 	tt.position = Vector2(96, 8)
 	tr.add_child(tt)

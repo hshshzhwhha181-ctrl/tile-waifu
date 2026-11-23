@@ -99,7 +99,7 @@ func _play() -> void :
 
 	var top: = UI.rbox("graphite", Rect2(W * 0.5 - 220, 120, 440, 92), 24, 3, 10)
 	add_child(top)
-	top.add_child(UI.tex(G.icon("play"), Rect2(10, 10, 72, 72)))
+	top.add_child(V8Art.rect(V8Art.nav("play"), Rect2(10, 10, 72, 72)))
 	var tl: = UI.label("Повтор партии", 26, UI.INK, UI.DARK, 3, "title", 800)
 	tl.position = Vector2(90, 8)
 	top.add_child(tl)

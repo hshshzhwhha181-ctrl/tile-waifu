@@ -85,7 +85,7 @@ func _recommended() -> void :
 	gl.modulate = Color(0.8, 0.9, 1, 0.8)
 	mc.add_child(gl)
 	for k in 3:
-		var gi: = UI.tex(G.icon("gem"), Rect2(40 + k * 34, 44 + (k % 2) * 18, 96, 96))
+		var gi: = V8Art.rect(V8Art.cur("gem"), Rect2(40 + k * 34, 44 + (k % 2) * 18, 96, 96))
 		mc.add_child(gi)
 	mc.add_child(UI.center_label(UI.title(V6Txt.s("shop.month_days"), 26, Color.WHITE, Color("1d4a7a")), Rect2(16, 150, 190, 40)))
 	var t1: = UI.title(V6Txt.s("shop.month"), 34, Color.WHITE, Color("1d4a7a"))
@@ -110,7 +110,7 @@ func _recommended() -> void :
 			_build_body())
 	else:
 		var can: bool = G.S.month_card.get("last", "") != G.today()
-		mb = JButton.make(V6Txt.s("shop.month_claim") if can else V6Txt.s("shop.month_active") % days, "mint" if can else "glass", Rect2(228, 144, W - 36 - 250, 56), G.icon("gem") if can else null, 26)
+		mb = JButton.make(V6Txt.s("shop.month_claim") if can else V6Txt.s("shop.month_active") % days, "mint" if can else "glass", Rect2(228, 144, W - 36 - 250, 56), V8Art.cur("gem") if can else null, 26)
 		mb.pressed.connect( func():
 			if G.S.month_card.get("last", "") == G.today():
 				main.toast(V6Txt.s("shop.month_got"), "calendar")
@@ -166,9 +166,11 @@ func _recommended() -> void :
 		l3.position = Vector2(158, 58)
 		l3.size = Vector2(W - 36 - 176, 26)
 		var l3s: = 17
-		while l3s > 13 and UI.font("body", 900).get_string_size(l3.text, HORIZONTAL_ALIGNMENT_LEFT, -1, l3s).x > l3.size.x:
+		while l3s > 16 and UI.font("body", 900).get_string_size(l3.text, HORIZONTAL_ALIGNMENT_LEFT, -1, l3s).x > l3.size.x:
 			l3s -= 1
 		l3.label_settings.font_size = l3s
+		l3.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		l3.clip_text = true
 		fr.add_child(l3)
 		var lt: = UI.label(V8Starter.T.left % V8Starter.left_text(), 16, Color("ffe7a6"), Color("7a2346"), 3, "body", 900)
 		lt.position = Vector2(392, 100)
@@ -191,7 +193,7 @@ func _recommended() -> void :
 	if not G.S.first_buy.has("first"):
 		var fb: = UI.rbox("mint", Rect2(18, y, W - 36, 120), 28, 5, 12)
 		body.add_child(fb)
-		fb.add_child(UI.tex(G.icon("gift"), Rect2(10, 6, 108, 108)))
+		fb.add_child(V8Art.rect(V8Art.icon("gift"), Rect2(14, 10, 100, 100)))
 		var t4: = UI.title(V6Txt.s("shop.first"), 28, Color.WHITE, Color("1f5e49"))
 		t4.position = Vector2(132, 10)
 		fb.add_child(t4)
@@ -235,7 +237,7 @@ func pass_popup() -> void :
 			(a.material as ShaderMaterial).set_shader_parameter("holo", 0.5)
 			c.add_child(a)
 		else:
-			c.add_child(UI.tex(G.icon("gem" if r.has("gems") else "coin"), Rect2(16, 22, cw - 32, cw - 32)))
+			c.add_child(V8Art.rect(V8Art.cur("gem" if r.has("gems") else "coin"), Rect2(16, 22, cw - 32, cw - 32)))
 			c.add_child(UI.center_label(UI.label(UI.fmt(r.get("gems", r.get("coins", 0))), 16, Color("f2799f") if r.has("gems") else Color("c58a2c"), Color.WHITE, 3, "body", 900), Rect2(0, 82, cw, 24)))
 		if got:
 			c.add_child(UI.center_label(UI.label("✓", 30, Color.WHITE, Color("1f5e49"), 4), Rect2(0, 20, cw, 60)))
@@ -290,23 +292,27 @@ func _outfits() -> void :
 		var it: Dictionary = list[i]
 		var r: = Rect2(18 + (i % 2) * (cw + 16), TOP + (i / 2) * (ch + 14), cw, ch)
 		var own: bool = G.owns(it.id)
-		var c: = UI.rbox("gold" if it.rar == "SSR" else "lav", r, 26, 5, 12)
+		# 0.8: the card is the rarity frame art (frame/card_*) over the outfit picture
+		var c: = Control.new()
+		c.position = r.position
+		c.size = r.size
+		c.pivot_offset = r.size * 0.5
 		c.mouse_filter = Control.MOUSE_FILTER_STOP
 		body.add_child(c)
-		var art: = Common.card_art(G.art_tex(it), Rect2(8, 8, cw - 16, ch - 16), Vector2(0.5, 0.3), 1.0, 20)
+		var inner: = Common.card_inner(it.rar, r.size)
+		var art: = Common.card_art(G.art_tex(it), inner, Vector2(0.5, 0.3), 1.0, Common.card_radius(it.rar, r.size))
 		(art.material as ShaderMaterial).set_shader_parameter("holo", 0.35 if it.rar == "SSR" else 0.0)
 		(art.material as ShaderMaterial).set_shader_parameter("bottom_shade", 0.95)
 		c.add_child(art)
-		var rl: = UI.label(it.rar, 26, Color.WHITE, G.rar_color(it.rar).darkened(0.5), 5, "title", 900)
-		rl.position = Vector2(16, 10)
-		c.add_child(rl)
+		Common.card_frame(c, it.rar, Rect2(Vector2.ZERO, r.size))
+		_rar_tag(c, it.rar, Vector2(cw - 22, 22))
 		var nl: = UI.label(it.name, 22, Color.WHITE, Color(0.2, 0.05, 0.2), 5, "body", 900)
-		nl.position = Vector2(16, ch - 128)
-		c.add_child(nl)
+		nl.position = Vector2(20, ch - 130)
+		c.add_child(Common.fit_line(nl, cw - 40))
 		var hl: = UI.label(G.HEROES[it.hero].name + (V6Txt.s("shop.animated") if it.rar == "SSR" else ""), 17, Color("ffe7a6"), Color(0.2, 0.05, 0.2), 4, "body", 900)
-		hl.position = Vector2(16, ch - 96)
-		c.add_child(hl)
-		var b: = JButton.make(V6Txt.s("shop.owned") if own else UI.fmt(it.shop), "mint" if own else "pink", Rect2(14, ch - 66, cw - 28, 54), null if own else G.icon("gem"), 24)
+		hl.position = Vector2(20, ch - 98)
+		c.add_child(Common.fit_line(hl, cw - 40))
+		var b: = JButton.make(V6Txt.s("shop.owned") if own else UI.fmt(it.shop), "mint" if own else "pink", Rect2(22, ch - 70, cw - 44, 54), null if own else V8Art.cur("gem"), 24)
 		b.pressed.connect( func(): _buy_outfit(it, b))
 		c.add_child(b)
 		UI.pop_in(c, 0.05 * i, 0.85)
@@ -360,7 +366,7 @@ func _gems() -> void :
 			var gs: = 72.0 - n * 3.0
 			var gx: = cw * 0.5 - gs * 0.5 + sin(ang) * 46.0
 			var gyy: = 60.0 - cos(ang) * 22.0 + (k % 2) * 10.0
-			var gi: = UI.tex(G.icon("gem"), Rect2(gx, gyy, gs, gs))
+			var gi: = V8Art.rect(V8Art.cur("gem"), Rect2(gx, gyy, gs, gs))
 			gi.pivot_offset = Vector2(gs, gs) * 0.5
 			gi.rotation = ang * 0.5
 			c.add_child(gi)
@@ -390,7 +396,7 @@ func _gems() -> void :
 	var dy: = gy + 2 * (chh + 16)
 	var d: = UI.rbox("mint", Rect2(18, dy, W - 36, 96), 26, 4, 12)
 	body.add_child(d)
-	d.add_child(UI.tex(G.icon("gift"), Rect2(10, 4, 88, 88)))
+	d.add_child(V8Art.rect(V8Art.icon("gift"), Rect2(12, 6, 84, 84)))
 	var dl: = UI.label(V6Txt.s("shop.gift"), 22, Color.WHITE, Color("1f5e49"), 5, "body", 900)
 	dl.position = Vector2(108, 16)
 	d.add_child(dl)
@@ -424,3 +430,13 @@ func dev_act(a: String) -> void :
 		"t1": _set_tab(1)
 		"t2": _set_tab(2)
 		"pass": pass_popup()
+
+
+# 0.8: rarity tag (R / SR / SSR) as a small graphite pill whose right edge is at `at.x`, top at `at.y`
+func _rar_tag(parent: Control, rar: String, at: Vector2) -> void :
+	var fs: = 20
+	var tw: = UI.font("body", 900).get_string_size(rar, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x + 22.0
+	var tag: = UI.rbox("graphite", Rect2(at.x - tw, at.y, tw, 30), 15, 2, 4)
+	tag.borders(G.rar_color(rar).lerp(Color.WHITE, 0.35), G.rar_color(rar).darkened(0.45))
+	parent.add_child(tag)
+	tag.add_child(UI.center_label(UI.label(rar, fs, G.rar_color(rar).lerp(Color.WHITE, 0.45), UI.DARK, 3, "body", 900), Rect2(0, -1, tw, 30)))

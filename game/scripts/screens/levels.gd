@@ -276,7 +276,7 @@ func _world_gate(w: int) -> void :
 		g.add_child(sl)
 		Common.progress_bar(g, Rect2(236, 100, g.size.x - 260, 18), float(ws) / max_st, "gold")
 	else:
-		g.add_child(UI.tex(G.icon("lock"), Rect2(132, 92, 32, 32)))
+		g.add_child(V8Art.rect(V8Art.icon("lock"), Rect2(132, 90, 34, 34)))
 		var ll: = UI.label("Победи босса главы %d" % w, 19, Color("e0cdee"), UI.DARK, 3, "body", 900)
 		ll.position = Vector2(170, 94)
 		g.add_child(ll)
@@ -307,38 +307,37 @@ func _level_node(it: Dictionary) -> Control:
 	var locked: = i > cur
 	var stars: = G.level_stars(i)
 	var hard: = int(lv.hard)
+	# 0.8 map nodes (misc/node_*): the current table glows pink, every played one is gold, locked ones are dark
 	var key: = "node_lock"
 	if not locked:
-		if i == cur:
-			key = "node_cur"
-		elif hard == 2:
-			key = "node_vhard"
-		elif hard == 1:
-			key = "node_hard"
-		elif stars == 0:
-			key = "node_open"
-		else:
-			key = "node_done"
+		key = "node_cur" if i == cur else "node_done"
 	if i == cur:
 		var r: = Common.rays(c, Vector2(64, 60), 300, Color(1, 0.88, 0.6, 0.85), 12, 0.07, 0.7)
 		r.show_behind_parent = true
-	c.add_child(UI.tex(load("res://assets/v06/map/%s.png" % key), Rect2(0, 0, 128, 140), false))
-	var face_col: = Color("5a2346") if not locked else Color("f1e8ff")
-	if hard > 0 and not locked:
-		face_col = Color("8a1830") if hard == 1 else Color("4a2390")
-	var num: = UI.center_label(UI.title(str(lv.stage + 1), 44, face_col, Color(1, 1, 1, 0.85) if not locked else Color(0.15, 0.08, 0.2)), Rect2(0, 6, 128, 104))
-	num.label_settings.outline_size = 4
-	c.add_child(num)
-	if locked:
-		c.add_child(UI.tex(G.icon("lock"), Rect2(84, 70, 36, 36)))
-	elif i < cur or stars > 0:
+	var art: = V8Art.rect(V8Art.misc(key), Rect2(4, 0, 120, 120))
+	art.name = "Node"
+	c.add_child(art)
+	var num_txt: = str(lv.stage + 1)
+	if i == cur:
+		# the number sits on the pink orb
+		var num: = UI.center_label(UI.title(num_txt, 44, Color("fff6ea"), Color("4a1428")), Rect2(4, 0, 120, 118))
+		num.label_settings.outline_size = 8
+		c.add_child(num)
+	else:
+		# gold sakura / lock stay visible: the number goes on a small graphite plaque under the disc
+		var pw: = maxf(48.0, UI.font("title", 900).get_string_size(num_txt, HORIZONTAL_ALIGNMENT_LEFT, -1, 26).x + 26.0)
+		var plq: = UI.rbox("graphite", Rect2(64 - pw * 0.5, 96, pw, 34), 17, 2, 4)
+		plq.borders(Color("ffe7a6") if not locked else Color("9a8a7a"), Color("8a5a1a") if not locked else Color("3a3236"))
+		c.add_child(plq)
+		plq.add_child(UI.center_label(UI.title(num_txt, 26, Color("fff1c2") if not locked else Color("cfc6bd"), UI.DARK), Rect2(0, -1, pw, 34)))
+	if not locked and (i < cur or stars > 0):
 		for q in 3:
 			var s: = UI.tex(G.fx("star" if q < stars else "star_empty"), Rect2([10.0, 46.0, 82.0][q], [-6.0, -20.0, -6.0][q], 36, 36))
 			s.pivot_offset = Vector2(18, 18)
 			s.rotation = [-0.25, 0.0, 0.25][q]
 			c.add_child(s)
 	if hard > 0 and not locked:
-		var chip: = UI.rbox("red" if hard == 1 else "lav", Rect2(6, 122, 116, 28), 14, 2, 4)
+		var chip: = UI.rbox("red" if hard == 1 else "lav", Rect2(6, 134, 116, 28), 14, 2, 4)
 		c.add_child(chip)
 		chip.add_child(UI.center_label(UI.label("СЛОЖНО" if hard == 1 else "ОЧЕНЬ", 16, Color.WHITE, Color(0.3, 0.05, 0.15), 3, "body", 900), Rect2(0, 0, 116, 28)))
 	if i == cur:
@@ -383,7 +382,7 @@ func _boss_node(it: Dictionary) -> Control:
 	rib.add_child(UI.center_label(UI.label("БОСС", 22, Color.WHITE, Color("6a1020"), 4, "body", 900), Rect2(0, 0, 140, 40)))
 	var stars: = G.level_stars(i)
 	if locked:
-		c.add_child(UI.tex(G.icon("lock"), Rect2(88, 108, 44, 44)))
+		c.add_child(V8Art.rect(V8Art.icon("lock"), Rect2(84, 104, 52, 52)))
 	else:
 		for q in 3:
 			c.add_child(UI.tex(G.fx("star" if q < stars else "star_empty"), Rect2(52 + q * 40, 242, 38, 38)))
@@ -414,8 +413,8 @@ func _refresh_chest(c: Control, w: int, kind: String) -> void :
 	if ready:
 		var r: = Common.rays(c, Vector2(70, 62), 260, Color(1, 0.9, 0.5, 0.9), 10, 0.1, 0.8)
 		r.show_behind_parent = true
-	var img: = UI.tex(load("res://assets/v06/map/%s.png" % ("chest_open" if opened else "chest_closed")), Rect2(-14, -10, 168, 150), false)
-	img.pivot_offset = Vector2(84, 130)
+	var img: = V8Art.rect(V8Art.misc("chest_open" if opened else "chest_closed"), Rect2(-6, -22, 152, 152))
+	img.pivot_offset = Vector2(76, 136)
 	c.add_child(img)
 	if kind == "star":
 		var chip: = UI.rbox("plum", Rect2(28, 116, 84, 30), 15, 2, 4)
@@ -455,12 +454,12 @@ func _chest_tap(c: Control, w: int, kind: String) -> void :
 func _chest_popup(r: Dictionary, kind: String) -> void :
 	var p: = Common.popup(main, "Сундук главы" if kind == "mid" else "Звёздный сундук", 560)
 	Common.rays(p, Vector2(330, 160), 420, Color(1, 0.88, 0.5, 0.8), 14, 0.08, 0.8)
-	var img: = UI.tex(load("res://assets/v06/map/chest_open.png"), Rect2(206, 60, 248, 222), false)
+	var img: = V8Art.rect(V8Art.misc("chest_open"), Rect2(220, 50, 220, 220))
 	p.add_child(img)
 	UI.pop_in(img, 0.1, 0.3)
 	var y: = 300.0
-	Common.chip(p, G.icon("gem"), "+%d" % int(r.gems), Rect2(50, y, 170, 58), "plum", 24)
-	Common.chip(p, G.icon("coin"), "+%s" % UI.fmt(int(r.coins)), Rect2(232, y, 170, 58), "plum", 24)
+	Common.chip(p, V8Art.cur("gem"), "+%d" % int(r.gems), Rect2(50, y, 170, 58), "plum", 24)
+	Common.chip(p, V8Art.cur("coin"), "+%s" % UI.fmt(int(r.coins)), Rect2(232, y, 170, 58), "plum", 24)
 	var hero: String = r.hero
 	var sh: = int(G.S.shards.get(hero, 0))
 	p.add_child(Common.avatar(hero, Rect2(418, y - 4, 66, 66), "pink"))
@@ -742,7 +741,7 @@ func open_card(i: int) -> void :
 	var rl: = UI.label("Награда", 18, Color("cbb5dc"), UI.DARK, 2, "body", 900)
 	rl.position = Vector2(34, y + 14)
 	p.add_child(rl)
-	Common.chip(p, G.icon("gem"), str(lv.reward.gems), Rect2(130, y, 150, 52), "plum", 22)
+	Common.chip(p, V8Art.cur("gem"), str(lv.reward.gems), Rect2(130, y, 150, 52), "plum", 22)
 	var rx: = 296.0
 	if lv.reward.has("item"):
 		var itd: Dictionary = G.ITEM[lv.reward.item]
@@ -786,7 +785,7 @@ func pick_partner(level: int) -> void :
 		row.add_child(av)
 		if not unl:
 			((av.get_node("Pic") as TextureRect).material as ShaderMaterial).set_shader_parameter("gray", 1.0)
-			av.add_child(UI.tex(G.fx("lock"), Rect2(34, 34, 32, 32)))
+			av.add_child(V8Art.rect(V8Art.icon("lock"), Rect2(30, 30, 40, 40)))
 			var nl0: = UI.label(G.HEROES[h].name, 24, Color("9a8a9a"), Color.WHITE, 3, "body", 900)
 			nl0.position = Vector2(128, 10)
 			row.add_child(nl0)
@@ -800,10 +799,10 @@ func pick_partner(level: int) -> void :
 		var nl: = UI.label(G.HEROES[h].name, 26, UI.INK, Color.WHITE, 3, "body", 900)
 		nl.position = Vector2(132, 12)
 		row.add_child(nl)
-		Common.chip(row, G.icon("heart"), "ур. %d" % G.aff_level(h), Rect2(450, 14, 140, 40), "pink", 18)
+		Common.chip(row, V8Art.icon("heart"), "ур. %d" % G.aff_level(h), Rect2(450, 14, 140, 40), "pink", 18)
 		var pk_t: String = _t("levels.skill", "Умение «%s»: %s") % [G.SKILLS[h].name, G.SKILLS[h].desc]
 		var pk_fs: = 17
-		while pk_fs > 14 and UI.font("body", 900).get_string_size(pk_t, HORIZONTAL_ALIGNMENT_LEFT, -1, pk_fs).x > 452.0:
+		while pk_fs > 16 and UI.font("body", 900).get_string_size(pk_t, HORIZONTAL_ALIGNMENT_LEFT, -1, pk_fs).x > 452.0:
 			pk_fs -= 1
 		var pk: = UI.label(pk_t, pk_fs, Color("ffd98a"), UI.DARK, 2, "body", 900)
 		pk.position = Vector2(132, 52)

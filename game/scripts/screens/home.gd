@@ -78,7 +78,7 @@ func build(m, _args: Dictionary) -> void :
 	modes_btn.lbl.size.x -= 34
 	modes_btn.sub.position.x += 34
 	modes_btn.sub.size.x -= 34
-	modes_btn.add_child(UI.tex(G.icon("star"), Rect2(18, 10, 60, 60)))
+	modes_btn.add_child(V8Art.rect(V8Art.nav("play"), Rect2(16, 8, 64, 64)))
 	modes_btn.pressed.connect( func(): main.go("modes"))
 	add_child(modes_btn)
 	UI.pop_in(modes_btn, 0.3)
@@ -96,20 +96,48 @@ func build(m, _args: Dictionary) -> void :
 func _build_left() -> void :
 	var mail_new: = V7RoomData.unread_mail() > 0 or _unseen_notices() > 0
 	var items: = [
-		["tasks", "trophy", V6Txt.s("home.tasks"), func(): Daily.tasks(main, self), G.tasks_ready() > 0],
-		["login", "calendar", V6Txt.s("home.login"), func(): Daily.login(main, self), G.login_ready()],
-		["mail", "mail", V6Txt.s("home.mail"), func(): open_mail(), mail_new],
-		["rating", "trophy", "Рейтинг", func(): main.go("v7tourney", {"tab": "quarter"}), false],
+		["tasks", "tasks", V6Txt.s("home.tasks"), func(): Daily.tasks(main, self), G.tasks_ready() > 0],
+		["login", "visits", V6Txt.s("home.login"), func(): Daily.login(main, self), G.login_ready()],
+		["mail", "letters", V6Txt.s("home.mail"), func(): open_mail(), mail_new],
+		["rating", "rating", "Рейтинг", func(): main.go("v7tourney", {"tab": "quarter"}), false],
 	]
 	for i in items.size():
 		var it: Array = items[i]
-		var b: = Common.icon_button(self, it[1], it[2], Rect2(COL_X, COL_Y + i * COL_STEP, 84, 84), it[3], it[4], 18)
+		var b: = _side_button(it[1], it[2], Rect2(COL_X, COL_Y + i * COL_STEP, 84, 84), it[3], it[4])
 		if it[0] == "rating":
 			_rating_mark(b)
 		side_btns[it[0]] = b
 		UI.slide_in(b, Vector2(-50, 0), 0.1 + i * 0.05)
 
-# «Рейтинг» uses the trophy too, so it gets a small quarter-place plate to tell it apart from «Поручения».
+# 0.8 left-column button: the round V8Art icon (tasks / visits / letters / rating — it has its own gold-rimmed
+# disc, so no drawn disc behind it), caption under it, a pulsing dot when something is ready.
+func _side_button(icon: String, text: String, rect: Rect2, cb: Callable, badge: bool) -> Control:
+	var c: = Control.new()
+	c.position = rect.position
+	c.size = rect.size
+	c.pivot_offset = rect.size * 0.5
+	c.mouse_filter = Control.MOUSE_FILTER_STOP
+	var art: = V8Art.rect(V8Art.icon(icon), Rect2(Vector2.ZERO, Vector2(rect.size.x, rect.size.x)))
+	art.name = "Icon"
+	c.add_child(art)
+	c.add_child(UI.center_label(UI.label(text, 18, UI.INK, UI.DARK, 4, "body", 900), Rect2(-24, rect.size.x - 6, rect.size.x + 48, 26)))
+	if badge:
+		var d: = UI.rbox("gold", Rect2(rect.size.x - 20, 2, 16, 16), 8, 1, 3)
+		d.colors(Color("ffe7a6"), Color("ff8fb0"))
+		c.add_child(d)
+		d.pivot_offset = Vector2(8, 8)
+		var t: Tween = d.create_tween().set_loops()
+		t.tween_property(d, "scale", Vector2(1.2, 1.2), 0.45).set_trans(Tween.TRANS_SINE)
+		t.tween_property(d, "scale", Vector2.ONE, 0.45).set_trans(Tween.TRANS_SINE)
+	c.gui_input.connect( func(e):
+		if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT:
+			Sfx.play("pop")
+			UI.punch(c, 0.15)
+			cb.call())
+	add_child(c)
+	return c
+
+# «Рейтинг» gets a small quarter-place plate on top of its icon.
 func _rating_mark(b: Control) -> void :
 	var q: = _league_call("my_quarter")
 	# 0.8: the same rule as the victory window, profile and Режимы (V8League.quarter_shown): no «#1 001»
@@ -294,8 +322,8 @@ func _league_card(r: Rect2) -> Control:
 	c.add_child(tag)
 	tag.add_child(UI.center_label(UI.label("ЛИГА НЕДЕЛИ", 16, Color.WHITE, Color("7a2346"), 4, "body", 900), Rect2(0, 0, 150, 32)))
 	var tier: = clampi(int(w.get("league_tier", G.rank_of(int(G.S.rp)).tier)), 0, G.RANKS.size() - 1)
-	var em: = Common.rank_emblem(c, Rect2(12, 54, 66, 66), tier, 0)
-	em.get_child(-1).visible = false
+	# weekly league crest (league/*), not the rank medallion
+	Common.league_emblem(c, Rect2(8, 46, 76, 76), tier)
 	var place: = int(w.get("place", 0))
 	var gs: = int(w.get("group_size", 20))
 	var pl: = UI.title("#%d" % place if place > 0 else "—", 40, Color("fff6ea"), UI.DARK)
@@ -369,7 +397,7 @@ func _build_affection() -> void :
 	aff_root.gui_input.connect( func(e):
 		if e is InputEventMouseButton and e.pressed:
 			main.go("room", {"hero": G.S.partner}))
-	aff_root.add_child(UI.tex(G.icon("heart"), Rect2(6, 6, 58, 58)))
+	aff_root.add_child(V8Art.rect(V8Art.icon("heart"), Rect2(8, 8, 56, 56)))
 	var tw: = r.size.x - 70.0 - 12.0
 	var name_s: String = G.HEROES[h].name
 	var fs: = 22

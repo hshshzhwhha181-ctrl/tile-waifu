@@ -38,6 +38,7 @@ static func run() -> int:
 	_population()
 	_week()
 	_quarter()
+	_fresh_quarter()
 	_migration()
 	_settle()
 	_api()
@@ -255,6 +256,31 @@ static func _quarter() -> void:
 	G.S.rp = 600
 
 
+# A fresh player: quarter points = all rank points since the quarter start (q_start_rp = 0). With one or a few
+# wins they land among the late starters of the quarter, never last of 1 001 (some players have not played yet).
+static func _fresh_quarter() -> void:
+	var q: = V8Population.quarter(_ts(WEEK_MON + "T12:00:00"))
+	var qs: = float(q.start)
+	var days: = (float(q.end) - qs) / 86400.0
+	for d in [1.0, 3.0, 7.0, 30.0, 53.0, days - 0.5]:
+		var at: = qs + d * 86400.0
+		var src: = V8Population.quarter_rows(at)
+		var zeros: = src.filter(func(x): return int(x[1]) == 0).size()
+		_check("quarter day %d: someone has not played yet" % int(d), zeros >= 10, str(zeros))
+		var one: = 1 + V8League._count_above(src, 18)
+		var few: = 1 + V8League._count_above(src, 60)
+		print("LEAGUE fresh player at quarter day %d: one win (18) #%d, three wins (60) #%d, not started %d" % [int(d), one, few, zeros])
+		_check("quarter day %d: one win is never last" % int(d), one < V8League.TOTAL - 5, str(one))
+		_check("quarter day %d: more wins, better place" % int(d), few <= one)
+		if d <= 7.0:
+			_check("quarter day %d: a few wins early is not the very top" % int(d), few > 10, str(few))
+	G.S.erase("v8_league")
+	G.S.rp = 0
+	var ls: = V8League.state()
+	_check("fresh player quarter starts at 0 rp", int(ls.q_start_rp) == 0)
+	G.S.rp = 600
+
+
 # ---------------------------------------------------------------- migration
 
 static func _migration() -> void:
@@ -277,6 +303,19 @@ static func _migration() -> void:
 	r2.tour = {"week": V7Ladder.week_key(wd2 - 7), "start": wd2 - 7, "league": 3, "group": 77, "best": [0, 0, 0], "runs": 0, "best_place": 0, "history": []}
 	var t2: = V7Ladder.st()
 	_check("old 0.7 week rolls over into 0.8 week", String(t2.week) == V7Ladder.week_key(wd2) and int(t2.league) == 3)
+	# a 0.7 player whose last tournament week is stale and who finished it at the bottom: neither that week
+	# nor the first 0.8 week demotes (rp 600 = Жемчуг, so league 3 could otherwise drop to 2)
+	G.S.erase("v7_event")
+	G.S.erase("v8_league")
+	G.S.rp = 600
+	var r3: = V7EventData.root()
+	r3.tour = {"week": V7Ladder.week_key(wd2 - 14), "start": wd2 - 14, "league": 3, "group": 77, "best": [1, 0, 0], "runs": 1, "best_place": 0, "history": []}
+	var t3: = V7Ladder.st()
+	_check("stale 0.7 week: settled without demotion", int(t3.league) == 3, str(t3.league))
+	_check("stale 0.7 week: current week is the first week", String(V8League.state().first_week) == String(t3.week))
+	_check("stale 0.7 week: no demotion this week", not V8League.can_demote(3, String(t3.week)) and V7Ladder.zone_in(20, 3, String(t3.week)) == "")
+	var pend3: Array = r3.pending
+	_check("stale 0.7 week: result shown, league kept", pend3.size() == 1 and int(pend3[0].new_league) == 3)
 	_check("6 leagues on G.RANKS", V7Ladder.LEAGUES.size() == G.RANKS.size())
 	for i in G.RANKS.size():
 		_check("league %d named after rank" % i, String(V7Ladder.LEAGUES[i].short) == String(G.RANKS[i].name))

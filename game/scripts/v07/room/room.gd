@@ -98,7 +98,7 @@ func _tabs() -> void :
 		c.add_child(av)
 		if not open:
 			av.modulate = Color(0.35, 0.33, 0.38)
-			c.add_child(UI.tex(G.icon("lock"), Rect2(d * 0.28, d * 0.28, d * 0.44, d * 0.44)))
+			c.add_child(V8Art.rect(V8Art.icon("lock"), Rect2(d * 0.26, d * 0.26, d * 0.48, d * 0.48)))
 		elif V7RoomData.fresh_scenes(id).size() > 0:
 			Common.badge(c, 0, Vector2(d - 22, -4))
 		var nm: = UI.center_label(UI.label(G.HEROES[id].name, 15 if not sel else 17, Color("ffe7a6") if sel else UI.INK, UI.DARK, 4, "body", 900), Rect2(-20, d - 4, d + 40, 26))
@@ -140,7 +140,7 @@ func _panel() -> void :
 	bt.position = Vector2(56, 84)
 	bt.size = Vector2(290, 28)
 	panel.add_child(bt)
-	panel.add_child(UI.tex(G.icon("heart"), Rect2(10, 78, 42, 42)))
+	panel.add_child(V8Art.rect(V8Art.icon("heart"), Rect2(12, 80, 38, 38)))
 	var aff: = int(G.S.aff.get(h, 0))
 	var frac: = 1.0 if lv >= 10 else float(aff % 100) / 100.0
 	Common.progress_bar(panel, Rect2(20, 120, 316, 20), frac, "pink")
@@ -212,7 +212,8 @@ func _btn(text: String, sub: String, pal: String, r: Rect2, icon: String) -> JBu
 	b.lbl.position.x = x0
 	b.lbl.size.x = r.size.x - x0 - 8
 	UI.center_label(b.sub, Rect2(x0, r.size.y * 0.52, r.size.x - x0 - 8, r.size.y * 0.4))
-	b.add_child(UI.tex(G.icon(icon), Rect2(10, (r.size.y - 52) * 0.5, 52, 52)))
+	# 0.8: gift / heart are the new gold glyphs; «star» has no 0.8 art and keeps the old icon
+	b.add_child(V8Art.rect(G.icon(icon) if icon == "star" else Common.ui_icon(icon), Rect2(10, (r.size.y - 52) * 0.5, 52, 52)))
 	return b
 
 
@@ -301,14 +302,14 @@ func _gift_popup() -> void :
 		nm.autowrap_mode = TextServer.AUTOWRAP_OFF
 		nm.clip_text = true
 		card.add_child(nm)
-		var price: = Common.chip(card, G.icon("coin"), UI.fmt(gd.price), Rect2(cw * 0.5 - 62, 130, 124, 32), "plum", 17)
+		var price: = Common.chip(card, V8Art.cur("coin"), UI.fmt(gd.price), Rect2(cw * 0.5 - 62, 130, 124, 32), "plum", 17)
 		price.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 		if V7RoomData.known(h, gd.id):
 			var tst: = V7RoomData.taste(h, gd.id)
 			var nh: = 2 if tst == "love" else (1 if tst == "like" else 0)
 			for k in nh:
-				card.add_child(UI.tex(G.icon("heart"), Rect2(cw - 40 - k * 24, 4, 34, 34)))
+				card.add_child(V8Art.rect(V8Art.icon("heart"), Rect2(cw - 40 - k * 24, 6, 30, 30)))
 			if nh == 0:
 				var okl: = UI.label("ок", 16, Color("bfb3a8"), UI.DARK, 2, "body", 900)
 				okl.position = Vector2(cw - 36, 8)
@@ -401,7 +402,7 @@ func _date_popup() -> void :
 		nm.position = Vector2(16, ch - 46)
 		card.add_child(nm)
 		if V7RoomData.place_known(h, pid) and V7RoomData.FAV[h] == pid:
-			Common.chip(card, G.icon("heart"), "Её любимое", Rect2(10, 10, 170, 32), "pink", 15).mouse_filter = Control.MOUSE_FILTER_IGNORE
+			Common.chip(card, V8Art.icon("heart"), "Её любимое", Rect2(10, 10, 170, 32), "pink", 15).mouse_filter = Control.MOUSE_FILTER_IGNORE
 		if V7RoomData.st().photos.get(h, {}).has(pid):
 			var ph: = UI.rbox("glass", Rect2(cw - 70, 10, 58, 32), 12, 2, 4)
 			card.add_child(ph)
@@ -419,7 +420,7 @@ func _date_popup() -> void :
 	var yb: = 90 + 4 * (ch + 12) + 6.0
 	var s: = V7RoomData.st()
 	if inv <= 0 and int(s.get("bought", 0)) < V7RoomData.EXTRA_INVITES_MAX:
-		var buy: = JButton.make("Ещё приглашение · %d" % V7RoomData.EXTRA_INVITE_GEMS, "gold", Rect2(150, yb, 380, 72), G.icon("gem"), 22)
+		var buy: = JButton.make("Ещё приглашение · %d" % V7RoomData.EXTRA_INVITE_GEMS, "gold", Rect2(150, yb, 380, 72), V8Art.cur("gem"), 22)
 		buy.pressed.connect( func():
 			Common.confirm(main, "Ещё приглашение", "Купить ещё одно приглашение на свидание на сегодня?", "gem", V7RoomData.EXTRA_INVITE_GEMS, func():
 				if int(G.S.gems) < V7RoomData.EXTRA_INVITE_GEMS:
@@ -519,7 +520,7 @@ func _scenes_popup() -> void :
 			th.modulate = Color(0.45, 0.42, 0.48)
 		row.add_child(th)
 		if not open:
-			row.add_child(UI.tex(G.icon("lock"), Rect2(98, rh * 0.5 - 28, 56, 56)))
+			row.add_child(V8Art.rect(V8Art.icon("lock"), Rect2(98, rh * 0.5 - 28, 56, 56)))
 		var tl: = UI.label(sc.title, 26, Color("fff1dc") if open else Color("a39a92"), UI.DARK, 3, "title", 800)
 		tl.position = Vector2(256, 16)
 		tl.size = Vector2(360, 40)

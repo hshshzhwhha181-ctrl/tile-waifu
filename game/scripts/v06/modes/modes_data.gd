@@ -213,6 +213,11 @@ static func gate_index(id: String) -> int:
 	var g: Array = GATES.get(id, [0, 0])
 	return int(g[0]) * 3 + int(g[1])
 
+# rank tier (G.RANKS index) a mode opens at: for the rank medallion next to «Откроется на ранге …»
+static func gate_tier(id: String) -> int:
+	var g: Array = GATES.get(id, [0, 0])
+	return int(g[0])
+
 static func gate_title(id: String) -> String:
 	var g: Array = GATES.get(id, [0, 0])
 	return G.rank_title(int(g[0]), int(g[1]))

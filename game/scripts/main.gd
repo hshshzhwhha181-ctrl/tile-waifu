@@ -4,8 +4,8 @@ extends Control
 const TABS: = [
 	{"id": "home", "name": "Чайная", "icon": "home"}, 
 	{"id": "collection", "name": "Гардероб", "icon": "wardrobe"}, 
-	{"id": "levels", "name": "Партия", "icon": "star", "big": true}, 
-	{"id": "summon", "name": "Желания", "icon": "gem"}, 
+	{"id": "levels", "name": "Партия", "icon": "play", "big": true}, 
+	{"id": "summon", "name": "Желания", "icon": "wishes"}, 
 	{"id": "shop", "name": "Лавка", "icon": "shop"}, 
 ]
 const SCREENS: = {
@@ -109,8 +109,8 @@ func _splash() -> void :
 	hero.interactive = false
 	sp.add_child(hero)
 	UI.slide_in(hero, Vector2(0, 120), 0.4, 0.9)
-	var logo: = UI.tex(load("res://assets/ui/logo.webp"), Rect2(W * 0.5 - 280, H * 0.05, 560, 320))
-	logo.pivot_offset = Vector2(280, 160)
+	var logo: = V8Art.rect(V8Art.misc("logo"), Rect2(W * 0.5 - 270, H * 0.04, 540, 306))
+	logo.pivot_offset = Vector2(270, 153)
 	sp.add_child(logo)
 	UI.pop_in(logo, 0.15, 0.4)
 	var tag: = UI.center_label(UI.label(V6Txt.s("title.tag"), 22, Color("ffe7c4"), UI.DARK, 4, "body", 900), Rect2(0, H * 0.05 + 300, W, 34))
@@ -123,12 +123,16 @@ func _splash() -> void :
 		sp.add_child(chip)
 		UI.slide_in(chip, Vector2(0, 16), 0.6)
 		fades.append(chip)
-	var plate: = UI.rbox("gold", Rect2(W * 0.5 - 230, H - 250, 460, 104), 52, 4, 14)
-	plate.colors(UI.PAL.gold[0], UI.PAL.gold[1])
+	# 0.8: the «Играть» plate is art (btn/play_title, the word is part of the picture); 560×196 drawn at 0.82
+	var plate: = V8Art.rect(V8Art.btn("play_title"), Rect2(W * 0.5 - 230, H - 286, 460, 161))
+	plate.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	sp.add_child(plate)
-	plate.add_child(UI.center_label(UI.label(V6Txt.s("title.tap"), 40, Color("3a2410"), Color(1.0, 0.95, 0.8, 0.55), 2, "body", 900), Rect2(0, 0, 460, 104)))
-	plate.pivot_offset = Vector2(230, 52)
-	plate.shine(1.2)
+	# the word as text too (invisible, under the art): screen readers and the playtest look the button up by it
+	var ptl: = UI.center_label(UI.label(V6Txt.s("title.tap"), 40, Color("3a2410"), Color(1.0, 0.95, 0.8, 0.55), 2, "body", 900), Rect2(0, 0, 460, 161))
+	ptl.self_modulate = Color(1, 1, 1, 0)
+	ptl.name = "PlayText"
+	plate.add_child(ptl)
+	plate.pivot_offset = Vector2(230, 80)
 	UI.pop_in(plate, 0.7, 0.7)
 	var pt: = plate.create_tween().set_loops()
 	pt.tween_property(plate, "scale", Vector2(1.04, 1.04), 0.8).set_trans(Tween.TRANS_SINE)
@@ -322,6 +326,10 @@ func _dev_args() -> void :
 		G.S.ex = int(a.get("ex", "0"))
 	if a.has("modest"):
 		G.S.modest = true
+	if a.has("rp"):
+		# dev: preview the top bar / screens at another rank (not saved unless the screen saves)
+		G.S.rp = int(a.rp)
+		_refresh_profile_chip()
 	if a.has("outfit"):
 		var it: Dictionary = G.ITEM[a.outfit]
 		G.S.owned[a.outfit] = true
@@ -414,6 +422,8 @@ func _dev_act(act: String) -> void :
 var prof_root: Control
 var _prof_key: = ""
 var history: Array = []
+const NAV_OFF: = Color(0.66, 0.62, 0.6, 0.88)
+const NAV_LOCKED: = Color(0.42, 0.4, 0.4, 0.75)
 const NO_HISTORY: = ["play", "arena", "v7play"]
 const PLAY_BACK: = {"play": "home", "arena": "modes", "v7play": "v7event"}
 
@@ -425,9 +435,9 @@ func _build_topbar() -> void :
 	prof_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	topbar.add_child(prof_root)
 	_build_profile_chip()
-	var gp: = _currency(Rect2(W - 338, 32, 160, 54), "gem", G.S.gems)
+	var gp: = _currency(Rect2(W - 344, 32, 160, 54), "gem", G.S.gems)
 	gems_lbl = gp
-	var cp: = _currency(Rect2(W - 166, 32, 150, 54), "coin", G.S.coins)
+	var cp: = _currency(Rect2(W - 176, 32, 160, 54), "coin", G.S.coins)
 	coins_lbl = cp
 	for sig in [G.profile_changed, G.rank_changed, G.rp_changed]:
 		if not (sig as Signal).is_connected(_on_profile_signal):
@@ -452,12 +462,12 @@ func _build_profile_chip() -> void :
 	var ri: = G.rank_of(int(G.S.rp))
 	var plate: = UI.rbox("glass", Rect2(96, 22, 270, 82), 26, 3, 10)
 	prof_root.add_child(plate)
-	var ring: = UI.rbox("gold", Rect2(16, 14, 96, 96), 48, 4, 10)
-	prof_root.add_child(ring)
 	var av_id: = str(G.profile().get("avatar", "mc"))
 	if not Hero.RIGS.has(av_id):
 		av_id = "mc"
-	prof_root.add_child(_avatar(av_id, Rect2(22, 20, 84, 84)))
+	# 0.8 avatar frame (V8Art): the ornate one from Dragon up. Both boxes put the portrait centre at ≈(64, 60).
+	var top: = V8Art.top_tier(int(ri.tier))
+	var ring: = V8Art.avatar(prof_root, av_id, Rect2(2, 8, 124, 124) if top else Rect2(10, 13, 108, 108), top)
 	var nick: = G.nick()
 	var nx: = 122.0
 	var nw: = 366.0 - nx - 14.0
@@ -472,7 +482,7 @@ func _build_profile_chip() -> void :
 	nl.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	nl.clip_text = true
 	prof_root.add_child(nl)
-	rank_em = Common.rank_emblem(prof_root, Rect2(nx - 2, 60, 38, 38), ri.tier, ri.sub)
+	rank_em = Common.rank_emblem(prof_root, Rect2(nx - 6, 54, 46, 46), ri.tier, ri.sub)
 	rank_lbl = UI.label(ri.title, 18, Color(G.RANKS[ri.tier].color).lerp(Color("fff6ea"), 0.45), UI.DARK, 3, "body", 900)
 	rank_lbl.position = Vector2(nx + 44, 58)
 	rank_lbl.size = Vector2(nw - 44, 22)
@@ -499,6 +509,7 @@ func _build_profile_chip() -> void :
 				go("profile", {"from": screen_id if screen_id != "" else "home"}))
 	prof_root.add_child(hit)
 
+# Round heroine portrait without a frame (collection.gd heroine row). The player's own avatar uses V8Art.avatar.
 func _avatar(hero: String, r: Rect2) -> TextureRect:
 	var t: = UI.tex(load("res://assets/hero/%s.png" % hero), r, false)
 	var m: = ShaderMaterial.new()
@@ -517,27 +528,54 @@ func _currency(r: Rect2, icon: String, val: int) -> Label:
 	var p: = UI.rbox("plum", r, r.size.y * 0.5, 3, 10)
 	p.set_param("border_top", Color("ffe7a6")).set_param("border_bottom", Color("c58a2c"))
 	topbar.add_child(p)
-	topbar.add_child(UI.tex(G.icon(icon), Rect2(r.position.x + 4, r.position.y + 5, 44, 44)))
-	var l: = UI.label(UI.fmt(val), 23, Color.WHITE, Color(0.2, 0.05, 0.2), 4)
-	l.position = r.position + Vector2(48, 0)
-	l.size = Vector2(r.size.x - 88, r.size.y)
+	topbar.add_child(V8Art.rect(V8Art.cur(icon), Rect2(r.position.x - 1, r.position.y + 1, 52, 52)))
+	var l: = UI.label(UI.fmt(val), 22, Color.WHITE, Color(0.2, 0.05, 0.2), 4)
+	l.position = r.position + Vector2(50, 0)
+	l.size = Vector2(r.size.x - 50 - 44, r.size.y)
 	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	topbar.add_child(l)
-	var plus: = JButton.make("+", "gold", Rect2(r.end.x - 38, r.position.y + 12, 30, 30), null, 22)
+	_fit_currency(l)
+	var plus: = JButton.make("", "graphite", Rect2(r.end.x - 40, r.position.y + 9, 36, 36), null, 22)
+	plus.box.visible = false
+	plus.add_child(V8Art.rect(V8Art.icon("plus"), Rect2(0, 0, 36, 36)))
 	plus.pressed.connect( func(): go("shop", {"tab": 2} if icon == "gem" else {}))
 	topbar.add_child(plus)
 	return l
+
+# Icon for toast(..., icon) and other callers that pass an old icon name: currencies -> cur/*, names with 0.8 art
+# -> icon/* (V8Art aliases), anything else (star, event currencies) keeps its old texture.
+func art_icon(name: String) -> Texture2D:
+	if name == "":
+		return null
+	if name in ["gem", "gems", "coin", "coins", "ticket", "tickets"]:
+		return V8Art.cur(name)
+	var n: String = V8Art.ICON_ALIAS.get(name, name)
+	if name != "star" and V8Art.has("icon/" + n):
+		return V8Art.icon(n)
+	return V8Art.old_icon(name)
+
+# currency amount between the coin art and the «+»: shrink the font for big numbers instead of running under the «+»
+func _fit_currency(l: Label) -> void :
+	var fs: = 22
+	var f: = UI.font("body", 800)
+	while fs > 16 and f.get_string_size(l.text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > l.size.x:
+		fs -= 1
+	if l.label_settings.font_size != fs:
+		l.label_settings = l.label_settings.duplicate()
+		l.label_settings.font_size = fs
 
 func refresh_currency(punch: = false) -> void :
 	gems_lbl.text = UI.fmt(G.S.gems)
 	_refresh_profile_chip()
 	coins_lbl.text = UI.fmt(G.S.coins)
+	_fit_currency(gems_lbl)
+	_fit_currency(coins_lbl)
 	if punch:
 		UI.punch(gems_lbl, 0.25)
 
 func gem_target() -> Vector2:
-	return Vector2(W - 340, 58)
+	return Vector2(W - 320, 58)
 
 func _build_navbar() -> void :
 
@@ -603,11 +641,11 @@ func _build_navbar() -> void :
 			var ring: = Common.rays(c, Vector2(tw * 0.5, 28), 150, Color(1, 0.85, 0.55, 1), 10, 0.03, 0.18)
 			ring.name = "Rays"
 			c.move_child(ring, inner.get_index())
-		var ic: = UI.tex(G.icon(tab.icon + "_flat") if not big else G.icon(tab.icon), Rect2(tw * 0.5 - 27, 40, 54, 54) if not big else Rect2(tw * 0.5 - 36, -8, 72, 72))
+		var ic: = V8Art.rect(V8Art.nav(tab.icon), Rect2(tw * 0.5 - 27, 40, 54, 54) if not big else Rect2(tw * 0.5 - 38, -10, 76, 76))
 		ic.name = "IC"
 		ic.pivot_offset = ic.size * 0.5
 		if not big:
-			ic.modulate = Color(0.78, 0.73, 0.68, 0.8)
+			ic.modulate = NAV_OFF
 		c.add_child(ic)
 		var l: = UI.center_label(UI.label(tab.name, 17 if not big else 19, UI.MUTED if not big else UI.GOLD, UI.DARK, 4, "body", 900), Rect2(0, 90, tw, 26))
 		l.name = "L"
@@ -629,12 +667,14 @@ func refresh_nav() -> void :
 			n.queue_free()
 	var tw: float = c.size.x
 	if not G.summon_open():
-		var lk: = UI.rbox("plum", Rect2(tw * 0.5 - 2, 46, 40, 40), 20, 2, 6)
+		var lk: = UI.rbox("graphite", Rect2(tw * 0.5 + 2, 50, 38, 38), 19, 2, 6)
 		lk.set_meta("navmark", true)
-		lk.add_child(UI.tex(G.fx("lock"), Rect2(7, 6, 26, 26)))
+		lk.add_child(V8Art.rect(V8Art.icon("lock"), Rect2(6, 5, 26, 26)))
 		c.add_child(lk)
-		(c.get_node("IC") as CanvasItem).modulate = Color(0.5, 0.47, 0.45, 0.6)
+		(c.get_node("IC") as CanvasItem).modulate = NAV_LOCKED
 	else:
+		if screen_id != "summon":
+			(c.get_node("IC") as CanvasItem).modulate = NAV_OFF
 		if G.S.free10 or int(G.S.ex) >= G.EXCHANGE_COST:
 			var d: = Common.badge(c, 0, Vector2(tw - 38, 20))
 			d.set_meta("navmark", true)
@@ -657,13 +697,12 @@ func _select_tab(id: String) -> void :
 			continue
 		c.get_node("HL").visible = on
 		c.get_node("BAR").visible = on
-		ic.texture = G.icon(tab.icon if on else tab.icon + "_flat")
 		l.label_settings = l.label_settings.duplicate()
 		l.label_settings.font_color = UI.GOLD if on else UI.MUTED
 		var t: Tween = ic.create_tween().set_parallel()
 		t.tween_property(ic, "scale", Vector2(1.18, 1.18) if on else Vector2.ONE, 0.28).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 		t.tween_property(ic, "position:y", 30.0 if on else 40.0, 0.28).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-		t.tween_property(ic, "modulate", Color.WHITE if on else Color(0.78, 0.73, 0.68, 0.8), 0.2)
+		t.tween_property(ic, "modulate", Color.WHITE if on else (NAV_LOCKED if k == "summon" and not G.summon_open() else NAV_OFF), 0.2)
 		if on and not G.demo:
 			Fx.ring(c, Vector2(c.size.x * 0.5, 64), Color(1, 0.85, 0.6, 0.6), 0.6, 0.3)
 
@@ -837,7 +876,7 @@ func toast(text: String, icon: = "") -> void :
 	overlay.add_child(p)
 	var x0: = 20.0
 	if icon != "":
-		p.add_child(UI.tex(G.icon(icon), Rect2(8, 4, 62, 62)))
+		p.add_child(V8Art.rect(art_icon(icon), Rect2(10, 6, 58, 58)))
 		x0 = 72
 	var fs: = 22
 	if UI.font("body", 800).get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > (w - x0 - 16) * 2.0:
@@ -861,7 +900,8 @@ func fly_gems(from: Vector2, n: int) -> void :
 	for i in min(n, 8):
 		var s: = TextureRect.new()
 		s.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		s.texture = G.icon("gem")
+		s.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+		s.texture = V8Art.cur("gem")
 		s.size = Vector2(54, 54)
 		s.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		s.position = from - Vector2(27, 27)

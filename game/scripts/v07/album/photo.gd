@@ -34,7 +34,7 @@ static func victory_hook(p, root: Control, st: int, s: float) -> void :
 	var h: float = p.size.y
 	var by: = h - 150.0 - 76.0
 	if V7Replay.has_log(p.board):
-		var rb: = JButton.make("Повтор", "graphite", Rect2(w * 0.5 - 230, by, 220, 62), G.icon("play"), 22)
+		var rb: = JButton.make("Повтор", "graphite", Rect2(w * 0.5 - 230, by, 220, 62), V8Art.nav("play"), 22)
 		rb.pressed.connect( func(): V7Replay.run(p, root))
 		root.add_child(rb)
 		UI.pop_in(rb, 1.1)
@@ -234,7 +234,7 @@ func _captions(fd: Dictionary) -> void :
 		l.size.x = 156
 		x += 176
 
-	var lg: = UI.tex(load("res://assets/ui/logo.webp"), Rect2(36, H - 176, 230, 110))
+	var lg: = V8Art.rect(V8Art.misc("logo"), Rect2(36, H - 186, 230, 130))
 	comp.add_child(lg)
 	var d: = Time.get_date_dict_from_system()
 	var dl: = UI.label("%02d.%02d.%d · с %s" % [d.day, d.month, d.year, G.HEROES[play.partner].name], 17, UI.INK, UI.DARK, 4, "body", 900)
@@ -293,7 +293,7 @@ func _build_bar() -> void :
 			_build_bar())
 		bar.add_child(b)
 	var cl: = JButton.make("", "graphite", Rect2(20, 108, 84, 84), null, 20)
-	cl.add_child(UI.tex(G.icon("close"), Rect2(22, 22, 40, 40)))
+	cl.add_child(V8Art.rect(V8Art.icon("close"), Rect2(20, 20, 44, 44)))
 	cl.pressed.connect(_close)
 	bar.add_child(cl)
 	var sv: = JButton.make("Сохранить", "gold", Rect2(116, 108, (W - 156) * 0.5, 84), null, 26)

@@ -53,7 +53,7 @@ func _build() -> void :
 			(av.material as ShaderMaterial).set_shader_parameter("gray", 1.0)
 		stage.add_child(av)
 		if not unl:
-			stage.add_child(UI.tex(G.fx("lock"), Rect2(x + AV * 0.5 - 16, ROW_Y + AV * 0.5 - 16, 32, 32)))
+			stage.add_child(V8Art.rect(V8Art.icon("lock"), Rect2(x + AV * 0.5 - 18, ROW_Y + AV * 0.5 - 18, 36, 36)))
 		var hh: String = h
 		var hit: = Control.new()
 		hit.position = Vector2(x, ROW_Y)
@@ -107,7 +107,7 @@ func _build() -> void :
 	var tl: = UI.label(G.HEROES[cur].title, 20, Color("b8406c"), Color.WHITE, 3, "body", 900)
 	tl.position = Vector2(22, 70)
 	ic.add_child(tl)
-	ic.add_child(UI.tex(G.icon("heart"), Rect2(14, 110, 56, 56)))
+	ic.add_child(V8Art.rect(V8Art.icon("heart"), Rect2(16, 112, 52, 52)))
 	var al: = UI.label(V6Txt.s("coll.aff") % G.aff_level(cur), 22, UI.INK, Color.WHITE, 3, "body", 900)
 	al.position = Vector2(74, 116)
 	ic.add_child(al)
@@ -167,45 +167,47 @@ func _build() -> void :
 			continue
 		var own: bool = G.owns(it.id)
 		var worn: bool = G.S.outfit.get(cur, "") == it.id or (G.S.outfit.get(cur, "") == "" and it.id in G.BASE_OUTFITS)
-		var pal: = "gold" if it.rar == "SSR" else ("lav" if it.rar == "SR" else "sky")
-		var card: = UI.rbox(pal, Rect2(cx, 44, cw, 168), 14, 3, 6)
+		# 0.8: the rarity frame art (frame/card_*) over the outfit; the card node is only a holder
+		var csz: = Vector2(cw, 168)
+		var card: = Control.new()
+		card.position = Vector2(cx, 44)
+		card.size = csz
+		card.pivot_offset = csz * 0.5
 		strip.add_child(card)
-		var art: = Common.card_art(G.art_tex(it), Rect2(4, 4, cw - 8, 160), Vector2(0.5, 0.3), 1.0, 10)
+		if worn and own:
+			# soft gold glow around the worn outfit
+			var glow: = UI.rbox("gold", Rect2(2, 2, cw - 4, 164), 12, 0, 10)
+			glow.set_param("glow", 1.0).set_param("glow_color", Color("ffe7a6"))
+			card.add_child(glow)
+		var inner: = Common.card_inner(it.rar, csz)
+		var art: = Common.card_art(G.art_tex(it), inner, Vector2(0.5, 0.3), 1.0, Common.card_radius(it.rar, csz))
 		var am: ShaderMaterial = art.material
 		if not own:
 			am.set_shader_parameter("gray", 1.0)
 			am.set_shader_parameter("bottom_shade", 0.9)
 		am.set_shader_parameter("holo", 0.4 if it.rar == "SSR" and own else 0.0)
 		card.add_child(art)
-		var rl: = UI.label(it.rar, 20, Color.WHITE, G.rar_color(it.rar).darkened(0.5), 4, "body", 900)
-		rl.position = Vector2(8, 4)
-		card.add_child(rl)
+		Common.card_frame(card, it.rar, Rect2(Vector2.ZERO, csz))
+		# rarity: a small pill in the top-right corner, clear of the frame's crest and flowers
+		var rw: = UI.font("body", 900).get_string_size(it.rar, HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x + 12.0
+		var rtag: = UI.rbox("graphite", Rect2(cw - rw - 5, inner.position.y + 2, rw, 22), 11, 2, 3)
+		rtag.borders(G.rar_color(it.rar).lerp(Color.WHITE, 0.35), G.rar_color(it.rar).darkened(0.45))
+		card.add_child(rtag)
+		rtag.add_child(UI.center_label(UI.label(it.rar, 16, G.rar_color(it.rar).lerp(Color.WHITE, 0.45), UI.DARK, 2, "body", 900), Rect2(0, -1, rw, 22)))
 		if not own:
-			card.add_child(UI.tex(G.fx("lock"), Rect2(cw * 0.5 - 18, 66, 36, 36)))
+			card.add_child(V8Art.rect(V8Art.icon("lock"), Rect2(cw * 0.5 - 20, 62, 40, 40)))
 		if worn and own:
-			card.set_param("glow", 1.0).set_param("glow_color", Color("ffe7a6"))
 			# inside the card (middle, over the art), so it never covers the strip caption or the rarity tag
 			var wl: = UI.rbox("pink", Rect2(cw * 0.5 - 36, 38, 72, 26), 13, 2, 4)
 			card.add_child(wl)
 			wl.add_child(UI.center_label(UI.label(V6Txt.s("coll.worn"), 16, Color.WHITE, Color("7a2346"), 3, "body", 900), Rect2(0, 0, 72, 26)))
-		# 0.8: name at 16 px (never smaller), up to three lines inside the card instead of an ellipsis; the label
-		# is at least as wide as the longest word (it may overhang the card edge a little), and wraps on word
-		# bounds only, so a long word is never cut in the middle
-		var nfs: = 16
-		var nwt: = 800
-		var nol: = 4
-		if UI.longest_word_w(it.name, nfs, "body", nwt, nol) > cw + 4.0:
-			# a long word («Императрица»): a lighter weight and a thinner outline before overhanging the card
-			nwt = 700
-			nol = 3
-		var nw: = maxf(cw + 4.0, UI.longest_word_w(it.name, nfs, "body", nwt, nol) + 4.0)
-		var nl: = UI.label(it.name, nfs, Color.WHITE, Color(0.2, 0.05, 0.2), nol, "body", nwt)
-		nl.autowrap_mode = TextServer.AUTOWRAP_WORD
-		nl.custom_minimum_size = Vector2(nw, 0)
-		nl.position = Vector2((cw - nw) * 0.5, 80)
+		# 0.8: name at 16 px (never smaller), up to three lines inside the frame; it wraps between words only —
+		# a word that is still too wide is drawn lighter and, as the last resort, trimmed with «…», never cut in two
+		var nl: = UI.label(it.name, 16, Color.WHITE, Color(0.2, 0.05, 0.2), 4, "body", 800)
+		var nw: = cw - 6.0
+		Common.fit_words(nl, nw, 3, 16)
+		nl.position = Vector2(3, 76)
 		nl.size = Vector2(nw, 84)
-		nl.max_lines_visible = 3
-		nl.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 		nl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		nl.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
 		card.add_child(nl)
@@ -231,17 +233,26 @@ func _preview(it: Dictionary) -> void :
 	dim.size = size
 	dim.color = Color(0.1, 0.03, 0.1, 0.85)
 	root.add_child(dim)
-	var aw: = W - 80.0
-	var ah: = aw * 1.49
-	var fr: = UI.rbox("gold", Rect2(32, (H - ah) * 0.5 - 8, aw + 16, ah + 16), 26, 5, 14)
-	root.add_child(fr)
-	var art: = Common.card_art(G.art_tex(it), Rect2(40, (H - ah) * 0.5, aw, ah), Vector2(0.5, 0.5), 1.0, 20)
+	# 0.8: the rarity frame art, drawn at most 1.4× its 344×512 source
+	var aw: = 344.0 * 1.4
+	var ah: = aw * 512.0 / 344.0
+	var frr: = Rect2((W - aw) * 0.5, (H - ah) * 0.5 - 30, aw, ah)
+	var inner: = Common.card_inner(it.rar, frr.size)
+	var art: = Common.card_art(G.art_tex(it), Rect2(frr.position + inner.position, inner.size), Vector2(0.5, 0.5), 1.0, Common.card_radius(it.rar, frr.size))
 	(art.material as ShaderMaterial).set_shader_parameter("holo", 0.3 if it.rar == "SSR" else 0.0)
 	(art.material as ShaderMaterial).set_shader_parameter("bottom_shade", 0.3)
-	root.add_child(art)
-	Common.ribbon(root, it.name, Rect2(50, (H + ah) * 0.5 - 40, W - 100, 76), "pink", 30)
+	# art + frame pop in together (the frame node is scaled, so it is animated through this holder)
+	var card: = Control.new()
+	card.position = frr.position
+	card.size = frr.size
+	card.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	root.add_child(card)
+	art.position -= frr.position
+	card.add_child(art)
+	Common.card_frame(card, it.rar, Rect2(Vector2.ZERO, frr.size))
+	Common.ribbon(root, it.name, Rect2(50, frr.end.y - 44, W - 100, 76), "pink", 30)
 	var worn: bool = G.S.outfit.get(it.hero, "") == it.id or (G.S.outfit.get(it.hero, "") == "" and it.id in G.BASE_OUTFITS)
-	var eb: = JButton.make(V6Txt.s("coll.wear_on") if worn else V6Txt.s("coll.wear"), "mint" if worn else "gold", Rect2(W * 0.5 - 160, (H + ah) * 0.5 + 50, 320, 84), null, 32)
+	var eb: = JButton.make(V6Txt.s("coll.wear_on") if worn else V6Txt.s("coll.wear"), "mint" if worn else "gold", Rect2(W * 0.5 - 160, frr.end.y + 46, 320, 84), null, 32)
 	eb.shine_every = 0.0 if worn else 2.0
 	eb.pressed.connect( func():
 		G.S.outfit[it.hero] = it.id
@@ -251,8 +262,7 @@ func _preview(it: Dictionary) -> void :
 		root.queue_free()
 		_build())
 	root.add_child(eb)
-	UI.pop_in(fr, 0.0, 0.85)
-	UI.pop_in(art, 0.0, 0.85)
+	UI.pop_in(card, 0.0, 0.85)
 	Sfx.say(it.hero, "outfit")
 	dim.mouse_filter = Control.MOUSE_FILTER_STOP
 	dim.gui_input.connect( func(e):

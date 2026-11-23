@@ -57,6 +57,8 @@ func build(m, args: Dictionary) -> void :
 	rl.size = Vector2(320, 24)
 	rl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	add_child(rl)
+	var rw: float = UI.font("body", 800).get_string_size(rl.text, HORIZONTAL_ALIGNMENT_LEFT, -1, 17).x
+	add_child(V8Art.rect(V8Art.rank(ri.tier), Rect2(W - 26 - rw - 34, y - 2, 30, 30)))
 	y += 32
 	var tw: = (W - 40 - 12) * 0.5
 	var th: = 80.0
@@ -78,23 +80,34 @@ func _help() -> void :
 	var lines: = ["Путь — карта партий с главами и боссами. Турнир недели — твоя группа из 20 игроков, очки недели дают три стола турнира, а очки ранга идут из всех режимов.", 
 		"Остальные режимы открываются по мере роста ранга. Ранг один на всю игру: очки ранга дают Путь, раскладка дня, турнир и режимы.", 
 		"Сейчас твой ранг: %s." % ri.title]
-	var p: = Common.popup(main, "Режимы", 560)
+	var p: = Common.popup(main, "Режимы", 616)
 	var l: = UI.label("\n\n".join(lines), 21, UI.INK)
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	l.position = Vector2(40, 64)
 	l.size = Vector2(580, 300)
 	l.custom_minimum_size = Vector2(580, 0)
 	p.add_child(l)
-	var gates: = []
-	for k in [["blitz", "Блиц"], ["zen", "Сад"], ["duel", "Дуэль"], ["etude", "Этюды"], ["shift", "Смена в чайной"], ["climb", "Лунная лестница"]]:
-		gates.append("%s — %s" % [k[1], V6ModesData.gate_title(k[0])])
-	var gl: = UI.label("%s · %s\n%s · %s\n%s · %s" % gates, 18, Color("ffd98a"), UI.DARK, 2, "body", 900)
-	gl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	gl.position = Vector2(40, 396)
-	gl.size = Vector2(580, 130)
-	gl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	gl.custom_minimum_size = Vector2(580, 0)
-	p.add_child(gl)
+	# gates: rank medallion + mode name + the rank it opens at, two columns
+	var gates: = [["blitz", "Блиц"], ["zen", "Сад"], ["duel", "Дуэль"], ["etude", "Этюды"], ["shift", "Смена в чайной"], ["climb", "Лунная лестница"]]
+	for i in gates.size():
+		var k: Array = gates[i]
+		var open: = V6ModesData.mode_open(k[0])
+		var gx: = 40.0 + (i % 2) * 296.0
+		var gy: = 406.0 + (i / 2) * 60.0
+		var em: = V8Art.rect(V8Art.rank(V6ModesData.gate_tier(k[0])), Rect2(gx, gy, 48, 48))
+		if not open:
+			em.modulate = Color(0.75, 0.72, 0.72, 0.9)
+		p.add_child(em)
+		var gn: = UI.label(k[1], 19, Color("ffd98a") if open else UI.INK, UI.DARK, 2, "body", 900)
+		gn.position = Vector2(gx + 56, gy)
+		gn.size = Vector2(232, 26)
+		gn.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		p.add_child(gn)
+		var gr: = UI.label(("открыт · " if open else "с ранга ") + V6ModesData.gate_title(k[0]), 16, UI.MUTED, UI.DARK, 2, "body", 800)
+		gr.position = Vector2(gx + 56, gy + 25)
+		gr.size = Vector2(232, 22)
+		gr.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		p.add_child(gr)
 
 
 func _art(parent: Control, bg: String, r: Rect2, focus: = Vector2(0.5, 0.5), shade_top: = 0.15, shade_bottom: = 0.92) -> TextureRect:
@@ -174,8 +187,8 @@ func _tour_card(r: Rect2) -> Control:
 	_art(card, "res://assets/v07/event/cg_finale_card.webp", r, Vector2(0.5, 0.3), 0.35, 0.9)
 	var w: = V6ModesData.league("my_week")
 	var tier: = clampi(int(w.get("league_tier", G.rank_of(int(G.S.rp)).tier)), 0, G.RANKS.size() - 1)
-	var em: = Common.rank_emblem(card, Rect2(20, 20, 92, 92), tier, 0)
-	em.get_child(-1).visible = false
+	# weekly league crest (league/*), not the rank medallion
+	Common.league_emblem(card, Rect2(14, 16, 104, 104), tier)
 	var t: = UI.title("Турнир недели", 36, Color("fff6ea"), Color("3a1620"))
 	t.position = Vector2(128, 16)
 	t.size = Vector2(r.size.x - 150, 50)
@@ -218,7 +231,7 @@ func _riichi_card(r: Rect2) -> Control:
 	card.mouse_filter = Control.MOUSE_FILTER_STOP
 	card.pivot_offset = r.size * 0.5
 	add_child(card)
-	card.add_child(UI.tex(G.fx("lock"), Rect2(20, (r.size.y - 40) * 0.5, 40, 40)))
+	card.add_child(V8Art.rect(V8Art.icon("lock"), Rect2(20, (r.size.y - 42) * 0.5, 42, 42)))
 	var t: = UI.label("Стол риичи", 24, Color("c9bdb0"), UI.DARK, 3, "body", 900)
 	t.position = Vector2(74, 0)
 	t.size = Vector2(300, r.size.y)
@@ -277,7 +290,7 @@ func _tile(r: Rect2, id: String, title: String, bg: String) -> Control:
 		(th.material as ShaderMaterial).set_shader_parameter("gray", 1.0)
 	card.add_child(th)
 	if not open:
-		card.add_child(UI.tex(G.fx("lock"), Rect2(r.size.y * 0.5 - 18, r.size.y * 0.5 - 18, 36, 36)))
+		card.add_child(V8Art.rect(V8Art.icon("lock"), Rect2(r.size.y * 0.5 - 20, r.size.y * 0.5 - 20, 40, 40)))
 	var tx: = 86.0
 	var tw: = r.size.x - tx - 10.0
 	var t: = UI.label(title, 21, UI.INK if open else Color("a39a92"), UI.DARK, 3, "body", 900)
@@ -286,12 +299,18 @@ func _tile(r: Rect2, id: String, title: String, bg: String) -> Control:
 	t.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	card.add_child(t)
 	var st: = _status(id) if open else V6ModesData.locked_text(id)
+	var sx: = tx
+	if not open:
+		# the rank it opens at: small medallion, then «Откроется на ранге …»
+		card.add_child(V8Art.rect(V8Art.rank(V6ModesData.gate_tier(id)), Rect2(tx - 2, 40, 30, 30)))
+		sx = tx + 32.0
+	var sw: = r.size.x - sx - 10.0
 	var fs: = 16
-	while fs > 12 and UI.font("body", 800).get_string_size(st, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > tw:
-		fs -= 1
+	if UI.font("body", 800).get_string_size(st, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > sw and not open:
+		st = "С ранга %s" % V6ModesData.gate_title(id)
 	var sl: = UI.label(st, fs, Color("ffd98a") if open else Color("bfb3a8"), UI.DARK, 2, "body", 800)
-	sl.position = Vector2(tx, 42)
-	sl.size = Vector2(tw, 26)
+	sl.position = Vector2(sx, 42)
+	sl.size = Vector2(sw, 26)
 	sl.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	card.add_child(sl)
 	card.gui_input.connect( func(e):
@@ -437,7 +456,7 @@ func _etude_btn(p: Control, i: int, r: Rect2) -> void :
 	p.add_child(b)
 	if not open:
 		b.modulate = Color(0.7, 0.65, 0.75, 0.8)
-		b.add_child(UI.tex(G.fx("lock"), Rect2(r.size.x * 0.5 - 22, 18, 44, 44)))
+		b.add_child(V8Art.rect(V8Art.icon("lock"), Rect2(r.size.x * 0.5 - 22, 14, 44, 44)))
 	else:
 		b.add_child(UI.center_label(UI.title(str(i + 1), 36, Color.WHITE if stars < 3 else Color("fff6d8"), Color("5a1a6a") if stars < 3 else Color("9a5a0a")), Rect2(0, 6, r.size.x, 56)))
 	for k in 3:

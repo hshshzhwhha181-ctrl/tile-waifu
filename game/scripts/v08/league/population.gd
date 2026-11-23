@@ -14,7 +14,7 @@ extends RefCounted
 #   V8Population.games_week(id, t, league) -> int   games since Monday (path + tournament tables)
 #   V8Population.quarter(t) -> {key, start, end, num, year}
 #   V8Population.quarter_rows(t) -> Array [[id, points], ...] sorted by points, best first
-#   V8Population.avatar_view(img, hero, rect) -> Control   round face crop of an outfit, ring in the heroine's colour
+#   V8Population.avatar_view(img, hero, rect, _, top) -> Control   round face crop of an outfit in the gold frame (V8Art.avatar)
 
 const COUNT: = 1000
 const SEED: = 80817
@@ -322,6 +322,24 @@ static func q_total(id: int, qkey: String) -> float:
 	r.seed = hash("q|%d|%s" % [id, qkey])
 	return float(p.q) * r.randf_range(0.8, 1.2)
 
+# 0.8: not everyone plays from the first day of a quarter. Per player and quarter: the day they start
+# playing it (0 for most; later for returning / new players; never for a few who sit this quarter out).
+# So a fresh player who wins a few tables mid-quarter lands among the late starters, never last of 1 001.
+const Q_INACTIVE: = 0.04
+const Q_LATE: = 0.34
+const Q_LATE_MAX: = 0.75
+
+static func q_join(id: int, qkey: String, days: float) -> float:
+	var r: = RandomNumberGenerator.new()
+	r.seed = hash("j|%d|%s" % [id, qkey])
+	var u: = r.randf()
+	if u < Q_INACTIVE:
+		return INF
+	if u < Q_INACTIVE + Q_LATE:
+		# whole days, so the local-time rhythm of rp_at stays aligned with the clock
+		return floorf(r.randf_range(0.03, Q_LATE_MAX) * days)
+	return 0.0
+
 static func rp_at(id: int, t: float) -> int:
 	var q: = quarter(t)
 	var x: = (t - float(q.start)) / 86400.0
@@ -329,8 +347,13 @@ static func rp_at(id: int, t: float) -> int:
 		return 0
 	var p: = get_p(id)
 	var days: = (float(q.end) - float(q.start)) / 86400.0
-	x = minf(x, days)
-	var rate: = q_total(id, q.key) / (_F(p, days) - _F(p, 0.0))
+	var join: = q_join(id, String(q.key), days)
+	if x <= join:
+		return 0
+	# a late starter plays at their usual pace from the join day: the quarter total shrinks with the days left
+	var span: = days - join
+	x = minf(x - join, span)
+	var rate: = q_total(id, q.key) * (span / days) / (_F(p, span) - _F(p, 0.0))
 	var k: = floori(x)
 	var fk: = _F(p, k)
 	var val: = fk - _F(p, 0.0) + (_F(p, k + 1) - fk) * _part(x - k, float(p.shift))
@@ -488,23 +511,8 @@ static func my_avatar_img() -> String:
 			return String(it.img)
 	return "%s_base" % h
 
-static func avatar_view(img: String, hero: String, r: Rect2, ring: = 3.0) -> Control:
-	var c: = Control.new()
-	c.position = r.position
-	c.size = r.size
-	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var col: Color = G.HEROES.get(hero, G.HEROES.mc).color
-	var b: = UI.rbox("gold", Rect2(Vector2.ZERO, r.size), r.size.x * 0.5, ring, 6)
-	b.colors(col.lightened(0.25), col.darkened(0.35)).borders(Color(1, 1, 1, 0.7), col.darkened(0.55))
-	b.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	c.add_child(b)
-	var path: = "res://assets/outfits/%s.webp" % img
-	if not ResourceLoader.exists(path):
-		path = "res://assets/outfits/mc_base.webp"
-	var fc: = face(img)
-	var inset: = maxf(3.0, r.size.x * 0.07)
-	var art: = Common.card_art(load(path), Rect2(Vector2(inset, inset), r.size - Vector2(inset, inset) * 2.0), Vector2(fc[0], fc[1]), float(fc[2]), (r.size.x - inset * 2.0) * 0.5)
-	(art.material as ShaderMaterial).set_shader_parameter("bottom_shade", 0.0)
-	art.name = "Pic"
-	c.add_child(art)
-	return c
+# Round portrait in the gold avatar frame (V8Art.avatar). top = the Dragon/Celestial frame (V8Art.top_tier).
+# `_ring` is kept for old callers and ignored.
+static func avatar_view(img: String, hero: String, r: Rect2, _ring: = 3.0, top: = false) -> Control:
+	var src: = img if ResourceLoader.exists("res://assets/outfits/%s.webp" % img) else (hero if G.HEROES.has(hero) else "mc")
+	return V8Art.avatar(null, src, r, top)

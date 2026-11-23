@@ -101,16 +101,22 @@ static func group_ids(wsd: int, league: int) -> Array:
 	return out
 
 static func my_row(t: Dictionary) -> Dictionary:
-	return {"pid": -1, "name": G.nick(), "hero": _my_hero(), "avatar": V8Population.my_avatar_img(), "score": V7Ladder.my_score(t), "me": true}
+	return {"pid": -1, "name": G.nick(), "hero": _my_hero(), "avatar": V8Population.my_avatar_img(), "score": V7Ladder.my_score(t),
+		"tier": my_tier(), "me": true}
+
+static func my_tier() -> int:
+	return int(G.rank_of(int(G.S.get("rp", 0))).tier)
 
 static func group_rows(t: Dictionary, at: float) -> Array:
 	var wsd: = int(t.start)
 	var league: = int(t.league)
 	at = clampf(at, wsd * 86400.0, (wsd + 7) * 86400.0)
 	var rows: = []
+	var tiers: = V8Population.tiers_at(wsd * 86400.0)
 	for id in group_ids(wsd, league):
 		var p: = V8Population.get_p(id)
-		rows.append({"pid": id, "name": p.nick, "hero": p.hero, "avatar": p.avatar, "score": V8Population.week_points(id, at, league, wsd), "me": false})
+		rows.append({"pid": id, "name": p.nick, "hero": p.hero, "avatar": p.avatar, "score": V8Population.week_points(id, at, league, wsd),
+			"tier": int(tiers[id]), "me": false})
 	rows.append(my_row(t))
 	rows.sort_custom(func(a, b):
 		if int(a.score) == int(b.score):
@@ -204,7 +210,7 @@ static func _count_above(src: Array, mine: int) -> int:
 
 static func _my_qrow(points: int, place: int) -> Dictionary:
 	return {"pid": -1, "name": G.nick(), "hero": _my_hero(), "avatar": V8Population.my_avatar_img(), "points": points,
-		"place": place, "tier": int(G.rank_of(int(G.S.get("rp", 0))).tier), "me": true}
+		"place": place, "tier": my_tier(), "me": true}
 
 static func my_quarter() -> Dictionary:
 	var at: = now()

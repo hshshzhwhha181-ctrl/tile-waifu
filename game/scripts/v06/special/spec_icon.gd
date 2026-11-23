@@ -27,6 +27,8 @@ func _init(k: String, c: = Color("f6c453"), count: = 0) -> void :
 
 func _ready() -> void :
 	_font = UI.font("body", 900)
+	# 0.8 glyphs (icon/gift, icon/lock) are drawn small: sample their mipmaps
+	texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	set_process(kind in ["joker", "bomb", "gift"])
 
 func _process(dt: float) -> void :
@@ -86,30 +88,15 @@ func _draw() -> void :
 		"bomb": _draw_bomb()
 
 func _draw_gift() -> void :
-	var rib: = Color("ff6f9f")
-	var dark: = Color("b8406c")
-
-	var band: = PackedVector2Array([Vector2( - HW, - HH + 20), Vector2( - HW + 20, - HH), Vector2( - HW + 34, - HH), Vector2( - HW, - HH + 34)])
-	draw_colored_polygon(band, rib)
-	draw_polyline(PackedVector2Array([band[1], band[0]]), dark, 2.0, true)
-	draw_polyline(PackedVector2Array([band[2], band[3]]), dark, 2.0, true)
-	draw_line(band[0].lerp(band[1], 0.5) + Vector2(3, 3), band[3].lerp(band[2], 0.5) + Vector2(-2, -2), Color(1, 1, 1, 0.35), 2.0, true)
-
+	# 0.8: the gold gift glyph (icon/gift) on the tile's top-left corner, rocking a little
+	var tex: = V8Art.icon("gift")
 	var c: = Vector2( - HW + 15, - HH + 15)
-	var wob: = sin(_t * 3.0) * 0.08
-	for side in [-1.0, 1.0]:
-		var a: float = - PI * 0.25 + (PI * 0.5 if side > 0 else 0.0) + wob * side
-		var dir: = Vector2(cos(a), sin(a))
-		var nrm: = Vector2( - dir.y, dir.x)
-		var loop: = PackedVector2Array([c, c + dir * 15 + nrm * 9, c + dir * 18, c + dir * 15 - nrm * 9])
-		draw_colored_polygon(loop, dark)
-		var inner: = PackedVector2Array([c + dir * 2, c + dir * 13 + nrm * 6, c + dir * 15, c + dir * 13 - nrm * 6])
-		draw_colored_polygon(inner, rib)
-
-	draw_line(c, c + Vector2(-4, 15), dark, 5.0, true)
-	draw_line(c, c + Vector2(9, 13), dark, 5.0, true)
-	draw_circle(c, 5.5, dark)
-	draw_circle(c, 4.0, Color("ffc8da"))
+	var sz: = 36.0
+	draw_set_transform(c, sin(_t * 3.0) * 0.08, Vector2.ONE)
+	draw_circle(Vector2(0, 2), sz * 0.5 + 1.0, Color(0, 0, 0, 0.25))
+	if tex:
+		draw_texture_rect(tex, Rect2(Vector2(-sz, -sz) * 0.5, Vector2(sz, sz)), false)
+	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
 	var tw: = 0.5 + 0.5 * sin(_t * 4.0)
 	draw_colored_polygon(_star(Vector2(HW - 10, HH - 12), 6.0 * tw + 1.0, 1.6, 0.0), Color(1, 0.95, 0.7, 0.9 * tw))
@@ -129,25 +116,16 @@ func _draw_key(c: Vector2, s: float) -> void :
 	draw_circle(ring_c, 2.0 * s, Color(0.27, 0.12, 0.32))
 
 func _draw_lock() -> void :
+	# 0.8: the gold lock glyph (icon/lock) on a disc of the lock's group colour (its key has the same colour)
 	var a: = 1.0 - open_t
 	_rrect(Rect2( - HW + 3, - HH + 3, HW * 2 - 6, HH * 2 - 6), 9.0, Color(0.12, 0.05, 0.2, 0.5 * a + 0.05))
-	var c: = Vector2(0, 8)
-	var lift: = -10.0 * open_t
-
-	var sh_c: = c + Vector2(0, -12 + lift)
-	draw_arc(sh_c, 11.0, PI, TAU, 16, OUT, 8.5, true)
-	draw_arc(sh_c, 11.0, PI, TAU, 16, Color("d9d3e8"), 5.0, true)
-	draw_line(sh_c + Vector2(-11, 0), sh_c + Vector2(-11, 9 - lift * 0.0), OUT, 8.5, true)
-	draw_line(sh_c + Vector2(-11, 0), sh_c + Vector2(-11, 9), Color("d9d3e8"), 5.0, true)
-	if open_t < 0.5:
-		draw_line(sh_c + Vector2(11, 0), sh_c + Vector2(11, 9), OUT, 8.5, true)
-		draw_line(sh_c + Vector2(11, 0), sh_c + Vector2(11, 9), Color("d9d3e8"), 5.0, true)
-
-	_rrect(Rect2(c.x - 18, c.y - 9, 36, 28), 7.0, OUT)
-	_rrect(Rect2(c.x - 15.5, c.y - 6.5, 31, 23), 5.0, col)
-	_rrect(Rect2(c.x - 13, c.y - 5, 26, 6), 3.0, col.lightened(0.35))
-	draw_circle(c + Vector2(0, 3), 3.6, OUT)
-	draw_line(c + Vector2(0, 4), c + Vector2(0, 11), OUT, 3.0, true)
+	var c: = Vector2(0, 2)
+	_badge(c, 22.0, Color(col.darkened(0.35), 0.95))
+	var tex: = V8Art.icon("lock")
+	if tex:
+		var sz: = 38.0
+		var lift: = -10.0 * open_t
+		draw_texture_rect(tex, Rect2(c + Vector2(-sz * 0.5, -sz * 0.5 + lift), Vector2(sz, sz)), false, Color(1, 1, 1, clampf(a * 1.4, 0.0, 1.0)))
 
 func _draw_chain() -> void :
 	var a: = 1.0 - open_t

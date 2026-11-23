@@ -216,7 +216,7 @@ func _claim_row(parent: Control, x: Dictionary, r: Rect2) -> void :
 		b.pulse = true
 		parent.add_child(b)
 	else:
-		var lk: = Common.chip(parent, G.icon("gem"), "%d за набор" % x.gems, br, "plum", 16)
+		var lk: = Common.chip(parent, V8Art.cur("gem"), "%d за набор" % x.gems, br, "plum", 16)
 		lk.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 func _claim(id: String, r: Rect2, parent: Control) -> void :
@@ -390,7 +390,7 @@ func _fill_tables() -> float:
 
 	var auto: = UI.rbox("gold" if cur == "" else "glass", Rect2(10, y, content.size.x - 20, 70), 22, 3, 8)
 	content.add_child(auto)
-	auto.add_child(UI.tex(G.icon("home"), Rect2(14, 8, 54, 54)))
+	auto.add_child(V8Art.rect(V8Art.nav("home"), Rect2(14, 8, 54, 54)))
 	var al: = UI.label("Стол главы (как задумано)", 22, Color("3a2410") if cur == "" else UI.INK, Color(1, 0.95, 0.8, 0.4) if cur == "" else UI.DARK, 3, "body", 900)
 	al.position = Vector2(80, 0)
 	al.size = Vector2(auto.size.x - 100, 70)
@@ -424,7 +424,7 @@ func _fill_tables() -> float:
 		hl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		card.add_child(hl)
 		if not unl:
-			card.add_child(UI.tex(G.icon("lock"), Rect2(cw * 0.5 - 24, 60, 48, 48)))
+			card.add_child(V8Art.rect(V8Art.icon("lock"), Rect2(cw * 0.5 - 24, 60, 48, 48)))
 		var tid: String = tb.id
 		var tname: String = tb.name
 		var tbc: Dictionary = tb
@@ -512,7 +512,7 @@ func _fill_photos() -> float:
 	if ph.is_empty():
 		var box: = UI.rbox("glass", Rect2(10, y, content.size.x - 20, 220), 26, 3, 10)
 		content.add_child(box)
-		box.add_child(UI.tex(G.icon("trophy"), Rect2(box.size.x * 0.5 - 50, 24, 100, 100)))
+		box.add_child(V8Art.rect(V8Art.icon("trophy"), Rect2(box.size.x * 0.5 - 50, 24, 100, 100)))
 		box.add_child(UI.center_label(UI.label("Пока пусто. Выиграй партию и нажми «Фото».", 20, UI.INK, UI.DARK, 3), Rect2(0, 140, box.size.x, 40)))
 		return y + 240
 	var cols: = 3

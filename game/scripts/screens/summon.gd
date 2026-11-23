@@ -360,36 +360,46 @@ func _card(r: Dictionary, sz: Vector2) -> Control:
 	front.visible = false
 	front.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	c.add_child(front)
-	var pal: = "gold" if r.rar == "SSR" else ("lav" if r.rar == "SR" else "sky")
-	front.add_child(UI.rbox(pal, Rect2(Vector2.ZERO, sz), 14, 4, 8))
+	# 0.8: the front is the rarity frame art (frame/card_r|sr|ssr) over the item picture
 	var tex: = G.art_tex(r)
 	var focus: = Vector2(0.5, 0.28) if r.cat == "outfit" else Vector2(0.5, 0.5)
-	var art: = Common.card_art(tex, Rect2(5, 5, sz.x - 10, sz.y - 10), focus, 1.0 if r.cat != "skin" else 0.75, 10)
+	var inner: = Common.card_inner(r.rar, sz)
+	var art: = Common.card_art(tex, inner, focus, 1.0 if r.cat != "skin" else 0.75, Common.card_radius(r.rar, sz))
 	var am: ShaderMaterial = art.material
 	am.set_shader_parameter("holo", 0.6 if r.rar == "SSR" else 0.0)
 	am.set_shader_parameter("bottom_shade", 0.8)
 	front.add_child(art)
-	var fs: = 16 if sz.x < 200 else 26
-	var rl: = UI.label(r.rar, fs + 8, Color.WHITE, col.darkened(0.5), 5, "title" if fs + 8 >= UI.TITLE_MIN else "body", 900)
-	rl.position = Vector2(8, 2)
-	front.add_child(rl)
+	Common.card_frame(front, r.rar, Rect2(Vector2.ZERO, sz))
+	var small: = sz.x < 200
+	var fs: = 16 if small else 26
+	# rarity tag: a pill in the top-right corner, inside the frame and clear of its crest and flowers
+	var rfs: = 16 if small else 24
+	var rw: = UI.font("body", 900).get_string_size(r.rar, HORIZONTAL_ALIGNMENT_LEFT, -1, rfs).x + (14.0 if small else 22.0)
+	var rh: = 24.0 if small else 36.0
+	var rr: = Rect2(sz.x - rw - (8.0 if small else 18.0), inner.position.y + (4.0 if small else 10.0), rw, rh)
+	var rtag: = UI.rbox("graphite", rr, rh * 0.5, 2, 4)
+	rtag.borders(col.lerp(Color.WHITE, 0.35), col.darkened(0.45))
+	rtag.name = "Rar"
+	front.add_child(rtag)
+	rtag.add_child(UI.center_label(UI.label(r.rar, rfs, col.lerp(Color.WHITE, 0.45), UI.DARK, 3, "body", 900), Rect2(0, -1, rw, rh)))
 	var nl: = UI.label(r.name, fs, Color.WHITE, Color(0.2, 0.05, 0.2), 4, "body", 900)
 	# autowrap first: with it off, the label's minimum width is the whole line and size.x would grow past the card
 	# 0.8: 16 px on the small cards too; word-bound wrapping only, the label as wide as the longest word
 	nl.autowrap_mode = TextServer.AUTOWRAP_WORD
 	var nw: = maxf(sz.x - 12.0, UI.longest_word_w(r.name, fs, "body", 900, 4) + 2.0)
 	nl.custom_minimum_size = Vector2(nw, 0)
-	nl.position = Vector2((sz.x - nw) * 0.5, sz.y - (50 if sz.x < 200 else 80))
-	nl.size = Vector2(nw, 46 if sz.x < 200 else 70)
+	nl.position = Vector2((sz.x - nw) * 0.5, sz.y - (54 if small else 86))
+	nl.size = Vector2(nw, 46 if small else 70)
 	nl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	nl.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
 	front.add_child(nl)
 	if r.get("new", false):
-		# 0.8: on the small cards the badge sits above the top edge, clear of the rarity tag («SSR», top-left)
-		var nr: = Rect2(sz.x - 74, -25, 80, 26) if sz.x < 200 else Rect2(sz.x - 84, -10, 90, 28)
-		var nb: = UI.rbox("red", nr, 13, 2, 4)
+		# 0.8: «НОВОЕ» hangs off the top-left corner; the rarity tag is top-right, so they never overlap
+		var nr: = Rect2(-8, -14, 76, 26) if small else Rect2(-12, -12, 110, 34)
+		var nb: = UI.rbox("red", nr, nr.size.y * 0.5, 2, 4)
+		nb.name = "New"
 		front.add_child(nb)
-		nb.add_child(UI.center_label(UI.label(V6Txt.s("common.new"), 16, Color.WHITE, Color("6a1020"), 2, "body", 900), Rect2(Vector2.ZERO, nr.size)))
+		nb.add_child(UI.center_label(UI.label(V6Txt.s("common.new"), 16 if small else 20, Color.WHITE, Color("6a1020"), 2, "body", 900), Rect2(Vector2.ZERO, nr.size)))
 	return c
 
 func _flip(c: Control, r: Dictionary) -> void :
@@ -425,22 +435,24 @@ func _showcase(r: Dictionary) -> void :
 	showcase.add_child(bg)
 	Common.rays(showcase, Vector2(W * 0.5, H * 0.42), 1500, Color(1, 0.82, 0.35, 0.8), 18, 0.05, 1.0)
 	Common.rays(showcase, Vector2(W * 0.5, H * 0.42), 900, Color(1, 0.6, 0.85, 0.5), 9, -0.08, 0.7)
-	var aw: = W - 110.0
-	var ah: = aw * 1.45
-	var frame: = UI.rbox("gold", Rect2((W - aw) * 0.5 - 8, H * 0.42 - ah * 0.5 - 8, aw + 16, ah + 16), 26, 6, 16)
-	frame.set_param("glow", 1.0)
-	showcase.add_child(frame)
-	var art: = Common.card_art(G.art_tex(r), Rect2((W - aw) * 0.5, H * 0.42 - ah * 0.5, aw, ah), Vector2(0.5, 0.45), 1.0, 20)
+	# 0.8: the frame art is drawn at most 1.4× its 344×512 source (larger turns soft)
+	var aw: = 344.0 * 1.4
+	var ah: = aw * 512.0 / 344.0
+	var fr: = Rect2((W - aw) * 0.5, H * 0.42 - ah * 0.5, aw, ah)
+	var inner: = Common.card_inner(r.rar, fr.size)
+	var art: = Common.card_art(G.art_tex(r), Rect2(fr.position + inner.position, inner.size), Vector2(0.5, 0.45), 1.0, Common.card_radius(r.rar, fr.size))
 	(art.material as ShaderMaterial).set_shader_parameter("holo", 0.45)
 	(art.material as ShaderMaterial).set_shader_parameter("bottom_shade", 0.6)
 	showcase.add_child(art)
+	var frame: = Common.card_frame(showcase, r.rar, fr)
 	frame.pivot_offset = frame.size * 0.5
-	art.pivot_offset = art.size * 0.5
+	art.pivot_offset = fr.size * 0.5 - inner.position
 	for n in [frame, art]:
-		n.scale = Vector2(1.6, 1.6)
+		var s1: Vector2 = n.scale
+		n.scale = s1 * 1.6
 		n.modulate.a = 0
 		var t: Tween = n.create_tween().set_parallel()
-		t.tween_property(n, "scale", Vector2.ONE, 0.6).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_OUT)
+		t.tween_property(n, "scale", s1, 0.6).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_OUT)
 		t.tween_property(n, "modulate:a", 1.0, 0.25)
 	var ssr: = UI.title("SSR", 120, Color("fff1b8"), Color("c0661a"))
 	ssr.position = Vector2(30, H * 0.42 - ah * 0.5 - 70)

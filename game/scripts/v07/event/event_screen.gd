@@ -223,7 +223,7 @@ func _node(i: int, p: Vector2, current: bool) -> Control:
 	if open:
 		c.add_child(UI.center_label(UI.title(str(i + 1), 40 if boss else 34, Color.WHITE, UI.DARK), Rect2(0, -4, s, s)))
 	else:
-		c.add_child(UI.tex(G.fx("lock"), Rect2(s * 0.5 - 20, s * 0.5 - 22, 40, 40)))
+		c.add_child(V8Art.rect(V8Art.icon("lock"), Rect2(s * 0.5 - 21, s * 0.5 - 22, 42, 42)))
 	if boss:
 		var cr: = UI.rbox("red", Rect2(s * 0.5 - 52, -18, 104, 28), 14, 2, 4)
 		c.add_child(cr)
@@ -350,7 +350,7 @@ func _shop() -> void :
 			icon = Common.avatar(def.hero, Rect2(12, 8, 72, 72), "gold")
 			row.add_child(icon)
 		else:
-			row.add_child(UI.tex(G.icon("gem" if s.kind == "gems" else "coin"), Rect2(10, 6, 76, 76)))
+			row.add_child(V8Art.rect(V8Art.cur("gem" if s.kind == "gems" else "coin"), Rect2(12, 8, 72, 72)))
 		var t: = ("Осколок портрета: %s" % G.HEROES[def.hero].name) if s.kind == "shard" else String(s.name)
 		var tl: = UI.label(t, 21, Color.WHITE, UI.DARK, 3, "body", 900)
 		tl.position = Vector2(100, 12)
