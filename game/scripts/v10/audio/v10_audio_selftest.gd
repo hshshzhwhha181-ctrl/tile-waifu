@@ -141,6 +141,9 @@ func _runtime() -> void :
 	_check(V10Music.current() == "motif_yue", "motif")
 	V10Music.play_screen("no_such_screen")
 	_check(V10Music.current() == "lobby", "unknown screen falls back to lobby")
+	await _secs(1.0)
+	st = m.debug_state()
+	_check(int(st["a"][0]) + int(st["b"][0]) == 1, "rapid tab hopping settles on one player: %s" % str(st))
 	# legacy bus: V10 plays on Music so Sfx.duck works
 	_check(AudioServer.get_bus_index("Music") >= 0, "Music bus exists")
 	_check(m.get_node("A").bus == "Music" and m.get_node("Fever").bus == "Music", "players on Music bus")

@@ -255,8 +255,11 @@ func _play(track_id: String, fade: float) -> void :
 	if _fever_on:
 		_set_fever(false)
 	_cur = track_id
-	if old.playing:
-		_fade(old, SILENT_DB, fade, true)
+	# fade out every base player except the one that takes the new track (rapid tab hopping can leave both
+	# mid-fade; the new track always goes to the quieter one)
+	for p in [_a, _b]:
+		if p.playing and (p != nw or track_id == ""):
+			_fade(p, SILENT_DB, fade, true)
 	if track_id == "" or not _music_on():
 		return
 	var st: = _stream(track_id)
