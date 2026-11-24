@@ -129,6 +129,9 @@ func decide(zone: String, now: float) -> Dictionary:
 			last_line_t = now
 			out.i = _pick(zone)
 		return out
+	# «body» (chest, hips, legs) never reacts and never counts toward the spam line: repeated pokes there get nothing
+	if zone == "body":
+		return out
 	taps.append(now)
 	while not taps.is_empty() and now - taps[0] > SPAM_WIN:
 		taps.pop_front()
@@ -142,8 +145,6 @@ func decide(zone: String, now: float) -> Dictionary:
 		out.line = true
 		last_line_t = now
 		out.i = _pick("spam")
-		return out
-	if zone == "body":
 		return out
 	out.kind = "react"
 	if now - last_line_t >= TALK_CD:

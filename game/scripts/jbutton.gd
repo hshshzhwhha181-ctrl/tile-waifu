@@ -23,6 +23,8 @@ var disabled: = false:
 		_apply_disabled()
 var _shine_t: = 0.0
 var _down: = false
+# 0.9: an optional check run on release (see set_gate): false = refuse the tap with the deny feedback only
+var gate: Callable
 
 # use_art = false keeps the procedural pill for tabs (their palette is swapped via box.colors()) and toggles
 static func make(text: String, pal: String, rect: Rect2, icon: Texture2D = null, font_size: = 30, radius: = -1.0, use_art: = true) -> JButton:
@@ -264,7 +266,7 @@ func _deny_shake() -> void :
 	V9Feel.deny(self)
 
 func _press_down() -> void :
-	if disabled:
+	if disabled or (gate.is_valid() and not bool(gate.call())):
 		_deny_shake()
 		denied.emit()
 		return
@@ -274,14 +276,30 @@ func _press_down() -> void :
 
 func _release(fire: bool) -> void :
 	box.set_param("pressed", 0.0)
+	# 0.9: the owner's gate decides before any success feedback — a refused tap gets only the deny (shake, deny
+	# sound and haptic) and `denied`, never the pop + overshoot followed by a deny in the same frame
+	if fire and gate.is_valid() and not bool(gate.call()):
+		V9Feel.press_up(self, false, sound)
+		_deny_shake()
+		denied.emit()
+		return
 	V9Feel.press_up(self, fire, sound)
 	if fire:
 		box.shine(0.0, 0.5)
 		pressed.emit()
 
+# gate the button: `ok` returns false when a tap will be refused (not enough currency, board busy…); `on_deny` runs
+# on such a tap (and on a tap while `disabled`) so the owner can say why (toast). Its own V9Feel.deny is a no-op.
+func set_gate(ok: Callable, on_deny: Callable = Callable()) -> void :
+	gate = ok
+	if on_deny.is_valid():
+		denied.connect(on_deny)
+
 func activate() -> void :
 
 	_press_down()
+	if not _down:
+		return
 	await get_tree().create_timer(0.12).timeout
 	_down = false
 	_release(true)

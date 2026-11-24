@@ -173,6 +173,16 @@ static func _charge() -> void :
 	_check("core: Rin with empty tray removes a pair", int(V9Ults.core("rin").empty_tray_pairs) == 1)
 	_check("core: MT 1 pair, Nova deepest", V9Ults.core("mc").pairs == 1 and V9Ults.core("nova").deepest)
 	_check("core table not mutated by ranked merge", not V9Ults.CORES.hana.has("reveal"))
+	# HEROINES §2: ranked cores are levelled in pair-equivalents — on a ranked board (no ice, no secrets) every
+	# heroine's ult removes exactly 1 pair (Rin: returns the tray, or removes 1 pair when it is empty)
+	var lvl_bad: = []
+	for h in G.HERO_ORDER:
+		var rc: = V9Ults.core(h, true)
+		var removes: = int(rc.get("pairs", 0)) if not rc.get("return_tray", false) else int(rc.get("empty_tray_pairs", 0))
+		if removes != 1 or rc.get("reveal_all", false):
+			lvl_bad.append(h)
+	_check("ranked cores: 1 pair-equivalent each on a board without ice / secrets", lvl_bad.is_empty(), str(lvl_bad))
+	_check("ranked core: Yue takes the pair at her beam + opens 1, never the whole board", int(V9Ults.core("yue", true).pairs) == 1 and int(V9Ults.core("yue", true).reveal) == 1 and not V9Ults.core("yue", true).reveal_all and V9Ults.core("yue").reveal_all)
 	var targets: = {}
 	for h in G.HERO_ORDER:
 		targets[h] = V9Ults.core(h).target

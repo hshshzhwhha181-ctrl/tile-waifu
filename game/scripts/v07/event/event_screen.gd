@@ -294,11 +294,10 @@ func _node(i: int, p: Vector2, current: bool) -> Control:
 	c.gui_input.connect( func(e):
 		if e is InputEventMouseButton and e.pressed:
 			if not open:
-				Sfx.play("deny")
+				V9Feel.deny(c)
 				main.toast("Сначала пройди стол %d" % i, "star")
 				return
-			Sfx.play("pop")
-			UI.punch(c, 0.1)
+			V9Feel.press(c)
 			table_popup(i))
 	node_btns.append(c)
 	return c
@@ -342,9 +341,10 @@ func table_popup(i: int) -> void :
 		a.gui_input.connect( func(e):
 			if e is InputEventMouseButton and e.pressed:
 				if not G.hero_unlocked(hh):
+					V9Feel.deny(a)
 					main.toast("%s ещё не с тобой. Осколки есть в лавке ивента" % G.HEROES[hh].name if hh == def.hero else "%s ещё не с тобой" % G.HEROES[hh].name, "heart")
 					return
-				Sfx.play("tap")
+				V9Feel.press(a, "tap")
 				pick[0] = hh
 				for k in avs:
 					var ring: RBox = avs[k].get_child(0)
@@ -438,9 +438,8 @@ func _ask_buy(s: Dictionary, b: Control, what: String) -> void :
 func _buy(s: Dictionary, b: Control) -> void :
 	var why: = V7EventData.buy(s)
 	if why != "":
-		Sfx.play("deny")
+		V9Feel.deny(b)
 		main.toast(why, "gift")
-		UI.punch(b, 0.1)
 		return
 	Sfx.play("reveal_sr", 1.0, -4)
 	Fx.burst(self, b.get_global_rect().get_center(), "sparkle", 30, Color(1, 0.9, 0.6), 1.0)

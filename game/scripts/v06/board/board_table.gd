@@ -49,6 +49,8 @@ static var enabled: = true
 var rect: = ColorRect.new()
 var mat: = ShaderMaterial.new()
 var theme_id: = "default"
+# 0.9: the frame's outer edge in the board's parent space (the play screen); the combo / fever glow is drawn on it
+var frame_rect: = Rect2()
 
 static func theme_for(bg: String) -> Dictionary:
 	var k: String = ALIAS.get(bg, bg)
@@ -94,6 +96,7 @@ func setup(board: Node2D, r: Rect2, bg: String) -> void :
 
 	var lim: = r.grow(k)
 	tr = tr.intersection(lim) if tr.intersects(lim) else tr
+	frame_rect = tr
 
 	scale = Vector2.ONE / s
 	position = (Vector2(tr.position.x, tr.position.y) - board.position) / s - Vector2(MARGIN, MARGIN)

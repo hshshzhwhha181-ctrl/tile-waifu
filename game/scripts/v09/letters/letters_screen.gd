@@ -422,6 +422,14 @@ func _answer(p: RBox, l: Dictionary, v: Dictionary, ry: float, fresh: bool) -> v
 	mine.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	p.add_child(mine)
 	var emo: = "shy" if i == 0 else "happy"
+	# 0.9: the reply's hearts rise inside this strip only (clipped to the reply rows, under her portrait and her
+	# answer): never over the letter text above, never past the popup's edge
+	var hz: = Control.new()
+	hz.position = Vector2(12, ry + 22)
+	hz.size = Vector2(pw - 24, 150)
+	hz.clip_contents = true
+	hz.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	p.add_child(hz)
 	var av: = V8Art.emotion_avatar(h, emo, Rect2(24, ry + 30, 104, 104), "pink")
 	p.add_child(av)
 	var bw: = pw - 48 - 120.0
@@ -447,13 +455,13 @@ func _answer(p: RBox, l: Dictionary, v: Dictionary, ry: float, fresh: bool) -> v
 	aff.modulate.a = 0.0
 	aff.create_tween().tween_property(aff, "modulate:a", 1.0, 0.25).set_delay(0.45)
 	V9Feel.success(av, "sparkle", 0.8)
-	var at: Vector2 = p.global_position + Vector2(76, ry + 82)
+	var at: = Vector2(76, ry + 82) - hz.position
 	# the «+5 симпатии» line itself pops (a rising «+5 ♥» ran over the words of her answer)
 	aff.pivot_offset = Vector2(bw, 12)
 	aff.scale = Vector2(0.6, 0.6)
 	aff.create_tween().tween_property(aff, "scale", Vector2.ONE, 0.35).set_delay(0.45).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	if V9Feel.can_fx():
-		Fx.burst(main.overlay, at, "heart", maxi(4, int(round(14 * V9Feel.fx_scale()))))
+		Fx.burst(hz, at, "heart", maxi(4, int(round(12 * V9Feel.fx_scale()))), Color(1, 0.75, 0.85), 0.7)
 	Sfx.voice_started.emit(h, str(v.answers[i]), minf(0.4 + str(v.answers[i]).length() * 0.045, 3.0))
 
 

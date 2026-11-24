@@ -917,14 +917,22 @@ func _skill_ready() -> void :
 		return
 	super._skill_ready()
 
+func _help_ok(kind: String) -> bool:
+	if mode == "etude":
+		# etude: only undo, and it also works while stuck (input off) — its handler refuses an empty history itself
+		return kind == "undo"
+	return super._help_ok(kind)
+
 func _hint() -> void :
 	if mode == "etude":
+		V9Feel.deny(btn_hint)
 		main.toast("В этюде подсказок нет: только отмена", "hint")
 		return
 	super._hint()
 
 func _shuffle() -> void :
 	if mode == "etude":
+		V9Feel.deny(btn_shuffle)
 		main.toast("В этюде фишки не смешиваются", "shuffle")
 		return
 	super._shuffle()

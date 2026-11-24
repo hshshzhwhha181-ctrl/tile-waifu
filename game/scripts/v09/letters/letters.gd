@@ -45,7 +45,7 @@ static func st() -> Dictionary:
 		d["lastk"] = {}
 	for k in ["seq", "n", "wins0", "best_combo"]:
 		d[k] = int(d.get(k, 0))
-	for k in ["day", "wins_day", "last_day"]:
+	for k in ["day", "wins_day", "last_day", "win_day"]:
 		d[k] = str(d.get(k, ""))
 	return d
 
@@ -98,9 +98,26 @@ static func _on_node(n: Node) -> void:
 	if not (n is Control):
 		return
 	var sc = n.get_script()
-	if sc is Script and (sc as Script).resource_path == PLAY_SCRIPT and not n.has_meta("v9_letters"):
+	if sc is Script and _is_play(sc) and not n.has_meta("v9_letters"):
 		n.set_meta("v9_letters", true)
 		n.tree_exiting.connect(_on_play_exit.bind(n), CONNECT_ONE_SHOT)
+
+
+# play.gd itself or any screen built on it (arena mode_play, event / tourney event_play)
+static func _is_play(sc: Script) -> bool:
+	var k: = 0
+	while sc != null and k < 8:
+		if sc.resource_path == PLAY_SCRIPT:
+			return true
+		sc = sc.get_base_script()
+		k += 1
+	return false
+
+
+# G.record_game calls this on a win: the day of the win is stored where it happens, so a match that ends past
+# midnight (or any win before the first home visit of the day) still makes «Первая победа дня»
+static func note_win() -> void:
+	st().win_day = G.today()
 
 
 static func _on_play_exit(n: Node) -> void:
@@ -162,7 +179,7 @@ static func tick() -> Array:
 	var s: = st()
 	_roll_day(s)
 	s.last_day = G.today()
-	if total_wins() > s.wins0 and not "first_win" in s.evs:
+	if (total_wins() > s.wins0 or s.win_day == G.today()) and not "first_win" in s.evs:
 		queue("first_win")
 	var today: = G.today()
 	var todo: Array = s.pending.filter(func(p): return p is Dictionary and str(p.get("day", "")) == today and not str(p.get("ev", "")) in s.evs)

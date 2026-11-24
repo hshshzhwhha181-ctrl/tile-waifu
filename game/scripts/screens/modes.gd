@@ -313,19 +313,24 @@ func _tile(r: Rect2, id: String, title: String, bg: String) -> Control:
 	card.add_child(sl)
 	card.gui_input.connect( func(e):
 		if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT:
-			UI.tap(card, 0.06, "")
-			_open(id))
+			# 0.9: decide first — a gated mode denies (shake, deny sound and haptic), an open one gets the press
+			if V6ModesData.GATES.has(id) and not V6ModesData.mode_open(id):
+				V9Feel.deny(card)
+			else:
+				V9Feel.press(card)
+			_open(id, false))
 	return card
 
 
-func _open(id: String) -> void :
+# feel = false: the tap handler already answered (press or deny); deep links and dev acts answer here
+func _open(id: String, feel: = true) -> void :
 	if V6ModesData.GATES.has(id) and not V6ModesData.mode_open(id):
-		Sfx.play("deny")
+		if feel:
+			V9Feel.deny(mode_tiles.get(id, null))
 		main.toast("%s · %s" % [_mode_name(id), V6ModesData.locked_text(id)], "lock")
-		if mode_tiles.has(id):
-			UI.punch(mode_tiles[id], 0.08)
 		return
-	Sfx.play("pop")
+	if feel:
+		Sfx.play("pop")
 	match id:
 		"duel":
 			_duel_pick()

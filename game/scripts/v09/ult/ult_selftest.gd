@@ -97,6 +97,9 @@ static func run(play) -> void :
 			want_pairs = 1 if ranked else 2
 		"rin":
 			want_pairs = 0 if tray0 > 0 else 1
+		"yue":
+			# ranked Yue is levelled like the others (V9Ults.RANKED_CORES.yue): the pair at her beam + 1 tile
+			want_pairs = 1 if ranked else 0
 	_check("from_ult pairs = core", box[0] == want_pairs, "got %d want %d" % [box[0], want_pairs])
 	_check("no plain pairs", box[1] == 0, "%d" % box[1])
 	_check("ult pairs do not charge", play.skill_charge == 0 and not play.skill_ready, "%d" % play.skill_charge)
@@ -108,7 +111,11 @@ static func run(play) -> void :
 			if tray0 > 0:
 				_check("rin: tiles returned", bd.board_count() == count0 + tray0, "%d -> %d (+%d)" % [count0, bd.board_count(), tray0])
 		"yue":
-			_check("yue: nothing closed", ult.closed_tiles().is_empty(), "%d -> %d" % [closed0, ult.closed_tiles().size()])
+			if ranked:
+				_check("yue ranked: at most 1 tile opened", ult.closed_tiles().size() >= closed0 - 1, "%d -> %d" % [closed0, ult.closed_tiles().size()])
+				_check("yue ranked: 1 pair removed", count0 - bd.board_count() == 2, "%d" % (count0 - bd.board_count()))
+			else:
+				_check("yue: nothing closed", ult.closed_tiles().is_empty(), "%d -> %d" % [closed0, ult.closed_tiles().size()])
 		_:
 			var gone: = count0 - bd.board_count()
 			# В returns a tray tile to the table (+1)

@@ -143,6 +143,8 @@ func _build_banner() -> void :
 		ip.add_child(ev)
 		var xb: = JButton.make(V6Txt.s("summon.exchange_btn") % G.EXCHANGE_COST, "gold" if ex >= G.EXCHANGE_COST else "glass", Rect2(pw - 250, 72, 232, 50), null, 19)
 		xb.pressed.connect( func(): _exchange(xb))
+		# 0.9: a refused exchange answers with the deny alone (JButton gate), then _exchange says why
+		xb.set_gate( func(): return int(G.S.ex) >= G.EXCHANGE_COST and not G.owns(b.item), func(): _exchange(xb))
 		ip.add_child(xb)
 	UI.pop_in(frame, 0.0, 0.92)
 	UI.pop_in(art, 0.0, 0.92)
@@ -153,6 +155,7 @@ func _build_banner() -> void :
 		pull1_btn = JButton.make(V6Txt.s("summon.pull1"), "lav", Rect2(24, by, 320, 124), null, 30)
 		pull1_btn.set_cost(V8Art.cur("gem"), G.PULL_COST, 22)
 		pull1_btn.pressed.connect( func(): _pull(1))
+		pull1_btn.set_gate( func(): return _can_pull(1), func(): _pull(1))
 		banner_root.add_child(pull1_btn)
 		UI.slide_in(pull1_btn, Vector2(0, 60), 0.1)
 	var r10: = Rect2(W - 344, by, 320, 124) if not newbie else Rect2(W * 0.5 - 220, by, 440, 124)
@@ -164,6 +167,7 @@ func _build_banner() -> void :
 	pull10_btn.shine_every = 2.0
 	pull10_btn.pulse = free or newbie
 	pull10_btn.pressed.connect( func(): _pull(10))
+	pull10_btn.set_gate( func(): return _can_pull(10), func(): _pull(10))
 	banner_root.add_child(pull10_btn)
 	if free:
 		Common.badge(pull10_btn, 0, Vector2(r10.size.x - 26, -10))
@@ -199,13 +203,23 @@ func _exchange_do(b: Dictionary) -> void :
 	await _showcase(r)
 	_build_banner()
 
+func _pull_cost(n: int) -> int:
+	var b: Dictionary = G.BANNERS[banner_i]
+	var newbie: bool = b.get("newbie", false)
+	var free: bool = n == 10 and G.S.free10 and not newbie
+	return 0 if free else (G.NEWBIE_COST if newbie else G.PULL_COST * n)
+
+# the pull buttons' gate: false only for a real refusal (not enough gems); a pull already running stays silent
+func _can_pull(n: int) -> bool:
+	return seq != null or int(G.S.gems) >= _pull_cost(n)
+
 func _pull(n: int) -> void :
 	if seq != null:
 		return
 	var b: Dictionary = G.BANNERS[banner_i]
 	var newbie: bool = b.get("newbie", false)
 	var free: bool = n == 10 and G.S.free10 and not newbie
-	var cost: = 0 if free else (G.NEWBIE_COST if newbie else G.PULL_COST * n)
+	var cost: = _pull_cost(n)
 	if G.S.gems < cost:
 		V9Feel.deny(pull1_btn if n == 1 else pull10_btn)
 		main.toast(V6Txt.s("summon.no_gems"), "gem")
@@ -358,6 +372,12 @@ func _sequence(res: Array, ctx: = {}) -> void :
 	vg.modulate.a = 0.0
 	seq.add_child(vg)
 	vg.create_tween().tween_property(vg, "modulate:a", 1.0, 0.8)
+	# 0.9: one magic circle on the lantern stage — the lit floor under the lantern; the circle painted into the
+	# backdrop's bottom edge sinks into the night (it fades back with the other stage effects when the cards deal)
+	var ff: = Common.floor_fade(seq, FLOOR_Y + 196.0, H, Color(0.03, 0.01, 0.06), 0.97)
+	ff.modulate.a = 0.0
+	ff.create_tween().tween_property(ff, "modulate:a", 1.0, 0.8)
+	seq_fx.append(ff)
 	Sfx.music("")
 	_mus(V9Summon.SUSPENSE_PITCH, V9Summon.SUSPENSE_DB, 1.2)
 	Sfx.say(b.hero, "gacha")
@@ -912,7 +932,8 @@ func _showcase(r: Dictionary) -> void :
 	add_child(showcase)
 	var bg: = ColorRect.new()
 	bg.size = size
-	bg.color = Color(0.06, 0.02, 0.1, 0.92)
+	# 0.9: opaque enough that the result grid underneath never ghosts through around the card
+	bg.color = Color(0.06, 0.02, 0.1, 0.985)
 	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	showcase.add_child(bg)
 	# 0.9: the showcase opens in the gold of the lantern: a warm veil that settles into the night backdrop
@@ -925,6 +946,11 @@ func _showcase(r: Dictionary) -> void :
 	if V9Feel.can_fx():
 		Common.rays(showcase, Vector2(W * 0.5, H * 0.42), 1500, Color(1, 0.82, 0.35, 0.8), 18, 0.05, 1.0)
 		Common.rays(showcase, Vector2(W * 0.5, H * 0.42), 900, Color(1, 0.6, 0.85, 0.5), 9, -0.08, 0.7)
+	# 0.9: the reveal's particles (petals, gold dust) live on this layer, behind the card and the name ribbon
+	var parts: = Control.new()
+	parts.size = size
+	parts.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	showcase.add_child(parts)
 	# 0.8: the frame art is drawn at most 1.4× its 344×512 source (larger turns soft)
 	var aw: = 344.0 * 1.4
 	var ah: = aw * 512.0 / 344.0
@@ -974,9 +1000,10 @@ func _showcase(r: Dictionary) -> void :
 		showcase.add_child(nb)
 		nb.add_child(UI.center_label(UI.label(V6Txt.s("common.new"), 22, Color.WHITE, Color("6a1020"), 3, "body", 900), Rect2(0, 0, 132, 42)))
 		UI.pop_in(nb, 0.6, 1.8)
-	Fx.burst(showcase, Vector2(W * 0.5, H * 0.42), "sparkle", 90, Color(1, 0.85, 0.45), 2.2)
-	Fx.burst(showcase, Vector2(W * 0.15, H), "confetti", 60)
-	Fx.burst(showcase, Vector2(W * 0.85, H), "confetti", 60)
+	Fx.burst(parts, Vector2(W * 0.5, H * 0.42), "sparkle", 90, Color(1, 0.85, 0.45), 2.2)
+	# sakura petals and gold dust (not flat confetti), from behind the card, never over the name plate
+	Fx.burst(parts, Vector2(W * 0.5, H * 0.36), "petal", 36, Color(1, 0.8, 0.88), 1.6)
+	Fx.burst(parts, Vector2(W * 0.5, H * 0.36), "sparkle", 40, Color(1, 0.86, 0.5), 1.5)
 	Fx.ambient(showcase, "stars", size)
 	await get_tree().create_timer(0.5).timeout
 	if not is_inside_tree():

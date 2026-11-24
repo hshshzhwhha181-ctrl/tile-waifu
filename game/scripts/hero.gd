@@ -217,10 +217,18 @@ func flash(v: = 0.6) -> void :
 
 func _process(dt: float) -> void :
 
-	bounce_v += (-170.0 * bounce - 9.0 * bounce_v) * dt
-	bounce += bounce_v * dt
-	tilt_v += (-90.0 * tilt - 7.0 * tilt_v) * dt
-	tilt += tilt_v * dt
+	# 0.9: the springs step at ≤ 1/60 s (semi-implicit): a long frame (a cut-in loading its art, a dev screenshot)
+	# used to blow the explicit step up, so the portrait flew out of its card and the HUD card showed empty
+	var left: = minf(dt, 0.25)
+	while left > 0.0:
+		var h: = minf(left, 1.0 / 60.0)
+		left -= h
+		bounce_v += (-170.0 * bounce - 9.0 * bounce_v) * h
+		bounce += bounce_v * h
+		tilt_v += (-90.0 * tilt - 7.0 * tilt_v) * h
+		tilt += tilt_v * h
+	bounce = clampf(bounce, -3.0, 3.0)
+	tilt = clampf(tilt, -3.0, 3.0)
 	mat.set_shader_parameter("bounce", bounce)
 	mat.set_shader_parameter("tilt", tilt * 0.12)
 	shadow.scale.x = 3.2 * height / 1160.0 * (1.0 + bounce * 0.04)

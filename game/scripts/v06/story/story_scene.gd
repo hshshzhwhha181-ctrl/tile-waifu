@@ -159,8 +159,10 @@ func _on_input(e: InputEvent) -> void :
 	if e is InputEventMouseButton and e.pressed:
 		tapped = true
 
-func _wait_tap() -> void :
-	tapped = false
+# keep = true: a tap that already arrived (e.g. during a line's first 0.2 s) counts, so fast tappers never tap twice
+func _wait_tap(keep: = false) -> void :
+	if not keep:
+		tapped = false
 	var t0: = G.time
 	while not tapped and is_inside_tree():
 		await get_tree().process_frame
@@ -196,17 +198,23 @@ func _say(who: String, text: String, emo: = "") -> void :
 	Sfx.play("pop", 1.3, -12)
 	var tw: = create_tween()
 	tw.tween_property(txt, "visible_ratio", 1.0, text.length() * 0.02)
+	# 0.9: the bouncing ▼ shows while the game waits for the tap that advances, not after it
+	tw.tween_callback( func():
+		if is_instance_valid(more):
+			more.visible = true)
+	tapped = false
 	await get_tree().create_timer(0.2).timeout
-	await _wait_tap()
+	await _wait_tap(true)
 	if skipping:
 		return
 	if txt.visible_ratio < 1.0:
 		tw.kill()
 		txt.visible_ratio = 1.0
+		more.visible = true
 		if heroes.has(who):
 			heroes[who].talk_left = 0.0
+		Sfx.play("tap", 1.15, -12)
 		await _wait_tap()
-	more.visible = true
 	Sfx.play("tap", 1.0, -8)
 
 func _ask(e: Dictionary) -> void :

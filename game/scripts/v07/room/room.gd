@@ -122,11 +122,10 @@ func _pick(id: String, c: Control) -> void :
 		_on_hero_tap()
 		return
 	if not G.hero_unlocked(id):
-		Sfx.play("deny")
-		UI.punch(c, 0.12)
+		V9Feel.deny(c)
 		main.toast("%s ещё не вернулась. Собери её портрет или загадай Желание." % G.HEROES[id].name, "lock")
 		return
-	Sfx.play("pop")
+	V9Feel.press(c)
 	h = id
 	_render(true)
 
@@ -190,7 +189,8 @@ func _actions() -> void :
 	actions.size = size
 	root.add_child(actions)
 	var bw: = (W - 32 - 24) / 3.0
-	var y: = H - 132 - 128.0
+	# 0.9: the row sits 16 px higher, so the centre nav star (it rises above the nav bar) clears the button rims
+	var y: = H - 132 - 144.0
 	var left: = V7RoomData.gifts_left(h)
 	var g: = _btn("Подарок", "сегодня ещё %d" % left if left > 0 else "завтра снова", "rose", Rect2(16, y, bw, 108), "gift")
 	g.pressed.connect(_gift_popup)
@@ -215,7 +215,7 @@ func _actions() -> void :
 
 
 func _btn(text: String, sub: String, pal: String, r: Rect2, icon: String) -> JButton:
-	var b: = JButton.make(text, pal, r, null, 24)
+	var b: = JButton.make(text, pal, r, null, 22)
 	b.set_sub(sub, 16)
 	# with the btn art the glyph sits inside the caps (clear of the gold rim and the sakura), as JButton's own icon
 	var ix: = 10.0
@@ -226,9 +226,12 @@ func _btn(text: String, sub: String, pal: String, r: Rect2, icon: String) -> JBu
 		var cr: = V8Art.nine_content(b._art_name, r.size)
 		ix = cr.position.x
 		isz = 40.0
-		x1 = r.size.x - cr.end.x
+		# 0.9: a little extra air on the right so the caption and sub-line never touch the sakura cap
+		x1 = r.size.x - cr.end.x + 8.0
 	var x0: = ix + isz + 4.0
 	b.lbl.position.x = x0
+	if b.art:
+		b.lbl.position.y += 3.0
 	b.lbl.size.x = r.size.x - x0 - x1
 	b._fit_label(b.lbl.size.x)
 	UI.center_label(b.sub, Rect2(x0, b.sub.position.y, r.size.x - x0 - x1, b.sub.size.y))
@@ -347,12 +350,13 @@ func _gift_popup() -> void :
 		card.gui_input.connect( func(e):
 			if e is InputEventMouseButton and e.pressed:
 				if left <= 0:
-					Sfx.play("deny")
+					V9Feel.deny(card)
 					main.toast("На сегодня подарков хватит. Завтра она будет ждать снова.", "gift")
 				elif int(G.S.coins) < int(gd.price):
-					Sfx.play("deny")
+					V9Feel.deny(card)
 					main.toast("Не хватает монет. Их дают за партии и поручения.", "coin")
 				else:
+					V9Feel.press(card)
 					Common.confirm(main, "Подарок", "Подарить %s «%s»?" % [G.HEROES[h].name, gd.name], "coin", int(gd.price), func():
 						Common.close_popup(p)
 						_give(gid), {"yes_text": "Подарить"}))
@@ -432,12 +436,11 @@ func _date_popup() -> void :
 			ph.add_child(UI.center_label(UI.label("фото", 16, Color("ffe7a6"), UI.DARK, 2, "body", 900), Rect2(0, 0, 58, 32)))
 		card.gui_input.connect( func(e):
 			if e is InputEventMouseButton and e.pressed:
-				Sfx.play("pop")
-				UI.punch(card, 0.06)
 				if V7RoomData.invites() <= 0:
-					Sfx.play("deny")
+					V9Feel.deny(card)
 					main.toast("Приглашения закончились. Завтра будут новые.", "heart")
 					return
+				V9Feel.press(card)
 				Common.close_popup(p)
 				_go_date(pid))
 	var yb: = 90 + 4 * (ch + 12) + 6.0
@@ -569,11 +572,10 @@ func _scenes_popup() -> void :
 		row.gui_input.connect( func(e):
 			if e is InputEventMouseButton and e.pressed:
 				if not open:
-					Sfx.play("deny")
-					UI.punch(row, 0.05)
+					V9Feel.deny(row)
 					main.toast("Нужна симпатия %d. Подарки и свидания её поднимают." % lv, "heart")
 					return
-				Sfx.play("pop")
+				V9Feel.press(row)
 				Common.close_popup(p)
 				_play_scene(id))
 

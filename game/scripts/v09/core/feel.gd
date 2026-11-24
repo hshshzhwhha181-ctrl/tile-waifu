@@ -158,6 +158,12 @@ static func press_up(node: CanvasItem, fire: bool, snd: = "pop") -> void :
 
 
 static func deny(node: CanvasItem) -> void :
+	# one deny per node per frame: a gated JButton already denied this tap, so its owner's own deny is a no-op
+	if node != null and is_instance_valid(node):
+		var f: = Engine.get_process_frames()
+		if int(node.get_meta("v9_deny_frame", -1)) == f:
+			return
+		node.set_meta("v9_deny_frame", f)
 	sound("deny")
 	haptic("deny")
 	if not _ok(node):
@@ -217,7 +223,12 @@ static func big(node: CanvasItem = null, snd: = "summon_boom") -> void :
 			fx.shake(0.25)
 
 
+# set around a replayed tap whose touch was already acknowledged (short ult clip buffer): no second click / haptic
+static var quiet_tile_tap: = false
+
 static func tile_tap(ok: bool) -> void :
+	if ok and quiet_tile_tap:
+		return
 	if ok:
 		sound("select", randf_range(0.96, 1.06))
 		haptic("select")

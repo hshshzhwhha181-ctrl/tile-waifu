@@ -42,6 +42,7 @@ static func run(main) -> void:
 	_texts()
 	_touch_lines()
 	_generator()
+	_midnight()
 	_zones()
 	_taps()
 	G.S = saved
@@ -105,6 +106,21 @@ static func _date(days_ago: int) -> String:
 	return Time.get_date_string_from_unix_time(int(Time.get_unix_time_from_system()) - days_ago * 86400)
 
 
+# home on day D, the match ends after midnight: the win is recorded before the first tick of D+1 (whose rollover
+# snapshots wins0 with that win already counted) — the stored win day still makes «Первая победа дня»
+static func _midnight() -> void:
+	G.S.erase("v9_letters")
+	G.S.stats = {}
+	var s: = V9Letters.st()
+	s.day = _date(1)
+	s.wins_day = _date(1)
+	s.last_day = _date(1)
+	G.record_game("path", true)
+	var made: = V9Letters.tick()
+	check(made.size() == 1 and str(made[0].ev) == "first_win", "a win past midnight still makes the first-win letter")
+	check(V9Letters._is_play(load("res://scripts/v06/modes/mode_play.gd")) and V9Letters._is_play(load("res://scripts/v07/event/event_play.gd")), "arena and event matches report their combo")
+
+
 static func _generator() -> void:
 	G.S.erase("v9_letters")
 	G.S.stats = {}
@@ -132,6 +148,7 @@ static func _generator() -> void:
 	# next day (rollover): rank + comeback, comeback first
 	s.day = _date(1)
 	s.wins_day = _date(1)
+	s.win_day = _date(1)
 	s.last_day = _date(3)
 	check(V9Letters.check_comeback() == 3, "3 days away -> comeback")
 	V9Letters.queue("rank", {"rank": "Нефрит II"})
@@ -255,6 +272,12 @@ static func _taps() -> void:
 	check(d.kind == "react" and d.line and not d.aff, "the room: a line, never affection")
 	d = t2.decide("body", 1.2)
 	check(d.kind == "quiet", "body: quiet bounce only")
+	# 0.9: repeated pokes on «body» never add up to the spam reaction (no flinch, pout or line)
+	var tb: = V9Touch.new()
+	var body_quiet: = true
+	for i in 10:
+		body_quiet = body_quiet and tb.decide("body", 80.0 + i * 0.25).kind == "quiet"
+	check(body_quiet, "10 body taps in 3 s: all quiet, no spam line")
 	var t3: = V9Touch.new()
 	var spam: = false
 	for i in V9Touch.SPAM_N:

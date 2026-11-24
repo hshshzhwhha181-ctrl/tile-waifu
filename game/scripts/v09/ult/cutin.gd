@@ -89,6 +89,8 @@ var eye_art: Polygon2D
 var _art_pts: PackedVector2Array
 var _eye_pts: PackedVector2Array
 var _tex: Texture2D
+var _eye_tex: Texture2D
+var _eye_face_px: = Rect2()
 var _face_px: = Rect2()
 var _art_c: = Vector2.ZERO
 var _art_s: = 1.0
@@ -105,6 +107,7 @@ var tag_l: Label
 var name_clip: Control
 var name_l: Label
 var name_w: = 0.0
+var sparks: Node2D
 var underline: Polygon2D
 var shout_l: Label
 var _shout_y: = 0.0
@@ -277,6 +280,15 @@ func _build(shout: String) -> void :
 		_tex = load("res://assets/outfits/mc_base.webp")
 		sh = V9Ults.shown("o_base")
 	_face_px = V9Ults.rect_px(sh.face_rect, _tex.get_size())
+	_eye_tex = _tex
+	_eye_face_px = _face_px
+	# an entry may point its eye close-up at another painting of her (eye_img + eye_rect, art space)
+	var ei: = String(u.get("eye_img", ""))
+	if ei != "" and u.has("eye_rect") and String(sh.img) == String(u.get("ref_img", "")) and ResourceLoader.exists(ei):
+		var et: Texture2D = load(ei)
+		if et:
+			_eye_tex = et
+			_eye_face_px = V9Ults.rect_px(u.eye_rect, et.get_size())
 	if eyes:
 		_build_eyes()
 	_build_band(shout, main, accent, ink)
@@ -460,7 +472,9 @@ func _build_text(shout: String, main: Color, accent: Color, ink: Color) -> void 
 	shout_l.clip_text = true
 
 	var gap: = 6.0
-	var total: = 24.0 + gap + lh + 16.0 + (32.0 if mode != "short" else 0.0)
+	# the brush underline sits below the italic descenders (~0.2 em), not through the bottom of the letters
+	var ul_drop: = maxf(4.0, fs * 0.2)
+	var total: = 24.0 + gap + lh + ul_drop + 16.0 + (32.0 if mode != "short" else 0.0)
 	var y: = - total * 0.5
 	tag_l.position = Vector2(- tw * 0.5, y)
 	y += 24.0 + gap
@@ -480,7 +494,7 @@ func _build_text(shout: String, main: Color, accent: Color, ink: Color) -> void 
 	underline.polygon = pts
 	underline.color = GOLD
 	underline.antialiased = true
-	underline.position = Vector2(- uw * 0.5, y + 4.0)
+	underline.position = Vector2(- uw * 0.5, y + ul_drop + 4.0)
 	# gold diamonds at the brush ends
 	for e in [Vector2(-10.0, 0.0), Vector2(uw + 10.0, -2.0)]:
 		var dm: = Polygon2D.new()
@@ -488,13 +502,16 @@ func _build_text(shout: String, main: Color, accent: Color, ink: Color) -> void 
 		dm.color = GOLD
 		dm.antialiased = true
 		underline.add_child(dm)
-	y += 16.0
+	y += 16.0 + ul_drop
 	_shout_y = y
 	shout_l.position = Vector2(- tw * 0.5, y)
 	shout_l.visible = mode != "short"
 	text.add_child(tag_l)
-	text.add_child(name_clip)
+	# the strong beat's sparks live here: under the name, the tag and the underline, never over the letters
+	sparks = Node2D.new()
+	text.add_child(sparks)
 	text.add_child(underline)
+	text.add_child(name_clip)
 	text.add_child(shout_l)
 
 
@@ -538,11 +555,11 @@ func _build_eyes() -> void :
 	eye.add_child(_poly(_eye_pts, [Color(pal.ink.darkened(0.5))]))
 	eye_art = Polygon2D.new()
 	eye_art.polygon = _eye_pts
-	eye_art.texture = _tex
+	eye_art.texture = _eye_tex
 	eye_art.antialiased = true
 	# 0.9 fix: the close-up was ~2.3× the 859 px painting and went soft; cap the magnification (the push adds 8 %)
 	# and widen the crop instead, so the eye line stays as crisp as the tiles beside it
-	_eye_s = minf(W * 0.82 / _face_px.size.x, EYE_MAX_ZOOM)
+	_eye_s = minf(W * 0.82 / _eye_face_px.size.x, EYE_MAX_ZOOM)
 	eye_art.uv = _uv(_eye_pts, Vector2.ZERO, _eye_px(), _eye_s)
 	eye.add_child(eye_art)
 	for top in [true, false]:
@@ -553,7 +570,7 @@ func _build_eyes() -> void :
 
 # the eye line: a little above the face centre of face_rect (face at ~45 % of it)
 func _eye_px() -> Vector2:
-	return _face_px.position + _face_px.size * Vector2(0.5, 0.4)
+	return _eye_face_px.position + _eye_face_px.size * Vector2(0.5, 0.4)
 
 
 # ── time line ───────────────────────────────────────────────────────────────
@@ -661,8 +678,11 @@ func _strong() -> void :
 		_flash_t = t
 	if fx_ok and _skip_t < 0.0 and fx_k > 0.0:
 		var c: = band.position
-		var name_at: = band.position + text.position
-		Fx.burst(self, name_at, "sparkle", int(26 * fx_k), (pal.accent as Color).lightened(0.35), 1.1)
+		# 0.9: the accent sparks fly from both ends of the name, on a layer under the letters — the ult name is
+		# the cleanest thing on the strong beat (it used to burst right on top of it)
+		var half_w: = name_w * 0.5 + 26.0
+		for sx in [-1.0, 1.0]:
+			Fx.burst(sparks, Vector2(sx * half_w, 0.0), "sparkle", int(13 * fx_k), (pal.accent as Color).lightened(0.35), 0.8)
 		# gold sparks fly off the slash (never a blob over her face)
 		var sl: Vector2 = c + (_art_pts[0] + _art_pts[3]) * 0.5
 		Fx.burst(self, sl, "sparkle", int(18 * fx_k), GOLD, 0.8)
@@ -735,6 +755,16 @@ func _on_input(e: InputEvent) -> void :
 		return
 	accept_event()
 	if mode == "short":
-		buffered.append(get_global_transform_with_canvas() * (e as InputEventMouseButton).position)
+		var gp: Vector2 = get_global_transform_with_canvas() * (e as InputEventMouseButton).position
+		buffered.append(gp)
+		# 0.9: answer the touch now (soft click, select haptic, glint on the tile) — it is replayed after the clip
+		V9Feel.haptic("select")
+		V9Feel.sound("select", randf_range(0.96, 1.06), -6.0)
+		var pp: = get_parent()
+		var pb = pp.get("board") if pp else null
+		if pb is Node and is_instance_valid(pb) and pb.has_method("tile_at"):
+			var tt = pb.tile_at(gp)
+			if tt and tt.has_method("press_glint"):
+				tt.press_glint()
 		return
 	skip()

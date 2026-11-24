@@ -31,8 +31,10 @@ const IDLE_LINE: = 24.0
 const IDLE_LINES_MAX: = 2
 const BUBBLE_X: = 114.0
 const BUBBLE_W: = 300.0
-# the bubble never rises over the clock plate
+# the bubble stays under the clock plate when it can; a long reply may rise to BUBBLE_TOP_MIN (under the top bar)
+# while the clock plate fades out, so it still sits above her head instead of over her hand or chest
 const BUBBLE_TOP: = 186.0
+const BUBBLE_TOP_MIN: = 116.0
 const AV: = 80.0
 const ZONE_EMO: = {"head": "shy", "hand": "happy", "outfit": "happy", "bg": "surprised", "spam": "pout", "idle": "happy"}
 # the face patch: the emotion portrait shows only inside a soft ellipse around her face, so hair, body and pose stay
@@ -211,8 +213,8 @@ func _tap(p: Vector2, force: = "") -> void:
 	var zone: = force if force != "" else zone_at(p)
 	var d: = touch.decide(zone, _t)
 	if d.kind == "quiet":
-		# 0.9 (spec §C): a tap on «body» (chest, hips, legs) gets no physical answer at all — no squash, no haptic, no
-		# sound; it only counts toward the «не так быстро» spam line (decide() keeps the tally)
+		# 0.9 (spec §C): a tap on «body» (chest, hips, legs) gets no answer at all — no squash, haptic, sound or line,
+		# and it does not count toward the «не так быстро» spam line either (decide() returns before the tally)
 		return
 	_react(d, p)
 
@@ -368,12 +370,21 @@ func say(text: String, emo: = "", voice: = "", talk: = true) -> void:
 	# eyes (bottom past head − 0.45 r), it hangs just under her chin with the tail pointing up instead.
 	var hr: float = (from_art(geom.head + Vector2(0, float(geom.head_r))) - head).y
 	var h: = _bubble_h(text, with_av)
-	pos.y = maxf(176.0 if mode == "video" else BUBBLE_TOP, head.y - hr - 30.0 - h)
+	var top: = 176.0 if mode == "video" else BUBBLE_TOP
+	pos.y = maxf(top, head.y - hr - 30.0 - h)
+	var over_clock: = false
 	if pos.y + h > head.y - hr * 0.45:
-		pos.y = head.y + hr * 0.85 + 26.0
-		tail_up = true
+		# 0.9: every reply (hand, outfit, room — not only the head) stays above her head: rise over the clock plate
+		# first; only a line too long even for that hangs under her chin
+		pos.y = maxf(BUBBLE_TOP_MIN, head.y - hr - 30.0 - h)
+		over_clock = pos.y < top
+		if pos.y + h > head.y - hr * 0.45:
+			pos.y = head.y + hr * 0.85 + 26.0
+			tail_up = true
+			over_clock = false
 	bubble = _bubble(text, pos, _paint_emo(emo) if with_av else emo, with_av, tail_up, head.x - pos.x)
 	home.set("bubble", bubble)
+	_clock_fade(over_clock, bubble)
 	var dur: = minf(0.4 + text.length() * 0.045, 4.0)
 	if talk and voice != "" and G.S.get("sound", true) and G.S.get("voice", true):
 		var st = load(voice)
@@ -388,6 +399,19 @@ func say(text: String, emo: = "", voice: = "", talk: = true) -> void:
 	t.tween_interval(maxf(3.6, dur + 1.6))
 	t.tween_property(b, "modulate:a", 0.0, 0.3)
 	t.tween_callback(b.queue_free)
+
+
+# the day/night clock plate (V7DayNight) gives way to a bubble that rises over it, and comes back when it is gone
+func _clock_fade(hide_it: bool, b: Control) -> void:
+	var chip: = home.get_node_or_null("V7ClockChip") as CanvasItem
+	if chip == null:
+		return
+	var t: = chip.create_tween()
+	t.tween_property(chip, "modulate:a", 0.0 if hide_it else 1.0, 0.18)
+	if hide_it and is_instance_valid(b):
+		b.tree_exiting.connect( func():
+			if is_instance_valid(chip) and not (bubble and is_instance_valid(bubble) and bubble != b and not bubble.is_queued_for_deletion()):
+				chip.create_tween().tween_property(chip, "modulate:a", 1.0, 0.25), CONNECT_ONE_SHOT)
 
 
 # Common.bubble's look; with `av` a round emotion portrait sits in the bubble's left part (painting / video modes)

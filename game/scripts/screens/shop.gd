@@ -370,6 +370,8 @@ func _outfits() -> void :
 		c.add_child(Common.fit_line(hl, cw - 40))
 		var b: = JButton.make(V6Txt.s("shop.owned"), "mint", Rect2(22, ch - 76, cw - 44, 60), null, 24) if own else _price_btn(UI.fmt(it.shop), Rect2(22, ch - 76, cw - 44, 60), V8Art.cur("gem"), 24)
 		b.pressed.connect( func(): _buy_outfit(it, b))
+		# 0.9: owned or unaffordable → the deny alone (JButton gate), then _buy_outfit says why
+		b.set_gate( func(): return not G.owns(it.id) and int(G.S.gems) >= int(it.shop), func(): _buy_outfit(it, b))
 		c.add_child(b)
 		UI.pop_in(c, 0.05 * i, 0.85)
 

@@ -365,7 +365,10 @@ func _replay(taps: Array) -> void :
 			return
 		var t: = bd.tile_at(p)
 		if t:
+			# the touch was acknowledged when it was buffered (cutin.gd): replay it without a second click / haptic
+			V9Feel.quiet_tile_tap = true
 			bd.tap(t)
+			V9Feel.quiet_tile_tap = false
 			await get_tree().create_timer(0.06).timeout
 
 
@@ -669,11 +672,12 @@ func _beam_preview(y: float, l: Node2D = null) -> void :
 	for c in l.get_children():
 		c.queue_free()
 	var br: Rect2 = play.board_rect
-	var col: Color = palette().main
+	# 0.9 (HEROINES §2: no white, ≤70 % value): the palette's flash colour in normal blend — an additive glow under an
+	# additive line clipped the whole row to pure white on bright tiles
+	var col: Color = V9Cutin.flash_color(palette().main)
 	var g: = Sprite2D.new()
 	g.texture = G.fx("glow")
-	g.material = Fx.add_mat()
-	g.modulate = Color(col.lightened(0.2), 0.75)
+	g.modulate = Color(col, 0.42)
 	var gs: Vector2 = g.texture.get_size()
 	g.scale = Vector2(br.size.x * 1.1 / gs.x, 70.0 / gs.y)
 	g.position = Vector2(br.get_center().x, snap_row(y))
@@ -681,7 +685,7 @@ func _beam_preview(y: float, l: Node2D = null) -> void :
 	var ln: = Line2D.new()
 	ln.points = PackedVector2Array([Vector2(br.position.x + 10, g.position.y), Vector2(br.end.x - 10, g.position.y)])
 	ln.width = 3.0
-	ln.default_color = col.lightened(0.6)
+	ln.default_color = Color(col, 0.9)
 	l.add_child(ln)
 
 
@@ -775,16 +779,31 @@ func _apply(pick: Dictionary, pal: Dictionary) -> void :
 			for t in bd.tiles:
 				if bd.on_board(t) and absf(pos_of(t).y - y) < Tile.TH * 0.5 * bd.scale.y:
 					_mark(lay, pos_of(t), col, 0.8)
-			for t in bd.tiles:
-				if not t.alive:
-					continue
-				if t.secret:
-					t.reveal()
-				if t.ice > 0:
-					t.ice = 0
-					t._update_ice()
-			bd.reveal_free()
-			_show_pair_near(y)
+			if bool(core.get("reveal_all", true)):
+				for t in bd.tiles:
+					if not t.alive:
+						continue
+					if t.secret:
+						t.reveal()
+					if t.ice > 0:
+						t.ice = 0
+						t._update_ice()
+				bd.reveal_free()
+				_show_pair_near(y)
+			else:
+				# ranked (V9Ults.RANKED_CORES.yue): 1 pair-equivalent like the others — the pair nearest the beam,
+				# then at most one closed tile (or one ice when nothing is closed)
+				var pr: Array = []
+				var pr_d: = INF
+				for q in pairs():
+					var d: = absf(pos_of(q[0]).y - y) + absf(pos_of(q[1]).y - y)
+					if d < pr_d:
+						pr_d = d
+						pr = q
+				if not pr.is_empty():
+					_take(pr, col)
+				if int(core.get("reveal", 0)) > 0 and _alive() and not _open_one(col):
+					_melt_one(col)
 		_:
 			if pick.has("from") and pick.has("to") and (pick["to"] - pick["from"]).length() >= 24.0:
 				_clear_aim_fx(0.0)
@@ -815,10 +834,32 @@ func _apply(pick: Dictionary, pal: Dictionary) -> void :
 	_applying = false
 
 
+# a target mark: ring + soft glow in the palette's flash colour, normal blend (additive rings over bright tile faces
+# clipped to white — HEROINES §2: no white flashes, ≤70 % value)
 func _mark(lay: Node, at: Vector2, col: Color, k: float) -> void :
-	Fx.ring(lay, at, col.lightened(0.12), 0.8 * k, 0.36)
-	if V9Feel.can_fx():
-		Fx.flash_glow(lay, at, Color(col, 0.6), 1.2 * k, 0.3)
+	if not V9Feel.can_fx() or lay == null or not is_instance_valid(lay):
+		return
+	var fc: = V9Cutin.flash_color(col)
+	var r: = Sprite2D.new()
+	r.texture = G.fx("ring")
+	r.position = at
+	r.modulate = Color(fc, 0.85)
+	r.scale = Vector2(0.15, 0.15)
+	lay.add_child(r)
+	var rt: Tween = r.create_tween().set_parallel()
+	rt.tween_property(r, "scale", Vector2(0.8 * k, 0.8 * k), 0.36).set_trans(Tween.TRANS_QUART).set_ease(Tween.EASE_OUT)
+	rt.tween_property(r, "modulate:a", 0.0, 0.36).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	rt.chain().tween_callback(r.queue_free)
+	var g: = Sprite2D.new()
+	g.texture = G.fx("glow")
+	g.position = at
+	g.modulate = Color(fc, 0.38)
+	g.scale = Vector2(0.48 * k, 0.48 * k)
+	lay.add_child(g)
+	var gt: Tween = g.create_tween().set_parallel()
+	gt.tween_property(g, "scale", Vector2(1.2 * k, 1.2 * k), 0.3).set_trans(Tween.TRANS_QUART).set_ease(Tween.EASE_OUT)
+	gt.tween_property(g, "modulate:a", 0.0, 0.3)
+	gt.chain().tween_callback(g.queue_free)
 
 
 func _take(pr: Array, col: Color) -> void :
@@ -852,6 +893,12 @@ func _take(pr: Array, col: Color) -> void :
 
 
 func _show_pair_near(y: float) -> void :
+	for t in _pair_near(y):
+		t.hint(true)
+
+
+# the free pair closest to the row at `y` (else the board's best move and its twin); [] when there is none
+func _pair_near(y: float) -> Array:
 	var bd: = _board()
 	var free: = bd.free_tiles()
 	var best: Array = []
@@ -868,13 +915,12 @@ func _show_pair_near(y: float) -> void :
 	if best.is_empty():
 		var t: = bd.best_move()
 		if t == null:
-			return
+			return []
 		for o in free:
 			if o != t and o.face == t.face:
 				best = [t, o]
 				break
-	for t in best:
-		t.hint(true)
+	return best
 
 
 # a pair to look at: the board's best free move and its twin; `secs` > 0 clears it again

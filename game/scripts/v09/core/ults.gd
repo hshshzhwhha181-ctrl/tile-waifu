@@ -96,6 +96,10 @@ const CORES: = {
 const RANKED_CORES: = {
 	"hana": {"desc": "снимает 1 пару и открывает 1 фишку", "pairs": 1, "reveal": 1},
 	"rin": {"desc": "возвращает лоток на стол и подсвечивает пару", "highlight_pair": true},
+	# ranked boards (blitz / zen / duel) have no secrets or ice, so «reveal everything» would be worth 0 there and
+	# every secret + ice tile on a weekly tourney table: ranked Yue takes the pair nearest her beam + opens 1 tile
+	"yue": {"desc": "снимает пару у луча и открывает 1 закрытую фишку", "reveal_all": false, "show_pair": false,
+		"pairs": 1, "reveal": 1},
 }
 
 const _HANA_INK: = Color("7a3a0c")
@@ -158,6 +162,9 @@ const ULTS: = {
 	"o_dragon": {"hero": "mc", "name": "Пробуждение дракона", "lines": ["Пробудись, дракон!", "Партия окончена~", "Нефрит и пламя!"],
 		"palette": {"main": Color("ff8fb8"), "accent": Color("ffc93c"), "ink": Color("6a1020")},
 		"ref_img": "res://assets/outfits/mc_dragon.webp", "face_rect": Rect2(287, 119, 286, 286), "alt_rect": Rect2(230, 61, 399, 499),
+		# 0.9: until mc_dragon is redrawn in the v2 direction (its face reads rounder / younger than her base art),
+		# the SSR eye close-up crops her base painting's mature face instead (eye_img / eye_rect, cutin.gd)
+		"eye_img": "res://assets/outfits/mc_base.webp", "eye_rect": Rect2(297, 48, 260, 260),
 		"mod": "Л", "sfx": "summon_boom", "fx": "jade_dragon"},
 	# ── Рин: нефрит 4fbf9f, золотые очки. Ядро: возвращает лоток (пуст — снимает пару).
 	"r_base": {"hero": "rin", "name": "Чайная пауза", "lines": ["Позволь.", "Чайная пауза.", "Не торопись."],

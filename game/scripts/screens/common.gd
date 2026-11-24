@@ -761,7 +761,11 @@ static func confirm(main, title: String, text: String, price_icon: String, price
 	p.add_child(no)
 	var yes: = JButton.make(str(opts.get("yes_text", "Да")), "glass" if short else "gold", Rect2(50 + bw, y + 4, bw, 84), null, 30)
 	if short:
-		yes.modulate = Color(1, 1, 1, 0.55)
+		# 0.9: can't afford → a real disabled button (dimmed, desaturated) whose tap is the deny + «Не хватает…»
+		yes.disabled = true
+		yes.denied.connect( func():
+			if not done[0] and main.has_method("toast"):
+				main.toast("Не хватает %s" % ("кристаллов" if price_icon == "gem" else "монет"), price_icon))
 	else:
 		yes.shine_every = 2.6
 	p.add_child(yes)
@@ -776,9 +780,6 @@ static func confirm(main, title: String, text: String, price_icon: String, price
 		if done[0]:
 			return
 		if short:
-			UI.punch(yes, 0.12)
-			if main.has_method("toast"):
-				main.toast("Не хватает %s" % ("кристаллов" if price_icon == "gem" else "монет"), price_icon)
 			return
 		done[0] = true
 		if skip[0] and skip_key != "":

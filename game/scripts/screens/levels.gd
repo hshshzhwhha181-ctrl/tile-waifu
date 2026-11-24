@@ -346,7 +346,11 @@ func _level_node(it: Dictionary) -> Control:
 		t.tween_property(c, "scale", Vector2(1.08, 1.08), 0.6).set_trans(Tween.TRANS_SINE)
 		t.tween_property(c, "scale", Vector2.ONE, 0.6).set_trans(Tween.TRANS_SINE)
 	_tap(c, func():
-		V9Feel.press(c)
+		# 0.9: a locked node denies (shake, deny sound and haptic), never the «ok» press before the refusal toast
+		if i > cur:
+			V9Feel.deny(c)
+		else:
+			V9Feel.press(c)
 		open_card(i))
 	return c
 
@@ -380,7 +384,11 @@ func _boss_node(it: Dictionary) -> Control:
 		t.tween_property(c, "scale", Vector2(1.06, 1.06), 0.7).set_trans(Tween.TRANS_SINE)
 		t.tween_property(c, "scale", Vector2.ONE, 0.7).set_trans(Tween.TRANS_SINE)
 	_tap(c, func():
-		V9Feel.press(c)
+		# 0.9: a locked node denies (shake, deny sound and haptic), never the «ok» press before the refusal toast
+		if i > cur:
+			V9Feel.deny(c)
+		else:
+			V9Feel.press(c)
 		open_card(i))
 	return c
 
@@ -423,6 +431,7 @@ func _refresh_chest(c: Control, w: int, kind: String) -> void :
 
 func _chest_tap(c: Control, w: int, kind: String) -> void :
 	if V6Worlds.chest_opened(w, kind):
+		V9Feel.deny(c)
 		main.toast("Сундук уже открыт", "gift")
 		return
 	if not V6Worlds.chest_ready(w, kind):

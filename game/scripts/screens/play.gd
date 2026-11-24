@@ -430,10 +430,11 @@ func _build_bottom() -> void :
 	btn_hint.pressed.connect(_hint)
 	btn_shuffle = _action("shuffle", V6Txt.s("play.shuffle"), xs[2], "mint")
 	btn_shuffle.pressed.connect(_shuffle)
-	for b in [btn_undo, btn_hint, btn_shuffle]:
-		b.denied.connect( func():
-			if riichi:
-				main.toast(V6Txt.s("play.riichi_locked"), "lock"))
+	# 0.9: a help tap that would be refused answers with the deny alone (JButton gate), then the handler says why
+	btn_undo.set_gate( func(): return _help_ok("undo"), _undo)
+	btn_hint.set_gate( func(): return _help_ok("hint"), _hint)
+	btn_shuffle.set_gate( func(): return _help_ok("shuffle"), _shuffle)
+	# (riichi disables them; a tap then reaches the same handlers through `denied`, which say «заблокировано»)
 	# 0.8: sound on / off right in the match (icon/sound, icon/sound_off), bottom left beside the helps
 	btn_sound = _v8_round_btn(V8Art.icon("sound" if _v8_sound_on() else "sound_off"), Rect2(x0, H - 158, 84, 84), 0.6, _v8_toggle_sound)
 
@@ -1098,15 +1099,31 @@ func _v8_source() -> String:
 			return mode
 	return "other"
 
+# false when a help tap will be refused (subclasses add their own rules); the handler's toast then says why
+func _help_ok(kind: String) -> bool:
+	if board == null or not board.input_on or riichi:
+		return false
+	match kind:
+		"hint":
+			return not _v8_hint_active() and board.best_move() != null
+		"undo":
+			return not board.history.is_empty()
+	return true
+
 func _hint() -> void :
+	if riichi:
+		V9Feel.deny(btn_hint)
+		main.toast(V6Txt.s("play.riichi_locked"), "lock")
+		return
 	if not board.input_on:
 		V9Feel.deny(btn_hint)
 		return
-	if riichi:
-		main.toast(V6Txt.s("play.riichi_locked"), "lock")
-		return
 	if _v8_hint_active():
+		V9Feel.deny(btn_hint)
 		main.toast(V8PlayRules.T.hint_on, "hint")
+		return
+	if board.best_move() == null:
+		V9Feel.deny(btn_hint)
 		return
 	if hint_n <= 0:
 		_v8_pay("hint", V8PlayRules.T.hint_t, V8PlayRules.T.hint_d, V8PlayRules.HELP_PRICE, func(): _v8_do_hint(true))
@@ -1119,6 +1136,7 @@ func _v8_do_hint(paid: bool) -> void :
 	if paid and not _v8_can_pay(V8PlayRules.HELP_PRICE):
 		return
 	if not board.hint():
+		V9Feel.deny(btn_hint)
 		_refresh()
 		return
 	if paid:
@@ -1130,11 +1148,12 @@ func _v8_do_hint(paid: bool) -> void :
 	_refresh()
 
 func _undo() -> void :
+	if riichi:
+		V9Feel.deny(btn_undo)
+		main.toast(V6Txt.s("play.riichi_locked"), "lock")
+		return
 	if not board.input_on:
 		V9Feel.deny(btn_undo)
-		return
-	if riichi:
-		main.toast(V6Txt.s("play.riichi_locked"), "lock")
 		return
 	if board.history.is_empty():
 		V9Feel.deny(btn_undo)
@@ -1157,14 +1176,17 @@ func _v8_do_undo(paid: bool) -> void :
 			undo_n -= 1
 		boosters_used += 1
 		Sfx.play("whoosh", 1.3)
+	else:
+		V9Feel.deny(btn_undo)
 	_refresh()
 
 func _shuffle() -> void :
+	if riichi:
+		V9Feel.deny(btn_shuffle)
+		main.toast(V6Txt.s("play.riichi_locked"), "lock")
+		return
 	if not board.input_on:
 		V9Feel.deny(btn_shuffle)
-		return
-	if riichi:
-		main.toast(V6Txt.s("play.riichi_locked"), "lock")
 		return
 	if shuffle_n <= 0:
 		_v8_pay("shuffle", V8PlayRules.T.shuffle_t, V8PlayRules.T.shuffle_d, V8PlayRules.HELP_PRICE, func(): _v8_do_shuffle(true))

@@ -201,6 +201,8 @@ func _make_chip(home: Node) -> Control:
 	var W: float = home.size.x
 	var c: = UI.rbox("glass", Rect2(108, 128, W - 108 - 222, 44), 22, 2, 8)
 	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	# 0.9: V9HomeLive fades it while a long reply bubble needs the room above her head
+	c.name = "V7ClockChip"
 	home.add_child(c)
 	_chip_lbl = UI.label("", 16, Color("fff1dc"), UI.DARK, 3, "body", 900)
 	_chip_lbl.size = c.size

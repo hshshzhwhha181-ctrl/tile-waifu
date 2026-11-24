@@ -233,6 +233,7 @@ func record_game(source: String, won: bool) -> void :
 	st.games = int(st.games) + 1
 	if won:
 		st.wins = int(st.wins) + 1
+		V9Letters.note_win()
 
 
 func stats_of(source: String) -> Dictionary:

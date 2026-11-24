@@ -115,17 +115,19 @@ func setup(p) -> V7Combo:
 	pill.pivot_offset = pill.size * 0.5
 	pill.visible = false
 	add_child(pill)
-	pill_lbl = UI.label("", 26, Color.WHITE, Color(0.1, 0.03, 0.12), 5, "title", 900)
+	# 0.9: one family for every tier (the body face: Playfair only fits the 52 px plate at 24+ px and spilled out
+	# of it, and the long tier names fell back to the body face anyway); title and sub-line both inside the rim
+	pill_lbl = UI.label("", 22, Color.WHITE, Color(0.1, 0.03, 0.12), 4, "body", 900)
 	pill_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	pill_lbl.position = Vector2(0, -1)
-	pill_lbl.size = Vector2(PILL_W0, 32)
+	pill_lbl.position = Vector2(0, 3)
+	pill_lbl.size = Vector2(PILL_W0, 26)
 	pill_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	pill_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	pill.add_child(pill_lbl)
 	pill_sub = UI.label("", 16, Color("ffe7a6"), Color(0.1, 0.03, 0.12), 4, "body", 900)
 	pill_sub.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	pill_sub.position = Vector2(0, 28)
-	pill_sub.size = Vector2(PILL_W0, 22)
+	pill_sub.position = Vector2(0, 26)
+	pill_sub.size = Vector2(PILL_W0, 20)
 	pill_sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	pill_sub.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	pill_sub.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
@@ -135,15 +137,14 @@ func setup(p) -> V7Combo:
 	_dev_setup()
 	return self
 
+# 0.9: the glow lives on the lacquer table frame itself (V6BoardTable.frame_rect: the art's outer edge), not on a
+# rectangle that followed the tile cloud — only its intensity changes with the tier, never its size or place
 func _frame_rect() -> Rect2:
 	var r: Rect2 = play.board_rect
-	if play.board and play.board.bounds.size.x > 0:
-
-		var b: TrayBoard = play.board
-		var tl: = b.position + b.bounds.position * b.scale.x
-		var br: = tl + b.bounds.size * b.scale.x
-		var fr: = Rect2(tl, br - tl).grow(34)
-		r = fr.intersection(r.grow(6)) if fr.intersects(r) else r
+	if play.board and is_instance_valid(play.board):
+		var tb = play.board.get_node_or_null("V6Table")
+		if tb and tb.get("frame_rect") is Rect2 and (tb.frame_rect as Rect2).size.x > 0.0:
+			r = tb.frame_rect
 	return r
 
 func _tier(n: int) -> Array:
@@ -256,7 +257,7 @@ func _draw() -> void :
 		var pc: = _pill_col()
 		var a: = pill.modulate.a
 		var ti: = maxi(tier_i, 0)
-		_sb_pill.bg_color = Color(0.09, 0.07, 0.11, 0.93 * a)
+		_sb_pill.bg_color = Color(0.09, 0.07, 0.11, 0.97 * a)
 		_sb_pill.border_color = Color(pc.r, pc.g, pc.b, a)
 		_sb_pill.set_border_width_all(3 if ti < 4 else 4)
 		_sb_pill.shadow_size = 8 + ti * 2 + int(8.0 * flash_k)
@@ -276,11 +277,11 @@ func _draw() -> void :
 			if f < 0.995:
 				var ex: = ir.end.x
 				draw_line(Vector2(ex - 1.5, ir.position.y + 6), Vector2(ex - 1.5, ir.end.y - 6), Color(1, 1, 1, 0.55 * a), 2.0, true)
-		# beads on the lower rim: one per tier reached
+		# beads just under the lower rim (clear of the sub-line): one per tier reached
 		if tier_i >= 0:
 			var nb: = tier_i + 1
 			var gap: = 13.0
-			var y: = pr.end.y - 1.0
+			var y: = pr.end.y + 5.0
 			var x0: = pr.get_center().x - (nb - 1) * gap * 0.5
 			for i in nb:
 				var c: Color = TIERS[i][2]
@@ -304,29 +305,34 @@ func _draw_glow() -> void :
 	var amount: = maxf(glow, fk * 0.85)
 	if amount > 0.01:
 		var c: = col.lerp(_fever_col(), fk)
+		# every stroke stays on the frame band (outer edge → V6BoardTable.FRAME inwards): it lights the lacquer
+		# and never spills past the art onto the room or onto the felt
+		var fw: = V6BoardTable.FRAME
 		if lvl == "min":
 			_sb_frame.set_border_width_all(3)
-			_sb_frame.set_corner_radius_all(26)
+			_sb_frame.set_corner_radius_all(18)
 			_sb_frame.border_color = Color(c.r, c.g, c.b, 0.7 * minf(1.0, amount * 1.6))
-			L.draw_style_box(_sb_frame, r.grow(2))
+			L.draw_style_box(_sb_frame, r.grow(-3))
 		else:
 			var speed: = 4.0 + amount * 6.0
 			var pulse: = 0.72 + 0.28 * sin(G.time * speed)
 			if fk > 0.5 and fever_left < 2.0 and fever_left > 0.0:
 				pulse *= 0.55 + 0.45 * (0.5 + 0.5 * sin(G.time * 18.0))
-			var layers: = 3 + int(amount * 5)
+			var layers: = 4
 			for i in layers:
 				var k: = 1.0 - float(i) / layers
 				_sb_frame.set_border_width_all(4)
-				_sb_frame.border_color = Color(c.r, c.g, c.b, 0.6 * amount * pulse * k * k)
-				_sb_frame.set_corner_radius_all(30 + i * 4)
-				L.draw_style_box(_sb_frame, r.grow(i * 4))
-			_sb_frame.set_corner_radius_all(26)
+				_sb_frame.border_color = Color(c.r, c.g, c.b, 0.6 * amount * pulse * k)
+				_sb_frame.set_corner_radius_all(maxi(6, 18 - i * 3))
+				L.draw_style_box(_sb_frame, r.grow(-2.0 - i * 4.0))
+			# the frame's inner lip in a light tint of the tier colour (was a white line)
+			var lip: = c.lightened(0.35)
+			_sb_frame.set_corner_radius_all(8)
 			_sb_frame.set_border_width_all(2)
-			_sb_frame.border_color = Color(1, 1, 1, 0.4 * amount * pulse)
-			L.draw_style_box(_sb_frame, r.grow(-3))
+			_sb_frame.border_color = Color(lip.r, lip.g, lip.b, 0.4 * amount * pulse)
+			L.draw_style_box(_sb_frame, r.grow(-fw + 1.0))
 			if fk > 0.05:
-				_draw_fever_lights(L, r.grow(2), fk)
+				_draw_fever_lights(L, r.grow(-fw * 0.5), fk)
 	# the screen edges (full effects only): a flash on a tier step, a soft beat on each pair from ×8
 	if edge_k > 0.01 and V9Feel.can_edge_flash():
 		_draw_edges(L, edge_col, edge_k)
@@ -377,7 +383,7 @@ func _draw_fever_lights(L: Node2D, r: Rect2, k: float) -> void :
 		var d: = fmod(ph + i * per / n, per)
 		var p: = _perimeter(r, d)
 		var c: = FEVER_GOLD if i % 2 == 0 else FEVER_COL
-		var s: = 26.0 + 6.0 * sin(G.time * 7.0 + i)
+		var s: = 18.0 + 4.0 * sin(G.time * 7.0 + i)
 		L.draw_texture_rect(tex, Rect2(p - Vector2(s, s) * 0.5, Vector2(s, s)), false, Color(c.r, c.g, c.b, 0.85 * k))
 
 func _perimeter(r: Rect2, d: float) -> Vector2:
@@ -524,21 +530,16 @@ func _set_width(w: float, animate: bool) -> void :
 func _fit_title(room: = -1.0) -> void :
 	if room < 0.0:
 		room = tier_width(maxi(tier_i, 0)) - 24.0
-	var f: = UI.font("title", 900)
-	var fs: = 26
-	while fs > 24 and f.get_string_size(pill_lbl.text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > room:
+	# one family on every tier (0.9): only the size steps down for a long tier name
+	var f: = UI.font("body", 900)
+	var fs: = 22
+	while fs > 17 and f.get_string_size(pill_lbl.text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > room:
 		fs -= 1
-	if f.get_string_size(pill_lbl.text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > room:
-		# Playfair only from 24 px: a long tier name goes to Nunito instead of a smaller Playfair
-		f = UI.font("body", 900)
-		fs = 24
-		while fs > 18 and f.get_string_size(pill_lbl.text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > room:
-			fs -= 1
 	var ls: LabelSettings = pill_lbl.label_settings
 	if ls.font != f or ls.font_size != fs:
 		ls.font = f
 		ls.font_size = fs
-		ls.outline_size = 5 if fs >= 24 else 4
+		ls.outline_size = 4
 
 # The pill takes the note slot (V8_NOTE_RECT in play.gd) while a combo runs: the luck / style note under it is
 # hidden, not drawn through the pill, and comes back when the pill has gone (play.v8_note hides a new note too).

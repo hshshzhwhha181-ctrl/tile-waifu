@@ -62,8 +62,9 @@ func build(m, _args: Dictionary) -> void :
 	# 0.9: every tap on her (and on the room) goes through V9HomeLive, not the rig's own tap
 	hero.interactive = false
 	UI.slide_in(hero, Vector2(0, 60), 0.05, 0.6)
-	# 0.8: her legs fade out at the knees under the button cluster (no shoes peeking between the plate and the CTA)
-	Common.floor_fade(self, H - 520.0, H - 150.0)
+	# 0.8: her legs fade out under the button cluster (no shoes peeking between the plate and the CTA). 0.9: the fade
+	# starts at the top of the cluster (Режимы, y ≈ 900), not right under the hem — her legs stay skin and colour
+	Common.floor_fade(self, H - 400.0, H - 150.0)
 	var oid: = G.equipped(G.S.partner)
 	var live_opts: = {"hero": hero}
 	var live_mode: = "rig"

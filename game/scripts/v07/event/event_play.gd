@@ -125,16 +125,27 @@ func _booster_ok(n: int) -> bool:
 		return false
 	return true
 
+func _help_ok(kind: String) -> bool:
+	if mode == "v7tourney" and int({"hint": hint_n, "undo": undo_n, "shuffle": shuffle_n}.get(kind, 1)) <= 0:
+		return false
+	return super._help_ok(kind)
+
 func _hint() -> void :
-	if _booster_ok(hint_n):
+	if not _booster_ok(hint_n):
+		V9Feel.deny(btn_hint)
+	else:
 		super._hint()
 
 func _undo() -> void :
-	if _booster_ok(undo_n):
+	if not _booster_ok(undo_n):
+		V9Feel.deny(btn_undo)
+	else:
 		super._undo()
 
 func _shuffle() -> void :
-	if _booster_ok(shuffle_n):
+	if not _booster_ok(shuffle_n):
+		V9Feel.deny(btn_shuffle)
+	else:
 		super._shuffle()
 
 func _on_fail() -> void :
