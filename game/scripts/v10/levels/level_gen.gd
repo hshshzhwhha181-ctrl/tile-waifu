@@ -210,6 +210,10 @@ static func level(i: int, salt: int = -1, assist: bool = false) -> Dictionary:
 
 # [level dict, positions] — build() reuses the positions the tile-count fit already computed
 static func _level(i: int, salt: int, assist: bool = false) -> Array:
+	if i < 0 or i >= TOTAL:
+		# a «next level» past the last arc must not crash the map / play screen (WORLD[w] out of range)
+		push_error("V10LevelGen: level index %d out of 0..%d" % [i, TOTAL - 1])
+		i = clampi(i, 0, TOTAL - 1)
 	if salt < 0:
 		salt = salt_of(i)
 	var w: = i / PER_WORLD
@@ -326,9 +330,14 @@ static func _level(i: int, salt: int, assist: bool = false) -> Array:
 		title = str(W.legend) if l == PER_WORLD - 1 else "Легенда: %s" % W.name
 	elif boss:
 		title = "Босс главы %d" % (c + 1)
-	var gems: int = 100 + i * 2 + {"tutorial": 0, "easy": 0, "normal": 20, "hard": 60, "very_hard": 120, "legendary": 300}[tier]
-	if boss:
-		gems += 200
+	# 0.10-spec §2.3: Path pays crystals on the FIRST clear only — 2 + 2×★, Сложный +3, Очень сложный +6,
+	# Пик 30, Легендарный 150 (the chapter chest is a separate source). `gems` excludes the star part.
+	# The old per-win formula (100 + 2i, up to ~2600 per replayable win) would blow the 400/day free cap.
+	var gems: int = 2 + {"tutorial": 0, "easy": 0, "normal": 0, "hard": 3, "very_hard": 6, "legendary": 0}[tier]
+	if is_peak(i):
+		gems = 30
+	elif legend:
+		gems = 150
 
 	var mech_flags: = []
 	for m in ["gold", "ice", "hidden"]:
@@ -348,7 +357,9 @@ static func _level(i: int, salt: int, assist: bool = false) -> Array:
 		"mech": ",".join(mech_flags), "mechs": mech, "gold": gold, "ice": ice, "hidden": hidden,
 		"v10_plan": plan, "D": int(T.D), "open": snappedf(openp, 0.01), "old": float(T.old),
 		"strict": snappedf(strict, 0.01), "dig": float(T.dig),
-		"reward": {"gems": gems},
+		"reward": {"gems": gems, "per_star": 2, "first_only": true},
+		# CEO_PLAN №4 / 0.10-spec П1: the assist deal is offered after 2 fails, but never on Peaks and Legendary
+		"assist_ok": not (is_peak(i) or legend),
 	}
 	var pos: = _fit_tiles(out, int(T.min))
 	return [out, pos]
@@ -438,7 +449,7 @@ static func build(i: int, salt: int = -1, sim = null, assist: bool = false) -> D
 	if sim == null:
 		sim = Sim.new()
 	sim.build(pos)
-	sim.tag = "%d:%d:%d:%d" % [i, int(lv.v10_salt), int(lv.seed), int(assist)]
+	sim.tag = "%d:%d:%d:%d" % [int(lv.v10_id), int(lv.v10_salt), int(lv.seed), int(assist)]
 	var n: int = sim.n
 	var rng: = RandomNumberGenerator.new()
 	rng.seed = _hash(int(lv.seed) * 3 + 77)

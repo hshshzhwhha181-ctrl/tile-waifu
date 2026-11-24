@@ -11,7 +11,8 @@ extends RefCounted
 #  - a free tile goes to the tray; if the tray holds the same face, both vanish (a pair);
 #    if the tray reaches `slots` tiles, the round is lost;
 #  - lock tiles are takeable after a key pair of their group is matched, chain tiles after N pairs are gone;
-#    after a match with no free takeable tile left, every lock/chain opens (V6SpecialBoard.unstick);
+#    after a match (or a tile into the tray, V10LevelBoard.tap) with no free takeable tile left, every lock/chain
+#    opens (V6SpecialBoard.unstick);
 #  - jokers pair with anything (tray-first, as V6SpecialBoard.tap), and the other joker becomes the twin;
 #  - the bomb blast (removes up to 3 nearby pairs) is NOT simulated: it only ever helps, so every verdict here is
 #    conservative (a board solvable without blasts is solvable with them).
@@ -311,6 +312,9 @@ func tap(i: int) -> int:
 	if tray.size() >= slots:
 		failed = true
 		return -1
+	# V10LevelBoard.tap: a tile into the tray with no takeable free tile left opens every lock/chain (softlock guard)
+	if on_board > 0 and has_locks and not unstuck and moves_now().is_empty():
+		unstuck = true
 	return 0
 
 

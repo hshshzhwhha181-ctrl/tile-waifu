@@ -74,6 +74,15 @@ func apply_specials(p: Dictionary) -> void :
 		_add_icon(t)
 
 
+# Softlock guard: V6SpecialBoard.unstick() runs only after a pair. If the tile just put in the tray (no pair) was the
+# last free takeable one and every other free tile is locked/chained, the player had no move and no fail. Open them
+# here too (the sim mirrors this rule). A full tray is the fail path and is left alone.
+func tap(t: Tile) -> void :
+	super.tap(t)
+	if v10_used and is_instance_valid(t) and tray.has(t) and not t.pending and tray.size() < slots:
+		unstick()
+
+
 # auto-play (playtest, fuzz, demo): the twin of a tray tile, else the next tile of the verified take order.
 # (Pairing by face alone can swap twins between pairs of one face and overfill the tray later.)
 func solver_move() -> Tile:

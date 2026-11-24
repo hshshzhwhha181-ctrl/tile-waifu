@@ -19,6 +19,7 @@ const R_RND: = 16
 const SOLVE_BUDGET: = 600
 const BAKE_TRIES: = 12
 const BAKE_MARGIN: = 0.04   # the bake wants the bot's rate this far inside the band (selection bias + noise)
+const ARC_GEMS_MAX: = 1600   # 100 levels x (2 + 2x3★) + tier extras + Peaks 30 + Legendary 150 — about 10 pulls an arc
 const CHECK_TOL: = 0.05     # the selftest re-measures with fresh bot seeds: 40 playouts => sigma ~0.08 at p=0.5
 
 var args: = {}
@@ -518,6 +519,7 @@ func _curve_checks(built: Array, mets: Array) -> void :
 
 
 func _schedule_checks(N: int) -> void :
+	var arc_gems: = {}
 	var seen: = {}
 	var last_new: = -100
 	for i in N:
@@ -541,7 +543,18 @@ func _schedule_checks(N: int) -> void :
 			_fail("%s: boss heroine %s has no art in this build" % [lv.code, lv.boss_hero])
 		if lv.intro != "" and Gen.TIERS.find(lv.tier) > Gen.TIERS.find("normal"):
 			_fail("%s: intro level is %s" % [lv.code, lv.tier])
+		# economy (0.10-spec §2.3): first clear only, small numbers; assist deal never on Peaks / Legendary
+		var rw: Dictionary = lv.reward
+		if not bool(rw.get("first_only", false)) or int(rw.gems) > 150 or int(rw.gems) < 0:
+			_fail("%s: reward %s breaks the Path economy" % [lv.code, str(rw)])
+		arc_gems[i / Gen.PER_WORLD] = int(arc_gems.get(i / Gen.PER_WORLD, 0)) + int(rw.gems) + 3 * int(rw.get("per_star", 0))
+		if bool(lv.assist_ok) == (bool(lv.peak) or bool(lv.legend)):
+			_fail("%s: assist_ok %s on peak=%s legend=%s" % [lv.code, lv.assist_ok, lv.peak, lv.legend])
+	for a in arc_gems:
+		if int(arc_gems[a]) > ARC_GEMS_MAX:
+			_fail("arc %d pays %d crystals on first clears (max %d)" % [a + 1, arc_gems[a], ARC_GEMS_MAX])
 	print("LEVELS schedule: mechanics introduced %s" % str(seen))
+	print("LEVELS economy: first-clear crystals per arc (3★) %s" % str(arc_gems.values()))
 
 
 # ---------------------------------------------------------------- bake
