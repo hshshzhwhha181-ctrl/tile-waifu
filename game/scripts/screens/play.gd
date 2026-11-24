@@ -19,8 +19,6 @@ var meter: RBox
 var meter_w: = 0.0
 var tray_box: RBox
 var slot_rects: Array = []
-var fever_overlay: ColorRect
-var fever_fx: Node2D
 var btn_hint: JButton
 var btn_undo: JButton
 var btn_shuffle: JButton
@@ -365,8 +363,14 @@ func _build_hud() -> void :
 		# 0.9: every portrait tap is answered. Busy (a cast running) or ready-but-the-board-is-busy (deal, fail
 		# delay, clear) is a deny — never silence and never a chat that hides the ready glow. A talk tap gets the
 		# press; the bubble has its own cooldown so mashing does not stack lines.
-		if ult.busy or (skill_ready and not board.input_on):
+		if ult.busy:
 			V9Feel.deny(stage)
+			return
+		if skill_ready and not board.input_on:
+			# ready, but the table is busy (deal, a fail beat, a clear): the deny and a short line that says why,
+			# so the glow does not read as broken
+			V9Feel.deny(stage)
+			_speak_wait()
 			return
 		if skill_ready:
 			_use_skill()
@@ -726,6 +730,14 @@ func _speak(kind: String, tapped: = false) -> void :
 	_speak_t = now()
 	stage.react("smug")
 	stage.say(kind)
+
+const V9_WAIT_LINES: = ["Умение готово — дай столу улечься.", "Секунду — стол ещё занят.", "Готова! Как только стол оживёт."]
+
+func _speak_wait() -> void :
+	if now() - _speak_t < 1.6:
+		return
+	_speak_t = now()
+	stage.say_text(V9_WAIT_LINES[randi() % V9_WAIT_LINES.size()], 1.8)
 
 func now() -> float:
 	return G.time
@@ -1242,30 +1254,10 @@ func _exit_tree() -> void :
 
 
 
-# 0.8: fast deal for the luck-card levels: every tile lands within ~0.75 s and input opens right after.
+# 0.8: fast deal for the luck-card levels: every tile lands within ~0.75 s and input opens right after (0.9: the
+# board's own deal(fast), so a tap during it skips the rest like any deal)
 func _v8_quick_deal() -> void :
-	board.input_on = false
-	var order: Array = board.tiles.duplicate()
-	var n: = order.size()
-	var step: = minf(0.004, 0.32 / maxf(1.0, n))
-	for i in n:
-		var t: Tile = order[i]
-		t.position = t.home + Vector2(0, -60)
-		t.modulate.a = 0.0
-		var d: = step * i + t.gz * 0.05
-		var tw: Tween = t.create_tween().set_parallel()
-		tw.tween_property(t, "position", t.home, 0.26).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT).set_delay(d)
-		tw.tween_property(t, "modulate:a", 1.0, 0.14).set_delay(d)
-		if i % 8 == 0:
-			get_tree().create_timer(d + 0.16).timeout.connect( func(): Sfx.play("clack%d" % (randi() % 3), randf_range(0.9, 1.1), -8))
-	var maxz: = 0
-	for t in order:
-		maxz = maxi(maxz, int(t.gz))
-	await get_tree().create_timer(step * n + maxz * 0.05 + 0.3).timeout
-	if not is_inside_tree() or not is_instance_valid(board):
-		return
-	board.input_on = true
-	board.reveal_free()
+	board.deal(true)
 
 # 0.8 match overlay layout: each transient overlay has its own slot, so two never land on each other, and
 # none of them covers a tile of the table or takes a tap (mouse_filter IGNORE).
@@ -2119,12 +2111,16 @@ func _victory(stars: int, reward: int, secs: float, first: bool) -> void :
 	var plate: Control = ctx.plate
 	var pw: float = ctx.w
 	# 0.9: the summon showcase's treatment instead of flat pink confetti bars — sakura petals and gold dust, on a
-	# layer UNDER the result panel (it sits right behind the plate in the tree), so nothing crosses its text
+	# layer UNDER the title ribbon and the result panel (right above the dim, behind both in the tree), so nothing
+	# crosses the title or the panel's text
 	var wparts: = Control.new()
 	wparts.size = size
 	wparts.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var under: = plate.get_index()
+	if ctx.has("rib") and is_instance_valid(ctx.rib):
+		under = mini(under, (ctx.rib as Node).get_index())
 	root.add_child(wparts)
-	root.move_child(wparts, plate.get_index())
+	root.move_child(wparts, under)
 	Fx.burst(wparts, Vector2(W * 0.2, H * 0.14), "petal", 30, Color(1, 0.8, 0.88), 1.5)
 	Fx.burst(wparts, Vector2(W * 0.8, H * 0.14), "petal", 30, Color(1, 0.8, 0.88), 1.5)
 	Fx.burst(wparts, Vector2(W * 0.5, H * 0.12), "sparkle", 40, Color(1, 0.86, 0.5), 1.4)
@@ -2500,6 +2496,9 @@ func _v8_yaku_chips(parent: Control, x: float, y: float, w: float) -> float:
 			y += 42
 		var c: = UI.rbox("plum", Rect2(cx, y, cw, 36), 18, 2, 4)
 		c.borders(Color("ffe7a6"), Color("8a6a3a"))
+		# the room the stamp may take while it is scaled: from just past the chip before it (or the block's left
+		# side) to the block's right side (_v9_stamp_chip)
+		c.set_meta("yaku_lo", x if cx <= x else cx - 6.0)
 		c.set_meta("yaku_hi", x + w)
 		parent.add_child(c)
 		c.add_child(UI.center_label(UI.label(txt, 17, Color("ffe7a6"), UI.DARK, 2, "body", 900), Rect2(0, 0, cw, 36)))
@@ -2570,6 +2569,20 @@ func _summon_unlocked() -> void :
 
 func dev_act(a: String) -> void :
 	match a:
+		"dealtap":
+			# a real touch on a tile while the deal is still landing (the deal-skip check)
+			var dt: Tile = null
+			for t in board.tiles:
+				if board.on_board(t):
+					dt = t
+			print("DEALTAP dealing=%s input_on=%s" % [board.dealing, board.input_on])
+			if dt:
+				var ev: = InputEventScreenTouch.new()
+				ev.pressed = true
+				ev.position = board.tile_layer.get_global_transform_with_canvas() * dt.home
+				Input.parse_input_event(ev)
+			await get_tree().create_timer(0.2).timeout
+			print("DEALTAP +0.2s dealing=%s input_on=%s" % [board.dealing, board.input_on])
 		"match":
 			for i in 2:
 				var t: = board.best_move()
@@ -2732,20 +2745,30 @@ func _v9_star_impact(ctx: Dictionary, s: TextureRect, i: int, last: bool) -> voi
 		dt.tween_property(plate, "position:y", y0 + 3.0 + 2.0 * i, 0.05).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 		dt.tween_property(plate, "position:y", y0, 0.28).set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
 
-# a yaku chip stamped onto the panel: drops from 1.25×, lands with a click a semitone above the one before.
-# 0.9: the pivot keeps the scaled chip inside its row — its left edge never moves left (so it never covers the chip
-# stamped before it, nor the panel's left frame) and its right edge never passes the yaku block's right side
+# a yaku chip stamped onto the panel: drops from up to 1.25×, lands with a click a semitone above the one before.
+# 0.9: the stamp is clamped to its slot in the row (yaku_lo … yaku_hi, set by _v8_yaku_chips): the start scale
+# shrinks to what that slot holds and the pivot slides so the scaled chip never covers the chip stamped before it,
+# the panel's left frame or the block's right side; a long chip alone in its row drops without the tilt
 const V9_STAMP_FROM: = 1.25
 
 func _v9_stamp_chip(c: Control, i: int) -> void :
 	if not is_instance_valid(c) or not is_inside_tree():
 		return
-	var s0: = V9_STAMP_FROM
-	var hi: = float(c.get_meta("yaku_hi", c.position.x + c.size.x * s0))
-	var px: = maxf(0.0, (c.position.x + c.size.x * s0 - hi) / (s0 - 1.0))
-	c.pivot_offset = Vector2(minf(px, c.size.x), c.size.y * 0.5)
+	var w: = c.size.x
+	var lo: = float(c.get_meta("yaku_lo", c.position.x))
+	var hi: = float(c.get_meta("yaku_hi", c.position.x + w * V9_STAMP_FROM))
+	# the scaled box is (left = x − p·(s−1), right = x + w·s − p·(s−1)); keep both inside [lo, hi]
+	var s0: = clampf((hi - lo) / maxf(w, 1.0), 1.0, V9_STAMP_FROM)
+	var px: = w * 0.5
+	if s0 > 1.001:
+		var p_min: = (c.position.x + w * s0 - hi) / (s0 - 1.0)
+		var p_max: = (c.position.x - lo) / (s0 - 1.0)
+		px = clampf(w * 0.5, maxf(0.0, p_min), minf(w, maxf(p_max, 0.0)))
+	c.pivot_offset = Vector2(px, c.size.y * 0.5)
 	c.scale = Vector2.ONE * s0
-	c.rotation = -0.035 if i % 2 == 0 else 0.035
+	# the tilt lifts a corner by w/2·sin(r) ≤ 1.5 px: with the 4.5 px of the 1.25× scale it stays inside the 6 px
+	# row gap, so a stamp never touches the row above or below
+	c.rotation = (-1.0 if i % 2 == 0 else 1.0) * minf(0.035, 3.0 / maxf(w, 1.0))
 	var t: = c.create_tween().set_parallel()
 	t.tween_property(c, "scale", Vector2.ONE * 0.94, 0.11).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	t.tween_property(c, "modulate:a", 1.0, 0.07)

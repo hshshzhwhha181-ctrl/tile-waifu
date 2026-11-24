@@ -15,7 +15,7 @@ extends Control
 #              sparks from its rim; it swells on each pair (V9Feel.can_fx; sparks × fx_scale).
 #   fever      readable without sound: the frame burns orange-gold with lights running round it, embers rise along
 #              the frame sides (not across the table), the pill reads «Лихорадка · кристаллы ×2 · 6 с», and the
-#              last 2 s blink. play.fever_fx (full-screen embers that crossed the tiles) is hidden.
+#              last 2 s blink. It is the only fever decor: play._fever has no full-screen vignette or embers (0.9).
 #   shake / sound / haptic   V6Fx.combo_tier (light shake by tier, full only), V9Feel.tile_match in the board
 #              (semitone pitch ladder + combo haptic in step with each pair).
 #   «Эффекты: минимум»   the pill, a steady frame line in the tier / fever colour: information only.
@@ -202,10 +202,6 @@ func _process(dt: float) -> void :
 		return
 	var b: TrayBoard = play.board
 	var alive: = b.combo >= 2 and _left_frac() > 0.0
-	# fever: the full-screen embers of play._fever rose across the tiles; the frame carries it instead
-	var ff = play.get("fever_fx")
-	if is_instance_valid(ff) and ff is CanvasItem and (ff as CanvasItem).visible:
-		(ff as CanvasItem).visible = false
 	var fev: = _fever_now()
 	if fev != fever_on:
 		fever_on = fev
@@ -273,17 +269,18 @@ func _draw() -> void :
 			ir.size.x *= f
 			_sb_fill.bg_color = Color(pc.r, pc.g, pc.b, 0.4 * a)
 			draw_style_box(_sb_fill, ir)
-			# 0.9: a soft leading edge in the tier colour (it fades back over ~14 px) — a hard white line ran through
+			# 0.9: a soft leading edge in the tier colour (a 16 px gradient) — a hard white line ran through
 			# the title like a rendering seam. The fill sits under the labels (they are the pill's children).
 			if f < 0.995:
 				var ex: = ir.end.x
 				var ec: = pc.lightened(0.3)
-				for i in 5:
-					var ew: = 3.0
-					var x0: = ex - ew * (i + 1)
-					if x0 < ir.position.x:
-						break
-					draw_rect(Rect2(x0, ir.position.y + 4, ew, ir.size.y - 8), Color(ec.r, ec.g, ec.b, 0.16 * (1.0 - i / 5.0) * a))
+				var x0: = maxf(ir.position.x, ex - 16.0)
+				var y0: = ir.position.y + 4.0
+				var y1: = ir.end.y - 4.0
+				var c0: = Color(ec.r, ec.g, ec.b, 0.0)
+				var c1: = Color(ec.r, ec.g, ec.b, 0.26 * a)
+				draw_polygon(PackedVector2Array([Vector2(x0, y0), Vector2(ex, y0), Vector2(ex, y1), Vector2(x0, y1)]),
+					PackedColorArray([c0, c1, c1, c0]))
 		# beads just under the lower rim (clear of the sub-line): one per tier reached
 		if tier_i >= 0:
 			var nb: = tier_i + 1

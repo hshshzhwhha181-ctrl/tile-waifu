@@ -314,17 +314,23 @@ func tile_at(gp: Vector2) -> Tile:
 	return null
 
 var dealing: = false
+var _deal_tws: Array[Tween] = []
+var _deal_gen: = 0
 
 func _unhandled_input(e: InputEvent) -> void :
 	if not input_on:
-		# 0.9: a tap while the deal is still landing is answered (a glint on the tile + a light tap haptic), so the
-		# board never feels dead in its first second; it is not played
-		if dealing and e is InputEventScreenTouch and e.pressed:
+		# 0.9: a tap on the table while the deal is still landing is never dropped: the tile under the finger
+		# glints, a soft clack and a light tap haptic answer it, and the rest of the deal lands at once (skip_deal)
+		# so the very next tap plays. The skipping tap itself is not played (a tile still in flight is no target).
+		if dealing and e is InputEventScreenTouch: print("DBG touch ", e.position, " hit=", _deal_hit(e.position))
+		if dealing and e is InputEventScreenTouch and e.pressed and _deal_hit(e.position):
 			var dt: = tile_at(e.position)
 			if dt:
 				dt.press_glint()
-				V9Feel.haptic("tap")
-				get_viewport().set_input_as_handled()
+			V9Feel.haptic("tap")
+			V9Feel.sound("clack%d" % (randi() % 3), randf_range(1.05, 1.15), -6.0)
+			get_viewport().set_input_as_handled()
+			skip_deal()
 		return
 	if e is InputEventScreenTouch and e.pressed:
 		var t: = tile_at(e.position)
@@ -712,24 +718,78 @@ func reassign_faces(ts: Array) -> void :
 		t.mat.set_shader_parameter("gold", 1.0 if t.gold else 0.0)
 	reveal_free()
 
-func deal() -> void :
+# the deal: every tile drops from 60 px above its home and fades in, lower layers first. fast = the luck-card deal
+# (0.8: the whole table down in ~0.75 s). Input opens as the last tile lands, or at once when a tap skips the deal.
+func deal(fast: = false) -> void :
 	input_on = false
 	dealing = true
+	_deal_gen += 1
+	var gen: = _deal_gen
+	_deal_tws.clear()
 	var order: = tiles.duplicate()
+	var n: = order.size()
+	var step: = minf(0.004, 0.32 / maxf(1.0, n)) if fast else 0.012
+	var zk: = 0.05 if fast else 0.12
+	var drop: = 0.26 if fast else 0.32
 	var last: = 0.0
-	for i in order.size():
+	for i in n:
 		var t: Tile = order[i]
 		t.position = t.home + Vector2(0, -60)
 		t.modulate.a = 0.0
-		var d: = 0.012 * i + t.gz * 0.12
+		var d: = step * i + t.gz * zk
 		last = maxf(last, d)
 		var tw: Tween = t.create_tween().set_parallel()
-		tw.tween_property(t, "position", t.home, 0.32).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT).set_delay(d)
-		tw.tween_property(t, "modulate:a", 1.0, 0.18).set_delay(d)
-		if i % 6 == 0:
-			get_tree().create_timer(d + 0.2).timeout.connect( func(): Sfx.play("clack%d" % (randi() % 3), randf_range(0.9, 1.1), -8))
-	# input opens as the last tile lands (its 0.32 s drop + a beat), not a fixed 0.9 s after the last start
-	await get_tree().create_timer(last + 0.32 + 0.12).timeout
+		tw.tween_property(t, "position", t.home, drop).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT).set_delay(d)
+		tw.tween_property(t, "modulate:a", 1.0, drop * 0.56).set_delay(d)
+		_deal_tws.append(tw)
+		if i % (8 if fast else 6) == 0:
+			get_tree().create_timer(d + drop * 0.62).timeout.connect( func():
+				if gen == _deal_gen:
+					Sfx.play("clack%d" % (randi() % 3), randf_range(0.9, 1.1), -8))
+	# input opens as the last tile lands (its drop + a beat), not a fixed 0.9 s after the last start
+	await get_tree().create_timer(last + drop + 0.12).timeout
+	if gen == _deal_gen:
+		_deal_done()
+
+# 0.9: a tap during the deal lands every tile still in flight in 0.14 s and opens the table right after
+func skip_deal() -> void :
+	if not dealing:
+		return
+	_deal_gen += 1
+	var gen: = _deal_gen
+	for tw in _deal_tws:
+		if tw and tw.is_valid():
+			tw.kill()
+	_deal_tws.clear()
+	for t in tiles:
+		if not is_instance_valid(t) or not on_board(t):
+			continue
+		if t.position.is_equal_approx(t.home) and t.modulate.a >= 0.999:
+			continue
+		var tw: Tween = t.create_tween().set_parallel()
+		tw.tween_property(t, "position", t.home, 0.14).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		tw.tween_property(t, "modulate:a", 1.0, 0.1)
+	await get_tree().create_timer(0.16).timeout
+	if gen == _deal_gen:
+		_deal_done()
+
+func _deal_done() -> void :
 	dealing = false
+	_deal_tws.clear()
 	input_on = true
 	reveal_free()
+
+# a deal-skipping tap must land on the table (its tile bounds + a margin), not anywhere on the screen
+func _deal_hit(gp: Vector2) -> bool:
+	if tile_layer == null:
+		return false
+	var lp: = tile_layer.to_local(gp)
+	var r: = Rect2()
+	var first: = true
+	for t in tiles:
+		if not on_board(t):
+			continue
+		var tr: = Rect2(t.home - Vector2(Tile.TW, Tile.TH) * 0.5, Vector2(Tile.TW, Tile.TH))
+		r = tr if first else r.merge(tr)
+		first = false
+	return not first and r.grow(24.0).has_point(lp)
