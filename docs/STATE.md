@@ -47,3 +47,4 @@
 - **Обязательная проверка перед каждой сборкой:** экспортировать пакет и прогнать на нём playtest:
   `godot --headless --path game --export-pack Android /tmp/x.pck` затем
   `xvfb-run ... godot --main-pack /tmp/x.pck --rendering-driver opengl3 --audio-driver Dummy --resolution 720x1280 -- --pt=fresh --shots=<dir>` → `PT OK 51`.
+- Рейтинг: целимся в Mature 17+ (Google Play) / 18+ (RuStore), уровень привлекательности — как у Brown Dust 2, но свои дизайны. Решение 2026-11-24. Детали — docs/HEROINES.md.
