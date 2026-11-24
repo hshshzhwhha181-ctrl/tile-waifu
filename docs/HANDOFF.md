@@ -245,3 +245,41 @@ scratchpad/uilora/combo_v2) → критики. GPU-бокс обязан быт
 от фонарей, бой на Пути выигрывается снятием стола. Пока нет героини Земли, духов Воды нет; Миэль — бесплатно за её Сказку.
 12 решений владельцу — §11, что сверить — §13, 11 дорожек `v11-*` в worktree — §9 (`--econ_budget=1` сначала реализовать: в ветках его нет).
 Черновик до критики — `docs/history/adventures-draft-v1.md`. `game/` под 0.11 ещё не трогали.
+
+## 25b. Состояние на 2026-11-24 22:05 UTC (передача в тред проекта)
+**Резервная копия ВСЕХ веток v10-* (git bundle, 109 МБ):** https://d2ol7oe51mr4n9.cloudfront.net/user_3L5lNdYfxsf6b0O0pIlvJXXfClr/f9894f3a-e956-431f-8533-6921de206352.zip
+Восстановление: скачать, unzip, затем `git fetch tw_v10_branches.bundle "refs/heads/*:refs/heads/*"` (или `git bundle list-heads`).
+
+Ветки (не на origin; влиты в gh-pages только rig-pilot и rig-v2):
+| ветка | коммит | что |
+|---|---|---|
+| v10-audio | 4e35574 | v10-audio review: sting/fever/replay fixes in V10Music, per-variant SFX trim, li |
+| v10-auth | c06f3ed | v10-auth review: consent withdrawal unlinks for guests too, deletion wipes the 0 |
+| v10-chat | 91954b4 | v10-chat review fixes: JSON-float save safety, orphan threads, stable feed |
+| v10-clarity | ad4f512 | v10-clarity round 2: playtester fixes — crystals add up, one name «Ва-ба� |
+| v10-economy | 6711c57 | v10 economy: review fixes (clock sleep, beginner guarantee, stale orders, odds p |
+| v10-fonts | 7800046 | v10 fonts: V10Fonts registry, 15 OFL faces with Cyrillic, selftest + preview |
+| v10-gacha | 5e0549c | v10 gacha: layout fixes for all screens (label wrap order, card sizing on tall/w |
+| v10-hud2 | ea1da30 | HUD v2 review fixes: cut-out heroine in match scene, lantern threads, no spine o |
+| v10-hud2-doc | 166afa0 | HUD v2: unified plate family, 3 type roles, combo showcase, screen wire specs, 6 |
+| v10-juice | ddb4a22 | V10Juice review fixes: budget no longer leaks when a host is freed mid-burst, no |
+| v10-levels | a79b61a | 0.10 levels review: first-clear rewards per spec, assist_ok, softlock guard, ind |
+| v10-look | b9de156 | v10 look (M5): goddess kits V10Look, tile themes + tables, HUD skin framework +  |
+| v10-meta | e59972d | v10-meta: V10Meta core (day 04:00, clock guard, Bond cap 25, notify plan, entry  |
+| v10-mj-koikoi | 9f497b4 | Koikoi (hanafuda with a heroine): rules, AI, screen, deck art, voices, music |
+| v10-mj-look | f68b062 | v10/mj/look: tile materials, heroine tables, ASMR bank, haptics, mode music, sta |
+| v10-mj-riichi | 5c4ea2d | v10-mj-riichi: «Стол на четверых» — Japanese mahjong screen ov |
+| v10-mj-sanma | 0f335b5 | v10-mj-sanma: Moon table for three (sanma) + "Hostess vs two" event; selftest 72 |
+| v10-mj-stage | 3fc2264 | v10-mj-stage: demo shots (motes, danger, wave), hide a line under a peek, rig bu |
+| v10-mj-triples | df0cff0 | v10-mj-triples: full selftest MJ_TRIPLES 2742/2742, exact bake, short-band barks |
+| v10-path | 03b8544 | v10-path: Higgsfield job ids of the Path art (for tools/art/jobs.tsv) |
+| v10-phone | 038984b | 0.10 v10-phone: «Телефон» (Лента · Чаты · Почта), messe |
+| v10-profile | 11d6f80 | v10 profile: review fixes (heroes via owned outfit, seed_seen, tap-on-release, n |
+| v10-responsive | fd33fbf | 0.10 M0 responsive: runner timeout after the lock, selftest with explicit insets |
+| v10-rituals | 139c83c | v10-rituals: layout pass after screenshot review (voice lines clear of faces, sh |
+| v10-salon | 2e0d9fc | v10-salon: Салон Пяти ветров (M2 Р1–Р2) — зоны z1–z3, |
+| v10-shop | 898ad7f | Лавка 2 (M4 Л1–Л8): витрина, наряды, пополнение, |
+| v10-tower | fe06b72 | v10-tower review: save safety and small fixes |
+| v10-tutorial | 01ca8d3 | v10-tutorial review: UX_RULES names (приём, Героини, Столы, С� |
+
+Оркестры, которые ещё идут в старой сессии (session_015DEnYgjuvjgqAwMSfCumJh): tw-010-mega (M0–M6, дорожки в сборке), tw-ui-lora (датасет/обучение UI-LoRA на GPU-боксе 84935f98, затем кит v10-uikit и витрины комбо v2 в scratchpad/uilora/combo_v2), tw-master-style (курирование датасета мастер-модели), tw-av-style (библии звука/видео, голоса), tw-mahjong-core (режимы v10-mj-*). Бокс 84935f98 (L40S, 71 кр/ч) арендован дорожкой UI-LoRA и останавливается ею в конце обучения; если сессия оборвалась — проверить gpu_my и остановить вручную.
