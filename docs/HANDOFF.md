@@ -310,3 +310,13 @@ rig-hana, rig-pilot, rig-rin, rig-v2, rituals, salon, shop, tower, tutorial.
 по docs/0.10-spec.md + UX_RULES + HUD_V2 (HUD v2 заменяет старый HUD); (2) влить audio, juice, auth, tutorial (переписать под новый UI), clarity
 (имена по UX_RULES), hud2, mj-*; (3) UI-LoRA и мастер-модель — из датасетов архива A; (4) шлифовка с 6 персонами, критики, APK 0.10.0
 (ключ подписи — у владельца). Higgsfield: баланс ~2700 кр, бюджет «безграничный» по словам владельца.
+
+## 26b. GPU / UI-LoRA — как подхватить (для сессии треда)
+Сообщение «не останавливай бокс 84935f98» пришло ПОСЛЕ остановки: бокс остановлен в 22:04:27 UTC, процесс обучения tw_ui_v1 прерван.
+/workspace постоянный, поэтому всё, что ai-toolkit успел сохранить, лежит там:
+- датасет: /workspace/tw/data/ui_v1 (копия также в архиве A: uilora/ds и uilora/train);
+- конфиг: в /workspace/tw/ (искать `ls /workspace/tw/*ui*.yaml`), выход: /workspace/tw/output/tw_ui_v1/ (чекпоинты *_00000N000.safetensors, samples/, optimizer.pt).
+Продолжение: арендовать новый L40S (gpu_rent), `cd /workspace/tw/ai-toolkit && apt-get install -y -q gcc python3.12-dev && pip install -q -r requirements.txt`,
+затем тот же конфиг: `CC=gcc HF_HUB_ENABLE_HF_TRANSFER=1 nohup python3 run.py ../<ui-конфиг>.yaml > ../train_ui_v1_resume.log 2>&1 &` —
+ai-toolkit сам продолжает с последнего сохранённого чекпоинта (optimizer.pt), если имя job не менялось. Если чекпоинтов нет — обучить с нуля по
+описанию в §19–20 (1800 шагов, rank 32, триггер `twui style`). После обучения — бокс остановить.
