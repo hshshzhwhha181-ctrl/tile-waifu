@@ -1,0 +1,39 @@
+{
+ "classic": {
+  "bpm": 95.7,
+  "bars": 16,
+  "len_s": 40.12,
+  "lufs": -16.0
+ },
+ "triples": {
+  "bpm": 103.4,
+  "bars": 18,
+  "len_s": 41.8,
+  "lufs": -15.9
+ },
+ "connect": {
+  "bpm": 87.6,
+  "bars": 15,
+  "len_s": 41.1,
+  "lufs": -17.1
+ },
+ "cube": {
+  "bpm": 79.5,
+  "bars": 13,
+  "len_s": 39.24,
+  "lufs": -16.0
+ },
+ "riichi": {
+  "bpm": 92.3,
+  "bars": 16,
+  "len_s": 41.61,
+  "lufs_full": -17.6,
+  "beat_phase_s": 0.023
+ },
+ "raid": {
+  "bpm": 80.7,
+  "bars": 14,
+  "len_s": 41.61,
+  "lufs": -16.1
+ }
+}
