@@ -1,0 +1,82 @@
+# ai-toolkit config for the master style LoRA tw_master_v1 (Z-Image Turbo + training adapter).
+# Pattern of tools/gpu/train_v2b.yaml and train_ui_v1.yaml (both trained fine on L40S), scaled per HANDOFF §22:
+# 5 categories with balancing repeats, rank 128, 6000 steps, multi-resolution. Launch via run_train.sh, not by hand.
+job: extension
+config:
+  name: tw_master_v1
+  process:
+    - type: diffusion_trainer
+      training_folder: /workspace/tw/output
+      device: cuda
+      trigger_word: twmaster style
+      network: {type: lora, linear: 128, linear_alpha: 128}
+      # keep every checkpoint: the eval picks the best step (3000..6000), nothing is overwritten
+      save: {dtype: bf16, save_every: 500, max_step_saves_to_keep: 12}
+      # repeats balance categories per pass: heroines 121x2=242, environments 82x2=164, ui 73x2=146,
+      # tiles_fx 61x2=122, scenes 40x3=120 (scenes only if the folder exists, see run_train.sh)
+      datasets:
+        - folder_path: /workspace/tw/data/master_v1/heroines
+          caption_ext: txt
+          caption_dropout_rate: 0.05
+          cache_latents_to_disk: true
+          resolution: [512, 768, 1024]
+          num_repeats: 2
+        - folder_path: /workspace/tw/data/master_v1/environments
+          caption_ext: txt
+          caption_dropout_rate: 0.05
+          cache_latents_to_disk: true
+          resolution: [512, 768, 1024]
+          num_repeats: 2
+        - folder_path: /workspace/tw/data/master_v1/ui
+          caption_ext: txt
+          caption_dropout_rate: 0.05
+          cache_latents_to_disk: true
+          resolution: [512, 768, 1024]
+          num_repeats: 2
+        - folder_path: /workspace/tw/data/master_v1/tiles_fx
+          caption_ext: txt
+          caption_dropout_rate: 0.05
+          cache_latents_to_disk: true
+          resolution: [512, 768, 1024]
+          num_repeats: 2
+        - folder_path: /workspace/tw/data/master_v1/scenes
+          caption_ext: txt
+          caption_dropout_rate: 0.05
+          cache_latents_to_disk: true
+          resolution: [512, 768, 1024]
+          num_repeats: 3
+      train:
+        batch_size: 1
+        steps: 6000
+        gradient_accumulation: 1
+        train_unet: true
+        train_text_encoder: false
+        gradient_checkpointing: true
+        noise_scheduler: flowmatch
+        optimizer: adamw8bit
+        lr: 0.0001
+        dtype: bf16
+        ema_config: {use_ema: false}
+      model:
+        name_or_path: Tongyi-MAI/Z-Image-Turbo
+        arch: zimage
+        assistant_lora_path: ostris/zimage_turbo_training_adapter/zimage_turbo_training_adapter_v2.safetensors
+        quantize: false
+      sample:
+        sampler: flowmatch
+        sample_every: 500
+        width: 832
+        height: 1216
+        prompts:
+          - "twmaster style, heroines, Mahjong-chan, adult woman with long wavy pink twin tails tied with jade knots and sakura flowers, rose-pink eyes, curvy hourglass figure, fitted mint qipao dress with white lace stockings, leaning on a lacquered mahjong table and offering a tile to the viewer with a playful wink, three-quarter view, knees-up, evening teahouse with paper lanterns, anime gacha heroine card art, cute adult Japanese gacha face with soft gradient iris, thin warm-colored lineart, soft painterly shading on a cel-shaded base, matte skin, highlights only in eyes and lips, heroine is the brightest and sharpest element, muted desaturated hazy background, no text"
+          - "twmaster style, environments, moonlit pagoda courtyard after rain, vertical composition, stone lanterns and wet flagstones reflecting warm light, a mahjong table under a carved wooden roof in the lower third, misty pine mountains in the distance, indigo, jade and lantern gold palette, muted desaturated painted anime gacha background, light atmospheric haze, thin warm-colored lineart, soft painterly shading on a cel-shaded base, matte surfaces, empty scene, no characters, no text"
+          - "twmaster style, ui, full mobile game screen mockup, daily rewards sheet, seven graphite lacquer day plates in a grid with thin gold hairlines on top edges, soft gold numerals, one dusty rose primary pill button with dark text at the bottom, near-black night background, elegant editorial serif titles, clean rounded sans ui text, thin monoline icons, calm expensive editorial minimalism, crisp pixel-sharp rendering"
+          - "twmaster style, tiles_fx, top-down view of a mahjong solitaire board, ivory bone tiles with softly rounded bevels and thin inset gold rim lines stacked in three layers on dark jade felt, engraved bamboo and circle motifs, one matched pair glowing with soft gold light motes, painted anime gacha game art, thin warm-colored lineart, soft painterly shading on a cel-shaded base, matte surfaces, restrained highlights, no text, no people"
+          - "twmaster style, scenes, two adult heroines at a lacquered mahjong table seen from the player's seat, Rin with a long dark-green side braid over one shoulder and thin round gold glasses studying her tiles, Hana with a wavy orange bob laughing and pointing at the board, warm lantern light, teahouse salon at night, anime gacha story CG, thin warm-colored lineart, soft painterly shading on a cel-shaded base, matte skin, heroines are the brightest element, muted hazy background, no text"
+          - "twmaster style, heroines, Zlata, adult firebird tsarevna with one thick braid shading from gold to scarlet, ornate red-and-gold pearl kokoshnik with a firebird feather, gold eyes, scarlet corset sarafan with gold folk floral ornament, cream lace stockings, spring festival look with a garland of early blossoms, standing in three-quarter view, knees-up, birch grove in early spring with no snow, anime gacha heroine card art, cute adult Japanese gacha face with soft gradient iris, thin warm-colored lineart, soft painterly shading on a cel-shaded base, matte skin, muted desaturated hazy background, no text"
+        neg: ''
+        seed: 42
+        walk_seed: true
+        guidance_scale: 1
+        sample_steps: 8
+meta: {name: tw_master_v1}
