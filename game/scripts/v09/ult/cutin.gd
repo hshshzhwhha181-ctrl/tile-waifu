@@ -93,6 +93,7 @@ var _face_px: = Rect2()
 var _art_c: = Vector2.ZERO
 var _art_s: = 1.0
 var _eye_s: = 1.0
+const EYE_MAX_ZOOM: = 1.35
 var streaks: Node2D
 var _streak_x0: Array = []
 var _streak_v: Array = []
@@ -539,7 +540,9 @@ func _build_eyes() -> void :
 	eye_art.polygon = _eye_pts
 	eye_art.texture = _tex
 	eye_art.antialiased = true
-	_eye_s = W * 0.82 / _face_px.size.x
+	# 0.9 fix: the close-up was ~2.3× the 859 px painting and went soft; cap the magnification (the push adds 8 %)
+	# and widen the crop instead, so the eye line stays as crisp as the tiles beside it
+	_eye_s = minf(W * 0.82 / _face_px.size.x, EYE_MAX_ZOOM)
 	eye_art.uv = _uv(_eye_pts, Vector2.ZERO, _eye_px(), _eye_s)
 	eye.add_child(eye_art)
 	for top in [true, false]:

@@ -164,7 +164,7 @@ func _panel() -> void :
 	nx.size = Vector2(320, 24)
 	panel.add_child(nx)
 	var bt2: = V6Heroines.bond_text(h)
-	var perk: = _fit_label("За столом: " + bt2.substr(bt2.find("·") + 2) if "·" in bt2 else "Симпатия 4 / 7 / 10 ускоряет её умение", 16, Color("cfc3d8"), 320.0)
+	var perk: = _fit_label("За столом: " + bt2.substr(bt2.find("·") + 2) if "·" in bt2 else "Симпатия 4 / 7 / 10 ускоряет её ульту", 16, Color("cfc3d8"), 320.0)
 	perk.position = Vector2(20, 174)
 	perk.size = Vector2(320, 24)
 	panel.add_child(perk)

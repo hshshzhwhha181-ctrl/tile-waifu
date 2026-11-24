@@ -8,6 +8,8 @@ varying vec2 buv;
 uniform float dim = 0.0;
 uniform float sel = 0.0;
 uniform float flash = 0.0;
+// flash never whites the tile out (HEROINES §2 «без белых вспышек»): a palette glaze capped at 38% + rim glow
+uniform vec3 flash_col = vec3(1.0, 0.8, 0.52);
 uniform float shine = -1.0;
 uniform float ice = 0.0;
 uniform float gold = 0.0;
@@ -70,6 +72,8 @@ void fragment() {
 	col += neon * edge * vec3(0.2, 0.9, 1.0) * (0.6 + 0.4 * sin(TIME * 3.0));
 	float band = exp(-pow((buv.x + buv.y * 0.5 - shine) / 0.09, 2.0));
 	col += band * 0.45;
-	col = mix(col, vec3(1.0, 0.98, 0.94), flash);
+	float fl = clamp(flash, 0.0, 1.0);
+	col = mix(col, col * 0.7 + flash_col * 0.5, fl * 0.38);
+	col += fl * edge * flash_col * 0.55;
 	COLOR = vec4(col, c.a) * vcol;
 }

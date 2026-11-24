@@ -154,10 +154,10 @@ func _build_chip() -> void :
 	hit.tooltip_text = d.name
 	chip.add_child(hit)
 	hit.gui_input.connect( func(e):
-		if (e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT) or (e is InputEventScreenTouch and e.pressed):
+		# left press only (a tap also arrives as an emulated ScreenTouch and fired twice)
+		if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT:
 			hit.accept_event()
-			Sfx.play("pop")
-			UI.punch(chip, 0.12)
+			V9Feel.press(chip)
 			_pulse(d.name)
 			if play.stage:
 				play.stage.say_text(d.long, 4.5))

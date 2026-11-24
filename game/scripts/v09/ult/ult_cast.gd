@@ -296,7 +296,10 @@ func begin(auto: = false) -> void :
 	var pal: = palette()
 	var mode: = cutin_mode()
 	_last_line = pick_line(_last_line)
-	_mark_seen()
+	# the day's «first ult» is spent only by a clip that actually plays in full (a ranked, «коротко», «выкл» or
+	# «Эффекты: минимум» cast leaves it for the next casual one — HEROINES §2)
+	if mode == "full":
+		_mark_seen()
 	var buffered: Array = []
 	_applied = false
 	if mode == "off":
@@ -501,8 +504,13 @@ func _show_pill(pal: Dictionary) -> void :
 	tw.tween_property(_pill, "scale", Vector2.ONE, 0.22).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	Sfx.play("summon_charge", 1.6, -12)
 	# the action buttons under the prompt step back while she aims
+	# (and stop taking taps: a faded button must not pop, buzz or flip the sound unseen)
 	for b in _bottom_btns():
 		b.create_tween().tween_property(b, "modulate:a", 0.0, 0.12)
+		if b is Control:
+			if not (b as Control).has_meta("v9_aim_mf"):
+				(b as Control).set_meta("v9_aim_mf", (b as Control).mouse_filter)
+			(b as Control).mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 
 func _bottom_btns() -> Array:
@@ -516,7 +524,11 @@ func _bottom_btns() -> Array:
 
 func _hide_pill() -> void :
 	for b in _bottom_btns():
-		b.create_tween().tween_property(b, "modulate:a", 1.0, 0.18)
+		var a: = 0.6 if b is JButton and (b as JButton).disabled else 1.0
+		b.create_tween().tween_property(b, "modulate:a", a, 0.18)
+		if b is Control and (b as Control).has_meta("v9_aim_mf"):
+			(b as Control).mouse_filter = int((b as Control).get_meta("v9_aim_mf"))
+			(b as Control).remove_meta("v9_aim_mf")
 	for n in [_pill, _frame]:
 		if n and is_instance_valid(n):
 			var tw: = (n as CanvasItem).create_tween()
@@ -832,7 +844,10 @@ func _take(pr: Array, col: Color) -> void :
 			Fx.burst(lay, (pa + pb) * 0.5, "sparkle", n, col.lightened(0.4), 1.0)
 	Sfx.play("pop", 1.25, -6)
 	play.v9_from_ult = true
+	var keep_tint: Color = bd.vanish_tint
+	bd.vanish_tint = V9Cutin.flash_color(col)
 	bd._vanish_pair(a, b)
+	bd.vanish_tint = keep_tint
 	play.v9_from_ult = false
 
 

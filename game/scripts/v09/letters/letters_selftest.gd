@@ -195,6 +195,14 @@ static func _zones() -> void:
 		check(V9Touch.classify(g, Vector2(float(rig.feet.x), float(rig.waist_y) + 120.0)) == "body", "%s rig: hips are not a zone" % h)
 		check(V9Touch.classify(g, Vector2(float(rig.feet.x), float(rig.feet.y) - 200.0)) == "body", "%s rig: legs are not a zone" % h)
 		check(V9Touch.classify(g, Vector2(-300, 600)) == "bg", "%s rig: the room" % h)
+		# 0.9 fix: the chest sides and the hips never react, whatever hand / band circle is near
+		var cc: Vector2 = rig.chest_c
+		var crx: float = (rig.chest_r as Vector2).x
+		var sides_ok: = true
+		for p in [cc, cc + Vector2(crx * 0.6, 0), cc - Vector2(crx * 0.6, 0), Vector2(cc.x, float(rig.waist_y) + 60.0)]:
+			if V9Touch.classify(g, p) != "body":
+				sides_ok = false
+		check(sides_ok, "%s rig: chest sides and hips are body" % h)
 	var vg: = V9Touch.video_geom()
 	check(V9Touch.classify(vg, Vector2(373, 316)) == "head", "video: head")
 	check(V9Touch.classify(vg, Vector2(505, 398)) == "hand", "video: hand (the tile)")
@@ -206,6 +214,19 @@ static func _zones() -> void:
 	check(V9Touch.classify(ag, Vector2(430, 500)) == "body", "painting: the middle of the torso is not a zone")
 	check(V9Touch.classify(ag, Vector2(430 - 170, 450)) == "outfit", "painting: shoulder / sleeve")
 	check(not ag.has("hand"), "painting: no hand zone")
+	# every outfit painting: the chest and the hips / thighs below the shoulder band are «body», never «outfit»
+	var bad: = []
+	for key in V9Ults.RECTS:
+		var fr: Rect2 = V9Ults.RECTS[key][0]
+		var pg: = V9Touch.art_geom(fr, key)
+		var sq: = fr.size.x
+		var cx: float = pg.cx
+		for p in [Vector2(cx, fr.end.y + sq * 0.4), Vector2(cx - sq * 0.3, fr.end.y + sq * 0.4), Vector2(cx + sq * 0.3, fr.end.y + sq * 0.4),
+				Vector2(cx, fr.end.y + sq * 1.6), Vector2(cx - sq * 0.5, fr.end.y + sq * 1.6), Vector2(cx + sq * 0.5, fr.end.y + sq * 1.6)]:
+			if V9Touch.classify(pg, p) != "body":
+				bad.append(key)
+				break
+	check(bad.is_empty(), "paintings: chest and hips are body (%s)" % ", ".join(bad))
 
 
 static func _taps() -> void:

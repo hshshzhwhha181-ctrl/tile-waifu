@@ -90,7 +90,7 @@ func build(m, _args: Dictionary) -> void :
 		hero.visible = false
 		live_mode = "art"
 		live_opts.merge({"art": art, "tex_size": Vector2(otex.get_width(), otex.get_height()), "focus": Vector2(float(ofc[0]), 0.4),
-			"face_rect": _face_rect(oid, otex, ofc)})
+			"face_rect": _face_rect(oid, otex, ofc), "art_key": okey})
 	live = V9HomeLive.make(self, live_mode, live_opts)
 	_build_left()
 	_build_right()
@@ -175,8 +175,7 @@ func _side_button(icon: String, text: String, rect: Rect2, cb: Callable, badge) 
 		t.tween_property(d, "scale", Vector2.ONE, 0.45).set_trans(Tween.TRANS_SINE)
 	c.gui_input.connect( func(e):
 		if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT:
-			Sfx.play("pop")
-			UI.punch(c, 0.15)
+			V9Feel.press(c)
 			cb.call())
 	add_child(c)
 	return c
@@ -259,8 +258,7 @@ func _build_right() -> void :
 			x2.add_child(UI.center_label(UI.label("×2", 16, Color.WHITE, Color("6a1020"), 2, "body", 900), Rect2(0, 0, 64, 26)))
 		c1.gui_input.connect( func(e):
 			if e is InputEventMouseButton and e.pressed:
-				Sfx.play("pop")
-				UI.punch(c1, 0.06)
+				V9Feel.press(c1)
 				main.go("v7event"))
 		UI.slide_in(c1, Vector2(60, 0), 0.28)
 		slot2.append(c1)
@@ -278,8 +276,7 @@ func _build_right() -> void :
 			nb = _banner_card(Rect2(x, y, CARD_W, 168), G.art_tex(G.ITEM["n_ssr"]), "БАННЕР", V6Txt.s("home.event_name"), V6Txt.s("home.event_left"), "lav", Vector2(0.5, 0.25))
 			nb.gui_input.connect( func(e):
 				if e is InputEventMouseButton and e.pressed:
-					Sfx.play("pop")
-					UI.punch(nb, 0.06)
+					V9Feel.press(nb)
 					main.go("summon", {"banner": 2}))
 		UI.slide_in(nb, Vector2(60, 0), 0.34)
 		slot2.append(nb)
@@ -374,8 +371,7 @@ func _league_card(r: Rect2) -> Control:
 	c.add_child(pt)
 	c.gui_input.connect( func(e):
 		if e is InputEventMouseButton and e.pressed:
-			Sfx.play("pop")
-			UI.punch(c, 0.06)
+			V9Feel.press(c)
 			main.go("v7tourney", {"tab": "week"}))
 	return c
 

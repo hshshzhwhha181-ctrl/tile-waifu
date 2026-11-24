@@ -166,17 +166,15 @@ static func punch(n, amount: = 0.18, dur: = 0.35) -> void :
 	t.tween_property(n, "scale", Vector2.ONE * (1.0 + amount), dur * 0.3).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	t.tween_property(n, "scale", Vector2.ONE, dur * 0.7).set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
 
-# 0.8: one tap response for every card that is not a JButton (gui_input lambdas): sound, scale punch, haptic
-static func tap(n, amount: = 0.06, sound: = "pop") -> void :
-	if sound != "":
-		Sfx.play(sound, randf_range(0.95, 1.08))
-	if n is CanvasItem and is_instance_valid(n):
-		punch(n, amount, 0.3)
-	var ml: = Engine.get_main_loop()
-	if ml is SceneTree:
-		var hp = (ml as SceneTree).root.get_node_or_null("V7Haptics")
-		if hp:
-			hp.kind("button")
+# one tap response for every card that is not a JButton (gui_input lambdas). 0.9 (spec §A): a thin wrapper over
+# V9Feel — the same dip to 0.94 + spring, click and haptic as JButtons; sound "deny" answers with V9Feel.deny.
+# `amount` is kept for old callers (the press depth is V9Feel.PRESS_SCALE everywhere now).
+static func tap(n, _amount: = 0.06, sound: = "pop") -> void :
+	var node: CanvasItem = n if n is CanvasItem and is_instance_valid(n) else null
+	if sound == "deny":
+		V9Feel.deny(node)
+		return
+	V9Feel.press(node, sound)
 
 static func fmt(n: int) -> String:
 	var s: = str(n)

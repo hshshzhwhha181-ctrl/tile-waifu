@@ -206,11 +206,31 @@ func _card(l: Dictionary) -> Control:
 		t.tween_property(sc, "scale", Vector2.ONE * 1.07, 0.18).set_trans(Tween.TRANS_SINE)
 		t.tween_property(sc, "scale", Vector2.ONE, 0.32).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	var id: = int(l.id)
-	c.gui_input.connect(func(e):
-		if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT:
-			V9Feel.press(c, "pop")
-			open_letter(id))
+	_tap_card(c, func(): open_letter(id))
 	return c
+
+
+# 0.9: cards sit in a scrolling list, so they dip on touch-down but open only on a release that did not scroll
+# (< 14 px of travel, like the album); a finger that starts a scroll on a card springs it back without firing
+func _tap_card(c: Control, cb: Callable) -> void:
+	c.mouse_filter = Control.MOUSE_FILTER_PASS
+	var st: = {"down": false, "at": Vector2.ZERO, "sv": 0}
+	c.gui_input.connect(func(e):
+		if e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT:
+			if e.pressed:
+				st.down = true
+				st.at = e.global_position
+				st.sv = scroll.scroll_vertical
+				V9Feel.press_down(c)
+			elif st.down:
+				st.down = false
+				var fire: bool = e.global_position.distance_to(st.at) < 14.0 and absi(scroll.scroll_vertical - int(st.sv)) < 14
+				V9Feel.press_up(c, fire)
+				if fire:
+					cb.call()
+		elif e is InputEventMouseMotion and st.down and e.global_position.distance_to(st.at) >= 14.0:
+			st.down = false
+			V9Feel.press_up(c, false))
 
 
 func _legacy_row(e: Dictionary) -> Control:
@@ -243,10 +263,7 @@ func _legacy_row(e: Dictionary) -> Control:
 	tx.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	c.add_child(tx)
 	var hh: String = e.h
-	c.gui_input.connect(func(ev):
-		if ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:
-			V9Feel.press(c, "pop")
-			main.go("room", {"hero": hh}))
+	_tap_card(c, func(): main.go("room", {"hero": hh}))
 	return c
 
 

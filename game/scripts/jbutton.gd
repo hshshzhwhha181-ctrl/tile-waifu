@@ -3,6 +3,8 @@ extends Control
 
 
 signal pressed
+# 0.9: a tap on a disabled button (after its deny shake), so the owner can say why
+signal denied
 var box: RBox
 var lbl: Label
 var sub: Label
@@ -264,6 +266,7 @@ func _deny_shake() -> void :
 func _press_down() -> void :
 	if disabled:
 		_deny_shake()
+		denied.emit()
 		return
 	_down = true
 	box.set_param("pressed", 1.0)

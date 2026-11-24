@@ -746,10 +746,12 @@ func land(pos: Vector2, slot: = 0) -> void :
 func on_match(pos: Vector2, combo: = 1, gold: = false, shard: = "") -> void :
 	var c: = clampi(combo, 1, 12)
 	var warm: = Color(1, 0.86, 0.5) if not gold else Color(1, 0.78, 0.2)
-	burst(pos, "spark", 14 + c * 3, warm, 1.0 + c * 0.06)
-	burst(pos, "chip", 8 + mini(c, 6), Color(1, 0.98, 0.94), 1.0)
-	burst(pos, "glint", 3 + c, Color(1, 0.95, 0.85), 1.0)
-	glow(pos, warm, 1.6 + c * 0.12, 0.3)
+	# 0.9: no white-out over the tray (HEROINES §2 «без белых вспышек»): cream chips, a few glints and an additive
+	# glow in a ≤ 70 %-value warm tint that stays about one tile wide
+	burst(pos, "spark", 10 + c * 2, warm, 1.0 + c * 0.04)
+	burst(pos, "chip", 6 + mini(c, 4), Color(1, 0.88, 0.7), 1.0)
+	burst(pos, "glint", 2 + mini(c, 6) / 2, Color(1, 0.88, 0.7), 0.9)
+	glow(pos, Color(V9Cutin.flash_color(warm), 0.75), 1.2 + mini(c, 8) * 0.05, 0.28)
 	# 0.9: the chime climbs the same semitone ladder as the board's match chime (Sfx.combo_step), so the two
 	# never clash; the thump stays put and only gets a touch louder
 	layers([["thump", 1.0, -9.0 + mini(c, 6) * 0.6], ["chime0", Sfx.combo_pitch(combo), -13.0, 0.02]])

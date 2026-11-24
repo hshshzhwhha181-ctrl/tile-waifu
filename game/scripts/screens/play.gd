@@ -212,6 +212,17 @@ func _v6_setup(_args: Dictionary) -> bool:
 func _slot_count() -> int:
 	return V7Passives.slots(partner, 6 if mode == "zen" else 4)
 
+# a Node2D right under the board (above the backdrop and the table felt): decor that must stay behind the tiles
+func _v9_under_board_fx() -> Node2D:
+	var n: Node2D = get_node_or_null("V9UnderBoardFx")
+	if n == null:
+		n = Node2D.new()
+		n.name = "V9UnderBoardFx"
+		add_child(n)
+	if board and is_instance_valid(board) and n.get_index() > board.get_index():
+		move_child(n, board.get_index())
+	return n
+
 func _make_board() -> void :
 	if board:
 		board.queue_free()
@@ -419,6 +430,10 @@ func _build_bottom() -> void :
 	btn_hint.pressed.connect(_hint)
 	btn_shuffle = _action("shuffle", V6Txt.s("play.shuffle"), xs[2], "mint")
 	btn_shuffle.pressed.connect(_shuffle)
+	for b in [btn_undo, btn_hint, btn_shuffle]:
+		b.denied.connect( func():
+			if riichi:
+				main.toast(V6Txt.s("play.riichi_locked"), "lock"))
 	# 0.8: sound on / off right in the match (icon/sound, icon/sound_off), bottom left beside the helps
 	btn_sound = _v8_round_btn(V8Art.icon("sound" if _v8_sound_on() else "sound_off"), Rect2(x0, H - 158, 84, 84), 0.6, _v8_toggle_sound)
 
@@ -482,8 +497,10 @@ func _refresh() -> void :
 	_set_badge(btn_undo, undo_n)
 	_set_badge(btn_shuffle, shuffle_n)
 
+	# 0.9: riichi locks the helps for real (JButton dims them and answers a tap with a deny; `denied` says why)
 	for b in [btn_hint, btn_undo, btn_shuffle]:
-		b.modulate = Color(0.55, 0.5, 0.6, 0.8) if riichi else Color.WHITE
+		if b.disabled != riichi:
+			b.disabled = riichi
 	_check_riichi()
 	var danger: = board.tray.size() >= maxi(3, board.slots - 1)
 	if danger and not _v6_danger and stage:
@@ -767,10 +784,14 @@ func _on_match(mid: Vector2, combo: int, gold: bool, shard: String) -> void :
 		_open_gift(mid)
 	if combo == 5:
 		G.task_add("combo5")
-	Fx.flash_glow(fx_layer, mid, Color(1, 0.95, 0.8), 2.4, 0.35)
-	Fx.ring(fx_layer, mid, Color(1, 0.85, 0.5), 1.4)
-	Fx.burst(fx_layer, mid, "sparkle", 16 + combo * 4, Color(1, 0.9, 0.55) if not gold else Color(1, 0.8, 0.2), 1.0 + combo * 0.1)
-	Fx.burst(fx_layer, mid, "petal", 8 + combo * 2)
+	# 0.9: one hero effect per pair — a palette glow (heroine colour, value ≤ 70 %, never white), a ring and a few
+	# sparkles; petals only from ×3 (the combo pill and the tier stamps carry the rest)
+	if V9Feel.can_fx():
+		Fx.flash_glow(fx_layer, mid, Color(V9Cutin.flash_color(G.HEROES[partner].color), 0.8), 1.4, 0.3)
+	Fx.ring(fx_layer, mid, Color(1, 0.85, 0.5), 1.1)
+	Fx.burst(fx_layer, mid, "sparkle", 8 + mini(combo, 8) * 2, Color(1, 0.9, 0.55) if not gold else Color(1, 0.8, 0.2), 1.0 + mini(combo, 8) * 0.05)
+	if combo >= 3:
+		Fx.burst(fx_layer, mid, "petal", 4 + mini(combo, 6))
 	Fx.float_text(fx_layer, mid + Vector2(0, 40), "+%d" % gain, Color("fff3c4") if not gold else Color("ffd34d"), 34 if not gold else 44)
 	UI.punch(gems_lbl, 0.25)
 	if shard != "":
@@ -787,8 +808,10 @@ func _on_match(mid: Vector2, combo: int, gold: bool, shard: String) -> void :
 		if combo >= 3:
 			Sfx.play("combo", 1.0 + combo * 0.03)
 		if cfg.fx == "lanterns":
+			# 0.9: the lantern fireworks bloom behind the tiles (a layer under the board), never over them
+			var bgl: = _v9_under_board_fx()
 			for i in min(combo, 4):
-				Fx.burst(fx_layer, Vector2(randf_range(80, W - 80), randf_range(380, 700)), "firework", 50, Color.from_hsv(randf(), 0.6, 1.0), 1.0)
+				Fx.burst(bgl, Vector2(randf_range(80, W - 80), randf_range(board_rect.position.y + 60.0, board_rect.end.y - 60.0)), "firework", 40, Color.from_hsv(randf(), 0.55, 0.9), 1.0)
 			Sfx.play("sparkle", 0.8)
 	else:
 		charge = min(1.0, charge + 0.06)
@@ -1077,6 +1100,7 @@ func _v8_source() -> String:
 
 func _hint() -> void :
 	if not board.input_on:
+		V9Feel.deny(btn_hint)
 		return
 	if riichi:
 		main.toast(V6Txt.s("play.riichi_locked"), "lock")
@@ -1107,11 +1131,13 @@ func _v8_do_hint(paid: bool) -> void :
 
 func _undo() -> void :
 	if not board.input_on:
+		V9Feel.deny(btn_undo)
 		return
 	if riichi:
 		main.toast(V6Txt.s("play.riichi_locked"), "lock")
 		return
 	if board.history.is_empty():
+		V9Feel.deny(btn_undo)
 		main.toast(V8PlayRules.T.undo_none, "undo")
 		return
 	if undo_n <= 0:
@@ -1135,6 +1161,7 @@ func _v8_do_undo(paid: bool) -> void :
 
 func _shuffle() -> void :
 	if not board.input_on:
+		V9Feel.deny(btn_shuffle)
 		return
 	if riichi:
 		main.toast(V6Txt.s("play.riichi_locked"), "lock")
@@ -1505,22 +1532,28 @@ func _check_riichi() -> void :
 	var left: = board.board_count()
 	if left > 0 and left <= 16 and board.tray.is_empty() and left < board.tiles.size() * 0.6:
 		riichi_offered = true
-		riichi_btn = JButton.make(V6Txt.s("play.riichi"), "red", Rect2(W - 150, H - 166, 140, 92), null, 26)
-		riichi_btn.set_sub(V6Txt.s("play.riichi_sub"), 16)
+		_riichi_make()
 		riichi_btn.pulse = true
 		riichi_btn.shine_every = 1.2
-		riichi_btn.z_index = 40
 		riichi_btn.pressed.connect(_declare_riichi)
-		add_child(riichi_btn)
 		UI.pop_in(riichi_btn, 0.0, 0.3)
 		Sfx.play("pop", 0.8)
 
 func _check_riichi_force() -> void :
 	riichi_offered = true
-	riichi_btn = JButton.make(V6Txt.s("play.riichi"), "red", Rect2(W - 150, H - 166, 140, 92), null, 26)
+	_riichi_make()
+
+# 0.9: the riichi offer takes the sound button's slot at the left end of the button row (a round gold-rim badge
+# the size of the helps), so it never overlaps a booster; the sound toggle comes back once riichi is declared
+func _riichi_make() -> void :
+	var d: = 108.0
+	var cx: = btn_sound.position.x + btn_sound.size.x * 0.5 if btn_sound else 117.0
+	riichi_btn = JButton.make(V6Txt.s("play.riichi"), "gold", Rect2(cx - d * 0.5, H - 170, d, d), null, 22, d * 0.5)
 	riichi_btn.set_sub(V6Txt.s("play.riichi_sub"), 16)
 	riichi_btn.z_index = 40
 	add_child(riichi_btn)
+	if btn_sound:
+		btn_sound.visible = false
 
 func _declare_riichi() -> void :
 	if riichi:
@@ -1528,6 +1561,8 @@ func _declare_riichi() -> void :
 	riichi = true
 	riichi_btn.queue_free()
 	riichi_btn = null
+	if btn_sound:
+		btn_sound.visible = true
 	Sfx.play("fever", 1.15)
 	var rib: = Common.ribbon(self, V6Txt.s("play.riichi"), Rect2(0, 0, 400, V8_BAND_H), "red", 34)
 	remove_child(rib)
@@ -2068,8 +2103,8 @@ func _victory(stars: int, reward: int, secs: float, first: bool) -> void :
 		rank_box = v8_res_rank(ctx, {})
 	# 0.9: the yaku stamps come after the stars, the reward roll and the rank bar, one per beat
 	_v9_yaku_at = V9_STAR_AT + V9_BEAT * mini(stars, 3) + (0.25 + V9_RANK_FILL if rank_box else 0.5)
+	# (the chip tweens read _v9_yaku_at while they are built, so the computed beat holds; no reset afterwards)
 	ctx.y = _v8_yaku_chips(plate, V8_RES_PAD, ctx.y, pw - V8_RES_PAD * 2.0) + 4.0
-	_v9_yaku_at = 1.3
 	# 0.8: the album chip («Альбом: +N марок») sits inside the panel, right under the yaku, not hanging off its edge
 	var album_y: = -1.0
 	if not (V7Album.st().new as Array).is_empty():

@@ -31,6 +31,8 @@ const IDLE_LINE: = 24.0
 const IDLE_LINES_MAX: = 2
 const BUBBLE_X: = 114.0
 const BUBBLE_W: = 300.0
+# the bubble never rises over the clock plate
+const BUBBLE_TOP: = 186.0
 const AV: = 80.0
 const ZONE_EMO: = {"head": "shy", "hand": "happy", "outfit": "happy", "bg": "surprised", "spam": "pout", "idle": "happy"}
 # the face patch: the emotion portrait shows only inside a soft ellipse around her face, so hair, body and pose stay
@@ -112,7 +114,7 @@ static func make(h_: Control, mode_: String, opts: Dictionary) -> V9HomeLive:
 			l.art = opts.art
 			l.art_tex = opts.tex_size
 			l.art_focus = opts.focus
-			l.geom = V9Touch.art_geom(opts.face_rect)
+			l.geom = V9Touch.art_geom(opts.face_rect, str(opts.get("art_key", "")))
 		"video":
 			l.video = opts.get("video")
 			l.geom = V9Touch.video_geom()
@@ -209,10 +211,8 @@ func _tap(p: Vector2, force: = "") -> void:
 	var zone: = force if force != "" else zone_at(p)
 	var d: = touch.decide(zone, _t)
 	if d.kind == "quiet":
-		if zone != "bg":
-			_bump(0.35)
-			V9Feel.haptic("tap")
-			V9Feel.sound("tap", 1.0 + randf() * 0.1, -10)
+		# 0.9 (spec §C): a tap on «body» (chest, hips, legs) gets no physical answer at all — no squash, no haptic, no
+		# sound; it only counts toward the «не так быстро» spam line (decide() keeps the tally)
 		return
 	_react(d, p)
 
@@ -281,7 +281,7 @@ func show_emotion(emo: String, hold: = PATCH_HOLD) -> void:
 		return
 	if mode != "rig":
 		if bubble and is_instance_valid(bubble) and bubble.has_meta("av"):
-			_set_avatar(bubble, en)
+			_set_avatar(bubble, V8Art.emo_name(_paint_emo(en)))
 		return
 	if not V8Art.has_emotion(hid, en) or hero == null:
 		return
@@ -362,8 +362,19 @@ func say(text: String, emo: = "", voice: = "", talk: = true) -> void:
 	var with_av: = mode != "rig"
 	# the lobby video frames her head high: the bubble sits right under the clock plate and only grazes her hair
 	var head: = from_art(geom.head)
-	var y: = 176.0 if mode == "video" else maxf(head.y - 250.0, 186.0)
-	bubble = _bubble(text, Vector2(BUBBLE_X, y), emo, with_av)
+	var pos: = Vector2(BUBBLE_X, 176.0)
+	var tail_up: = false
+	if mode != "video":
+		# 0.9: anchored by its bottom edge to a line above her face, so extra lines grow upward; when there is no
+		# room under the clock plate it hangs just under her chin with the tail pointing up — never over her eyes
+		var hr: float = (from_art(geom.head + Vector2(0, float(geom.head_r))) - head).y
+		var h: = _bubble_h(text, with_av)
+		print("DBG bubble head=", head, " hr=", hr, " h=", h)
+		pos.y = head.y - hr - 30.0 - h
+		if pos.y < BUBBLE_TOP:
+			pos.y = head.y + hr * 0.85 + 26.0
+			tail_up = true
+	bubble = _bubble(text, pos, _paint_emo(emo) if with_av else emo, with_av, tail_up, head.x - pos.x)
 	home.set("bubble", bubble)
 	var dur: = minf(0.4 + text.length() * 0.045, 4.0)
 	if talk and voice != "" and G.S.get("sound", true) and G.S.get("voice", true):
@@ -382,7 +393,21 @@ func say(text: String, emo: = "", voice: = "", talk: = true) -> void:
 
 
 # Common.bubble's look; with `av` a round emotion portrait sits in the bubble's left part (painting / video modes)
-func _bubble(text: String, pos: Vector2, emo: String, av: bool) -> Control:
+func _bubble_h(text: String, av: bool) -> float:
+	var w: = BUBBLE_W + (AV - 6.0 if av else 0.0)
+	var tx: = (AV + 8.0) if av else 18.0
+	var tw: = w - tx - 18.0
+	var th: float = UI.font("body", 800).get_multiline_string_size(text, HORIZONTAL_ALIGNMENT_CENTER, tw - 4.0, 22, -1, TextServer.BREAK_MANDATORY | TextServer.BREAK_WORD_BOUND | TextServer.BREAK_ADAPTIVE).y
+	return maxf(AV + 12.0 if av else 56.0, 30.0 + th)
+
+
+# the painting keeps its own smile: the bubble portrait never contradicts it with a sulk or tears (a tease reads «shy»)
+func _paint_emo(emo: String) -> String:
+	var en: = V8Art.emo_name(emo) if emo != "" else ""
+	return "shy" if en in ["pout", "sad"] else emo
+
+
+func _bubble(text: String, pos: Vector2, emo: String, av: bool, tail_up: = false, tail_x: = -1.0) -> Control:
 	var w: = BUBBLE_W + (AV - 6.0 if av else 0.0)
 	var tx: = (AV + 8.0) if av else 18.0
 	var tw: = w - tx - 18.0
@@ -390,11 +415,14 @@ func _bubble(text: String, pos: Vector2, emo: String, av: bool) -> Control:
 	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.position = pos
 	root.name = "V9Bubble"
-	var th: float = UI.font("body", 800).get_multiline_string_size(text, HORIZONTAL_ALIGNMENT_CENTER, tw - 4.0, 22, -1, TextServer.BREAK_MANDATORY | TextServer.BREAK_WORD_BOUND | TextServer.BREAK_ADAPTIVE).y
-	var h: float = maxf(AV + 12.0 if av else 56.0, 30.0 + th)
+	var h: = _bubble_h(text, av)
 	var tail: = Polygon2D.new()
 	tail.color = Color(0.12, 0.11, 0.13, 0.97)
-	tail.polygon = PackedVector2Array([Vector2(w - 80, h - 6), Vector2(w - 40, h - 6), Vector2(w - 30, h + 22)])
+	if tail_up:
+		var tc: = clampf(tail_x, 60.0, w - 40.0) if tail_x >= 0.0 else w - 50.0
+		tail.polygon = PackedVector2Array([Vector2(tc - 22, 6), Vector2(tc + 18, 6), Vector2(tc + 4, -22)])
+	else:
+		tail.polygon = PackedVector2Array([Vector2(w - 80, h - 6), Vector2(w - 40, h - 6), Vector2(w - 30, h + 22)])
 	root.add_child(tail)
 	var b: = UI.rbox("cream", Rect2(0, 0, w, h), 24, 3, 12)
 	b.set_param("border_top", Color("e8c9a0")).set_param("border_bottom", Color("a8697a"))
@@ -412,7 +440,7 @@ func _bubble(text: String, pos: Vector2, emo: String, av: bool) -> Control:
 		root.set_meta("av", true)
 		_set_avatar(root, V8Art.emo_name(emo) if emo != "" else "happy", Vector2(8, (h - AV) * 0.5))
 	root.size = Vector2(w, h)
-	root.pivot_offset = Vector2(w * 0.7, h)
+	root.pivot_offset = Vector2(w * 0.7, 0.0 if tail_up else h)
 	home.add_child(root)
 	root.scale = Vector2(0.4, 0.4)
 	root.modulate.a = 0

@@ -346,8 +346,7 @@ func _level_node(it: Dictionary) -> Control:
 		t.tween_property(c, "scale", Vector2(1.08, 1.08), 0.6).set_trans(Tween.TRANS_SINE)
 		t.tween_property(c, "scale", Vector2.ONE, 0.6).set_trans(Tween.TRANS_SINE)
 	_tap(c, func():
-		Sfx.play("pop")
-		UI.punch(c, 0.1)
+		V9Feel.press(c)
 		open_card(i))
 	return c
 
@@ -381,8 +380,7 @@ func _boss_node(it: Dictionary) -> Control:
 		t.tween_property(c, "scale", Vector2(1.06, 1.06), 0.7).set_trans(Tween.TRANS_SINE)
 		t.tween_property(c, "scale", Vector2.ONE, 0.7).set_trans(Tween.TRANS_SINE)
 	_tap(c, func():
-		Sfx.play("pop")
-		UI.punch(c, 0.08)
+		V9Feel.press(c)
 		open_card(i))
 	return c
 
@@ -428,8 +426,7 @@ func _chest_tap(c: Control, w: int, kind: String) -> void :
 		main.toast("Сундук уже открыт", "gift")
 		return
 	if not V6Worlds.chest_ready(w, kind):
-		Sfx.play("deny")
-		UI.punch(c, 0.08)
+		V9Feel.deny(c)
 		main.toast(V6Worlds.chest_need_text(w, kind), "gift")
 		return
 	var r: = V6Worlds.open_chest(w, kind)
@@ -883,18 +880,41 @@ func pick_partner(level: int) -> void :
 			row.add_child(hl0)
 			Common.progress_bar(row, Rect2(128, 78, 300, 18), float(sh) / G.SHARDS_NEED, "gold")
 			row.modulate = Color(1, 1, 1, 0.85)
+			# 0.9: a locked heroine answers a tap with a clear «no» (shake, deny sound and haptic) and how to unlock her
+			var hn: String = G.HEROES[h].name
+			row.gui_input.connect( func(e):
+				if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT:
+					V9Feel.deny(row)
+					main.toast(_t("levels.locked_hero", "%s ещё не с тобой: собери портрет из осколков") % hn, "lock"))
 			continue
 		var nl: = UI.label(G.HEROES[h].name, 26, UI.INK, Color.WHITE, 3, "body", 900)
 		nl.position = Vector2(132, 12)
 		row.add_child(nl)
 		Common.chip(row, V8Art.icon("heart"), "ур. %d" % G.aff_level(h), Rect2(450, 14, 140, 40), "pink", 18)
-		var pk_t: String = _t("levels.skill", "Умение «%s»: %s") % [G.SKILLS[h].name, G.SKILLS[h].desc]
+		# 0.9 (spec §B): one name for the ability everywhere — «Ульта», named per equipped outfit (HEROINES §5)
+		var u_id: = V9Ults.for_hero(h)
+		var u_name: String = String(V9Ults.get_ult(u_id).get("name", G.SKILLS[h].name))
+		var u_mod: = V9Ults.mod(u_id)
+		var pk_t: String = _t("levels.skill", "Ульта «%s»: %s") % [u_name, String(V9Ults.core(h).get("desc", G.SKILLS[h].desc))]
+		var pk_w: = 452.0 if u_mod == "" else 408.0
 		var pk_fs: = 17
-		while pk_fs > 16 and UI.font("body", 900).get_string_size(pk_t, HORIZONTAL_ALIGNMENT_LEFT, -1, pk_fs).x > 452.0:
+		while pk_fs > 16 and UI.font("body", 900).get_string_size(pk_t, HORIZONTAL_ALIGNMENT_LEFT, -1, pk_fs).x > pk_w:
 			pk_fs -= 1
 		var pk: = UI.label(pk_t, pk_fs, Color("ffd98a"), UI.DARK, 2, "body", 900)
 		pk.position = Vector2(132, 52)
-		pk.size = Vector2(452, 28)
+		pk.size = Vector2(pk_w, 28)
+		if u_mod != "":
+			# the outfit modifier as a small gold-rim letter badge (П/О/Л/В/Ц/С)
+			var mb: = UI.rbox("gold", Rect2(132 + pk_w + 8, 50, 34, 34), 17, 2, 4)
+			mb.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			mb.tooltip_text = String(V9Ults.MODS.get(u_mod, {}).get("name", ""))
+			row.add_child(mb)
+			var ml: = UI.label(u_mod, 18, UI.DARK, Color.WHITE, 0, "body", 900)
+			ml.size = mb.size
+			ml.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			ml.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+			ml.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			mb.add_child(ml)
 		pk.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 		pk.clip_text = true
 		row.add_child(pk)
@@ -916,8 +936,7 @@ func pick_partner(level: int) -> void :
 					var r: RBox = partner_rows[k]
 					if not G.hero_unlocked(k):
 						continue
-					_pick_style(r, k == h)
-				UI.punch(row, 0.06))
+					_pick_style(r, k == h))
 		if h == cur_h[0]:
 			_pick_style(row, true)
 	partner_go_btn = JButton.make(_t("levels.deal", "Раздать фишки"), "pink", Rect2(130, p.size.y - 120, 400, 96), null, 32)

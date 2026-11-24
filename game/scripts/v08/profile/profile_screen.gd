@@ -156,7 +156,7 @@ func _fit(l: Label, kind: String, big: int, small: int) -> void :
 
 
 func _rank() -> void :
-	var c: = _section(206)
+	var c: = _section(234)
 	var rp: = int(G.S.get("rp", 0))
 	var ri: = G.rank_of(rp)
 	var rk: Dictionary = G.RANKS[ri.tier]
@@ -178,6 +178,9 @@ func _rank() -> void :
 	_lbl(c, V8ProfileUI.s("profile.rank_total") % rp, Vector2(180, 138), 17, UI.MUTED, cw - 206)
 	var note: = _lbl(c, V8ProfileUI.s("profile.rank_note"), Vector2(24, 166), 16, Color(0.75, 0.7, 0.65, 0.75), cw - 48)
 	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	# 0.9 (spec §B, HEROINES §2): ranked play is outfit-neutral, and the profile says so
+	var fair: = _lbl(c, V8ProfileUI.s("profile.ranked_outfits"), Vector2(24, 194), 16, Color("ffd98a"), cw - 48)
+	fair.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 
 
 func _league() -> void :

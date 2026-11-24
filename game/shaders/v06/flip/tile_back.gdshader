@@ -1,6 +1,6 @@
 shader_type canvas_item;
 // v06:flip — back of a face-down tile. ready = free and waiting for a tap: the crest breathes
-// and a soft light sweep crosses the lacquer every few seconds. flash = white-out at the flip midpoint.
+// and a soft light sweep crosses the lacquer every few seconds. flash = warm glaze at the flip midpoint (capped, never a white-out).
 varying vec4 vcol;
 void vertex() { vcol = COLOR; }
 uniform float ready = 0.0;
@@ -19,6 +19,6 @@ void fragment() {
 	float band = exp(-pow((UV.x + UV.y * 0.55 - sw) / 0.08, 2.0)) * ready * 0.32;
 	band += exp(-pow((UV.x + UV.y * 0.55 - shine) / 0.09, 2.0)) * 0.45;
 	col += band * vec3(1.0, 0.96, 0.86);
-	col = mix(col, vec3(1.0, 0.98, 0.94), flash);
+	col = mix(col, col * 0.7 + vec3(1.0, 0.8, 0.52) * 0.5, clamp(flash, 0.0, 1.0) * 0.45);
 	COLOR = vec4(col, c.a * vcol.a);
 }

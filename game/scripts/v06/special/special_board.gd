@@ -156,7 +156,9 @@ func tap(t: Tile) -> void :
 		return
 	if is_free(t) and not takeable(t):
 		t.deny()
-		Sfx.play("deny", 0.8)
+		# 0.9: the shared deny (sound + deny haptic) — this board opts out of V7Haptics, so it must buzz itself.
+		# `denied` is not emitted: «blocked» below explains the lock/chain, and a deny would break the streak
+		V9Feel.tile_tap(false)
 		Sfx.play("clack2", 0.7, -6)
 		if icons.has(t):
 			var ic: V6SpecIcon = icons[t]

@@ -474,6 +474,9 @@ func _layout_tray(arriving: Tile = null) -> void :
 		else:
 			t.fly_to(target, sc, 0.16, false)
 
+# glow tint for tiles removed without a tray match (ult / skill); warm gold by default
+var vanish_tint: = Color(1.0, 0.8, 0.52)
+
 func _match(a: Tile, b: Tile) -> void :
 	var tnow: = now()
 	combo = combo + 1 if tnow - last_match < combo_window else 1
@@ -510,10 +513,13 @@ func _match(a: Tile, b: Tile) -> void :
 
 
 func _vanish_pair(a: Tile, b: Tile) -> void :
+	# 0.9: an ult's removal follows the cut-in palette (vanish_tint, set by V9UltCast); the shader caps the glow so the face stays readable
 	for t in [a, b]:
 		t.alive = false
 		t.kill_move()
 		t.z_index = 150
+		if t.mat:
+			t.mat.set_shader_parameter("flash_col", Vector3(vanish_tint.r, vanish_tint.g, vanish_tint.b))
 		var tw: Tween = t.create_tween()
 		tw.tween_property(t, "position", t.position + Vector2(0, -30), 0.15).set_trans(Tween.TRANS_QUAD)
 		tw.parallel().tween_method( func(v): t.mat.set_shader_parameter("flash", v), 0.0, 1.0, 0.15)

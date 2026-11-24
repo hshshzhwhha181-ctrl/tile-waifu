@@ -299,8 +299,7 @@ static func icon_button(parent: Control, icon: String, text: String, rect: Rect2
 		t.tween_property(d, "scale", Vector2.ONE, 0.45).set_trans(Tween.TRANS_SINE)
 	c.gui_input.connect( func(e):
 		if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT:
-			Sfx.play("pop")
-			UI.punch(c, 0.15)
+			V9Feel.press(c)
 			cb.call())
 	parent.add_child(c)
 	return c

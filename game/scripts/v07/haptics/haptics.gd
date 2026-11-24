@@ -126,6 +126,8 @@ func _hook_card(n) -> void :
 		return
 	n.gui_input.connect( func(e):
 		if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT and not n.has_meta("no_haptic"):
+			if V9Feel.haptic_frame == Engine.get_process_frames():
+				return
 			pulse(8, 0.25))
 
 # 0.9: a board that routes its feedback through V9Feel (meta "v9_feel") gets no second set of haptics from here

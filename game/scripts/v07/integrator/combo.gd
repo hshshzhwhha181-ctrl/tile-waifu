@@ -678,8 +678,10 @@ func _milestone(n: int, at: Vector2) -> void :
 	var st = play.stage
 	if st:
 		st.react("big")
-		Fx.burst(play.fx_layer, st.head_pos(), "heart", 8 + mini(n, 12), hero_col.lightened(0.2), 1.0)
-		Fx.flash_glow(play.fx_layer, st.head_pos(), hero_col, 3.0, 0.5)
+		# 0.9: a compact milestone at the portrait (the HUD corner was filling up with rings, confetti and halos)
+		Fx.burst(play.fx_layer, st.head_pos(), "heart", 5 + mini(n, 8) / 2, hero_col.lightened(0.2), 0.9)
+		if V9Feel.can_fx():
+			Fx.flash_glow(play.fx_layer, st.head_pos(), Color(V9Cutin.flash_color(hero_col), 0.8), 1.6, 0.4)
 	var what: = ""
 	var icon: = ""
 	var target: Control = null

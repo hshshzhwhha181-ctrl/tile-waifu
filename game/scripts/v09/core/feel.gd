@@ -66,7 +66,12 @@ static func fx_scale() -> float:
 	return 1.0
 
 
+# the process frame of the last V9Feel haptic: V7Haptics' generic card hook skips its light pulse in that frame,
+# so a press or deny routed here is never overridden (or doubled) by the catch-all tap pulse
+static var haptic_frame: = -1
+
 static func haptic(kind: String) -> void :
+	haptic_frame = Engine.get_process_frames()
 	var tree: = Engine.get_main_loop() as SceneTree
 	if tree == null:
 		return

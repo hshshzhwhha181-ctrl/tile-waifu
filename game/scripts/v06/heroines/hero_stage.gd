@@ -48,7 +48,8 @@ func setup(id: String, rect: Rect2, opts: = {}) -> V6HeroStage:
 	emote_layer.z_index = 5
 	add_child(emote_layer)
 	gui_input.connect( func(e):
-		if (e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT) or (e is InputEventScreenTouch and e.pressed):
+		# left press only: with touch↔mouse emulation one tap also arrives as a ScreenTouch, which fired twice (0.9 fix)
+		if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT:
 			accept_event()
 			pressed.emit())
 	return self

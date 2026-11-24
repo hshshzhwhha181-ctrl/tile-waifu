@@ -300,7 +300,10 @@ func settings() -> void :
 	fb.pressed.connect( func():
 		G.S.side = "f"
 		G.save())
+	# 0.9: «мужская сторона» is not available yet: it looks like a tab but answers with a deny, not a success press
+	mb.sound = ""
 	mb.pressed.connect( func():
+		V9Feel.deny(mb)
 		toast(V6Txt.s("settings.side_m_toast"), "heart"))
 	p.add_child(fb)
 	p.add_child(mb)
@@ -560,8 +563,7 @@ func _build_profile_chip() -> void :
 	hit.mouse_filter = Control.MOUSE_FILTER_STOP
 	hit.gui_input.connect( func(e):
 		if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT:
-			Sfx.play("pop")
-			UI.punch(ring, 0.08)
+			V9Feel.press(ring)
 			if screen_id != "profile":
 				go("profile", {"from": screen_id if screen_id != "" else "home"}))
 	prof_root.add_child(hit)
@@ -705,8 +707,12 @@ func _build_navbar() -> void :
 		c.add_child(l)
 		c.gui_input.connect( func(e):
 			if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT:
-				Sfx.play("tap")
-				go(tab.id))
+				# 0.9: the tab itself dips (V9Feel) like every other press; a locked tab denies in go()
+				if tab.id == "summon" and not G.summon_open():
+					go(tab.id)
+				else:
+					V9Feel.press(c, "tap")
+					go(tab.id))
 		navbar.add_child(c)
 		tab_nodes[tab.id] = c
 	refresh_nav()
@@ -768,8 +774,8 @@ func go(id: String, args: = {}, animate: = true, remember: = true) -> void :
 	if busy or (id == screen_id and args.is_empty()):
 		return
 	if id == "summon" and not G.summon_open():
+		V9Feel.deny(tab_nodes.get("summon"))
 		toast(V6Txt.s("summon.locked"), "gem")
-		UI.punch(tab_nodes["summon"], 0.12)
 		return
 	var from_id: = screen_id
 	var from_args: Dictionary = screen.get_meta("v8_args", {}) if screen and is_instance_valid(screen) else {}

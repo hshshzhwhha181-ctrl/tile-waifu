@@ -339,6 +339,10 @@ func _blast_fx(d: Dictionary) -> void :
 	_refresh()
 
 func _on_matched(mid: Vector2, combo: int, gold: bool, shard: String) -> void :
+	# 0.9: pairs taken by an ult neither feed «Счастливая серия» (whose rewards charge the next ult) nor the
+	# 3-pair challenge (spec §B: from_ult pairs do not charge the ult)
+	if play and play.get("v9_from_ult") == true:
+		return
 	if star_until > 0.0:
 		Fx.burst(_fx(), mid, "sparkle", 18, Color(1.0, 0.95, 0.6), 1.2)
 	if ch_until > 0.0:
@@ -443,7 +447,7 @@ func _open_box(pos: Vector2) -> void :
 			txt = "Перемешивание"
 		"skill":
 			icon = "star"
-			txt = "Умение готово"
+			txt = "Ульта готова"
 			if "skill_ready" in play and not play.skill_ready and play.has_method("_skill_ready"):
 				play.skill_charge = int(play.SKILL_NEED) if "SKILL_NEED" in play else 8
 				# 0.8: the heroine says «… готово» once the reward float has faded, not at the same moment
@@ -466,11 +470,14 @@ func _open_box(pos: Vector2) -> void :
 
 	# 0.8: a gift opened in the tray shows its reward over the top of the table and floats down into it,
 	# never up into the HUD band (goal plate, luck chip, gem counter)
+	# 0.9: a gift opened in the tray pops in its tray slot (no rise into the HUD) and its reward line goes to the
+	# heroine's bubble beside the portrait — nothing lands on the board's tiles
 	var top: float = play.board_rect.position.y if "board_rect" in play else 0.0
 	var rise: = 90.0
-	if pos.y < top + 60.0:
-		pos = Vector2(clampf(pos.x, 160.0, play.size.x - 160.0), top + 70.0)
-		rise = -40.0
+	var in_tray: = pos.y < top + 60.0
+	if in_tray:
+		pos.x = clampf(pos.x, 60.0, play.size.x - 60.0)
+		rise = 0.0
 	var box: = TextureRect.new()
 	box.texture = V8Art.icon("gift")
 	box.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -488,9 +495,10 @@ func _open_box(pos: Vector2) -> void :
 	t.tween_property(box, "rotation", 0.12, 0.07)
 	t.tween_property(box, "rotation", 0.0, 0.06)
 	t.tween_callback( func():
-		Fx.flash_glow(_fx(), pos, Color(1, 0.9, 0.7), 2.6, 0.35)
-		Fx.burst(_fx(), pos, "confetti", 36, Color.WHITE, 1.0)
-		Fx.burst(_fx(), pos, "sparkle", 20, Color(1, 0.85, 0.95), 1.0)
+		# one hero effect: a palette glow (≤70% value) + sparkles, no confetti over the HUD
+		if V9Feel.can_fx():
+			Fx.flash_glow(_fx(), pos, Color.from_hsv(0.1, 0.45, 0.7, 0.8), 1.4, 0.3)
+			Fx.burst(_fx(), pos, "sparkle", int(14 * V9Feel.fx_scale()), Color(1, 0.85, 0.95), 0.9)
 		Sfx.play("reveal_sr", 1.2, -2)
 		var rw: = TextureRect.new()
 		rw.texture = Common.ui_icon(icon)
@@ -507,8 +515,11 @@ func _open_box(pos: Vector2) -> void :
 		r.tween_interval(0.4)
 		r.tween_property(rw, "modulate:a", 0.0, 0.3)
 		r.tween_callback(rw.queue_free)
-		if rise < 0.0:
-			_float_down(pos + Vector2(0, 60), txt)
+		if in_tray:
+			if play.get("stage") and is_instance_valid(play.stage) and play.stage.has_method("say_text"):
+				play.stage.say_text(txt, 2.4, false)
+			else:
+				_float_down(Vector2(play.size.x * 0.5, top - 40.0), txt)
 		else:
 			Fx.float_text(_fx(), pos + Vector2(0, -30), txt, Color("ffe7a6"), 28, Color("7a2346")))
 	t.tween_property(box, "scale", Vector2(1.6, 1.6), 0.12)

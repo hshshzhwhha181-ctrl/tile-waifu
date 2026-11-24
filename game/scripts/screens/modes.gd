@@ -142,8 +142,7 @@ func _frame(r: Rect2, radius: = 28.0) -> RBox:
 func _tap(card: Control, cb: Callable) -> void :
 	card.gui_input.connect( func(e):
 		if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT:
-			Sfx.play("pop")
-			UI.punch(card, 0.05)
+			V9Feel.press(card)
 			cb.call())
 
 
@@ -241,8 +240,7 @@ func _riichi_card(r: Rect2) -> Control:
 	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	card.gui_input.connect( func(e):
 		if e is InputEventMouseButton and e.pressed:
-			Sfx.play("deny")
-			UI.punch(card, 0.04)
+			V9Feel.deny(card)
 			main.toast("Стол риичи появится в одном из следующих обновлений", "lock"))
 	return card
 
@@ -418,8 +416,7 @@ func _duel_pick() -> void :
 		row.add_child(UI.center_label(UI.label("›", 54, Color("ffe7a6")), Rect2(530, 20, 60, 80)))
 		row.gui_input.connect( func(e):
 			if e is InputEventMouseButton and e.pressed:
-				Sfx.play("pop")
-				UI.punch(row, 0.06)
+				V9Feel.press(row)
 				main.go("play", {"mode": "duel", "rival": h, "partner": G.S.level_partner}))
 		y += 136
 
@@ -465,9 +462,8 @@ func _etude_btn(p: Control, i: int, r: Rect2) -> void :
 	b.gui_input.connect( func(e):
 		if e is InputEventMouseButton and e.pressed:
 			if not open:
-				Sfx.play("deny")
+				V9Feel.deny(b)
 				main.toast("Сначала реши этюд %d" % i, "star")
 				return
-			Sfx.play("pop")
-			UI.punch(b, 0.1)
+			V9Feel.press(b)
 			main.go("arena", {"mode": "etude", "etude": i, "partner": G.S.level_partner}))

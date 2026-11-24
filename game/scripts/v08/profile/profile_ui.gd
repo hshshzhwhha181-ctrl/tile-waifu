@@ -46,6 +46,7 @@ const T: = {
 	"profile.rank_next": "%d / %d до ранга %s",
 	"profile.rank_top": "Высшая ступень",
 	"profile.rank_note": "Очки ранга дают все режимы. Ниже начала ступени ранг не опускается.",
+	"profile.ranked_outfits": "В рейтинге наряды не дают силы: ульты без модификаторов, заряд с нуля.",
 	"profile.league": "Лига и квартал",
 	"profile.week": "Лига недели",
 	"profile.quarter": "Квартал",

@@ -224,7 +224,8 @@ func _build() -> void :
 		card.mouse_filter = Control.MOUSE_FILTER_STOP
 		card.gui_input.connect( func(e):
 			if e is InputEventMouseButton and e.pressed:
-				UI.tap(card, 0.06)
+				# 0.9: an outfit you do not own denies (shake + deny haptic) before saying where to get it
+				UI.tap(card, 0.06, "pop" if own else "deny")
 				if own:
 					_preview(itc)
 				else:

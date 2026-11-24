@@ -54,6 +54,7 @@ void fragment() {
 	outc = mix(outc, icec, ice * 0.62);
 	float band = exp(-pow((l.x + l.y * 0.5 - shine) / 0.09, 2.0));
 	outc += band * 0.45;
-	outc = mix(outc, vec3(1.0, 0.98, 0.94), flash);
+	// tinted, capped glow instead of a white-out (HEROINES §2)
+	outc = mix(outc, outc * 0.7 + vec3(1.0, 0.8, 0.52) * 0.5, clamp(flash, 0.0, 1.0) * 0.38);
 	COLOR = vec4(outc, a) * vcol;
 }

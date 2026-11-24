@@ -65,6 +65,10 @@ func _build_body() -> void :
 		2: _gems()
 	var note: = UI.center_label(UI.label(V6Txt.s("shop.test_note"), 16, Color.WHITE, Color(0.3, 0.1, 0.25), 3), Rect2(0, ny, W, 24))
 	body.add_child(note)
+	if tab == 1:
+		# 0.9 (spec §B): outfits give ult modifiers and charge outside ranked play only
+		var fair: = UI.center_label(UI.label("В рейтинге наряды не дают силы", 16, Color("ffd98a"), Color(0.3, 0.1, 0.25), 3), Rect2(0, ny + 26.0, W, 24))
+		body.add_child(fair)
 
 
 func _note_y() -> float:
@@ -371,9 +375,11 @@ func _outfits() -> void :
 
 func _buy_outfit(it: Dictionary, b: JButton) -> void :
 	if G.owns(it.id):
+		V9Feel.deny(b)
 		main.toast(V6Txt.s("shop.owned_toast"), "wardrobe")
 		return
 	if int(G.S.gems) < int(it.shop):
+		V9Feel.deny(b)
 		main.toast(V6Txt.s("common.need_gems") % UI.fmt(it.shop), "gem")
 		_set_tab(2)
 		return
