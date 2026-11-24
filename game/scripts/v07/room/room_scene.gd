@@ -32,7 +32,10 @@ static func run(data: Dictionary) -> Dictionary:
 
 static func backdrop(parent: Control, path: String, size: Vector2, focus: = Vector2(0.5, 0.5), bright: = 1.0, blur: = 0.0) -> TextureRect:
 	var tex: Texture2D = load(path)
-	var r: = UI.tex(tex, Rect2(Vector2.ZERO, size), false)
+	# 0.10 M0: bleeds to the viewport edges past the content column (tablets, cut-outs), aspect kept by the shader
+	var area: = Common._bleed_area(parent, size)
+	size = area.size
+	var r: = UI.tex(tex, area, false)
 	var m: = ShaderMaterial.new()
 	m.shader = preload("res://shaders/blurbg.gdshader")
 	m.set_shader_parameter("size", size)

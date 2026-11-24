@@ -43,11 +43,20 @@ var rank_bar: RBox
 var rank_em: Control
 var finger: Sprite2D
 var busy: = false
+# 0.10 M0 (V10Layout): the column screens are built in (≤720 wide, centred, below a camera cut-out) and the
+# safe insets in viewport px. Chrome plates and backgrounds bleed to the real edges.
+var CR: = Rect2(0, 0, 720, 1280)
+var safe_top: = 0.0
+var safe_bottom: = 0.0
 
 func _ready() -> void :
 	var vs: = get_viewport_rect().size
 	W = vs.x
 	H = vs.y
+	CR = V10Layout.content_rect(vs)
+	var ins: = V10Layout.safe_insets(vs)
+	safe_top = float(ins.top)
+	safe_bottom = float(ins.bottom)
 	screen_root = Control.new()
 	screen_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	screen_root.size = vs
@@ -88,6 +97,9 @@ func _splash() -> void :
 		return
 	if "--shots" in args and not "--splash" in args and not "--pt=" in args:
 		return
+	# 0.10 M0: the layout runner (V10LayoutShots) opens the title itself when it wants it
+	if ("--layout_shots=" in args or "--layout_selftest=" in args) and not has_node("V10LayoutShots"):
+		return
 	if "--splash" in args:
 		# --fresh: clean install (no profile, intro not seen); --v07: a 0.7 player (intro seen, no profile yet)
 		G.S.intro_done = "--fresh" not in args
@@ -120,22 +132,25 @@ func _splash() -> void :
 	fb.size = Vector2(W, 290.0)
 	fb.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	sp.add_child(fb)
-	var logo: = V8Art.rect(V8Art.misc("logo"), Rect2(W * 0.5 - 270, H * 0.04, 540, 306))
+	# 0.10 M0: the logo block starts below a camera cut-out; on tall phones it moves down with the extra height
+	# (the art and the CTA keep their size: the free height goes between them, not into a squashed logo)
+	var ly: = safe_top + H * 0.04 + maxf(0.0, H - 1280.0) * 0.12
+	var logo: = V8Art.rect(V8Art.misc("logo"), Rect2(W * 0.5 - 270, ly, 540, 306))
 	logo.pivot_offset = Vector2(270, 153)
 	sp.add_child(logo)
 	UI.pop_in(logo, 0.15, 0.4)
-	var tag: = UI.center_label(UI.label(V6Txt.s("title.tag"), 22, Color("ffe7c4"), UI.DARK, 4, "body", 900), Rect2(0, H * 0.05 + 300, W, 34))
+	var tag: = UI.center_label(UI.label(V6Txt.s("title.tag"), 22, Color("ffe7c4"), UI.DARK, 4, "body", 900), Rect2(0, ly + H * 0.01 + 300, W, 34))
 	sp.add_child(tag)
 	UI.slide_in(tag, Vector2(0, 20), 0.5)
 	var fades: Array = [logo, tag]
 	var has_profile: = bool(G.S.get("profile_done", false))
 	if has_profile:
-		var chip: = V8ProfileUI.title_chip(Rect2(0, H * 0.05 + 346, W, 64))
+		var chip: = V8ProfileUI.title_chip(Rect2(0, ly + H * 0.01 + 346, W, 64))
 		sp.add_child(chip)
 		UI.slide_in(chip, Vector2(0, 16), 0.6)
 		fades.append(chip)
 	# 0.8: the «Играть» plate is art (btn/play_title, the word is part of the picture); 560×196 drawn at 0.82
-	var plate: = V8Art.rect(V8Art.btn("play_title"), Rect2(W * 0.5 - 230, H - 286, 460, 161))
+	var plate: = V8Art.rect(V8Art.btn("play_title"), Rect2(W * 0.5 - 230, H - safe_bottom - 286, 460, 161))
 	plate.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	sp.add_child(plate)
 	# the word as text too (invisible, under the art): screen readers and the playtest look the button up by it
@@ -148,7 +163,7 @@ func _splash() -> void :
 	var pt: = plate.create_tween().set_loops()
 	pt.tween_property(plate, "scale", Vector2(1.04, 1.04), 0.8).set_trans(Tween.TRANS_SINE)
 	pt.tween_property(plate, "scale", Vector2.ONE, 0.8).set_trans(Tween.TRANS_SINE)
-	var ver: = UI.center_label(UI.label(V6Txt.s("title.version") % G.version(), 16, Color(1, 1, 1, 0.65), UI.DARK, 2, "body", 800), Rect2(0, H - 56, W, 26))
+	var ver: = UI.center_label(UI.label(V6Txt.s("title.version") % G.version(), 16, Color(1, 1, 1, 0.65), UI.DARK, 2, "body", 800), Rect2(0, H - safe_bottom - 56, W, 26))
 	sp.add_child(ver)
 	fades.append_array([plate, ver])
 	Sfx.music("menu")
@@ -206,7 +221,7 @@ func _meet_scene(sp: Control, hero: Hero) -> void :
 		"Перед каждой партией я гадаю на омикудзи. А девушки квартала, если подружишься, помогут своими умениями.", 
 		"Ну что, садись напротив. Первую партию сыграем вместе, я подскажу.", 
 	]
-	var box: = UI.rbox("plum", Rect2(18, H - 330, W - 36, 220), 28, 4, 12)
+	var box: = UI.rbox("plum", Rect2(CR.position.x + 18, H - safe_bottom - 330, CR.size.x - 36, 220), 28, 4, 12)
 	box.colors(Color(0.16, 0.08, 0.26, 0.94), Color(0.08, 0.04, 0.14, 0.96)).borders(Color("fff0b8"), Color("c58a2c"))
 	sp.add_child(box)
 	var nameplate: = UI.rbox("pink", Rect2(30, -26, 220, 48), 22, 3, 8)
@@ -214,11 +229,11 @@ func _meet_scene(sp: Control, hero: Hero) -> void :
 	nameplate.add_child(UI.center_label(UI.label("Маджонг-тян", 22, Color.WHITE, Color("7a2346"), 4, "body", 900), Rect2(0, 0, 220, 48)))
 	var txt: = UI.label("", 25, Color("fff1dc"), UI.DARK, 2, "body", 800)
 	txt.position = Vector2(30, 40)
-	txt.size = Vector2(W - 100, 150)
+	txt.size = Vector2(CR.size.x - 100, 150)
 	txt.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(txt)
 	var more: = UI.label("▼", 20, Color("ffd98a"))
-	more.position = Vector2(W - 90, 180)
+	more.position = Vector2(CR.size.x - 90, 180)
 	box.add_child(more)
 	UI.slide_in(box, Vector2(0, 60), 0.0, 0.35)
 	for line in lines:
@@ -398,6 +413,10 @@ func _dev_args() -> void :
 	if a.has("fuzz"):
 		V7Fuzz.run(self, int(a.fuzz))
 		return
+	if a.has("layout_shots") or a.has("layout_selftest"):
+		# 0.10 M0 layout runner: every screen at this resolution (scripts/v10/responsive/README.md)
+		V10LayoutShots.start(self, a)
+		return
 	if a.has("pt"):
 		# 0.8 playtest runner (scripts/v08/devtools/playtest.gd): plays from the title with touch input
 		V8Playtest.start(self, a)
@@ -490,6 +509,7 @@ const PLAY_BACK: = {"play": "home", "arena": "modes", "v7play": "v7event"}
 func _build_topbar() -> void :
 	topbar = Control.new()
 	topbar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	topbar.position = Vector2(0, safe_top)
 	add_child(topbar)
 	prof_root = Control.new()
 	prof_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -630,13 +650,13 @@ func refresh_currency(punch: = false) -> void :
 		UI.punch(gems_lbl, 0.25)
 
 func gem_target() -> Vector2:
-	return Vector2(W - 320, 58)
+	return Vector2(W - 320, 58 + safe_top)
 
 func _build_navbar() -> void :
 
 	navbar = Control.new()
 	navbar.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	navbar.position = Vector2(0, H - 132)
+	navbar.position = Vector2(0, H - 132 - safe_bottom)
 	add_child(navbar)
 	var fade: = TextureRect.new()
 	var fg: = GradientTexture2D.new()
@@ -647,17 +667,20 @@ func _build_navbar() -> void :
 	fg.fill_to = Vector2(0, 1)
 	fade.texture = fg
 	fade.position = Vector2(0, -40)
-	fade.size = Vector2(W, 172)
+	fade.size = Vector2(W, 172 + safe_bottom)
 	fade.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	navbar.add_child(fade)
 	var plate: = UI.rbox("graphite", Rect2(8, 26, W - 16, 100), 30, 2, 14)
 	plate.set_param("pattern", 1.0)
 	navbar.add_child(plate)
-	var tw: = (W - 40) / TABS.size()
+	# 0.10 M0: the plate spans the screen; on tablets the five tabs keep phone spacing in the middle
+	var tabs_w: = minf(W - 40, 820.0)
+	var tw: = tabs_w / TABS.size()
+	var tx0: = (W - tabs_w) * 0.5
 	for i in TABS.size():
 		var tab: Dictionary = TABS[i]
 		var c: = Control.new()
-		c.position = Vector2(20 + i * tw, 0)
+		c.position = Vector2(tx0 + i * tw, 0)
 		c.size = Vector2(tw, 126)
 		c.mouse_filter = Control.MOUSE_FILTER_STOP
 		c.pivot_offset = Vector2(tw * 0.5, 70)
@@ -807,7 +830,8 @@ func go(id: String, args: = {}, animate: = true, remember: = true) -> void :
 	screen = Control.new()
 	screen.set_script(SCREENS[id])
 	screen.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	screen.size = Vector2(W, H)
+	screen.position = CR.position
+	screen.size = CR.size
 	screen.set_meta("v8_args", args.duplicate())
 	screen_root.add_child(screen)
 	screen.call("build", self, args)
@@ -916,7 +940,7 @@ func _unhandled_key_input(e: InputEvent) -> void :
 
 func toast(text: String, icon: = "") -> void :
 	var w: = 560.0
-	var y: = V8Header.CONTENT_Y + 12.0 if topbar and topbar.visible else 130.0
+	var y: = (V8Header.CONTENT_Y + 12.0 if topbar and topbar.visible else 130.0) + CR.position.y
 	# 0.8: during a match the top of the screen is the HUD (goal, gems, tray) and the table reaches down to the
 	# action buttons, so a toast sits at the very bottom, over the buttons' captions (it takes no tap), and there
 	# is one slot only: a new toast replaces the one before instead of stacking up into the tiles
@@ -927,7 +951,7 @@ func toast(text: String, icon: = "") -> void :
 		if screen.v8_notice(text, art_icon(icon) if icon != "" else null):
 			return
 	if in_match:
-		y = get_viewport_rect().size.y - 74.0
+		y = get_viewport_rect().size.y - safe_bottom - 74.0
 	for c in overlay.get_children():
 		if c.has_meta("v8_toast") and not c.is_queued_for_deletion() and not c.has_meta("fading"):
 			if in_match:
@@ -945,7 +969,7 @@ func toast(text: String, icon: = "") -> void :
 	var pop_r: = _open_popup_rect()
 	if not in_match and pop_r.size != Vector2.ZERO:
 		var vh: = get_viewport_rect().size.y
-		var nav_top: = vh - 150.0 if navbar and navbar.visible else vh - 24.0
+		var nav_top: = vh - safe_bottom - (150.0 if navbar and navbar.visible else 24.0)
 		if pop_r.end.y + 16.0 + th <= nav_top:
 			y = pop_r.end.y + 16.0
 		else:
@@ -958,6 +982,7 @@ func toast(text: String, icon: = "") -> void :
 				ft2.tween_callback(c.queue_free)
 	elif not in_match and screen and is_instance_valid(screen) and screen.has_method("v8_toast_rect"):
 		var sr: Rect2 = screen.v8_toast_rect()
+		sr.position += screen.position
 		if sr.size != Vector2.ZERO:
 			x = sr.position.x
 			w = sr.size.x

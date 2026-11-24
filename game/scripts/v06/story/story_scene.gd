@@ -45,6 +45,9 @@ var tapped: = false
 var skipping: = false
 var auto: = false
 var choice_layer: Control
+# 0.10 M0: camera cut-out / gesture bar insets (V10Layout), viewport px
+var _st: = 0.0
+var _sb: = 0.0
 
 func play(id: String) -> void :
 	var d: Dictionary = V6Scenes.SCENES[id]
@@ -52,6 +55,9 @@ func play(id: String) -> void :
 	W = vs.x
 	H = vs.y
 	size = vs
+	var ins: = V10Layout.safe_insets(vs)
+	_st = float(ins.top)
+	_sb = float(ins.bottom)
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	# above the match result window (play.gd V8Result z 300) and main.overlay (400 in a match): post-level scenes
 	# play from before_go() while the victory screen is still alive
@@ -86,7 +92,7 @@ func _build(d: Dictionary, id: String) -> void :
 
 	var top: = ColorRect.new()
 	top.color = Color(0.04, 0.02, 0.07, 0.55)
-	top.size = Vector2(W, 118)
+	top.size = Vector2(W, 118 + _st)
 	top.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(top)
 	var chapter: = ""
@@ -95,7 +101,7 @@ func _build(d: Dictionary, id: String) -> void :
 	elif id in ["intro", "first_win"]:
 		chapter = G.LOCS[0].name + " · "
 	var ttl: = UI.label(chapter + V6Scenes.TITLES.get(id, ""), 24, Color("ffe7a6"), UI.DARK, 4, "body", 900)
-	ttl.position = Vector2(28, 52)
+	ttl.position = Vector2(28, 52 + _st)
 	add_child(ttl)
 	UI.slide_in(ttl, Vector2(-30, 0), 0.2, 0.5)
 
@@ -117,7 +123,9 @@ func _build(d: Dictionary, id: String) -> void :
 		UI.slide_in(hero, Vector2(0 if cast.size() == 1 else (-80 if k == 0 else 80), 60), 0.1 + k * 0.15, 0.6)
 		heroes[h] = hero
 
-	box = UI.rbox("plum", Rect2(18, H - 300, W - 36, 256), 28, 4, 12)
+	# 0.10 M0: above the bottom inset; on tablets a readable measure (≤ 820) in the middle
+	var bw: = minf(W - 36.0, 820.0)
+	box = UI.rbox("plum", Rect2((W - bw) * 0.5, H - _sb - 300, bw, 256), 28, 4, 12)
 	box.colors(Color(0.14, 0.07, 0.2, 0.95), Color(0.07, 0.035, 0.12, 0.97)).borders(Color("fff0b8"), Color("c58a2c"))
 	add_child(box)
 	plate = UI.rbox("pink", Rect2(30, -26, 250, 50), 22, 3, 8)
@@ -126,17 +134,17 @@ func _build(d: Dictionary, id: String) -> void :
 	plate.add_child(plate_lbl)
 	txt = UI.label("", 25, Color("fff1dc"), UI.DARK, 2, "body", 800)
 	txt.position = Vector2(30, 40)
-	txt.size = Vector2(W - 100, 180)
+	txt.size = Vector2(bw - 64, 180)
 	txt.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(txt)
 	more = UI.label(V6Txt.s("story.next"), 20, Color("ffd98a"))
-	more.position = Vector2(W - 90, 212)
+	more.position = Vector2(bw - 54, 212)
 	box.add_child(more)
 	var mt: = more.create_tween().set_loops()
 	mt.tween_property(more, "position:y", 204.0, 0.45).set_trans(Tween.TRANS_SINE)
 	mt.tween_property(more, "position:y", 212.0, 0.45).set_trans(Tween.TRANS_SINE)
 	UI.slide_in(box, Vector2(0, 60), 0.15, 0.35)
-	var sk: = JButton.make(V6Txt.s("story.skip"), "glass", Rect2(W - 214, 36, 196, 60), null, 22)
+	var sk: = JButton.make(V6Txt.s("story.skip"), "glass", Rect2(W - 214, 36 + _st, 196, 60), null, 22)
 	sk.pressed.connect( func():
 		skipping = true
 		tapped = true)
@@ -222,7 +230,7 @@ func _ask(e: Dictionary) -> void :
 	var opts: Array = e.ask
 	var picked: = [-1]
 	more.visible = false
-	var y: = H - 300 - 36 - opts.size() * 104
+	var y: = H - _sb - 300 - 36 - opts.size() * 104
 	var btns: = []
 	for k in opts.size():
 		var b: = JButton.make(opts[k][0], "gold" if k == 0 else "rose", Rect2(48, y + k * 104, W - 96, 88), null, 26)

@@ -25,8 +25,15 @@ var _w: = 720.0
 
 static func make(screen: Control, main, title: String, on_back: Callable, on_help: = Callable()) -> V8Header:
 	var h: = V8Header.new()
-	h._w = float(main.W) if main != null and "W" in main else screen.size.x
-	h.position = Vector2(0, TOP)
+	# 0.10 M0: the screen is the content column (V10Layout); the header plate spans the viewport like the top bar,
+	# so «назад» and «?» sit at the real edges on tablets
+	h._w = screen.size.x
+	var bx: = 0.0
+	if screen.is_inside_tree():
+		var br: Rect2 = V10Layout.bleed_rect(screen)
+		bx = br.position.x
+		h._w = br.size.x
+	h.position = Vector2(bx, TOP)
 	h.size = Vector2(h._w, HEIGHT)
 	h.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	h.name = "V8Header"
