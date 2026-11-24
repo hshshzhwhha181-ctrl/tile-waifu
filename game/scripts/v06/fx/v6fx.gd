@@ -907,7 +907,10 @@ func set_danger(on: bool) -> void :
 	danger = on
 	if on:
 		hb_t = 0.0
-		grade(1.0, 1.0, 0.0, 0.55, Color(0.85, 0.05, 0.18), 0.7, 0.3)
+		# the warning tint stays at every level (information), but only «полные» pulses it, and the steady tint is
+		# lighter so the outer tile columns are not washed red (it reached ~30 % on the edge tiles at its peak)
+		var full: = V9Feel.can_edge_flash()
+		grade(1.0, 1.0, 0.0, 0.42 if full else 0.34, Color(0.85, 0.05, 0.18), 0.45 if full else 0.0, 0.3)
 		music_filter(2400.0)
 	else:
 		grade_reset(0.35)

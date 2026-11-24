@@ -1133,8 +1133,9 @@ func _modifier(col: Color) -> void :
 	_mod_chip(chip, chip_l, _chip_title)
 
 
-# the modifier's result as a small lacquer chip (gold glyph + player-facing line) that slides out to the LEFT of the
-# portrait card, level with its ult bar: never on her portrait or its plates, never over the board. `title` (a «выкл»
+# the modifier's result as a small lacquer chip (gold glyph + player-facing line) shown in the match's transient band
+# (play.v8_band: under the table frame, above the action buttons): never on her portrait, the tray or the board; a
+# compact card (duel) still gets it beside the card. `title` (a «выкл»
 # cast: the ult name) sits above the line in small gold caps; no `letter` (a base outfit) = no glyph.
 func _mod_chip(txt: String, letter: = "", title: = "") -> void :
 	var st: V6HeroStage = play.stage
@@ -1150,7 +1151,7 @@ func _mod_chip(txt: String, letter: = "", title: = "") -> void :
 	if ttl != "":
 		tw = maxf(tw, minf(250.0, tf.get_string_size(ttl, HORIZONTAL_ALIGNMENT_LEFT, -1, 13).x + 6.0))
 	var icon_w: = 26.0 + 8.0 if letter != "" else 16.0 + 8.0
-	var h: = 40.0 if ttl == "" else 54.0
+	var h: = 40.0 if ttl == "" else 52.0
 	var w: = 14.0 + icon_w + tw + 16.0
 	var right: = st.position.x - 6.0
 	# level with the bottom of the card, below the fortune panel's text, still clear of the board's frame
@@ -1193,6 +1194,11 @@ func _mod_chip(txt: String, letter: = "", title: = "") -> void :
 	l.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	c.add_child(l)
+	# 0.9: the chip goes to the match's transient band (between the table frame and the action buttons, one plaque
+	# at a time, ≤ 52 px): left of the card it covered the right half of the tray — the tiles there and the slots
+	if not st.compact and play.has_method("v8_band"):
+		play.v8_band(c, 1.5, true, 1)
+		return
 	play.add_child(c)
 	c.pivot_offset = Vector2(w, h * 0.5)
 	c.modulate.a = 0.0
