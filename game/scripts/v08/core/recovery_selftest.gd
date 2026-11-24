@@ -160,13 +160,13 @@ static func _migration_v5() -> void :
 	old.ver = 5
 	var d = JSON.parse_string(JSON.stringify(old))
 	_check("v5 save applies", G.apply_state(d))
-	_check("v5 -> v6: ver bumped", int(G.S.ver) == 6)
+	_check("v5 -> current: ver bumped", int(G.S.ver) == G.SAVE_VER)
 	_check("v5 -> v6: profile card shown again", G.S.profile_done == false and str(G.S.profile.nick) == "" and str(G.S.profile.id).length() == 8)
 	_check("v5 -> v6: progress kept", int(G.S.rp) == 1777 and int(G.S.unlocked) == G.LEVELS.size() and G.S.stars.size() == G.LEVELS.size())
 	_check("v5 -> v6: stats empty dict", G.S.stats is Dictionary and G.S.stats.is_empty())
 	var code: = V8Recovery.export_code(d)
 	G.S = G.default_state()
-	_check("0.7 save code imports with migration", V8Recovery.import_code(code) and int(G.S.ver) == 6 and not G.S.profile_done)
+	_check("0.7 save code imports with migration", V8Recovery.import_code(code) and int(G.S.ver) == G.SAVE_VER and not G.S.profile_done)
 
 
 static func _add_rp() -> void :

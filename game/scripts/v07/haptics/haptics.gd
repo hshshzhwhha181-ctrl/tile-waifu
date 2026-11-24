@@ -1,5 +1,9 @@
 extends Node
 
+# V7Haptics — vibration (autoload). kind(k) plays a named pattern from KINDS, combo(n, gold) the combo pulse,
+# pulse(ms, amp) one raw pulse. Settings: S.v7_haptics.on / power. Taps on JButtons are answered by V9Feel
+# (scripts/v09/core/feel.gd), which calls kind() — this autoload only hooks plain buttons, cards and boards.
+
 
 
 
@@ -103,7 +107,7 @@ func _on_node_added(n: Node) -> void :
 	if n is TrayBoard:
 		_attach_board.call_deferred(n)
 	elif n is JButton:
-		n.pressed.connect( func(): pulse(8, 0.25))
+		pass # 0.9: JButton vibrates on touch-down through V9Feel.press_down
 	elif n is BaseButton:
 		n.pressed.connect( func(): pulse(8, 0.25))
 	elif n is Hero:
@@ -123,8 +127,9 @@ func _hook_card(n) -> void :
 		if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT and not n.has_meta("no_haptic"):
 			pulse(8, 0.25))
 
+# 0.9: a board that routes its feedback through V9Feel (meta "v9_feel") gets no second set of haptics from here
 func _attach_board(b: Node) -> void :
-	if not is_instance_valid(b) or _boards.has(b.get_instance_id()):
+	if not is_instance_valid(b) or _boards.has(b.get_instance_id()) or b.has_meta("v9_feel"):
 		return
 	_boards[b.get_instance_id()] = true
 	b.tree_exiting.connect( func(): _boards.erase(b.get_instance_id()))

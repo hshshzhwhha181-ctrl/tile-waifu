@@ -236,35 +236,45 @@ func _meet_scene(sp: Control, hero: Hero) -> void :
 		Sfx.play("tap")
 
 
+# 0.9: two 3-way rows on top — «Эффекты» (S.fx_level) and «Вставки ульт» (S.ult_cutin) — then the on/off rows.
+# «Тряска и вспышки» folded into «Эффекты» (only "full" shakes and flashes; G keeps S.v6_fx in step).
+const SETTINGS_SEG: = [
+	["fx_level", "Эффекты", [["full", "Полные"], ["mid", "Умеренные"], ["min", "Минимум"]],
+		{"full": "Вспышки, тряска, частицы и ауры", "mid": "Без тряски и вспышек по краям экрана", "min": "Только отклик на нажатия"}],
+	["ult_cutin", "Вставки ульт", [["full", "Полностью"], ["short", "Коротко"], ["off", "Выкл"]],
+		{"full": "Полная сцена при первой ульте дня в наряде", "short": "Короткая вставка, меньше секунды", "off": "Только эффект на поле"}],
+]
+
 func settings() -> void :
-	var p: = Common.popup(self, V6Txt.s("settings.title"), 900)
+	var p: = Common.popup(self, V6Txt.s("settings.title"), 990)
+	var y: = 50.0
+	for seg in SETTINGS_SEG:
+		_settings_seg(p, seg, y)
+		y += 132.0
 	var rows: = [
-		["modest", V6Txt.s("settings.modest"), V6Txt.s("settings.modest_d")], 
 		["cutins", V6Txt.s("settings.cutins"), V6Txt.s("settings.cutins_d")], 
+		["modest", V6Txt.s("settings.modest"), V6Txt.s("settings.modest_d")], 
+		["v7_haptics.on", "Вибрация", "Отклик на касания, пары и серии"], 
+		["v6_story.on", V6Txt.s("settings.story"), V6Txt.s("settings.story_d")], 
 		["sound", V6Txt.s("settings.sound"), ""], 
 		["music", V6Txt.s("settings.music"), ""], 
 		["voice", V6Txt.s("settings.voice"), ""], 
-		["v6_story.on", V6Txt.s("settings.story"), V6Txt.s("settings.story_d")], 
-		["v6_fx.shake", V6Txt.s("settings.shake"), V6Txt.s("settings.shake_d")], 
-		["v7_haptics.on", "Вибрация", "Отклик на касания, пары и серии"], 
 	]
 	for i in rows.size():
 		var key: String = rows[i][0]
-		var y: = 56.0 + i * 82
+		var rh: = 78.0 if rows[i][2] != "" else 66.0
 		var l: = UI.label(rows[i][1], 26, UI.INK, Color.WHITE, 3, "body", 900)
-		l.position = Vector2(34, y + (4 if rows[i][2] != "" else 18))
+		l.position = Vector2(34, y + (4 if rows[i][2] != "" else 12))
 		p.add_child(l)
 		if rows[i][2] != "":
 			var d: = UI.label(rows[i][2], 17, Color("8a5a7a"))
 			d.position = Vector2(34, y + 42)
 			p.add_child(d)
 		var on: bool = _v6_opt(key)
-		var b: = JButton.make(V6Txt.s("common.on") if on else V6Txt.s("common.off"), "mint" if on else "glass", Rect2(500, y + 8, 128, 64), null, 24)
+		var b: = JButton.make(V6Txt.s("common.on") if on else V6Txt.s("common.off"), "mint" if on else "glass", Rect2(500, y + (8 if rows[i][2] != "" else 2), 128, 64), null, 24)
 		b.pressed.connect( func():
 			var v: bool = not _v6_opt(key)
 			_v6_opt(key, v)
-			if key == "v6_fx.shake":
-				_v6_opt("v6_fx.flash", v)
 			G.save()
 			b.lbl.text = V6Txt.s("common.on") if v else V6Txt.s("common.off")
 			b.set_pal("mint" if v else "glass")
@@ -277,12 +287,13 @@ func settings() -> void :
 					screen_id = ""
 					go(sid, {}, false)))
 		p.add_child(b)
+		y += rh
 
 	var sl: = UI.label(V6Txt.s("settings.side"), 26, UI.INK, Color.WHITE, 3, "body", 900)
-	sl.position = Vector2(34, 744)
+	sl.position = Vector2(34, 848)
 	p.add_child(sl)
-	var fb: = JButton.make(V6Txt.s("settings.side_f"), "pink" if G.S.side == "f" else "glass", Rect2(220, 732, 196, 64), null, 22, -1.0, false)
-	var mb: = JButton.make(V6Txt.s("settings.side_m"), "glass", Rect2(428, 732, 200, 64), null, 20, -1.0, false)
+	var fb: = JButton.make(V6Txt.s("settings.side_f"), "pink" if G.S.side == "f" else "glass", Rect2(220, 836, 196, 64), null, 22, -1.0, false)
+	var mb: = JButton.make(V6Txt.s("settings.side_m"), "glass", Rect2(428, 836, 200, 64), null, 20, -1.0, false)
 	Common.tab_paint(fb, G.S.side == "f")
 	Common.tab_paint(mb, false)
 	fb.pressed.connect( func():
@@ -293,13 +304,46 @@ func settings() -> void :
 	p.add_child(fb)
 	p.add_child(mb)
 	var eg: = UI.label("Тайники найдены: %d из %d" % [V7Eggs.found_count(), V7Eggs.total()], 18, Color("d9c4e6"))
-	eg.position = Vector2(34, 820)
+	eg.position = Vector2(34, 916)
 	p.add_child(eg)
 	var vl: = UI.label(V6Txt.s("title.version") % G.version(), 16, Color(1, 1, 1, 0.45))
-	vl.position = Vector2(34, 852)
+	vl.position = Vector2(34, 946)
 	vl.size = Vector2(592, 24)
 	vl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	p.add_child(vl)
+
+
+# one 3-way setting: caption, three segments (the chosen one painted like a selected tab) and a hint line
+func _settings_seg(p: Control, seg: Array, y: float) -> void :
+	var key: String = seg[0]
+	var l: = UI.label(seg[1], 26, UI.INK, Color.WHITE, 3, "body", 900)
+	l.position = Vector2(34, y)
+	p.add_child(l)
+	var hint: = UI.label("", 17, Color("8a5a7a"))
+	hint.position = Vector2(34, y + 100)
+	p.add_child(hint)
+	var cur: = func() -> String: return G.fx_level() if key == "fx_level" else G.ult_cutin()
+	var btns: = []
+	var opts: Array = seg[2]
+	var paint: = func():
+		var c: String = cur.call()
+		for j in btns.size():
+			Common.tab_paint(btns[j], opts[j][0] == c)
+		hint.text = String(seg[3].get(c, ""))
+	var w: = (592.0 - 16.0) / opts.size()
+	for j in opts.size():
+		var val: String = opts[j][0]
+		var b: = JButton.make(opts[j][1], "glass", Rect2(34 + j * (w + 8.0), y + 40, w, 56), null, 22, -1.0, false)
+		b.pressed.connect( func():
+			if key == "fx_level":
+				G.set_fx_level(val)
+			else:
+				G.set_ult_cutin(val)
+			G.save()
+			paint.call())
+		p.add_child(b)
+		btns.append(b)
+	paint.call()
 
 
 func _v6_opt(key: String, v = null) -> bool:

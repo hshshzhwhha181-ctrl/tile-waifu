@@ -1,5 +1,26 @@
 extends Node
 
+# Sfx — sounds, music, heroine voices (autoload).
+#   Sfx.play(name, pitch = 1, vol_db = 0)    one-shot from res://assets/sfx/<name>.wav (respects S.sound)
+#   Sfx.music(name, fade = 1.2)              crossfade the music loop ("" stops)
+#   Sfx.say(hero, kind) -> String            a heroine line (+ voice file when there is one)
+# 0.9 Foundation (Stream A):
+#   Sfx.combo_step(n, vol_db = 0) -> float   the combo pitch ladder: pair n of a combo plays the match chime
+#                                            a semitone higher than pair n-1 (pair 1 = base pitch), capped at an
+#                                            octave (pair 13+). Returns the pitch used. Use it for every combo pair.
+#   Sfx.combo_pitch(n) -> float              the same ladder as a pure function (2^((min(n,13)-1)/12))
+#   Sfx.duck(depth_db = -8, hold = 1.4)      lower the music for `hold` seconds (cut-ins, big reveals); repeated
+#                                            calls extend/deepen, never stack. Attack 0.08 s, release 0.4 s.
+#   Sfx.duck_hold(on, depth_db = -8)         duck for as long as on == true (e.g. while a cut-in is on screen)
+#   Sfx.duck_db() -> float                   current music attenuation (0 = none), for tests / dev overlay
+#   Music plays on its own "Music" bus (created at start if the project has no bus layout); ducking moves that bus.
+
+const COMBO_BASE: = "match0"
+const COMBO_MAX_STEP: = 12
+const MUSIC_BUS: = "Music"
+const DUCK_ATTACK: = 0.08
+const DUCK_RELEASE: = 0.4
+
 
 const VOICE: = {
 	"greet": 2, "match": 3, "combo": 2, "fever": 1, "win": 2, "lose": 1, "gacha": 1, "ssr": 1, "outfit": 1, "aff": 1, "hint": 1, 
@@ -35,6 +56,70 @@ func _ready() -> void :
 	for p in [music_a, music_b, voice]:
 		add_child(p)
 	voice.volume_db = 1.0
+	_ensure_music_bus()
+	music_a.bus = MUSIC_BUS
+	music_b.bus = MUSIC_BUS
+
+
+func _ensure_music_bus() -> void :
+	if AudioServer.get_bus_index(MUSIC_BUS) >= 0:
+		return
+	AudioServer.add_bus()
+	var i: = AudioServer.bus_count - 1
+	AudioServer.set_bus_name(i, MUSIC_BUS)
+	AudioServer.set_bus_send(i, "Master")
+
+
+static func combo_pitch(n: int) -> float:
+	return pow(2.0, float(clampi(n - 1, 0, COMBO_MAX_STEP)) / 12.0)
+
+
+func combo_step(n: int, vol_db: = 0.0) -> float:
+	var p: = combo_pitch(n)
+	play(COMBO_BASE, p, vol_db)
+	return p
+
+
+var _duck_until: = 0.0
+var _duck_depth: = 0.0
+var _duck_held: = false
+var _duck_hold_depth: = 0.0
+var _duck_cur: = 0.0
+
+
+func _now() -> float:
+	return Time.get_ticks_msec() / 1000.0
+
+
+func duck(depth_db: = -8.0, hold: = 1.4) -> void :
+	var t: = _now()
+	_duck_depth = minf(depth_db, _duck_depth) if t < _duck_until else depth_db
+	_duck_until = maxf(_duck_until, t + hold)
+
+
+func duck_hold(on: bool, depth_db: = -8.0) -> void :
+	_duck_held = on
+	_duck_hold_depth = depth_db
+
+
+func duck_db() -> float:
+	return _duck_cur
+
+
+func _process(dt: float) -> void :
+	var target: = 0.0
+	if _now() < _duck_until:
+		target = _duck_depth
+	if _duck_held:
+		target = minf(target, _duck_hold_depth)
+	if is_equal_approx(target, _duck_cur):
+		return
+	# constant slopes: an 8 dB duck lands in DUCK_ATTACK and lifts in DUCK_RELEASE
+	var rate: = 8.0 / (DUCK_ATTACK if target < _duck_cur else DUCK_RELEASE)
+	_duck_cur = move_toward(_duck_cur, target, rate * dt)
+	var bi: = AudioServer.get_bus_index(MUSIC_BUS)
+	if bi >= 0:
+		AudioServer.set_bus_volume_db(bi, _duck_cur)
 
 func _stream(path: String) -> AudioStream:
 	if not cache.has(path):

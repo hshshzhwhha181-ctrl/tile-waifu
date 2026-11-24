@@ -256,22 +256,10 @@ func _apply_disabled() -> void :
 		scale = Vector2.ONE
 
 var _dimmed: = false
-var _shake_tw: Tween
 
+# 0.9: press / release / deny feedback (scale spring, click, haptic) lives in V9Feel — one place for every tap
 func _deny_shake() -> void :
-	Sfx.play("deny")
-	var hp = get_node_or_null("/root/V7Haptics")
-	if hp:
-		hp.kind("deny")
-	if _shake_tw and _shake_tw.is_valid():
-		_shake_tw.kill()
-		position.x = _shake_x
-	_shake_x = position.x
-	_shake_tw = create_tween()
-	for dx in [-6.0, 6.0, -4.0, 3.0, 0.0]:
-		_shake_tw.tween_property(self, "position:x", _shake_x + dx, 0.036)
-
-var _shake_x: = 0.0
+	V9Feel.deny(self)
 
 func _press_down() -> void :
 	if disabled:
@@ -279,16 +267,12 @@ func _press_down() -> void :
 		return
 	_down = true
 	box.set_param("pressed", 1.0)
-	var t: = create_tween()
-	t.tween_property(self, "scale", Vector2(0.92, 0.9), 0.07)
+	V9Feel.press_down(self)
 
 func _release(fire: bool) -> void :
 	box.set_param("pressed", 0.0)
-	var t: = create_tween()
-	t.tween_property(self, "scale", Vector2(1.05, 1.06), 0.08)
-	t.tween_property(self, "scale", Vector2.ONE, 0.25).set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
+	V9Feel.press_up(self, fire, sound)
 	if fire:
-		Sfx.play(sound, randf_range(0.95, 1.08))
 		box.shine(0.0, 0.5)
 		pressed.emit()
 

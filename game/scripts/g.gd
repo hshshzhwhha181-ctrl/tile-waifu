@@ -12,13 +12,27 @@ extends Node
 #   Signals: profile_changed, rank_changed(old_index, new_index), rp_changed(old_rp, new_rp)
 #   Save keys added in v6: S.profile {nick, avatar, frame, created, id}, S.profile_done, S.stats {source: {games, wins, rp}}
 # add_rp / record_game / set_* do not write to disk except set_profile; call G.save() after a batch of changes.
+#
+# 0.9 Foundation (Stream A) — feel settings, save v7:
+#   G.fx_level() -> "full" | "mid" | "min"    «Эффекты: полные / умеренные / минимум» (S.fx_level, default "full").
+#                                             mid = no screen shake, no edge flashes; min = press feedback only.
+#                                             Effects ask V9Feel.can_shake() / can_edge_flash() / can_fx() / fx_scale().
+#   G.set_fx_level(l)                         also keeps the 0.6 keys S.v6_fx.shake/flash in step (V6Fx reads them)
+#   G.ult_cutin() -> "full" | "short" | "off" «Вставки ульт: полностью / коротко / выкл» (S.ult_cutin, default "full");
+#                                             the per-cast decision is V9Ults.cutin_mode()
+#   G.set_ult_cutin(m)
+#   Signal settings_changed(key)              emitted by both setters (key "fx_level" / "ult_cutin"); setters do not save
+#   Save v6 -> v7: adds fx_level (a player who had turned «Тряска и вспышки» off gets "mid") and ult_cutin "full".
 
 signal profile_changed
 signal rank_changed(old_index: int, new_index: int)
 signal rp_changed(old_rp: int, new_rp: int)
+signal settings_changed(key: String)
 
 const SAVE_PATH: = "user://save.json"
-const SAVE_VER: = 6
+const SAVE_VER: = 7
+const FX_LEVELS: = ["full", "mid", "min"]
+const ULT_CUTINS: = ["full", "short", "off"]
 const RP_SOURCES: = ["path", "daily", "duel", "blitz", "zen", "etude", "event", "tourney", "table", "other"]
 const NICK_MIN: = 3
 const NICK_MAX: = 16
@@ -454,6 +468,11 @@ func _ready() -> void :
 	load_game()
 	if "--recovery_selftest=1" in args:
 		_recovery_selftest.call_deferred()
+	if "--ults_selftest=1" in args:
+		_ults_selftest.call_deferred()
+	for a in args:
+		if a.begins_with("--ults_overlay="):
+			_ults_overlay.call_deferred(a.substr(15))
 	if "--v8_confirm_demo=1" in args:
 		_confirm_demo.call_deferred()
 	if "--v8_header_demo=1" in args:
@@ -463,6 +482,18 @@ func _ready() -> void :
 func _recovery_selftest() -> void :
 	var fails: int = V8RecoverySelftest.run()
 	get_tree().quit(1 if fails > 0 else 0)
+
+
+func _ults_selftest() -> void :
+	var fails: int = V9UltsSelftest.run()
+	get_tree().quit(1 if fails > 0 else 0)
+
+
+# dev: writes contact sheets of every outfit art with its V9Ults face_rect (red) and alt_rect (cyan) to <dir>
+func _ults_overlay(dir: String) -> void :
+	var n: int = V9UltsSelftest.overlay(dir)
+	print("ULTS OVERLAY %d sheets -> %s" % [n, dir])
+	get_tree().quit()
 
 
 func _header_demo() -> void :
@@ -516,6 +547,7 @@ func default_state() -> Dictionary:
 		"modest": false, "cutins": true, "voice": true, "first_buy": {}, "shards": {}, "side": "f", 
 		"rp": 0, "ver": SAVE_VER, "yaku_seen": {}, "blitz_best": 0, "next_great": false, "intro_done": false,
 		"profile": new_profile(), "profile_done": false, "stats": {},
+		"fx_level": "full", "ult_cutin": "full",
 	}
 
 # Compliance wave 0 (docs/HEROINES.md §6): an item marked "hidden" is retired — never sold, pulled,
@@ -639,10 +671,58 @@ func _migrate() -> void :
 		S.profile_done = false
 		S.stats = {}
 		S.ver = 6
+	if int(S.ver) < 7:
+		# 0.9: the old «Тряска и вспышки» switch becomes the 3-step effects level
+		var v6fx = S.get("v6_fx", {})
+		var calm: bool = v6fx is Dictionary and not bool(v6fx.get("shake", true))
+		S.fx_level = "mid" if calm else "full"
+		S.ult_cutin = "full"
+		S.ver = 7
+	if not (str(S.get("fx_level", "")) in FX_LEVELS):
+		S.fx_level = "full"
+	if not (str(S.get("ult_cutin", "")) in ULT_CUTINS):
+		S.ult_cutin = "full"
+	_sync_v6_fx()
 	_ensure_profile()
 	S.profile_done = bool(S.get("profile_done", false))
 	if not (S.get("stats") is Dictionary):
 		S.stats = {}
+
+
+func fx_level() -> String:
+	var l: = str(S.get("fx_level", "full"))
+	return l if l in FX_LEVELS else "full"
+
+
+func set_fx_level(l: String) -> void :
+	if not (l in FX_LEVELS):
+		push_warning("G.set_fx_level: unknown level '%s'" % l)
+		return
+	S.fx_level = l
+	_sync_v6_fx()
+	settings_changed.emit("fx_level")
+
+
+func ult_cutin() -> String:
+	var m: = str(S.get("ult_cutin", "full"))
+	return m if m in ULT_CUTINS else "full"
+
+
+func set_ult_cutin(m: String) -> void :
+	if not (m in ULT_CUTINS):
+		push_warning("G.set_ult_cutin: unknown mode '%s'" % m)
+		return
+	S.ult_cutin = m
+	settings_changed.emit("ult_cutin")
+
+
+# V6Fx.shake()/flash() read S.v6_fx.shake/flash: only the "full" level keeps them on
+func _sync_v6_fx() -> void :
+	if not (S.get("v6_fx") is Dictionary):
+		S.v6_fx = {}
+	var on: = str(S.get("fx_level", "full")) == "full"
+	S.v6_fx.shake = on
+	S.v6_fx.flash = on
 
 
 func _tmp_path() -> String:
