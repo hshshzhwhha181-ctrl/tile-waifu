@@ -123,7 +123,7 @@ const RECTS: = {
 	"mc_base": [Rect2(297, 48, 260, 260), Rect2(219, 0, 416, 520)],
 	"mc_cafe": [Rect2(322, 75, 260, 260), Rect2(261, 22, 382, 478)],
 	"mc_cozy": [Rect2(322, 48, 260, 260), Rect2(244, 0, 416, 520)],
-	"mc_dragon": [Rect2(287, 119, 286, 286), Rect2(230, 61, 399, 499)],
+	"mc_dragon": [Rect2(277, 46, 286, 286), Rect2(220, 0, 400, 500)],
 	"mc_tutor": [Rect2(222, 75, 260, 260), Rect2(145, 22, 414, 518)],
 	"nova_base": [Rect2(338, 126, 260, 260), Rect2(273, 73, 390, 487)],
 	"nova_offline": [Rect2(322, 125, 260, 260), Rect2(257, 72, 390, 488)],
@@ -139,7 +139,7 @@ const RECTS: = {
 	"yue_duel": [Rect2(299, 135, 260, 260), Rect2(222, 82, 414, 518)],
 	"yue_queen": [Rect2(313, 151, 260, 260), Rect2(234, 98, 418, 522)],
 	# event outfits (V7EventData.limited_items): close-up cards, faces are larger
-	"cg_mc_card": [Rect2(168, 175, 468, 468), Rect2(74, 80, 656, 820)],
+	"cg_mc_card": [Rect2(231, 119, 468, 468), Rect2(110, 40, 640, 800)],
 	"cg_rin_card": [Rect2(449, 140, 390, 390), Rect2(308, 61, 551, 689)],
 	"cg_hana_card": [Rect2(417, 145, 442, 442), Rect2(163, 55, 696, 870)],
 	"cg_yue_card": [Rect2(136, 117, 338, 338), Rect2(66, 48, 478, 597)],
@@ -166,10 +166,8 @@ const ULTS: = {
 		"mod": "О", "sfx": "sparkle", "fx": "knit_heart"},
 	"o_dragon": {"hero": "mc", "name": "Пробуждение дракона", "lines": ["Пробудись, дракон!", "Партия окончена~", "Нефрит и пламя!"],
 		"palette": {"main": Color("ff8fb8"), "accent": Color("ffc93c"), "ink": Color("6a1020")},
-		"ref_img": "res://assets/outfits/mc_dragon.webp", "face_rect": Rect2(287, 119, 286, 286), "alt_rect": Rect2(230, 61, 399, 499),
-		# 0.9: mc_dragon's face reads rounder / younger than her base art (queued for the v2 adult-face redraw): the
-		# clip (art panel and eye close-up) shows her base portrait until then — clip_art()
-		"redraw": true,
+		"ref_img": "res://assets/outfits/mc_dragon.webp", "face_rect": Rect2(277, 46, 286, 286), "alt_rect": Rect2(220, 0, 400, 500),
+		# 0.9.0: mc_dragon redrawn with her adult face (recipe v4) — clip uses its own art again
 		"mod": "Л", "sfx": "summon_boom", "fx": "jade_dragon"},
 	# ── Рин: нефрит 4fbf9f, золотые очки. Ядро: возвращает лоток (пуст — снимает пару).
 	"r_base": {"hero": "rin", "name": "Чайная пауза", "lines": ["Позволь.", "Чайная пауза.", "Не торопись."],
@@ -252,10 +250,8 @@ const ULTS: = {
 	# 0.9: a salon-lamps ult in a neutral voice (no «closed sign» / «only for us» after-hours framing)
 	"ev_mc": {"hero": "mc", "name": "Вечерние фонари", "lines": ["Фонари, светлее!", "Ещё партию?", "Партия окончена~"],
 		"palette": {"main": Color("ff8fb8"), "accent": Color("ffcf8a"), "ink": _MC_INK},
-		"ref_img": "res://assets/v07/event/cg_mc_card.webp", "face_rect": Rect2(168, 175, 468, 468), "alt_rect": Rect2(74, 80, 656, 820),
-		# cg_mc_card's face reads much younger than her base art (queued for an adult-face redraw, docs/ART.md): the
-		# clip shows her base portrait until then — clip_art()
-		"redraw": true,
+		"ref_img": "res://assets/v07/event/cg_mc_card.webp", "face_rect": Rect2(231, 119, 468, 468), "alt_rect": Rect2(110, 40, 640, 800),
+		# 0.9.0: cg_mc_card redrawn with her adult face (recipe v4) — clip uses its own art again
 		"mod": "В", "sfx": "sparkle", "fx": "lamp_dim"},
 	"ev_rin": {"hero": "rin", "name": "Рой светлячков", "lines": ["Позволь.", "Светлячки, ко мне.", "Посидим у пруда."],
 		"palette": {"main": Color("4fbf9f"), "accent": Color("fff0a0"), "ink": _RIN_INK},
