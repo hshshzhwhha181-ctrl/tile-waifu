@@ -29,7 +29,7 @@ func _ready() -> void:
 			var kv: = s.substr(2).split("=", true, 1)
 			a[kv[0]] = kv[1]
 	if a.has("path_selftest"):
-		var st: = load("res://scripts/v10/path/path_selftest.gd").new()
+		var st = load("res://scripts/v10/path/path_selftest.gd").new()
 		add_child(st)
 		var r: Array = await st.run()
 		get_tree().quit(0 if int(r[0]) == int(r[1]) else 1)
@@ -188,10 +188,10 @@ func act(step: String) -> float:
 		"fail", "fail_peak":
 			var f: = State.current() if cmd == "fail" else _first_peak(true)
 			var cfg: = State.play_cfg(f)
-			var log: = Jam.demo_fail_log(cfg, 3)
+			var takes: = Jam.demo_fail_log(cfg, 3)
 			State.on_fail(f)
 			var res: = State.on_fail(f)
-			var jam: = Jam.find(cfg, log)
+			var jam: = Jam.find(cfg, takes)
 			Dlg.fail_window(main, f, res, jam, Callable(), Callable())
 			return 1.0
 		"summit":

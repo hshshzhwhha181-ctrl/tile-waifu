@@ -95,6 +95,16 @@ static func summit_stamp(parent: Control, size: Vector2, summits: int, step: int
 	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.name = "SummitStamp"
 	parent.add_child(root)
+	var dim: = ColorRect.new()
+	dim.size = size
+	dim.color = Color(0.03, 0.02, 0.05, 0.0)
+	dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	root.add_child(dim)
+	var td: = dim.create_tween()
+	td.tween_property(dim, "color:a", 0.62, 0.2)
+	td.tween_interval(2.4)
+	td.tween_property(root, "modulate:a", 0.0, 0.35)
+	td.tween_callback(root.queue_free)
 	var c: = Vector2(size.x * 0.5, size.y * 0.42)
 	var disc: = Control.new()
 	disc.size = Vector2(300, 300)

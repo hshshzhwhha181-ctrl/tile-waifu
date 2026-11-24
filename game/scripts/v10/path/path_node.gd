@@ -62,7 +62,18 @@ func _build_art() -> void:
 		_portrait = Common.avatar(host, Rect2(c - Vector2(r, r), Vector2(r, r) * 2.0), "gold")
 		add_child(_portrait)
 		if locked():
-			_portrait.modulate = Color(0.42, 0.4, 0.46)
+			# the portrait's shader ignores modulate: a dark veil and a lock on top instead
+			var veil: = Polygon2D.new()
+			var pts: = PackedVector2Array()
+			for k in 40:
+				var a: = TAU * k / 40.0
+				pts.append(c + Vector2(cos(a), sin(a)) * (r - 2.0))
+			veil.polygon = pts
+			veil.color = Color(0.06, 0.04, 0.09, 0.62)
+			add_child(veil)
+			var lk: = V8Art.icon("lock")
+			if lk:
+				add_child(UI.tex(lk, Rect2(c - Vector2(26, 26), Vector2(52, 52))))
 		var fr: Texture2D = load(Rules.OLD_MAP_DIR + "boss_frame.png") if ResourceLoader.exists(Rules.OLD_MAP_DIR + "boss_frame.png") else null
 		if fr:
 			var fs: = Vector2(radius * 2.5, radius * 2.5 * 236.0 / 220.0)
@@ -76,6 +87,7 @@ func _build_art() -> void:
 			add_child(_peak)
 			if locked():
 				_peak.modulate = Color(0.5, 0.5, 0.58)
+				_veil(c, radius * 0.86)
 	elif kind == "legend":
 		var t2: = Rules.icon("crown")
 		if t2:
@@ -87,6 +99,20 @@ func _build_art() -> void:
 				_crown.modulate = Color(0.35, 0.33, 0.4, 0.75)
 			elif locked():
 				_crown.modulate = Color(0.55, 0.52, 0.6)
+
+
+func _veil(c: Vector2, r: float) -> void:
+	var veil: = Polygon2D.new()
+	var pts: = PackedVector2Array()
+	for k in 40:
+		var a: = TAU * k / 40.0
+		pts.append(c + Vector2(cos(a), sin(a)) * r)
+	veil.polygon = pts
+	veil.color = Color(0.06, 0.04, 0.09, 0.55)
+	add_child(veil)
+	var lk: = V8Art.icon("lock")
+	if lk:
+		add_child(UI.tex(lk, Rect2(c - Vector2(24, 24), Vector2(48, 48))))
 
 
 func _process(dt: float) -> void:
@@ -168,7 +194,7 @@ func _draw_num_chip(c: Vector2, lk: bool) -> void:
 	var txt: = str(num)
 	var fs: = 22
 	var sz: = _font.get_string_size(txt, HORIZONTAL_ALIGNMENT_CENTER, -1, fs)
-	var r: = Rect2(c + Vector2(-sz.x * 0.5 - 14, radius * 0.62), Vector2(sz.x + 28, 30))
+	var r: = Rect2(c + Vector2(-sz.x * 0.5 - 14, radius * 0.9), Vector2(sz.x + 28, 30))
 	draw_style_box(_pill(Color(0.12, 0.07, 0.1, 0.92) if not lk else Color(0.2, 0.2, 0.24, 0.9), Color("e8c47e")), r)
 	draw_string(_font, Vector2(r.position.x + 14, r.position.y + 23), txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color("ffe7c4"))
 

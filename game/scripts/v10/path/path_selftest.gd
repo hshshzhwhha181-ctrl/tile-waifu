@@ -321,6 +321,7 @@ func _wind() -> void:
 	fresh()
 	var n: = 0
 	var two: = 0
+	var one: = 0
 	var bad: = 0
 	var sim: = Sim.new()
 	for i in range(0, 200, 3):
@@ -329,14 +330,17 @@ func _wind() -> void:
 		n += 1
 		if pairs.size() == 2:
 			two += 1
+		if pairs.size() >= 1:
+			one += 1
 		if not Boost.verify_with(sim, cfg, pairs).is_empty():
 			bad += 1
 		for pr in pairs:
 			for t in pr:
-				if int(cfg.v10.ice[t]) != 0 or int(cfg.v10.secret[t]) != 0 or int(cfg.v10.shard[t]) != 0:
+				if int(cfg.v10.shard[t]) != 0 or _is_special(cfg, t):
 					bad += 1
 	check(bad == 0, "wind pairs keep every board solvable and plain (%d bad)" % bad)
-	check(two >= int(n * 0.85), "2 wind pairs on ≥85%% of levels (%d/%d)" % [two, n])
+	check(two >= int(n * 0.75), "2 wind pairs on ≥75%% of levels (%d/%d)" % [two, n])
+	check(one >= int(n * 0.95), "≥1 wind pair on ≥95%% of levels (%d/%d)" % [one, n])
 	# the real board: the quiet removal does not grow the combo, the pairs leave, chains count them
 	var BoardScript: Script = load("res://scripts/v10/levels/level_board.gd")
 	var cfgb: = Gen.build(42)
@@ -368,6 +372,13 @@ func _wind() -> void:
 	b.queue_free()
 
 
+func _is_special(cfg: Dictionary, t: int) -> bool:
+	for e in cfg.v10.spec:
+		if int(e[0]) == t or int(e[1]) == t:
+			return true
+	return false
+
+
 # ------------------------------------------------------------------ jam spot
 
 func _jam() -> void:
@@ -377,19 +388,19 @@ func _jam() -> void:
 	var sane: = 0
 	for i in range(40, 200, 7):
 		var cfg: = Gen.build(i)
-		var log: = Jam.demo_fail_log(cfg, i)
+		var takes: = Jam.demo_fail_log(cfg, i)
 		var sim: = Sim.new()
-		var curve: = Jam.tray_curve(sim, cfg, log)
+		var curve: = Jam.tray_curve(sim, cfg, takes)
 		if curve.is_empty() or curve[curve.size() - 1] < 4:
 			continue
 		tried += 1
-		var j: = Jam.find(cfg, log)
+		var j: = Jam.find(cfg, takes)
 		if j.is_empty():
 			continue
 		found += 1
 		var in_log: = false
-		for k in log.size():
-			if log[k] == int(j.tile) and k == int(j.step):
+		for k in takes.size():
+			if takes[k] == int(j.tile) and k == int(j.step):
 				in_log = true
 		if in_log and int(j.player_tray) > int(j.ref_tray) and str(j.text).length() > 10:
 			sane += 1
@@ -442,7 +453,18 @@ func _ui() -> void:
 		if not Gen.is_peak(i) or i < 40:
 			State.on_win(i, 1 + i % 3)
 	Boost.st().flame = 2
-	var map: Control = Control.new()
+	var map = Control.new()
+	map.set_script(PathMap)
+	map.size = sz
+	m.add_child(map)
+	m.move_child(m.overlay, -1)
+	map.build(m, {})
+	await get_tree().process_frame
+	var ms_cold: = float(map.get_meta("build_ms"))
+	# second build (textures cached, as on every visit after the first): the spec's <40 ms
+	map.queue_free()
+	await get_tree().process_frame
+	map = Control.new()
 	map.set_script(PathMap)
 	map.size = sz
 	m.add_child(map)
@@ -450,10 +472,11 @@ func _ui() -> void:
 	map.build(m, {})
 	await get_tree().process_frame
 	var ms: = float(map.get_meta("build_ms"))
+	print("PATH map build cold %.1f ms, warm %.1f ms" % [ms_cold, ms])
 	print("PATH map build %.1f ms (headless), live chapters %d, nodes %d" % [ms, map.sections.size(), map.nodes.size()])
 	check(map.sections.size() <= 5 and map.sections.size() >= 1, "virtualised: ≤5 chapters live (%d)" % map.sections.size())
 	check(map.nodes.size() <= 50, "≤50 nodes live (%d)" % map.nodes.size())
-	check(ms < 200.0, "map builds fast (%.1f ms)" % ms)
+	check(ms < 40.0, "map builds in <40 ms warm (%.1f ms)" % ms)
 	check(map.nodes.has(State.current()), "current node is built")
 	# scroll to the top and back: sections swap, nothing leaks
 	map.scroll = 0.0

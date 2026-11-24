@@ -60,7 +60,9 @@ static func open(main, map, i: int) -> Control:
 
 	var pw: = minf(vs.x - 24.0, 700.0)
 	var intro_on: bool = str(n.intro) != ""
-	var ph: = 600.0 + (170.0 if intro_on else 0.0) + (120.0 if n.peak or n.legend else 0.0)
+	var show_daily: bool = bool(State.daily().show) and not (n.peak or n.legend)
+	var ph: = 170.0 + (170.0 if intro_on else 0.0) + (120.0 if n.peak or n.legend else 0.0) + 50.0 + (26.0 if show_daily else 0.0) \
+		+ (26.0 if State.assisted(i) else 0.0) + 8.0 + 172.0 + 128.0
 	ph = minf(ph, vs.y - 150.0)
 	var px: = (vs.x - pw) * 0.5
 	var py: = vs.y - ph - 18.0
@@ -115,11 +117,11 @@ static func open(main, map, i: int) -> Control:
 	tl.size = Vector2(220, 46)
 	tl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	tp.add_child(tl)
-	tp.size.x = minf(250.0, UI.font("body", 900).get_string_size(tier_name, HORIZONTAL_ALIGNMENT_LEFT, -1, 22).x + 40.0 + 26.0 * int(look.flames))
+	tp.size.x = minf(300.0, UI.font("body", 900).get_string_size(tier_name, HORIZONTAL_ALIGNMENT_LEFT, -1, 22).x + 44.0 + 30.0 * mini(int(look.flames), 2))
 	for f in int(look.flames):
 		if f >= 2:
 			break
-		var fi: = UI.tex(Rules.icon("flame"), Rect2(tp.size.x - 34 - f * 24, 4, 36, 36))
+		var fi: = UI.tex(Rules.icon("flame"), Rect2(tp.size.x - 40 - f * 28, 5, 34, 34))
 		tp.add_child(fi)
 	if Gen.TIERS.find(str(n.tier)) >= Gen.TIERS.find("hard"):
 		var pr: = UI.label("проходят ≈%d%%" % pass_rate(i), 21, Color("f0e2cf"), Color(0.06, 0.03, 0.05), 3)
@@ -351,7 +353,7 @@ static func _boosters(main, p: Control, i: int, mode: String, sel: Dictionary, h
 		if k >= fl or honest:
 			cup.modulate = Color(0.35, 0.32, 0.4, 0.75)
 		box.add_child(cup)
-	var hint: = UI.label("Здесь только честная игра" if honest else ("Победа разжигает огонёк, провал гасит одну чашку" if fl < 3 else "Огонёк горит в полную силу"), 17, Color("d7c8b8"))
+	var hint: = UI.label("Здесь только честная игра" if honest else ("Победа +1 чашка, провал −1" if fl < 3 else "Огонёк горит в полную силу"), 17, Color("d7c8b8"))
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	hint.position = Vector2(290, 0)
@@ -372,29 +374,39 @@ static func _boosters(main, p: Control, i: int, mode: String, sel: Dictionary, h
 		slot.name = "Boost_" + kind
 		box.add_child(slot)
 		_paint_slot(slot, kind, sel, honest)
-		slot.gui_input.connect(func(e):
-			if not (e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT and not e.pressed):
-				return
-			var res: = Boost.toggle(sel, kind, i, mode)
-			match res:
-				"deny":
-					V9Feel.deny(slot)
-					if honest and main and main.has_method("toast"):
-						main.toast("Здесь только честная игра")
-				"buy":
-					V9Feel.press(slot)
-					Common.confirm(main, Rules.BOOSTER_NAMES[kind], Rules.BOOSTER_HELP[kind], "gem", Rules.BOOST_PRICE, func():
-						if Boost.buy(kind):
-							Boost.toggle(sel, kind, i, mode)
-							_paint_slot(slot, kind, sel, honest)
-							V9Feel.success(slot)
-							if main and main.has_method("refresh_currency"):
-								main.refresh_currency())
-				_:
-					V9Feel.press(slot, "pop" if res != "" else "tap")
-					_paint_slot(slot, kind, sel, honest)
-					if res != "" and V9Feel.can_fx():
-						Fx.burst(slot, Vector2(cs * 0.5, cs * 0.5), "sparkle", 10, Color(1, 0.9, 0.6), 0.5))
+		slot.gui_input.connect(func(e): _slot_input(e, main, slot, kind, sel, honest, i, mode))
+
+
+static func _slot_input(e: InputEvent, main, slot: Control, kind: String, sel: Dictionary, honest: bool, i: int, mode: String) -> void:
+	if not (e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT and not e.pressed):
+		return
+	var res: = Boost.toggle(sel, kind, i, mode)
+	if res == "deny":
+		V9Feel.deny(slot)
+		if honest and main and main.has_method("toast"):
+			main.toast("Здесь только честная игра")
+		return
+	if res == "buy":
+		V9Feel.press(slot)
+		Common.confirm(main, Rules.BOOSTER_NAMES[kind], Rules.BOOSTER_HELP[kind], "gem", Rules.BOOST_PRICE,
+			func(): _buy_done(main, slot, kind, sel, honest, i, mode))
+		return
+	V9Feel.press(slot, "pop" if res != "" else "tap")
+	_paint_slot(slot, kind, sel, honest)
+	if res != "" and V9Feel.can_fx():
+		Fx.burst(slot, slot.size * Vector2(0.5, 0.36), "sparkle", 10, Color(1, 0.9, 0.6), 0.5)
+
+
+static func _buy_done(main, slot: Control, kind: String, sel: Dictionary, honest: bool, i: int, mode: String) -> void:
+	if not Boost.buy(kind):
+		V9Feel.deny(slot)
+		return
+	Boost.toggle(sel, kind, i, mode)
+	if is_instance_valid(slot):
+		_paint_slot(slot, kind, sel, honest)
+		V9Feel.success(slot)
+	if main and main.has_method("refresh_currency"):
+		main.refresh_currency()
 
 
 static func _paint_slot(slot: Control, kind: String, sel: Dictionary, honest: bool) -> void:

@@ -181,7 +181,7 @@ static func bypassed(i: int) -> bool:
 
 
 # "arc_locked" | "locked" | "open" | "current" | "done" | "bypass"
-static func state_of(i: int) -> String:
+static func state_of(i: int, cur: = -2) -> String:
 	if not arc_released(arc_of(i)):
 		return "arc_locked"
 	if stars(i) > 0:
@@ -191,7 +191,9 @@ static func state_of(i: int) -> String:
 	if bypassed(i):
 		return "bypass"
 	if i < unlocked():
-		return "current" if i == current() else "open"
+		if cur == -2:
+			cur = current()
+		return "current" if i == cur else "open"
 	return "locked"
 
 

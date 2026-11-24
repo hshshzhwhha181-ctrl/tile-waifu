@@ -172,7 +172,7 @@ static func lantern_payload(cfg: Dictionary) -> void:
 	b["secret"] = sec
 
 
-# Попутный ветер: up to 2 pairs that are free at the start, plain (no special, no shard, no ice / secret), chosen so
+# Попутный ветер: up to 2 pairs that are free at the start, plain (no special, no shard; flip-backs are fine), chosen so
 # the level stays provably solvable: the pairs are taken first, then the certificate (minus them) must replay.
 static func wind_pairs(cfg: Dictionary, want: = 2) -> Array:
 	if not cfg.has("v10"):
@@ -186,19 +186,19 @@ static func wind_pairs(cfg: Dictionary, want: = 2) -> Array:
 	var rank: = {}
 	for k in cert.size():
 		rank[cert[k]] = k
-	var free: = []
+	var cands: = []
 	for t in sim.freel:
-		if sim.kind[t] == 0 and sim.ice0[t] == 0 and sim.secret0[t] == 0 and shard[t] == 0 and sim.face0[t] < Sim.JOKER:
-			free.append(t)
-	free.sort_custom(func(x, y): return int(rank.get(x, 0)) < int(rank.get(y, 0)))
+		if sim.kind[t] == 0 and shard[t] == 0 and sim.face0[t] < Sim.JOKER:
+			cands.append(t)
+	cands.sort_custom(func(x, y): return int(rank.get(x, 0)) < int(rank.get(y, 0)))
 	var picked: = []
 	var used: = {}
-	for a in free:
+	for a in cands:
 		if picked.size() >= want:
 			break
 		if used.has(a):
 			continue
-		for c in free:
+		for c in cands:
 			if c == a or used.has(c) or sim.face0[c] != sim.face0[a]:
 				continue
 			var trial: Array = picked + [[a, c]]
@@ -219,6 +219,8 @@ static func verify_with(sim, cfg: Dictionary, pairs: Array) -> Dictionary:
 		for t in pr:
 			if sim.present[t] == 0 or not sim.is_free(t) or not sim.takeable(t):
 				return {"why": "wind tile %d not free" % t}
+			while sim.ice[t] > 0:
+				sim.tap(t)
 			sim.tap(t)
 			gone[t] = true
 		if not sim.tray.is_empty():

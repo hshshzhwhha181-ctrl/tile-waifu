@@ -45,6 +45,9 @@ var scroll: = 0.0
 var content_h: = 0.0
 var gate_h: = 0.0
 var map_root: Control
+var bg_root: Control
+var fg_root: Control
+var band_root: Control
 var sections: = {}
 var nodes: = {}
 var chests: = {}
@@ -97,7 +100,19 @@ func build(m, args: Dictionary = {}) -> void:
 	map_root.size = Vector2(W, content_h)
 	map_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(map_root)
+	bg_root = Control.new()
+	bg_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	bg_root.name = "Backdrops"
+	map_root.add_child(bg_root)
+	band_root = Control.new()
+	band_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	band_root.name = "Seams"
+	map_root.add_child(band_root)
 	_build_path_lines()
+	fg_root = Control.new()
+	fg_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	fg_root.name = "Chapters"
+	map_root.add_child(fg_root)
 	_build_gate()
 	_build_start()
 	var wfx: String = str(Gen.WORLD[arc].fx)
@@ -200,7 +215,6 @@ func _build_path_lines() -> void:
 	shadow.joint_mode = Line2D.LINE_JOINT_ROUND
 	shadow.begin_cap_mode = Line2D.LINE_CAP_ROUND
 	shadow.end_cap_mode = Line2D.LINE_CAP_ROUND
-	shadow.z_index = 1
 	map_root.add_child(shadow)
 	line_rest = Line2D.new()
 	line_rest.points = path_pts
@@ -209,7 +223,6 @@ func _build_path_lines() -> void:
 	line_rest.texture_mode = Line2D.LINE_TEXTURE_TILE
 	line_rest.texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
 	line_rest.default_color = Color(1.0, 0.95, 0.88, 0.7)
-	line_rest.z_index = 1
 	map_root.add_child(line_rest)
 	glow_done = Line2D.new()
 	glow_done.width = 30.0
@@ -217,7 +230,6 @@ func _build_path_lines() -> void:
 	glow_done.joint_mode = Line2D.LINE_JOINT_ROUND
 	glow_done.begin_cap_mode = Line2D.LINE_CAP_ROUND
 	glow_done.end_cap_mode = Line2D.LINE_CAP_ROUND
-	glow_done.z_index = 1
 	map_root.add_child(glow_done)
 	line_done = Line2D.new()
 	line_done.width = 12.0
@@ -225,7 +237,6 @@ func _build_path_lines() -> void:
 	line_done.joint_mode = Line2D.LINE_JOINT_ROUND
 	line_done.begin_cap_mode = Line2D.LINE_CAP_ROUND
 	line_done.end_cap_mode = Line2D.LINE_CAP_ROUND
-	line_done.z_index = 1
 	map_root.add_child(line_done)
 	_set_done_to(_done_upto())
 
@@ -305,7 +316,7 @@ func _update_sections() -> void:
 
 
 func _free_section(c: int) -> void:
-	var sec: Control = sections[c]
+	var pair: Array = sections[c]
 	sections.erase(c)
 	for i in nodes.keys():
 		if State.chapter_in_arc(i) == c and State.arc_of(i) == arc:
@@ -313,7 +324,8 @@ func _free_section(c: int) -> void:
 	for k in chests.keys():
 		if int(str(k).get_slice(":", 0)) % 10 == c:
 			chests.erase(k)
-	sec.queue_free()
+	for x in pair:
+		(x as Node).queue_free()
 
 
 func _build_section(c: int) -> void:
@@ -323,9 +335,14 @@ func _build_section(c: int) -> void:
 	sec.size = Vector2(W, CH)
 	sec.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	sec.name = "Chapter%d" % (c + 1)
-	map_root.add_child(sec)
-	map_root.move_child(sec, 0)
-	sections[c] = sec
+	fg_root.add_child(sec)
+	var back: = Control.new()
+	back.position = sec.position
+	back.size = sec.size
+	back.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	back.name = "Back%d" % (c + 1)
+	bg_root.add_child(back)
+	sections[c] = [back, sec]
 	# backdrop: the arc's illustrated map, dimmed so the nodes carry the light; mirrored every other chapter
 	var bgt: = Rules.map_bg(arc)
 	if bgt:
@@ -336,20 +353,20 @@ func _build_section(c: int) -> void:
 		bg.size = Vector2(W, CH + 2)
 		bg.flip_h = _mirror(c)
 		bg.flip_v = c % 4 >= 2
-		bg.modulate = Color(0.6, 0.55, 0.64)
+		bg.modulate = Color(0.5, 0.46, 0.55)
 		bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		sec.add_child(bg)
-	Common.edge_shade(sec, Rect2(0, 0, W, 160), 1, Color(0.075, 0.05, 0.09), 0.85)
-	Common.edge_shade(sec, Rect2(0, CH - 160, W, 160), -1, Color(0.075, 0.05, 0.09), 0.85)
-	if W > CW + 8:
-		Common.edge_shade(sec, Rect2(0, 0, X0 + 40, CH), 1, Color(0.075, 0.05, 0.09), 0.6).rotation = 0.0
+		back.add_child(bg)
+	# one soft seam over the boundary to the chapter below (drawn above both backdrops, so build order never shows)
+	var seam: = _seam(Rect2(0, _sec_top(c) + CH - 150.0, W, 300.0))
+	band_root.add_child(seam)
+	(sections[c] as Array).append(seam)
 	_chapter_plate(sec, gc)
 	# nodes
 	var host: = State.host_of_chapter(gc)
 	for k in Gen.CHAPTER:
 		var i: = gc * Gen.CHAPTER + k
 		var info: = State.node(i)
-		var st: = State.state_of(i)
+		var st: = State.state_of(i, cur)
 		if st == "current" and i != cur:
 			st = "open"
 		if i == cur and st == "open":
@@ -357,12 +374,11 @@ func _build_section(c: int) -> void:
 		var n: = PNode.new().setup(info, st, State.stars(i), host if (info.boss or info.legend) else "")
 		var p: = _pos(i) - sec.position
 		n.position = p - n.centre()
-		n.z_index = 2
 		n.name = "Node%d" % i
 		sec.add_child(n)
 		nodes[i] = n
 		if info.peak:
-			_peak_branch(sec, i)
+			_peak_branch(back, i)
 	for kind in ["chapter", "star"]:
 		_build_chest(sec, gc, kind)
 
@@ -374,7 +390,6 @@ func _chapter_plate(sec: Control, gc: int) -> void:
 	var x: = X0 + (CW - w) * 0.5
 	var plate: = UI.rbox("graphite", Rect2(x, y, w, 62), 31, 2, 10)
 	plate.borders(Color("ffe7a6"), Color("a8742a"))
-	plate.z_index = 2
 	sec.add_child(plate)
 	var host: = State.host_of_chapter(gc)
 	plate.add_child(Common.avatar(host, Rect2(-10, -10, 82, 82), "gold"))
@@ -394,6 +409,27 @@ func _chapter_plate(sec: Control, gc: int) -> void:
 	plate.add_child(st)
 
 
+func _seam(r: Rect2) -> TextureRect:
+	var g: = Gradient.new()
+	var col: = Color(0.075, 0.05, 0.09)
+	g.offsets = PackedFloat32Array([0.0, 0.38, 0.5, 0.62, 1.0])
+	g.colors = PackedColorArray([Color(col, 0.0), Color(col, 0.82), Color(col, 0.92), Color(col, 0.82), Color(col, 0.0)])
+	var gt: = GradientTexture2D.new()
+	gt.gradient = g
+	gt.fill_from = Vector2(0, 0)
+	gt.fill_to = Vector2(0, 1)
+	gt.width = 4
+	gt.height = 128
+	var tr: = TextureRect.new()
+	tr.texture = gt
+	tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	tr.stretch_mode = TextureRect.STRETCH_SCALE
+	tr.position = r.position
+	tr.size = r.size
+	tr.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return tr
+
+
 func _peak_branch(sec: Control, i: int) -> void:
 	var a: = _pos(State.boss_of(i)) - sec.position
 	var b: = _pos(i) - sec.position
@@ -410,7 +446,6 @@ func _peak_branch(sec: Control, i: int) -> void:
 	l.texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
 	var open: = State.state_of(i) != "locked"
 	l.default_color = Color(0.86, 0.9, 1.0, 0.8) if open else Color(0.6, 0.62, 0.72, 0.45)
-	l.z_index = 1
 	sec.add_child(l)
 
 
@@ -422,7 +457,6 @@ func _build_chest(sec: Control, gc: int, kind: String) -> void:
 	box.size = sz + Vector2(0, 30)
 	box.position = p - sz * 0.5
 	box.pivot_offset = sz * 0.5
-	box.z_index = 2
 	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	box.name = "Chest_%s" % kind
 	box.set_meta("gc", gc)
@@ -556,7 +590,6 @@ func _build_marker() -> void:
 	marker = Control.new()
 	marker.size = Vector2(84, 100)
 	marker.pivot_offset = Vector2(42, 100)
-	marker.z_index = 4
 	marker.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	marker.name = "Marker"
 	map_root.add_child(marker)
@@ -655,7 +688,20 @@ func scroll_to_level(i: int, animate: bool) -> void:
 		return
 	_vel = 0.0
 	var tw: = create_tween()
-	tw.tween_method(func(v): scroll = v; _apply_scroll(), scroll, y, 0.55).set_trans(Tween.TRANS_QUART).set_ease(Tween.EASE_OUT)
+	tw.tween_method(_set_scroll, scroll, y, 0.55).set_trans(Tween.TRANS_QUART).set_ease(Tween.EASE_OUT)
+
+
+func _has_screen(id: String) -> bool:
+	var sc = main.get_script()
+	if sc == null:
+		return false
+	var m: Dictionary = sc.get_script_constant_map()
+	return m.has("SCREENS") and (m.SCREENS as Dictionary).has(id)
+
+
+func _set_scroll(v: float) -> void:
+	scroll = v
+	_apply_scroll()
 
 
 func _popup_open() -> bool:
@@ -824,13 +870,13 @@ func switch_arc(w: int) -> void:
 	if w == arc or not State.arc_released(w):
 		return
 	V9Feel.sound("whoosh")
-	if main and main.has_method("go") and main.get("screen") == self and main.SCREENS.has("v10path"):
+	if main and main.has_method("go") and main.get("screen") == self and _has_screen("v10path"):
 		main.go("v10path", {"arc": w}, true, false)
 		return
 	# standalone: rebuild in place
 	var p: = get_parent()
 	var s: = size
-	var nm: Control = Control.new()
+	var nm = Control.new()
 	nm.set_script(get_script())
 	nm.size = s
 	nm.mouse_filter = Control.MOUSE_FILTER_IGNORE

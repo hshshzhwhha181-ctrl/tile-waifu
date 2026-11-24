@@ -126,7 +126,8 @@ static func fail_window(main, i: int, res: Dictionary, jam: Dictionary, on_retry
 	var n: = State.node(i)
 	var stone: bool = n.peak or n.legend
 	var w: = minf(vs.x - 40.0, 660.0)
-	var h: = 560.0 + (110.0 if not jam.is_empty() else 0.0) + (90.0 if res.get("bypass", false) else 0.0)
+	var h: = 300.0 + (138.0 if not jam.is_empty() else 0.0) + (34.0 if bool(res.get("offer_assist", false)) else 0.0) \
+		+ (90.0 if res.get("bypass", false) else 0.0) + 128.0
 	var p: = UI.rbox("graphite", Rect2((vs.x - w) * 0.5, maxf(140.0, (vs.y - h) * 0.5), w, h), 32, 4, 14)
 	if stone:
 		p.colors(Color(0.27, 0.27, 0.3, 0.97), Color(0.13, 0.13, 0.15, 0.98))
@@ -142,7 +143,7 @@ static func fail_window(main, i: int, res: Dictionary, jam: Dictionary, on_retry
 	var t: = UI.center_label(UI.title(title, 40, Color("fff3e6"), Color(0.2, 0.05, 0.1)), Rect2(0, 22, w, 60))
 	p.add_child(t)
 	var host: = State.host_of_chapter(State.gchapter(i))
-	var av: = V8Art.emotion_avatar(host, "sad" if not stone else "surprised", Rect2(w * 0.5 - 70, 92, 140, 140), "gold")
+	var av: = V8Art.emotion_avatar(host, "sad", Rect2(w * 0.5 - 70, 92, 140, 140), "gold")
 	p.add_child(av)
 	var y: = 246.0
 	var cheer: = "Ещё чуть-чуть. Вершины берут упорством." if stone else "Лоток переполнился. Попробуем ещё раз?"
@@ -150,28 +151,28 @@ static func fail_window(main, i: int, res: Dictionary, jam: Dictionary, on_retry
 	p.add_child(cl)
 	y += 54.0
 	if not jam.is_empty():
-		var jb: = UI.rbox("graphite", Rect2(28, y, w - 56, 96), 22, 2, 10)
+		var jb: = UI.rbox("graphite", Rect2(28, y, w - 56, 124), 22, 2, 10)
 		jb.colors(Color(0.32, 0.12, 0.16, 0.9), Color(0.16, 0.06, 0.08, 0.95))
 		jb.borders(Color("ffb3c0"), Color("7a2a3a"))
 		jb.name = "JamBlock"
 		p.add_child(jb)
 		var jt: = UI.label("Место затора", 21, Color("ffd2da"), Color(0.15, 0.03, 0.06), 3, "body", 900)
 		jt.position = Vector2(18, 6)
-		jt.size = Vector2(w - 260, 30)
+		jt.size = Vector2(w - 230, 30)
 		jb.add_child(jt)
 		var jl: = UI.label(str(jam.get("text", "")), 17, Color("f6e6ea"))
 		jl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		jl.position = Vector2(18, 36)
-		jl.size = Vector2(w - 260, 56)
+		jl.position = Vector2(18, 38)
+		jl.size = Vector2(w - 230, 80)
 		jb.add_child(jl)
-		var sb: = JButton.make("Показать", "graphite", Rect2(w - 56 - 190, 16, 176, 64), null, 22)
+		var sb: = JButton.make("Показать", "graphite", Rect2(w - 56 - 172, 32, 158, 62), null, 21)
 		sb.name = "ShowJam"
 		sb.pressed.connect(func():
 			_close(root)
 			if on_show_jam.is_valid():
 				on_show_jam.call(jam))
 		jb.add_child(sb)
-		y += 110.0
+		y += 138.0
 	if bool(res.get("offer_assist", false)):
 		var al: = UI.center_label(UI.label("%s может переложить стол удобнее" % Rules.host_name(host), 19, Color("b9f0d6")), Rect2(30, y, w - 60, 30))
 		p.add_child(al)
