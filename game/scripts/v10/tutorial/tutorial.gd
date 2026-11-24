@@ -242,7 +242,9 @@ func _set_step(s: Dictionary, entry: bool) -> void:
 	step_entry = entry
 	step_t0 = t
 	step_shown = false
-	_resume_id = ""
+	# a bridge step does not use up the resume point (it only leads to the chapter screen)
+	if not entry:
+		_resume_id = ""
 	V10TutState.set_step(String(s.id))
 	var b = _board()
 	snap = {"tray": b.tray.size() if b else 0, "gone": _gone(b), "pulls": int(G.S.get("pulls", 0)),

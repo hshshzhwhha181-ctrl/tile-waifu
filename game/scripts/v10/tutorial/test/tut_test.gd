@@ -22,6 +22,7 @@ var shots: = ""
 var shot_n: = 0
 var shown_steps: = {}
 var log_lines: = []
+var resume_at_attach: = ""
 
 
 func _ready() -> void:
@@ -108,6 +109,7 @@ func boot(fresh: bool) -> void:
 	add_child(main)
 	# integration hook (README): main._ready → V10Tutorial.attach(main)
 	V10Tutorial.attach(main)
+	resume_at_attach = tut()._resume_id
 	await wait(1.6)
 	# the title waits for a tap
 	await tap(Vector2(vp().x * 0.5, vp().y - 200))
@@ -148,9 +150,11 @@ func answer_coach() -> String:
 	if c == null or not c.visible or c._closing or not c.bubble.visible:
 		return ""
 	await wait(0.45)
-	if c == null or not c.visible or not c.bubble.visible:
+	if c == null or not c.visible or c._closing or not c.bubble.visible:
 		return ""
 	var sid: = String(tut().step.get("id", "")) if tut().tip_showing == "" else "tip_" + tut().tip_showing
+	if sid == "":
+		return ""
 	if not shown_steps.has(sid):
 		shown_steps[sid] = true
 		await wait(0.35)
@@ -405,10 +409,10 @@ func _resume_and_skip() -> void:
 	await kill_app()
 	st.check("resume: step survives the kill", String(G.S.v10_tut.step) == "m_twin", str(G.S.get("v10_tut", {}).get("step")))
 	await boot(false)
-	st.check("resume: resume point loaded", tut()._resume_id == "m_twin", tut()._resume_id)
+	st.check("resume: resume point loaded at attach", resume_at_attach == "m_twin", resume_at_attach)
 	await go("play", {"level": 0, "partner": "mc"})
 	var t0: = G.time
-	while not (coach().visible and coach().bubble.visible) and G.time - t0 < 15.0:
+	while not (coach().visible and coach().bubble.visible and not coach()._closing and String(tut().step.get("id", "")) != "m_wait") and G.time - t0 < 15.0:
 		await wait(0.2)
 	st.check("resume: restarts at the table explanation", String(tut().step.get("id", "")) == "m_board", String(tut().step.get("id", "")))
 	await wait(0.6)
@@ -420,7 +424,7 @@ func _resume_and_skip() -> void:
 	await wait(0.6)
 	st.check("skip: asks first", coach().confirm_open())
 	await shot("skip_confirm")
-	var yes: = V10TutTarget.find_text(coach()._confirm, "Пропустить") if coach().confirm_open() else null
+	var yes = coach()._confirm.find_child("Yes", true, false) if coach().confirm_open() else null
 	if yes:
 		await tap((yes as Control).get_global_rect().get_center())
 	await wait(0.8)

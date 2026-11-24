@@ -222,7 +222,7 @@ func show_step(d: Dictionary) -> void:
 	if has_goal:
 		hole = goal if first or hole.size == Vector2.ZERO else hole
 	# the dim fades in at the first step and stays between steps (no flicker); a tip is lighter
-	var a: = 0.62 if mode == "tip" else 0.74
+	var a: = 0.66 if mode == "tip" else 0.8
 	mat.set_shader_parameter("dim", Color(0.035, 0.02, 0.05, a))
 	var tw: = create_tween()
 	tw.tween_method(func(v): mat.set_shader_parameter("amount", v), float(mat.get_shader_parameter("amount")), 1.0, 0.28)
@@ -277,7 +277,7 @@ func _fill_bubble(d: Dictionary) -> void:
 		var lbl: = UI.label("%d / %d" % [i, n], 15, Color("e8d6c0"), UI.DARK, 2, "body", 900)
 		lbl.position = Vector2(0, -2)
 		counter.add_child(lbl)
-		var x0: = 52.0
+		var x0: = UI.font("body", 900).get_string_size(lbl.text, HORIZONTAL_ALIGNMENT_LEFT, -1, 15).x + 12.0
 		for j in mini(n, 14):
 			var dot: = UI.rbox("gold" if j < i else "plum", Rect2(x0 + j * 15.0, 4, 10, 10), 5, 1, 2)
 			if j >= i:
@@ -370,10 +370,17 @@ func _layout() -> void:
 		y = SAFE_TOP + 26.0 if _above else vp.y - SAFE_BOTTOM - bh
 	y = clampf(y, SAFE_TOP + 26.0, vp.y - SAFE_BOTTOM - bh)
 	bubble.position = Vector2(x, y)
-	# skip pill: top right under the status bar; moved down when the hole is there
-	skip_btn.position = Vector2(vp.x - skip_btn.size.x - 14.0, 22.0)
-	if has_goal and Rect2(skip_btn.position, skip_btn.size).grow(8).intersects(goal):
-		skip_btn.position.y = minf(goal.end.y + 14.0, vp.y * 0.5)
+	# skip pill: top right; another corner when the hole or the bubble is there
+	var br: = Rect2(bubble.position, bubble.size).grow(10)
+	var sw: = skip_btn.size
+	var spots: = [Vector2(vp.x - sw.x - 14.0, 22.0), Vector2(14.0, 22.0), Vector2(vp.x - sw.x - 14.0, vp.y - sw.y - 22.0),
+		Vector2(14.0, vp.y - sw.y - 22.0)]
+	skip_btn.position = spots[0]
+	for sp in spots:
+		var r: = Rect2(sp, sw).grow(8)
+		if not (has_goal and r.intersects(goal)) and not r.intersects(br):
+			skip_btn.position = sp
+			break
 	if is_instance_valid(_timeout_chip):
 		_timeout_chip.position = Vector2(bubble.position.x + bw - _timeout_chip.size.x - 14.0, bubble.position.y + bh + 12.0 if bubble.position.y + bh + 70.0 < vp.y else bubble.position.y - 64.0)
 
@@ -384,6 +391,9 @@ func _pointer_at() -> Vector2:
 	var c: = goal.get_center()
 	if goal.size.x > 220.0:
 		c.x -= goal.size.x * 0.18
+	# a tall target (a portrait): touch its lower half, the arrow must not sit on her face
+	if goal.size.y > 180.0:
+		c.y = goal.position.y + goal.size.y * 0.68
 	return c
 
 
@@ -564,6 +574,7 @@ func _ask_skip() -> void:
 	p.add_child(bl)
 	var bw: = (w - 72.0) * 0.5
 	var keep: = JButton.make("Продолжить", "pink", Rect2(24, h - 104, bw, 80), null, 24)
+	keep.name = "No"
 	keep.pressed.connect(func():
 		var c: = _confirm
 		_confirm = null
@@ -571,6 +582,7 @@ func _ask_skip() -> void:
 			c.queue_free())
 	p.add_child(keep)
 	var skip: = JButton.make("Пропустить", "glass", Rect2(48 + bw, h - 104, bw, 80), null, 24, -1.0, false)
+	skip.name = "Yes"
 	skip.pressed.connect(func():
 		var c: = _confirm
 		_confirm = null
