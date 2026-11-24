@@ -18,7 +18,7 @@ const REWARDS: = [
 	{"kind": "coins", "n": 500, "text": "500 монет", "icon": "coin"},
 	{"kind": "tickets", "n": 2, "text": "2 билета желания", "icon": "ticket"},
 	{"kind": "item", "id": "s_lemon", "text": "Фишки «Лимон»", "icon": "tiles"},
-	{"kind": "tickets", "n": 3, "text": "3 билета и фон «Первый вечер»", "icon": "ticket", "extra": {"kind": "cos", "id": "cb_first_evening"}},
+	{"kind": "tickets", "n": 3, "text": "3 билета и фон «Первый вечер»", "icon": "ticket", "extra": {"kind": "cos", "id": "cb_evening"}},
 ]
 
 

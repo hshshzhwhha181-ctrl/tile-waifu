@@ -21,6 +21,19 @@ func _args() -> Dictionary:
 
 func _ready() -> void:
 	args = _args()
+	if args.has("check"):
+		# load every script of the lane once: parse/compile errors print, exit 1 if any failed
+		var bad: = 0
+		for d in ["res://scripts/v10/gacha/", "res://scripts/v10/gacha/ui/"]:
+			for f in DirAccess.get_files_at(d):
+				if f.ends_with(".gd"):
+					var s = load(d + f)
+					if s == null or not (s as Script).can_instantiate() and not f.ends_with("gui.gd"):
+						bad += 1
+						print("CHECK FAIL ", d + f)
+		print("GACHA_CHECK bad=%d" % bad)
+		get_tree().quit(1 if bad > 0 else 0)
+		return
 	if args.has("gacha_selftest"):
 		var r: = V10GachaSelftest.run(float(args.get("mc", "1")))
 		get_tree().quit(0 if r[0] == r[1] else 1)
