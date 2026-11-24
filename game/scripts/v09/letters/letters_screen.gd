@@ -431,7 +431,10 @@ func _answer(p: RBox, l: Dictionary, v: Dictionary, ry: float, fresh: bool) -> v
 	aff.create_tween().tween_property(aff, "modulate:a", 1.0, 0.25).set_delay(0.45)
 	V9Feel.success(av, "sparkle", 0.8)
 	var at: Vector2 = p.global_position + Vector2(76, ry + 82)
-	Fx.float_text(main.overlay, p.global_position + Vector2(pw - 100, ry + 120), "+%d ♥" % V9Letters.REPLY_AFF, Color("ffd0e0"), 40)
+	# the «+5 симпатии» line itself pops (a rising «+5 ♥» ran over the words of her answer)
+	aff.pivot_offset = Vector2(bw, 12)
+	aff.scale = Vector2(0.6, 0.6)
+	aff.create_tween().tween_property(aff, "scale", Vector2.ONE, 0.35).set_delay(0.45).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	if V9Feel.can_fx():
 		Fx.burst(main.overlay, at, "heart", maxi(4, int(round(14 * V9Feel.fx_scale()))))
 	Sfx.voice_started.emit(h, str(v.answers[i]), minf(0.4 + str(v.answers[i]).length() * 0.045, 3.0))

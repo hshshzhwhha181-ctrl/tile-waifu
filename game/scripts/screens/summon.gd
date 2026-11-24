@@ -197,6 +197,8 @@ func _exchange_do(b: Dictionary) -> void :
 	_build_banner()
 
 func _pull(n: int) -> void :
+	if seq != null:
+		return
 	var b: Dictionary = G.BANNERS[banner_i]
 	var newbie: bool = b.get("newbie", false)
 	var free: bool = n == 10 and G.S.free10 and not newbie
@@ -208,86 +210,448 @@ func _pull(n: int) -> void :
 		G.S.free10 = false
 	G.S.gems -= cost
 	main.refresh_currency(true)
+	# 0.9: the pity counter and guarantee are replayed card by card during the sequence, from their pre-pull values
+	var ctx: = {"pity": int(G.S.pity), "guar": bool(G.S.guar), "newbie_left": int(G.S.get("newbie_left", 0)),
+		"skip": V9Summon.can_skip(int(G.S.pulls))}
 	var res: = G.pull(n, b, free)
 	last_n = n
-	_sequence(res)
+	_sequence(res, ctx)
 
 
-func _sequence(res: Array) -> void :
+# ---- 0.9 §E: the three-stage summon (lantern → colour → cards). Rules and timings: scripts/v09/summon/summon_rules.gd
+var skipping: = false
+var hurry: = false
+var stage: = ""
+var tapped: = false
+var lantern: V9Lantern
+var lantern_cap: Control
+var hint_lbl: Label
+var skip_btn: JButton
+var top_hud: Control
+var pity_num: Label
+var pity_bar: RBox
+var guar_lbl: Label
+var mus: AudioStreamPlayer
+var seq_res: Array = []
+var seq_ctx: Dictionary = {}
+var pity_steps: Array = []
+var guar_steps: Array = []
+var flipped: Dictionary = {}
+var showcased: Dictionary = {}
+var dealt: = false
+var seq_fx: Array = []
+var dev_preview: = false
+
+const LANTERN_H: = 470.0
+const LANTERN_Y: = 176.0
+const FLOOR_Y: = 846.0
+const PITY_BAR: = Rect2(16, 38, 284, 12)
+
+func _alive() -> bool:
+	return is_inside_tree() and seq != null and is_instance_valid(seq)
+
+# a wait that ends early when the player skips (callers check `skipping` after it)
+func _wait(t: float) -> void :
+	var end: = Time.get_ticks_msec() + int(t * 1000.0)
+	while _alive() and not skipping and Time.get_ticks_msec() < end:
+		await get_tree().process_frame
+
+# (a tap during the lantern's drop counts: `tapped` is cleared when the sequence starts, not here)
+func _wait_tap(t: float) -> void :
+	var end: = Time.get_ticks_msec() + int(t * 1000.0)
+	while _alive() and not skipping and not tapped and Time.get_ticks_msec() < end:
+		await get_tree().process_frame
+
+func _seq_input(e: InputEvent) -> void :
+	if not (e is InputEventMouseButton and e.pressed):
+		return
+	tapped = true
+	if stage == "deal":
+		hurry = true
+
+# own music player on the Music bus: the summon loop slowed down while the lantern is dark, then at the
+# rarity's pitch once it has its colour (Sfx ducking still works on it)
+func _mus(pitch: float, db: float, fade: = 0.6) -> void :
+	if not G.S.get("music", true):
+		return
+	if mus == null:
+		mus = AudioStreamPlayer.new()
+		mus.bus = Sfx.MUSIC_BUS if AudioServer.get_bus_index(Sfx.MUSIC_BUS) >= 0 else "Master"
+		add_child(mus)
+	if not mus.playing:
+		var st: AudioStream = load(V7DayNight.music_path("summon"))
+		if st == null:
+			return
+		st = st.duplicate()
+		if st is AudioStreamOggVorbis:
+			st.loop = true
+		mus.stream = st
+		mus.volume_db = -40.0
+		mus.pitch_scale = pitch
+		mus.play()
+	var tw: = mus.create_tween().set_parallel()
+	tw.tween_property(mus, "volume_db", db, fade)
+	tw.tween_property(mus, "pitch_scale", pitch, fade * 0.6)
+
+func _mus_stop(fade: = 0.5) -> void :
+	if mus and mus.playing:
+		var m: = mus
+		mus = null
+		var tw: = m.create_tween()
+		tw.tween_property(m, "volume_db", -40.0, fade)
+		tw.tween_callback(m.queue_free)
+
+func _fx_node(n: Node) -> Node:
+	seq_fx.append(n)
+	return n
+
+func _sequence(res: Array, ctx: = {}) -> void :
 	results_shown = false
 	flipping = true
+	tapped = false
+	skipping = false
+	hurry = false
+	dealt = false
+	flipped = {}
+	showcased = {}
+	seq_fx = []
+	seq_res = res
+	seq_ctx = ctx
+	var b: Dictionary = G.BANNERS[banner_i]
+	pity_steps = V9Summon.pity_track(int(ctx.get("pity", G.S.pity)), res)
+	guar_steps = V9Summon.guar_track(bool(ctx.get("guar", G.S.guar)), res, String(b.get("item", "")), b.get("newbie", false))
 	main.show_chrome(false, false)
 	banner_root.visible = false
-	var best: = "R"
-	for r in res:
-		if r.rar == "SSR":
-			best = "SSR"
-		elif r.rar == "SR" and best == "R":
-			best = "SR"
-	var col: = G.rar_color(best)
+	var best: = V9Summon.best_rar(res)
 	seq = Control.new()
 	seq.size = size
 	seq.mouse_filter = Control.MOUSE_FILTER_STOP
+	seq.gui_input.connect(_seq_input)
 	add_child(seq)
+	# night falls: a dim plus a radial vignette, so the lantern is the only light on screen
 	var dim: = ColorRect.new()
 	dim.size = size
-	dim.color = Color(0.05, 0.02, 0.1, 0.0)
+	dim.color = Color(0.04, 0.02, 0.08, 0.0)
 	dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	seq.add_child(dim)
-	dim.create_tween().tween_property(dim, "color:a", 0.55, 0.6)
+	dim.create_tween().tween_property(dim, "color:a", 0.6, 0.6)
+	var vg: = TextureRect.new()
+	var gt: = GradientTexture2D.new()
+	gt.fill = GradientTexture2D.FILL_RADIAL
+	gt.fill_from = Vector2(0.5, 0.38)
+	gt.fill_to = Vector2(1.15, 1.0)
+	var gr: = Gradient.new()
+	gr.set_color(0, Color(0.03, 0.01, 0.06, 0.0))
+	gr.set_color(1, Color(0.03, 0.01, 0.06, 0.85))
+	gt.gradient = gr
+	gt.width = 256
+	gt.height = 256
+	vg.texture = gt
+	vg.size = size
+	vg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	vg.stretch_mode = TextureRect.STRETCH_SCALE
+	vg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	vg.modulate.a = 0.0
+	seq.add_child(vg)
+	vg.create_tween().tween_property(vg, "modulate:a", 1.0, 0.8)
 	Sfx.music("")
-	Sfx.say(G.BANNERS[banner_i].hero, "gacha")
-
-	var t: = create_tween().set_parallel()
-	t.tween_property(circle, "position:y", H * 0.5 - 310, 1.0).set_trans(Tween.TRANS_QUART).set_ease(Tween.EASE_IN_OUT)
-	t.tween_property(circle, "scale", Vector2(1.05, 1.05), 1.0).set_trans(Tween.TRANS_QUART).set_ease(Tween.EASE_IN_OUT)
-	t.tween_method( func(v): circle_mat.set_shader_parameter("power", v), 0.25, 1.4, 2.4)
-	t.tween_method( func(v): circle_mat.set_shader_parameter("spin", v), 0.2, 2.2, 2.4)
+	_mus(V9Summon.SUSPENSE_PITCH, V9Summon.SUSPENSE_DB, 1.2)
+	Sfx.say(b.hero, "gacha")
+	_build_top_hud()
+	if ctx.get("skip", false):
+		var holder: = Control.new()
+		holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		seq.add_child(holder)
+		skip_btn = JButton.make("Пропустить", "glass", Rect2(W - 214, 22, 190, 58), null, 20)
+		skip_btn.pressed.connect(_skip)
+		holder.add_child(skip_btn)
+		UI.slide_in(skip_btn, Vector2(40, 0), 0.4)
+	# the magic circle becomes the lit floor under the lantern
 	move_child(circle, get_child_count() - 1)
-	await get_tree().create_timer(0.5).timeout
-	Sfx.play("summon_charge")
+	var ct: = create_tween().set_parallel()
+	ct.tween_property(circle, "position:y", FLOOR_Y - 310, 0.9).set_trans(Tween.TRANS_QUART).set_ease(Tween.EASE_IN_OUT)
+	ct.tween_property(circle, "scale", Vector2(0.86, 0.3), 0.9)
+	ct.tween_method( func(v): circle_mat.set_shader_parameter("power", v), 0.25, 0.55, 0.9)
+	move_child(seq, get_child_count() - 1)
 
-	var p: = Fx.particles("glow", 90, 1.0)
+	# ---- stage 1: the lantern drops in, unlit
+	stage = "lantern"
+	lantern = V9Lantern.new()
+	lantern.setup(LANTERN_H, "R", dev_code)
+	lantern.position.x = W * 0.5 - lantern.size.x * 0.5
+	seq.add_child(lantern)
+	# the counter stays above the lantern's cord
+	seq.move_child(top_hud, -1)
+	lantern.drop_in(-LANTERN_H - 80, LANTERN_Y, V9Summon.DROP)
+	Sfx.play("whoosh", 0.8, -6)
+	hint_lbl = UI.center_label(UI.label("Коснись фонаря, чтобы зажечь", 22, Color(1, 0.96, 0.88, 0.95), Color(0.12, 0.04, 0.16), 5), Rect2(0, FLOOR_Y + 150, W, 40))
+	hint_lbl.modulate.a = 0.0
+	seq.add_child(hint_lbl)
+	var ht: = hint_lbl.create_tween()
+	ht.tween_interval(V9Summon.DROP)
+	ht.tween_property(hint_lbl, "modulate:a", 1.0, 0.3)
+	ht.tween_callback( func():
+		if is_instance_valid(hint_lbl):
+			var hl: = hint_lbl.create_tween().set_loops()
+			hl.tween_property(hint_lbl, "modulate:a", 0.45, 0.7)
+			hl.tween_property(hint_lbl, "modulate:a", 1.0, 0.7))
+	await _wait(V9Summon.DROP * 0.7)
+	await _wait_tap(V9Summon.AUTO_LIGHT)
+	if skipping:
+		return
+	if not _alive():
+		return
+
+	# ---- stage 2: the colour climbs to the best rarity; the music changes with it
+	stage = "climb"
+	if is_instance_valid(hint_lbl):
+		var hf: = hint_lbl.create_tween()
+		hf.tween_property(hint_lbl, "modulate:a", 0.0, 0.2)
+		hf.tween_callback(hint_lbl.queue_free)
+	lantern.light(0.4)
+	Sfx.play("sparkle", 0.85, -2)
+	V9Feel.haptic("tap")
+	_circle_to(V9Summon.COL.R, 0.5)
+	await _wait(V9Summon.LIGHT)
+	for rar in V9Summon.steps(best).slice(1):
+		if skipping or not _alive():
+			break
+		if rar == "SSR":
+			# the long build: the lantern trembles, light streams in, a rising charge
+			lantern.charge(true)
+			Sfx.play("summon_charge", 1.0, -2)
+			_stream_in(V9Summon.COL.SSR, float(V9Summon.STEP.SSR))
+			await _wait(float(V9Summon.STEP.SSR) * 0.85)
+			if skipping or not _alive():
+				break
+			lantern.charge(false)
+			lantern.morph("SSR", 0.3)
+			Sfx.duck(-10, 1.6)
+			Sfx.play("reveal_ssr")
+			_flash(V9Summon.COL.SSR, 0.5)
+			if V9Feel.can_shake():
+				Fx.shake(seq, 7, 0.45)
+			_circle_to(V9Summon.COL.SSR, 0.3)
+			if V9Feel.can_fx():
+				var ry: = Common.rays(seq, lantern.centre(), 1300, Color(1, 0.84, 0.4, 0.55), 14, 0.04, 0.8)
+				seq.move_child(ry, lantern.get_index())
+				ry.modulate.a = 0.0
+				ry.create_tween().tween_property(ry, "modulate:a", 1.0, 0.4)
+				_fx_node(ry)
+			Fx.burst(seq, lantern.centre(), "sparkle", 50, V9Summon.COL.SSR, 1.8)
+		else:
+			await _wait(float(V9Summon.STEP[rar]) * 0.6)
+			if skipping or not _alive():
+				break
+			lantern.morph(rar, 0.3)
+			Sfx.play("reveal_sr", 1.0, -2)
+			Fx.burst(seq, lantern.centre(), "sparkle", 30, V9Summon.COL[rar], 1.2)
+			_circle_to(V9Summon.COL[rar], 0.3)
+			await _wait(float(V9Summon.STEP[rar]) * 0.4)
+	if skipping or not _alive():
+		return
+	_mus(V9Summon.MUSIC_PITCH[best], V9Summon.MUSIC_DB[best], 0.8)
+	_show_caption(best)
+	await _wait(V9Summon.HOLD[best])
+	if skipping or not _alive():
+		return
+
+	# ---- the lantern opens: the cards come out of its light
+	Sfx.play("summon_boom", 1.0 if best == "SSR" else 1.12, 0.0 if best == "SSR" else -4.0)
+	var lc: = lantern.centre()
+	lantern.open(0.45)
+	_flash(V9Summon.COL[best], 0.35 if best != "SSR" else 0.55)
+	Fx.burst(seq, lc, "sparkle", 70 if best == "SSR" else 40, V9Summon.COL[best], 2.0)
+	if is_instance_valid(lantern_cap):
+		var cf: = lantern_cap.create_tween()
+		cf.tween_property(lantern_cap, "modulate:a", 0.0, 0.3)
+	var cc: = create_tween()
+	cc.tween_property(circle, "modulate:a", 0.0, 0.5)
+	await _wait(0.25)
+	if skipping or not _alive():
+		return
+	_deal_cards(res, lc)
+
+func _circle_to(c: Color, dur: float) -> void :
+	var from: Color = circle_mat.get_shader_parameter("color")
+	create_tween().tween_method( func(v): circle_mat.set_shader_parameter("color", v), from, Color(c.r, c.g, c.b, 0.95), dur)
+
+# light streaming into the lantern from the whole screen (SSR build-up)
+func _stream_in(col: Color, dur: float) -> void :
+	var n: = Fx.scaled(80)
+	if n <= 0:
+		return
+	var p: = Fx.particles("glow", n, 0.9)
 	p.material = Fx.add_mat()
-	p.position = Vector2(W * 0.5, H * 0.5)
+	p.position = lantern.centre()
 	p.emission_shape = CPUParticles2D.EMISSION_SHAPE_SPHERE_SURFACE
-	p.emission_sphere_radius = 400
+	p.emission_sphere_radius = 420
 	p.spread = 0
 	p.initial_velocity_max = 0
 	p.radial_accel_min = -900
 	p.radial_accel_max = -700
-	p.tangential_accel_min = 200
-	p.tangential_accel_max = 300
-	p.scale_amount_min = 0.12
-	p.scale_amount_max = 0.3
-	p.color = Color(0.7, 0.85, 1.0)
-	add_child(p)
-	await get_tree().create_timer(1.0).timeout
+	p.tangential_accel_min = 160
+	p.tangential_accel_max = 260
+	p.scale_amount_min = 0.1
+	p.scale_amount_max = 0.26
+	p.color = col
+	seq.add_child(p)
+	_fx_node(p)
+	get_tree().create_timer(dur).timeout.connect( func():
+		if is_instance_valid(p):
+			p.emitting = false
+			get_tree().create_timer(1.0).timeout.connect( func():
+				if is_instance_valid(p):
+					p.queue_free()))
 
-	var tc: = create_tween()
-	tc.tween_method( func(c): circle_mat.set_shader_parameter("color", c);p.color = c, Color(0.65, 0.85, 1.0, 0.9), Color(col.r, col.g, col.b, 1.0), 0.6)
-	Fx.shake(seq, 6, 1.0)
-	await get_tree().create_timer(1.0).timeout
-	p.emitting = false
+# a soft flash in the rarity colour (never white); none at «минимум», gentler at «умеренные»
+func _flash(col: Color, a: float) -> void :
+	if not V9Feel.can_fx() or not _alive():
+		return
+	if not V9Feel.can_edge_flash():
+		a *= 0.5
+	var f: = ColorRect.new()
+	f.size = size
+	f.color = Color(col.lerp(Color(1, 0.95, 0.85), 0.2), a)
+	f.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	seq.add_child(f)
+	var ft: = f.create_tween()
+	ft.tween_property(f, "color:a", 0.0, 0.6).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	ft.tween_callback(f.queue_free)
 
-	Sfx.play("summon_boom")
-	var flash: = ColorRect.new()
-	flash.size = size
-	flash.color = Color(1, 1, 1, 1)
-	flash.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(flash)
-	var ft: Tween = flash.create_tween()
-	ft.tween_property(flash, "color:a", 0.0, 0.7)
-	ft.tween_callback(flash.queue_free)
-	p.queue_free()
-	var rays: = Common.rays(seq, Vector2(W * 0.5, H * 0.5), 1400, Color(col.r, col.g, col.b, 0.7), 16, 0.05, 0.9)
-	Fx.burst(seq, Vector2(W * 0.5, H * 0.5), "sparkle", 60, col, 2.0)
+func _show_caption(best: String) -> void :
+	if is_instance_valid(lantern_cap):
+		lantern_cap.queue_free()
+	var col: Color = V9Summon.COL[best]
+	lantern_cap = Control.new()
+	lantern_cap.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	lantern_cap.position = Vector2(0, LANTERN_Y + LANTERN_H + 14)
+	lantern_cap.size = Vector2(W, 100)
+	lantern_cap.pivot_offset = Vector2(W * 0.5, 30)
+	seq.add_child(lantern_cap)
+	var t1: = UI.center_label(UI.title(V9Summon.NAME[best], 40 if best == "SSR" else 36, col.lerp(Color.WHITE, 0.55), col.darkened(0.6)), Rect2(0, 0, W, 56))
+	lantern_cap.add_child(t1)
+	var t2: = UI.center_label(UI.label(V9Summon.SUB[best], 20, col.lerp(Color.WHITE, 0.3), Color(0.1, 0.03, 0.14), 4, "body", 900), Rect2(0, 56, W, 32))
+	lantern_cap.add_child(t2)
+	UI.pop_in(lantern_cap, 0.0, 0.7)
+
+# the pity counter and the banner guarantee, visible for the whole sequence; ticks per flipped card
+func _build_top_hud() -> void :
+	var b: Dictionary = G.BANNERS[banner_i]
+	var newbie: bool = b.get("newbie", false)
+	top_hud = Control.new()
+	top_hud.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	seq.add_child(top_hud)
+	# left of the lantern's cord (x = W/2), the skip button sits on the right
+	var box: = UI.rbox("plum", Rect2(20, 18, 316, 86), 22, 2, 8)
+	box.set_param("border_top", Color("ffe7a6")).set_param("border_bottom", Color("c58a2c"))
+	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	top_hud.add_child(box)
+	var l1: = UI.label("До гаранта SSR", 17, Color("ffe7a6"), Color(0.2, 0.05, 0.2), 3, "body", 900)
+	l1.position = Vector2(16, 8)
+	box.add_child(l1)
+	pity_num = UI.label(str(V9Summon.left(int(seq_ctx.get("pity", G.S.pity)))), 26, Color.WHITE, Color("7a4a0c"), 4, "body", 900)
+	pity_num.position = Vector2(16 + l1.get_minimum_size().x + 8, 1)
+	box.add_child(pity_num)
+	pity_bar = Common.progress_bar(box, PITY_BAR, float(seq_ctx.get("pity", G.S.pity)) / float(V9Summon.PITY_MAX), "gold")
+	guar_lbl = UI.label("", 16, Color("f4e6ff"), Color(0.2, 0.05, 0.2), 3, "body", 800)
+	guar_lbl.position = Vector2(16, 54)
+	box.add_child(guar_lbl)
+	if newbie:
+		guar_lbl.text = "SSR-наряд в первых 20 желаниях"
+	else:
+		_set_guar(bool(seq_ctx.get("guar", G.S.guar)))
+	UI.slide_in(top_hud, Vector2(0, -40), 0.2)
+
+func _set_guar(g: bool) -> void :
+	if guar_lbl == null or not is_instance_valid(guar_lbl) or G.BANNERS[banner_i].get("newbie", false):
+		return
+	guar_lbl.text = "Следующая SSR — с баннера ✓" if g else "Следующая SSR: 50/50 на баннер"
+	guar_lbl.label_settings.font_color = Color("ffe7a6") if g else Color("f4e6ff")
+
+func _tick_pity(i: int) -> void :
+	if i < 0 or i >= pity_steps.size() or pity_num == null or not is_instance_valid(pity_num):
+		return
+	var p: int = pity_steps[i]
+	pity_num.text = str(V9Summon.left(p))
+	if is_instance_valid(pity_bar):
+		pity_bar.queue_free()
+	pity_bar = Common.progress_bar(pity_num.get_parent(), PITY_BAR, float(p) / float(V9Summon.PITY_MAX), "gold")
+	if String(seq_res[i].get("rar", "R")) == "SSR":
+		UI.punch(pity_num, 0.4, 0.4)
+		Fx.burst(top_hud, Vector2(80, 40), "sparkle", 18, V9Summon.COL.SSR, 0.6)
+		_set_guar(guar_steps[i])
+	else:
+		UI.punch(pity_num, 0.12, 0.2)
+
+func _skip() -> void :
+	if skipping or results_shown or not _alive():
+		return
+	skipping = true
+	if is_instance_valid(skip_btn):
+		skip_btn.get_parent().queue_free()
+	skip_btn = null
+	_finish_skipped()
+
+# skip: everything left is shown at once (cards face up, counter final), then each SSR still gets its showcase
+func _finish_skipped() -> void :
+	await get_tree().process_frame
+	if not _alive():
+		return
+	stage = "deal"
+	if is_instance_valid(lantern):
+		lantern.queue_free()
+	if is_instance_valid(lantern_cap):
+		lantern_cap.queue_free()
+	if is_instance_valid(hint_lbl):
+		hint_lbl.queue_free()
+	for n in seq_fx:
+		if is_instance_valid(n):
+			n.queue_free()
+	seq_fx.clear()
 	circle.visible = false
-	await get_tree().create_timer(0.3).timeout
-	_deal_cards(res)
+	var best: = V9Summon.best_rar(seq_res)
+	_mus(V9Summon.MUSIC_PITCH[best], V9Summon.MUSIC_DB[best], 0.4)
+	if not dealt:
+		_layout_cards(seq_res, Vector2(W * 0.5, H * 0.4), true)
+	Sfx.play("flip")
+	for i in cards.size():
+		if not flipped.has(i):
+			flipped[i] = true
+			var c: Control = cards[i]
+			c.get_node("Back").visible = false
+			c.get_node("Front").visible = true
+	_settle_cards()
+	# tweens already running on a card (deal, flip, the SSR lift and shake) end within a second: settle again after
+	get_tree().create_timer(1.0).timeout.connect(_settle_cards)
+	if pity_steps.size() > 0:
+		_tick_pity(pity_steps.size() - 1)
+		_set_guar(guar_steps[guar_steps.size() - 1])
+	for i in seq_res.size():
+		var r: Dictionary = seq_res[i]
+		if r.rar == "SSR" and not showcased.has(i):
+			showcased[i] = true
+			await _showcase(r)
+			if not _alive():
+				return
+	flipping = false
+	stage = "results"
+	_results(seq_res)
 
-func _deal_cards(res: Array) -> void :
+func _settle_cards() -> void :
+	for c in cards:
+		if not is_instance_valid(c):
+			continue
+		c.position = c.get_meta("slot", c.position)
+		c.scale = Vector2.ONE
+		c.rotation = 0.0
+		c.modulate = Color.WHITE
+		if c.has_meta("shake_base"):
+			c.remove_meta("shake_base")
+
+func _layout_cards(res: Array, from: Vector2, instant: = false) -> void :
 	cards.clear()
+	dealt = true
 	var n: = res.size()
 	# 0.8: a 10-pull is dealt 3-4-3 at 160×240 (was 2×5 at 124×186) and centred between the «Результаты» ribbon
 	# and the button row, so the cards read and the screen has no dead band above the buttons
@@ -297,7 +661,7 @@ func _deal_cards(res: Array) -> void :
 	var vgap: = 22.0
 	var row_n: = [3, 4, 3] if n == 10 else ([n] if n <= 5 else [5, n - 5])
 	var slots: = []
-	var top: = 170.0
+	var top: = 190.0
 	var bottom: = H - 190.0
 	var grid_h: = row_n.size() * ch + (row_n.size() - 1) * vgap
 	var y0: = top + (bottom - top - grid_h) * 0.5 if n > 1 else H * 0.5 - ch * 0.5 - 30
@@ -310,34 +674,113 @@ func _deal_cards(res: Array) -> void :
 		var r: Dictionary = res[i]
 		var pos: Vector2 = slots[i]
 		var c: = _card(r, Vector2(cw, ch))
-		c.position = Vector2(W * 0.5 - cw * 0.5, H * 0.5 - ch * 0.5)
-		c.scale = Vector2(0.2, 0.2)
-		c.rotation = randf_range(-1.0, 1.0)
+		c.set_meta("slot", pos)
 		seq.add_child(c)
-		var t: Tween = c.create_tween().set_parallel()
-		t.tween_property(c, "position", pos, 0.45).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT).set_delay(i * 0.06)
-		t.tween_property(c, "scale", Vector2.ONE, 0.45).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT).set_delay(i * 0.06)
-		t.tween_property(c, "rotation", 0.0, 0.45).set_delay(i * 0.06)
-		get_tree().create_timer(i * 0.06).timeout.connect( func(): Sfx.play("flip", randf_range(0.9, 1.1)))
 		cards.append(c)
-	await get_tree().create_timer(0.6 + n * 0.06).timeout
+		if instant:
+			c.position = pos
+			continue
+		c.position = from - Vector2(cw, ch) * 0.5
+		c.scale = Vector2(0.15, 0.15)
+		c.rotation = randf_range(-0.8, 0.8)
+		var d: = i * 0.06
+		var t: Tween = c.create_tween().set_parallel()
+		t.tween_property(c, "position", pos, 0.5).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT).set_delay(d)
+		t.tween_property(c, "scale", Vector2.ONE, 0.5).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT).set_delay(d)
+		t.tween_property(c, "rotation", 0.0, 0.5).set_delay(d)
+		get_tree().create_timer(d).timeout.connect( func(): Sfx.play("flip", randf_range(0.9, 1.1), -3))
+
+func _deal_cards(res: Array, from: = Vector2(-1, -1)) -> void :
+	if from.x < 0:
+		from = Vector2(W * 0.5, H * 0.45)
+	stage = "deal"
+	for fx in seq_fx:
+		if is_instance_valid(fx) and fx is CanvasItem:
+			var ft: = (fx as CanvasItem).create_tween()
+			ft.tween_property(fx, "modulate:a", 0.0, 0.8)
+	_layout_cards(res, from)
+	var n: = res.size()
+	await _wait(0.65 + n * 0.06)
 	for i in n:
-		if not is_inside_tree():
+		if skipping or not _alive():
 			return
 		var c: Control = cards[i]
 		var r: Dictionary = res[i]
 		if r.rar == "SSR":
-
-			Fx.shake(c, 6, 0.6)
-			Fx.flash_glow(seq, c.position + c.size * 0.5, Color(1, 0.85, 0.4), 4.0, 0.8)
-			await get_tree().create_timer(0.7).timeout
+			# the grand reveal: the card rises in a gold pillar, trembles, then flips into the showcase
+			await _ssr_build(c)
+			if skipping or not _alive():
+				return
+		flipped[i] = true
 		await _flip(c, r)
+		_tick_pity(i)
+		if skipping or not _alive():
+			return
 		if r.rar == "SSR":
+			showcased[i] = true
 			await _showcase(r)
-		else:
-			await get_tree().create_timer(0.12 if r.rar == "R" else 0.25).timeout
+			if not _alive():
+				return
+			_ssr_return(c)
+			await _wait(0.35)
+		elif not hurry:
+			await _wait(0.1 if r.rar == "R" else 0.3)
+	if skipping or not _alive():
+		return
+	if is_instance_valid(skip_btn):
+		skip_btn.get_parent().queue_free()
+		skip_btn = null
 	flipping = false
+	stage = "results"
 	_results(res)
+
+# the SSR card leaves the grid for the centre of the screen, the rest of the pull dims, a gold pillar rises behind
+# it and it trembles; the flip happens there, then the showcase, then the card settles back into its slot
+func _ssr_build(c: Control) -> void :
+	var col: Color = V9Summon.COL.SSR
+	seq.move_child(c, seq.get_child_count() - 1)
+	var dur: = V9Summon.SSR_BUILD_HURRY if hurry else V9Summon.SSR_BUILD
+	var move: = 0.3 if hurry else 0.4
+	var k: = 1.0 if cards.size() == 1 else 1.55
+	var target: = Vector2(W * 0.5, H * 0.47) - c.size * 0.5
+	for o in cards:
+		if o != c:
+			o.create_tween().tween_property(o, "modulate", Color(0.5, 0.47, 0.56), move)
+	var mt: = c.create_tween().set_parallel()
+	mt.tween_property(c, "position", target, move).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	mt.tween_property(c, "scale", Vector2(k, k), move).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	Sfx.play("whoosh", 1.1, -4)
+	# wait for the tween itself (not the clock): the shake below must start from the card's final place
+	while _alive() and not skipping and mt.is_running():
+		await get_tree().process_frame
+	if skipping or not _alive():
+		return
+	var center: = target + c.size * 0.5
+	if V9Feel.can_fx():
+		var ry: = Common.rays(seq, center, 1200, Color(col.r, col.g, col.b, 0.8), 12, 0.08, 1.0)
+		seq.move_child(ry, c.get_index())
+		ry.scale = Vector2(0.3, 0.3)
+		var rt: = ry.create_tween()
+		rt.tween_property(ry, "scale", Vector2.ONE, dur).set_trans(Tween.TRANS_QUART).set_ease(Tween.EASE_OUT)
+		rt.tween_property(ry, "modulate:a", 0.0, 0.6)
+		rt.tween_callback(ry.queue_free)
+		_fx_node(ry)
+	Fx.flash_glow(seq, center, Color(1, 0.85, 0.4), 6.0, dur)
+	Sfx.play("summon_charge", 1.25, -4)
+	if V9Feel.can_shake():
+		Fx.shake(c, 5, dur * 0.9)
+	await _wait(dur)
+	c.remove_meta("shake_base")
+
+func _ssr_return(c: Control) -> void :
+	if not is_instance_valid(c):
+		return
+	var t: = c.create_tween().set_parallel()
+	t.tween_property(c, "position", c.get_meta("slot", c.position), 0.45).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
+	t.tween_property(c, "scale", Vector2.ONE, 0.45).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
+	for o in cards:
+		if o != c and is_instance_valid(o):
+			o.create_tween().tween_property(o, "modulate", Color.WHITE, 0.4)
 
 func _card(r: Dictionary, sz: Vector2) -> Control:
 	var c: = Control.new()
@@ -436,13 +879,15 @@ func _card(r: Dictionary, sz: Vector2) -> Control:
 	return c
 
 func _flip(c: Control, r: Dictionary) -> void :
+	# flips around the card's current scale (the SSR card flips enlarged at the centre)
+	var k: = c.scale.x
 	var t: Tween = c.create_tween()
-	t.tween_property(c, "scale", Vector2(0.0, 1.08), 0.11).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	t.tween_property(c, "scale", Vector2(0.0, 1.08 * k), 0.11).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	t.tween_callback( func():
 		c.get_node("Back").visible = false
 		c.get_node("Front").visible = true)
-	t.tween_property(c, "scale", Vector2(1.08, 1.08), 0.11).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	t.tween_property(c, "scale", Vector2.ONE, 0.12)
+	t.tween_property(c, "scale", Vector2(1.08 * k, 1.08 * k), 0.11).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	t.tween_property(c, "scale", Vector2(k, k), 0.12)
 	Sfx.play("flip")
 	await t.finished
 	var center: = c.position + c.size * 0.5
@@ -451,8 +896,8 @@ func _flip(c: Control, r: Dictionary) -> void :
 			Sfx.play("reveal_ssr")
 		"SR":
 			Sfx.play("reveal_sr")
-			Fx.burst(seq, center, "sparkle", 26, G.rar_color("SR"), 1.0)
-			Fx.ring(seq, center, G.rar_color("SR"), 1.4)
+			Fx.burst(seq, center, "sparkle", 26, V9Summon.COL.SR, 1.0)
+			Fx.ring(seq, center, V9Summon.COL.SR, 1.4)
 		_:
 			Sfx.play("reveal_r", randf_range(0.95, 1.1), -4)
 
@@ -466,8 +911,16 @@ func _showcase(r: Dictionary) -> void :
 	bg.color = Color(0.06, 0.02, 0.1, 0.92)
 	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	showcase.add_child(bg)
-	Common.rays(showcase, Vector2(W * 0.5, H * 0.42), 1500, Color(1, 0.82, 0.35, 0.8), 18, 0.05, 1.0)
-	Common.rays(showcase, Vector2(W * 0.5, H * 0.42), 900, Color(1, 0.6, 0.85, 0.5), 9, -0.08, 0.7)
+	# 0.9: the showcase opens in the gold of the lantern: a warm veil that settles into the night backdrop
+	var veil: = ColorRect.new()
+	veil.size = size
+	veil.color = Color(V9Summon.COL.SSR, 0.22 if V9Feel.can_fx() else 0.0)
+	veil.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	showcase.add_child(veil)
+	veil.create_tween().tween_property(veil, "color:a", 0.0, 0.7).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	if V9Feel.can_fx():
+		Common.rays(showcase, Vector2(W * 0.5, H * 0.42), 1500, Color(1, 0.82, 0.35, 0.8), 18, 0.05, 1.0)
+		Common.rays(showcase, Vector2(W * 0.5, H * 0.42), 900, Color(1, 0.6, 0.85, 0.5), 9, -0.08, 0.7)
 	# 0.8: the frame art is drawn at most 1.4× its 344×512 source (larger turns soft)
 	var aw: = 344.0 * 1.4
 	var ah: = aw * 512.0 / 344.0
@@ -490,6 +943,12 @@ func _showcase(r: Dictionary) -> void :
 	var ct0: Tween = card.create_tween().set_parallel()
 	ct0.tween_property(card, "scale", Vector2.ONE, 0.6).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_OUT)
 	ct0.tween_property(card, "modulate:a", 1.0, 0.25)
+	# a slow breath on the card while it is on show
+	ct0.chain().tween_callback( func():
+		if is_instance_valid(card):
+			var br: = card.create_tween().set_loops()
+			br.tween_property(card, "scale", Vector2(1.02, 1.02), 1.6).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+			br.tween_property(card, "scale", Vector2.ONE, 1.6).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT))
 	var ssr: = UI.title("SSR", 120, Color("fff1b8"), Color("c0661a"))
 	ssr.position = Vector2(30, H * 0.42 - ah * 0.5 - 70)
 	ssr.rotation = deg_to_rad(-8)
@@ -500,11 +959,25 @@ func _showcase(r: Dictionary) -> void :
 	if r.has("hero"):
 		var hl: = UI.center_label(UI.label(G.HEROES[r.hero].name + " · " + G.HEROES[r.hero].title, 24, Color("ffe7a6"), Color(0.2, 0.05, 0.2), 5, "body", 900), Rect2(0, 86, W - 80, 36))
 		rib.add_child(hl)
+	if r.has("id") and V9Ults.has(String(r.id)):
+		# 0.9: an outfit SSR names its ult (HEROINES.md §5), so the reveal says what the outfit does in a match
+		var un: String = V9Ults.get_ult(String(r.id)).get("name", "")
+		if un != "":
+			var ul: = UI.center_label(UI.label("Ульта «%s»" % un, 20, Color("f4e6ff"), Color(0.2, 0.05, 0.2), 4, "body", 800), Rect2(0, 122, W - 80, 30))
+			rib.add_child(ul)
+	if r.get("new", false):
+		var nb: = UI.rbox("red", Rect2(W - 40 - 150, H * 0.42 - ah * 0.5 - 22, 132, 42), 21, 2, 4)
+		showcase.add_child(nb)
+		nb.add_child(UI.center_label(UI.label(V6Txt.s("common.new"), 22, Color.WHITE, Color("6a1020"), 3, "body", 900), Rect2(0, 0, 132, 42)))
+		UI.pop_in(nb, 0.6, 1.8)
 	Fx.burst(showcase, Vector2(W * 0.5, H * 0.42), "sparkle", 90, Color(1, 0.85, 0.45), 2.2)
 	Fx.burst(showcase, Vector2(W * 0.15, H), "confetti", 60)
 	Fx.burst(showcase, Vector2(W * 0.85, H), "confetti", 60)
 	Fx.ambient(showcase, "stars", size)
 	await get_tree().create_timer(0.5).timeout
+	if not is_inside_tree():
+		return
+	Sfx.duck(-7, 2.2)
 	Sfx.say(r.get("hero", "mc"), "ssr")
 	var tap: = UI.center_label(UI.label(V6Txt.s("summon.tap"), 22, Color(1, 1, 1, 0.85), Color(0.2, 0.05, 0.2), 4), Rect2(0, H - 90, W, 40))
 	showcase.add_child(tap)
@@ -524,7 +997,8 @@ func _showcase(r: Dictionary) -> void :
 	ct.tween_property(showcase, "modulate:a", 0.0, 0.25)
 	ct.tween_callback(showcase.queue_free)
 	showcase = null
-	Sfx.music("summon")
+	if seq == null:
+		Sfx.music("summon")
 
 func _results(res: Array) -> void :
 	results_shown = true
@@ -546,14 +1020,21 @@ func _results(res: Array) -> void :
 	seq.add_child(ok)
 	UI.slide_in(again, Vector2(0, 80), 0.0)
 	UI.slide_in(ok, Vector2(0, 80), 0.08)
-	var ttl: = Common.ribbon(seq, V6Txt.s("summon.results"), Rect2(W * 0.5 - 270, 70, 540, 84), "lav", 36)
+	var ttl: = Common.ribbon(seq, V6Txt.s("summon.results"), Rect2(W * 0.5 - 270, 112, 540, 84), "lav", 36)
 	UI.pop_in(ttl, 0.0)
 
 func _close_seq() -> void :
 	if seq:
 		seq.queue_free()
 		seq = null
+	stage = ""
+	skipping = false
+	hurry = false
+	lantern = null
+	skip_btn = null
+	_mus_stop(0.4)
 	circle.visible = true
+	circle.modulate.a = 1.0
 	circle.position = Vector2(W * 0.5 - 310, H - 132 - 330)
 	circle.scale = Vector2(1.0, 0.36)
 	circle_mat.set_shader_parameter("power", 0.25)
@@ -564,30 +1045,72 @@ func _close_seq() -> void :
 	Sfx.music("summon")
 	_build_banner()
 
-# Android «назад» during the pull sequence: close the results when they are shown, otherwise ignore.
+# Android «назад» during the pull sequence: close the results when they are shown, skip when skipping is allowed,
+# otherwise ignore.
 func handle_back() -> bool:
 	if seq and is_instance_valid(seq):
 		if results_shown and not flipping:
 			_close_seq()
+		elif skip_btn and is_instance_valid(skip_btn) and showcase == null:
+			_skip()
 		return true
 	return false
 
 func demo_skip() -> bool:
-
 	if showcase:
 		var ev: = InputEventMouseButton.new()
 		ev.pressed = true
 		ev.button_index = MOUSE_BUTTON_LEFT
 		showcase.gui_input.emit(ev)
 		return true
+	if stage == "lantern":
+		tapped = true
 	return flipping
+
+# dev (main.gd --act=…): pull10 = a real 10-pull with a forced SSR (G.demo_force_ssr);
+# r1 / sr1 / ssr1 / r10 / sr10 / ssr10 = a preview pull with that best rarity (nothing given, nothing spent);
+# second = previews behave like a second summon (skip shown); code = code-drawn lantern; tap = a tap on the
+# sequence; skip = the skip button; fx_full / fx_mid / fx_min = effects level; selftest = summon rules selftest
+var dev_second: = false
+var dev_code: = false
 
 func dev_act(a: String) -> void :
 	if a == "pull10":
 		G.demo_force_ssr = true
 		_pull(10)
+	elif a in ["r1", "sr1", "ssr1", "r10", "sr10", "ssr10"]:
+		if seq != null:
+			return
+		var n: = 10 if a.ends_with("10") else 1
+		var best: = a.trim_suffix("10").trim_suffix("1").to_upper()
+		dev_preview = true
+		var ctx: = {"pity": int(G.S.pity), "guar": bool(G.S.guar), "skip": dev_second}
+		_sequence(V9Summon.dev_results(n, best, G.BANNERS[banner_i]), ctx)
+	elif a == "second":
+		dev_second = true
+	elif a == "code":
+		dev_code = true
+	elif a.begins_with("fx_"):
+		# dev only: not saved (the level is put back when the screen closes), so a preview never changes the save
+		if not has_meta("dev_fx_keep"):
+			set_meta("dev_fx_keep", G.fx_level())
+			tree_exiting.connect( func(): G.S.fx_level = get_meta("dev_fx_keep"))
+		G.S.fx_level = a.substr(3)
+	elif a == "tap":
+		var ev: = InputEventMouseButton.new()
+		ev.pressed = true
+		ev.button_index = MOUSE_BUTTON_LEFT
+		if showcase:
+			showcase.gui_input.emit(ev)
+		elif seq:
+			_seq_input(ev)
+	elif a == "skip":
+		if skip_btn and is_instance_valid(skip_btn):
+			_skip()
+		else:
+			demo_skip()
+	elif a == "selftest":
+		V9SummonSelftest.run(self)
 	elif a.begins_with("b"):
 		banner_i = int(a.substr(1))
 		_build_banner()
-	elif a == "skip":
-		demo_skip()

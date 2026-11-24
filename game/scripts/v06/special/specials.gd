@@ -207,6 +207,10 @@ func _toast(text: String, icon: = "gift") -> void :
 		play.main.toast(text, icon)
 
 func _banner(title: String, sub: String, pal: = "gold") -> void :
+	# 0.9: never over the tiles — a one-line plaque in the play screen's band slot under the board
+	if play.has_method("v8_notice"):
+		if play.v8_notice(title + ((" · " + sub) if sub != "" else "")):
+			return
 	var W: float = play.size.x
 	var H: float = play.size.y
 	var rib: = Common.ribbon(play, title, Rect2(W * 0.5 - 250, H * 0.42, 500, 84), pal, 36)
@@ -369,6 +373,11 @@ func _streak_reward(mid: Vector2) -> void :
 				play.skill_charge = mini(play.skill_charge + 3, _need() - 1)
 			txt = "+%d и заряд умения" % (40 + 10 * tier)
 	var W: float = play.size.x
+	# 0.9: the streak plaque goes to the band slot under the board, not over the tiles
+	if play.has_method("v8_notice") and play.v8_notice("Счастливая серия ×%d · %s" % [streak, txt]):
+		Sfx.play("star1", 1.1, -2)
+		_refresh()
+		return
 	var l: = UI.title("Счастливая серия ×%d" % streak, 38, Color("fff6d8"), Color("3c8a4a"))
 	l.size = Vector2(560, 64)
 	var sy: float = (play.board_rect.get_center().y + 40.0) if "board_rect" in play else 300.0

@@ -1002,10 +1002,10 @@ func _on_node_added(n: Node) -> void :
 	if n is TrayBoard:
 		_attach_board.call_deferred(n)
 
-func _attach_board(b: Node) -> void :
+func _attach_board(b) -> void :
 	if not is_instance_valid(b) or not b.is_inside_tree():
 		return
-	var scr: = b.get_parent()
+	var scr: Node = b.get_parent()
 	var redeal: bool = board_screen != null and is_instance_valid(board_screen) and scr == board_screen
 	board = b
 	board_screen = scr

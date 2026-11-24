@@ -251,7 +251,13 @@ func _gain(p: Vector2) -> void:
 			UI.punch(home.aff_root, 0.12)
 	V9Feel.sound("sparkle", 1.2, -6)
 	var at: = from_art(geom.head)
-	Fx.float_text(home, at + Vector2(110, -10), "+%d ♥" % V9Touch.AFF, Color("ffd0e0"), 40)
+	# «+5 ♥» rises from the affection plate it fills (beside her head it ran over the words of her bubble)
+	var ar = home.get("aff_root")
+	var ft: = at + Vector2(110, -10)
+	if ar is Control and is_instance_valid(ar):
+		var r: Rect2 = (ar as Control).get_global_rect()
+		ft = Vector2(r.position.x + r.size.x * 0.72, r.position.y - 8.0)
+	Fx.float_text(home, ft, "+%d ♥" % V9Touch.AFF, Color("ffd0e0"), 40)
 	if V9Feel.can_fx():
 		Fx.burst(home, at + Vector2(0, -50), "heart", maxi(3, int(round(14 * V9Feel.fx_scale()))))
 

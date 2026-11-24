@@ -418,7 +418,10 @@ func _build_text(shout: String, main: Color, accent: Color, ink: Color) -> void 
 		for w in nm.split(" ", false):
 			longest = maxf(longest, f.get_string_size(w, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x)
 		nh = f.get_multiline_string_size(nm, HORIZONTAL_ALIGNMENT_CENTER, tw, fs).y
-		if longest + 20.0 <= tw and nh <= fs * 1.25 * 2.0:
+		# a name that only just fits one line touches the screen edge once the italic, outline and shadow are on
+		var full: = f.get_string_size(nm, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
+		var tight: = full > tw - 36.0 and full <= tw
+		if longest + 20.0 <= tw and nh <= fs * 1.25 * 2.0 and not tight:
 			break
 		fs -= 2
 	nh = f.get_multiline_string_size(nm, HORIZONTAL_ALIGNMENT_CENTER, tw, fs).y

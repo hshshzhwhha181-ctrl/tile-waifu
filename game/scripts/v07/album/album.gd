@@ -73,7 +73,7 @@ func _on_node_added(n: Node) -> void :
 		_snap.call_deferred(n, 0)
 
 
-func _snap(b: TrayBoard, tries: int) -> void :
+func _snap(b, tries: int) -> void :
 	if not is_instance_valid(b) or not b.is_inside_tree():
 		return
 	if b.tiles.is_empty():

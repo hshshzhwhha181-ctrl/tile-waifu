@@ -94,7 +94,8 @@ func kind(k: String) -> void :
 
 
 func combo(n: int, gold: = false) -> void :
-	if n >= 3 and (n in [3, 5, 8, 12, 16, 20] or (n > 20 and n % 5 == 0)):
+	# 0.9: the tier pulse follows the combo ladder (V7Combo.TIERS from ×3: Трио, Каскад, Цветение, …), then every 5
+	if n >= 3 and (n in [3, 4, 5, 8, 12, 16, 20] or (n > 20 and n % 5 == 0)):
 		var a: = clampf(0.7 + n * 0.02, 0.7, 1.0)
 		pattern([[20, a, 45], [34 + mini(n, 20), 1.0, 0]])
 	elif gold:
@@ -128,7 +129,7 @@ func _hook_card(n) -> void :
 			pulse(8, 0.25))
 
 # 0.9: a board that routes its feedback through V9Feel (meta "v9_feel") gets no second set of haptics from here
-func _attach_board(b: Node) -> void :
+func _attach_board(b) -> void :
 	if not is_instance_valid(b) or _boards.has(b.get_instance_id()) or b.has_meta("v9_feel"):
 		return
 	_boards[b.get_instance_id()] = true

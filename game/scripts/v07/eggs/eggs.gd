@@ -84,6 +84,17 @@ func _main() -> Node:
 	var m: = get_tree().current_scene
 	return m if m and ("screen_id" in m) else null
 
+# 0.9: in a match a line never sits over the tiles — it goes to the play screen's band slot under the board
+# (play.v8_notice); false when no match is on (the caller then shows its bubble)
+func _match_notice(text: String) -> bool:
+	var m: = _main()
+	if m == null or not is_instance_valid(m.get("screen")):
+		return false
+	var sc = m.get("screen")
+	if not sc.has_method("v8_notice"):
+		return false
+	return sc.v8_notice(text)
+
 
 func bubble(text: String, pos: Vector2, width: = 330.0, dur: = 3.6, tail_left: = true) -> Control:
 	var root: = Control.new()
@@ -100,7 +111,7 @@ func bubble(text: String, pos: Vector2, width: = 330.0, dur: = 3.6, tail_left: =
 
 
 
-func _attach_board(b: Node) -> void :
+func _attach_board(b) -> void :
 	if not is_instance_valid(b):
 		return
 	_board = b
@@ -199,7 +210,8 @@ func _on_match(b: Node, mid: Vector2, combo: int) -> void :
 		_star_pair = []
 		_star_caught(cpos)
 	if combo == 13:
-		bubble(V7Lines.KOKUSHI, Vector2(vp.x * 0.5 - 170, vp.y * 0.44), 340)
+		if not _match_notice(V7Lines.KOKUSHI):
+			bubble(V7Lines.KOKUSHI, Vector2(vp.x * 0.5 - 170, vp.y * 0.44), 340)
 		discover("kokushi")
 	if combo >= 8 and not _peeked:
 		var force: bool = dev.get("peek", "") == "1"
@@ -230,7 +242,9 @@ func _star_caught(pos: Vector2) -> void :
 	var who: String = G.S.get("level_partner", G.S.partner)
 	if not V7Lines.STAR.has(who):
 		who = "mc"
-	bubble("★ +%d   %s" % [STAR_GEMS, V7Lines.STAR[who]], Vector2(vp.x * 0.5 - 180, vp.y * 0.34), 360, 4.2)
+	var st_line: = "★ +%d   %s" % [STAR_GEMS, V7Lines.STAR[who]]
+	if not _match_notice(st_line):
+		bubble(st_line, Vector2(vp.x * 0.5 - 180, vp.y * 0.34), 360, 4.2)
 	discover("star")
 
 func _peek_play() -> void :
@@ -239,6 +253,10 @@ func _peek_play() -> void :
 	if pool.is_empty():
 		return
 	var h: String = pool[randi() % pool.size()]
+	# 0.9: the peeking heroine used to slide in over the left tiles; in a match she speaks from the band slot
+	if _match_notice("%s: %s" % [G.HEROES[h].name, V7Lines.PEEK_PLAY[h]]):
+		discover("peek")
+		return
 	var vp: = get_viewport().get_visible_rect().size
 	var root: = Node2D.new()
 	_layer.add_child(root)

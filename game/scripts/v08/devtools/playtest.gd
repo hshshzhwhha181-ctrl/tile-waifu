@@ -11,6 +11,9 @@ extends Node
 # daily calendar, levels (plays 1-2 and 1-3, which opens Желания), summon (one free pull), wardrobe, shop,
 # tasks, visits, letters, tournament (quarter, a player card, week), league card, event, room, plus the
 # Android «назад» key on a popup and on a screen.
+# 0.9 adds: an ult cast in a Path level (shots during the cut-in), the 3-stage summon (lantern, lit, caption, deal,
+# showcase), taps on the live heroine's zones at home (head / hand / outfit / room), the letters screen, and
+# «Эффекты» switched to «Минимум» and back to «Полные» from the settings.
 # Ends with "PT OK <n steps>" (exit 0) or "PT FAIL <step> <reason>" (exit 1). Any SCRIPT ERROR fails the run.
 
 const NOISE: = ["custom_samplers", "Error calling deferred method", "ObjectDB instances", "resources still in use",
@@ -50,6 +53,7 @@ var t_start: = 0.0
 var touch_miss: = 0
 var notes: Array = []
 var _done: = false
+var ult_casts: = 0
 
 
 static func start(m, args: Dictionary) -> V8Playtest:
@@ -561,14 +565,48 @@ func _fresh() -> String:
 	var sm = main.screen
 	if sm.pull10_btn and on_screen(sm.pull10_btn):
 		await tap(pos_of(sm.pull10_btn))
+		# 0.9 §E stage 1: the lantern drops in dark; a tap on it lights it
+		step = "summon_lantern"
+		if not await until(func(): return sm.stage == "lantern" and sm.lantern != null and is_instance_valid(sm.lantern), 8.0):
+			return "the summon lantern never dropped in (stage «%s»)" % sm.stage
+		await wait(1.2)
+		await shot("summon_lantern")
+		await tap(sm.seq.get_global_rect().position + sm.lantern.centre())
+		if not await until(func(): return sm.stage != "lantern", 3.0):
+			return "a tap on the lantern did not light it"
+		# stage 2: the colour climbs to the best rarity, then its caption
+		step = "summon_climb"
+		await wait(0.6)
+		await shot("summon_lit")
+		if not await until(func(): return sm.stage != "climb" or (sm.lantern_cap != null and is_instance_valid(sm.lantern_cap)), 12.0):
+			return "the lantern never reached its colour"
+		await wait(0.7)
+		await shot("summon_caption")
+		# stage 3: the cards come out of the light and flip (an SSR rises into the showcase)
+		step = "summon_cards"
+		if not await until(func(): return sm.stage in ["deal", "results"], 10.0):
+			return "the cards were never dealt (stage «%s»)" % sm.stage
+		await wait(1.0)
+		await shot("summon_deal")
 		var t0: = Time.get_ticks_msec()
-		var mid_shot: = false
-		while Time.get_ticks_msec() - t0 < 40000 and not (sm.results_shown and not sm.flipping):
-			await wait(0.8)
-			if not mid_shot and Time.get_ticks_msec() - t0 > 2500:
-				mid_shot = true
-				await shot("summon_pull")
-			await tap(Vector2(main.W * 0.5, main.H * 0.55))
+		var sc_shots: = 0
+		var flip_shot: = false
+		while Time.get_ticks_msec() - t0 < 45000 and not (sm.results_shown and not sm.flipping):
+			if sm.showcase != null and is_instance_valid(sm.showcase) and sm.showcase.is_inside_tree() and not sm.showcase.is_queued_for_deletion():
+				await wait(1.3)
+				if sc_shots < 2:
+					sc_shots += 1
+					await shot("summon_showcase%d" % sc_shots)
+				await tap(Vector2(main.W * 0.5, main.H * 0.55))
+				await until(func(): return sm.showcase == null or not is_instance_valid(sm.showcase) or sm.showcase.is_queued_for_deletion(), 3.0)
+				continue
+			await wait(0.5)
+			if not flip_shot and Time.get_ticks_msec() - t0 > 2200:
+				flip_shot = true
+				await shot("summon_flip")
+			if Time.get_ticks_msec() - t0 > 6000:
+				await tap(Vector2(main.W * 0.5, main.H * 0.55))
+		step = "summon"
 		if not sm.results_shown:
 			return "10-pull results never showed"
 		await wait(1.0)
@@ -608,6 +646,11 @@ func _fresh() -> String:
 	else:
 		notes.append("starter offer did not show after the 3rd Path win")
 	await shot("home2")
+	step = "home_touch"
+	e = await home_touch()
+	if e != "":
+		return e
+	await dismiss_popups("home_touch")
 	var home = main.screen
 	# ---- left column
 	step = "tasks"
@@ -765,6 +808,12 @@ func _fresh() -> String:
 	e = await header_back()
 	if e != "":
 		return e
+	step = "fx_level"
+	e = await fx_toggle()
+	if e != "":
+		return e
+	if ult_casts == 0:
+		return "no ult was cast in levels 1-1…1-3"
 	step = "end"
 	if main.screen_id != "home":
 		return "ended on %s" % main.screen_id
@@ -821,6 +870,16 @@ func play_level(label: String, need_next: bool) -> String:
 			await tap(pos_of(play.fail_retry_btn))
 			await wait(1.0)
 			continue
+		# 0.9: an ult (auto-cast when charged outside ranked, or a real tap on the glowing portrait)
+		if play.ult != null and play.ult.busy:
+			await ult_cast(label, play)
+			continue
+		if play.skill_ready and play.stage != null and on_screen(play.stage) and not play.ult.busy:
+			await wait(0.3)
+			if play.skill_ready and not play.ult.busy:
+				await tap(pos_of(play.stage))
+				await wait(0.2)
+			continue
 		var b = play.board
 		if b == null or not is_instance_valid(b) or b.board_count() == 0:
 			await wait(0.2)
@@ -854,4 +913,103 @@ func play_level(label: String, need_next: bool) -> String:
 		return "victory buttons did not appear"
 	await wait(2.6)
 	await shot(label + "_victory")
+	return ""
+
+
+# one ult cast: screenshots of the cut-in (the strip coming in, the strong beat) and of the board after it.
+# Shots only for the first two casts of the run; later casts are just waited out.
+func ult_cast(label: String, play) -> void:
+	ult_casts += 1
+	var k: = ult_casts
+	var t0: = Time.get_ticks_msec()
+	if k <= 2:
+		var cut: Node = await wait_find(func(): return find(play, func(c): return c is V9Cutin), 3.2)
+		if cut != null:
+			await wait(0.3)
+			await shot("%s_ult%d_cutin" % [label, k])
+			await wait(0.4)
+			if is_instance_valid(cut):
+				await shot("%s_ult%d_strong" % [label, k])
+		else:
+			await shot("%s_ult%d_nocutin" % [label, k])
+			notes.append("%s: ult %d had no cut-in (ult_cutin=%s)" % [label, k, G.ult_cutin()])
+	await until(func(): return not is_instance_valid(play) or play.ult == null or not play.ult.busy, 8.0)
+	if is_instance_valid(play) and play.ult != null and play.ult.busy:
+		notes.append("%s: ult %d still busy after 8 s" % [label, k])
+	if k <= 2:
+		await wait(0.5)
+		await shot("%s_ult%d_after" % [label, k])
+	print("PT ult %d cast in %s (%.1f s)" % [k, label, (Time.get_ticks_msec() - t0) / 1000.0])
+
+
+# 0.9 live heroine at home: real taps on her zones; every zone must answer (a line, or affection on her)
+func home_touch() -> String:
+	var home = main.screen
+	var live: V9HomeLive = home.live if "live" in home else null
+	if live == null or not is_instance_valid(live):
+		return "home has no live heroine layer"
+	var pet0: = G.pet_left()
+	for z in ["head", "hand", "outfit", "bg"]:
+		var p: Vector2 = live.zone_point(z)
+		var got: = live.zone_at(p)
+		if got != z:
+			notes.append("home_touch: %s point %s reads as «%s»" % [z, str(p), got])
+			continue
+		var l0: = live.touch.last_line_t
+		var pl0: = G.pet_left()
+		await tap(p)
+		await wait(0.8)
+		await shot("home_touch_" + z)
+		var answered: bool = live.touch.last_line_t != l0 or G.pet_left() != pl0
+		if not answered:
+			if z == "hand" or z == "outfit":
+				# a card or icon above her can take this tap first (Hana's tile on a stick)
+				notes.append("home_touch: a tap on her %s at %s got no answer (covered?)" % [z, str(p)])
+			else:
+				return "a tap on her %s at %s got no answer" % [z, str(p)]
+		# her next line needs V9Touch.TALK_CD (the room: ×1.5)
+		await wait(3.3)
+	if G.pet_left() >= pet0 and pet0 > 0:
+		return "touching her gave no affection (pet_left %d)" % G.pet_left()
+	return ""
+
+
+# 0.9 «Эффекты»: switch to «Минимум» in the settings (from the profile), look at home, tap her, then back to «Полные»
+func fx_toggle() -> String:
+	for lv in [["min", "Минимум"], ["full", "Полные"]]:
+		await tap(Vector2(190, 62))
+		var e: = await on("profile")
+		if e != "":
+			return e
+		# «Настройки» sits at the bottom of the profile
+		var psc: ScrollContainer = main.screen.scroll
+		await wheel(psc.get_global_rect().get_center(), 36)
+		e = await tap_button(main.screen, "Настройки")
+		if e != "":
+			return e
+		await wait(0.8)
+		if popup() == null:
+			return "settings did not open from the profile"
+		e = await tap_button(popup(), lv[1])
+		if e != "":
+			return e
+		await wait(0.4)
+		if G.fx_level() != lv[0]:
+			return "«%s» set effects to %s" % [lv[1], G.fx_level()]
+		await shot("settings_fx_" + lv[0])
+		await key(KEY_ESCAPE)
+		if not await until(func(): return popup() == null, 2.0):
+			return "Android back did not close the settings popup"
+		e = await header_back()
+		if e != "":
+			return e
+		if main.screen_id != "home":
+			return "profile back went to %s" % main.screen_id
+		await wait(0.6)
+		var live = main.screen.live if "live" in main.screen else null
+		if live != null and is_instance_valid(live):
+			await tap(live.zone_point("head"))
+			await wait(0.5)
+		await shot("home_fx_" + lv[0])
+		await wait(2.0)
 	return ""
