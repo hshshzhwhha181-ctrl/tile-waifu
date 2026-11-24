@@ -21,7 +21,11 @@
    `idle_sparkle` — только на 1–2 главные платные/премиальные кнопки экрана.
 6. **«Без тряски и вспышек»** (BENCHMARK MD-6): ключ сохранения `a11y_calm = true` выключает тряску V10Juice при любом уровне FX
    (тумблер в настройках делает дорожка доступности; `V6Fx.shake` пусть проверяет `V10Juice.calm()` так же).
-7. Эффекты вешаются на слой `V10Juice_fx` (CanvasLayer 70: над экранами, попапами и сеткой V6Fx). Переходы — `V10JuiceTransition` (CanvasLayer 96).
+7. **Цель не внутри Container — уже учтено:** `ult_ready`/`danger_beat` и `idle_sparkle` сами выходят из раскладки контейнера
+   (`top_level`) и следуют за кнопкой в координатах холста — ряд кнопок не сдвигается.
+8. **Бюджет не течёт при раннем закрытии.** Счётчики эмиттеров/слоёв уменьшаются по `tree_exiting`, поэтому можно смело
+   передавать экран или окно как `parent` — если его закроют посреди вспышки, частицы не «кончатся» до конца сессии.
+9. Эффекты вешаются на слой `V10Juice_fx` (CanvasLayer 70: над экранами, попапами и сеткой V6Fx). Переходы — `V10JuiceTransition` (CanvasLayer 96).
 
 ## Уровни FX
 
@@ -53,7 +57,9 @@
 ## Подключение по экранам (точные вызовы)
 
 ### main.gd — прогрев
-`_ready()`: `V10Juice.warm.call_deferred()` — слой, пул звуков, шторка переходов и звуки в кэш заранее (первый эффект без рывка).
+`_ready()`: `V10Juice.warm.call_deferred()` — слой, пул звуков, шторка переходов, звуки и текстуры частиц в кэш заранее,
+плюс один невидимый кадр каждого из 14 шейдеров (2×2 px, 1 % альфы, 0,25 с): GL Compatibility компилирует шейдер при
+первой отрисовке, без прогрева первый переход/пара/баннер дёрнут кадр на 20–80 мс на среднем Android.
 
 ### main.gd — переходы вкладок (`go()`)
 ```gdscript
@@ -70,8 +76,9 @@ if animate:
 
 ### play.gd — пары, комбо, лихорадка, ульта
 ```gdscript
-# _on_pair(...) рядом с v7combo.on_match(mid, combo, gain)  (стр. ~855); mid — в координатах холста:
-V10Juice.tile_match(mid, a.face, combo, a.gold or b.gold)
+# _on_match(mid, combo, gold, shard) рядом с v7combo.on_match(mid, combo, gain)  (стр. ~855); mid — уже в координатах холста
+# (TrayBoard.matched), масть — board.last_face (выставляется до emit):
+V10Juice.tile_match(mid, board.last_face, combo, gold)
 # V6Fx.on_match уже даёт искры и звон: при подключении снять в нём burst("spark"/"chip") — иначе двойные частицы.
 if V10Juice.is_milestone(combo):
 	V10Juice.combo_milestone(combo, Rect2(0, HUD_STRIP_Y, W, 120))   # полоса HUD над столом, не над фишками
@@ -114,7 +121,9 @@ for u in rank_ups:
 ### Чайная (home.gd), Гардероб (collection.gd), Салон, Профиль
 - Героиня при входе на экран / смене героини / смене наряда: `V10Juice.heroine_entrance(hero_node, "right")`.
 - Премиальные кнопки (Пропуск, Лавка, «Купить»): `V10Juice.idle_sparkle(btn)` — сам засыпает, когда кнопка скрыта.
-- Смена наряда: `V10Juice.dissolve(old_art, 0.45)` → новый арт `V10Juice.dissolve(new_art, 0.5, true)`.
+- Смена наряда: `V10Juice.dissolve(old_art, 0.45, false, ROSE)` → новый арт `V10Juice.dissolve(new_art, 0.5, true, ROSE)`,
+  где `ROSE = Color(0.92, 0.5, 0.62)`. Кромку по умолчанию (оранжевая, «горение») на героиню не ставить: на ревью лицо
+  «выгорало» раньше волос — читается как пожар, а не как переодевание. Оранжевая кромка — для печатей, карт, сундуков.
 
 ### Лавка (shop.gd)
 - Покупка: `V10Juice.fountain(card_center, main.gem_counter, "gem", 10, …)` + `V10Juice.roll(...)`.

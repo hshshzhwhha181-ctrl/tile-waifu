@@ -44,6 +44,10 @@ const IVORY: = Color(0.96, 0.93, 0.85)
 
 const MILESTONES: = {5: ["Цветение", Color(0.86, 0.36, 0.52)], 10: ["Лунная буря", Color(0.34, 0.6, 0.9)], 20: ["Пять ветров", Color(0.3, 0.75, 0.55)]}
 
+const SHADERS: = ["juice_ink_wipe", "juice_iris", "juice_petal_wipe", "juice_dissolve", "juice_glint", "juice_outline_glow",
+	"juice_bloom_fake", "juice_frame_aura", "juice_godrays", "juice_ring", "juice_ink_splat", "juice_brush_band",
+	"juice_seal", "juice_sweep_rr"]
+
 static var live_emitters: = 0
 static var live_particles: = 0
 static var live_overlays: = 0
@@ -111,7 +115,8 @@ static func vp_size() -> Vector2:
 # the juice CanvasLayer: "fx" (70, above screens, popups and V6Fx grade) or "top" (96, transitions)
 static func layer(which: = "fx") -> CanvasLayer:
 	var l = _layers.get(which)
-	if l != null and is_instance_valid(l) and l.is_inside_tree():
+	# a layer added this frame is not inside the tree yet (add_child is deferred): reuse it, do not make a second one
+	if l != null and is_instance_valid(l) and not l.is_queued_for_deletion() and (l.is_inside_tree() or l.get_parent() == null):
 		return l
 	var t: = tree()
 	var cl: = CanvasLayer.new()
@@ -126,11 +131,24 @@ static func layer(which: = "fx") -> CanvasLayer:
 # create the layers, the sound players and the transition curtain ahead of time (call deferred from main._ready):
 # the first effect then needs no tree change, and its sound is not lost
 static func warm() -> void:
-	layer("fx")
+	var l: = layer("fx")
 	V10JuiceTransition.get_or_make()
 	sound("", 1.0, -80.0)
 	for s in SOUND_FALLBACK:
 		_stream(s)
+	# procedural particle textures (GDScript pixel loops) built now, not on the first match
+	for tx in ["star4", "dot", "ember"]:
+		V10JuiceTex.get_tex(tx)
+	# GL Compatibility compiles a shader on its first draw (a 20–80 ms hitch on a mid Android GPU): draw every juice
+	# shader once, 2×2 px at 1 % alpha for a few frames, so the first transition / match / banner does not stutter
+	for sh in SHADERS:
+		var c: = ColorRect.new()
+		c.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		c.size = Vector2(2, 2)
+		c.modulate = Color(1, 1, 1, 0.01)
+		c.material = mat(sh)
+		l.add_child(c)
+		tree().create_timer(0.25, true, false, true).timeout.connect(c.queue_free)
 
 
 static func host(parent: Node) -> Node:
@@ -379,10 +397,12 @@ static func burst(parent: Node, pos: Vector2, preset: = "star4", count: = 12, co
 	p.emitting = true
 	live_emitters += 1
 	live_particles += count
-	p.finished.connect(func():
+	p.finished.connect(p.queue_free)
+	# count down when the emitter leaves the tree — also when its host is freed first (a screen or a crest closed
+	# mid-burst), otherwise the budget leaks and particles stop for the rest of the session
+	p.tree_exiting.connect(func():
 		live_emitters -= 1
-		live_particles -= count
-		p.queue_free())
+		live_particles -= count, CONNECT_ONE_SHOT)
 	return p
 
 
@@ -410,10 +430,9 @@ static func ripple(parent: Node, pos: Vector2, color: = GOLD, radius: = 120.0, d
 	var r: = rect(parent, Rect2(pos - Vector2(radius, radius), Vector2(radius, radius) * 2.0), "juice_ring",
 		{"color": color, "t": 0.0, "thickness": thickness})
 	live_overlays += 1
+	r.tree_exiting.connect(func(): live_overlays -= 1, CONNECT_ONE_SHOT)
 	var t: = tween_param(r, "t", 0.0, 1.0, dur, Tween.TRANS_LINEAR)
-	t.tween_callback(func():
-		live_overlays -= 1
-		r.queue_free())
+	t.tween_callback(r.queue_free)
 
 
 # ── 1. tab transitions ───────────────────────────────────────────────────────────────────────────────────────
@@ -540,6 +559,9 @@ static func ult_ready(target: Control, color_a: = Color(1.0, 0.36, 0.5), color_b
 		return null
 	var a: = V10JuiceAura.new()
 	var p: = target.get_parent()
+	if p is Container:
+		# a Container would lay the aura out as one more cell and shift the buttons: keep it out of the layout
+		a.top_level = true
 	p.add_child(a)
 	p.move_child(a, target.get_index())
 	a.setup_heartbeat(target, color_a, color_b, with_sound)
@@ -660,7 +682,6 @@ static func chest_open(chest: CanvasItem, rarity: = "SR", on_open: = Callable(),
 	var col: = rarity_color(rarity)
 	var rattle: = 0.0 if not can_fx() else 0.55
 	if chest != null and is_instance_valid(chest) and rattle > 0.0:
-		var x0 = chest.get("position")
 		var t: = chest.create_tween()
 		for i in 3:
 			var k: = 1.0 + i * 0.6
@@ -715,12 +736,11 @@ static func godrays(pos: Vector2, size: = 640.0, color: = GOLD, dur: = 1.6, spre
 	var r: = rect(parent, Rect2(pos - Vector2(size, size) * 0.5, Vector2(size, size)), "juice_godrays",
 		{"color": color, "intensity": 0.0, "spread": spread, "count": 12.0, "speed": 0.08})
 	live_overlays += 1
+	r.tree_exiting.connect(func(): live_overlays -= 1, CONNECT_ONE_SHOT)
 	var t: = tween_param(r, "intensity", 0.0, peak, 0.22, Tween.TRANS_QUAD)
 	t.tween_interval(maxf(0.1, dur - 0.8))
 	t.tween_method(func(v): param(r, "intensity", v), peak, 0.0, 0.58).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
-	t.tween_callback(func():
-		live_overlays -= 1
-		r.queue_free())
+	t.tween_callback(r.queue_free)
 	return r
 
 

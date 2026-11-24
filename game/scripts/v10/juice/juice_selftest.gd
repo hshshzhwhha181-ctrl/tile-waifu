@@ -67,15 +67,27 @@ static func run(host: Node) -> void:
 		if snd == "twinkle":
 			continue
 		check(ResourceLoader.exists(V10Juice.SFX % snd), "sound file " + snd)
-	for sh in ["juice_ink_wipe", "juice_iris", "juice_petal_wipe", "juice_dissolve", "juice_glint", "juice_outline_glow",
-			"juice_bloom_fake", "juice_frame_aura", "juice_godrays", "juice_ring", "juice_ink_splat", "juice_brush_band",
-			"juice_seal", "juice_sweep_rr"]:
+	for sh in V10Juice.SHADERS:
 		check(V10Juice.shader(sh) != null, "shader " + sh)
+	check(V10Juice.SHADERS.size() == 14, "warm() pre-draws all 14 shaders")
 	# suits
 	check(V10Juice.suit_of(0) == 0 and V10Juice.suit_of(35) == 4 and V10Juice.suit_of(-1) == -1, "suit_of")
 	# wait for the one-shots to finish: counters must return to zero (no leak)
 	await tree.create_timer(2.6).timeout
 	check(V10Juice.live_emitters == 0 and V10Juice.live_particles == 0, "no leaked emitters (%d / %d)" % [V10Juice.live_emitters, V10Juice.live_particles])
+	# the host dies mid-burst (a screen / crest closed early): the budget must still come back
+	var ov0: = V10Juice.live_overlays
+	var h2: = Node2D.new()
+	host.add_child(h2)
+	V10Juice.burst(h2, Vector2(200, 200), "confetti_gold", 20)
+	V10Juice.burst(h2, Vector2(200, 200), "star4", 10)
+	V10Juice.ripple(h2, Vector2(200, 200))
+	check(V10Juice.live_emitters == 2 and V10Juice.live_overlays == ov0 + 1, "early-free test armed (%d / %d)" % [V10Juice.live_emitters, V10Juice.live_overlays])
+	h2.queue_free()
+	await tree.process_frame
+	await tree.process_frame
+	check(V10Juice.live_emitters == 0 and V10Juice.live_particles == 0 and V10Juice.live_overlays == ov0,
+		"host freed mid-burst: no budget leak (%d / %d / %d)" % [V10Juice.live_emitters, V10Juice.live_particles, V10Juice.live_overlays - ov0])
 	V10Juice.forced_level = ""
 	print("JUICE SELFTEST %d/%d" % [ok, total])
 	tree.quit(0 if ok == total else 1)

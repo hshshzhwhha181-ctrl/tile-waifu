@@ -95,6 +95,11 @@ func _follow() -> void:
 	var s: = target.size * target.scale
 	# a pressed / bouncing button scales around its pivot: follow its visual rect
 	var p: = target.position + target.pivot_offset * (Vector2.ONE - target.scale)
+	if top_level:
+		# out of a Container's layout (V10Juice.ult_ready): canvas coordinates
+		var gr: = target.get_global_rect()
+		s = gr.size
+		p = gr.position
 	position = p - Vector2(pad, pad)
 	size = s + Vector2(pad, pad) * 2.0
 	glow.size = size
@@ -123,7 +128,10 @@ func _process(dt: float) -> void:
 	if k != last_beat and ph > 0.06:
 		last_beat = k
 		if visible and V10Juice.level() == "full":
-			V10Juice.ripple(get_parent(), target.position + target.size * 0.5, col_a, maxf(target.size.x, target.size.y) * 0.85, 0.6, 0.05)
+			if top_level:
+				V10Juice.ripple(null, target.get_global_rect().get_center(), col_a, maxf(target.size.x, target.size.y) * 0.85, 0.6, 0.05)
+			else:
+				V10Juice.ripple(get_parent(), target.position + target.size * 0.5, col_a, maxf(target.size.x, target.size.y) * 0.85, 0.6, 0.05)
 		if with_sound and visible:
 			V10Juice.sound("ult_heartbeat", 1.0, -12.0)
 

@@ -24,7 +24,11 @@ func setup(tgt: Control, c: Color, e: float, radius: float) -> void:
 	color = c
 	every = e
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	# inside a Container target (a shop card) stay out of its layout and follow it in canvas coordinates
+	top_level = tgt is Container
 	size = tgt.size
+	if top_level:
+		global_position = tgt.global_position
 	t_star = randf_range(0.3, e)
 	t_sheen = randf_range(0.6, 1.4)
 	sheen = ColorRect.new()
@@ -40,8 +44,17 @@ func _process(dt: float) -> void:
 		queue_free()
 		return
 	if not V10Juice.can_fx() or not target.is_visible_in_tree():
+		# asleep (button hidden, or «минимум» switched on in settings): nothing left frozen mid-twinkle
+		if not stars.is_empty() or sheen_t >= 0.0:
+			for s in stars:
+				(s[0] as Sprite2D).queue_free()
+			stars.clear()
+			sheen_t = -1.0
+			sheen.visible = false
 		return
 	size = target.size
+	if top_level:
+		global_position = target.global_position
 	var full: = V10Juice.level() == "full"
 	t_star -= dt
 	if t_star <= 0.0:
