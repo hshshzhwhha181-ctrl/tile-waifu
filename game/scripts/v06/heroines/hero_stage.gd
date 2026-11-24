@@ -175,7 +175,8 @@ func set_charge(cur: int, total: int) -> void :
 		queue_redraw()
 	elif gauge:
 		gauge.create_tween().tween_property(gauge, "size:x", maxf(8.0, gauge_w * f), 0.25).set_trans(Tween.TRANS_QUAD)
-		gauge_lbl.text = ("КОСНИСЬ: УМЕНИЕ" if size.x > 220.0 else "УМЕНИЕ!") if cur >= need else "умение %d/%d" % [cur, need]
+		# 0.9: the skill meter is the Ultimate («ульта N/M», ready: tap the portrait)
+		gauge_lbl.text = ("УЛЬТА · КОСНИСЬ" if size.x > 220.0 else "УЛЬТА!") if cur >= need else "ульта %d/%d" % [cur, need]
 	if cur >= need and not is_ready:
 		_set_ready(true)
 	elif cur < need and is_ready:
@@ -187,7 +188,7 @@ func _set_ready(on: bool) -> void :
 		_ready_tw.kill()
 		_ready_tw = null
 	if _sparks:
-		_sparks.emitting = on
+		_sparks.emitting = on and V9Feel.can_fx()
 	if back:
 		back.set_param("glow", 1.0 if on else 0.0).set_param("glow_color", col.lightened(0.3))
 	if on:
@@ -519,7 +520,8 @@ func cast(title: String, targets: Array, sub: = "") -> void :
 		hero.flash(0.8)
 	UI.punch(self, 0.3)
 	Sfx.play("fever", 1.3)
-	_cutin(p, title, sub)
+	# 0.9: no band here any more — the player's ult has its own cut-in (V9Cutin) and a duel rival's skill is
+	# «one line and the target highlighted» (HEROINES.md §2); title / sub stay for callers' logs
 	await get_tree().create_timer(0.35).timeout
 	if not is_inside_tree():
 		return
@@ -574,58 +576,29 @@ func _orb(layer: Node, from: Vector2, to: Vector2, delay: float) -> void :
 	t.tween_interval(0.45)
 	t.tween_callback(o.queue_free)
 
-func _cutin(p: Control, title: String, sub: String) -> void :
-	var W: = p.size.x
-	var y0: = 150.0
-	var h: = 120.0
-	var root: = Control.new()
-	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	root.z_index = 45
-	root.position = Vector2(W, y0)
-	root.size = Vector2(W, h)
-	p.add_child(root)
-	var band: = Polygon2D.new()
-	band.polygon = PackedVector2Array([Vector2(40, 0), Vector2(W + 40, 0), Vector2(W - 40, h), Vector2(-40, h)])
-	var c0: = Color(col.r * 0.55, col.g * 0.35, col.b * 0.6, 0.96)
-	var c1: = Color(0.08, 0.04, 0.14, 0.96)
-	band.vertex_colors = PackedColorArray([c0, c1, c1, c0])
-	root.add_child(band)
-	for yy in [2.0, h - 4.0]:
-		var ln: = Line2D.new()
-		ln.width = 3
-		ln.default_color = Color("ffe7a6")
-		ln.points = PackedVector2Array([Vector2(40 - 80 * yy / h, yy), Vector2(W + 40 - 80 * yy / h, yy)])
-		root.add_child(ln)
 
-	var face: = UI.tex(load("res://assets/hero/%s.png" % hero_id), Rect2(W - 300, -40, 280, h + 40), false)
-	var m: = ShaderMaterial.new()
-	m.shader = preload("res://shaders/card.gdshader")
-	var rig: Dictionary = Hero.RIGS[hero_id]
-	m.set_shader_parameter("size", face.size)
-	m.set_shader_parameter("radius", 0.0)
-	m.set_shader_parameter("tex_size", Vector2(848, 1264))
-	# redrawn rigs (zoom_k) frame on the measured face centre; the older art on head_c + 40 px (its face centre)
-	var fc: Vector2 = V8Art.rig_face(hero_id) if rig.has("zoom_k") else rig.head_c + Vector2(0, 40)
-	m.set_shader_parameter("focus", Vector2(fc.x / 848.0, fc.y / 1264.0))
-	m.set_shader_parameter("zoom", 2.2 * float(rig.get("zoom_k", 1.0)))
-	m.set_shader_parameter("bottom_shade", 0.0)
-	# the face rect pokes 40 px above the band: fade the hair out instead of slicing it with a hard edge
-	m.set_shader_parameter("top_fade", 0.3)
-	face.material = m
-	root.add_child(face)
-	var tl: = UI.title(title, 40, Color("ffe7a6"), Color(0.25, 0.04, 0.16))
-	tl.position = Vector2(40, 16)
-	tl.size = Vector2(W - 340, 56)
-	root.add_child(tl)
-	if sub != "":
-		var sl: = UI.label(sub, 18, Color.WHITE, Color(0.1, 0.03, 0.12), 3, "body", 900)
-		sl.position = Vector2(44, 72)
-		sl.size = Vector2(W - 350, 30)
-		sl.clip_text = true
-		root.add_child(sl)
-	var t: = root.create_tween()
-	t.tween_property(root, "position:x", 0.0, 0.18).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_OUT)
-	t.tween_property(root, "position:x", -30.0, 0.7)
-	t.tween_property(root, "position:x", - W, 0.16).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_IN)
-	t.parallel().tween_property(root, "modulate:a", 0.0, 0.16)
-	t.tween_callback(root.queue_free)
+# 0.9: the outfit's ult modifier (П/О/Л/В/Ц/С, HEROINES.md §2) as a small lacquer medallion on the card's top-left
+# corner (HUD, never over the board, takes no taps). "" removes it.
+var ult_badge: Control = null
+
+func set_ult_badge(letter: String, c: Color, hint: = "") -> void :
+	if ult_badge and is_instance_valid(ult_badge):
+		ult_badge.queue_free()
+	ult_badge = null
+	if letter == "" or compact:
+		return
+	var d: = 34.0
+	var b: = UI.rbox("plum", Rect2(8, 8, d, d), d * 0.5, 2, 2)
+	b.colors(Color(c.r * 0.45 + 0.08, c.g * 0.35 + 0.05, c.b * 0.5 + 0.1, 0.96), Color(0.08, 0.04, 0.12, 0.98))
+	b.borders(Color("ffe7a6"), Color("c58a2c"))
+	b.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	b.tooltip_text = hint
+	b.z_index = 4
+	add_child(b)
+	var l: = UI.label(letter, 18, Color("fff2d2"), Color(0.08, 0.03, 0.1), 3, "body", 900)
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	l.size = Vector2(d, d)
+	l.position = Vector2(0, -1)
+	b.add_child(l)
+	ult_badge = b

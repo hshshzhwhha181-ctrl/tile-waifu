@@ -28,6 +28,11 @@ static func blocked(play) -> String:
 	return ""
 
 static func use(play) -> void :
+	# 0.9: the skill is the Ultimate now (scripts/v09/ult/ult_cast.gd); this path stays for old callers
+	var u = play.get("ult")
+	if u is V9UltCast:
+		await u.begin()
+		return
 	var board: TrayBoard = play.board
 	var st: V6HeroStage = play.stage
 	var h: String = play.partner

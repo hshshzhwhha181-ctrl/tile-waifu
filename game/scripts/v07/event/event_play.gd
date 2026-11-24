@@ -111,7 +111,8 @@ func _check_riichi() -> void :
 func _on_match(mid: Vector2, combo: int, gold: bool, shard: String) -> void :
 	super._on_match(mid, combo, gold, shard)
 	if mode == "v7tourney" and not finished:
-		var pts: = V7Ladder.score_pair(combo, gold)
+		# 0.9: a pair the ult removed scores as a plain pair (from_ult never counts the combo)
+		var pts: = V7Ladder.score_pair(1 if v9_from_ult else combo, gold)
 		score += pts
 		score_lbl2.text = str(score)
 		UI.punch(score_lbl2, 0.2)

@@ -2,6 +2,9 @@ extends Control
 
 # 0.8 home (Чайная): left column of 4 (Поручения, Визиты, Письма, Рейтинг), right column of cards
 # (лига недели, ивент, баннер), «Режимы» + «Сесть за стол» bottom right, affection plate bottom left.
+# 0.9 (docs/0.9-spec.md §C): she is alive — V9HomeLive (scripts/v09/home) answers taps by zone with an emotion,
+# a line and affection, idles, and plays the Маджонг-тян lobby video; «Письма» opens the letters screen
+# (scripts/v09/letters) and its icon carries the count of unread letters.
 
 const COL_X: = 16.0
 const COL_Y: = 140.0
@@ -19,6 +22,8 @@ var side_btns: = {}
 var league_card: Control
 var W: = 720.0
 var H: = 1280.0
+var live: V9HomeLive
+var video: VideoStreamPlayer
 
 func build(m, _args: Dictionary) -> void :
 	main = m
@@ -26,8 +31,20 @@ func build(m, _args: Dictionary) -> void :
 	H = size.y
 	main.show_chrome(true, true)
 	Sfx.music("menu")
+	if "--letters_selftest=1" in OS.get_cmdline_user_args():
+		V9LettersSelftest.run.call_deferred(main)
+	for a in OS.get_cmdline_user_args():
+		# dev: preview home at another effects level (--fx=full|mid|min)
+		if a.begins_with("--fx=") and a.substr(5) in G.FX_LEVELS:
+			G.S.fx_level = a.substr(5)
+	V9Letters.install()
+	var new_letters: = V9Letters.tick()
 	Common.backdrop(self, "menu", size, 0.0, 1.0, Color.WHITE, Vector2(0.5, 0.5))
-	Common.rays(self, Vector2(W * 0.52, H * 0.34), 1000, Color(1, 0.93, 0.8, 0.45), 10, 0.03, 0.35)
+	# 0.9 video pilot: Маджонг-тян's lobby loop (her room and her in one clip) instead of the room art + rig
+	if V9HomeLive.video_wanted(str(G.S.partner)):
+		video = V9HomeLive.build_video(self, size)
+	if video == null:
+		Common.rays(self, Vector2(W * 0.52, H * 0.34), 1000, Color(1, 0.93, 0.8, 0.45), 10, 0.03, 0.35)
 	Fx.ambient(self, "petals", size)
 
 	var floor_y: = H - 120.0
@@ -37,16 +54,24 @@ func build(m, _args: Dictionary) -> void :
 	ped.position = Vector2(W * 0.52, floor_y - 10)
 	ped.scale = Vector2(6.0, 1.1)
 	ped.modulate = Color(1, 0.85, 0.9, 0.5)
+	ped.visible = video == null
 	add_child(ped)
 	hero = Hero.new().setup(G.S.partner, H * 0.64)
 	hero.position = Vector2(W * 0.52, floor_y)
 	add_child(hero)
-	hero.tapped.connect(on_hero_tap)
+	# 0.9: every tap on her (and on the room) goes through V9HomeLive, not the rig's own tap
+	hero.interactive = false
 	UI.slide_in(hero, Vector2(0, 60), 0.05, 0.6)
 	# 0.8: her legs fade out at the knees under the button cluster (no shoes peeking between the plate and the CTA)
 	Common.floor_fade(self, H - 520.0, H - 150.0)
 	var oid: = G.equipped(G.S.partner)
-	if oid != "":
+	var live_opts: = {"hero": hero}
+	var live_mode: = "rig"
+	if video != null:
+		hero.visible = false
+		live_mode = "video"
+		live_opts["video"] = video
+	elif oid != "":
 
 		# the outfit art is a full-height painting with the face near its top (y ≈ 0.11…0.19): drawn edge to edge it
 		# sits under the top bar and the greeting bubble. Push it down so her face lands where the rigged hero's face
@@ -63,15 +88,10 @@ func build(m, _args: Dictionary) -> void :
 		var shade: = Common.vignette(self, size, Color(0.1, 0.03, 0.15), 0.45)
 		move_child(shade, 2)
 		hero.visible = false
-		hero.interactive = false
-		var hit: = Control.new()
-		hit.position = Vector2(W * 0.2, H * 0.2)
-		hit.size = Vector2(W * 0.6, H * 0.5)
-		hit.mouse_filter = Control.MOUSE_FILTER_STOP
-		hit.gui_input.connect( func(e):
-			if e is InputEventMouseButton and e.pressed:
-				on_hero_tap())
-		add_child(hit)
+		live_mode = "art"
+		live_opts.merge({"art": art, "tex_size": Vector2(otex.get_width(), otex.get_height()), "focus": Vector2(float(ofc[0]), 0.4),
+			"face_rect": _face_rect(oid, otex, ofc)})
+	live = V9HomeLive.make(self, live_mode, live_opts)
 	_build_left()
 	_build_right()
 	_build_affection()
@@ -94,6 +114,8 @@ func build(m, _args: Dictionary) -> void :
 	modes_btn.pressed.connect( func(): main.go("modes"))
 	add_child(modes_btn)
 	UI.pop_in(modes_btn, 0.3)
+	if not new_letters.is_empty():
+		_letter_arrived.call_deferred()
 	await get_tree().create_timer(0.9).timeout
 	if is_inside_tree():
 		_say(Sfx.say(G.S.partner, "greet"))
@@ -106,7 +128,7 @@ func build(m, _args: Dictionary) -> void :
 # ---------------------------------------------------------------- left column
 
 func _build_left() -> void :
-	var mail_new: = V7RoomData.unread_mail() > 0 or _unseen_notices() > 0
+	var mail_new: = V9Letters.badge_count()
 	var items: = [
 		["tasks", "tasks", V6Txt.s("home.tasks"), func(): Daily.tasks(main, self), G.tasks_ready() > 0],
 		["login", "visits", V6Txt.s("home.login"), func(): Daily.login(main, self), G.login_ready()],
@@ -123,7 +145,8 @@ func _build_left() -> void :
 
 # 0.8 left-column button: the round V8Art icon (tasks / visits / letters / rating — it has its own gold-rimmed
 # disc, so no drawn disc behind it), caption under it, a pulsing dot when something is ready.
-func _side_button(icon: String, text: String, rect: Rect2, cb: Callable, badge: bool) -> Control:
+# 0.9: `badge` may be a count (Письма): a number badge instead of the dot.
+func _side_button(icon: String, text: String, rect: Rect2, cb: Callable, badge) -> Control:
 	var c: = Control.new()
 	c.position = rect.position
 	c.size = rect.size
@@ -133,7 +156,16 @@ func _side_button(icon: String, text: String, rect: Rect2, cb: Callable, badge: 
 	art.name = "Icon"
 	c.add_child(art)
 	c.add_child(UI.center_label(UI.label(text, 18, UI.INK, UI.DARK, 4, "body", 900), Rect2(-24, rect.size.x - 6, rect.size.x + 48, 26)))
-	if badge:
+	if badge is int and int(badge) > 0:
+		var nb: = Common.badge(c, int(badge), Vector2(rect.size.x - 26, -6))
+		nb.name = "Badge"
+		nb.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		nb.pivot_offset = Vector2(15, 15)
+		var bt: Tween = nb.create_tween().set_loops()
+		bt.tween_interval(1.6)
+		bt.tween_property(nb, "scale", Vector2(1.18, 1.18), 0.16).set_trans(Tween.TRANS_SINE)
+		bt.tween_property(nb, "scale", Vector2.ONE, 0.3).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	elif badge is bool and badge:
 		var d: = UI.rbox("gold", Rect2(rect.size.x - 20, 2, 16, 16), 8, 1, 3)
 		d.colors(Color("ffe7a6"), Color("ff8fb0"))
 		c.add_child(d)
@@ -167,101 +199,31 @@ func refresh_badges() -> void :
 	side_btns.clear()
 	_build_left()
 
-# «Письма»: what the heroines actually wrote after dates + newly opened room scenes. Toast if there is nothing.
+# «Письма» (0.9): the letters screen — heroines' letters with replies, plus the 0.7/0.8 date notes and scene notices.
 func open_mail() -> void :
-	var entries: Array = []
-	var mail: Array = V7RoomData.mail()
-	for i in range(mail.size() - 1, -1, -1):
-		var e = mail[i]
-		if e is Dictionary and G.HEROES.has(str(e.get("h", ""))):
-			entries.append({"h": str(e.h), "text": "«%s»" % str(e.text), "sub": _ago(int(e.get("t", 0))), "new": not bool(e.get("read", false))})
-	for h in G.HERO_ORDER:
-		if not G.hero_unlocked(h):
-			continue
-		for id in V7RoomData.fresh_scenes(h):
-			entries.push_front({"h": h, "text": "Открыта сцена «%s». Загляни ко мне в комнату." % V7RoomScenes.SCENES[id].title, "sub": "Комната", "new": not _notice_seen().has(str(id))})
-	if entries.is_empty():
-		main.toast("Писем пока нет. Своди героиню на свидание", "mail")
+	main.go("letters")
+
+# a letter was written while she was away: the Письма icon bows once with a little sparkle
+func _letter_arrived() -> void :
+	await get_tree().create_timer(1.1).timeout
+	if not is_inside_tree() or not side_btns.has("mail"):
 		return
-	entries = entries.slice(0, 8)
-	var rh: = 132.0
-	var p: = Common.popup(main, V6Txt.s("home.mail"), 84 + entries.size() * (rh + 10) + 20)
-	var y: = 64.0
-	for e in entries:
-		var row: = UI.rbox("glass", Rect2(26, y, 608, rh), 24, 3, 8)
-		row.mouse_filter = Control.MOUSE_FILTER_STOP
-		row.pivot_offset = row.size * 0.5
-		if e.new:
-			row.borders(Color("ffe7a6"), Color("c58a2c"))
-		p.add_child(row)
-		row.add_child(Common.avatar(e.h, Rect2(12, 14, 92, 92), "gold" if e.new else "glass"))
-		var nm: = UI.label(G.HEROES[e.h].name, 22, Color("ffd2de"), UI.DARK, 3, "body", 900)
-		nm.position = Vector2(120, 10)
-		row.add_child(nm)
-		var sub: = UI.label(e.sub, 16, UI.MUTED, UI.DARK, 2, "body", 800)
-		sub.position = Vector2(330, 14)
-		sub.size = Vector2(260, 22)
-		sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-		row.add_child(sub)
-		var tx: = UI.label(e.text, 19, UI.INK, UI.DARK, 2, "body", 800)
-		tx.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		tx.position = Vector2(120, 42)
-		tx.size = Vector2(470, 82)
-		tx.custom_minimum_size = Vector2(470, 0)
-		tx.max_lines_visible = 3
-		tx.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-		row.add_child(tx)
-		var hh: String = e.h
-		row.gui_input.connect( func(ev):
-			if ev is InputEventMouseButton and ev.pressed:
-				Sfx.play("pop")
-				UI.punch(row, 0.05)
-				main.go("room", {"hero": hh}))
-		y += rh + 10
-	V7RoomData.mark_mail_read()
-	_mark_notices_seen()
-	G.save()
-	if side_btns.has("mail"):
-		var root: Control = p.get_meta("root")
-		root.set_meta("on_close", func():
-			if is_inside_tree():
-				refresh_badges())
+	var b: Control = side_btns["mail"]
+	V9Feel.success(b, "sparkle", 0.6)
+	if V9Feel.can_fx():
+		Fx.burst(self, b.position + b.size * 0.4, "sparkle", maxi(4, int(round(12 * V9Feel.fx_scale()))))
 
-# 0.8: fresh-scene notices in «Письма» count as new only until the player has opened the letters once
-# (the Комната «Сцены» badge keeps tracking unwatched scenes).
-static func _notice_seen() -> Dictionary:
-	var d = G.S.get("v8_mail_seen")
-	if not (d is Dictionary):
-		d = {}
-		G.S["v8_mail_seen"] = d
-	return d
-
-static func _unseen_notices() -> int:
-	var seen: = _notice_seen()
-	var n: = 0
-	for h in G.HERO_ORDER:
-		if G.hero_unlocked(h):
-			for id in V7RoomData.fresh_scenes(h):
-				if not seen.has(str(id)):
-					n += 1
-	return n
-
-static func _mark_notices_seen() -> void :
-	var seen: = _notice_seen()
-	for h in G.HERO_ORDER:
-		if G.hero_unlocked(h):
-			for id in V7RoomData.fresh_scenes(h):
-				seen[str(id)] = true
-
-static func _ago(t: int) -> String:
-	if t <= 0:
-		return ""
-	var d: = int(Time.get_unix_time_from_system()) - t
-	if d < 3600:
-		return "только что"
-	if d < 86400:
-		return "%d ч назад" % (d / 3600)
-	return "%d д назад" % (d / 86400)
+# the head-and-shoulders square of the equipped outfit painting (V9Ults rects, scaled to this texture); an outfit
+# without an ult entry falls back to the 0.8 face crop (V8Population.FACES)
+static func _face_rect(oid: String, tex: Texture2D, ofc: Array) -> Rect2:
+	var ts: = Vector2(tex.get_width(), tex.get_height())
+	if V9Ults.has(oid):
+		var sh: = V9Ults.shown(oid)
+		if str(sh.img).get_file().get_basename() == tex.resource_path.get_file().get_basename():
+			return V9Ults.rect_px(sh.face_rect, ts)
+	var side: = ts.x * 0.3
+	var c: = Vector2(float(ofc[0]) * ts.x, float(ofc[1]) * ts.y)
+	return Rect2(c - Vector2(side * 0.5, side * 0.42), Vector2(side, side))
 
 # ---------------------------------------------------------------- right column
 
@@ -481,6 +443,9 @@ func _build_affection() -> void :
 	aff_root.add_child(pl)
 
 func _say(text: String) -> void :
+	if live and is_instance_valid(live):
+		live.say(text)
+		return
 	if bubble:
 		bubble.queue_free()
 	var head: = hero.head_global()
@@ -506,22 +471,10 @@ func v8_toast_shown(dur: float) -> void :
 		t.tween_property(b, "modulate:a", 0.0, 0.12)
 		t.tween_callback(b.queue_free)
 
+# a touch on her head (main.run_demo, dev «pet»): the same reaction as a real tap there
 func on_hero_tap() -> void :
-	var h: String = G.S.partner
-	if G.pet_left() > 0:
-		G.S.pet.n = int(G.S.pet.n) + 1
-		G.add_aff(h, 5)
-		G.save()
-		hero.react("big")
-		Fx.burst(self, hero.head_global() + Vector2(0, -40), "heart", 16)
-		Fx.float_text(self, hero.head_global() + Vector2(60, -90), "+5 ♥", Color("ffd0e0"), 40)
-		_build_affection()
-		UI.punch(aff_root, 0.12)
-		_say(Sfx.say(h, "aff"))
-	else:
-		hero.react("happy")
-		Fx.burst(self, hero.head_global() + Vector2(0, -40), "heart", 6)
-		_say(Sfx.say(h, "greet"))
+	if live and is_instance_valid(live):
+		live.tap_zone("head")
 
 func dev_act(a: String) -> void :
 	match a:
@@ -543,6 +496,27 @@ func dev_act(a: String) -> void :
 			main.android_back()
 		"pet":
 			on_hero_tap()
+		"tap_head", "tap_hand", "tap_outfit", "tap_bg", "tap_body":
+			live.touch = V9Touch.new()
+			live.tap_zone(a.substr(4))
+		"tap_at_head", "tap_at_hand", "tap_at_outfit", "tap_at_bg":
+			# a real touch at the zone's point (goes through the hit test, not the forced zone)
+			live.touch = V9Touch.new()
+			live._tap(live.zone_point(a.substr(7)))
+		"spam":
+			live.touch = V9Touch.new()
+			for i in V9Touch.SPAM_N:
+				live._t += 0.3
+				live.tap_zone("head")
+		"idle_line":
+			live.idle_t = V9HomeLive.IDLE_LINE
+			if bubble and is_instance_valid(bubble):
+				bubble.queue_free()
+				bubble = null
+		"zones":
+			live.zones_dbg = true
+		"letters":
+			open_mail()
 		"toast":
 			main.toast("Тайник найден: Особая минута · 2 из 10", "star")
 		"cameo":

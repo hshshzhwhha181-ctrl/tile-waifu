@@ -22,6 +22,7 @@ const SCREENS: = {
 	"v7tourney": preload("res://scripts/v07/event/tourney_screen.gd"), 
 	"v7play": preload("res://scripts/v07/event/event_play.gd"),
 	"profile": preload("res://scripts/v08/profile/profile_screen.gd"),
+	"letters": preload("res://scripts/v09/letters/letters_screen.gd"),
 }
 
 var W: = 720.0

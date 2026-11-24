@@ -78,6 +78,9 @@ var timer_lbl: Label
 var score_lbl: Label
 var free_rescue_left: = 0
 var first_pairs_bonus: = 0
+# 0.9 Ultimate (scripts/v09/ult/ult_cast.gd); v9_from_ult is true while an ult removes a pair (its matched signal)
+var ult: V9UltCast
+var v9_from_ult: = false
 
 func build(m, args: Dictionary) -> void :
 	main = m
@@ -159,6 +162,7 @@ func build(m, args: Dictionary) -> void :
 	_refresh()
 	_intro()
 	_v8_dev()
+	_v9_dev()
 
 
 # dev: --v8_win=1 opens the victory window as soon as the table is playable (for screenshots),
@@ -331,8 +335,11 @@ func _build_hud() -> void :
 		score_lbl.position = Vector2(gp.size.x - 90, 52)
 		gp.add_child(score_lbl)
 
-	SKILL_NEED = V6Heroines.skill_need(partner)
-	skill_charge = mini(V6Heroines.start_charge(partner), SKILL_NEED - 1)
+	# 0.9: the skill meter is the Ultimate: need / start charge from V9Ults (ranked: 6, start 0)
+	ult = V9UltCast.new().setup(self)
+	add_child(ult)
+	SKILL_NEED = ult.need()
+	skill_charge = ult.start_charge()
 	var stage_w: = 242.0 if _slot_count() <= 4 else 186.0
 	if mode == "duel":
 		stage = V6HeroStage.new().setup(partner, Rect2(98, 22, 92, 92), {"compact": true})
@@ -341,7 +348,11 @@ func _build_hud() -> void :
 		# bond_text («… · умение за 7 пар · наряд +N») ran past the right screen edge
 		stage = V6HeroStage.new().setup(partner, Rect2(W - stage_w - 8, 66, stage_w, 240), {"tag": "Симпатия %d" % G.aff_level(partner)})
 	add_child(stage)
+	if ult.mod != "":
+		stage.set_ult_badge(ult.mod, G.HEROES[partner].color, String(V9Ults.MODS[ult.mod].desc))
 	stage.pressed.connect( func():
+		if ult.busy:
+			return
 		if skill_ready and board.input_on:
 			_use_skill()
 		else:
@@ -718,6 +729,10 @@ func _on_match(mid: Vector2, combo: int, gold: bool, shard: String) -> void :
 	# the previous step's combo word goes at once (its count is stale now); a new one may follow below
 	_v8_clear_combo_word()
 	_v8_fold_fortune()
+	# 0.9: a pair the ult removed (from_ult) neither charges the ult nor extends / counts the combo; Блиц: 10 points
+	var from_ult: = v9_from_ult
+	if from_ult:
+		combo = 1
 	var fever: = now() < fever_until
 	var mult: = 1 + (combo - 1) / 2
 	var gain: = int(round(mult * (2 if fever else 1) * (gold_mult if gold else 1) * (1.0 + gem_bonus)))
@@ -732,8 +747,8 @@ func _on_match(mid: Vector2, combo: int, gold: bool, shard: String) -> void :
 		Fx.float_text(fx_layer, mid + Vector2(0, -10), "+%d" % pts, Color("9fe8d0"), 30)
 	elif mode == "zen":
 		blitz_score += 1
-	if not skill_ready:
-		skill_charge += 1
+	if not skill_ready and not from_ult and not (ult and ult.busy):
+		skill_charge = V9Ults.add(skill_charge, SKILL_NEED)
 		if skill_charge >= SKILL_NEED:
 			_skill_ready()
 	G.S.gems += gain
@@ -741,7 +756,8 @@ func _on_match(mid: Vector2, combo: int, gold: bool, shard: String) -> void :
 	G.add_aff(partner, 1)
 	G.task_add("pairs")
 	max_combo = maxi(max_combo, combo)
-	last_combo = combo
+	if not from_ult:
+		last_combo = combo
 	if gold:
 		gold_got += 1
 	if shard == "":
@@ -789,7 +805,7 @@ func _on_match(mid: Vector2, combo: int, gold: bool, shard: String) -> void :
 	stage.react("combo" if combo >= 3 else "match")
 	if duel:
 		duel.on_player_pair(mid)
-	if v7combo:
+	if v7combo and not from_ult:
 		v7combo.on_match(mid, combo, gain)
 	_refresh()
 
@@ -1333,20 +1349,55 @@ func _skill_ready() -> void :
 	skill_ready = true
 	skill_charge = SKILL_NEED
 	stage.set_charge(SKILL_NEED, SKILL_NEED)
-	_bubble(V6Txt.s("play.skill_ready") % G.SKILLS[partner].name)
+	# 0.9: «Ульта готова»: the portrait glows (stage), a chime, her line names the ult
+	var nm: = ult.ult_name() if ult else String(G.SKILLS[partner].name)
+	_bubble("Ульта «%s» готова! Коснись меня." % nm)
 	Sfx.play("reveal_sr", 1.3, -4)
+	V9Feel.haptic("match")
 
 func _use_skill() -> void :
-	var why: = V6Skills.blocked(self)
-	if why != "":
-		stage.say_text(why)
+	if ult == null or ult.busy:
 		return
-	skill_ready = false
-	skill_charge = 0
-	_refresh()
-	await V6Skills.use(self)
+	await ult.begin()
 	if is_inside_tree():
 		_refresh()
+
+
+# dev (screenshots): --v9_ult=1 casts the equipped outfit's ult as soon as the table is playable, auto-target, no
+# aim window. --v9_cutin=full|short|off forces the clip (default full); --v9_ult_shots=0.1,0.5,… saves the clip
+# at those times into --shots=<dir> as <name>_t<ms>.png; --v9_freeze=<s> holds the clip at that time.
+# Dev runs save to a separate file.
+func _v9_dev() -> void :
+	var a: = {}
+	for x in OS.get_cmdline_user_args():
+		if x.begins_with("--") and "=" in x:
+			var kv: = x.substr(2).split("=", true, 1)
+			a[kv[0]] = kv[1]
+	if a.get("v9_ult_selftest", "") == "1":
+		G.save_path = "user://dev_v9_ult.json"
+		V9UltSelftest.run(self)
+		return
+	if a.get("v9_ult", "") != "1":
+		return
+	G.save_path = "user://dev_v9_ult.json"
+	ult.force_mode = String(a.get("v9_cutin", "full"))
+	ult.force_auto = true
+	if a.has("v9_ult_shots") and a.has("shots"):
+		V9Cutin.dev_dir = String(a.shots)
+		V9Cutin.dev_name = String(a.get("name", "ult"))
+		V9Cutin.dev_shots = Array(String(a.v9_ult_shots).split(",")).map( func(x): return float(x))
+	if a.has("v9_freeze"):
+		V9Cutin.dev_freeze = float(a.v9_freeze)
+	while is_inside_tree() and not board.input_on:
+		await get_tree().create_timer(0.05).timeout
+	if not is_inside_tree():
+		return
+	await get_tree().create_timer(float(a.get("v9_delay", "0.4"))).timeout
+	if not is_inside_tree():
+		return
+	skill_charge = SKILL_NEED
+	_skill_ready()
+	_use_skill()
 
 
 func _open_gift(mid: Vector2) -> void :

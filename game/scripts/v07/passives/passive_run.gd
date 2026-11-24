@@ -243,6 +243,9 @@ func _on_deal() -> void :
 		_nova_hack()
 
 func _on_match(_mid: Vector2, _combo: int, _gold: bool, _shard: String) -> void :
+	# 0.9: pairs an ult removed (from_ult) do not feed the passive counters either
+	if play and is_instance_valid(play) and play.get("v9_from_ult") == true:
+		return
 	pairs += 1
 	since_relay += 1
 	match h:
