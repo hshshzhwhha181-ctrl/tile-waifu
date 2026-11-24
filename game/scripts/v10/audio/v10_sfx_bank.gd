@@ -22,9 +22,10 @@ const DIR: = "res://assets/v10/audio/sfx/"
 const VOICE_DIR: = "res://assets/v10/audio/voice/"
 const POOL: = 20
 
-# id: [variants], db (playback gain), spread (± semitones), max (voices of this id), gap (s, min retrigger)
+# id: [variants], db (playback gain), spread (± semitones), max (voices of this id), gap (s, min retrigger),
+# vdb (optional per-variant trim so random variants land at the same loudness; measured 100 ms K-weighted peak)
 const BANK: = {
-	"tile_click": {"v": ["tile_click", "tile_click_b", "tile_click_c"], "db": -2.0, "spread": 0.6, "max": 4, "gap": 0.03},
+	"tile_click": {"v": ["tile_click", "tile_click_b", "tile_click_c"], "vdb": [0.0, 0.8, -2.6], "db": -2.0, "spread": 0.6, "max": 4, "gap": 0.03},
 	"tile_select": {"v": ["tile_select"], "db": -3.0, "spread": 0.5, "max": 4, "gap": 0.03},
 	"tile_deny": {"v": ["tile_deny"], "db": -4.0, "spread": 0.3, "max": 2, "gap": 0.12},
 	"match_1": {"v": ["match_1", "match_1b"], "db": 0.0, "spread": 0.4, "max": 3, "gap": 0.04},
@@ -38,13 +39,13 @@ const BANK: = {
 	"ult_cast": {"v": ["ult_cast"], "db": -3.0, "spread": 0.0, "max": 1, "gap": 0.5},
 	"cutin_whoosh": {"v": ["cutin_whoosh"], "db": -2.0, "spread": 0.4, "max": 2, "gap": 0.15},
 	"chest_open": {"v": ["chest_open"], "db": 0.0, "spread": 0.2, "max": 1, "gap": 0.4},
-	"coin_fly": {"v": ["coin_fly"], "db": -4.0, "spread": 0.8, "max": 3, "gap": 0.06},
+	"coin_fly": {"v": ["coin_fly"], "db": -7.0, "spread": 0.8, "max": 3, "gap": 0.06},
 	"gem_fly": {"v": ["gem_fly"], "db": 0.0, "spread": 0.8, "max": 3, "gap": 0.06},
 	"reward_pop": {"v": ["reward_pop"], "db": -5.0, "spread": 1.0, "max": 4, "gap": 0.05},
 	"star": {"v": ["star"], "db": -2.0, "spread": 0.0, "max": 3, "gap": 0.1},
 	"rank_up": {"v": ["rank_up"], "db": -2.0, "spread": 0.0, "max": 1, "gap": 1.0},
 	"btn_hover": {"v": ["btn_hover"], "db": -14.0, "spread": 0.8, "max": 2, "gap": 0.06},
-	"btn_press": {"v": ["btn_press", "btn_press_b"], "db": -4.0, "spread": 0.5, "max": 3, "gap": 0.04},
+	"btn_press": {"v": ["btn_press", "btn_press_b"], "vdb": [1.9, -1.9], "db": -4.0, "spread": 0.5, "max": 3, "gap": 0.04},
 	"tab_switch": {"v": ["tab_switch"], "db": -6.0, "spread": 0.4, "max": 2, "gap": 0.08},
 	"page_turn": {"v": ["page_turn"], "db": -6.0, "spread": 0.6, "max": 2, "gap": 0.08},
 	"notify": {"v": ["notify"], "db": -2.0, "spread": 0.0, "max": 1, "gap": 0.3},
@@ -53,7 +54,7 @@ const BANK: = {
 	"sr_reveal": {"v": ["sr_reveal"], "db": -3.0, "spread": 0.0, "max": 1, "gap": 0.3},
 	"ssr_reveal": {"v": ["ssr_reveal"], "db": -1.0, "spread": 0.0, "max": 1, "gap": 0.5},
 	"booster": {"v": ["booster"], "db": -3.0, "spread": 0.3, "max": 1, "gap": 0.2},
-	"undo": {"v": ["undo"], "db": -2.0, "spread": 0.3, "max": 1, "gap": 0.1},
+	"undo": {"v": ["undo"], "db": 0.0, "spread": 0.3, "max": 1, "gap": 0.1},
 	"shuffle": {"v": ["shuffle"], "db": -1.0, "spread": 0.2, "max": 1, "gap": 0.3},
 	"heart": {"v": ["heart"], "db": -4.0, "spread": 0.5, "max": 2, "gap": 0.15},
 }
@@ -227,7 +228,8 @@ func _play(id: String, opts: Dictionary) -> void :
 	p.stop()
 	p.stream = st
 	p.pitch_scale = clampf(pitch, 0.25, 4.0)
-	p.volume_db = float(e["db"]) + float(opts.get("db", 0.0))
+	var vdb: Array = e.get("vdb", [])
+	p.volume_db = float(e["db"]) + (float(vdb[vi]) if vi < vdb.size() else 0.0) + float(opts.get("db", 0.0))
 	p.bus = String(opts.get("bus", "Master"))
 	_owner[p] = id
 	_started[p] = now

@@ -74,6 +74,10 @@ func _assets() -> void :
 				_check(not st.loop, "sfx not looped: " + v)
 			if id in TAP_IDS and st != null:
 				_check(st.get_length() <= 0.5, "tap sfx short (<= 0.5 s): %s %.2f" % [v, st.get_length()])
+	for id in V10SfxBank.BANK:
+		var e: Dictionary = V10SfxBank.BANK[id]
+		if e.has("vdb"):
+			_check(e["vdb"].size() == e["v"].size(), "vdb per variant: " + id)
 	for h in V10SfxBank.HEROES:
 		for k in V10SfxBank.VOICE_KINDS:
 			var p: = V10SfxBank.voice_path(h, k)
@@ -127,6 +131,15 @@ func _runtime() -> void :
 	_check(st["fever"] and st["fever_p"][0] and st["fever_p"][1] > -7.0, "fever layer up: %s" % str(st))
 	var base_db: float = st["a"][1] if st["a"][0] else st["b"][1]
 	_check(base_db <= -20.0, "base ducked under fever (%.1f dB)" % base_db)
+	# tray fills up during fever: calm -> tense must keep the fever layer on top, the new base comes in ducked
+	V10Music.set_tension(0.8)
+	await _secs(1.4)
+	st = m.debug_state()
+	_check(V10Music.current() == "match_tense" and st["fever"] and st["fever_p"][0] and st["fever_p"][1] > -7.0, "tension switch keeps fever: %s" % str(st))
+	base_db = st["a"][1] if st["a"][0] else st["b"][1]
+	_check(int(st["a"][0]) + int(st["b"][0]) == 1 and base_db <= -20.0, "tense base ducked under fever: %s" % str(st))
+	V10Music.set_tension(0.2)
+	await _secs(1.4)
 	V10Music.fever(false)
 	await _secs(1.1)
 	st = m.debug_state()
@@ -135,6 +148,21 @@ func _runtime() -> void :
 	await _frames(2)
 	st = m.debug_state()
 	_check(st["sting_p"][0], "victory sting plays")
+	await _secs(0.5)
+	st = m.debug_state()
+	_check(maxf(st["a"][1], st["b"][1]) <= -25.0, "loop dips under the sting: %s" % str(st))
+	# "next level" right after the victory sting: same track -> the dipped loop must come back up
+	V10Music.play_screen("match")
+	await _secs(1.0)
+	st = m.debug_state()
+	_check(V10Music.current() == "match_calm" and maxf(st["a"][1], st["b"][1]) > -7.0, "same track after sting comes back to level: %s" % str(st))
+	# defeat sting with resume, then a tab hop before it ends: the old loop must not be revived
+	V10Music.sting("defeat", true)
+	await _secs(0.3)
+	V10Music.play_screen("shop")
+	await _secs(float(load(V10Music.path_of("sting_defeat")).get_length()) + 0.6)
+	st = m.debug_state()
+	_check(V10Music.current() == "shop" and int(st["a"][0]) + int(st["b"][0]) == 1, "sting resume does not revive a faded-out loop: %s" % str(st))
 	V10Music.play_screen("summon")
 	_check(V10Music.current() == "summon", "summon track")
 	V10Music.motif("yue")

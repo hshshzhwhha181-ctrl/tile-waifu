@@ -85,6 +85,8 @@ var _pos: = {}  # track id -> [position_s, left_at_ticks_s]
 var _cache: = {}
 var _tw: Dictionary = {}  # player -> Tween
 var _pending: Array = []
+var _sting_tw: Tween = null
+var _cur_p: AudioStreamPlayer = null  # the base player that holds _cur (the other one may still be fading out)
 
 
 static func inst() -> V10Music:
@@ -247,12 +249,20 @@ func _silence_legacy() -> void :
 
 func _play(track_id: String, fade: float) -> void :
 	if track_id == _cur and (track_id == "" or _a.playing or _b.playing):
+		# same track again (e.g. "next level" after a victory sting left the loop dipped at -30 dB): bring it back up
+		var cur_p: = _base()
+		if track_id != "" and not _fever_on and cur_p != null and cur_p.volume_db < LEVEL_DB - 0.5:
+			_kill_sting_tw()
+			_fade(cur_p, LEVEL_DB, fade)
 		return
+	_kill_sting_tw()
 	var old: = _a if _a.playing and (not _b.playing or _a.volume_db >= _b.volume_db) else _b
 	var nw: = _b if old == _a else _a
 	if _cur != "" and old.playing:
 		_pos[_cur] = [old.get_playback_position(), Time.get_ticks_msec() / 1000.0]
-	if _fever_on:
+	# calm <-> tense inside a match keeps the fever layer on top (the new base comes in ducked under it)
+	var keep_fever: = _fever_on and _cur.begins_with("match") and track_id.begins_with("match") and _music_on()
+	if _fever_on and not keep_fever:
 		_set_fever(false)
 	_cur = track_id
 	# fade out every base player except the one that takes the new track (rapid tab hopping can leave both
@@ -260,6 +270,7 @@ func _play(track_id: String, fade: float) -> void :
 	for p in [_a, _b]:
 		if p.playing and (p != nw or track_id == ""):
 			_fade(p, SILENT_DB, fade, true)
+	_cur_p = null
 	if track_id == "" or not _music_on():
 		return
 	var st: = _stream(track_id)
@@ -276,11 +287,13 @@ func _play(track_id: String, fade: float) -> void :
 		if Time.get_ticks_msec() / 1000.0 - float(rec[1]) < RESUME_S:
 			from = fmod(float(rec[0]), maxf(st.get_length(), 0.01))
 	nw.play(from)
-	_fade(nw, LEVEL_DB, fade)
+	_cur_p = nw
+	_fade(nw, FEVER_BASE_DB if keep_fever else LEVEL_DB, fade)
 
 
 func _base() -> AudioStreamPlayer:
-	return _a if _a.playing and (not _b.playing or _a.volume_db >= _b.volume_db) else _b
+	# null after stop()/music off: a player that is only fading out must never be revived by fever/sting
+	return _cur_p if _cur_p != null and _cur_p.playing else null
 
 
 func _set_fever(on: bool) -> void :
@@ -295,12 +308,12 @@ func _set_fever(on: bool) -> void :
 		_fever.volume_db = SILENT_DB
 		_fever.play()
 		_fade(_fever, LEVEL_DB + 1.0, 0.35)
-		if base.playing:
+		if base != null:
 			_fade(base, FEVER_BASE_DB, 0.35)
 	else:
 		if _fever.playing:
 			_fade(_fever, SILENT_DB, 0.9, true)
-		if base.playing:
+		if base != null:
 			_fade(base, LEVEL_DB, 0.9)
 
 
@@ -315,15 +328,26 @@ func _sting(id: String, resume: bool) -> void :
 	if _fever_on:
 		_set_fever(false)
 	var base: = _base()
-	if base.playing:
+	if base != null:
 		_fade(base, STING_DIP_DB, 0.25)
 	_sting_p.stream = st
 	_sting_p.volume_db = LEVEL_DB + 1.0
 	_sting_p.play()
-	if resume and base.playing:
-		var tw: = create_tween()
-		tw.tween_interval(maxf(0.5, st.get_length() - 0.6))
-		tw.tween_callback(func(): _fade(base, LEVEL_DB, 1.2))
+	_kill_sting_tw()
+	if resume and base != null:
+		# the loop comes back only if nothing changed meanwhile (a tab hop in between must not revive a faded-out player)
+		var tid: = _cur
+		_sting_tw = create_tween()
+		_sting_tw.tween_interval(maxf(0.5, st.get_length() - 0.6))
+		_sting_tw.tween_callback(func():
+			if _cur == tid and base == _cur_p and base.playing and not _fever_on:
+				_fade(base, LEVEL_DB, 1.2))
+
+
+func _kill_sting_tw() -> void :
+	if _sting_tw != null and _sting_tw.is_valid():
+		_sting_tw.kill()
+	_sting_tw = null
 
 
 # dev / tests
