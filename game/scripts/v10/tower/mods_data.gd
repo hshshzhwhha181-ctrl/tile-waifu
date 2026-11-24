@@ -95,7 +95,7 @@ const BLESS_ORDER: = ["lamp", "tips", "cup", "pause", "breath", "warmup", "silve
 	"boost", "pact", "aurora"]
 const BLESS_CAP_DEFAULT: = 3
 # blessings that make no sense in a mode (Journey has hearts and no lantern cap, no hourglass by default)
-const BLESS_SKIP: = {"journey": ["feather"]}
+const BLESS_SKIP: = {"journey": ["feather"], "practice": ["feather"]}
 
 # ---------------------------------------------------------------- curses
 # Each curse has 1..3 levels; a level replaces the lower one (heat is the level's own value, not a sum of levels).

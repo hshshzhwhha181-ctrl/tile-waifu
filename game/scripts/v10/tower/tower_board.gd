@@ -105,8 +105,9 @@ static func _my_pagoda(wid: int) -> Dictionary:
 	var wk: Dictionary = d.week
 	var sc: = int(wk.score) if int(wk.id) == wid else 0
 	var fl: = int(wk.floors) if int(wk.id) == wid else 0
+	var hh: = int(wk.get("heat", 0)) if int(wk.id) == wid else 0
 	return {"pid": -1, "name": String(G.nick()) if G.has_method("nick") else "Ты", "hero": String(G.S.get("level_partner", "mc")),
-		"avatar": "", "floors": fl, "heat": 0, "score": sc, "tier": _my_tier(), "me": true, "ai_label": ""}
+		"avatar": "", "floors": fl, "heat": hh, "score": sc, "tier": _my_tier(), "me": true, "ai_label": ""}
 
 static func _by_score(a: Dictionary, b: Dictionary) -> bool:
 	if int(a.score) == int(b.score):

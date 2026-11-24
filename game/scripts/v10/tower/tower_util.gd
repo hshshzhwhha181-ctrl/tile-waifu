@@ -41,11 +41,20 @@ static func econ(key: String):
 			return v
 	return ECON.get(key)
 
+# the global class list does not change while the game runs: look each name up once (econ() and now_utc() are
+# called many times per screen; a full scan of the class list each time is wasted work on a mid Android phone)
+static var _cls_cache: = {}
+
 static func _class_script(n: String) -> Script:
+	if _cls_cache.has(n):
+		return _cls_cache[n]
+	var s: Script = null
 	for c in ProjectSettings.get_global_class_list():
 		if String(c.get("class", "")) == n:
-			return load(String(c.path))
-	return null
+			s = load(String(c.path))
+			break
+	_cls_cache[n] = s
+	return s
 
 static func _script_has(s: Script, fn: String) -> bool:
 	for m in s.get_script_method_list():

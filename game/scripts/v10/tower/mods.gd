@@ -435,8 +435,11 @@ static func _search(cur: Dictionary, i: int, best: Array) -> void:
 static func bless_card(id: String, state: Dictionary) -> Dictionary:
 	var d: Dictionary = D.BLESS[id]
 	var p: = bless_plus(id, state)
+	var line: = String(d.plus if p else d.desc)
+	if String(state.get("mode", "pagoda")) != "pagoda":
+		line = line.replace("+1 фонарь", "+1 сердце").replace("+2 фонаря", "+2 сердца")
 	return {"id": id, "hero": String(d.hero), "hero_name": U.hero_name(String(d.hero)), "title": String(d.name),
-		"line": String(d.plus if p else d.desc), "plus": p, "kind": "bless"}
+		"line": line, "plus": p, "kind": "bless"}
 
 static func curse_card(id: String, lvl: int, mode: = "pagoda") -> Dictionary:
 	var d: Dictionary = D.CURSES[id]

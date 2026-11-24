@@ -166,7 +166,9 @@ static func start(partner: String, practice: = false) -> Dictionary:
 	var run: = {"mode": "journey" if not practice else "practice", "week": wid, "practice": practice, "board": 0,
 		"hearts": HEARTS, "partner": partner, "bless": {}, "curses": {}, "extra_eff": [theme(wid).eff],
 		"scores": [], "offer": [], "curse_offer": [], "attempt": int(d.attempts)}
-	d.run = run
+	# a practice run is not saved: it must never overwrite an unfinished real attempt (already paid for)
+	if not practice:
+		d.run = run
 	return run
 
 static func current_run() -> Dictionary:
@@ -329,8 +331,10 @@ static func finish(run: Dictionary) -> Dictionary:
 	var score: = total(run)
 	var out: = {"boards": boards, "score": score, "tier": tier_of(score), "tier_name": tier_name(tier_of(score)),
 		"reward": {}, "practice": bool(run.practice), "record": false}
+	if bool(run.practice):
+		return out
 	d.run = {}
-	if bool(run.practice) or int(run.week) != int(d.week):
+	if int(run.week) != int(d.week):
 		return out
 	if score > int(d.best.score) or boards > int(d.best.boards):
 		out.record = score > int(d.best.score)

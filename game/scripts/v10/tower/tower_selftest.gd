@@ -347,6 +347,7 @@ func _pagoda() -> void:
 	var d: = P.st()
 	check(int(d.best.get("0", 0)) == 12, "migration: climb_best -> heat 0 record")
 	check(5 in d.miles and 10 in d.miles and not 15 in d.miles, "migration: old miles counted, no new ones")
+	check(int(d.best_score) == P.floor_score(12, 0), "migration: best score on the ×100 scale (%d)" % int(d.best_score))
 	var snap: = JSON.stringify(d)
 	P.st()
 	check(JSON.stringify(P.st()) == snap, "migration is idempotent")
@@ -474,6 +475,9 @@ func _journey() -> void:
 	check(int(J.board_cfg(r2).seed) == int(cfg1.seed), "both attempts play the same first table")
 	var pr: = J.start("mc", true)
 	check(not pr.has("error") and bool(pr.practice), "practice is always open")
+	check(J.current_run() == r2 and not bool(J.current_run().practice), "practice never replaces the saved attempt")
+	J.finish(pr)
+	check(J.current_run() == r2, "finishing practice keeps the saved attempt")
 	check(bool(J.board_rules(r2).normalized) and not M.bless_plus("lamp", r2), "journey is normalized: no plus")
 	# hearts: overflow = −1 heart and the same table
 	var fl: = {}

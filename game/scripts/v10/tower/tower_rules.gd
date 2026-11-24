@@ -112,10 +112,12 @@ func apply_op(play, op: Dictionary) -> void:
 				if t.alive and t.secret and t.back_spr:
 					t.back_spr.visible = false
 					t.face_spr.visible = true
+			var wb: = weakref(board)
 			board.get_tree().create_timer(float(op.secs)).timeout.connect(func():
-				if not is_instance_valid(board):
+				var bb: TrayBoard = wb.get_ref()
+				if bb == null:
 					return
-				for t in board.tiles:
+				for t in bb.tiles:
 					if is_instance_valid(t) and t.alive and t.secret and t.back_spr:
 						t.back_spr.visible = true
 						t.face_spr.visible = false)

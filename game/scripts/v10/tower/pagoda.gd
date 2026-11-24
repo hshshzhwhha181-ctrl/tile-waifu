@@ -36,7 +36,7 @@ const COS: = [
 	{"id": "edge_pagoda_flame", "kind": "tile_edge", "name": "Пламя Пагоды", "heat": 32, "floor": 20},
 ]
 
-const DEFAULTS: = {"best": {}, "best_score": 0, "week": {"id": -1, "floors": 0, "score": 0, "offered": 0},
+const DEFAULTS: = {"best": {}, "best_score": 0, "week": {"id": -1, "floors": 0, "score": 0, "offered": 0, "heat": 0},
 	"miles": [], "runs": 0, "cos": [], "run": {}, "migrated": false}
 
 static var _test_S = null  # selftests inject a save dict
@@ -68,7 +68,7 @@ static func _migrate(S: Dictionary, d: Dictionary) -> void:
 		paid_to = maxi(paid_to, int(m))
 	if old_best > 0:
 		d.best["0"] = maxi(int(d.best.get("0", 0)), old_best)
-		d.best_score = maxi(int(d.best_score), old_best)
+		d.best_score = maxi(int(d.best_score), floor_score(old_best, 0))
 	for m in U.econ("pagoda.miles"):
 		if int(m[0]) <= paid_to and not int(m[0]) in (d.miles as Array):
 			d.miles.append(int(m[0]))
@@ -201,10 +201,12 @@ static func floor_clear(run: Dictionary, res: = {}) -> Dictionary:
 	# the week's table and the weekly offering (<= 60 gems a week, by the best floor of the week)
 	var wid: = U.week_id(U.now_utc())
 	if int(d.week.id) != wid:
-		d.week = {"id": wid, "floors": 0, "score": 0, "offered": 0}
+		d.week = {"id": wid, "floors": 0, "score": 0, "offered": 0, "heat": 0}
 	var h: = heat_chosen(run)
 	d.week.floors = maxi(int(d.week.floors), f)
-	d.week.score = maxi(int(d.week.score), floor_score(f, h))
+	if floor_score(f, h) > int(d.week.score):
+		d.week.score = floor_score(f, h)
+		d.week["heat"] = h
 	var due: = 0
 	for o in U.econ("pagoda.offering"):
 		if int(d.week.floors) >= int(o[0]):
