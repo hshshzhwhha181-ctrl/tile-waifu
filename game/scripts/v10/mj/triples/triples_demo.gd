@@ -66,6 +66,27 @@ func _run() -> void:
 	scr = _make()
 	await _wait(1.4)
 	await _shot("start")
+	if a.get("only", "") == "start":
+		# + комбо и Приём для обзора: две тройки подряд и заряженное окно
+		var rr: = scr.board.rules
+		for rep in 2:
+			var by: = {}
+			for i in rr.frees:
+				if not by.has(rr.face[i]):
+					by[rr.face[i]] = []
+				(by[rr.face[i]] as Array).append(i)
+			for f in by:
+				if (by[f] as Array).size() >= 3:
+					for k in 3:
+						scr.board.tap(by[f][k])
+						await _wait(0.07)
+					break
+			await _wait(0.45)
+		scr.charge = scr.need
+		scr._sync_charge()
+		await _wait(0.12)
+		await _shot("combo")
+		return
 	# 2) 6/7: шесть разных лиц в лотке, без тройки
 	var r: = scr.board.rules
 	var guard: = 0

@@ -38,6 +38,7 @@ var lost: = false
 var won: = false
 var triples: = 0
 var max_tray: = 0
+var last_shuffle_order: Array[int] = []
 
 
 static func covers_rel(o: Vector3i, t: Vector3i) -> bool:
@@ -468,6 +469,7 @@ func reshuffle(rng: RandomNumberGenerator, tries: = 40) -> bool:
 				break
 		if ok and r.won:
 			face = newf
+			last_shuffle_order = order
 			return true
 	return false
 

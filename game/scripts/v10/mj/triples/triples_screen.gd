@@ -273,6 +273,7 @@ func _build_presence() -> void:
 	lite.attach(self, hero, {"sound": sound, "fx_min": board.fx_min, "mode": args.get("hero_mode", "")} if args.has("hero_mode") else {"sound": sound, "fx_min": board.fx_min})
 	move_child(lite, fx_layer.get_index())
 	lite.layout(Rect2(0, 0, vw.x, band_h), _window_rect(), vw)
+	lite.yield_nodes = [left_lbl, bar]
 	lite.portrait_tapped.connect(_try_ult)
 	lite.finale_done.connect(_after_finale)
 	presence = ext if ext != null and ext.has_method("on") else lite

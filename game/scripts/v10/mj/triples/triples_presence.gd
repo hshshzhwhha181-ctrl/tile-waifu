@@ -48,6 +48,7 @@ var mode: = "live"              # live | quiet | finish (настройка «Г
 var fx_min: = false
 var events: Array = []          # журнал событий (самотест)
 var lines_said: Array = []
+var yield_nodes: Array = []      # узлы полосы, уступающие место реплике на коротком экране (9:16)
 
 var _win_node: Control
 var _art: TextureRect
@@ -159,8 +160,13 @@ func layout(band: Rect2, window: Rect2, scr: Vector2) -> void:
 	var ring: Control = get_node("Ring")
 	ring.position = window.position - Vector2(10, 10)
 	ring.size = window.size + Vector2(20, 20)
-	_line.size = Vector2(maxf(160.0, window.position.x - 140.0), 80)
-	_line.position = Vector2(window.position.x - _line.size.x - 12.0, window.end.y - 84.0)
+	if band.size.y <= 140.0:
+		# короткая полоса (9:16): реплика встаёт на место строки «Осталось», та на 4 с притихает
+		_line.size = Vector2(window.position.x - 104.0 - 12.0, 64)
+		_line.position = Vector2(104.0, maxf(8.0, band.size.y * 0.5 - 40.0))
+	else:
+		_line.size = Vector2(maxf(160.0, window.position.x - 140.0), 80)
+		_line.position = Vector2(window.position.x - _line.size.x - 12.0, window.end.y - 84.0)
 	_edge.queue_redraw()
 	_win_node.queue_redraw()
 	ring.queue_redraw()
@@ -449,6 +455,13 @@ func _say(kind: String, force: = false) -> void:
 	tw.tween_property(_line, "modulate:a", 1.0, 0.4 if not fx_min else 0.12)
 	tw.tween_interval(3.6)
 	tw.tween_property(_line, "modulate:a", 0.0, 0.3)
+	if band_rect.size.y <= 140.0:
+		for n in yield_nodes:
+			if is_instance_valid(n):
+				var t2: = (n as CanvasItem).create_tween()
+				t2.tween_property(n, "modulate:a", 0.0, 0.2)
+				t2.tween_interval(3.9)
+				t2.tween_property(n, "modulate:a", 1.0, 0.3)
 
 
 # победа: она выходит в полный рост справа поверх притушенного (уже неактивного) стола; тап — пропуск

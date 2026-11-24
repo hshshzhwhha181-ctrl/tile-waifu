@@ -323,6 +323,7 @@ static func calibrate(i: int, log_cb: Callable = Callable()) -> Dictionary:
 	var best: = {}
 	var best_d: = INF
 	for it in 30:
+		x = snappedf(x, 0.001)
 		var lv: = build(i, x, it)
 		if not certificate_ok(lv):
 			continue
@@ -333,7 +334,7 @@ static func calibrate(i: int, log_cb: Callable = Callable()) -> Dictionary:
 			d = float(b[0]) - rate
 		elif rate > float(b[1]):
 			d = rate - float(b[1])
-		var e: = {"i": i, "x": snappedf(x, 0.001), "salt": it, "rate": rate, "n": lv.n, "kinds": lv.kinds,
+		var e: = {"i": i, "x": x, "salt": it, "rate": rate, "n": lv.n, "kinds": lv.kinds,
 			"hold": lv.hold, "shape": lv.shape, "kind": lv.kind, "band": b, "in_band": d == 0.0,
 			"cert": lv.order.size()}
 		if d + absf(rate - mid) * 0.01 < best_d:
@@ -362,7 +363,7 @@ static func bake(path: = BAKE_PATH, log_cb: Callable = Callable()) -> Dictionary
 	DirAccess.make_dir_recursive_absolute(abs_path.get_base_dir())
 	var f: = FileAccess.open(path, FileAccess.WRITE)
 	if f:
-		f.store_string(JSON.stringify(d, "\t"))
+		f.store_string(JSON.stringify(d, "\t", true, true))
 		f.close()
 	_bake = {}
 	_bake_loaded = false
