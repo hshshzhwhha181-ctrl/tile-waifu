@@ -91,6 +91,17 @@ Every name used in `reactions` must exist in `gestures[]` with `tier` `base` or 
 * `rig_sheen.gd` (`V10RigSheen`) + `v10_sheen.gdshader` — LEGWEAR `sheen_sweep`: a specular band over a mask painted
   in a layer's texture space (`tools/sheen_mask.py`), drawn by a copy of that skinned layer, so it follows the bones.
   The mask never goes above the knee (`knee_y`).
+  API (other rigs code against it; load it softly with `ResourceLoader.exists("res://scripts/v10/rig/rig_sheen.gd")`):
+  ```gdscript
+  var sheen = V10RigSheen.attach(rig, gestures.shaders.sheen)  # adds itself as a child of the rig; null if layer/mask missing
+  sheen.sweep()            # one pass now (call it when a legs:true gesture starts); sweep(1.6) = stronger (fever_glow-like)
+  sheen.auto_period = Vector2(8, 12)   # automatic passes every 8–12 s; Vector2.ZERO = off
+  sheen.enabled = false    # e.g. FX «Минимум», Yandex alt_rect framing
+  ```
+  `shaders.sheen` keys: `layer` (`body` or a split layer name), `mask` (PNG in the rig folder, same size as that
+  layer's texture), `knee_y` (body px; the mask is empty above it), `from` / `to` (body px: the band travels from → to,
+  e.g. down the shins), `width` (px, 18), `strength` (0.35), `color` ([r, g, b], warm white by default), `dur` (0.6 s),
+  `period` ([8, 12] s), `polys` (body px polygons, the source for `tools/sheen_mask.py <rig_dir>`).
 * `rig_data_selftest.gd` / `.tscn` — validates every `game/assets/v10/rig/*/gestures.json` against this contract
   and against the rig itself (names implemented, zones vs dead zones, bold never reachable from a tap, LEGWEAR masks
   and ornament bones below the knee). Godot: `--path game res://scripts/v10/rig/rig_data_selftest.tscn` →
