@@ -36,6 +36,9 @@ const BUBBLE_W: = 300.0
 const BUBBLE_TOP: = 186.0
 const BUBBLE_TOP_MIN: = 116.0
 const AV: = 80.0
+# the spam cooldown's tiny expression flicker (alternating) and how long the rig's face holds it
+const COOL_EMO: = ["shy", "surprised"]
+const COOL_HOLD: = 0.9
 const ZONE_EMO: = {"head": "shy", "hand": "happy", "outfit": "happy", "bg": "surprised", "spam": "pout", "idle": "happy"}
 # the face patch: the emotion portrait shows only inside a soft ellipse around her face, so hair, body and pose stay
 # the rig's own and only the expression changes
@@ -65,6 +68,7 @@ var bubble: Control
 var fps_lbl: Label
 var zones_dbg: = false
 var _t: = 0.0
+var _cool_i: = 0
 
 
 static func video_wanted(h: String) -> bool:
@@ -217,12 +221,37 @@ func _tap(p: Vector2, force: = "") -> void:
 		# and it does not count toward the «не так быстро» spam line either (decide() returns before the tally)
 		return
 	if d.kind == "cool":
-		# after «не так быстро»: a light bounce, tap haptic and a soft click — no line, no affection
-		_bump(0.5)
-		V9Feel.haptic("tap")
-		V9Feel.sound("pop", 1.12 + randf() * 0.06, -12)
+		_cool_ack()
 		return
 	_react(d, p)
+
+
+# 0.9: after «не так быстро» (V9Touch.SPAM_CD) every touch is still acknowledged, only smaller: a soft click and the
+# tap haptic, a V9Feel press on her bubble (or its portrait), a light squash on the rig and a tiny expression
+# flicker (COOL_EMO, a short hold) — no line, no affection, no hearts
+func _cool_ack() -> void:
+	_cool_i += 1
+	var emo: String = COOL_EMO[_cool_i % COOL_EMO.size()]
+	V9Feel.sound("pop", 1.12 + randf() * 0.06, -12)
+	var b: Control = bubble if bubble and is_instance_valid(bubble) and not bubble.is_queued_for_deletion() else null
+	if mode == "rig":
+		_bump(0.5)
+		show_emotion(emo, COOL_HOLD)
+		if b:
+			V9Feel.press(b, "", "tap")
+		else:
+			V9Feel.haptic("tap")
+		return
+	# painting / video: the expression lives on the bubble's round portrait — a new one springs in, the same one dips
+	if b and b.has_meta("av"):
+		_set_avatar(b, V8Art.emo_name(_paint_emo(emo)))
+		V9Feel.haptic("tap")
+	elif b:
+		V9Feel.press(b, "", "tap")
+	else:
+		V9Feel.haptic("tap")
+		if V9Feel.can_fx():
+			Fx.burst(home, from_art(geom.head), "petal", maxi(1, int(round(3 * V9Feel.fx_scale()))))
 
 
 func _react(d: Dictionary, p: Vector2) -> void:
@@ -484,7 +513,9 @@ func _set_avatar(b: Control, en: String, at = null) -> void:
 	var old: Node = b.get_node_or_null("Av")
 	var pos: Vector2 = at if at is Vector2 else (old.position if old else Vector2(8, 8))
 	if old and str(old.get_meta("emo", "")) == en:
-		UI.punch(old, 0.08)
+		# the same expression again: the portrait dips and springs back (V9Feel press, no click — the caller's tap
+		# already sounded), never grows
+		V9Feel.press(old as CanvasItem, "", "")
 		return
 	var a: = V8Art.emotion_avatar(hid, en, Rect2(pos, Vector2(AV, AV)), "gold")
 	a.name = "Av"

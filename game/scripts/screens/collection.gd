@@ -9,6 +9,9 @@ var stage: Control
 
 const ROW_Y: = V8Header.CONTENT_Y + 6.0
 const AV: = 104.0
+# outfit strip cards: the name's side padding (frame rim + gap) and its bottom margin above the card edge
+const NAME_PAD: = 9.0
+const NAME_FOOT: = 13.0
 const BODY_Y: = ROW_Y + AV + 14.0
 
 var preview_root: Control
@@ -61,7 +64,8 @@ func _build() -> void :
 		hit.mouse_filter = Control.MOUSE_FILTER_STOP
 		hit.gui_input.connect( func(e):
 			if e is InputEventMouseButton and e.pressed:
-				Sfx.play("tap")
+				# 0.9: V9Feel press (dip + spring, click, haptic) on the tapped ring, never a bare click
+				V9Feel.press(ring, "tap")
 				if hh != cur:
 					cur = hh
 					_build())
@@ -197,14 +201,15 @@ func _build() -> void :
 		card.add_child(rtag)
 		rtag.add_child(UI.center_label(UI.label(it.rar, 16, G.rar_color(it.rar).lerp(Color.WHITE, 0.45), UI.DARK, 2, "body", 900), Rect2(0, -1, rw, 22)))
 		if worn and own:
-			# 0.9: «надет» is a jade band at the bottom of the art (behind the name) plus a small jade check badge in
-			# the top-left corner (mirroring the rarity tag) — never a pill over her face
+			# 0.9: «надет» is a jade band at the bottom of the art (behind the name) plus a small jade check badge
+			# pinned on the frame's top-left corner (mirroring the rarity tag), mostly over the rim — never a pill
+			# over her face
 			var band_h: = 62.0
 			var wb: = UI.rbox("mint", Rect2(inner.position.x + 1, inner.end.y - band_h - 1, inner.size.x - 2, band_h), 10, 0, 2)
 			wb.colors(Color(0.12, 0.42, 0.34, 0.0), Color(0.08, 0.34, 0.27, 0.92))
 			wb.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			card.add_child(wb)
-			var wk: = UI.rbox("mint", Rect2(inner.position.x + 3, inner.position.y + 2, 24, 24), 12, 2, 2)
+			var wk: = UI.rbox("mint", Rect2(-4, -4, 24, 24), 12, 2, 2)
 			wk.colors(Color("4fbf9f"), Color("1f6b55")).borders(Color("ffe7a6"), Color("c58a2c"))
 			wk.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			wk.tooltip_text = V6Txt.s("coll.worn")
@@ -212,17 +217,14 @@ func _build() -> void :
 			wk.add_child(UI.center_label(UI.label("✓", 16, Color.WHITE, Color(0.05, 0.2, 0.15), 3, "body", 900), Rect2(0, -1, 24, 24)))
 		# 0.8: name at 16 px (never smaller), up to three lines inside the frame; it wraps between words only —
 		# a word that is still too wide is drawn lighter and, as the last resort, trimmed with «…», never cut in two
-		# 0.9: 6 px of side padding (+ the 4 px outline) and the last line ends 8 px above the frame's bottom rim
+		# 0.9: the name always keeps NAME_PAD px clear of the frame on each side (the rim art is ~4 px + a 5 px gap,
+		# the outline is inside that) and its last line ends NAME_FOOT px above the card's bottom edge, clear of the
+		# rim's corner flowers. A word too wide for that box drops to a lighter weight, then is hyphenated
+		# (Common.fit_words) — it never grows back over the frame
 		var nl: = UI.label(it.name, 16, Color.WHITE, Color(0.2, 0.05, 0.2), 4, "body", 800)
-		var nw: = cw - 12.0
-		# a single word wider than that at 16 px («Спортивный» on a 96 px card) takes the full inner width
-		# instead of being split with a hyphen
-		var lf: = UI.font("body", 800)
-		for wd in String(it.name).split(" ", false):
-			if lf.get_string_size(wd, HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x + 5.0 > nw:
-				nw = cw - 2.0
+		var nw: = cw - NAME_PAD * 2.0
 		Common.fit_words(nl, nw, 3, 16)
-		nl.position = Vector2((cw - nw) * 0.5, minf(76.0, inner.end.y - 8.0 - 84.0))
+		nl.position = Vector2(NAME_PAD, minf(72.0, csz.y - NAME_FOOT - 84.0))
 		nl.size = Vector2(nw, 84)
 		nl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		nl.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM

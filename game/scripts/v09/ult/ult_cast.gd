@@ -1149,7 +1149,7 @@ func _mod_chip(txt: String, letter: = "", title: = "") -> void :
 	var tf: = UI.font("body", 900)
 	if ttl != "":
 		tw = maxf(tw, minf(250.0, tf.get_string_size(ttl, HORIZONTAL_ALIGNMENT_LEFT, -1, 13).x + 6.0))
-	var icon_w: = 26.0 + 8.0 if letter != "" else 4.0
+	var icon_w: = 26.0 + 8.0 if letter != "" else 16.0 + 8.0
 	var h: = 40.0 if ttl == "" else 54.0
 	var w: = 14.0 + icon_w + tw + 16.0
 	var right: = st.position.x - 6.0
@@ -1166,6 +1166,16 @@ func _mod_chip(txt: String, letter: = "", title: = "") -> void :
 		var ic: = V9ModIcon.make(letter, 26.0)
 		ic.position = Vector2(14.0, (h - 26.0) * 0.5)
 		c.add_child(ic)
+	else:
+		# no modifier (a base outfit): a gold lacquer diamond in the glyph's place, so the chip never reads bare
+		for k in [[9.0, Color(0.09, 0.03, 0.1, 0.95)], [7.0, Color("ffe7a6")], [3.0, Color("c58a2c")]]:
+			var r: float = k[0]
+			var dm: = Polygon2D.new()
+			dm.polygon = PackedVector2Array([Vector2(0, - r), Vector2(r, 0), Vector2(0, r), Vector2(- r, 0)])
+			dm.color = k[1]
+			dm.antialiased = true
+			dm.position = Vector2(14.0 + 8.0, h * 0.5)
+			c.add_child(dm)
 	var tx: = 14.0 + icon_w
 	if ttl != "":
 		var t2: = UI.label(ttl, 13, Color("ffd98a"), Color(0.08, 0.03, 0.1), 3, "body", 900)
