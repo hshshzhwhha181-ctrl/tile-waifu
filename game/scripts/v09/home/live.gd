@@ -237,7 +237,7 @@ func _cool_ack() -> void:
 	if mode == "rig":
 		_bump(0.5)
 		show_emotion(emo, COOL_HOLD)
-		if b:
+		if b and _settled(b):
 			V9Feel.press(b, "", "tap")
 		else:
 			V9Feel.haptic("tap")
@@ -246,12 +246,18 @@ func _cool_ack() -> void:
 	if b and b.has_meta("av"):
 		_set_avatar(b, V8Art.emo_name(_paint_emo(emo)))
 		V9Feel.haptic("tap")
-	elif b:
+	elif b and _settled(b):
 		V9Feel.press(b, "", "tap")
 	else:
 		V9Feel.haptic("tap")
-		if V9Feel.can_fx():
+		if not b and V9Feel.can_fx():
 			Fx.burst(home, from_art(geom.head), "petal", maxi(1, int(round(3 * V9Feel.fx_scale()))))
+
+
+# a bubble / portrait still springing in (its own scale tween) is not pressed: V9Feel would keep that mid-tween
+# scale as its resting one
+static func _settled(n: CanvasItem) -> bool:
+	return n.has_meta(V9Feel.META_BASE) or n.scale.is_equal_approx(Vector2.ONE)
 
 
 func _react(d: Dictionary, p: Vector2) -> void:
@@ -515,7 +521,8 @@ func _set_avatar(b: Control, en: String, at = null) -> void:
 	if old and str(old.get_meta("emo", "")) == en:
 		# the same expression again: the portrait dips and springs back (V9Feel press, no click — the caller's tap
 		# already sounded), never grows
-		V9Feel.press(old as CanvasItem, "", "")
+		if _settled(old as CanvasItem):
+			V9Feel.press(old as CanvasItem, "", "")
 		return
 	var a: = V8Art.emotion_avatar(hid, en, Rect2(pos, Vector2(AV, AV)), "gold")
 	a.name = "Av"

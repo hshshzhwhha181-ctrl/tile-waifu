@@ -350,7 +350,9 @@ static func avatar_row(sel: String, rect: Rect2) -> AvatarRow:
 
 static func copy_code(main, code: String) -> void :
 	DisplayServer.clipboard_set(code)
-	Sfx.play("pop")
+	# 0.9: the «Скопировать» JButton already clicked on release (V9Feel.press_up); the copy itself answers with the
+	# success haptic only — never a second raw pop
+	V9Feel.success(null, "")
 	if main != null and main.has_method("toast"):
 		main.toast(s("code.copied"), "gift")
 

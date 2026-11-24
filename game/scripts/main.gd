@@ -234,7 +234,8 @@ func _meet_scene(sp: Control, hero: Hero) -> void :
 			tw.kill()
 			txt.visible_ratio = 1.0
 			await _wait_tap(sp)
-		Sfx.play("tap")
+		# 0.9: the advancing tap answers through V9Feel (the ▼ dips, click + tap haptic)
+		V9Feel.press(more, "tap", "tap")
 
 
 # 0.9: two 3-way rows on top — «Эффекты» (S.fx_level) and «Вставки ульт» (S.ult_cutin) — then the on/off rows.

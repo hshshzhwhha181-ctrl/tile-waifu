@@ -9,9 +9,13 @@ var stage: Control
 
 const ROW_Y: = V8Header.CONTENT_Y + 6.0
 const AV: = 104.0
-# outfit strip cards: the name's side padding (frame rim + gap) and its bottom margin above the card edge
+# outfit strip cards: the name's side padding (frame rim + gap: NAME_PAD on a six-card strip's ~108 px card, growing
+# by NAME_PAD_K per px of a wider card, as the rim art and its corner flowers do) and its bottom margin above the
+# card edge
 const NAME_PAD: = 9.0
+const NAME_PAD_K: = 0.3
 const NAME_FOOT: = 13.0
+const NAME_MIN_FS: = 14
 const BODY_Y: = ROW_Y + AV + 14.0
 
 var preview_root: Control
@@ -168,6 +172,14 @@ func _build() -> void :
 	var cx: = 10.0
 	var n_items: = G.ITEMS.filter( func(x): return x.get("hero", "") == cur).size()
 	var cw: = clampf((strip.size.x - 20.0 - (n_items - 1) * 5.0) / maxf(1.0, n_items), 96.0, 118.0)
+	# 0.9: one name size for the whole strip — the largest (16 → NAME_MIN_FS) at which every name of this heroine
+	# fits its padded box without a break inside a word, so no card has a hyphenated or thinned name and the row
+	# reads as one set
+	var nw: = cw - _name_pad(cw) * 2.0
+	var name_fs: = 16
+	for it in G.ITEMS:
+		if it.get("hero", "") == cur:
+			name_fs = mini(name_fs, _name_fs(String(it.name), nw))
 	for it in G.ITEMS:
 		if it.get("hero", "") != cur:
 			continue
@@ -215,16 +227,15 @@ func _build() -> void :
 			wk.tooltip_text = V6Txt.s("coll.worn")
 			card.add_child(wk)
 			wk.add_child(UI.center_label(UI.label("✓", 16, Color.WHITE, Color(0.05, 0.2, 0.15), 3, "body", 900), Rect2(0, -1, 24, 24)))
-		# 0.8: name at 16 px (never smaller), up to three lines inside the frame; it wraps between words only —
-		# a word that is still too wide is drawn lighter and, as the last resort, trimmed with «…», never cut in two
-		# 0.9: the name always keeps NAME_PAD px clear of the frame on each side (the rim art is ~4 px + a 5 px gap,
-		# the outline is inside that) and its last line ends NAME_FOOT px above the card's bottom edge, clear of the
+		# 0.8: name up to three lines inside the frame; it wraps between words only (0.9: at the strip's common
+		# name_fs, 16 px when every name allows it, never below NAME_MIN_FS)
+		# 0.9: the name always keeps _name_pad(cw) px clear of the frame on each side (the rim art + a gap; the outline
+		# is inside that) and its last line ends NAME_FOOT px above the card's bottom edge, clear of the
 		# rim's corner flowers. A word too wide for that box drops to a lighter weight, then is hyphenated
 		# (Common.fit_words) — it never grows back over the frame
-		var nl: = UI.label(it.name, 16, Color.WHITE, Color(0.2, 0.05, 0.2), 4, "body", 800)
-		var nw: = cw - NAME_PAD * 2.0
-		Common.fit_words(nl, nw, 3, 16)
-		nl.position = Vector2(NAME_PAD, minf(72.0, csz.y - NAME_FOOT - 84.0))
+		var nl: = UI.label(_name_text(String(it.name), nw, name_fs), name_fs, Color.WHITE, Color(0.2, 0.05, 0.2), 4 if name_fs >= 16 else 3, "body", 800)
+		Common.fit_words(nl, nw, 3, name_fs)
+		nl.position = Vector2((cw - nw) * 0.5, minf(72.0, csz.y - NAME_FOOT - 84.0))
 		nl.size = Vector2(nw, 84)
 		nl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		nl.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
@@ -250,6 +261,47 @@ func _build() -> void :
 					main.toast(V6Txt.s("coll.missing") % itc.name, "wardrobe"))
 		UI.pop_in(card, 0.1 + cx / 2000.0, 0.8)
 		cx += cw + 5
+
+static func _name_pad(cw: float) -> float:
+	return NAME_PAD + maxf(0.0, cw - 108.0) * NAME_PAD_K
+
+
+# a compound name too wide for one line («Офлайн-выходной») breaks after its own hyphen, never inside a part
+static func _name_text(name: String, width: float, fs: int) -> String:
+	var f: = UI.font("body", 800)
+	var pad: = 4.0 if fs >= 16 else 3.0
+	var out: = []
+	for wd in name.split(" ", false):
+		if wd.contains("-") and f.get_string_size(wd, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x + pad > width:
+			wd = wd.replace("-", "-\n")
+		out.append(wd)
+	return " ".join(out).replace("\n ", "\n")
+
+
+# the parts of a name that must each fit one line: its words, compound words split after their hyphens
+static func _name_parts(name: String) -> Array:
+	var parts: = []
+	for wd in name.split(" ", false):
+		var bits: = wd.split("-", false)
+		for i in bits.size():
+			parts.append(bits[i] + ("-" if i < bits.size() - 1 else ""))
+	return parts
+
+
+# the largest size (16 down to NAME_MIN_FS) at which `name` sets in `width` (outline included) in at most three
+# lines with every word whole, at the strip's weight
+static func _name_fs(name: String, width: float) -> int:
+	var f: = UI.font("body", 800)
+	for fs in range(16, NAME_MIN_FS - 1, -1):
+		var pad: = 4.0 if fs >= 16 else 3.0
+		var fits: = true
+		for wd in _name_parts(name):
+			if f.get_string_size(wd, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x + pad > width:
+				fits = false
+		var h: = f.get_multiline_string_size(name, HORIZONTAL_ALIGNMENT_LEFT, width - pad, fs, -1, TextServer.BREAK_MANDATORY | TextServer.BREAK_WORD_BOUND).y
+		if fits and h <= f.get_height(fs) * 3 + 1.0:
+			return fs
+	return NAME_MIN_FS
 
 func _preview(it: Dictionary) -> void :
 	var root: = Control.new()
@@ -295,12 +347,12 @@ func _preview(it: Dictionary) -> void :
 	dim.mouse_filter = Control.MOUSE_FILTER_STOP
 	dim.gui_input.connect( func(e):
 		if e is InputEventMouseButton and e.pressed:
-			Sfx.play("tap")
+			V9Feel.press(null, "tap", "tap")
 			root.queue_free())
 
 func handle_back() -> bool:
 	if preview_root and is_instance_valid(preview_root) and not preview_root.is_queued_for_deletion():
-		Sfx.play("tap")
+		V9Feel.press(null, "tap", "tap")
 		preview_root.queue_free()
 		preview_root = null
 		return true

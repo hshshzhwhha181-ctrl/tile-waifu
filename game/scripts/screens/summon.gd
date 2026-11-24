@@ -239,6 +239,11 @@ func _pull(n: int) -> void :
 # ---- 0.9 §E: the three-stage summon (lantern → colour → cards). Rules and timings: scripts/v09/summon/summon_rules.gd
 var skipping: = false
 var hurry: = false
+# 0.9: the pace of the climb / hold and the deal's flip gaps (_wait(t, true)): every tap there raises it by RUSH_STEP up
+# to RUSH_MAX, so a tap visibly speeds the sequence up even where it cannot skip (a first summon)
+var rush: = 1.0
+const RUSH_STEP: = 0.45
+const RUSH_MAX: = 2.4
 var stage: = ""
 var tapped: = false
 var lantern: V9Lantern
@@ -268,11 +273,16 @@ const PITY_BAR: = Rect2(16, 38, 284, 12)
 func _alive() -> bool:
 	return is_inside_tree() and seq != null and is_instance_valid(seq)
 
-# a wait that ends early when the player skips (callers check `skipping` after it)
-func _wait(t: float) -> void :
-	var end: = Time.get_ticks_msec() + int(t * 1000.0)
-	while _alive() and not skipping and Time.get_ticks_msec() < end:
+# a wait that ends early when the player skips (callers check `skipping` after it); `rushable`: it runs at the
+# player's `rush` pace, so taps during the climb, the hold and the deal shorten it
+func _wait(t: float, rushable: = false) -> void :
+	var left: = t
+	var last: = Time.get_ticks_msec()
+	while _alive() and not skipping and left > 0.0:
 		await get_tree().process_frame
+		var now: = Time.get_ticks_msec()
+		left -= float(now - last) / 1000.0 * (rush if rushable else 1.0)
+		last = now
 
 # (a tap during the lantern's drop counts: `tapped` is cleared when the sequence starts, not here)
 func _wait_tap(t: float) -> void :
@@ -286,9 +296,10 @@ func _seq_input(e: InputEvent) -> void :
 	if not (e is InputEventMouseButton and e.pressed):
 		return
 	tapped = true
-	# 0.9: every tap in the sequence is answered (at most one answer per 90 ms of mashing). The climb and hold
-	# cannot be skipped on a first summon, but a tap still sways the lantern with a soft chime; the deal's «hurry»
-	# tap gets a click.
+	# 0.9: every tap in the sequence is answered (at most one answer per 90 ms of mashing) and speeds it up. The climb
+	# and hold cannot be skipped on a first summon, but a tap presses the lantern (V9Feel dip + spring, tap haptic)
+	# with a soft chime and raises the pace (`rush`); the deal's «hurry» tap clicks, glints where the finger landed
+	# and shortens the flip gaps
 	var now: = Time.get_ticks_msec()
 	if now - _seq_tap_t < 90:
 		if stage == "deal":
@@ -297,13 +308,18 @@ func _seq_input(e: InputEvent) -> void :
 	_seq_tap_t = now
 	match stage:
 		"climb":
-			V9Feel.haptic("tap")
+			rush = minf(rush + RUSH_STEP, RUSH_MAX)
+			V9Feel.press(lantern if is_instance_valid(lantern) else null, "", "tap")
 			V9Feel.sound("sparkle", randf_range(1.5, 1.7), -16.0)
-			if is_instance_valid(lantern) and lantern.has_method("_punch"):
-				lantern._punch(1.04)
 		"deal":
 			hurry = true
+			rush = minf(rush + RUSH_STEP, RUSH_MAX)
 			V9Feel.press(null, "select", "tap")
+			if V9Feel.can_fx() and seq:
+				var at: Vector2 = (e as InputEventMouseButton).position
+				if at == Vector2.ZERO:
+					at = Vector2(W * 0.5, H * 0.45)
+				Fx.burst(seq, at, "sparkle", 6, Color(1.0, 0.86, 0.55), 0.6)
 
 # own music player on the Music bus: the summon loop slowed down while the lantern is dark, then at the
 # rarity's pitch once it has its colour (Sfx ducking still works on it)
@@ -347,6 +363,7 @@ func _sequence(res: Array, ctx: = {}) -> void :
 	tapped = false
 	skipping = false
 	hurry = false
+	rush = 1.0
 	dealt = false
 	flipped = {}
 	showcased = {}
@@ -461,7 +478,7 @@ func _sequence(res: Array, ctx: = {}) -> void :
 	Sfx.play("sparkle", 0.85, -2)
 	V9Feel.haptic("tap")
 	_circle_to(V9Summon.COL.R, 0.5)
-	await _wait(V9Summon.LIGHT)
+	await _wait(V9Summon.LIGHT, true)
 	for rar in V9Summon.steps(best).slice(1):
 		if skipping or not _alive():
 			break
@@ -469,10 +486,13 @@ func _sequence(res: Array, ctx: = {}) -> void :
 			# the long build: the lantern trembles, light streams in, a rising charge
 			lantern.charge(true)
 			Sfx.play("summon_charge", 1.0, -2)
-			_stream_in(V9Summon.COL.SSR, float(V9Summon.STEP.SSR))
-			await _wait(float(V9Summon.STEP.SSR) * 0.85)
+			var stream: = _stream_in(V9Summon.COL.SSR, float(V9Summon.STEP.SSR))
+			await _wait(float(V9Summon.STEP.SSR) * 0.85, true)
 			if skipping or not _alive():
 				break
+			# a rushed build: the stream stops with the morph instead of running on past it
+			if is_instance_valid(stream):
+				stream.emitting = false
 			lantern.charge(false)
 			lantern.morph("SSR", 0.3)
 			Sfx.duck(-10, 1.6)
@@ -489,19 +509,19 @@ func _sequence(res: Array, ctx: = {}) -> void :
 				_fx_node(ry)
 			Fx.burst(seq, lantern.centre(), "sparkle", 50, V9Summon.COL.SSR, 1.8)
 		else:
-			await _wait(float(V9Summon.STEP[rar]) * 0.6)
+			await _wait(float(V9Summon.STEP[rar]) * 0.6, true)
 			if skipping or not _alive():
 				break
 			lantern.morph(rar, 0.3)
 			Sfx.play("reveal_sr", 1.0, -2)
 			Fx.burst(seq, lantern.centre(), "sparkle", 30, V9Summon.COL[rar], 1.2)
 			_circle_to(V9Summon.COL[rar], 0.3)
-			await _wait(float(V9Summon.STEP[rar]) * 0.4)
+			await _wait(float(V9Summon.STEP[rar]) * 0.4, true)
 	if skipping or not _alive():
 		return
 	_mus(V9Summon.MUSIC_PITCH[best], V9Summon.MUSIC_DB[best], 0.8)
 	_show_caption(best)
-	await _wait(V9Summon.HOLD[best])
+	await _wait(V9Summon.HOLD[best], true)
 	if skipping or not _alive():
 		return
 
@@ -526,10 +546,10 @@ func _circle_to(c: Color, dur: float) -> void :
 	create_tween().tween_method( func(v): circle_mat.set_shader_parameter("color", v), from, Color(c.r, c.g, c.b, 0.95), dur)
 
 # light streaming into the lantern from the whole screen (SSR build-up)
-func _stream_in(col: Color, dur: float) -> void :
+func _stream_in(col: Color, dur: float) -> CPUParticles2D:
 	var n: = Fx.scaled(80)
 	if n <= 0:
-		return
+		return null
 	var p: = Fx.particles("glow", n, 0.9)
 	p.material = Fx.add_mat()
 	p.position = lantern.centre()
@@ -552,6 +572,7 @@ func _stream_in(col: Color, dur: float) -> void :
 			get_tree().create_timer(1.0).timeout.connect( func():
 				if is_instance_valid(p):
 					p.queue_free()))
+	return p
 
 # a soft flash in the rarity colour (never white); none at «минимум», gentler at «умеренные»
 func _flash(col: Color, a: float) -> void :
@@ -749,7 +770,7 @@ func _deal_cards(res: Array, from: = Vector2(-1, -1)) -> void :
 			ft.tween_property(fx, "modulate:a", 0.0, 0.8)
 	_layout_cards(res, from)
 	var n: = res.size()
-	await _wait(0.65 + n * 0.06)
+	await _wait(0.65 + n * 0.06, true)
 	for i in n:
 		if skipping or not _alive():
 			return
@@ -773,7 +794,7 @@ func _deal_cards(res: Array, from: = Vector2(-1, -1)) -> void :
 			_ssr_return(c)
 			await _wait(0.35)
 		elif not hurry:
-			await _wait(0.1 if r.rar == "R" else 0.3)
+			await _wait(0.1 if r.rar == "R" else 0.3, true)
 	if skipping or not _alive():
 		return
 	if is_instance_valid(skip_btn):
@@ -1086,6 +1107,7 @@ func _close_seq() -> void :
 	stage = ""
 	skipping = false
 	hurry = false
+	rush = 1.0
 	lantern = null
 	skip_btn = null
 	_mus_stop(0.4)
