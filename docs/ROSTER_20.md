@@ -146,7 +146,8 @@
 
 ## 2.1 Общая часть промпта (рецепт стиля v4, дословно для всех 20)
 
-Промпт собирается так: `twaifu_<id>, adult woman, <возраст> years old, <роль>, ` + **V4_FACE** + `<выражение>, ` + **ТЕЛО** (из карточки) + **V4_TAIL**.
+Промпт собирается так: `twaifu_<id>, adult woman, <возраст> years old, <роль>, ` + **V4_FACE** + `<выражение>, ` + **ТЕЛО** (из карточки: облик и наряд, затем поза, окружение, свет и кадр богини из `POSES.md`) + **V4_TAIL**.
+Поза, окружение, свет и кадр у каждой богини свои и не повторяются (правило владельца, `POSES.md` §0). Для другого слота (`select`, `win`, `lose`, `shy`, `tease`) в промпте карточки меняется только фраза позы. Кадр и ракурс задаёт строка «Кадр» богини, поэтому в V4_TAIL общего `knees-up three-quarter view, eye-level camera` больше нет.
 В `image_references` подаётся лист персонажа (лицо анфас и 3/4, причёска сзади и сбоку, фигура, HEX). Для основательниц дополнительно эталоны `docs/concepts/v4/cute_<id>.webp`.
 
 **V4_FACE**
@@ -156,7 +157,7 @@ cute adult Japanese gacha-game face: soft rounded yet mature oval face with visi
 
 **V4_TAIL**
 ```
-7.5 heads tall, soft feminine figure with no visible muscles, form-fitting costume with a detailed cut, fabric texture and at least three accessories, layered fabrics, emphasizing her figure; knees-up three-quarter view, eye-level camera; she is the brightest, most saturated and sharpest element of the frame; full background scene but muted and desaturated, lowered saturation and contrast, light haze and gentle darkening, fewer details, no loud bokeh, no neon clutter; thin warm-colored lineart, lost edges in highlights, soft painterly shading on a cel-shaded base, matte skin, highlights only in the eyes and on the lips, no AI gloss; fully opaque fabric, garment stays exactly in place, adult mature face, no school elements, mahjong tiles blank or absent, no text, no logos, vertical 9:16
+7.5 heads tall, soft feminine figure with no visible muscles, form-fitting costume with a detailed cut, fabric texture and at least three accessories, layered fabrics, emphasizing her figure; she is the brightest, most saturated and sharpest element of the frame; full background scene but muted and desaturated, lowered saturation and contrast, light haze and gentle darkening, fewer details, no loud bokeh, no neon clutter; thin warm-colored lineart, lost edges in highlights, soft painterly shading on a cel-shaded base, matte skin, highlights only in the eyes and on the lips, no AI gloss; fully opaque fabric, garment stays exactly in place, adult mature face, no school elements, mahjong tiles blank or absent, no text, no logos, vertical 9:16
 ```
 
 **Скромная версия (Яндекс):** в ТЕЛЕ чулки заменяются на `opaque tights`, вырез поднимается, кадр обрезается по `alt_rect`.
@@ -187,10 +188,10 @@ cute adult Japanese gacha-game face: soft rounded yet mature oval face with visi
   - поражение — надувает щёки, требует реванш;
   - комбо — хвосты взлетают.
 - **Эмоции:** победная, дразнящая, ревнивая (надутые щёки), тёплая, удивлённая.
-- **Позы:**
-  1. Щелчок 東 к камере.
-  2. Сидя у стола, подбородок на ладони.
-  3. Полуоборот с веером (единственный её «через плечо» — в `o_dragon`).
+- **Позы:** вся постановка (6 поз, пластика, окружение, свет, кадр, анимация) — в `POSES.md` §1. Главные три:
+  1. Щелчок 東 в камеру из широкой боковой стойки, подмигивание (`select`).
+  2. Опирается бедром о край стола и крутит фишку (`idle`).
+  3. Ревниво держит рукав игрока и наматывает хвост на палец (`shy`).
 - **Фирменный idle:** крутит фишку между пальцами, хвосты пружинят.
 - **Наряды:**
   - `o_base` A —;
@@ -209,9 +210,9 @@ cute adult Japanese gacha-game face: soft rounded yet mature oval face with visi
   - A — рамка «Пять ветров» и акцент «Сакура» (`s_sakura`). Её HUD — базовый HUD игры.
   - Через SSR-наряд — тема «Золото дракона» (`s_gold`) и стол «Чайный сад».
 - **Палитра:** ff8fb8 · 3fae8c · fff4ec.
-- **Промпт** (роль: `mahjong salon owner`; выражение: `playful wink with a confident smile`):
+- **Промпт** (роль: `mahjong salon owner`; выражение: `playful wink with a confident smile`; поза: `select` из `POSES.md`):
 ```
-high pink twin tails tied with jade knots, rose-pink eyes, holding a blank ivory mahjong tile between two fingers near her face, curvy hourglass figure, full bust, soft shoulders; knee-length sakura-pink cheongsam with jade piping and side slits, mandarin collar with a teardrop opening showing light cleavage, cinched waist, sheer skin-tone stockings, jade earrings, pink pumps; flicking the tile toward the viewer in a three-quarter contrapposto; background: warm tea salon with lattice windows and mahjong table, muted; sakura pink key accent, jade-green rim light, 
+high pink twin tails tied with jade knots, rose-pink eyes, holding a blank ivory mahjong tile between two fingers near her face, curvy hourglass figure, full bust, soft shoulders; knee-length sakura-pink cheongsam with jade piping and side slits, mandarin collar with a teardrop opening showing light cleavage, cinched waist, sheer skin-tone stockings, jade earrings, pink pumps; standing side-on to the mahjong table in a wide planted stance, feet set wide apart on a line parallel to the table edge and not toward the camera, both legs straight with her weight centered, torso twisted to face the viewer, right arm extended flicking a blank ivory tile off her thumb so it spins toward the camera, left hand catching the end of her left twin tail at shoulder height, playful wink with a confident smile; background: the Five Winds mahjong salon at late evening, warm cherry-wood interior, lattice windows onto the dark night, green-felt mahjong table with a wall of blank tiles, carved salon chairs, sakura-pink paper lanterns, four wind chimes hanging from the ceiling, a sakura branch in a jade vase, petals on the felt, muted; lit only by sakura-pink paper lanterns, warm pink-amber key, soft jade-green bounce light from the felt below; opponent's point of view across the mahjong table, green felt and a wall of blank tiles in the lower foreground, camera at a seated player's eye level, tilt up under 5 degrees, knees-up, she is centered or slightly right, twin tails crossing the top edge, 
 ```
 
 #### rin — Рин · **A** · чай и нефрит · 27
@@ -224,10 +225,10 @@ high pink twin tails tied with jade knots, rose-pink eyes, holding a blank ivory
   - поражение — снимает очки, протирает их, «…Ещё раз»;
   - комбо — пар из пиалы закручивается.
 - **Эмоции:** невозмутимая, смущённая (поправляет очки), тёплая полуулыбка, удивлённая, строгая.
-- **Позы:**
-  1. Наливает чай с высоты.
-  2. Сидит нога на ногу у стойки.
-  3. Пиала у губ, взгляд поверх очков.
+- **Позы:** вся постановка (6 поз, пластика, окружение, свет, кадр, анимация) — в `POSES.md` §2. Главные три:
+  1. Сидит прямо на высоком табурете, нога на ногу, стопа на кольце-подножке (`idle`).
+  2. Наливает чай с высоты между стеллажами (`select`).
+  3. Двигает пиалу к игроку, взгляд поверх очков (`tease`).
 - **Фирменный idle:** пар над пиалой, медленно перекладывает ногу на ногу (сидя).
 - **Наряды:**
   - `r_base` A —;
@@ -246,9 +247,9 @@ high pink twin tails tied with jade knots, rose-pink eyes, holding a blank ivory
   - A — акцент «Мята» (`s_mint`).
   - Через SSR-наряд — тема «Нефрит и иней» (нефритовая рубашка с инеем по краю) и стол «Ледяной павильон».
 - **Палитра:** 4fbf9f · 1e3b33 · e9d8a6.
-- **Промпт** (роль: `tea master`; выражение: `composed half-smile, slightly flustered blush`):
+- **Промпт** (роль: `tea master`; выражение: `composed half-smile, slightly flustered blush`; поза: `idle` из `POSES.md`):
 ```
-long dark-green hair in a side braid over the left shoulder, thin round gold glasses, jade drop earrings, sage-green eyes, holding a celadon tea bowl, tall slender hourglass figure, long neck, elegant hands; high stand-collar fitted silk blouse with a keyhole neckline, high-waisted pencil skirt to the knee with a back slit, sheer dark stockings with a subtle lace top hidden under the hem, low heels; seated on a tall stool, legs crossed at the knee, pouring tea; background: quiet frosted tea pavilion with steam, muted; jade-green key accent, cool white rim light, 
+long dark-green hair in a side braid over the left shoulder, thin round gold glasses, jade drop earrings, sage-green eyes, holding a celadon tea bowl, tall slender hourglass figure, long neck, elegant hands; high stand-collar fitted silk blouse with a keyhole neckline, high-waisted pencil skirt to the knee with a back slit, sheer dark stockings with a subtle lace top hidden under the hem, low heels; perched upright on a tall pale-wood stool at a long library counter, legs crossed at the knee with the left leg over the right, right foot hooked on the stool's footrest ring, left foot hanging still, both low shoes firmly on, both hands cradling a celadon bowl on her knee with a thin wisp of steam, spine straight, dark-green side braid over her left shoulder, composed half-smile, calm eyes on the viewer, camera at her eye level, hem stays in place; background: a tall scholar's tea library, floor-to-ceiling shelves of unlabeled tea tins, a rolling library ladder, brass scales, a long pale-ash counter, celadon ware, a skylight in the ceiling, quiet orderly vertical architecture, muted; cool even north light from an overcast skylight at noon, crisp and nearly shadowless, the only warm notes are the glint on her glasses and the tea; she stands on the right third, strong vertical shelf lines parallel to the frame edges, tall empty space above her head, camera level at her eye height, framed from mid-shin, 
 ```
 
 #### hana — Хана · **A** · солнце и бег · 24
@@ -261,10 +262,10 @@ long dark-green hair in a side braid over the left shoulder, thin round gold gla
   - поражение — «Реванш! Сейчас же!»;
   - комбо — оранжевый след.
 - **Эмоции:** азартная, смущённая (в платье), обиженная, хохочущая, решительная.
-- **Позы:**
-  1. Низкий старт (в брюках).
-  2. «Дай пять» к камере.
-  3. Неуверенно на каблуках (`h_gala`).
+- **Позы:** вся постановка (6 поз, пластика, окружение, свет, кадр, анимация) — в `POSES.md` §3. Главные три:
+  1. «Дай пять» в беговом выпаде (`select`).
+  2. Растяжка квадрицепса с подсолнухом над головой (`idle`).
+  3. Победный прыжок с кулаком в небо (`win`).
 - **Фирменный idle:** пружинит на носках, крутит подсолнух.
 - **Наряды:**
   - `h_base` A —;
@@ -284,9 +285,9 @@ long dark-green hair in a side braid over the left shoulder, thin round gold gla
   - Через SSR-наряд — тема «Подсолнух» и стол «Стадион на закате».
 - **Палитра:** ffb35c · 2b4a7a · fff1d6.
 - **Примечание:** в `docs/concepts/v4/` нет эталона Ханы, его нужно сделать первым (лицо повзрослить, один тон кожи).
-- **Промпт** (роль: `relay team captain and gym coach`; выражение: `bright competitive grin`):
+- **Промпт** (роль: `relay team captain and gym coach`; выражение: `bright competitive grin`; поза: `select` из `POSES.md`):
 ```
-wavy shoulder-length orange bob, amber eyes, sunflower hair clip, track jacket tied around the waist, sporty slender figure, long legs, soft waist; fitted zip-up sports top opened to the collarbone, high-waisted running shorts over sheer black leggings with a side stripe, sneakers, wristband; raising a hand for a high five toward the viewer; background: evening stadium track with lanterns, muted; warm orange key accent, navy rim light, 
+wavy shoulder-length orange bob, amber eyes, sunflower hair clip, track jacket tied around the waist, sporty slender figure, long legs, soft waist; fitted zip-up sports top opened to the collarbone, high-waisted running shorts over sheer black leggings with a side stripe, sneakers, wristband; running lunge toward the viewer for a high five: right leg forward with the knee bent over the foot, left leg extended straight behind on the ball of the foot, torso leaning forward, right palm raised open toward the camera at face height, left arm swung back, sleeves of the track jacket tied at her waist flying, bright grin, eyes locked on the viewer; background: relay stadium at sunset, rust-red running track with white lane lines, tall floodlight towers just switching on, bleacher benches, a finish ribbon, a bucket of sunflowers by the coach's bench, an unbranded water bottle, muted; golden-hour sunset backlight, glowing orange halo on her hair, soft floodlight fill from the front; sports panning shot, knees-up, background streaked with horizontal motion blur while she stays sharp, level horizon, eye-level camera, 
 ```
 
 #### yue — Юэ · **S** · луна · на вид 27
@@ -299,10 +300,10 @@ wavy shoulder-length orange bob, amber eyes, sunflower hair clip, track jacket t
   - поражение — «Любопытно…» с интересом, без обиды;
   - комбо — серебряные блики.
 - **Эмоции:** надменная, заинтригованная, тёплая, удивлённая, дразнящая.
-- **Позы:**
-  1. Веер у губ, 3/4.
-  2. На троне, нога на ногу.
-  3. Вальс в 3/4 (`y_ball`, её «через плечо»).
+- **Позы:** вся постановка (6 поз, пластика, окружение, свет, кадр, анимация) — в `POSES.md` §4. Главные три:
+  1. Придворная S-линия, веер у губ, взгляд вдаль (`idle`).
+  2. Сидит во внутреннем изгибе полумесяца над облаками (`win`).
+  3. Стоп-кадр поворота с «водяными рукавами» (`select`).
 - **Фирменный idle:** медленно обмахивается веером, волосы плывут.
 - **Наряды:**
   - `y_base` S —;
@@ -318,9 +319,9 @@ wavy shoulder-length orange bob, amber eyes, sunflower hair clip, track jacket t
   3. Проигрывает нарочно, чтобы ты вернулся.
 - **Набор S:** тема «Полночь» (`s_night`), стол «Лунный дворец» (`b_palace`).
 - **Палитра:** c8b6ff · 2a2350 · e8e4f4.
-- **Промпт** (роль: `ruler of the Moon Palace`; выражение: `amused gaze from above, folding fan at her lips`):
+- **Промпт** (роль: `ruler of the Moon Palace`; выражение: `amused gaze into the distance, folding fan at her lips`; поза: `idle` из `POSES.md`):
 ```
-waist-length lavender hair, small elegant horns, crescent-moon tiara, violet-silver gradient eyes, tall statuesque figure, regal posture, long limbs; lavender hanfu-inspired gown with bare shoulders, fitted embroidered bodice showing cleavage, sash-cinched waist, long layered skirt with a high side slit, sheer white stockings with silver lace tops, silver jewelry; holding a folding fan at her lips in a three-quarter view; background: moonlit palace terrace with clouds, muted; lavender key accent, silver-blue rim light, 
+waist-length lavender hair, small elegant horns, crescent-moon tiara, violet-silver gradient eyes, tall statuesque figure, regal posture, long limbs; lavender hanfu-inspired gown with bare shoulders, fitted embroidered bodice showing cleavage, sash-cinched waist, long layered skirt with a high side slit, sheer white stockings with silver lace tops, silver jewelry; standing tall in a court-lady S-curve: weight on her straight left leg, right leg crossed in front of it with the right toe pointed on the floor, hips swayed to her left, open folding fan held at her lips in her right hand, left arm hanging long with the trailing sleeve draped behind her, chin raised, amused eyes gazing past the viewer into the distance; background: Moon Palace terrace above a sea of clouds, white jade balustrades, an enormous full-moon disc, an osmanthus tree with tiny golden blossoms, silver bells under the eaves, a path of moonlight across the clouds, drifting glowing motes, muted; midnight full-moon backlight from behind and above, silver rim on her hair and horns, soft lavender fill bouncing up from the clouds; she occupies the upper two thirds of the frame above empty clouds, the full-moon disc directly behind her head like a halo, camera at her eye level, long vertical composition from mid-shin, sleeves and hair leaving the frame edges, 
 ```
 
 #### nova — Нова · **S** · неон и данные · 23
@@ -333,10 +334,10 @@ waist-length lavender hair, small elegant horns, crescent-moon tiara, violet-sil
   - поражение — «…баг. Не мой.»;
   - комбо — бегущий код по краю HUD.
 - **Эмоции:** самодовольная, сосредоточенная, смущённая (без визора), раздражённая, восторженная.
-- **Позы:**
-  1. Голо-фишка над ладонью.
-  2. Сидит на байке боком.
-  3. Поднимает визор.
+- **Позы:** вся постановка (6 поз, пластика, окружение, свет, кадр, анимация) — в `POSES.md` §5. Главные три:
+  1. Сидит боком на байке, колени вместе, голо-фишка над ладонью (`select`).
+  2. Сутулясь, печатает по голо-клавиатуре (`idle`).
+  3. Висит на кабелях и качает голо-сердечко, как наживку (`tease`).
 - **Фирменный idle:** печатает в воздухе, наушники пульсируют.
 - **Наряды:**
   - `n_base` S —;
@@ -351,9 +352,9 @@ waist-length lavender hair, small elegant horns, crescent-moon tiara, violet-sil
   3. «Режим офлайн» — первый раз без визора.
 - **Набор S:** тема «Неон» (`s_neon`), стол «Неоновый город» (`b_neon`).
 - **Палитра:** 4fe3ff · ff6fd8 · 1a1530.
-- **Промпт** (роль: `white-hat hacker and street racer`; выражение: `smug little smirk`):
+- **Промпт** (роль: `white-hat hacker and street racer`; выражение: `smug little smirk`; поза: `select` из `POSES.md`):
 ```
-asymmetric short haircut in cyan and pink, headphones with small cat-ear shapes, transparent visor pushed up on the forehead, cyan eyes with a pink gradient, slender lean figure, narrow hips; cropped techwear jacket over a high-collar fitted bodysuit, utility mini skirt with straps over sheer black tights, thigh-high glossy boots, asymmetric straps; a small hologram of a blank tile hovering above her palm; background: rainy night street with dimmed signs, muted; cyan key accent, magenta rim light, 
+asymmetric short haircut in cyan and pink, headphones with small cat-ear shapes, transparent visor pushed up on the forehead, cyan eyes with a pink gradient, slender lean figure, narrow hips; cropped techwear jacket over a high-collar fitted bodysuit, utility mini skirt with straps over sheer black tights, thigh-high glossy boots, asymmetric straps; sitting sideways on the seat of her parked unbranded custom motorcycle, both knees together with both legs angled down to her right, both boots resting side by side on the concrete floor, right hand pushing her transparent visor up onto her forehead with two fingers, left palm raised with a small hologram of a blank tile hovering above it, smug little smirk at the viewer, camera at her eye level; background: cramped back-alley garage workshop under an elevated railway, a motorcycle on a lift, cable spaghetti overhead, stacks of old CRT monitors with abstract glowing graphs and no text, one rolled-up shutter onto a dark dry alley, muted, no neon clutter; lit only by her screens and holograms: cyan underlight on her face and hands, magenta rim from a hologram behind her, dark surroundings; perfectly level frame-within-a-frame shot through the rectangle of a foreground CRT bezel or HUD panel with no text, she stands on the left third with space for holograms on the right, tight framing from mid-thigh, eye-level camera, 
 ```
 
 ---
@@ -373,11 +374,11 @@ asymmetric short haircut in cyan and pink, headphones with small cat-ear shapes,
   - поражение — молча перетягивает хвост, «Ещё заход»;
   - комбо — стайка теневых ласточек.
 - **Эмоции:** холодная уверенная, смущённая в шарф, удивлённая (широкие глаза), довольная полуулыбка, решительный прищур.
-- **Позы:**
-  1. 3/4, письмо между двумя пальцами у лица, шарф развевается.
-  2. Уход в полуоборот, взгляд через плечо (единственный, в SSR).
-  3. Сидит боком на перилах моста, нога на ногу, шарф до носа.
-- **Фирменный idle:** перекатывает кунай-ласточку между пальцами, хвост и шарф колышутся, колени изредка смущённо сводятся.
+- **Позы:** вся постановка (6 поз, пластика, окружение, свет, кадр, анимация) — в `POSES.md` §6. Главные три:
+  1. Идёт по коньку крыши, как по канату, читает адрес на письме (`idle`).
+  2. Стоп-кадр прыжка между крышами в профиль (`select`).
+  3. Приземлилась на одно колено на коньке, письма опускаются (`win`).
+- **Фирменный idle:** перекатывает кунай-ласточку между пальцами, хвост и шарф колышутся, пятка опорной ноги приподнимается (микробаланс).
 - **Наряды:**
 
 | id | Ранг | Образ | Ульта — визуал | М |
@@ -393,9 +394,9 @@ asymmetric short haircut in cyan and pink, headphones with small cat-ear shapes,
   3. На высокой симпатии приносит письма, которые пишет сама, но не подписывает.
 - **Фишки:** подпись — слива на тёмном лаке. Рубашка: индиго-лак с серебряной ласточкой. Стол: ночные татами и крыши в тумане.
 - **Палитра:** 1d1b2e · c8283c · a9b0c2.
-- **Промпт** (роль: `kunoichi courier`; выражение: `cool confident half-smile`):
+- **Промпт** (роль: `kunoichi courier`; выражение: `cool confident half-smile`; поза: `idle` из `POSES.md`):
 ```
-jet-black very long high ponytail tied with a crimson cord, side-swept bangs, steel-grey eyes with a crimson gradient, swallow-shaped kunai hairpin, long crimson scarf trailing in the wind, lithe slender-curvy figure, long legs; short dark-indigo wrap kimono dress with an obi belt, crossed neckline showing light cleavage, mesh arm guards, fishnet thigh-high stockings, split-toe tabi boots; holding a sealed letter between two fingers near her face, three-quarter contrapposto; background: night rooftops and a misty bridge, muted; crimson key accent, cold moonlight rim light, 
+jet-black very long high ponytail tied with a crimson cord, side-swept bangs, steel-grey eyes with a crimson gradient, swallow-shaped kunai hairpin, long crimson scarf trailing in the wind, lithe slender-curvy figure, long legs; short dark-indigo wrap kimono dress with an obi belt, crossed neckline showing light cleavage, mesh arm guards, fishnet thigh-high stockings, split-toe tabi boots; walking the ridge of a tiled roof like a tightrope in three-quarter view, right tabi placed directly in front of the left on the ridge line, both legs straight with the back heel lifted, reading the address on a sealed letter in her left hand, right hand spinning the swallow-shaped kunai on one finger, crimson scarf trailing behind in the wind, cool focused eyes flicking up to the viewer, hem stays in place; background: top tier of a courier post tower above a misty canal town at night, dark wet tiled roof ridge, swallow nests under the eaves, lines of sealed envelopes strung like laundry, one small guild-seal paper lamp, moonless overcast sky, muted and hazy; moonless overcast night, cool misty glow rising from the canal town below lighting her from beneath, a narrow crimson side light from the guild lamp; perfectly level horizon, ultra-vertical composition with a huge empty night sky filling over half the frame, she stands in the lower right third, scarf cutting a diagonal, knees-up, eye-level camera, 
 ```
 
 #### miel — Миэль · **A** · сахар · 25
@@ -411,10 +412,10 @@ jet-black very long high ponytail tied with a crimson cord, side-swept bangs, st
   - поражение — надувает губы, «Перестаралась с сахаром»;
   - комбо — взрыв посыпки.
 - **Эмоции:** сияющая улыбка, подмигивание с пальцем у губ («секрет рецепта»), надутые щёки, смущённый румянец, восторг.
-- **Позы:**
-  1. Взбивает крем в миске, прижатой к бедру, 3/4.
-  2. Протягивает макарон к камере.
-  3. Сидит на высоком табурете у витрины, нога на ногу, покачивает туфелькой.
+- **Позы:** вся постановка (6 поз, пластика, окружение, свет, кадр, анимация) — в `POSES.md` §7. Главные три:
+  1. Миска на бедре, взбивает крем и напевает (`idle`).
+  2. Кондитерский реверанс с подносом пирожных (`win`).
+  3. Тянется через стойку с ложкой сливок: «Скажи „а-а“» (`tease`).
 - **Фирменный idle:** покачивается в такт музыке, сдувает пудру с ладони, коленки трутся друг о друга.
 - **Наряды:**
 
@@ -431,9 +432,9 @@ jet-black very long high ponytail tied with a crimson cord, side-swept bangs, st
   3. На высокой симпатии дарит рецепт, названный твоим именем.
 - **Фишки:** подпись — торт. Рубашка: сливочная глазурь с каплей малины. Стол: мраморная столешница в сахарной пудре.
 - **Палитра:** f6e7cf · c98a4b · e0566f.
-- **Промпт** (роль: `pâtissière`; выражение: `beaming smile with a playful wink`):
+- **Промпт** (роль: `pâtissière`; выражение: `humming with a soft closed-eye smile`; поза: `idle` из `POSES.md`):
 ```
-caramel-honey blonde hair in big loose curls gathered into a side ponytail with a white satin ribbon, macaron hair clip, warm amber eyes, small beauty mark near the lips, soft pear-shaped figure, wide hips, full thighs, medium-full bust; cream off-shoulder blouse with puffed sleeves, fitted corset apron-skirt above the knee showing a soft waist, white thigh-high stockings with small bows, pastry pumps; whisking cream in a bowl held at her hip, piping bag in the apron pocket; background: cozy pastry shop with glass display, muted; raspberry key accent, warm caramel rim light, 
+caramel-honey blonde hair in big loose curls gathered into a side ponytail with a white satin ribbon, macaron hair clip, warm amber eyes, small beauty mark near the lips, soft pear-shaped figure, wide hips, full thighs, medium-full bust; cream off-shoulder blouse with puffed sleeves, fitted corset apron-skirt above the knee showing a soft waist, white thigh-high stockings with small bows, pastry pumps; standing in three-quarter view, a large copper mixing bowl hugged against her right hip with the right arm, right hip pushed out with her weight on the straight right leg, left leg relaxed with the knee bent inward and the left heel lifted out of the pump, left hand whisking cream in the bowl, head tilted toward her right shoulder, humming with a soft closed-eye smile, a small dab of cream on her cheek; background: morning kitchen of a small pastry shop, brick oven arch with an ember glow, marble counter dusted with powdered sugar, copper bowls, cooling racks of macarons, honey jars, flour sacks, a sunlit window with a lace café curtain, muted, soft haze of floating sugar; soft early-morning sun through the window, warm oven glow from the side, powdered sugar glittering in the light beams; customer's view across the counter, camera about 10 degrees above her eye level, warm medium shot from mid-calf in three-quarter view, she stands on the left third, soft out-of-focus pastries in the foreground edge, 
 ```
 
 #### lian — Лянь · **A** · струна и река · 28
@@ -449,10 +450,10 @@ caramel-honey blonde hair in big loose curls gathered into a side ponytail with 
   - поражение — грустная мелодия, «Минор тебе к лицу»;
   - комбо — ноты поднимаются по лестнице полутонов.
 - **Эмоции:** спокойная полуулыбка, лукавый взгляд поверх пипы, удивлённая, мечтательная (глаза закрыты), мягко-грустная.
-- **Позы:**
-  1. Сидит боком на скамье лодки, пипа на колене, нога на ногу.
-  2. Пипа за спиной, рука протянута к камере.
-  3. Полуоборот, прячет пол-лица за грифом.
+- **Позы:** вся постановка (6 поз, пластика, окружение, свет, кадр, анимация) — в `POSES.md` §8. Главные три:
+  1. Сидит прямо на шёлковом пуфе, пипа вертикально на бедре (`idle`).
+  2. Вытягивает к камере светящуюся струну (`select`).
+  3. Профиль, взгляд через плечо, шаг сквозь разрез (`tease`, её единственный «через плечо»).
 - **Фирменный idle:** перебирает струны, кисти качаются, лёгкое покачивание в ритме.
 - **Наряды:**
 
@@ -469,9 +470,9 @@ caramel-honey blonde hair in big loose curls gathered into a side ponytail with 
   3. На высокой симпатии сочиняет «твою тему»: она становится музыкой лобби.
 - **Фишки:** подпись — карп. Рубашка: тёмная бирюза с золотыми струнами. Стол: палуба лодки, отражения фонарей.
 - **Палитра:** 1f4e5a · f1d6cf · c9a35b.
-- **Промпт** (роль: `pipa musician on a river teahouse boat`; выражение: `serene half-smile with half-closed eyes`):
+- **Промпт** (роль: `pipa musician on a river teahouse boat`; выражение: `serene half-smile with half-closed eyes`; поза: `idle` из `POSES.md`):
 ```
-floor-length straight dark teal-black hair with a hime cut and blunt bangs, lotus hairpins with pearl tassels, soft grey-teal eyes, willowy tall figure, delicate shoulders, small waist, modest bust, long neck and fingers; short embroidered beizi jacket over a form-fitting midi dress with a high side slit, white silk stockings with embroidered lotus, embroidered slippers; seated sideways on a boat bench, legs crossed, a pipa lute resting on her knee, fingers on the strings; background: night river with lanterns and lotus leaves, muted; lotus-coral key accent, teal moonlight rim light, 
+floor-length straight dark teal-black hair with a hime cut and blunt bangs, lotus hairpins with pearl tassels, soft grey-teal eyes, willowy tall figure, delicate shoulders, small waist, modest bust, long neck and fingers; short embroidered beizi jacket over a form-fitting midi dress with a high side slit, white silk stockings with embroidered lotus, embroidered slippers; sitting upright on a low round embroidered silk ottoman on the lacquered dais, the pipa held vertically on her left thigh with its neck rising beside her left shoulder, left fingers pressing the frets, right fingers plucking the strings, both knees together angled toward frame-right, both feet side by side with the right toe pointed, long neck tilted toward the instrument, eyes half-closed, serene half-smile, camera at her eye level, hem and slit stay in place; background: a river music barge at night, a raised red-lacquered dais under a curved boat roof on red lacquer pillars, hanging bead-string blinds, lotus-shaped floating candles drifting on black water, lotus leaves, a mooring rope, light mist over the water, muted, no moon; warm coral candlelight rising from floating lotus candles on the water below, low mist, deep teal shadows, no moonlight; off-center three-quarter view shot through hanging bead strings in the soft foreground, knees-up, eye-level camera, no reflection of her legs in the water, 
 ```
 
 #### jess — Джесс · **A** · пыль и закат · 25
@@ -487,10 +488,10 @@ floor-length straight dark teal-black hair with a hime cut and blunt bangs, lotu
   - поражение — «Дикая лошадка. Объезжу!»;
   - комбо — петля лассо растёт.
 - **Эмоции:** широкая улыбка, подмигивание из-под шляпы, удивлённая с открытым ртом, раздражённая (сдувает чёлку), испуганная.
-- **Позы:**
-  1. Опирается на забор, сапог на перекладине, шляпа набок.
-  2. Раскручивает лассо над головой.
-  3. Сидит на седле, брошенном на тюк сена, нога на ногу.
+- **Позы:** вся постановка (6 поз, пластика, окружение, свет, кадр, анимация) — в `POSES.md` §9. Главные три:
+  1. Предплечья на жерди загона, щиколотки скрещены (`idle`).
+  2. Раскручивает лассо над головой и ловит падающую шляпу (`win`).
+  3. «Попался!» — тянет лассо, каблук вбит в землю (`tease`).
 - **Фирменный idle:** перекидывает косу, постукивает сапогом, переносит вес с ноги на ногу.
 - **Наряды:**
 
@@ -507,9 +508,9 @@ floor-length straight dark teal-black hair with a hime cut and blunt bangs, lotu
   3. На высокой симпатии зовёт смотреть закат с крыши салона.
 - **Фишки:** подпись — клевер. Рубашка: потёртая кожа с тиснением. Стол: коновязь и закат в дымке.
 - **Палитра:** 3d5a80 · b5532f · e8cf9a.
-- **Промпт** (роль: `cowgirl caravan driver`; выражение: `wide laughing grin`):
+- **Промпт** (роль: `cowgirl caravan driver`; выражение: `relaxed easy grin`; поза: `idle` из `POSES.md`):
 ```
-sandy wheat-blonde hair in two long low braids, cowboy hat with feathers and silver conchos, sky-blue eyes, light freckles on a mature face, tall long-legged figure, medium bust; plaid shirt tied in a knot above a soft bare midriff, high-waisted denim shorts, brown over-the-knee socks, tooled leather boots, belt with a horseshoe buckle, coiled lasso; leaning on a wooden fence with one boot on the rail; background: prairie ranch at golden hour with dust, muted; rust key accent, warm sunset rim light, 
+sandy wheat-blonde hair in two long low braids, cowboy hat with feathers and silver conchos, sky-blue eyes, light freckles on a mature face, tall long-legged figure, medium bust; plaid shirt tied in a knot above a soft bare midriff, high-waisted denim shorts, brown over-the-knee socks, tooled leather boots, belt with a horseshoe buckle, coiled lasso; leaning forward with both forearms folded on the top rail of a wooden corral fence, body in three-quarter view, both boots on the dirt with the right ankle crossed behind the left, both legs straight, hat tilted to one side, a wheat stalk between her lips, relaxed easy grin, sky-blue eyes on the viewer; background: corral beside a tea caravan in a copper-red canyon, sun-bleached wooden hitching fence, covered wagon loaded with tea crates under canvas, a windmill, scattered hay, tumbleweed, distant red mesas, muted; harsh high-noon sun directly overhead, short hard shadows under the hat brim, heat shimmer above the ground, bleached pale sky; classic western cowboy shot cropped at mid-thigh, eye-level camera, horizon in the lower third, she stands on the right third with sky and canyon on the left, 
 ```
 
 #### tsuru — Цуру · **A** · пар и журавль · 31
@@ -525,10 +526,10 @@ sandy wheat-blonde hair in two long low braids, cowboy hat with feathers and sil
   - поражение — «Ну-ну» и складывает журавлика на удачу;
   - комбо — журавли взлетают.
 - **Эмоции:** тёплая (глаза-полумесяцы), дразнящая (прищур, ладонь у щеки), строгая забота, удивлённая, растроганная.
-- **Позы:**
-  1. У раздвижной двери, придерживает рукав.
-  2. Сидит на краю энгавы, нога на ногу, поднос.
-  3. Складывает журавлика у лица.
+- **Позы:** вся постановка (6 поз, пластика, окружение, свет, кадр, анимация) — в `POSES.md` §10. Главные три:
+  1. Плечом в раме сёдзи, руки в рукавах, гэта на зубце (`idle`).
+  2. Раздвигает норэн: «Проходи» (`select`).
+  3. Сэйдза у очага, похлопывает по подушке рядом (`tease`).
 - **Фирменный idle:** заправляет прядь за ухо, пар клубится, журавлик в пальцах.
 - **Ограничение:** без бани и полотенец на теле, только хозяйка и гостиница.
 - **Наряды:**
@@ -546,9 +547,9 @@ sandy wheat-blonde hair in two long low braids, cowboy hat with feathers and sil
   3. На высокой симпатии сама просит тебя остаться ещё на вечер у очага.
 - **Фишки:** подпись — фонарь. Рубашка: тёплое дерево хиноки с журавлём. Стол: камень у источника в пару.
 - **Палитра:** 2e3a6b · e0703b · f1ece4.
-- **Промпт** (роль: `hot-spring inn proprietress`; выражение: `warm teasing smile, palm at her cheek`):
+- **Промпт** (роль: `hot-spring inn proprietress`; выражение: `warm crescent-eyed smile`; поза: `idle` из `POSES.md`):
 ```
-chocolate-brown elegant updo with a crane kanzashi and loose framing strands, warm hazel-gold gentle eyes, beauty mark under one eye, voluptuous soft figure, full bust and hips; knee-length fitted indigo kimono dress with a wide persimmon obi, crossed neckline showing cleavage, haori with a crane crest draped on her shoulders, sheer dark stockings, lacquered geta; standing by a sliding door, holding her sleeve, three-quarter view; background: mountain inn corridor with steam and paper lanterns, muted; persimmon key accent, soft steam-white rim light, 
+chocolate-brown elegant updo with a crane kanzashi and loose framing strands, warm hazel-gold gentle eyes, beauty mark under one eye, voluptuous soft figure, full bust and hips; knee-length fitted indigo kimono dress with a wide persimmon obi, crossed neckline showing cleavage, haori with a crane crest draped on her shoulders, sheer dark stockings, lacquered geta; standing in a shoji doorframe with her right shoulder resting against the wooden frame, both hands tucked into the opposite kimono sleeves in front of her obi, both geta together with the knees softly bent, the right geta tipped forward onto its front tooth, head tilted against the frame, warm crescent-eyed smile, eyes level with the viewer's, hem stays in place; background: hearth room of a mountain onsen ryokan, sunken irori hearth with an iron kettle on a hook breathing steam, tatami and floor cushions, open shoji onto an autumn mountain pass with distant hot-spring steam and no bathers, crane-crest noren at the entrance, a string of paper cranes, muted; late-afternoon autumn sun raking through the shoji in striped bars of persimmon light, warm hearth glow as secondary fill from below; camera at a seated guest's height for seated poses and at her eye level for standing poses, perfectly horizontal, the shoji lattice as a graphic frame, close warm framing from the knees, 
 ```
 
 ---
@@ -568,10 +569,10 @@ chocolate-brown elegant updo with a crane kanzashi and loose framing strands, wa
   - поражение — уши прижаты, хвост поник;
   - комбо — число огоньков растёт.
 - **Эмоции:** хитрая ухмылка с клычком, надменная, смущённая (уши прижаты), возмущённая, счастливая (глаза закрыты, хвост ходит).
-- **Позы:**
-  1. Под тории, жезл-гохэй на плече, полуоборот.
-  2. Сидит боком на перилах храма, болтает ногой.
-  3. Огонёк в ладонях у лица.
+- **Позы:** вся постановка (6 поз, пластика, окружение, свет, кадр, анимация) — в `POSES.md` §11. Главные три:
+  1. На лестнице, гохэй поперёк плеч (`idle`).
+  2. Выглядывает из-за столба тории, хвост выдаёт (`select`).
+  3. «Лисичка» из пальцев и подброшенная пятка (`tease`).
 - **Фирменный idle:** хвост мягко ходит, уши подрагивают, звякает колокольчик.
 - **Наряды:**
 
@@ -589,9 +590,9 @@ chocolate-brown elegant updo with a crane kanzashi and loose framing strands, wa
   3. На высокой симпатии показывает настоящий облик, Девятихвостую, только тебе.
 - **Фишки:** подпись — лиса. Рубашка: алый лак с белой лисой и золотыми вратами. Лица фишек в мягкой красной обводке (вне рейтинга). Стол: ступени храма с тысячей ториев в тумане.
 - **Палитра:** f3efe9 · d63a2a · e2a23d.
-- **Промпт** (роль: `fox shrine maiden`; выражение: `sly smirk with a tiny fang`):
+- **Промпт** (роль: `fox shrine maiden`; выражение: `sly smirk with a tiny fang`; поза: `idle` из `POSES.md`):
 ```
-long snow-white hair with vermilion tips, white fox ears with red inner fur, one fluffy white fox tail with a red tip, vermilion eyeliner, amber-gold eyes, small bell on a red cord, fox mask worn on the side of her head, medium-height soft hourglass figure, long legs; stylized shrine-maiden outfit: fitted white top with detached wide sleeves and bare shoulders showing cleavage, vermilion hakama skirt with thigh-high side slits, white thigh-high stockings with red bows, wooden sandals; gohei wand resting on her shoulder, half-turn under a torii gate; background: hillside shrine with rows of torii in mist, muted; vermilion key accent, amber foxfire rim light, 
+long snow-white hair with vermilion tips, white fox ears with red inner fur, one fluffy white fox tail with a red tip, vermilion eyeliner, amber-gold eyes, small bell on a red cord, fox mask worn on the side of her head, medium-height soft hourglass figure, long legs; stylized shrine-maiden outfit: fitted white top with detached wide sleeves and bare shoulders showing cleavage, vermilion hakama skirt with thigh-high side slits, white thigh-high stockings with red bows, wooden sandals; standing on a stone stairway in three-quarter view, left foot up on the next step with the left knee bent forward, right leg straight on the lower step bearing her weight, gohei wand laid horizontally across the back of her shoulders with both wrists draped lazily over it and the wide sleeves hanging down, fluffy tail curled around the front of her shins, head tilted toward her raised knee, sly smirk with a tiny fang, amber eyes on the viewer, camera at eye level; background: night stairway tunnel of countless vermilion torii gates climbing a hillside, worn stone steps with mossy edges, stone kitsune statues wearing red bibs, stone lanterns with floating amber foxfire orbs, golden ginkgo leaves on the steps, low drifting mist, muted and desaturated; night, key light from small floating amber foxfire orbs, vermilion bounce from the lacquered torii, cool blue-grey fill from the mist; frame within a frame: the two pillars of the nearest torii crop the left and right edges, the stairway climbing diagonally into the depth, she stands on the right third with her tail filling the left, knees-up, 50mm lens, eye level, 
 ```
 
 #### shirin — Ширин · **S** · песок и солнце · 26
@@ -607,10 +608,10 @@ long snow-white hair with vermilion tips, white fox ears with red inner fur, one
   - поражение — театральный вздох, «Пески переменчивы»;
   - комбо — лестница звона монет.
 - **Эмоции:** загадочная полуулыбка, смеющаяся, сонно-ворчливая, удивлённая, нежная.
-- **Позы:**
-  1. Танцевальная поза: руки с вуалью над головой, контрапост (без прогиба спины).
-  2. Сидит на подушках, раскладывает фишки-гадание, нога на ногу.
-  3. Взгляд поверх вуали, ладонь к камере.
+- **Позы:** вся постановка (6 поз, пластика, окружение, свет, кадр, анимация) — в `POSES.md` §12. Главные три:
+  1. Танец с лампой на голове, змеиные руки (`idle`).
+  2. Шаг-променад, вуаль отводит, как занавес (`select`).
+  3. Стоп-кадр пируэта с веером монет (`win`).
 - **Фирменный idle:** мягкое покачивание в танцевальном ритме с малой амплитудой, звенят браслеты, вуаль течёт.
 - **Наряды:**
 
@@ -628,9 +629,9 @@ long snow-white hair with vermilion tips, white fox ears with red inner fur, one
   3. На высокой симпатии танцует только для тебя под звёздами: взгляд в камеру, без сексуализации.
 - **Фишки:** подпись — солнце. Рубашка: бирюзовая мозаика с золотом. Стол: тёплый песчаник и ковры в мареве.
 - **Палитра:** d9b26f · 1f8f8a · c08a1e.
-- **Промпт** (роль: `desert caravan dancer and fortune teller`; выражение: `mysterious half-smile over a lowered veil`):
+- **Промпт** (роль: `desert caravan dancer and fortune teller`; выражение: `serene concentrated half-smile`; поза: `idle` из `POSES.md`):
 ```
-voluminous plum-black wavy hair to the hips with woven gold coin chains, golden forehead chain, honey-gold eyes with kohl, warm brown skin, curvy hourglass figure with a soft belly and no abs, full hips, medium-full bust; opaque embroidered choli top with sheer chiffon sleeves showing cleavage, bare soft midriff, low-slung skirt with a high slit, jingling coin belt, ankle bracelets, gold armlets, light veil held in her hands; dance pose with arms raised holding the veil, gentle contrapposto, no arched back; background: caravan camp at dusk with tents and lamps, muted; turquoise key accent, warm sunset gold rim light, 
+voluminous plum-black wavy hair to the hips with woven gold coin chains, golden forehead chain, honey-gold eyes with kohl, warm brown skin, curvy hourglass figure with a soft belly and no abs, full hips, medium-full bust; opaque embroidered choli top with sheer chiffon sleeves showing cleavage, bare soft midriff, low-slung skirt with a high slit, jingling coin belt, ankle bracelets, gold armlets, light chiffon veil; standing in three-quarter view on a kilim carpet, a small lit brass oil lamp balanced on top of her head, weight on her flat right foot, left foot raised onto its ball close beside it, knees soft and together, hips swayed gently to her right with a straight back and no arch, both arms extended out to the sides at shoulder height in a slow serpentine wave, wrists bent and fingers in a dancer's shape, the light veil draped over both forearms behind her shoulders, serene concentrated half-smile, honey-gold kohl-lined eyes on the viewer, camera at eye level; background: interior of a fortune-teller's caravan tent, layered kilim carpets, low cushions and bolsters, brass oil lamps hanging on chains, a brass sand divination tray, a hanging screen of coin strings, tent flap open onto dunes with the first stars and a distant camel silhouette, muted and desaturated; blue-hour interior, warm key from brass oil lamps, cool turquoise backlight from the open tent flap, plum shadows; eye-level view as if seated on a cushion opposite her, lamp chains and the arc of the veil forming a circular arch around her placed off-center, framed from mid-thigh, torso more frontal with legs in three-quarter, 50mm lens, 
 ```
 
 #### mari — Марисоль · **S** · шторм и море · 29
@@ -646,10 +647,10 @@ voluminous plum-black wavy hair to the hips with woven gold coin chains, golden 
   - поражение — «Шторм — не повод сдаваться»;
   - комбо — волна растёт.
 - **Эмоции:** дерзкая ухмылка, хохот, сердитая, удивлённая, редкая мягкая.
-- **Позы:**
-  1. Сапог на бухте каната, подзорная труба, ветер (брюки, низкий ракурс допустим).
-  2. У штурвала, взгляд через плечо (единственный).
-  3. Сидит на борту, нога на ногу, крутит компас.
+- **Позы:** вся постановка (6 поз, пластика, окружение, свет, кадр, анимация) — в `POSES.md` §13. Главные три:
+  1. Ботфорт на планшире, рука на ванте (`idle`).
+  2. Вылетает над палубой на канате (`win`).
+  3. Стоит на ящике с чаем и указывает на горизонт (`select`).
 - **Фирменный idle:** плащ и перо хлопают на ветру, качка передаётся переносом веса.
 - **Ограничение:** без бочек, рома и стекла.
 - **Наряды:**
@@ -668,9 +669,9 @@ voluminous plum-black wavy hair to the hips with woven gold coin chains, golden 
   3. На высокой симпатии предлагает тебе место старпома.
 - **Фишки:** подпись — колокол. Рубашка: синяя парусина с розой ветров. Стол: мокрая палуба в морской дымке.
 - **Палитра:** 1f2f4a · c23a3a · d4b15a.
-- **Промпт** (роль: `free tea-clipper captain`; выражение: `bold smirk`):
+- **Промпт** (роль: `free tea-clipper captain`; выражение: `bold smirk`; поза: `idle` из `POSES.md`):
 ```
-wild crimson-red curls in a loose low ponytail, tricorne hat with a white plume, sea-green eyes, compass pendant, tall full-figured body, long legs, full bust; white shirt with a deep open neckline under a fitted corset vest, tight dark leather trousers, glossy over-the-knee boots, long navy coat with gold buttons draped over her shoulders, sash belt; one boot on a coil of rope, holding a brass spyglass, wind in her hair; background: ship deck with sails and stormy sea haze, muted; crimson key accent, brass-gold rim light, 
+wild crimson-red curls in a loose low ponytail, tricorne hat with a white plume, sea-green eyes, compass pendant, tall full-figured body, long legs, full bust; white shirt with a deep open neckline under a fitted corset vest, tight dark leather trousers, glossy over-the-knee boots, long navy coat with gold buttons draped over her shoulders, sash belt; standing at the ship's bulwark in three-quarter view, left boot planted up on the wooden rail at hip height with the left knee bent high, right leg straight on the deck bearing her weight, left forearm resting across the raised thigh, right arm raised gripping a taut rigging shroud above her head, leaning slightly forward into the wind gazing at the horizon past the camera, long navy coat and white plume streaming back, confident grin, camera at eye level; background: foredeck of a tea clipper in a passing daytime squall, wet holystoned planks, taut rigging shrouds and ratlines, furled sails, bowsprit, brass ship's bell, tea chests wrapped in oilcloth with no markings, ship's wheel on a wooden pedestal, sea spray, sunlight breaking through slate storm clouds, muted, no barrels, no bottles; midday squall, hard white sunlight breaking through slate clouds as backlight, glittering spray, cool overcast fill; eye-level camera with a 6 to 8 degree Dutch tilt following the ship's roll, 28mm wide lens, diagonal horizon, rigging lines leading to her, framed from the knees to full length, 
 ```
 
 #### hibana — Хибана · **S** · гром · 27
@@ -686,10 +687,10 @@ wild crimson-red curls in a loose low ponytail, tricorne hat with a white plume,
   - поражение — палочки крест-накрест над головой, «Ещё раунд!»;
   - комбо — бит ускоряется вместе с питч-лестницей.
 - **Эмоции:** зубастая улыбка, боевой клич, обиженная, растерянная (тишина), тёплая.
-- **Позы:**
-  1. Замах палочками над головой, 3/4.
-  2. Сидит боком на большом барабане, нога на ногу, палочки на плече.
-  3. Указывает палочкой в камеру.
+- **Позы:** вся постановка (6 поз, пластика, окружение, свет, кадр, анимация) — в `POSES.md` §14. Главные три:
+  1. Стойка тайко: выпад, палочка в небо, палочка на игрока (`select`).
+  2. Пружинит на носках, дробь в воздухе (`idle`).
+  3. Удар двумя руками на верху одайко (`win`).
 - **Фирменный idle:** покачивается в ритме, искры в волосах, барабаны медленно вращаются.
 - **Наряды:**
 
@@ -707,9 +708,9 @@ wild crimson-red curls in a loose low ponytail, tricorne hat with a white plume,
   3. На высокой симпатии впервые молчит рядом с тобой, и ей не страшно.
 - **Фишки:** подпись — молния. Рубашка: лиловый лак с золотыми томоэ. Стол: камень святилища под дождём в дымке.
 - **Палитра:** 2c2650 · ffd23f · 8e8fa3.
-- **Промпт** (роль: `taiko drummer of a thunder shrine`; выражение: `toothy excited grin`):
+- **Промпт** (роль: `taiko drummer of a thunder shrine`; выражение: `toothy excited grin`; поза: `select` из `POSES.md`):
 ```
-medium wolf-cut slate-grey hair with an electric-yellow inner color, small tomoe hair ornaments, electric yellow-gold eyes, soft sturdy figure with wide hips and full thighs, medium bust, no visible muscles; short happi jacket slipping off the shoulders over a fitted high-neck crop top showing a soft waist, twisted rope obi belt, hakama shorts, black thigh-high stockings with a yellow stripe, straw sandals, drumsticks in both hands; mid-swing with sticks raised overhead, three-quarter view; background: mountain shrine under a storm sky with rain, muted; lightning-yellow key accent, violet rim light, 
+medium wolf-cut slate-grey hair with an electric-yellow inner color, small tomoe hair ornaments, electric yellow-gold eyes, soft sturdy figure with wide hips and full thighs, medium bust, no visible muscles; short happi jacket slipping off the shoulders over a fitted high-neck crop top showing a soft waist, twisted rope obi belt, hakama shorts, black thigh-high stockings with a yellow stripe, straw sandals, drumsticks in both hands; taiko ready stance in profile-three-quarter view, deep forward lunge toward a giant drum at frame-left, left knee bent directly over the left foot, right leg extended straight behind her with the heel down, torso upright, right arm raised straight up with its drumstick pointing at the sky, left arm extended forward pointing the other drumstick at the viewer, fierce grin, eyes locked on the camera, camera at eye level; background: wooden drum tower above terraced mountain tea plantation rows in a dusk spring thunderstorm, slanting sheets of rain over tea bushes, a giant odaiko drum on a wooden cradle, a ring of small shime-daiko drums, wet plank floor, straw rope tassels, distant lightning over the ridges, muted and desaturated, no shrine buildings, no lanterns; dusk thunderstorm, diffuse violet ambient light, intermittent yellow-gold lightning backlight; eye-level tight action shot from mid-thigh, rim of a near odaiko in the lower-left foreground, 35mm lens, drumsticks and hair strands breaking past the frame edges, slight motion trails on the sticks, 
 ```
 
 #### nemi — Неми · **S** · лес · на вид 26
@@ -725,10 +726,10 @@ medium wolf-cut slate-grey hair with an electric-yellow inner color, small tomoe
   - поражение — уши чуть опускаются, «Ветер был против»;
   - комбо — вихрь листьев.
 - **Эмоции:** невозмутимая, лёгкая улыбка, смущение (кончики ушей краснеют), прищур (прицел), удивление (уши вверх).
-- **Позы:**
-  1. Натягивает лук, 3/4, ветер.
-  2. Сидит на корне дерева, нога на ногу, книга.
-  3. Опирается на лук, взгляд через плечо (единственный).
+- **Позы:** вся постановка (6 поз, пластика, окружение, свет, кадр, анимация) — в `POSES.md` §15. Главные три:
+  1. Полное натяжение лука в боковой стойке, стрела мимо камеры (`select`).
+  2. Поза дерева на ветви, лист на ладони (`idle`).
+  3. Гладит игрока по голове сверху (`tease`).
 - **Фирменный idle:** уши подрагивают, падают листья, она ловит один.
 - **Наряды:**
 
@@ -746,9 +747,9 @@ medium wolf-cut slate-grey hair with an electric-yellow inner color, small tomoe
   3. На высокой симпатии сажает с тобой дерево, которое вырастет через сто лет: «Я подожду».
 - **Фишки:** подпись — клён. Рубашка: берёста с резным листом. Стол: мох и корни в лучах.
 - **Палитра:** 4f6b35 · b8612e · ece4cf.
-- **Промпт** (роль: `elven archer guarding wild tea trees`; выражение: `calm deadpan look with a faint smile`):
+- **Промпт** (роль: `elven archer guarding wild tea trees`; выражение: `calm deadpan look with a faint smile`; поза: `select` из `POSES.md`):
 ```
-waist-length deep copper-auburn hair with thin leaf braids, long pointed elf ears with gold cuffs, leaf circlet, moss-green eyes, very tall slender figure, long legs, small-to-medium bust; fitted green corset vest over a white shirt with an open collar, short hooded cape, leather tasset skirt with slits, leather bracers, leaf-pattern lace thigh-high stockings, soft knee boots; drawing a longbow, three-quarter view, wind in her hair; background: ancient forest of wild tea trees with light shafts, muted; moss-green key accent, warm copper rim light, 
+waist-length deep copper-auburn hair with thin leaf braids, long pointed elf ears with gold cuffs, leaf circlet, moss-green eyes, very tall slender figure, long legs, small-to-medium bust; fitted green corset vest over a white shirt with an open collar, short hooded cape, leather tasset skirt with slits, leather bracers, leaf-pattern lace thigh-high stockings, soft knee boots; full draw in a side-on archer's stance, feet shoulder-width apart on a line perpendicular to the camera, both knees straight, left arm fully extended holding the longbow, right hand drawing the string back to the corner of her jaw, arrow aimed off-frame to the left and never at the camera, head turned toward the target, eyes narrowed, wind lifting her thin copper braids and short hooded cape, camera at eye level; background: canopy of colossal ancient wild tea trees on an autumn morning, broad living branches used as walkways, bridges of roots and vines, moss and hanging lichen, copper and gold leaves drifting down, mist far below, sun shafts through the foliage, muted and desaturated; early autumn morning, dappled sun shafts through the canopy, warm copper bounce from the leaves, cool green shade; full-length vertical shot from a neighboring branch at eye level, 85mm telephoto compression, lots of air above her head, a vertical trunk as a leading line, she fills a tall narrow strip of the frame, 
 ```
 
 ---
@@ -768,10 +769,10 @@ waist-length deep copper-auburn hair with thin leaf braids, long pointed elf ear
   - поражение — перья тускнеют, она собирает их, «Пепел — только начало»;
   - комбо — огненные перья множатся.
 - **Эмоции:** величественная полуулыбка, тёплый смех, гордая (подбородок вверх), смущённая (блины), гневная искра.
-- **Позы:**
-  1. Плащ-крылья раскинуты, перо в руке, 3/4.
-  2. Сидит боком на резном троне-ладье, нога на ногу, перо у губ.
-  3. Коса через плечо, взгляд через плечо (единственный).
+- **Позы:** вся постановка (6 поз, пластика, окружение, свет, кадр, анимация) — в `POSES.md` §16. Главные три:
+  1. Строго анфас, тлеющий кончик косы, как свеча (`idle`).
+  2. Плясовой «каблучок» с махом крыла-рукава (`select`).
+  3. Ведёт игрока косой, как лентой (`tease`).
 - **Фирменный idle:** перья плаща колышутся, по косе бегут угольки, ветер приносит искры.
 - **Наряды:**
 
@@ -794,12 +795,12 @@ waist-length deep copper-auburn hair with thin leaf braids, long pointed elf ear
   - вкладки — перья;
   - полоски валют — огненные ленты;
   - фон меню — тёмный лак с силуэтом жар-птицы, при открытии окна перо прочерчивает рамку (0,4 с);
-  - экран загрузки — Злата на троне-ладье;
+  - экран загрузки — Злата стоит фронтально на резном гульбище терема над рекой, коса как свеча (POSES.md §16);
   - стинг — гусли и балалайка с женским хором «ой» (4–6 с).
 - **Палитра:** c3242b · e8b23a · 1b1513.
-- **Промпт** (роль: `firebird tsarevna of a fairy-tale kingdom`; выражение: `regal warm half-smile`):
+- **Промпт** (роль: `firebird tsarevna of a fairy-tale kingdom`; выражение: `regal warm half-smile`; поза: `idle` из `POSES.md`):
 ```
-one thick floor-length braid with a gold-to-scarlet gradient and glowing ember tip, ornate kokoshnik crown with a firebird feather, gold-amber eyes with fire glints, statuesque full figure, wide hips, full bust; scarlet corset sarafan with gold floral folk-style ornament of original design, bare shoulders and cleavage, long feather wing-sleeves, skirt with a high slit, scarlet stockings with gold pattern and lace tops, embroidered heeled boots, feather cape spreading like wings; holding a glowing feather, wings spread, three-quarter view; background: fairy-tale palace hall with carved wood and spring dawn light, muted; scarlet key accent, golden ember rim light, 
+one thick floor-length braid with a gold-to-scarlet gradient and glowing ember tip, ornate kokoshnik crown with a firebird feather, gold-amber eyes with fire glints, statuesque full figure, wide hips, full bust; scarlet corset sarafan with gold floral folk-style ornament of original design, bare shoulders and cleavage, long feather wing-sleeves, skirt with a high slit, scarlet stockings with gold pattern and lace tops, embroidered heeled boots, feather wing-cape; standing perfectly frontal and symmetrical, both feet planted hip-width apart with the weight even on both legs, both knees soft, toes turned slightly outward, feather wing-cape folded closed around her shoulders like a mantle and parting at the front to show the sarafan, both hands held together at waist height cradling the glowing ember tip of her floor-length braid like a candle, the braid running down over her right shoulder, chin slightly raised, eyes looking straight into the camera, regal warm half-smile; background: carved wooden terem gallery-porch overlooking a thawing river at spring sunrise, window frames carved with firebirds, embroidered linen towels drying on the railing, birches with first buds, ice floes drifting on the river, no snow, no icicles, muted; low spring sunrise backlight through the carvings, warm ember underglow from her braid and feathers, cool blue shadow from the river; strictly frontal and symmetrical icon composition, she stands dead center inside a carved window-frame or gallery arch like a lubok print, camera at eye level, knees-up, no tilt, no diagonals, 
 ```
 
 #### minamo — Минамо · **SSR** · жемчужное море · на вид 26
@@ -815,10 +816,10 @@ one thick floor-length braid with a gold-to-scarlet gradient and glowing ember t
   - поражение — «Течение унесло… но вернёт»;
   - комбо — пузырьки и жемчуг.
 - **Эмоции:** мечтательная улыбка, игривая (палец у губ), удивлённая, обиженно-надутая, нежная.
-- **Позы:**
-  1. «Парит» на коралле, шаль и волосы плывут.
-  2. Сидит боком на троне-раковине, нога на ногу.
-  3. Шкатулка у лица, полуоборот.
+- **Позы:** вся постановка (6 поз, пластика, окружение, свет, кадр, анимация) — в `POSES.md` §17. Главные три:
+  1. Парит вертикально, ноги русалочьим хвостом (`idle`).
+  2. Подплывает к камере, ладони козырьком: «о!» (`select`).
+  3. Прячется в раковине, как под крышкой (`shy`).
 - **Фирменный idle:** волосы и шаль плывут медленно, как под водой, перламутр переливается.
 - **Наряды:**
 
@@ -843,9 +844,9 @@ one thick floor-length braid with a gold-to-scarlet gradient and glowing ember t
   - звук — подводные колокольчики;
   - стинг — арфа и мягкий подводный пэд.
 - **Палитра:** 7fd3d0 · f3e9f1 · 3a4fa0.
-- **Промпт** (роль: `princess of the undersea Pearl Palace`; выражение: `dreamy smile, finger at her lips`):
+- **Промпт** (роль: `princess of the undersea Pearl Palace`; выражение: `dreamy parted-lip smile`; поза: `idle` из `POSES.md`):
 ```
-long flowing pastel aqua-pearl wavy hair drifting as if underwater, pearl strands and a coral comb in the hair, aqua-violet gradient eyes, soft rounded figure, long limbs, medium-full bust; form-fitting sea-green hanfu-inspired gown with bare shoulders and cleavage, pearl-embroidered bodice, skirt with a high slit, translucent hagoromo shawl floating around her arms, sheer pale-blue stockings with pearl lace tops, pearl anklets; holding a small lacquered jewel box near her face, half-turn, standing lightly on coral; background: undersea palace hall with soft light rays and fish, muted; aqua key accent, pearl-violet rim light, 
+long flowing pastel aqua-pearl wavy hair drifting as if underwater, pearl strands and a coral comb in the hair, aqua-violet gradient eyes, soft rounded figure, long limbs, medium-full bust; form-fitting sea-green hanfu-inspired gown with bare shoulders and cleavage, pearl-embroidered bodice, skirt with a high slit, translucent hagoromo shawl floating around her arms, sheer pale-blue stockings with pearl lace tops, pearl anklets; floating weightlessly upright in clear water with her feet not touching anything, both legs pressed together and bent at the knees, swept gently to her left like a mermaid's tail with the toes pointed, both arms drifting loosely at shoulder height with palms down and fingers softly spread, translucent shawl and pearl-strung hair drifting upward around her, head tilted back slightly, gazing up toward the sunlight above with half-lidded dreamy eyes and a soft parted-lip smile, gown fully opaque and smoothly in place; background: flooded pearl grotto beneath a stone well, a round shaft above with a bright disc of daylight, mother-of-pearl walls, swaying kelp, jellyfish lanterns, a giant open clam shell, a gentle sea turtle, a sunken lacquered table with blank tiles drifting, light caustics, magical water where fabric stays dry-looking and fully opaque, muted; noon light through deep water, a vertical sun shaft from above, crawling caustics on skin and fabric, pearl-violet rim; always full length with pointed toes visible and feet off the ground, camera at her chest height with no tilt, lots of space above her head for drifting hair and shawl, she drifts slightly off-center, 
 ```
 
 #### kira — Кира · **SSR** · сталь и тяга · 23
@@ -861,11 +862,11 @@ long flowing pastel aqua-pearl wavy hair drifting as if underwater, pearl strand
   - поражение — «Отход на перегруппировку!», надевает шлем;
   - комбо — метки захвата по краю HUD.
 - **Эмоции:** дерзкая ухмылка, сосредоточенная, смущённая паника, победное подмигивание с салютом, усталая улыбка.
-- **Позы:**
-  1. У ноги меха, шлем под мышкой.
-  2. Сидит боком в открытом кокпите, нога на ногу.
-  3. Салют двумя пальцами у виска (комбинезон, лёгкий низкий ракурс допустим).
-- **Фирменный idle:** перехватывает шлем, вентиляторы ангара шевелят волосы, сенсор меха медленно моргает.
+- **Позы:** вся постановка (6 поз, пластика, окружение, свет, кадр, анимация) — в `POSES.md` §18. Главные три:
+  1. Откинулась на броню меха, крутит шлем на пальце (`idle`).
+  2. «Цель захвачена!» — пистолет из пальцев в объектив (`select`).
+  3. Смущение в устав: «смирно» и салют (`shy`).
+- **Фирменный idle:** крутит шлем на пальце и ловит, ночной ветер двора шевелит волосы, сенсор меха медленно моргает.
 - **Наряды:**
 
 | id | Ранг | Образ | Ульта — визуал | М |
@@ -886,13 +887,13 @@ long flowing pastel aqua-pearl wavy hair drifting as if underwater, pearl strand
   - валюты — цифровые табло;
   - кнопки — тумблеры, нажатие со щелчком;
   - у края поля (не на поле) прицельные уголки;
-  - фон меню — ангар с мехом (видео-петля 5 с);
+  - фон меню — двор чайного домика с коленопреклонённым мехом (видео-петля 5 с);
   - переходы — «загрузка систем»;
   - стинг — синт-оркестр.
 - **Палитра:** f2f2f5 · e03a3e · 1c2b4a.
-- **Промпт** (роль: `mecha ace pilot`; выражение: `cocky grin`):
+- **Промпт** (роль: `mecha ace pilot`; выражение: `cocky grin`; поза: `idle` из `POSES.md`):
 ```
-short silver-white layered bob with longer front locks, red pilot headset with a small antenna, warm red gradient eyes, chrysanthemum emblem on the shoulder, medium-height curvy figure, full hips, medium-full bust; form-fitting white-and-red pilot bodysuit with armor plates on shoulders and hips, front zipper lowered to the upper chest showing cleavage, fitted gloves, armored knee boots; holding her helmet under one arm, standing by the giant leg of a white mecha; background: orbital hangar with gantries, muted; red key accent, cool blue hangar rim light, 
+short silver-white layered bob with longer front locks, red pilot headset with a small antenna, warm red gradient eyes, chrysanthemum emblem on the shoulder, medium-height curvy figure, full hips, medium-full bust; form-fitting white-and-red pilot bodysuit with armor plates on shoulders and hips, front zipper lowered to the upper chest showing cleavage, fitted gloves, armored knee boots; leaning back against the knee armor of her kneeling white mecha with her left elbow hooked back over the armor edge, right leg straight and planted, left knee bent with the sole of her left boot flat against the armor behind her, right hand raised at shoulder height spinning her helmet on her index finger, chest open, chin up, cocky lopsided grin at the camera; background: a traditional tea house courtyard at night where a giant white mecha crash-landed and now kneels, a toppled stone water basin, a split bamboo fence, tarps and thick cables, tool carts, scorched raked gravel, tiled tea house eaves above, sci-fi hardware against old wood, muted; night, warm sodium work floodlights from the side, a red warning strobe, the mecha's cold blue sensor eye as backlight; dynamic low angle of 15 to 20 degrees, wide-angle lens, level horizon, huge mecha fingers, armor plates and cables in the foreground, strong diagonal composition, 
 ```
 
 #### vesper — Веспер · **SSR** · алая ночь · на вид 28 (ей 400 лет)
@@ -908,11 +909,11 @@ short silver-white layered bob with longer front locks, red pilot headset with a
   - поражение — театрально прикладывает руку ко лбу (стоя);
   - комбо — вихрь летучих мышей.
 - **Эмоции:** надменная улыбка с клычком, лукавый прищур, скучающая, искренне смущённая, гневная.
-- **Позы:**
-  1. Сидит боком на троне, нога на ногу, чашка гранатового чая.
-  2. У окна с луной, взгляд через плечо (единственный).
-  3. Протягивает руку в перчатке к камере.
-- **Фирменный idle:** лениво крутит розу, кейп и вуаль колышутся, медленно перекладывает ногу на ногу (сидя).
+- **Позы:** вся постановка (6 поз, пластика, окружение, свет, кадр, анимация) — в `POSES.md` §19. Главные три:
+  1. Тандю с кружевным зонтиком на плече (`select`).
+  2. Сидит прямо на бархатной кушетке с розой (`idle`).
+  3. Снимает перчатку зубами на банкетке клавесина (`tease`).
+- **Фирменный idle:** лениво крутит розу, кейп и вуаль колышутся, медленно перекладывает лодыжки (сидя на кушетке).
 - **Наряды:**
 
 | id | Ранг | Образ | Ульта — визуал | М |
@@ -932,13 +933,13 @@ short silver-white layered bob with longer front locks, red pilot headset with a
   - панели — готические арки с рубиново-чёрным витражом;
   - кнопки — сургучные печати с розой;
   - вкладки — кованое ажурное железо;
-  - фон меню — тронный зал при свечах;
+  - фон меню — музыкальный салон при свечах;
   - переходы — летучие мыши и лепестки;
   - стинг — орган и клавесин.
 - **Палитра:** 6b0f1a · 141018 · c9c3cf.
-- **Промпт** (роль: `vampire countess`; выражение: `haughty smile showing a tiny fang`):
+- **Промпт** (роль: `vampire countess`; выражение: `haughty smile showing a tiny fang`; поза: `select` из `POSES.md`):
 ```
-long black-cherry wine-colored ringlets in a half-up style with a small black lace veil fascinator, ruby-red gradient eyes, cameo choker with a crimson rose, tall voluptuous figure, full bust, narrow waist, long legs; black-and-crimson gothic gown with a corset bodice and deep neckline showing cleavage, high thigh slit, sheer lace sleeves, long satin gloves, black lace-top stockings with garters as part of the gown, heeled boots, high bat-wing cape collar; seated sideways on a carved throne, legs crossed, holding a porcelain cup of pomegranate tea; background: candlelit gothic throne room with stained glass, muted; crimson key accent, cold silver moonlight rim light, 
+long black-cherry wine-colored ringlets in a half-up style with a small black lace veil fascinator, ruby-red gradient eyes, cameo choker with a crimson rose, tall voluptuous figure, full bust, narrow waist, long legs; black-and-crimson gothic gown with a corset bodice and deep neckline showing cleavage, high thigh slit, sheer lace sleeves, long satin gloves, black lace-top stockings with garters as part of the gown, heeled boots, high bat-wing cape collar; standing tall, an opened black lace parasol resting on her right shoulder so its lace shadow falls across half her face, weight on her straight left leg, right leg extended forward in a ballet tendu with the pointed toe of her heeled boot touching the floor through the high slit, left gloved hand raised with the back of her fingers hiding her lips, narrowed amused eyes looking down at the camera; background: gothic castle music salon, a black lacquered harpsichord, a black velvet chaise longue, a tall pointed-arch stained-glass window glowing ruby from a bonfire outside, no moon, candelabras dripping wax, porcelain tea set with pomegranate tea, black roses in a vase, heavy velvet drapes, muted; candlelight only, warm flickering flames from the front and side, ruby patches of stained-glass light on the floor, deep wine-black shadows; long diagonal of her body across the frame, telephoto compression, a heavy out-of-focus velvet drape or candelabra in the foreground, theatrical opera-box vignette, camera at her face or chest level with an upward tilt under 5 degrees, 
 ```
 
 #### sigrid — Сигрид · **SSR** · иней и сияние · 24
@@ -954,10 +955,10 @@ long black-cherry wine-colored ringlets in a half-up style with a small black la
   - поражение — иней на ресницах, «Холод — ещё не конец»;
   - комбо — снежинки кристаллизуются.
 - **Эмоции:** сдержанная, неловкая тёплая улыбка, смущение (румянец на бледной коже, пар изо рта), удивление, решимость.
-- **Позы:**
-  1. Стоит в снегу, плащ раскрыт, снежинка на ладони.
-  2. Сидит боком на ледяном троне, нога на ногу.
-  3. Кружит лентой сияния над головой (движется лента, не подол).
+- **Позы:** вся постановка (6 поз, пластика, окружение, свет, кадр, анимация) — в `POSES.md` §20. Главные три:
+  1. Т-позиция на чёрном льду, касается тиары (`idle`).
+  2. Перебежка фигуристки мимо камеры (`select`).
+  3. Стоп-кадр вращения, запястья скрещены над головой (`win`).
 - **Фирменный idle:** видимое дыхание паром, снег, лента сияния течёт.
 - **Наряды:**
 
@@ -982,9 +983,9 @@ long black-cherry wine-colored ringlets in a half-up style with a small black la
   - снег при прокрутке;
   - стинг — колокольчики и хор.
 - **Палитра:** dff1f7 · 7fc8d8 · 8b7fd6.
-- **Промпт** (роль: `northern princess of the aurora`; выражение: `reserved, slightly awkward warm smile with a faint blush`):
+- **Промпт** (роль: `northern princess of the aurora`; выражение: `reserved, slightly awkward warm smile with a faint blush`; поза: `idle` из `POSES.md`):
 ```
-very long straight pale ice-blue to mint gradient hair with a crown braid, crystal ice tiara, pale blue-violet aurora gradient eyes, visible breath mist, tall slim elegant figure, medium bust, long legs; fitted white-and-ice-blue gown with fur trim, frost-embroidered corset bodice, bare shoulders under a short white fur capelet, skirt with a side slit, white stockings with frost-pattern lace tops, tall white heeled boots, glowing aurora ribbon scarf flowing around her; holding a snowflake on her open palm, three-quarter view; background: snowy pine forest under the northern lights, muted; ice-blue key accent, aurora violet-green rim light, 
+very long straight pale ice-blue to mint gradient hair with a crown braid, crystal ice tiara, pale blue-violet aurora gradient eyes, visible breath mist, tall slim elegant figure, medium bust, long legs; fitted white-and-ice-blue gown with fur trim, frost-embroidered corset bodice, bare shoulders under a short white fur capelet, skirt with a side slit, white stockings with frost-pattern lace tops, tall white heeled boots, glowing aurora ribbon scarf flowing around her; standing on the black ice of a frozen lake in a figure-skater T-position, right foot forward with the left heel tucked against the right instep, both legs straight and close together, right fingertip adjusting her crystal tiara, left hand holding a small copper mug of hot chocolate low at her waist, visible breath mist, aurora ribbon resting over her forearms, seen in three-quarter profile, reserved small smile at the camera; background: a frozen mountain lake at polar night, black mirror-like ice reflecting the aurora, a carved ice gazebo and snow-laden pines on the shore, a small copper pot of hot chocolate on a brazier, tall clear ice panes standing on the lake, faint frost trails on the ice, muted; deep polar night, cold key light reflected from snow and ice, shimmering violet-green aurora rim from above, the brazier as the only small warm accent; side-on tracking shot like a rink camera, full-length wide frame with large negative space of empty ice and sky, camera strictly at eye level, she sits near one edge of the frame moving along the horizontal, 
 ```
 
 ---
