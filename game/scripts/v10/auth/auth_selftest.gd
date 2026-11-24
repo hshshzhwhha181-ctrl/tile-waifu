@@ -184,6 +184,15 @@ static func run(host: Control) -> Array:
 	V10Auth.set_consent(false)
 	check(V10Auth.is_guest() and V10Auth.state().linked.is_empty() and V10Auth.player_id() == pid, "withdrawn consent → guest, accounts unlinked")
 	V10Auth.set_consent(true)
+	# a guest who kept a link after an expired provider session: withdrawing consent still removes it
+	V10Auth._apply_account("vkid", V10AuthProvider.ok({"sub": "vk:42", "name": "Тест"}, "tok"))
+	V10Auth.now_override += 40 * V10Auth.DAY
+	_relaunch()
+	b = await V10Auth.restore()
+	check(V10Auth.is_guest() and V10Auth.state().linked.has("vkid"), "expired provider: guest keeps the link")
+	V10Auth.set_consent(false)
+	check(V10Auth.is_guest() and V10Auth.state().linked.is_empty() and int(G.S.gems) == 1234, "withdrawn consent as a guest also unlinks, progress kept")
+	V10Auth.set_consent(true)
 
 	# ── 9. 0.9 save migration ──
 	var keep_pid: = pid
@@ -209,6 +218,9 @@ static func run(host: Control) -> Array:
 	G.save()
 	var bak: = G.save_path.get_basename() + ".bak.json"
 	var dev0: = V10Auth.install_id()
+	V10Auth._apply_account("vkid", V10AuthProvider.ok({"sub": "vk:9", "name": "Имя Фамилия"}, "tok"))
+	var pre: = V10Auth.pre_import_path()
+	_write_raw(pre, JSON.stringify(G.S))
 	var del: = V10Auth.request_deletion()
 	check(bool(del.ok) and str(del.player_id) == pid, "deletion accepted")
 	check(int(G.S.gems) != 999 and not bool(G.S.profile_done) and int(G.S.unlocked) == 1, "deletion wipes local progress")
@@ -216,6 +228,8 @@ static func run(host: Control) -> Array:
 	check(not FileAccess.file_exists(bak), "deletion removes the save backup")
 	var ob: = V10Auth.outbox()
 	check(ob.size() == 1 and str(ob[0].player_id) == pid and str(ob[0].type) == "delete_account", "deletion request queued for the server")
+	check(not FileAccess.file_exists(pre), "deletion removes the 0.8 pre-import save copy")
+	check(str(ob[0].get("linked", {}).get("vkid", "")) == "vk:9" and not ("Имя Фамилия" in JSON.stringify(ob)), "deletion request keeps ids only, no names")
 	check(V10Auth.install_id() != dev0, "install id rotated")
 	_relaunch()
 	check(int(G.S.gems) != 999 and str(V10Auth.state().deletion.get("player_id", "")) == pid, "deletion survives a relaunch")

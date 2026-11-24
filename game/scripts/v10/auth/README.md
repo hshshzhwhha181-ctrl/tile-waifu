@@ -69,14 +69,14 @@ VK ID: OneTap Android SDK → authorization code + PKCE → обмен на се
 ## Проверка
 ```
 flock /tmp/tw-godot.lock /opt/tw-tools/godot --headless --path game res://scripts/v10/auth/auth_dev.tscn -- \
-  --auth_selftest=1 --save=user://auth_selftest_save.json --save_wipe=1          # AUTH_SELFTEST 98/98
+  --auth_selftest=1 --save=user://auth_selftest_save.json --save_wipe=1          # AUTH_SELFTEST 102/102
 flock /tmp/tw-godot.lock xvfb-run -a /opt/tw-tools/godot --path game --rendering-driver opengl3 --audio-driver Dummy \
   --resolution 720x1280 res://scripts/v10/auth/auth_dev.tscn -- --auth_shots=<dir> --flavor=rustore \
   --save=user://auth_shots_save.json --save_wipe=1                                 # 11 кадров; --only=login|splash
 ```
 Самотест: первый запуск → гость → перезапуск (автовход) → выход → снова вход; все заглушки провайдеров; согласие и его отзыв;
 повреждённая / подделанная / пропавшая / чужая / с другого устройства сессия; истёкшая сессия провайдера → гость с тостом, привязки целы;
-офлайн-льгота неистёкшей сессии; миграция сейва 0.9; удаление аккаунта (сейв + бэкап + сессия + install id + очередь на сервер);
+офлайн-льгота неистёкшей сессии; миграция сейва 0.9; удаление аккаунта (сейв + бэкап + копия импорта 0.8 + сессия + install id + очередь на сервер, в запросе только id); отзыв согласия гостем с сохранённой привязкой;
 уникальность ID; ники; стоп-слова; хук V10AgeGate; UI-смоук экрана входа (3 флейвора), листа имени, листа аккаунта.
 
 ## Арт (Higgsfield, gpt_image_2_6, рецепт v4)

@@ -131,7 +131,14 @@ static func relogin(main: Control) -> Dictionary:
 	skip_splash = false
 	if main.has_method("go"):
 		main.screen_id = ""
-		main.go("home", {}, false)
+		if bool(r.get("new_player", false)) and not bool(r.get("imported", false)) and not bool(G.S.get("intro_done", false)):
+			# after «Удалить аккаунт» the player starts from zero: the intro and the first game, as on a first launch
+			await V6Story.play("intro")
+			G.S.intro_done = true
+			G.save()
+			main.go("play", {"level": 0, "partner": "mc"}, false)
+		else:
+			main.go("home", {}, false)
 	return r
 
 

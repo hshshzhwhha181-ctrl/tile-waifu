@@ -190,18 +190,19 @@ func _ask_logout() -> void :
 # ── deletion: hold the red button for 2 s ──────────────────────────────────────────────────────────────────
 
 const HOLD_SEC: = 2.0
+const DEL_H: = 490.0
 
 func _ask_delete() -> void :
-	var sh: = _confirm(V10AuthText.s("acc.del_q"), V10AuthText.s("acc.del_text"), 560.0)
+	var sh: = _confirm(V10AuthText.s("acc.del_q"), V10AuthText.s("acc.del_text"), DEL_H)
 	_del_root = sh.root
 	var p: Control = sh.panel
 	var w: = p.size.x - 72.0
-	var stay: = JButton.make(V10AuthText.s("acc.cancel"), "pink", Rect2(36, 560 - 236, w, 88), null, 28)
+	var stay: = JButton.make(V10AuthText.s("acc.cancel"), "pink", Rect2(36, DEL_H - 236, w, 88), null, 28)
 	stay.pressed.connect(func(): V10AuthUI.close(sh.root))
 	p.add_child(stay)
 	var hb: = Control.new()
 	hb.name = "HoldDelete"
-	hb.position = Vector2(36, 560 - 132)
+	hb.position = Vector2(36, DEL_H - 132)
 	hb.size = Vector2(w, 86)
 	hb.mouse_filter = Control.MOUSE_FILTER_STOP
 	p.add_child(hb)

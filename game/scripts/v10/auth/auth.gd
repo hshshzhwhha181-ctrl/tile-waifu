@@ -238,14 +238,16 @@ static func has_consent() -> bool:
 static func set_consent(on: bool) -> void :
 	var st: = state()
 	st.consent = {"pd152": on, "at": now(), "doc": DOC_VER if on else ""}
-	# withdrawing consent stops processing: provider accounts are unlinked, the player keeps playing as a guest
-	if not on and not is_guest():
+	# withdrawing consent stops processing: provider accounts are unlinked (also the ones a guest kept after an
+	# expired provider session — their sub / name are personal data), the player keeps playing as a guest
+	if not on:
 		for k in st.linked.keys():
 			var p: = provider(str(k))
 			if p:
 				p.sign_out()
 		st.linked = {}
-		_guest_session(st)
+		if not is_guest():
+			_guest_session(st)
 	G.save()
 
 
@@ -456,8 +458,12 @@ static func sign_out() -> void :
 static func request_deletion() -> Dictionary:
 	var st: = state()
 	var old: = str(st.player_id)
+	# the request carries ids only (no provider display names): it may wait on the device until the server exists
+	var subs: = {}
+	for k in st.linked.keys():
+		subs[str(k)] = str((st.linked[k] as Dictionary).get("sub", ""))
 	var req: = {"type": "delete_account", "player_id": old, "provider": str(st.provider),
-		"linked": st.linked.duplicate(true), "requested_at": now(), "install_id": install_id()}
+		"linked": subs, "requested_at": now(), "install_id": install_id()}
 	var ob = _read_json(root + "v10_auth_outbox.json")
 	var q: Array = ob.get("queue", []) if ob is Dictionary and ob.get("queue") is Array else []
 	q.append(req)
@@ -470,9 +476,10 @@ static func request_deletion() -> Dictionary:
 	_remove(root + "v10_device.json")
 	_install = ""
 	_wipe_dir(root + "v10_logs/")
-	# the old progress must not survive in the save's backup: remove main, backup and temp before the fresh save
+	# the old progress must not survive in the save's backups: remove main, backup, temp and the copy the 0.8
+	# recovery-code import keeps (V8Recovery.PRE_IMPORT_PATH) before the fresh save
 	var base: = G.save_path.get_basename()
-	for f in [G.save_path, base + ".bak.json", base + ".tmp.json"]:
+	for f in [G.save_path, base + ".bak.json", base + ".tmp.json", pre_import_path()]:
 		_remove(f)
 	G.S = G.default_state()
 	var nst: = ensure()
@@ -481,6 +488,13 @@ static func request_deletion() -> Dictionary:
 	if G.has_signal("profile_changed"):
 		G.profile_changed.emit()
 	return {"ok": true, "player_id": old}
+
+
+# the 0.8 import backup sits next to the real save; tests with --save=<other> get their own path
+static func pre_import_path() -> String:
+	if G.save_path == G.SAVE_PATH:
+		return V8Recovery.PRE_IMPORT_PATH
+	return G.save_path.get_basename() + ".pre_import.json"
 
 
 static func outbox() -> Array:

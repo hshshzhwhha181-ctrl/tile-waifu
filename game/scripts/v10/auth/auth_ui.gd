@@ -271,10 +271,20 @@ static func welcome(host: Control, hero: String, line: String, y: = -1.0) -> Con
 	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.add_child(bg)
 	var col: Color = G.HEROES.get(hero, G.HEROES.mc).color
-	var glow: = ColorRect.new()
-	glow.color = Color(col, 0.18)
-	glow.position = Vector2(6, 16)
-	glow.size = Vector2(w * 0.42, hh - 22)
+	# heroine-coloured light behind the avatar, fading out to the right (no hard edge across the text)
+	var glow: = TextureRect.new()
+	var gt: = GradientTexture2D.new()
+	gt.fill = GradientTexture2D.FILL_RADIAL
+	gt.fill_from = Vector2(0.14, 0.5)
+	gt.fill_to = Vector2(0.86, 0.5)
+	var gr: = Gradient.new()
+	gr.set_color(0, Color(col, 0.30))
+	gr.set_color(1, Color(col, 0.0))
+	gt.gradient = gr
+	glow.texture = gt
+	glow.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	glow.position = Vector2(6, 6)
+	glow.size = Vector2(w * 0.6, hh - 22)
 	glow.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	bg.add_child(glow)
 	var av: = Common.avatar(hero, Rect2(10, 0, 118, 118))
