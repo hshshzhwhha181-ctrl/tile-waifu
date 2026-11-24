@@ -48,7 +48,7 @@
 
 Из `HEROINES.md` §4 и `ART_DIRECTION_v2.md`:
 - все богини явно взрослые: в промпте `adult woman`, зрелое лицо, 7,5 головы;
-- нет наготы, белья как наряда, просвечивающей ткани, сексуальных действий и их имитации;
+- нет наготы, белья как наряда, просвечивающей ткани на интимных зонах (прозрачный легвир в APK разрешён по `LEGWEAR.md` §1; лиф, бёдра под юбкой и юбка всегда непрозрачны), сексуальных действий и их имитации;
 - нет школы и «учитель — ученик»;
 - **позы:** нельзя лёжа, на четвереньках, с прогибом спины, ноги врозь к камере, тянуть ворот или подол, «прикрываться», сидеть на столе;
 - **камера:** на юбках и платьях не ниже уровня талии, наклон вверх не больше 10°. Низкий ракурс только в брюках, комбинезоне или доспехе (у нас это Кира). Нет камеры, которая разглядывает тело, нет крупных планов груди, ягодиц и паха, нет ракурса «под юбку»;
@@ -136,6 +136,10 @@
 | vesper | музыкальный салон замка | только свечи, рубиновый витраж от огня снаружи | длинная диагональ, портьера на переднем плане |
 | sigrid | замёрзшее горное озеро | полярная ночь, рим сияния | профиль, следящая камера, пустой лёд |
 
+### 0.7 Ножки и горячие жесты
+
+Легвир всех нарядов (коды `LW01…LW87`), ножные и «горячие» жесты, правки поз-витрин и `allure` — в **`LEGWEAR.md`** (источник правды по ногам, заменяет `POSES_HOT.md` §5). В каждой карточке ниже строка «Ножки и горячие жесты» даёт id жестов богини. Жесты стоп (`framing: full`) играют только в кадре «В рост», `allure`, выборе наряда, галерее, раскрытии, победе и ульте. `leg_recross`, `ankle_swap`, `kick_back`, `calf_glide` — только видео.
+
 ### 0.6 Что исправлено
 
 - **45 групп столкновений критика** (30 по позам и привычкам, 4 по окружению, 5 по свету, 6 по кадру) и **16 замечаний** «шаблонно / красная линия». Решения критика приняты, где он оставлял позу одной богине.
@@ -185,6 +189,7 @@
 **Кадр.** Взгляд соперника через стол: внизу кадра всегда сукно, стенка фишек или спинка стула. Камера на высоте глаз сидящего игрока (на уровне её ключиц), вверх не больше 5°. От колен, она по центру или чуть правее, хвосты уходят за верхний край.
 `opponent's point of view across the mahjong table, green felt and a wall of blank tiles in the lower foreground, camera at a seated player's eye level, tilt up under 5 degrees, knees-up, she is centered or slightly right, twin tails crossing the top edge`
 **Анимация.** Перекатывает фишку по костяшкам, стучит ею по краю стола «раз-два», хвосты пружинят при переносе веса, ревниво косится за край кадра и тут же возвращает взгляд, привстаёт на носки в азарте.
+**Ножки и горячие жесты** (`LEGWEAR.md` §3, §4.3 п. 1): LW01–LW07; витрина `select`, `tease`. Жесты: `mc.knee_in_heel` (18+), `mc.shoe_dangle` (18+), `mc.table_hip_slide`, `mc.scale_glint`, `mc.ribbon_tug`; у всех также `leg_idle`, `sheen_sweep`, `ornament_sway`.
 **Взгляд через плечо:** только в `o_dragon` — уходит по алой дорожке, раскрытый веер за головой (кадр выше талии).
 
 ---
@@ -217,6 +222,7 @@
 **Кадр.** Вне центра, на правой трети. Сильные вертикали стеллажей параллельны краям кадра, над головой много пустого пространства, это подчёркивает рост. Камера ровно на уровне глаз, от середины голени.
 `she stands on the right third, strong vertical shelf lines parallel to the frame edges, tall empty space above her head, camera level at her eye height, framed from mid-shin`
 **Анимация.** Моргает вдвое реже остальных; струйка над пиалой закручивается; подносит пиалу к губам и опускает, так и не отпив; блик скользит по очкам; перебирает кончик косы; сидя раз неторопливо перекладывает ногу.
+**Ножки и горячие жесты** (`LEGWEAR.md` §3, §4.3 п. 2): LW08–LW14; `idle` статичен, `allure` стоя между стеллажами. Жесты: `rin.leg_recross` (18+, V, только r_after), `rin.shoe_dangle` (18+), `rin.seam_glance`, `rin.over_glasses`, `rin.idol_ankle_bow`; у всех также `leg_idle`, `sheen_sweep`, `ornament_sway`.
 **Взгляд через плечо:** только в `r_agent` — очки вспыхивают, как прицел (кадр выше талии).
 
 ---
@@ -249,6 +255,7 @@
 **Кадр.** Спортивная проводка: кадр от колен, камера ведёт её, фон смазан по горизонтали. Горизонт ровный, на уровне глаз.
 `sports panning shot, knees-up, background streaked with horizontal motion blur while she stays sharp, level horizon, eye-level camera`
 **Анимация.** Пружинит на носках, встряхивает каре и смеётся, крутит подсолнух за стебель, косится на секундомер, вращает стопу, разминая щиколотку.
+**Ножки и горячие жесты** (`LEGWEAR.md` §3, §4.3 п. 3): LW15–LW21; витрина `idle`. Жесты: `ha.sock_pullup`, `ha.bounce_toes`, `ha.heel_wobble`, `ha.kick_back` (V), `ha.tape_press`, `ha.lunge_lean` (таз в профиль); у всех также `leg_idle`, `sheen_sweep`, `ornament_sway`.
 **Взгляд через плечо:** нет.
 
 ---
@@ -281,6 +288,7 @@
 **Кадр.** Камера на уровне её глаз, но она стоит высоко и занимает верхние две трети, внизу пустое небо и облака. Диск луны всегда за головой, как нимб. Длинная вертикаль от середины голени, рукава и волосы уходят за край.
 `she occupies the upper two thirds of the frame above empty clouds, the full-moon disc directly behind her head like a halo, camera at her eye level, long vertical composition from mid-shin, sleeves and hair leaving the frame edges`
 **Анимация.** Медленно обмахивается веером; волосы и рукава дрейфуют вверх, как в невесомости; веер щёлкает, по нему бегут звёзды; лениво прикрывает глаза; колокольчики качаются в такт дыханию.
+**Ножки и горячие жесты** (`LEGWEAR.md` §3, §4.3 п. 4): LW22–LW27; витрина `select`, баннер y_duel. Жесты: `yue.toe_point`, `yue.crossing_glide`, `yue.calf_glide` (18+), `yue.boot_glint`, `yue.weightless`; у всех также `leg_idle`, `sheen_sweep`, `ornament_sway`.
 **Взгляд через плечо:** только в `y_ball` — в повороте вальса, рука на плече невидимого партнёра.
 
 ---
@@ -313,6 +321,7 @@
 **Кадр.** Строго ровно, «экран в экране»: она снята сквозь рамку ЭЛТ-монитора или прямоугольник интерфейса на переднем плане (без текста). Она на левой трети, справа место под голограммы. Плотный кадр от середины бедра, камера на уровне глаз.
 `perfectly level frame-within-a-frame shot through the rectangle of a foreground CRT bezel or HUD panel with no text, she stands on the left third with space for holograms on the right, tight framing from mid-thigh, eye-level camera`
 **Анимация.** Печатает в воздухе; ушки наушников пульсируют в такт; голова кивает; голо-фишка подглючивает; носок отбивает ритм; сдувает прядь асимметричной чёлки.
+**Ножки и горячие жесты** (`LEGWEAR.md` §3, §4.3 п. 5): LW28–LW32; рваный LW28. Жесты: `nv.glitch_nod`, `nv.hip_drop_tap` (только «В рост»), `nv.slash_poke`, `nv.led_pulse`, `nv.holo_shift`; у всех также `leg_idle`, `sheen_sweep`, `ornament_sway`.
 **Взгляд через плечо:** нет.
 
 ---
@@ -345,6 +354,7 @@
 **Кадр.** Ровный горизонт, ультравертикаль: огромное пустое ночное небо занимает больше половины кадра, она в нижней правой трети, шарф идёт диагональю. Кроп от колен.
 `perfectly level horizon, ultra-vertical composition with a huge empty night sky filling over half the frame, she stands in the lower right third, scarf cutting a diagonal, knees-up, eye-level camera`
 **Анимация.** Перекатывает кунай по костяшкам; раз в ~8 с резко поворачивает голову на звук и медленно расслабляется; пятка опорной ноги приподнимается (микробаланс); у ног вьётся дым; шарф и хвост тянутся по ветру.
+**Ножки и горячие жесты** (`LEGWEAR.md` §3, §4.3 п. 6): LW33–LW35; рваный LW35, в `allure` порыва нет. Жесты: `tb.micro_balance`, `tb.freeze_dash`, `tb.sashiko_touch`, `tb.ridge_balance`; у всех также `leg_idle`, `sheen_sweep`, `ornament_sway`.
 **Взгляд через плечо:** только в SSR-наряде — уходит в дым, два пальца подняты в прощании (кадр выше талии).
 
 ---
@@ -377,6 +387,7 @@
 **Кадр.** Взгляд покупателя через прилавок: камера на ~10° выше её глаз, тёплый средний план от середины икры, 3/4. Она на левой трети, по краю кадра мягкий передний план из пирожных.
 `customer's view across the counter, camera about 10 degrees above her eye level, warm medium shot from mid-calf in three-quarter view, she stands on the left third, soft out-of-focus pastries in the foreground edge`
 **Анимация.** Покачивается на «раз-два»; дважды стучит венчиком о миску; сдувает пудру с ладони; пятка выскальзывает из туфельки и возвращается; хвост с лентой подпрыгивает с задержкой.
+**Ножки и горячие жесты** (`LEGWEAR.md` §3, §4.3 п. 7): LW36–LW38; ножные жесты только в кадре «В рост». Жесты: `me.hip_sway`, `me.heel_slip` (18+), `me.tiptoe_reach`, `me.sock_pullup`; у всех также `leg_idle`, `sheen_sweep`, `ornament_sway`.
 **Взгляд через плечо:** нет.
 
 ---
@@ -409,6 +420,7 @@
 **Кадр.** Вне центра, 3/4. Снято сквозь нити бусин на переднем плане, они размывают край кадра. От колен, камера на уровне глаз. Отражений её ног в воде нет.
 `off-center three-quarter view shot through hanging bead strings in the soft foreground, knees-up, eye-level camera, no reflection of her legs in the water`
 **Анимация.** Тремоло пальцев по струнам; жемчужные кисти качаются с задержкой; раз в ~10 с закрывает глаза на 2 с, «слушает»; кончики волос скользят по палубе; рядом раскрывается лотос.
+**Ножки и горячие жесты** (`LEGWEAR.md` §3, §4.3 п. 8): LW39–LW41; разрез как в K, не расширяется. Жесты: `li.slit_step`, `li.lotus_trace` (18+), `li.toe_ripple`, `li.ripple_shimmer`; у всех также `leg_idle`, `sheen_sweep`, `ornament_sway`.
 **Взгляд через плечо:** только `tease` базового наряда.
 
 ---
@@ -441,6 +453,7 @@
 **Кадр.** Классический «ковбойский» кадр вестерна от середины бедра (кобура-высота), камера на уровне глаз, горизонт в нижней трети, она на правой трети, слева небо и каньон. Низкого ракурса нет: на ней шорты.
 `classic western cowboy shot cropped at mid-thigh, eye-level camera, horizon in the lower third, she stands on the right third with sky and canyon on the left`
 **Анимация.** Стучит каблуком в ритм; перекидывает косу; большим пальцем поднимает поля; соломинка покачивается; широко переносит вес; лассо качается на поясе; катится перекати-поле.
+**Ножки и горячие жесты** (`LEGWEAR.md` §3, §4.3 п. 9): LW42–LW44; рваный LW42, `allure` стоя у столба. Жесты: `je.weight_drop_brim`, `je.heel_stomp`, `je.sock_pullup`, `je.ankle_cross`; у всех также `leg_idle`, `sheen_sweep`, `ornament_sway`.
 **Взгляд через плечо:** нет.
 
 ---
@@ -473,6 +486,7 @@
 **Кадр.** В сидячих позах камера на высоте сидящего гостя (~1 м), в стоячих на уровне её глаз, строго горизонтально. Решётка сёдзи работает как графичная рамка, план от колен.
 `camera at a seated guest's height for seated poses and at her eye level for standing poses, perfectly horizontal, the shoji lattice as a graphic frame, close warm framing from the knees`
 **Анимация.** Заправляет прядь за ухо; разглаживает ворот хаори; кивает «м-хм»; вертит журавлика; из чайника идёт пар; раз в ~12 с прячет руки в рукава и вынимает.
+**Ножки и горячие жесты** (`LEGWEAR.md` §3, §4.3 п. 10): LW45–LW47; в `allure` гэта вместе, пар на уровне лица. Жесты: `tu.geta_rock`, `tu.toe_twist`, `tu.knowing_lean`, `tu.steam_sheen`; у всех также `leg_idle`, `sheen_sweep`, `ornament_sway`.
 **Взгляд через плечо:** нет.
 
 ---
@@ -505,6 +519,7 @@
 **Кадр.** Кадр в кадре: столбы ближнего тории режут левый и правый край (это есть только у Кохаку), лестница уходит диагональю вверх. Она на правой трети, хвост заполняет пустоту слева. От колен, 50 мм, уровень глаз.
 `frame within a frame: the two pillars of the nearest torii crop the left and right edges, the stairway climbing diagonally into the depth, she stands on the right third with her tail filling the left, knees-up, 50mm lens, eye level`
 **Анимация.** Хвост ходит восьмёркой и раз в ~8 с дёргается; уши поворачиваются независимо; судзу звякает при наклоне головы; прячет ухмылку краем рукава; огонёк перекатывается с пальца на палец; переступает с носка на носок.
+**Ножки и горячие жесты** (`LEGWEAR.md` §3, §4.3 п. 11): LW48–LW51; бубенцы под коленом, `allure` стоя на ступени. Жесты: `ko.heel_flick`, `ko.pigeon_toe`, `ko.tail_brush`, `ko.bell_chime`, `ko.ofuda_glow`; у всех также `leg_idle`, `sheen_sweep`, `ornament_sway`.
 **Взгляд через плечо:** нет.
 
 ---
@@ -537,6 +552,7 @@
 **Кадр.** Уровень глаз, будто зритель сидит на подушке напротив. Цепи ламп и дуга вуали образуют круглую арку, она стоит вне центра. От середины бедра, корпус фронтальнее, ноги в 3/4, 50 мм.
 `eye-level view as if seated on a cushion opposite her, lamp chains and the arc of the veil forming a circular arch around her placed off-center, framed from mid-thigh, torso more frontal with legs in three-quarter, 50mm lens`
 **Анимация.** Змеиная волна рук малой амплитуды; монисто звенит от покачивания бёдрами (мягкая вторичная физика); перебирает монетки в волосах; браслеты позвякивают; изредка сонно зевает в ладонь; пламя лампы мигает.
+**Ножки и горячие жесты** (`LEGWEAR.md` §3, §4.3 п. 12): LW52–LW55. Жесты: `sh.releve`, `sh.anklet_roll`, `sh.calf_glide` (18+), `sh.hip_eight`, `sh.henna_sheen`; у всех также `leg_idle`, `sheen_sweep`, `ornament_sway`.
 **Взгляд через плечо:** нет.
 
 ---
@@ -569,6 +585,7 @@
 **Кадр.** Уровень глаз (без низкого ракурса), голландский наклон 6–8° синхронно с качкой. Наклон есть только у Мари. Широкий объектив 28 мм, горизонт по диагонали, ванты ведут взгляд к ней. От колен до полного роста.
 `eye-level camera with a 6 to 8 degree Dutch tilt following the ship's roll, 28mm wide lens, diagonal horizon, rigging lines leading to her, framed from the knees to full length`
 **Анимация.** Переносит вес в такт качке (фон качается синхронно); поправляет треуголку двумя пальцами; перо и полы хлопают; щёлкает крышкой компаса; морщится от брызг и смеётся; отгоняет чайку.
+**Ножки и горячие жесты** (`LEGWEAR.md` §3, §4.3 п. 13): LW56–LW59. Жесты: `ma.heel_strike`, `ma.boot_shine`, `ma.sash_wind`, `ma.attention_blush`; у всех также `leg_idle`, `sheen_sweep`, `ornament_sway`.
 **Взгляд через плечо:** только в одном SSR-наряде — у штурвала оглядывается на шторм (кадр выше талии).
 
 ---
@@ -601,6 +618,7 @@
 **Кадр.** Уровень глаз, плотный экшен от середины бедра. Обод ближнего одайко в нижнем левом углу, объектив 35 мм. Палочки и пряди выходят за край кадра (выход за рамку есть только у Хибаны), лёгкие следы движения на палочках.
 `eye-level tight action shot from mid-thigh, rim of a near odaiko in the lower-left foreground, 35mm lens, drumsticks and hair strands breaking past the frame edges, slight motion trails on the sticks`
 **Анимация.** Стучит палочками по воздуху около 120 BPM; крутит палочку; статика поднимает пряди, бегут искры; притопывает на сильную долю; если звука нет 5 с, замирает и оглядывается.
+**Ножки и горячие жесты** (`LEGWEAR.md` §3, §4.3 п. 14): LW60–LW63; рваный только LW63, hi_base цел. Жесты: `hi.beat_stomp`, `hi.bounce_toes`, `hi.rip_knee_beat` (только hi_rock), `hi.raijin_crackle`, `hi.sock_pullup`; у всех также `leg_idle`, `sheen_sweep`, `ornament_sway`.
 **Взгляд через плечо:** нет.
 
 ---
@@ -633,6 +651,7 @@
 **Кадр.** Полный рост, вертикаль. Камера на уровне глаз с соседней ветви на расстоянии, телевик 85 мм. Над головой много воздуха, вертикальный ствол ведёт взгляд, она занимает высокую узкую полосу кадра.
 `full-length vertical shot from a neighboring branch at eye level, 85mm telephoto compression, lots of air above her head, a vertical trunk as a leading line, she fills a tall narrow strip of the frame`
 **Анимация.** Почти неподвижна; уши дёргаются по очереди; моргает медленно; не глядя ловит лист двумя пальцами; поправляет оперение; переносит вес раз в ~10 с; на тап по голове кончики ушей розовеют.
+**Ножки и горячие жесты** (`LEGWEAR.md` §3, §4.3 п. 15): LW64–LW67. Жесты: `ne.weight_shift`, `ne.leaf_on_knee`, `ne.toe_twist`, `ne.vine_bloom`, `ne.feather_sway`; у всех также `leg_idle`, `sheen_sweep`, `ornament_sway`.
 **Взгляд через плечо:** только в одном наряде — опирается на вертикальный лук и оглядывается вдоль ветви (кадр выше талии).
 
 ---
@@ -664,7 +683,8 @@
 `low spring sunrise backlight through the carvings, warm ember underglow from her braid and feathers, cool blue shadow from the river`
 **Кадр.** Строго фронтально и симметрично (это есть только у Златы), камера на уровне глаз, от колен. Она по центру в «раме в раме» из резного наличника или арки гульбища, как на лубке. Без наклона, без диагоналей.
 `strictly frontal and symmetrical icon composition, she stands dead center inside a carved window-frame or gallery arch like a lubok print, camera at eye level, knees-up, no tilt, no diagonals`
-**Анимация.** Отбрасывает косу коротким движением шеи, с кончика сыплются искры; отбивает каблучком такт; перья плаща дышат волной; обмахивается собственным пером; украдкой облизывает губы после блинов.
+**Анимация.** Отбрасывает косу коротким движением шеи, с кончика сыплются искры; отбивает каблучком такт; перья плаща дышат волной; обмахивается собственным пером; смахивает крошку с уголка губ тыльной стороной пальца (облизывание запрещено ROSTER §4.3).
+**Ножки и горячие жесты** (`LEGWEAR.md` §3, §4.3 п. 16): LW68–LW71; `allure` анфас с мантией-крыльями. Жесты: `zl.heel_tap`, `zl.drobushka`, `zl.ember_seam`, `zl.ribbon_ends`; у всех также `leg_idle`, `sheen_sweep`, `ornament_sway`.
 **Взгляд через плечо:** только в одном SSR-наряде — поднимается по ступеням крыльца, коса тянется следом, как хвост кометы (кадр выше талии).
 
 ---
@@ -697,6 +717,7 @@
 **Кадр.** Всегда в полный рост: видны вытянутые носки, ноги не касаются земли. Камера на уровне её груди, без наклона, много воздуха над головой. Она чуть смещена от центра и дрейфует в кадре.
 `always full length with pointed toes visible and feet off the ground, camera at her chest height with no tilt, lots of space above her head for drifting hair and shawl, she drifts slightly off-center`
 **Анимация.** Покачивается вверх-вниз на 6–8 px, как буй; пальцы ног поджимаются и вытягиваются; накручивает жемчуг на палец; хихикает пузырьками; моргает медленно; шаль и волосы отстают на полтакта.
+**Ножки и горячие жесты** (`LEGWEAR.md` §3, §4.3 п. 17): LW72–LW75. Жесты: `mi.mermaid_flutter`, `mi.toe_curl`, `mi.ankle_drift`, `mi.pearl_chime`; у всех также `leg_idle`, `sheen_sweep`, `ornament_sway`.
 **Взгляд через плечо:** нет.
 
 ---
@@ -729,6 +750,7 @@
 **Кадр.** Низкий ракурс 15–20° (на ней комбинезон, правило это допускает; низкий ракурс есть только у Киры), широкоугольник, горизонт **ровный**. На переднем плане крупное железо меха: пальцы, бронеплиты, кабели. Сильная диагональ композиции.
 `dynamic low angle of 15 to 20 degrees, wide-angle lens, level horizon, huge mecha fingers, armor plates and cables in the foreground, strong diagonal composition`
 **Анимация.** Крутит шлем и ловит; стучит по гарнитуре, когда та пищит; пружинит на каблуках; сдувает чёлку уголком рта; хрустит пальцами в перчатках; на внезапный звук застывает в стойке.
+**Ножки и горячие жесты** (`LEGWEAR.md` §3, §4.3 п. 18): LW76–LW79; `lean-back-boot-on-armor` и низкий ракурс только стоя и только ki_base/ki_stealth, в ki_off/ki_dress витрина `rigid-attention-salute`. Жесты: `ki.heel_click`, `ki.salute_stop`, `ki.boot_zip`, `ki.dring_glint`; у всех также `leg_idle`, `sheen_sweep`, `ornament_sway`.
 **Взгляд через плечо:** нет.
 
 ---
@@ -761,6 +783,7 @@
 **Кадр.** Длинная диагональ тела через кадр, длиннофокусное сжатие, тяжёлый передний план из бархатной портьеры или канделябра в расфокусе, виньетирование, как из ложи оперы. Камера на уровне её лица или груди, вверх не больше 5°: она всегда смотрит вниз на зрителя.
 `long diagonal of her body across the frame, telephoto compression, a heavy out-of-focus velvet drape or candelabra in the foreground, theatrical opera-box vignette, camera at her face or chest level with an upward tilt under 5 degrees`
 **Анимация.** Покачивает гранатовый чай в чашке; крутит розу; моргает лениво; сидя перекладывает лодыжки; постукивает пальцем в перчатке по клычку; вуалетка колышется от сквозняка свечей.
+**Ножки и горячие жесты** (`LEGWEAR.md` §3, §4.3 п. 19): LW80–LW83; `allure` у клавесина. Жесты: `ve.ankle_swap` (18+, V), `ve.shoe_dangle` (18+), `ve.toe_point`, `ve.calf_glide` (18+), `ve.lace_trace` (18+); у всех также `leg_idle`, `sheen_sweep`, `ornament_sway`.
 **Взгляд через плечо:** только в одном наряде — у рубинового витража (кадр выше талии).
 
 ---
@@ -793,4 +816,5 @@
 **Кадр.** Профиль или крутые 3/4, как следящая камера на катке. Широкий кадр в полный рост с пустым льдом и небом (негативное пространство), камера строго на уровне глаз. Она ближе к краю кадра, направление движения задаёт горизонталь.
 `side-on tracking shot like a rink camera, full-length wide frame with large negative space of empty ice and sky, camera strictly at eye level, she sits near one edge of the frame moving along the horizontal`
 **Анимация.** Пар дыхания на каждом выдохе; греет пальцы о кружку у талии; покачивается на льду с тонким следом инея; поправляет тиару кончиком пальца; лента сияния течёт; на миг прикрывает глаза от тепла кружки.
+**Ножки и горячие жесты** (`LEGWEAR.md` §3, §4.3 п. 20): LW84–LW87; `allure` Т-позиция у бортика. Жесты: `si.ice_rock`, `si.crossover_glide`, `si.low_attitude`, `si.frost_knee`, `si.glitter_sweep`; у всех также `leg_idle`, `sheen_sweep`, `ornament_sway`.
 **Взгляд через плечо:** нет.
