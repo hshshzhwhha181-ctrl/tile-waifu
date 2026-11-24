@@ -22,6 +22,9 @@ var visual_layer: Control
 var photo: Control
 var cg: TextureRect
 var result: = {"aff": 0, "score": 0, "skipped": false}
+# 0.10 M0: camera cut-out / gesture bar insets (V10Layout), viewport px — like V6StoryScene
+var _st: = 0.0
+var _sb: = 0.0
 
 static func run(data: Dictionary) -> Dictionary:
 	var root: Node = (Engine.get_main_loop() as SceneTree).current_scene
@@ -55,6 +58,9 @@ func play(d: Dictionary) -> Dictionary:
 	W = vs.x
 	H = vs.y
 	size = vs
+	var ins: = V10Layout.safe_insets(vs)
+	_st = float(ins.top)
+	_sb = float(ins.bottom)
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	z_index = 40
 	var args: = OS.get_cmdline_user_args()
@@ -99,11 +105,11 @@ func _build(d: Dictionary) -> void :
 	add_child(visual_layer)
 	var top: = ColorRect.new()
 	top.color = Color(0.04, 0.02, 0.05, 0.6)
-	top.size = Vector2(W, 118)
+	top.size = Vector2(W, 118 + _st)
 	top.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(top)
 	var ttl: = UI.label(d.get("title", ""), 24, Color("ffe7a6"), UI.DARK, 4, "body", 900)
-	ttl.position = Vector2(28, 52)
+	ttl.position = Vector2(28, 52 + _st)
 	ttl.size = Vector2(W - 270, 40)
 	ttl.clip_text = true
 	add_child(ttl)
@@ -118,7 +124,9 @@ func _build(d: Dictionary) -> void :
 		visual_layer.add_child(hero)
 		UI.slide_in(hero, Vector2(0, 60), 0.1 + k * 0.15, 0.6)
 		heroes[h] = hero
-	box = UI.rbox("plum", Rect2(18, H - 300, W - 36, 256), 28, 4, 12)
+	# 0.10 M0: above the bottom inset; on tablets a readable measure (≤ 820) in the middle
+	var bw: = minf(W - 36.0, 820.0)
+	box = UI.rbox("plum", Rect2((W - bw) * 0.5, H - _sb - 300, bw, 256), 28, 4, 12)
 	box.colors(Color(0.13, 0.08, 0.11, 0.95), Color(0.06, 0.04, 0.06, 0.97)).borders(Color("f3dca0"), Color("a8782c"))
 	add_child(box)
 	plate = UI.rbox("pink", Rect2(30, -26, 250, 50), 22, 3, 8)
@@ -127,17 +135,17 @@ func _build(d: Dictionary) -> void :
 	plate.add_child(plate_lbl)
 	txt = UI.label("", 25, Color("fff1dc"), UI.DARK, 2, "body", 800)
 	txt.position = Vector2(30, 40)
-	txt.size = Vector2(W - 100, 180)
+	txt.size = Vector2(bw - 64, 180)
 	txt.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(txt)
 	more = UI.label("▼", 20, Color("ffd98a"))
-	more.position = Vector2(W - 90, 212)
+	more.position = Vector2(bw - 54, 212)
 	box.add_child(more)
 	var mt: = more.create_tween().set_loops()
 	mt.tween_property(more, "position:y", 204.0, 0.45).set_trans(Tween.TRANS_SINE)
 	mt.tween_property(more, "position:y", 212.0, 0.45).set_trans(Tween.TRANS_SINE)
 	UI.slide_in(box, Vector2(0, 60), 0.15, 0.35)
-	var sk: = JButton.make("Пропустить", "glass", Rect2(W - 214, 36, 196, 60), null, 22)
+	var sk: = JButton.make("Пропустить", "glass", Rect2(W - 214, 36 + _st, 196, 60), null, 22)
 	sk.pressed.connect( func():
 		skipping = true
 		tapped = true)
@@ -204,7 +212,7 @@ func _buttons(opts: Array) -> int:
 	var picked: = [-1]
 	more.visible = false
 	var bh: = 96.0 if opts.size() > 2 else 104.0
-	var y: = H - 300 - 30 - opts.size() * bh
+	var y: = H - _sb - 300 - 30 - opts.size() * bh
 	var btns: = []
 	for k in opts.size():
 		var b: = JButton.make(opts[k][0], "gold" if k == 0 else "rose", Rect2(40, y + k * bh, W - 80, bh - 14), null, 23)
@@ -271,7 +279,7 @@ func _photo(item_id: String, cap: String) -> void :
 	photo = Control.new()
 	photo.size = Vector2(pw, ph)
 	photo.pivot_offset = photo.size * 0.5
-	photo.position = Vector2(26, 150)
+	photo.position = Vector2(26, 150 + _st)
 	photo.rotation = -0.06
 	photo.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	visual_layer.add_child(photo)
@@ -352,7 +360,7 @@ func _cg(id: String, focus_x: float) -> void :
 	wide.add_child(bl)
 	var fw: = W - 24.0
 	var fh: = fw * float(tex.get_height()) / float(tex.get_width())
-	var fy: = maxf(130.0, (H - 300.0 - fh) * 0.5 + 40.0)
+	var fy: = maxf(130.0 + _st, (H - _sb - 300.0 - fh) * 0.5 + 40.0)
 	var fr: = UI.rbox("gold", Rect2(6, fy - 6, fw + 12, fh + 12), 18, 3, 10)
 	wide.add_child(fr)
 	var full: = Common.card_art(tex, Rect2(12, fy, fw, fh), Vector2(0.5, 0.5), 1.0, 14)
