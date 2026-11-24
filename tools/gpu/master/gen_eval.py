@@ -3,7 +3,7 @@
 then build contact sheets for the three judges (see EVAL_RUBRIC.md).
 
 Usage (on the GPU box):
-  HF_HOME=/workspace/tw/hf_home python3 gen_eval.py --prompts eval_prompts.json --out /workspace/tw/eval/tw_master_v1 \
+  source hf_env.sh && python3 gen_eval.py --prompts eval_prompts.json --out /workspace/tw/eval/tw_master_v1 \
       --lora base=none --lora s3000=/workspace/tw/output/tw_master_v1/tw_master_v1_000003000.safetensors \
       --lora s6000=/workspace/tw/output/tw_master_v1/tw_master_v1.safetensors@0.8
   --only heroines,e05_...   restrict to categories and/or item ids

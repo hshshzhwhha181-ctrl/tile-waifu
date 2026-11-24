@@ -34,7 +34,8 @@ H200 (134 кр/ч) выгоднее L40S (71 кр/ч) не по цене час�
 ## 2. GPU-бокс
 
 Перед арендой: `gpu_my` — не трогать чужие боксы (UI-LoRA ведёт главный тред). `/workspace` общий для всех боксов,
-наши пути: `/workspace/tw/{kit,data/master_v1,output/tw_master_v*,eval,backups,hf_home,logs}`.
+наши пути: `/workspace/tw/{kit,data/master_v1,output/tw_master_v*,eval,backups,hf_home,logs}`; кэш базовой модели —
+общий `/workspace/tw/base_models` главного треда (`hf_env.sh` находит его сам, повторно 20+ ГБ не качаем).
 
 1. `gpu_rent` (H200 или L40S, `auto_pause_minutes: 60`), `gpu_rental` до статуса working.
 2. Кит (одна команда `gpu_rental_exec`):
@@ -54,7 +55,7 @@ H200 (134 кр/ч) выгоднее L40S (71 кр/ч) не по цене час�
    Остановка только `kill $(cat /workspace/tw/logs/tw_master_v1.pid)`; **никогда** `pkill -f run.py`.
 5. Промежуточный тест (только H200, параллельно обучению) на чекпоинтах 3000 и 4000:
    ```
-   cd /workspace/tw/kit/tools/gpu/master && HF_HOME=/workspace/tw/hf_home nohup python3 gen_eval.py --prompts eval_prompts.json --out /workspace/tw/eval/tw_master_v1 --lora base=none --lora s3000=/workspace/tw/output/tw_master_v1/tw_master_v1_000003000.safetensors > /workspace/tw/logs/eval.log 2>&1 &
+   cd /workspace/tw/kit/tools/gpu/master && source hf_env.sh && nohup python3 gen_eval.py --prompts eval_prompts.json --out /workspace/tw/eval/tw_master_v1 --lora base=none --lora s3000=/workspace/tw/output/tw_master_v1/tw_master_v1_000003000.safetensors > /workspace/tw/logs/eval.log 2>&1 &
    ```
    На L40S — тот же тест после конца обучения: `--lora base=none --lora s3000=… --lora s4000=… --lora s5000=… --lora s6000=…/tw_master_v1.safetensors`,
    затем лучшему шагу ещё `--lora sBEST_w08=…@0.8`.
@@ -72,7 +73,8 @@ H200 (134 кр/ч) выгоднее L40S (71 кр/ч) не по цене час�
 1. `media_upload` (filename `tw_master_v1.zip`, file_input, тот же workspace) → `bash backup_weights.sh tw_master_v1 <лучший_чекпоинт> "<upload_url>"`
    → `UPLOAD_HTTP_200` → `media_confirm`. Копия на постоянном диске: `/workspace/tw/backups/tw_master_v1/` (+ SHA256SUMS).
 2. Ссылку записать в `docs/STYLE_SYSTEM.md`, таблица «Где лежат веса», и отметить боевую версию.
-3. Кэш базовой модели — `/workspace/tw/hf_home` (Z-Image Turbo + адаптер обучения), грузится с `HF_HUB_OFFLINE=1`.
+3. Кэш базовой модели — `/workspace/tw/base_models` (сделан главным тредом) или `/workspace/tw/hf_home`; `cache_base.sh` докачивает
+   только недостающее, запуск без интернета к HF — `TW_OFFLINE=1`.
 
 ## 5. Конец
 

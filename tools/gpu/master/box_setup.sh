@@ -3,7 +3,8 @@
 # Usage (on the box): nohup bash /workspace/tw/kit/tools/gpu/master/box_setup.sh > /workspace/tw/logs/setup.log 2>&1 &
 # Ends with the line SETUP_OK. Safe to re-run. Never git-pulls /workspace/tw/ai-toolkit: another box (UI-LoRA) may use it.
 set -euo pipefail
-export HF_HOME=/workspace/tw/hf_home HF_HUB_ENABLE_HF_TRANSFER=1 PIP_CACHE_DIR=/workspace/tw/pip-cache
+source "$(dirname "$0")/hf_env.sh"
+export PIP_CACHE_DIR=/workspace/tw/pip-cache
 mkdir -p /workspace/tw/logs "$HF_HOME" "$PIP_CACHE_DIR"
 cd /workspace/tw
 if [ ! -d ai-toolkit ]; then

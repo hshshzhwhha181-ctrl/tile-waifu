@@ -27,6 +27,16 @@ LEGWEAR.md (ножки и горячие жесты), POSES.md (уникальн
 Каждый новый одобренный ассет (после аудита) → добавляется в датасет (tools/art/captions_*, docs/concepts) и в элемент героини →
 при накоплении 20–30 новых — переобучение LoRA. Брак в датасет не попадает никогда (двойной аудит анатомии).
 
+## Где лежат веса (бэкапы, HANDOFF §24)
+| что | где | дата |
+|---|---|---|
+| `tw_ui_v1` (`twui style`, 1800 шагов, rank 32, Z-Image Turbo) — **боевая UI-LoRA** + `tw_heroines_v2b` (`twaifu4 style`) — **боевая LoRA героинь**, конфиги обучения, сэмплы | https://d2ol7oe51mr4n9.cloudfront.net/user_3L5lNdYfxsf6b0O0pIlvJXXfClr/2df5fc5c-6fe1-4c1d-aae5-85b1fe68b3c0.zip (340 МБ) | 2026-11-24 |
+| Те же веса на постоянном диске Higgsfield | `/workspace/tw/output/tw_ui_v1/tw_ui_v1.safetensors`, `/workspace/tw/output/tw_heroines_v2b/tw_heroines_v2b.safetensors` | 2026-11-24 |
+| Кэш базовой модели Z-Image Turbo + адаптер обучения ostris | `/workspace/tw/base_models/` (HF-кэш, для офлайн-обучения: `HF_HOME` указать на копию или `--local-dir`) | 2026-11-24 |
+| `tw_master_v1` (`twmaster style`) — мастер-модель всей игры (§4) | после обучения: `/workspace/tw/backups/tw_master_v1/` + ссылка cloudfront (`backup_weights.sh`) | ждёт кредитов |
+Следующие версии (`tw_heroines_v3`, `tw_master_v1`, …) — новым файлом и новой строкой здесь; старые не перезаписывать.
+Отложено до пополнения кредитов: генерация UI-кита `v10-uikit` на tw_ui_v1, витрины комбо v2, обучение tw_heroines_v3 и tw_master_v1.
+
 ## 4. Мастер-модель `tw_master` (вся игра в одном стиле) — HANDOFF §22, §24
 **Статус (2026-11-24 23:00 UTC):** всё подготовлено, обучение отложено до пополнения кредитов (решение владельца: кредиты по приоритету 0.10).
 Порядок запуска — `tools/gpu/master/RUNBOOK.md` (оценка ≈ 400–480 кр с 40 сценами, ≈ 230–300 без сцен).
@@ -53,11 +63,4 @@ Z-Image Turbo, 9 шагов, guidance 0, LoRA `tw_master_vN` с весом 1.0 (
 Героини-основательницы описываются внешностью и именем, как в подписях датасета (элементы Higgsfield на нашем GPU не работают).
 Текст в UI рисует движок, не модель: надписи в генерации — только заглушки.
 
-### Где лежат веса
-| LoRA | Триггер | Постоянный диск (/workspace) | Постоянная ссылка (cloudfront) | Статус |
-|---|---|---|---|---|
-| tw_heroines_v2b | `twaifu4 style` | /workspace/tw/output/tw_heroines_v2b/tw_heroines_v2b.safetensors | нет — сделать `backup_weights.sh` при следующей аренде | боевая для героинь до tw_master |
-| tw_ui_v1 | `twui style` | /workspace/tw/output/tw_ui_v1/ | — (ведёт главный тред) | обучается |
-| tw_master_v1 | `twmaster style` | /workspace/tw/backups/tw_master_v1/ (после обучения) | — | ждёт кредитов |
-| базовая Z-Image Turbo + адаптер | — | /workspace/tw/hf_home (`cache_base.sh`) | — | кэшировать при первой аренде |
-Правило: LoRA не перезаписывать, новая версия — новый номер; `backup_weights.sh` отказывается перезаписать отличающийся бэкап.
+Веса и кэш базовой модели — таблица «Где лежат веса» выше (бэкапы делает `tools/gpu/master/backup_weights.sh`, новая версия — новой строкой).

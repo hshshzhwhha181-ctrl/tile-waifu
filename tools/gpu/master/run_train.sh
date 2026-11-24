@@ -9,7 +9,8 @@
 set -euo pipefail
 KIT=${KIT:-/workspace/tw/kit}
 export NAME=${NAME:-tw_master_v1} DS_NAME=${DS_NAME:-master_v1}
-export HF_HOME=/workspace/tw/hf_home HF_HUB_ENABLE_HF_TRANSFER=1 CC=gcc
+source "$KIT/tools/gpu/master/hf_env.sh"
+export CC=gcc
 mkdir -p /workspace/tw/logs
 RT=/workspace/tw/$NAME.runtime.yaml
 python3 - "$KIT/tools/gpu/master/train_master_v1.yaml" "$RT" <<'EOF'
