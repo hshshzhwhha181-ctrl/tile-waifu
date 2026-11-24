@@ -924,7 +924,7 @@ func pick_partner(level: int) -> void :
 		var u_id: = V9Ults.for_hero(h)
 		var u_name: String = String(V9Ults.get_ult(u_id).get("name", G.SKILLS[h].name))
 		var u_mod: = V9Ults.mod(u_id)
-		var pk_t: String = _t("levels.skill", "Ульта «%s»: %s") % [u_name, String(V9Ults.core(h).get("desc", G.SKILLS[h].desc))]
+		var pk_t: String = _t("levels.skill", "Умение «%s»: %s") % [u_name, String(V9Ults.core(h).get("desc", G.SKILLS[h].desc))]
 		var pk_w: = 452.0 if u_mod == "" else 408.0
 		var pk_fs: = 17
 		while pk_fs > 16 and UI.font("body", 900).get_string_size(pk_t, HORIZONTAL_ALIGNMENT_LEFT, -1, pk_fs).x > pk_w:

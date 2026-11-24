@@ -69,7 +69,7 @@ static func run(play) -> void :
 	_check("need on screen", play.SKILL_NEED == V9Ults.need(G.aff_level(hero), ranked), "%d" % play.SKILL_NEED)
 	_check("start charge", play.skill_charge == clampi(V9Ults.start_charge_for(ult.id, ranked), 0, play.SKILL_NEED - 1), "%d" % play.skill_charge)
 	_check("ranked: no modifier", not ranked or ult.mod == "")
-	_check("stage reads ульта", play.stage.gauge_lbl == null or play.stage.gauge_lbl.text.begins_with("ульта") or play.stage.gauge_lbl.text.begins_with("УЛЬТА"), play.stage.gauge_lbl.text if play.stage.gauge_lbl else "")
+	_check("stage reads умение", play.stage.gauge_lbl == null or play.stage.gauge_lbl.text.begins_with("умение") or play.stage.gauge_lbl.text.begins_with("УМЕНИЕ"), play.stage.gauge_lbl.text if play.stage.gauge_lbl else "")
 
 	# ── 1. core with the auto-target, no clip ──
 	if hero == "rin":

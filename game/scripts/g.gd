@@ -136,7 +136,7 @@ func _build_levels() -> void :
 				"ice": (3 + li) if "ice" in mech else 0, 
 				"hidden": "hidden" in mech, 
 				"reward": {"gems": 100 + n * 10 + st[7] * 60}, 
-				"goal": "Очисти стол и найди осколок портрета: %s" % HEROES[L.shard].name, 
+				"goal": "Очисти стол и найди частичку героини: %s" % HEROES[L.shard].name, 
 				"intro": L.intro, 
 			}
 			V6Worlds.decorate(lv, st, li, si)
@@ -329,7 +329,7 @@ const YAKU: = {
 	"calm": {"name": "Пустой лоток", "rp": 3, "desc": "в лотке не больше двух фишек"}, 
 	"sharp": {"name": "Без промаха", "rp": 2, "desc": "ни одного касания по закрытой"}, 
 	"swift": {"name": "Молния", "rp": 3, "desc": "очень быстрая победа"}, 
-	"riichi": {"name": "Риичи", "rp": 6, "desc": "объявлено и выиграно, награда ×2"}, 
+	"riichi": {"name": "Ва-банк", "rp": 6, "desc": "нажат «Ва-банк» и стол пройден, награда ×2"},  # v10-clarity: was «Риичи» 
 	"dragon": {"name": "Пробуждение дракона", "rp": 4, "desc": "комбо ×7"}, 
 	"goldvein": {"name": "Золотая жила", "rp": 2, "desc": "все золотые пары"}, 
 	"finale": {"name": "Финальный аккорд", "rp": 2, "desc": "последняя пара в комбо"}, 

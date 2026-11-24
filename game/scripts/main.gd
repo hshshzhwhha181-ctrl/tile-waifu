@@ -258,8 +258,8 @@ func _meet_scene(sp: Control, hero: Hero) -> void :
 const SETTINGS_SEG: = [
 	["fx_level", "Эффекты", [["full", "Полные"], ["mid", "Умеренные"], ["min", "Минимум"]],
 		{"full": "Вспышки, тряска, частицы и ауры", "mid": "Без тряски и вспышек по краям экрана", "min": "Только отклик на нажатия"}],
-	["ult_cutin", "Вставки ульт", [["full", "Полностью"], ["short", "Коротко"], ["off", "Выкл"]],
-		{"full": "Полная сцена при первой ульте дня в наряде", "short": "Короткая вставка, меньше секунды", "off": "Только эффект на поле"}],
+	["ult_cutin", "Вставки умений", [["full", "Полностью"], ["short", "Коротко"], ["off", "Выкл"]],
+		{"full": "Полная сцена при первом умении дня в наряде", "short": "Короткая вставка, меньше секунды", "off": "Только эффект на поле"}],
 ]
 
 func settings() -> void :
@@ -330,6 +330,7 @@ func settings() -> void :
 	vl.size = Vector2(592, 24)
 	vl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	p.add_child(vl)
+	V10Clarity.settings_hook(self, p)  # v10-clarity hook: «Фишки и словарь»
 
 
 # one 3-way setting: caption, three segments (the chosen one painted like a selected tab) and a hint line

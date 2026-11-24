@@ -161,6 +161,7 @@ func build(m, args: Dictionary) -> void :
 	_intro()
 	_v8_dev()
 	_v9_dev()
+	V10Clarity.attach_play(self)  # v10-clarity hook: tile bubble, «Фишки» pill, clear goal plate
 
 
 # dev: --v8_win=1 opens the victory window as soon as the table is playable (for screenshots),
@@ -731,7 +732,7 @@ func _speak(kind: String, tapped: = false) -> void :
 	stage.react("smug")
 	stage.say(kind)
 
-const V9_WAIT_LINES: = ["Ульта готова — дай столу улечься.", "Секунду — стол ещё занят.", "Готова! Как только стол оживёт."]
+const V9_WAIT_LINES: = ["Умение готово — дай столу улечься.", "Секунду — стол ещё занят.", "Готова! Как только стол оживёт."]
 
 func _speak_wait() -> void :
 	if now() - _speak_t < 1.6:
@@ -1006,7 +1007,8 @@ func _on_deny(_t: Tile) -> void :
 		stage.flash_emotion("pout")
 	if talk_cd <= 0.0:
 		talk_cd = 5.0
-		_bubble(V6Txt.s("play.blocked"))
+		var why_blocked: = V10Glossary.blocked_reason(board, _t)  # v10-clarity hook: the exact reason (top vs sides)
+		_bubble(why_blocked if why_blocked != "" else V6Txt.s("play.blocked"))
 
 
 func _on_fail() -> void :
@@ -1335,14 +1337,14 @@ func _show_fortune() -> void :
 	var seal: = UI.rbox("plum", Rect2(12, 12, 94, 94), 20, 3, 4)
 	seal.colors(Color(0.42, 0.1, 0.2), Color(0.24, 0.05, 0.12)).borders(Color("ffe7a6"), Color("c58a2c"))
 	card.add_child(seal)
-	seal.add_child(UI.center_label(UI.title("吉", 50, Color("ffe7a6"), Color(0.2, 0.02, 0.08)), Rect2(0, 0, 94, 94)))
+	seal.add_child(V10ClarityIcon.make("glyph:omikuji", 74, Vector2(10, 10)))  # v10-clarity hook (was the kanji 吉)
 	var seal_y: = (root.size.y - 94.0) * 0.5
 	seal.position.y = seal_y
 	var tx: = 118.0
 	var tw_: = root.size.x - tx - 12.0
-	var nm_txt: = "%s · %s" % [fortune.rank, fortune.name]
+	var nm_txt: = V10Glossary.fortune_title(fortune)  # v10-clarity hook: the effect first, not «Великая удача · Ладонь кицунэ»
 	var nf: = 26
-	while nf > 24 and UI.font("title", 900).get_string_size(nm_txt, HORIZONTAL_ALIGNMENT_LEFT, -1, nf).x > tw_:
+	while nf > 20 and UI.font("title", 900).get_string_size(nm_txt, HORIZONTAL_ALIGNMENT_LEFT, -1, nf).x > tw_:
 		nf -= 1
 	if UI.font("title", 900).get_string_size(nm_txt, HORIZONTAL_ALIGNMENT_LEFT, -1, nf).x > tw_:
 		nm_txt = String(fortune.name)
@@ -1387,9 +1389,9 @@ const V8_FORTUNE_SECS: = 2.4
 
 func _v8_fortune_chip() -> void :
 	# a long «Великая удача · <name>» does not fit the plate at 16 px: the rank folds into a small gold star
-	var t: = "%s · %s" % [fortune.rank, fortune.name]
+	var t: = V10Glossary.fortune_chip(fortune)  # v10-clarity hook: «Гадание: Первые 3 пары ×3»
 	if UI.font("body", 900).get_string_size(t, HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x + 36.0 > V8_NOTE_RECT.size.x:
-		t = "★ %s" % fortune.name
+		t = "★ %s" % V10Glossary.fortune_title(fortune)
 	v8_note(t)
 
 func _skill_ready() -> void :
@@ -1398,7 +1400,7 @@ func _skill_ready() -> void :
 	stage.set_charge(SKILL_NEED, SKILL_NEED)
 	# 0.9: «Ульта готова»: the portrait glows (stage), a chime, her line names the ult
 	var nm: = ult.ult_name() if ult else String(G.SKILLS[partner].name)
-	_bubble("Ульта «%s» готова! Коснись меня." % nm)
+	_bubble("Умение «%s» готово! Коснись меня." % nm)  # v10-clarity: «ульта» → «умение»
 	Sfx.play("reveal_sr", 1.3, -4)
 	V9Feel.haptic("match")
 
@@ -1512,8 +1514,8 @@ func _track_set(mid: Vector2) -> void :
 		cat_streak = 0
 		cat_last = -1
 		sets_done.append(c)
-		var nm: String = G.CATS[c][2]
-		_yaku_banner(nm, V6Txt.s("play.set3") + G.CATS[c][3])
+		var nm: String = V10Glossary.label("set.%d" % c)  # v10-clarity hook: «Тройка: цветы», not the bare suit name
+		_yaku_banner(nm, "3 пары подряд · +15")
 		G.S.gems += 15
 		gained += 15
 		Fx.float_text(fx_layer, mid + Vector2(0, -50), "+15", Color("ffd34d"), 36)
@@ -2128,9 +2130,10 @@ func _victory(stars: int, reward: int, secs: float, first: bool) -> void :
 	Fx.burst(wparts, Vector2(W * 0.2, H * 0.14), "petal", 30, Color(1, 0.8, 0.88), 1.5)
 	Fx.burst(wparts, Vector2(W * 0.8, H * 0.14), "petal", 30, Color(1, 0.8, 0.88), 1.5)
 	Fx.burst(wparts, Vector2(W * 0.5, H * 0.12), "sparkle", 40, Color(1, 0.86, 0.5), 1.4)
-	var star_nodes: = v8_res_stars(ctx, V8PlayRules.T.star_rule)
-	v8_res_line(ctx, V8PlayRules.T.stats % [int(secs), boosters_used, fails], 19, UI.INK, 4.0)
+	var star_nodes: = v8_res_stars(ctx, V10Glossary.star_rule())  # v10-clarity hook (was V8PlayRules.T.star_rule)
+	v8_res_line(ctx, V10Glossary.stats_line(secs, boosters_used, fails), 19, UI.INK, 4.0)  # v10-clarity hook (was T.stats)
 	var rw: = v8_res_reward(ctx, 0, "+10 симпатии" if mode != "trial" else "")
+	V10Breakdown.tap_reward(self, rw.row, stars, reward)  # v10-clarity hook: tap the crystals → «из чего сумма»
 	var rr: Control = rw.row
 	var gl: Label = rw.lbl
 	if first and cfg.reward.has("item"):
@@ -2158,7 +2161,7 @@ func _victory(stars: int, reward: int, secs: float, first: bool) -> void :
 	# 0.9: the yaku stamps come after the stars, the reward roll and the rank bar, one per beat
 	_v9_yaku_at = V9_STAR_AT + V9_BEAT * mini(stars, 3) + (0.25 + V9_RANK_FILL if rank_box else 0.5)
 	# (the chip tweens read _v9_yaku_at while they are built, so the computed beat holds; no reset afterwards)
-	ctx.y = _v8_yaku_chips(plate, V8_RES_PAD, ctx.y, pw - V8_RES_PAD * 2.0) + 10.0
+	ctx.y = V10Clarity.victory(self, plate, V8_RES_PAD, ctx.y, pw - V8_RES_PAD * 2.0, stars, reward) + 10.0  # v10-clarity hook (was _v8_yaku_chips)
 	# 0.8: the album chip («Альбом: +N марок») sits inside the panel, right under the yaku, not hanging off its edge
 	var album_y: = -1.0
 	if not (V7Album.st().new as Array).is_empty():

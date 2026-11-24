@@ -6,7 +6,7 @@ extends Node
 
 
 const NAMES: = {
-	"gift": ["Шкатулка", "Собери пару с бантом: внутри случайный подарок."], 
+	"gift": ["Шкатулка", "Собери пару фишек с коробочкой: внутри случайный подарок."],  # v10-clarity: no «бант» (a tile picture) 
 	"lock": ["Замок и ключ", "Фишку под замком не взять. Собери пару с ключом того же цвета, и замки откроются."], 
 	"chain": ["Цепь", "Число на цепи: сколько пар убрать с поля, и она спадёт сама."], 
 	"joker": ["Джокер", "Встаёт в пару к любой фишке в лотке. Второй джокер станет её двойником."], 
@@ -14,7 +14,7 @@ const NAMES: = {
 }
 const EVENTS: = {
 	"starfall": ["Звездопад", "10 секунд каждая пара даёт втрое больше"], 
-	"giftdrop": ["Подарок с неба", "Найди пару с бантом"], 
+	"giftdrop": ["Подарок с неба", "Собери пару с коробочкой"], 
 	"wind": ["Попутный ветер", "Ветер уносит две пары"], 
 	"golden": ["Золотой дождь", "Три пары стали золотыми"], 
 	"challenge": ["Вызов Маджонг-тян", "Собери 3 пары за 12 секунд"], 
@@ -378,11 +378,11 @@ func _streak_reward(mid: Vector2) -> void :
 			txt = "+%d и заряд умения" % (40 + 10 * tier)
 	var W: float = play.size.x
 	# 0.9: the streak plaque goes to the band slot under the board, not over the tiles
-	if play.has_method("v8_notice") and play.v8_notice("Счастливая серия ×%d · %s" % [streak, txt]):
+	if play.has_method("v8_notice") and play.v8_notice("Чистый ритм ×%d · %s" % [streak, txt]):
 		Sfx.play("star1", 1.1, -2)
 		_refresh()
 		return
-	var l: = UI.title("Счастливая серия ×%d" % streak, 38, Color("fff6d8"), Color("3c8a4a"))
+	var l: = UI.title("Чистый ритм ×%d" % streak, 38, Color("fff6d8"), Color("3c8a4a"))
 	l.size = Vector2(560, 64)
 	var sy: float = (play.board_rect.get_center().y + 40.0) if "board_rect" in play else 300.0
 	l.position = Vector2(W * 0.5 - 280, sy)
@@ -447,7 +447,7 @@ func _open_box(pos: Vector2) -> void :
 			txt = "Перемешивание"
 		"skill":
 			icon = "star"
-			txt = "Ульта готова"
+			txt = "Умение готово"
 			if "skill_ready" in play and not play.skill_ready and play.has_method("_skill_ready"):
 				play.skill_charge = int(play.SKILL_NEED) if "SKILL_NEED" in play else 8
 				# 0.8: the heroine says «… готово» once the reward float has faded, not at the same moment
@@ -465,7 +465,7 @@ func _open_box(pos: Vector2) -> void :
 			txt = "+10 симпатии %s" % G.HEROES[h].name
 		"star":
 			icon = "star"
-			txt = "Звёздный миг: 8 с ×2"
+			txt = "Кристаллы ×2 на 8 с"
 			_starfall(8.0, 1.0, false)
 
 	# 0.8: a gift opened in the tray shows its reward over the top of the table and floats down into it,

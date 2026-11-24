@@ -94,7 +94,7 @@ func setup(p) -> V9UltCast:
 
 
 func ult_name() -> String:
-	return String(V9Ults.get_ult(id).get("name", "Ульта"))
+	return String(V9Ults.get_ult(id).get("name", "Умение"))
 
 
 # her shout for this cast: never the line used last time, and never one that only repeats the ult name in the strip
@@ -484,7 +484,7 @@ func _show_pill(pal: Dictionary) -> void :
 	_ring.size = Vector2(68, 68)
 	_ring.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_pill.add_child(_ring)
-	var tl: = UI.label("Ульта «%s»" % ult_name(), 17, Color("ffd98a"), Color(0.1, 0.05, 0.2), 3, "body", 900)
+	var tl: = UI.label("Умение «%s»" % ult_name(), 17, Color("ffd98a"), Color(0.1, 0.05, 0.2), 3, "body", 900)
 	tl.position = Vector2(96, 10)
 	tl.size = Vector2(_pill.size.x - 110, 24)
 	tl.clip_text = true

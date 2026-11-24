@@ -48,7 +48,7 @@ static func victory_hook(p, root: Control, st: int, s: float) -> void :
 	var nw: = V7Album.take_new()
 	if nw.size() > 0:
 		# 0.8: a count, not a list of tile names — the names never fit the left column at 16 px
-		var txt: = "Альбом: +%d %s" % [nw.size(), V8PlayRules.plural(nw.size(), "марка", "марки", "марок")]
+		var txt: = "Коллекция фишек: +%d %s" % [nw.size(), V8PlayRules.plural(nw.size(), "награда", "награды", "наград")]  # v10-clarity (was «Альбом: +N марок»)
 		var ch: = Common.chip(root, V8Art.icon("star"), txt, Rect2(w * 0.5 - 250, by - 56, 500, 44), "plum", 18)
 		ch.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		# 64 px high touch target around the 44 px chip (play._v8_narrow_chip keeps its width in step)
@@ -212,7 +212,7 @@ func _rebuild() -> void :
 		_captions(fd)
 
 func _captions(fd: Dictionary) -> void :
-	var win: String = "Риичи!" if play.riichi else "Победа"
+	var win: String = "Ва-банк!" if play.riichi else "Победа"  # v10-clarity
 	var rib: = Common.ribbon(comp, win, Rect2(W * 0.5 - 210, 54, 420, 86), "pink", 44)
 	rib.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var plate: = UI.rbox("glass", Rect2(W * 0.5 - 280, 150, 560, 150), 24, 3, 10)
