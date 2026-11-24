@@ -28,3 +28,13 @@
 - Площадки: сначала RuStore (APK, размер не ограничиваем), Яндекс Игры после (облегчённый веб-пресет). Решение 2026-11-23.
 - Качество: «всё приятно нажимается, гармонично и дорого» — главный критерий приёмки любой фичи.
 - Владелец разрешил действовать без подтверждений (автоматический режим), включая траты кредитов Higgsfield в пределах баланса.
+
+## Релиз 0.8 (2026-11-24)
+- APK: `TileWaifu-0.8.apk` (0.8.0, versionCode 8, 133 МБ) — в репозиторий не кладётся (лимит GitHub 100 МБ).
+  Постоянная ссылка: https://d2ol7oe51mr4n9.cloudfront.net/user_3L5lNdYfxsf6b0O0pIlvJXXfClr/f64c895e-e41c-492d-bd0f-18c381f74186.zip
+- Подпись: новый ключ CN=Tile Waifu, SHA-256 3c65ad9e…5854 (ключ 0.2–0.7 утерян → 0.8 ставится после удаления 0.7).
+  Ключ передан владельцу файлом; в контейнере лежит в /opt/tw-tools/release.keystore (не в репозитории).
+- Проверки: selftest 240/240, event 84/84, league 1131/1131, profile 13/13, recovery 42/42, fuzz 144 партий без ошибок, playtest PT OK 51 шаг.
+- Сборка: `cd game && GODOT_ANDROID_KEYSTORE_RELEASE_{PATH,USER,PASSWORD} godot --headless --export-release Android ../build/TileWaifu-X.apk`
+  (тулчейн: /opt/tw-tools/setup.sh — Godot 4.5.1, шаблоны Android, SDK 35).
+- Дальше: docs/ROADMAP.md (0.9 «Живая чайная»), docs/HEROINES.md (ульты нарядов, волна 1).
