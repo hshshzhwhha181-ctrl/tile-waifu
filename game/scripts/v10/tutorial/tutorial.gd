@@ -372,7 +372,41 @@ static func fill(s: String) -> String:
 		if b and "slots" in b:
 			slots = int(b.slots)
 	var word: = "место" if slots % 10 == 1 and slots % 100 != 11 else ("места" if slots % 10 in [2, 3, 4] and not (slots % 100 in [12, 13, 14]) else "мест")
-	return s.replace("{slots} места", "%d %s" % [slots, word]).replace("{slots}", str(slots))
+	s = s.replace("{slots} места", "%d %s" % [slots, word]).replace("{slots}", str(slots))
+	# tab names are read from the real navbar, so the lines stay right whatever the integrator names the tabs
+	# (UX_RULES §4.2 renames «Гардероб» → «Героини», «Партия» → «Столы»)
+	if s.find("{tab") >= 0:
+		var names: = []
+		for id in TAB_ORDER:
+			var nm: = tab_name(id)
+			if nm != "":
+				names.append(nm)
+			s = s.replace("{tab:%s}" % id, nm if nm != "" else String(TAB_DEFAULT.get(id, id)))
+		if names.size() >= 2:
+			s = s.replace("{tabs}", ", ".join(names.slice(0, names.size() - 1)) + " и " + names.back())
+		else:
+			s = s.replace("{tabs}", "Чайная, Героини, Столы, Желания и Лавка")
+	return s
+
+
+const TAB_ORDER: = ["home", "collection", "levels", "summon", "shop"]
+const TAB_DEFAULT: = {"home": "Чайная", "collection": "Героини", "levels": "Столы", "summon": "Желания", "shop": "Лавка"}
+
+
+# the visible label of a navbar tab ("" when there is no navbar / no such tab)
+static func tab_name(id: String) -> String:
+	if not active() or inst.main == null or not ("tab_nodes" in inst.main):
+		return ""
+	var c = inst.main.tab_nodes.get(id)
+	if not (c is Node) or not is_instance_valid(c):
+		return ""
+	var l = c.get_node_or_null("L")
+	if l == null:
+		for ch in c.get_children():
+			if ch is Label:
+				l = ch
+				break
+	return String(l.text).strip_edges() if l is Label and String(l.text).strip_edges() != "" else ""
 
 
 # ── gifts ────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -538,6 +572,9 @@ func _pred(name: String) -> bool:
 				and not bool(s.get("flipping")) and (V10TutTarget.usable(s.get("pull1_btn")) or V10TutTarget.usable(s.get("pull10_btn")))
 		"pulled":
 			return int(G.S.get("pulls", 0)) > int(snap.pulls)
+		"pull1_ready":
+			# the gift is ONE wish: never point at a ×10 (the 0.9 «Первый гость» banner has only a discounted ×10)
+			return screen_id == "summon" and s != null and V10TutTarget.usable(s.get("pull1_btn"))
 		"ult_ready":
 			# the ult is taught on the 2nd / 3rd table (spec: when the meter first fills after the first match)
 			return screen_id == "play" and s and int(s.get("lvl")) >= 1 and bool(s.get("skill_ready")) and b != null and b.input_on
@@ -561,7 +598,7 @@ func _pred(name: String) -> bool:
 # all names the data may use (the selftest checks every step / chapter against this list)
 const PREDICATES: = ["first_match", "board_ready", "tile_in_tray", "pair_done", "no_blocked", "victory_shown",
 	"victory_settled", "left_victory", "home_ready", "screen_settled", "screen_play_or_levels", "screen_summon",
-	"screen_collection", "summon_ready", "summon_idle", "pulled", "ult_ready", "ult_used", "ult_skipped",
+	"screen_collection", "summon_ready", "summon_idle", "pulled", "pull1_ready", "ult_ready", "ult_used", "ult_skipped",
 	"after_match1", "after_summon1"]
 
 
@@ -583,6 +620,23 @@ static func register_dyn_all() -> void:
 		return inst._dyn_win_stars() if V10Tutorial.active() else null)
 	V10TutTarget.register_dyn("win_reward", func(c):
 		return inst._dyn_win_reward() if V10Tutorial.active() else null)
+	V10TutTarget.register_dyn("wish_tab", func(c):
+		return inst._dyn_wish_tab() if V10Tutorial.active() else null)
+
+
+# the tab of the first banner that has a single wish (not the newbie ×10-only banner)
+func _dyn_wish_tab():
+	var s = _screen()
+	if s == null or screen_id != "summon":
+		return null
+	for i in G.BANNERS.size():
+		var bb: Dictionary = G.BANNERS[i]
+		if bb.get("newbie", false) or i == int(s.get("banner_i")):
+			continue
+		var n = V10TutTarget.find_text(s, String(bb.get("name", "")))
+		if V10TutTarget.usable(n):
+			return n
+	return null
 
 
 func _dyn_board():

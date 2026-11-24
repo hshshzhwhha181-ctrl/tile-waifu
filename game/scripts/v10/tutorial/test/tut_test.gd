@@ -289,12 +289,16 @@ func _real() -> void:
 	# ── summon (opens at level 4) and the wardrobe
 	G.S.unlocked = 4
 	var g0: = int(G.S.gems)
+	var p0: = int(G.S.get("pulls", 0))
+	var tabs_line: = V10Tutorial.fill("{tabs}")
+	st.check("real: {tabs} read from the navbar", tabs_line.begins_with("Чайная, ") and tabs_line.find("{") < 0 and tabs_line.find(" и ") > 0, tabs_line)
 	await go("modes")
 	await go("home")
 	var ok4: = await drive(func(): return V10TutState.chapter_done("summon1"), 200.0)
 	st.check("real: summon chapter finished", ok4)
 	st.check("real: first wish gift given once", V10TutState.gift_given("first_wish"))
 	st.check("real: wish pulled", int(G.S.pulls) >= 1)
+	st.check("real: the gift is ONE wish (the finger never sends a ×10)", int(G.S.pulls) - p0 == 1, "%d" % (int(G.S.pulls) - p0))
 	for sid in ["s_go", "s_rates", "s_pull", "s_wardrobe"]:
 		st.check("real: step %s shown" % sid, shown_steps.has(sid))
 	var ok5: = await drive(func(): return V10TutState.chapter_done("wardrobe1"), 90.0)

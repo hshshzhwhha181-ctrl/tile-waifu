@@ -132,7 +132,8 @@ func data_checks() -> void:
 	check("shop tip speaker is the neutral guide", String(V10TutTips.topic("shop").get("speaker", "mc")) == "guide")
 	# every feature the owner listed has a topic
 	for need in ["path", "salon", "phone", "gacha", "shop", "profile", "tile_themes", "pagoda", "journey", "palm", "duels",
-			"modes", "rituals", "leagues", "events", "room", "settings", "basics", "tray", "combo", "helpers", "victory", "home", "wardrobe"]:
+			"modes", "rituals", "leagues", "events", "room", "settings", "basics", "tray", "combo", "helpers", "victory", "home", "wardrobe",
+			"today", "flame", "challenge", "constellation"]:
 		check("topic %s exists" % need, tids.has(need))
 
 
@@ -372,4 +373,26 @@ func state_checks() -> void:
 	V10TutState.set_large(false)
 	check("text_large off → 1.0", is_equal_approx(V10TutState.text_scale(), 1.0))
 	check("{slots} plural", V10Tutorial.fill("всего {slots} места") == "всего 4 места")
+	check("{tabs} without a navbar", V10Tutorial.fill("Внизу: {tabs}.") == "Внизу: Чайная, Героини, Столы, Желания и Лавка.")
+	check("{tab:id} without a navbar", V10Tutorial.fill("«{tab:collection}»") == "«Героини»")
+	# UX_RULES §4.2/§4.3: no banned / renamed words in any visible tutorial line
+	for e in V10TutSteps.all_steps():
+		_ux_words("step " + String(e.step.id), String(e.step.get("text", "")))
+	for c in V10TutSteps.CHAPTERS:
+		_ux_words("chapter " + String(c.id), String(c.get("title", "")))
+	for tp in V10TutTips.TOPICS:
+		_ux_words("tip " + String(tp.id), String(tp.get("tip", "")) + " " + String(tp.get("help", "")) + " " + String(tp.get("title", "")))
+	for c in V10TutTips.CATS:
+		_ux_words("cat " + String(c[0]), String(c[1]))
 	V10TutState.override_s = null
+
+
+# UX_RULES §4.2 «было» and §4.3 jargon (lower-case word stems; a tutorial line must use the 0.10 names)
+const UX_BANNED: = ["ульт", "гардероб", "сесть за стол", "следующая партия", "поручени", "визит", "ивент", "богин",
+	"квартал", "фивер", "лихорадк", "перк", "гарант", "крутк", "гача", "донат", "успей", "последний шанс", "ранг наряд"]
+
+
+func _ux_words(owner: String, txt: String) -> void:
+	var low: = txt.to_lower()
+	for w in UX_BANNED:
+		check("%s UX_RULES no «%s»" % [owner, w], not (w in low), txt.substr(0, 60))
