@@ -350,10 +350,18 @@ static func ctx_from_save(S: Dictionary) -> Dictionary:
 	var cos = S.get("v10_cos_owned", {})
 	ctx.cos_owned = (cos as Dictionary).duplicate() if cos is Dictionary else {}
 	var shards = S.get("shards", {})
+	# same rule as G.hero_unlocked: mc, 5 shards, or owning any item of hers (a bought / summoned outfit)
+	var item_heroes: = {}
+	if g_ok:
+		for id in ctx.owned:
+			if ctx.owned[id] and G.ITEM.has(id):
+				item_heroes[String(G.ITEM[id].get("hero", ""))] = true
+	var v10h = S.get("v10_heroes", {})
 	for h in ROSTER:
 		if not released(h):
 			continue
-		if h == "mc" or (shards is Dictionary and int(shards.get(h, 0)) >= 5) or bool(S.get("v10_heroes", {}).get(h, false)):
+		if h == "mc" or (shards is Dictionary and int(shards.get(h, 0)) >= 5) or item_heroes.has(h) \
+				or (v10h is Dictionary and bool(v10h.get(h, false))):
 			ctx.heroes[h] = true
 	var aff = S.get("aff", {})
 	var aff_max: = 0
@@ -544,6 +552,18 @@ static func mark_seen(S: Dictionary, id: String) -> void:
 	if not (S.get("v10_cos_seen") is Dictionary):
 		S["v10_cos_seen"] = {}
 	S.v10_cos_seen[id] = true
+
+
+# first run of 0.10 on an old save: everything already unlocked counts as seen (no toast / dot storm for veterans).
+# Returns false when S.v10_cos_seen already existed (nothing done).
+static func seed_seen(S: Dictionary, ctx: Dictionary) -> bool:
+	if S.get("v10_cos_seen") is Dictionary:
+		return false
+	S["v10_cos_seen"] = {}
+	for e in all():
+		if is_unlocked(e.id, ctx):
+			S.v10_cos_seen[e.id] = true
+	return true
 
 
 # ================================================================== selection

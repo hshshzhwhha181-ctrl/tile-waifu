@@ -14,7 +14,7 @@
 | `frame_view.gd` + `frame_fx.gdshader` | `V10FrameView` | Аватар в рамке: расписные рамки 0.8 (`frame/avatar`, `frame/avatar_top`) + перекраска шейдером (золото / сакура / аметист, светотень сохраняется) + декор кодом (лавр, листья, камни, жемчуг, звёзды, цветы, иней, солнце, луна, схема, пламя, табличка I–X / S1 / 2027) + ореол и блик. Анимация выключена при fx «минимум» и в строках лиги |
 | `card_bg.gdshader` | — | Фон карточки: скруглённая маска, обрезка по фокусу, мягкий блюр, затемнение к низу, виньетка, медленный дрейф |
 | `card_editor.gd` | `V10CardEditor` | «Оформить карточку»: живой превью «Так тебя видят другие», вкладки Рамка · Титул · Витрина · Фон · Значки, закрытое серое с условием, точка «новое», Сохранить / Отмена |
-| `profile2_selftest.gd` (+ `_runner.gd`, `.tscn`) | `V10Profile2Selftest` | `--profile2_selftest=1`: 109 проверок |
+| `profile2_selftest.gd` (+ `_runner.gd`, `.tscn`) | `V10Profile2Selftest` | `--profile2_selftest=1`: 112 проверок |
 | `card_preview.gd` / `.tscn` | — | Рендер PNG образцов под xvfb (3 карточки other, own, строки лиги, весь каталог рамок, редактор) |
 
 ### Каталог (выпущенное / с учётом скрытых)
@@ -44,7 +44,8 @@
    ```gdscript
    var card: = V10CardView.make(V10CardPayload.mine(G.S, {"league": V8League.my_week().league_tier, "games_week": <партий за неделю>}),
        Rect2(x, y, 672, 560), "own")
-   card.edit_requested.connect(func(): V10CardEditor.open(main.overlay, G.S, func(ch): if ch: G.save(); _rebuild()))
+   var ex: = {"league": V8League.my_week().league_tier, "games_week": <партий за неделю>}
+   card.edit_requested.connect(func(): V10CardEditor.open(main.overlay, G.S, func(ch): if ch: G.save(); _rebuild(), ex))
    card.avatar_tapped.connect(_avatar_popup)
    card.showcase_tapped.connect(func(h): <реакция рига/эмоции, БЕЗ V10Bond>)
    ```
@@ -60,16 +61,19 @@
 7. **Выдачи** (`V10ProfileCos.grant(S, id)`): Лавка — `fr_shop_*` после покупки; пропуск — `fr_pass_1`, `fr_pass_plus_1`;
    ДР — `fr_me_2027`, `fr_bday_<h>_2027`; возврат — `fr_back_2027`, `t_back`; «Первый гость» — `fr_own`, `t_own`;
    «Чтение руки» — `fr_palm`, `t_palm`; «Семь встреч» д7 — `cb_evening`. Новые годы ДР, Пагода и т. п. — `V10ProfileCos.register({...})`.
-8. **Тост «новый титул»**: после партии `V10ProfileCos.unseen(G.S, V10ProfileCos.ctx_from_save(G.S))` → для титулов тост с печатью
+8. **Первый запуск 0.10 на старом сейве**: один раз `V10ProfileCos.seed_seen(G.S, V10ProfileCos.ctx_from_save(G.S))` (в миграции / при
+   первом открытии профиля) — всё уже открытое считается увиденным, иначе ветеран получит десятки тостов и точек «новое».
+   **Данные с сервера** (1.0): `V10CardPayload.validate(p) == ""` перед `V10CardView.make` — вид не проверяет типы полей.
+9. **Тост «новый титул»**: после партии `V10ProfileCos.unseen(G.S, V10ProfileCos.ctx_from_save(G.S))` → для титулов тост с печатью
    (`V10CardView._Seal`) → `mark_seen`.
-9. **V10Rank** (ветка экономики): заменить `V10ProfileCos.TIER_COL/TIER_DARK` на `V10Rank.color/…`; подписи A/S/SSR уже в новом стиле.
-10. **Экспорт**: самотест и превью должны оставаться в пакете (урок 0.8.1, `exclude_filter` пуст).
+10. **V10Rank** (ветка экономики): заменить `V10ProfileCos.TIER_COL/TIER_DARK` на `V10Rank.color/…`; подписи A/S/SSR уже в новом стиле.
+11. **Экспорт**: самотест и превью должны оставаться в пакете (урок 0.8.1, `exclude_filter` пуст).
 
 ## Как проверить
 ```bash
 # самотест (headless)
 flock /tmp/tw-godot.lock /opt/tw-tools/godot --headless --path game \
-  res://scripts/v10/profile/profile2_selftest.tscn -- --profile2_selftest=1      # PROFILE2_SELFTEST 109/109, exit 0
+  res://scripts/v10/profile/profile2_selftest.tscn -- --profile2_selftest=1      # PROFILE2_SELFTEST 112/112, exit 0
 # превью PNG (нужен xvfb, в headless пустой рендерер)
 flock /tmp/tw-godot.lock xvfb-run -a -s "-screen 0 1600x1200x24" /opt/tw-tools/godot --path game \
   --rendering-driver opengl3 --audio-driver Dummy res://scripts/v10/profile/card_preview.tscn -- --out=<dir>

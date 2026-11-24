@@ -625,9 +625,17 @@ func _hit(visual: Control, r: Rect2, cb: Callable) -> void:
 	h.mouse_filter = Control.MOUSE_FILTER_STOP
 	h.name = "Hit_" + visual.name
 	h.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	# fire on release inside the area (like JButton): a drag that scrolls the profile never pops hearts
+	var down: = [false, Vector2.ZERO]
 	h.gui_input.connect(func(ev):
-		if ev is InputEventMouseButton and ev.button_index == MOUSE_BUTTON_LEFT and ev.pressed:
-			cb.call())
+		if ev is InputEventMouseButton and ev.button_index == MOUSE_BUTTON_LEFT:
+			if ev.pressed:
+				down[0] = true
+				down[1] = ev.position
+			elif down[0]:
+				down[0] = false
+				if Rect2(Vector2.ZERO, h.size).has_point(ev.position) and ev.position.distance_to(down[1]) < 24.0:
+					cb.call())
 	h.mouse_entered.connect(func():
 		_on_hover(true)
 		if is_instance_valid(visual) and V10FrameView.fx_on():

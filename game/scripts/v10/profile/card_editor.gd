@@ -11,6 +11,7 @@ extends Control
 #     S       the save dictionary: S.profile is edited only on «Сохранить» (V10ProfileCos.select per slot),
 #             S.v10_cos_seen gets every cell the player looked at
 #     on_done(changed: bool) after «Сохранить» / «Отмена»
+#     extra   optional V10CardPayload.mine() extras for the preview ({"league": tier, "games_week": n})
 # Dev: --card_editor_tab=<frame|title|showcase|bg|badges> opens on that tab.
 
 signal done(changed: bool)
@@ -30,13 +31,15 @@ var scroll: ScrollContainer
 var grid: Control
 var hint: Label
 var on_done: Callable
+var extra: = {}
 var _closing: = false
 
 
-static func open(parent: Control, save: Dictionary, cb: Callable = Callable()) -> V10CardEditor:
+static func open(parent: Control, save: Dictionary, cb: Callable = Callable(), preview_extra: = {}) -> V10CardEditor:
 	var ed: = V10CardEditor.new()
 	ed.S = save
 	ed.on_done = cb
+	ed.extra = preview_extra
 	ed.size = parent.size if parent.size != Vector2.ZERO else Vector2(720, 1280)
 	ed.mouse_filter = Control.MOUSE_FILTER_STOP
 	ed.name = "V10CardEditor"
@@ -116,7 +119,7 @@ func payload() -> Dictionary:
 	var p: = V10CardPayload.mine({"profile": work, "rp": S.get("rp", 0), "owned": S.get("owned", {}), "shards": S.get("shards", {}),
 		"aff": S.get("aff", {}), "stats": S.get("stats", {}), "skin": S.get("skin", "s_sakura"), "ostars": S.get("ostars", {}),
 		"v10_cos_owned": S.get("v10_cos_owned", {}), "v10_feats": S.get("v10_feats", {}), "v10_levels": S.get("v10_levels", {}),
-		"v10_streak": S.get("v10_streak", {}), "v10_seasons": S.get("v10_seasons", {}), "v10_heroes": S.get("v10_heroes", {})})
+		"v10_streak": S.get("v10_streak", {}), "v10_seasons": S.get("v10_seasons", {}), "v10_heroes": S.get("v10_heroes", {})}, extra)
 	return p
 
 
@@ -282,10 +285,19 @@ func _cell(it: Dictionary, r: Rect2) -> void:
 		var nd: = UI.rbox("red", Rect2(8, 8, 16, 16), 8, 2, 3)
 		nd.name = "NewDot"
 		c.add_child(nd)
+	# tap = press and release inside the cell without travelling (a scroll drag is not a pick)
+	var down: = [false, Vector2.ZERO, 0]
 	c.gui_input.connect(func(ev):
-		if ev is InputEventMouseButton and ev.button_index == MOUSE_BUTTON_LEFT and not ev.pressed:
-			if Rect2(Vector2.ZERO, c.size).has_point(ev.position):
-				_tap(it, c))
+		if ev is InputEventMouseButton and ev.button_index == MOUSE_BUTTON_LEFT:
+			if ev.pressed:
+				down[0] = true
+				down[1] = ev.global_position
+				down[2] = scroll.scroll_vertical
+			elif down[0]:
+				down[0] = false
+				if Rect2(Vector2.ZERO, c.size).has_point(ev.position) and ev.global_position.distance_to(down[1]) < 24.0 \
+						and absi(scroll.scroll_vertical - int(down[2])) < 12:
+					_tap(it, c))
 
 
 func _tap(it: Dictionary, c: Control) -> void:
@@ -341,6 +353,8 @@ func _finish(save: bool) -> void:
 			S["profile"] = {}
 		var p: Dictionary = S.profile
 		for k in ["frame", "title", "badges", "card_bg", "showcase", "avatar"]:
+			if not work.has(k):
+				continue
 			if JSON.stringify(p.get(k)) != JSON.stringify(work.get(k)):
 				changed = true
 			p[k] = work[k]

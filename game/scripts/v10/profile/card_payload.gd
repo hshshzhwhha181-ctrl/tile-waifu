@@ -42,7 +42,11 @@ static func mine(S: Dictionary, extra: = {}) -> Dictionary:
 	var sub: = 0
 	if _g():
 		sub = int(G.rank_of(int(S.get("rp", 0))).get("sub", 0))
-	var nick: = String(prof.get("nick", "")).strip_edges()
+	var nick: = ""
+	for ch in String(prof.get("nick", "")):
+		if ch.unicode_at(0) >= 32:
+			nick += ch
+	nick = nick.strip_edges()
 	if nick == "":
 		nick = "Гость"
 	var ost = S.get("ostars", {})
@@ -52,9 +56,9 @@ static func mine(S: Dictionary, extra: = {}) -> Dictionary:
 		"badges": (prof.get("badges", []) as Array).duplicate(), "card_bg": String(prof.get("card_bg", d.card_bg)),
 		"showcase": {"hero": String(sc.hero), "outfit": String(sc.outfit), "pose": String(sc.get("pose", "base"))},
 		"rank": {"tier": tier, "sub": sub}, "league": int(extra.get("league", 0)),
-		"stats": {"heroes": int(ctx.stats.get("heroes", 1)), "heroes_total": HEROES_TOTAL,
-			"games_week": int(extra.get("games_week", 0)), "best_combo": int(ctx.stats.get("best_combo", 0))},
-		"ostars": int(ost.get(String(sc.outfit), 0)) if ost is Dictionary else 0,
+		"stats": {"heroes": clampi(int(ctx.stats.get("heroes", 1)), 0, HEROES_TOTAL), "heroes_total": HEROES_TOTAL,
+			"games_week": clampi(int(extra.get("games_week", 0)), 0, 100000), "best_combo": clampi(int(ctx.stats.get("best_combo", 0)), 0, 999)},
+		"ostars": clampi(int(ost.get(String(sc.outfit), 0)), 0, 5) if ost is Dictionary else 0,
 		"tile": String(S.get("skin", "s_sakura")), "sim": false,
 	}
 	if not roster_has(p.avatar):
@@ -63,7 +67,7 @@ static func mine(S: Dictionary, extra: = {}) -> Dictionary:
 		if not p.has(k) or k in ["league"]:
 			p[k] = extra[k]
 	if extra.has("games_week"):
-		p.stats.games_week = int(extra.games_week)
+		p.stats.games_week = clampi(int(extra.games_week), 0, 100000)
 	return p
 
 

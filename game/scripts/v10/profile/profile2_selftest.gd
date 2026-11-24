@@ -154,6 +154,14 @@ static func _unlocks() -> void:
 	check("t_combo" in un and "fr_shop_jade" in un and not ("t_guest" in un), "unseen lists new unlocks, not defaults")
 	V10ProfileCos.mark_seen(s, "t_combo")
 	check(not ("t_combo" in V10ProfileCos.unseen(s, c2)), "mark_seen hides it")
+	# a goddess opened by owning her outfit (bought / summoned) counts, as in G.hero_unlocked
+	var sn: = save_fresh()
+	sn.owned["n_base"] = true
+	check(V10ProfileCos.ctx_from_save(sn).heroes.has("nova"), "goddess unlocked by an owned outfit")
+	# veteran migration: everything already open is seen once, no toast storm; second call is a no-op
+	var sv: = save_mid()
+	var cv: = V10ProfileCos.ctx_from_save(sv)
+	check(V10ProfileCos.seed_seen(sv, cv) and V10ProfileCos.unseen(sv, cv).is_empty() and not V10ProfileCos.seed_seen(sv, cv), "seed_seen marks old unlocks once")
 
 
 static func _selection() -> void:
@@ -202,6 +210,8 @@ static func _payload() -> void:
 	s3.profile.nick = "ОченьДлинныйНик16"
 	var p3: = V10CardPayload.mine(s3)
 	check(V10CardPayload.validate(p3) == "" and String(p3.nick).length() <= 16, "long nick trimmed to 16")
+	s3.profile.nick = "Ник\nс\tпереносом"
+	check(V10CardPayload.validate(V10CardPayload.mine(s3)) == "", "control chars stripped from the nick")
 	var bad: = p.duplicate(true)
 	bad.badges = ["b_first_win", "b_first_win"]
 	check(V10CardPayload.validate(bad) != "", "duplicate badge invalid")
