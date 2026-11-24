@@ -203,7 +203,7 @@ func _process(dt: float) -> void :
 	var alive: = b.combo >= 2 and _left_frac() > 0.0
 	# fever: the full-screen embers of play._fever rose across the tiles; the frame carries it instead
 	var ff = play.get("fever_fx")
-	if ff is CanvasItem and is_instance_valid(ff) and (ff as CanvasItem).visible:
+	if is_instance_valid(ff) and ff is CanvasItem and (ff as CanvasItem).visible:
 		(ff as CanvasItem).visible = false
 	var fev: = _fever_now()
 	if fev != fever_on:
@@ -772,6 +772,9 @@ func _dev_setup() -> void :
 			_dev[kv[0]] = kv[1]
 	# --v9_fx=full|mid|min: «Эффекты» for this dev run (screenshots of each level)
 	if _dev.has("v9_fx") and String(_dev.v9_fx) in G.FX_LEVELS:
+		# a dev run never writes its effect level into the player's save
+		if not String(G.save_path).begins_with("user://dev_"):
+			G.save_path = "user://dev_v9_fx.json"
 		G.set_fx_level(String(_dev.v9_fx))
 	if not (_dev.has("v9_combo_shots") and _dev.has("shots")):
 		_dev = {}

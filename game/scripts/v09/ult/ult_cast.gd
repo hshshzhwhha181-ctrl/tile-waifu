@@ -281,7 +281,8 @@ func begin(auto: = false) -> void :
 	var fever_on: = t0 < float(play.fever_until)
 	play._refresh()
 	V9Feel.press(play.stage, "pop", "button")
-	play.stage.react("big")
+	# a happy beat on the card, not the «big» bounce: that one lifts her out of the frame while the strip plays
+	play.stage.react("combo")
 	var bub = play.stage.bubble_node
 	if bub and is_instance_valid(bub) and not bub.is_queued_for_deletion():
 		bub.queue_free()

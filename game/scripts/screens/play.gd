@@ -1365,8 +1365,8 @@ func _use_skill() -> void :
 
 # dev (screenshots): --v9_ult=1 casts the equipped outfit's ult as soon as the table is playable, auto-target, no
 # aim window. --v9_cutin=full|short|off forces the clip (default full); --v9_ult_shots=0.1,0.5,… saves the clip
-# at those times into --shots=<dir> as <name>_t<ms>.png; --v9_freeze=<s> holds the clip at that time.
-# Dev runs save to a separate file.
+# at those times into --shots=<dir> as <name>_t<ms>.png; --v9_freeze=<s> holds the clip at that time;
+# --v9_mirror=0|1 picks the strip's side; --v9_aim=1 opens the 2 s aim window. Dev runs save to a separate file.
 func _v9_dev() -> void :
 	var a: = {}
 	for x in OS.get_cmdline_user_args():
@@ -1389,6 +1389,9 @@ func _v9_dev() -> void :
 		V9Cutin.dev_shots = Array(String(a.v9_ult_shots).split(",")).map( func(x): return float(x))
 	if a.has("v9_freeze"):
 		V9Cutin.dev_freeze = float(a.v9_freeze)
+	# --v9_mirror=0|1: which way the first strip enters (1 = art on the left, the default first cast)
+	if a.has("v9_mirror"):
+		V9Cutin._mirror_flip = a.v9_mirror != "1"
 	while is_inside_tree() and not board.input_on:
 		await get_tree().create_timer(0.05).timeout
 	if not is_inside_tree():
@@ -2658,7 +2661,7 @@ func _v9_stamp_chip(c: Control, i: int) -> void :
 		V9Feel.haptic("select")
 		var par: Node = c.get_parent()
 		var at: = c.position + c.size * 0.5
-		Fx.ring(par, at, Color(1, 0.9, 0.6, 0.7), 0.55 + c.size.x / 400.0, 0.3)
+		Fx.ring(par, at, Color(1, 0.9, 0.6, 0.6), 0.36 + c.size.x / 700.0, 0.28)
 		Fx.burst(par, at, "sparkle", 8, Color(1, 0.9, 0.6), 0.7))
 	t.chain().tween_property(c, "scale", Vector2.ONE, 0.3).set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
 
@@ -2704,7 +2707,7 @@ func _v9_rank_fill(k: float, box: Control, fill: Control, w0: float, w1: float, 
 		return
 	fill.size.x = lerpf(w0, w1, k)
 	var gl = box.get_meta("gain_lbl") if box.has_meta("gain_lbl") else null
-	if gl is Label and is_instance_valid(gl) and rp_gain > 0:
+	if is_instance_valid(gl) and gl is Label and rp_gain > 0:
 		var v: = int(round(rp_gain * k))
 		if v != int(st[1]):
 			st[1] = v
@@ -2727,7 +2730,7 @@ func _v9_rank_done(box: Control, fill: Control) -> void :
 	Fx.burst(box, tip, "sparkle", 12, Color(1, 0.88, 0.5), 0.8)
 	Sfx.play("sparkle", 1.15, -6.0)
 	var gl = box.get_meta("gain_lbl") if box.has_meta("gain_lbl") else null
-	if gl is Label and is_instance_valid(gl):
+	if is_instance_valid(gl) and gl is Label:
 		UI.punch(gl, 0.14)
 	_v9_shimmer(fill)
 
