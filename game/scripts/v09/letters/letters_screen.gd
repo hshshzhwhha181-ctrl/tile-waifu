@@ -430,8 +430,8 @@ func _answer(p: RBox, l: Dictionary, v: Dictionary, ry: float, fresh: bool) -> v
 	aff.modulate.a = 0.0
 	aff.create_tween().tween_property(aff, "modulate:a", 1.0, 0.25).set_delay(0.45)
 	V9Feel.success(av, "sparkle", 0.8)
-	var at: Vector2 = p.global_position + Vector2(76, ry + 60)
-	Fx.float_text(main.overlay, at + Vector2(40, -40), "+%d ♥" % V9Letters.REPLY_AFF, Color("ffd0e0"), 40)
+	var at: Vector2 = p.global_position + Vector2(76, ry + 82)
+	Fx.float_text(main.overlay, p.global_position + Vector2(pw - 100, ry + 120), "+%d ♥" % V9Letters.REPLY_AFF, Color("ffd0e0"), 40)
 	if V9Feel.can_fx():
 		Fx.burst(main.overlay, at, "heart", maxi(4, int(round(14 * V9Feel.fx_scale()))))
 	Sfx.voice_started.emit(h, str(v.answers[i]), minf(0.4 + str(v.answers[i]).length() * 0.045, 3.0))

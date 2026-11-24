@@ -453,7 +453,7 @@ func _build_affection() -> void :
 
 func _say(text: String) -> void :
 	if live and is_instance_valid(live):
-		live.say(text)
+		live.say(text, "", "", false)
 		return
 	if bubble:
 		bubble.queue_free()

@@ -27,6 +27,7 @@ const EV_TAG: = {"first_win": "Первая победа дня", "combo": "Ре
 const PLAY_SCRIPT: = "res://scripts/screens/play.gd"
 
 static var _installed: = false
+static var _rp_frame: = -1
 
 
 static func st() -> Dictionary:
@@ -58,6 +59,8 @@ static func install() -> void:
 		_installed = true
 		if not G.rank_changed.is_connected(_on_rank):
 			G.rank_changed.connect(_on_rank)
+		if not G.rp_changed.is_connected(_on_rp):
+			G.rp_changed.connect(_on_rp)
 		var tree: = Engine.get_main_loop() as SceneTree
 		if tree and not tree.node_added.is_connected(_on_node):
 			tree.node_added.connect(_on_node)
@@ -80,8 +83,14 @@ static func check_comeback() -> int:
 	return 0
 
 
+# a rank up is news only when points were just earned (G.add_rp emits rp_changed, then rank_changed in the same
+# frame); a restored save (V8Recovery.import_code) emits rank_changed alone and writes no letter
+static func _on_rp(_old: int, _new: int) -> void:
+	_rp_frame = Engine.get_process_frames()
+
+
 static func _on_rank(before: int, after: int) -> void:
-	if after > before:
+	if after > before and _rp_frame == Engine.get_process_frames():
 		queue("rank", {"rank": G.rank_of(int(G.S.get("rp", 0))).title})
 
 

@@ -158,6 +158,14 @@ static func _generator() -> void:
 	check(int(G.S.aff.get(h, 0)) == a0 + V9Letters.REPLY_AFF, "reply: +%d affection" % V9Letters.REPLY_AFF)
 	V9Letters.reply(int(l.id), 0)
 	check(int(G.S.aff.get(h, 0)) == a0 + V9Letters.REPLY_AFF and int(l.reply) == 1, "a letter is answered once")
+	# rank up: only from points just earned, never from a restored save
+	s.pending = []
+	G.rank_changed.emit(0, 6)
+	check(s.pending.is_empty(), "a restored save's rank change writes no letter")
+	G.S.rp = 0
+	G.add_rp(int(G.RANKS[0].per) + 5, "path")
+	check(s.pending.any(func(p): return str(p.ev) == "rank"), "rank up from earned points -> rank letter queued")
+	s.pending = []
 	# storage bound
 	for i in 40:
 		V9Letters._make("first_win", {}, "rin")

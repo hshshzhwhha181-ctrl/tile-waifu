@@ -69,6 +69,9 @@ static func video_wanted(h: String) -> bool:
 
 # the lobby loop over its own first frame; returns the player (null when the stream does not load)
 static func build_video(parent: Control, sz: Vector2) -> VideoStreamPlayer:
+	var stream = load(VIDEO_PATH)
+	if not (stream is VideoStream):
+		return null
 	if ResourceLoader.exists(STILL_PATH):
 		var still: = TextureRect.new()
 		still.texture = load(STILL_PATH)
@@ -78,9 +81,6 @@ static func build_video(parent: Control, sz: Vector2) -> VideoStreamPlayer:
 		still.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		still.name = "V9LobbyStill"
 		parent.add_child(still)
-	var stream = load(VIDEO_PATH)
-	if not (stream is VideoStream):
-		return null
 	var vp: = VideoStreamPlayer.new()
 	vp.name = "V9LobbyVideo"
 	vp.stream = stream
@@ -117,12 +117,21 @@ static func make(h_: Control, mode_: String, opts: Dictionary) -> V9HomeLive:
 			l.video = opts.get("video")
 			l.geom = V9Touch.video_geom()
 	h_.add_child(l)
+	if mode_ == "video" and not G.settings_changed.is_connected(l._on_settings):
+		G.settings_changed.connect(l._on_settings)
 	var args: = OS.get_cmdline_user_args()
 	l.zones_dbg = "--zones=1" in args
 	if "--fps=1" in args:
 		l._build_fps()
 	l.next_micro = randf_range(IDLE_MICRO.x, IDLE_MICRO.y)
 	return l
+
+
+# «Эффекты» turned down while home is open: the loop stops on its first frame (the still under it)
+func _on_settings(key: String) -> void:
+	if key == "fx_level" and video and is_instance_valid(video) and G.fx_level() != "full":
+		video.stop()
+		video.visible = false
 
 
 # ------------------------------------------------------------------ geometry
@@ -338,7 +347,8 @@ func _end_patch() -> void:
 
 # ------------------------------------------------------------------ bubble
 
-func say(text: String, emo: = "", voice: = "") -> void:
+# `talk` = false: the caller already played / announced the line (Sfx.say, V7DayNight.say_home emit voice_started)
+func say(text: String, emo: = "", voice: = "", talk: = true) -> void:
 	if text == "":
 		return
 	if bubble and is_instance_valid(bubble):
@@ -350,13 +360,14 @@ func say(text: String, emo: = "", voice: = "") -> void:
 	bubble = _bubble(text, Vector2(BUBBLE_X, y), emo, with_av)
 	home.set("bubble", bubble)
 	var dur: = minf(0.4 + text.length() * 0.045, 4.0)
-	if voice != "" and G.S.get("sound", true) and G.S.get("voice", true):
+	if talk and voice != "" and G.S.get("sound", true) and G.S.get("voice", true):
 		var st = load(voice)
 		if st is AudioStream and Sfx.voice:
 			Sfx.voice.stream = st
 			Sfx.voice.play()
 			dur = (st as AudioStream).get_length()
-	Sfx.voice_started.emit(hid, text, dur)
+	if talk:
+		Sfx.voice_started.emit(hid, text, dur)
 	var b: = bubble
 	var t: Tween = b.create_tween()
 	t.tween_interval(maxf(3.6, dur + 1.6))

@@ -641,20 +641,20 @@ func _fresh() -> String:
 	if e != "":
 		return e
 	await shot("mail")
-	var card: Control = null
+	var lcard: Control = null
 	for c in main.screen.list.get_children():
 		if str(c.name).begins_with("Letter"):
-			card = c
+			lcard = c
 			break
-	if card != null:
-		e = await tap_node(card, "letter card")
+	if lcard != null:
+		e = await tap_node(lcard, "letter card")
 		if e != "":
 			return e
 		await wait(0.7)
 		await shot("letter")
-		var rb = popup().get_node_or_null("Reply0") if popup() != null else null
-		if rb != null:
-			e = await tap_node(rb, "letter reply")
+		var lrb = popup().get_node_or_null("Reply0") if popup() != null else null
+		if lrb != null:
+			e = await tap_node(lrb, "letter reply")
 			if e != "":
 				return e
 			await wait(0.9)
