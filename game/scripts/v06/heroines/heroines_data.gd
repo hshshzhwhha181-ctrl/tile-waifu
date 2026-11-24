@@ -21,7 +21,7 @@ static func bond_text(h: String) -> String:
 	var parts: = ["Симпатия %d" % G.aff_level(h)]
 	var need: = skill_need(h)
 	if need < 8:
-		parts.append("ульта за %d %s" % [need, V8PlayRules.plural(need, "пару", "пары", "пар")])
+		parts.append("умение за %d %s" % [need, V8PlayRules.plural(need, "пару", "пары", "пар")])
 	var sc: = start_charge(h)
 	if sc > 0:
 		parts.append("наряд +%d" % sc)

@@ -224,8 +224,8 @@ static func my_quarter() -> Dictionary:
 # the place is shown only inside the top 80% of the table. Below that cut a new player sees what the points
 # are for, never «#1 001 из 1 001».
 const Q_SHOW_FRAC: = 0.8
-const Q_HIDDEN: = "Очки ранга идут в рейтинг квартала"
-const Q_HIDDEN_SHORT: = "идут в рейтинг квартала"
+const Q_HIDDEN: = "Очки ранга идут в рейтинг сезона"  # v10-clarity: «квартал» → «сезон»
+const Q_HIDDEN_SHORT: = "идут в рейтинг сезона"
 
 static func quarter_shown(q: Dictionary) -> bool:
 	var place: = int(q.get("place", 0))

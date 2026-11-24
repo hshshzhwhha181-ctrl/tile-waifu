@@ -27,7 +27,8 @@ static func open(host: Node, id: String, extra: = {}) -> V10InfoCard:
 	if e.is_empty():
 		return null
 	var lines: = []
-	lines.append(["За что", String(e.why)])
+	# «За что» only for things you EARN; a tile, a suit, a rank or a league is described («Что это»)
+	lines.append(["За что" if e.cat in ["bonus", "win", "combo", "event", "egg"] else "Что это", String(e.why)])
 	if String(e.how) != "":
 		lines.append(["Как получить снова" if e.cat in ["bonus", "win", "combo", "event", "egg", "fortune"] else "Как это работает", String(e.how)])
 	var rw: String = extra.get("points", "") if extra.get("points", "") != "" else String(e.reward)

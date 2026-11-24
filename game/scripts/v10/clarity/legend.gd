@@ -17,9 +17,9 @@ static func open(host: Node) -> V10Sheet:
 	s.para("Фишка свободна, если сверху на ней пусто и открыт хотя бы один бок — левый или правый. Свободные светлые, зажатые — тусклые.", 19)
 	s.section("Пары и лоток")
 	s.list.add_child(PairDemo.new().setup(cw))
-	s.para("Взятая фишка едет в лоток. Две ОДИНАКОВЫЕ картинки в лотке исчезают. Другие масти и похожие картинки парой не считаются. Полный лоток — беда, держи место свободным.", 19)
+	s.para("Взятая фишка едет в лоток. Две ОДИНАКОВЫЕ картинки в лотке исчезают. Другие масти и похожие картинки парой не считаются. Лоток заполнился — партия проиграна, если не спасти. Держи одно место свободным.", 19)
 	s.section("Масти: цветной уголок")
-	s.para("В правом нижнем углу — метка масти: цвет и значок. С «крупными символами» внутри ещё и номер картинки в масти. Три пары одной масти подряд — бонус «Тройка».", 18, Color("d9cdbf"))
+	s.para("В правом нижнем углу — цветной уголок: цвет и значок масти. Уголок пару НЕ задаёт: пара — только одинаковая картинка. Зачем он: три пары одной масти подряд — бонус «Тройка».", 18, Color("d9cdbf"))
 	for c in G.CATS.size():
 		s.list.add_child(_suit_row(c, cw))
 	s.list.add_child(_size_demo(cw))
@@ -86,7 +86,7 @@ static func _size_demo(cw: float) -> Control:
 	row.custom_minimum_size = Vector2(cw, h)
 	var holder: = Node2D.new()
 	row.add_child(holder)
-	var specs: = [[17, 0, "Обычные метки"], [17, 1, "Крупные символы"]]
+	var specs: = [[17, 0, "Обычный уголок"], [17, 1, "Крупные символы"]]
 	for i in 2:
 		var t: = V10ClarityIcon.mini_tile(int(specs[i][0]))
 		t.scale = Vector2(1.18, 1.18)
@@ -164,7 +164,7 @@ class FreeDemo extends Control:
 			"A": return c + Vector2(-dx, 0)
 			"B": return c
 			"C": return c + Vector2(dx, 0)
-			"D": return c + Vector2(-6, -13) * K + Vector2(0, -2)
+			"D": return c + Vector2(-10, -40) * K
 		return c
 
 	func _reset() -> void:
@@ -181,6 +181,19 @@ class FreeDemo extends Control:
 			tiles[k] = t
 		(tiles.B as Tile).set_free(false, false)
 		(tiles.B as Tile).mat.set_shader_parameter("dim", 1.6)
+		(tiles.A as Tile).set_free(true, false)
+		(tiles.C as Tile).set_free(true, false)
+		(tiles.D as Tile).set_free(true, false)
+		# a soft shadow under the top tile so it reads as lying ON the middle one
+		var sh: = Polygon2D.new()
+		var pd: Vector2 = _pos("D") + Vector2(8, 10) * K
+		var hw: = 40.0 * K
+		var hh: = 42.0 * K
+		sh.polygon = PackedVector2Array([pd + Vector2(-hw, -hh), pd + Vector2(hw, -hh), pd + Vector2(hw, hh), pd + Vector2(-hw, hh)])
+		sh.color = Color(0.05, 0.02, 0.06, 0.35)
+		holder.add_child(sh)
+		holder.move_child(sh, holder.get_child_count() - 2)
+		tiles["shadow"] = sh
 
 	func _say(s: String, col: = Color("ffe7a6")) -> void:
 		cap.text = s
@@ -198,10 +211,12 @@ class FreeDemo extends Control:
 		var tw: = create_tween().set_loops()
 		tw.tween_callback(func():
 			_reset()
-			_say("Средняя фишка зажата: сверху лежит другая", Color("ffb0a8")))
+			_say("Средняя (тусклая) зажата: на ней лежит другая фишка", Color("ffb0a8")))
 		tw.tween_interval(1.9)
 		tw.tween_callback(func():
 			_gone("D", Vector2(0, -60))
+			if tiles.has("shadow") and is_instance_valid(tiles.shadow):
+				tiles.shadow.create_tween().tween_property(tiles.shadow, "modulate:a", 0.0, 0.3)
 			_say("Сверху пусто, но оба бока закрыты — ещё нельзя", Color("ffb0a8")))
 		tw.tween_interval(2.0)
 		tw.tween_callback(func():
@@ -281,7 +296,10 @@ class PairDemo extends Control:
 		var t: Tile = tiles[i]
 		t.press_glint()
 		t.fly_to(slots[slot], 0.88, 0.32, true)
-		cap.text = say
+		var c: = [cap]
+		get_tree().create_timer(0.34).timeout.connect(func():
+			if is_instance_valid(c[0]):
+				(c[0] as Label).text = say)
 
 	func _pop() -> void:
 		for i in [0, 2]:

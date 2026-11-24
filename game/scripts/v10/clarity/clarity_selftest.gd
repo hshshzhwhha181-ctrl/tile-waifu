@@ -129,7 +129,15 @@ func _all(host: Node) -> void:
 		_t(e.cat in V10Glossary.CATS.map(func(c): return c[0]), "%s: unknown cat %s" % [id, e.cat])
 		var k: String = String(e.icon).split("|")[0].split(":")[0]
 		_t(k in kinds, "%s: bad icon spec %s" % [id, e.icon])
-		_t(not ("лёд" in String(e.why).to_lower() or "льд" in String(e.why).to_lower()), "%s: says «лёд» (the tile is «Рубашка»)" % id)
+		# every visible field, not only «за что» (the «перевёртыш · «лёд»» sub slipped through before)
+		var vis: = ("%s|%s|%s|%s|%s" % [nm, e.sub, e.why, e.how, e.reward]).to_lower()
+		_t(not ("лёд" in vis or "льд" in vis), "%s: says «лёд» (the tile is «Рубашка»)" % id)
+		_t(not ("риичи" in vis), "%s: says «риичи» (one name: «Ва-банк»)" % id)
+		_t(not ("№" in vis), "%s: shows a picture number (players paired by digits)" % id)
+		if not (String(id).begins_with("face.") or String(id).begins_with("suit.")):
+			_t(not ("бант" in vis), "%s: says «бант» (Бант is a picture; the gift is «с коробочкой»)" % id)
+		for oldn in ["букет", "небосвод", "сладкоежк", "сокровищниц", "зверинец", "квартал", "осколок", "ульта", "марки", "марок"]:
+			_t(not (oldn in vis), "%s: shows the old name «%s» (one concept — one word)" % [id, oldn])
 	# 4. suits / faces helpers
 	for f in 36:
 		var c: = V10Glossary.suit_of(f)
@@ -170,6 +178,8 @@ func _all(host: Node) -> void:
 			_t(r == "", "free tile has no blocked reason")
 		var d: = V10TileInfo.describe(b, t)
 		_t(String(d.title) != "" and String(d.status) != "", "bubble text for tile %d" % t.face)
+		var dtx: = ("%s %s %s" % [d.sub, " ".join(PackedStringArray(d.lines)), d.status]).to_lower()
+		_t(not ("№" in dtx) and not ("бант" in dtx and t.face != 23), "bubble of tile %d: no number, no «бант» for the gift" % t.face)
 	_t(top_ok, "a covered tile says «Сверху лежит…»")
 	_t(side_ok or b.tiles.all(func(t): return b.is_free(t) or not b.cov[t].filter(func(o): return b.on_board(o)).is_empty()), "a side-locked tile says «…бок»")
 	b.queue_free()
@@ -178,3 +188,24 @@ func _all(host: Node) -> void:
 	_t(V10Glossary.stats_line(72, 1, 0) == "Время 1:12 · Подсказок 1 · Лоток переполнялся 0", "stats line")
 	_t(V10Glossary.bonus_id("set:2") == "set.2" and V10Glossary.bonus_id("clean") == "bonus.clean", "bonus ids")
 	_t(V10Glossary.tip("bonus.calm").begins_with("Аккуратный лоток — "), "tutorial tip line")
+	# 8. one name on the table and the victory screen: «Ва-банк», never «Риичи» (the real mahjong mode keeps it)
+	for k in ["play.riichi", "play.win_riichi", "play.riichi_locked", "play.riichi_burnt", "play.no_yaku", "play.shard"]:
+		var tx: = V6Txt.s(k).to_lower()
+		_t(not ("риичи" in tx or "осколок" in tx), "V6Txt %s still says «%s»" % [k, V6Txt.s(k)])
+	_t(String(G.YAKU.riichi.name) == "Ва-банк", "G.YAKU.riichi is «Ва-банк»")
+	_t(not ("вартал" in V8PlayRules.T.quarter), "the season line says «Сезон»")
+	# 9. «Почему так?» crystals ALWAYS add up to the big number (reward + gained, what play._victory rolls)
+	for c in [[180, 3, false, 0], [180, 3, true, 0], [180, 2, true, 40], [120, 1, false, 75], [0, 0, false, 30]]:
+		var base: int = c[0]
+		var st: int = c[1]
+		var rch: bool = c[2]
+		var gn: int = c[3]
+		var reward: = base + st * 20
+		if rch:
+			reward = reward * 2 + gn
+		var fake: = {"gained": gn, "riichi": rch, "mode": "" if base > 0 else "trial", "cfg": {"reward": {"gems": base}}}
+		var cm: = V10Breakdown.crystal_math(fake, st, reward)
+		_t(int(cm.total) == reward + gn and int(cm.sum) == reward + gn, "crystals add up: %s → %d = %s" % [str(c), reward + gn, cm.text])
+		_t(("%d" % (reward + gn)) in String(cm.text) or reward + gn == 0, "crystal formula ends with the total %d: %s" % [reward + gn, cm.text])
+	# 10. one word per suit
+	_t(V10Glossary.SUIT_LOOK.all(func(l): return String(l.name).to_lower() == String(l.short)), "each suit has ONE name (name == short)")

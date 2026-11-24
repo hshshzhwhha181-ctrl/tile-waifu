@@ -41,7 +41,7 @@ static func _fill(s: V10Sheet, tab: int, focus: String) -> void:
 			var cnt: = -1
 			if cat == "bonus":
 				var yk: String = String(e.get("yaku", ""))
-				cnt = int(G.S.get("yaku_seen", {}).get(yk, 0)) if yk != "" and not yk.begins_with("set") else V10ClarityState.seen_count(e.id)
+				cnt = V10Breakdown.count_for(String(e.id), yk)
 			s.entry_row(e, cnt)
 	if focus_node:
 		var fn: = focus_node

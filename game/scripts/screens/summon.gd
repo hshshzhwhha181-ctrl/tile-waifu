@@ -1039,7 +1039,7 @@ func _showcase(r: Dictionary) -> void :
 		# 0.9: an outfit SSR names its ult (HEROINES.md §5), so the reveal says what the outfit does in a match
 		var un: String = V9Ults.get_ult(String(r.id)).get("name", "")
 		if un != "":
-			var ul: = UI.center_label(UI.label("Ульта «%s»" % un, 20, Color("f4e6ff"), Color(0.2, 0.05, 0.2), 4, "body", 800), Rect2(0, 122, W - 80, 30))
+			var ul: = UI.center_label(UI.label("Умение «%s»" % un, 20, Color("f4e6ff"), Color(0.2, 0.05, 0.2), 4, "body", 800), Rect2(0, 122, W - 80, 30))
 			rib.add_child(ul)
 	if r.get("new", false):
 		var nb: = UI.rbox("red", Rect2(W - 40 - 150, H * 0.42 - ah * 0.5 - 22, 132, 42), 21, 2, 4)

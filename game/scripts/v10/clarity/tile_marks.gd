@@ -4,8 +4,10 @@ extends Node2D
 # Suit marks and state badges on a tile (child of Tile, drawn above the face / back, below the special icons).
 #   suit mark     bottom-right corner: a small silhouette in the suit colour — flower (цветы, pink), star (небо, blue),
 #                 candy (сладости, orange), gem (сокровища, gold), paw (звери, green). Colour AND shape differ, so it
-#                 reads for colour-blind players too. «Крупные символы» (V10ClarityState.big): a bigger silhouette with
-#                 the number of the picture inside its suit (сладости №3 = клубника), so look-alikes never mix up.
+#                 reads for colour-blind players too. «Крупные символы» (V10ClarityState.big): the silhouette twice as
+#                 big. NO number on the tile: playtesters paired «same digits» / «same colour»; the corner is only the suit.
+#   blocked       the mark of a zажатая tile fades with it (marks of lower tiles peeking between upper ones read as
+#                 belonging to nobody); full again once the tile is free or in the tray.
 #                 Bottom-right because a tile on the layer above covers the top-left part of the one below.
 #   gold coin     top-left «×5» on a gold tile (gold tiles never carry a gift, which also lives top-left)
 #   back badge    face-down tiles: «↻» on a frosty back (Рубашка / перевёртыш: tap to flip) vs «?» on the plum back
@@ -29,6 +31,7 @@ var _font: Font
 var _gen: = -1
 var always: = false          # legend / icons: show even when the setting is off
 var big_override: = -1       # -1 = setting, 0 small, 1 big
+var _board: Node = null      # the TrayBoard (tile → tile_layer → board), found once
 
 static func attach(t: Tile) -> V10TileMarks:
 	if t == null or not is_instance_valid(t):
@@ -59,15 +62,36 @@ func _process(_dt: float) -> void:
 	if tile == null or not is_instance_valid(tile):
 		return
 	var back: = tile.back_spr != null and is_instance_valid(tile.back_spr)
-	var s: = "%d|%s|%s|%s|%s|%s|%s|%d" % [tile.face, back, tile.ice > 0, tile.secret, tile.gold, tile.free, tile.face_spr.visible if tile.face_spr else false, gen]
+	var faded: = _faded()
+	var s: = "%d|%s|%s|%s|%s|%s|%s|%d|%s" % [tile.face, back, tile.ice > 0, tile.secret, tile.gold, tile.free, tile.face_spr.visible if tile.face_spr else false, gen, faded]
 	if s != _sig:
 		_sig = s
+		modulate.a = 0.3 if faded else 1.0
 		if back and tile.ice > 0 and not tile.back_spr.has_meta("v10_ice"):
 			tile.back_spr.set_meta("v10_ice", true)
 			var b = tile.back_spr.get("body")
 			if b is CanvasItem and (always or on()):
 				(b as CanvasItem).modulate = (b as CanvasItem).modulate.lerp(ICE_BACK, 0.5)
 		queue_redraw()
+
+# a blocked tile on the table (not in the tray, not a legend / icon tile shown on purpose)
+func _faded() -> bool:
+	if always or not tile.alive or tile.free or tile.pending:
+		return false
+	if _board == null:
+		var n: = tile.get_parent()
+		for i in 3:
+			if n == null:
+				break
+			if n.get("tray") is Array:
+				_board = n
+				break
+			n = n.get_parent()
+		if _board == null:
+			return false
+	if not is_instance_valid(_board):
+		return false
+	return not (_board.tray as Array).has(tile)
 
 func _draw() -> void:
 	if tile == null or not is_instance_valid(tile) or not (always or on()):
@@ -87,9 +111,9 @@ func _draw() -> void:
 	var c: = V10Glossary.suit_of(tile.face)
 	if c >= 0:
 		if bg:
-			draw_suit(self, c, Vector2(HW - 15, HH - 16), 14.0, V10Glossary.face_index(tile.face), _font)
+			draw_suit(self, c, Vector2(HW - 18, HH - 19), 16.0, 0, _font)
 		else:
-			draw_suit(self, c, Vector2(HW - 12, HH - 13), 9.5, 0, _font)
+			draw_suit(self, c, Vector2(HW - 13, HH - 14), 10.5, 0, _font)
 	if tile.gold:
 		_coin(Vector2(-HW + 14, -HH + 14), 13.0 if bg else 11.0)
 

@@ -2,7 +2,7 @@ class_name V10TileInfo
 extends Node
 
 # «Что это за фишка?» in a match:
-#   long press (0.45 s, finger still) on any tile → an info bubble: picture, suit and its number, what it pairs with
+#   long press (0.45 s, finger still) on any tile → an info bubble: picture, its suit (no number), what it pairs with
 #     (only the SAME picture — checked in TrayBoard.tap: x.face == t.face; no flower / season groups in this game),
 #     how many twins are left on the table / in the tray, its special behaviour (gold, рубашка, тайная, замок, ключ,
 #     цепь, джокер, хлопушка, подарок, портрет) and whether it can be taken now — and if not, the exact reason.
@@ -154,7 +154,7 @@ static func describe(b, t: Tile) -> Dictionary:
 		out.num = V10Glossary.face_index(t.face)
 		out.icon = "tile:%d" % t.face
 		if c >= 0:
-			out.sub = "масть «%s» · №%d" % [V10Glossary.SUIT_LOOK[c].short, out.num]
+			out.sub = "масть «%s» · уголок пару не задаёт" % V10Glossary.SUIT_LOOK[c].short
 		var left: = 0
 		var in_tray: = 0
 		if b:
@@ -174,9 +174,15 @@ static func describe(b, t: Tile) -> Dictionary:
 			out.lines.append("Золотая: пара даёт ×5 кристаллов")
 	match kind:
 		"gift":
-			out.lines.append("С бантом: пара откроет подарок с призом")
+			out.lines.append("С коробочкой: пара откроет подарок с призом")
 		"key":
-			out.lines.append("С ключом: пара откроет замки этого цвета")
+			var locks: = 0
+			if b:
+				for o in b.tiles:
+					var so: Dictionary = b.spec.get(o, {})
+					if o.alive and String(so.get("kind", "")) == "lock" and not bool(so.get("open", false)) and so.get("group") == spec.get("group"):
+						locks += 1
+			out.lines.append("С ключом: пара откроет замки того же цвета, что и ключ" + (" (на столе: %d)" % locks if locks > 0 else ""))
 		"lock":
 			out.lines.append("Под замком: " + ("открыт, можно брать" if bool(spec.get("open", false)) else "нужна пара с ключом того же цвета"))
 		"chain":
@@ -210,9 +216,28 @@ func show_for(t: Tile) -> void:
 	var tp: Vector2 = t.get_global_transform_with_canvas().origin
 	tp = play.get_global_transform_with_canvas().affine_inverse() * tp
 	var th: = Tile.TH * float(board.scale.y if board else 1.0)
-	var above: = tp.y - th * 0.5 - h - 14.0 > 120.0
-	var y: = tp.y - th * 0.5 - h - 14.0 if above else tp.y + th * 0.5 + 14.0
-	y = clampf(y, 110.0, play.size.y - h - 20.0)
+	# keep clear of the heroine's card + her line and of the tray (wherever the layout puts it): of «above» and «below»
+	# the tile, take the side that covers less of them; a tie keeps «above»
+	var obst: = []
+	for nm_ in ["stage", "tray_box", "riichi_btn"]:
+		var c = play.get(nm_)
+		if is_instance_valid(c) and c is Control and (c as Control).is_visible_in_tree():
+			var cc: = c as Control
+			obst.append(Rect2(cc.global_position - (play as Control).global_position, cc.size * cc.scale).grow(6.0))
+	var y_up: = clampf(tp.y - th * 0.5 - h - 14.0, 110.0, play.size.y - h - 20.0)
+	var y_dn: = clampf(tp.y + th * 0.5 + 14.0, 110.0, play.size.y - h - 20.0)
+	var x0_: = clampf(tp.x - w * 0.5, 16.0, W - w - 16.0)
+	var cover: = func(yy: float) -> float:
+		var r: = Rect2(x0_, yy, w, h)
+		var a_: = 0.0
+		for o in obst:
+			a_ += r.intersection(o).get_area()
+		# a bubble that would sit on the tile itself (clamped) is the worst
+		if r.has_point(tp):
+			a_ += w * h
+		return a_
+	var above: = float(cover.call(y_up)) <= float(cover.call(y_dn))
+	var y: = y_up if above else y_dn
 	var x: = clampf(tp.x - w * 0.5, 16.0, W - w - 16.0)
 	var bb: = UI.rbox("cream", Rect2(x, y, w, h), 24, 3, 8)
 	bb.borders(Color("ffe7a6"), Color("c58a2c"))
@@ -270,7 +295,8 @@ func show_for(t: Tile) -> void:
 	Sfx.play("pop", 1.25, -6)
 	V9Feel.haptic("select")
 	bubble = bb
-	var me: = bb
+	# capture the bubble in an array: a lambda that captured a freed node logs «Lambda capture … was freed»
+	var me: = [bb]
 	get_tree().create_timer(7.0).timeout.connect(func():
-		if bubble == me:
+		if is_instance_valid(me[0]) and bubble == me[0]:
 			close_bubble())

@@ -177,7 +177,7 @@ func set_charge(cur: int, total: int) -> void :
 	elif gauge:
 		gauge.create_tween().tween_property(gauge, "size:x", maxf(8.0, gauge_w * f), 0.25).set_trans(Tween.TRANS_QUAD)
 		# 0.9: the skill meter is the Ultimate («ульта N/M», ready: tap the portrait)
-		gauge_lbl.text = ("УЛЬТА · КОСНИСЬ" if size.x > 220.0 else "УЛЬТА!") if cur >= need else "ульта %d/%d" % [cur, need]
+		gauge_lbl.text = ("УМЕНИЕ · КОСНИСЬ" if size.x > 220.0 else "УМЕНИЕ!") if cur >= need else "умение %d/%d" % [cur, need]  # v10-clarity: «ульта» → «умение» (Словарь)
 	if cur >= need and not is_ready:
 		_set_ready(true)
 	elif cur < need and is_ready:

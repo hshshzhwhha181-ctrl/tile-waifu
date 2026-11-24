@@ -6,7 +6,7 @@ extends Node
 
 
 const NAMES: = {
-	"gift": ["Шкатулка", "Собери пару с бантом: внутри случайный подарок."], 
+	"gift": ["Шкатулка", "Собери пару фишек с коробочкой: внутри случайный подарок."],  # v10-clarity: no «бант» (a tile picture) 
 	"lock": ["Замок и ключ", "Фишку под замком не взять. Собери пару с ключом того же цвета, и замки откроются."], 
 	"chain": ["Цепь", "Число на цепи: сколько пар убрать с поля, и она спадёт сама."], 
 	"joker": ["Джокер", "Встаёт в пару к любой фишке в лотке. Второй джокер станет её двойником."], 
@@ -14,7 +14,7 @@ const NAMES: = {
 }
 const EVENTS: = {
 	"starfall": ["Звездопад", "10 секунд каждая пара даёт втрое больше"], 
-	"giftdrop": ["Подарок с неба", "Найди пару с бантом"], 
+	"giftdrop": ["Подарок с неба", "Собери пару с коробочкой"], 
 	"wind": ["Попутный ветер", "Ветер уносит две пары"], 
 	"golden": ["Золотой дождь", "Три пары стали золотыми"], 
 	"challenge": ["Вызов Маджонг-тян", "Собери 3 пары за 12 секунд"], 
@@ -447,7 +447,7 @@ func _open_box(pos: Vector2) -> void :
 			txt = "Перемешивание"
 		"skill":
 			icon = "star"
-			txt = "Ульта готова"
+			txt = "Умение готово"
 			if "skill_ready" in play and not play.skill_ready and play.has_method("_skill_ready"):
 				play.skill_charge = int(play.SKILL_NEED) if "SKILL_NEED" in play else 8
 				# 0.8: the heroine says «… готово» once the reward float has faded, not at the same moment

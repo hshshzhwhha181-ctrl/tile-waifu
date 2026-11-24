@@ -101,12 +101,21 @@ static func _tips(play, ti: V10TileInfo) -> void:
 			if is_instance_valid(play) and play.is_inside_tree():
 				_ask_marks(play)
 		return
+	var said: = false
 	if not V10ClarityState.tip_done("longpress") and int(play.lvl) >= 1:
 		if await wait_ready.call():
 			await tree.create_timer(2.5).timeout
 			if is_instance_valid(play) and play.is_inside_tree() and play.has_method("_bubble"):
 				V10ClarityState.mark_tip("longpress")
 				play._bubble("Не знаешь, что за фишка? Подержи на ней палец — расскажу!")
+				said = true
+	# once, said aloud: the coloured corner is NOT the pair (players paired by colour / by the digit)
+	if not V10ClarityState.tip_done("corner") and V10TileMarks.on():
+		if await wait_ready.call():
+			await tree.create_timer(11.0 if said else 2.5).timeout
+			if is_instance_valid(play) and play.is_inside_tree() and play.has_method("_bubble"):
+				V10ClarityState.mark_tip("corner")
+				play._bubble("Цвет уголка — не пара! Пара — только одинаковая картинка.")
 
 static func _ask_marks(play) -> void:
 	var W: float = play.size.x
@@ -143,6 +152,8 @@ static func _ask_marks(play) -> void:
 
 # ── victory ─────────────────────────────────────────────────────────────────────────────────────────────────────
 static func victory(play, plate: Control, x: float, y: float, w: float, stars: int, reward: int) -> float:
+	play.set_meta("v10_win", {"stars": stars, "reward": reward})
+	_victory_words(play, plate)
 	var yy: = V10Breakdown.build(play, plate, x, y, w, stars, reward)
 	var op: = _arg("v10_open")
 	if op in ["why", "card"]:
@@ -157,6 +168,57 @@ static func victory(play, plate: Control, x: float, y: float, w: float, stars: i
 				var id: String = rows[1].id if rows.size() > 1 else "win.base"
 				V10InfoCard.open(play, id, {"points": "+%d очка ранга" % V10Glossary.bonus_points(String(rows[1].yaku)) if rows.size() > 1 else "", "count": 1}))
 	return yy
+
+# the rank card and the weekly-race row above the bonuses: one word per system, and a tap explains it.
+#   rank card «Нефрит I»  → the rank card «Ранг «Нефрит»: …» (it never falls; the league is separate)
+#   «Лига Бамбука · #4 из 20» → «Гонка недели · #4 из 20 · лига Бамбука»; «Квартал: …» → «Сезон: …»; tap → both explained
+static func _victory_words(play, plate: Control) -> void:
+	for c in plate.get_children():
+		if not (c is RBox):
+			continue
+		var box: = c as RBox
+		if box.get_node_or_null("Em") != null and box.has_meta("bar"):
+			var tier: = int(G.rank_of(int(G.S.rp)).tier)
+			_help_dot(box, Vector2(box.size.x - 34, box.size.y - 34))
+			box.mouse_filter = Control.MOUSE_FILTER_STOP
+			V10Breakdown._tappable(box, func(): V10InfoCard.open(play, "rank.%d" % tier, {}))
+			continue
+		var league_lbl: Label = null
+		var season_lbl: Label = null
+		for l in box.get_children():
+			if l is Label:
+				var t: String = (l as Label).text
+				if t.begins_with("Лига ") and " из " in t:
+					league_lbl = l
+				elif "вартал" in t:
+					season_lbl = l
+		if league_lbl == null:
+			continue
+		var t1: String = league_lbl.text
+		var cut: = t1.find(" · ")
+		if cut > 0:
+			var lname: = "лига" + t1.substr(4, cut - 4)
+			var nt: = "Гонка недели · " + t1.substr(cut + 3)
+			var with_league: = nt + " · " + lname
+			var fs: = league_lbl.get_theme_font_size("font_size") if league_lbl.label_settings == null else league_lbl.label_settings.font_size
+			league_lbl.text = with_league if UI.font("body", 900).get_string_size(with_league, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x < league_lbl.size.x - 34.0 else nt
+		if season_lbl:
+			season_lbl.text = season_lbl.text.replace("Квартал", "Сезон").replace("квартала", "сезона").replace("квартал", "сезон")
+		_help_dot(box, Vector2(box.size.x - 34, (box.size.y - 26) * 0.5))
+		box.mouse_filter = Control.MOUSE_FILTER_STOP
+		V10Breakdown._tappable(box, func():
+			var w: = V10Glossary.get_entry("win.week")
+			var se: = V10Glossary.get_entry("win.season")
+			V10InfoCard.open_text(play, "Гонка недели и сезон", "это не ранг", "league:0",
+				[["Гонка недели", "%s. %s" % [w.why, w.how]], ["Сезон", "%s. %s" % [se.why, se.how]],
+				["Ранг", V10Glossary.RANK_WHY]], "", false, "win"))
+
+# a small gold «?» on anything that opens an explanation by a tap
+static func _help_dot(parent: Control, at: Vector2) -> void:
+	var q: = UI.rbox("gold", Rect2(at, Vector2(26, 26)), 13, 1, 2)
+	q.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	parent.add_child(q)
+	q.add_child(UI.center_label(UI.label("?", 17, Color("5a3208"), Color(0, 0, 0, 0), 0, "body", 900), Rect2(0, -1, 26, 26)))
 
 # ── settings ────────────────────────────────────────────────────────────────────────────────────────────────────
 const SETTINGS_EXTRA: = 84.0
@@ -174,7 +236,7 @@ static func settings_hook(main, p: Control) -> void:
 	var l: = UI.label("Фишки и словарь", 26, UI.INK, Color.WHITE, 3, "body", 900)
 	l.position = Vector2(34, y0 + 2)
 	p.add_child(l)
-	var d: = UI.label("Метки мастей, крупные символы, все названия", 17, Color("8a5a7a"))
+	var d: = UI.label("Цветной уголок, крупные символы, все названия", 17, Color("8a5a7a"))
 	d.position = Vector2(34, y0 + 42)
 	p.add_child(d)
 	var b: = JButton.make("Открыть", "lav", Rect2(470, y0 + 8, 158, 64), null, 22)
@@ -188,7 +250,7 @@ static func open_settings(host: Node) -> void:
 	var p: = Common.popup(m, "Фишки и словарь", 880)
 	var y: = 56.0
 	# marks: 3-way
-	var l: = UI.label("Метки мастей на фишках", 25, UI.INK, Color.WHITE, 3, "body", 900)
+	var l: = UI.label("Цветной уголок на фишках", 25, UI.INK, Color.WHITE, 3, "body", 900)
 	l.position = Vector2(34, y)
 	p.add_child(l)
 	var hint: = UI.label("", 17, Color("8a5a7a"))
@@ -196,7 +258,7 @@ static func open_settings(host: Node) -> void:
 	hint.size = Vector2(592, 24)
 	p.add_child(hint)
 	var opts: = [["auto", "Авто"], ["on", "Вкл"], ["off", "Выкл"]]
-	var hints: = {"auto": "Первые 10 столов включены, потом спрошу", "on": "Цветной уголок масти на каждой фишке", "off": "Фишки без меток"}
+	var hints: = {"auto": "Первые 10 столов включены, потом спрошу", "on": "Уголок масти на каждой фишке (пару он не задаёт)", "off": "Фишки без уголков"}
 	var btns: = []
 	var preview: = Node2D.new()
 	var paint: = func():
@@ -219,10 +281,10 @@ static func open_settings(host: Node) -> void:
 		p.add_child(b)
 		btns.append(b)
 	y += 146.0
-	var l2: = UI.label("Крупные символы\nи контрастные масти", 25, UI.INK, Color.WHITE, 3, "body", 900)
+	var l2: = UI.label("Крупные символы\nи контраст", 25, UI.INK, Color.WHITE, 3, "body", 900)
 	l2.position = Vector2(34, y - 4)
 	p.add_child(l2)
-	var d2: = UI.label("Номер в метке, ярче зажатые и свободные", 17, Color("8a5a7a"))
+	var d2: = UI.label("Уголок вдвое крупнее, зажатые фишки темнее", 17, Color("8a5a7a"))
 	d2.position = Vector2(34, y + 72)
 	p.add_child(d2)
 	var on: = V10ClarityState.big()
