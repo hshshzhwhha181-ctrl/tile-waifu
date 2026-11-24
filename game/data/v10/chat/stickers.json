@@ -1,0 +1,64 @@
+{
+ "v": 1,
+ "note": "8 common stickers (everyone) + 8 per heroine (owned; level = affection level needed). Art: 512x512 webp at img (to be drawn, §Р8 «Арт»); until then the UI draws glyph + label in code. mood picks her answer line (reactions.json sticker_<mood>).",
+ "common": [
+  {"id": "c_heart", "label": "Сердечко", "glyph": "♥", "mood": "warm", "img": "res://assets/v10/stickers/c_heart.webp"},
+  {"id": "c_laugh", "label": "Ха-ха", "glyph": "ха", "mood": "fun", "img": "res://assets/v10/stickers/c_laugh.webp"},
+  {"id": "c_wow", "label": "Ого!", "glyph": "!", "mood": "win", "img": "res://assets/v10/stickers/c_wow.webp"},
+  {"id": "c_tea", "label": "Чай?", "glyph": "茶", "mood": "warm", "img": "res://assets/v10/stickers/c_tea.webp"},
+  {"id": "c_fire", "label": "Огонь", "glyph": "✦", "mood": "win", "img": "res://assets/v10/stickers/c_fire.webp"},
+  {"id": "c_thanks", "label": "Спасибо", "glyph": "✿", "mood": "warm", "img": "res://assets/v10/stickers/c_thanks.webp"},
+  {"id": "c_sleepy", "label": "Спокойной ночи", "glyph": "☾", "mood": "tired", "img": "res://assets/v10/stickers/c_sleepy.webp"},
+  {"id": "c_again", "label": "Ещё партию?", "glyph": "東", "mood": "tease", "img": "res://assets/v10/stickers/c_again.webp"}
+ ],
+ "mc": [
+  {"id": "mc_wink", "label": "Подмигивает", "glyph": "★", "mood": "tease", "level": 1, "img": "res://assets/v10/stickers/mc_wink.webp"},
+  {"id": "mc_east", "label": "Фишка 東", "glyph": "東", "mood": "win", "level": 1, "img": "res://assets/v10/stickers/mc_east.webp"},
+  {"id": "mc_pout", "label": "Дуется", "glyph": "ε", "mood": "tease", "level": 1, "img": "res://assets/v10/stickers/mc_pout.webp"},
+  {"id": "mc_proud", "label": "Горжусь!", "glyph": "✓", "mood": "win", "level": 1, "img": "res://assets/v10/stickers/mc_proud.webp"},
+  {"id": "mc_tea", "label": "Чайник готов", "glyph": "茶", "mood": "warm", "level": 1, "img": "res://assets/v10/stickers/mc_tea.webp"},
+  {"id": "mc_gg", "label": "Партия окончена~", "glyph": "~", "mood": "fun", "level": 1, "img": "res://assets/v10/stickers/mc_gg.webp"},
+  {"id": "mc_shy", "label": "Смущена", "glyph": "///", "mood": "warm", "level": 5, "img": "res://assets/v10/stickers/mc_shy.webp"},
+  {"id": "mc_heart", "label": "Хвосты-сердечко", "glyph": "♥", "mood": "warm", "level": 5, "img": "res://assets/v10/stickers/mc_heart.webp"}
+ ],
+ "rin": [
+  {"id": "rin_tea", "label": "Пиала", "glyph": "茶", "mood": "warm", "level": 1, "img": "res://assets/v10/stickers/rin_tea.webp"},
+  {"id": "rin_glasses", "label": "Поправляет очки", "glyph": "◎", "mood": "tease", "level": 1, "img": "res://assets/v10/stickers/rin_glasses.webp"},
+  {"id": "rin_allow", "label": "Позволь.", "glyph": "…", "mood": "warm", "level": 1, "img": "res://assets/v10/stickers/rin_allow.webp"},
+  {"id": "rin_note", "label": "Записываю", "glyph": "✎", "mood": "fun", "level": 1, "img": "res://assets/v10/stickers/rin_note.webp"},
+  {"id": "rin_frown", "label": "Неэффективно", "glyph": "−", "mood": "tease", "level": 1, "img": "res://assets/v10/stickers/rin_frown.webp"},
+  {"id": "rin_more", "label": "Ещё чашку?", "glyph": "+", "mood": "warm", "level": 1, "img": "res://assets/v10/stickers/rin_more.webp"},
+  {"id": "rin_blush", "label": "…Хм", "glyph": "///", "mood": "warm", "level": 5, "img": "res://assets/v10/stickers/rin_blush.webp"},
+  {"id": "rin_smile", "label": "Улыбка", "glyph": "◡", "mood": "win", "level": 5, "img": "res://assets/v10/stickers/rin_smile.webp"}
+ ],
+ "hana": [
+  {"id": "hana_five", "label": "Дай пять!", "glyph": "✋", "mood": "win", "level": 1, "img": "res://assets/v10/stickers/hana_five.webp"},
+  {"id": "hana_start", "label": "На старт!", "glyph": "▶", "mood": "fun", "level": 1, "img": "res://assets/v10/stickers/hana_start.webp"},
+  {"id": "hana_sun", "label": "Подсолнух", "glyph": "✺", "mood": "warm", "level": 1, "img": "res://assets/v10/stickers/hana_sun.webp"},
+  {"id": "hana_rematch", "label": "Реванш!", "glyph": "!!", "mood": "tease", "level": 1, "img": "res://assets/v10/stickers/hana_rematch.webp"},
+  {"id": "hana_run", "label": "Бегу!", "glyph": "»", "mood": "fun", "level": 1, "img": "res://assets/v10/stickers/hana_run.webp"},
+  {"id": "hana_pout", "label": "Нечестно!", "glyph": "ε", "mood": "tease", "level": 1, "img": "res://assets/v10/stickers/hana_pout.webp"},
+  {"id": "hana_blush", "label": "Не смотри так", "glyph": "///", "mood": "warm", "level": 5, "img": "res://assets/v10/stickers/hana_blush.webp"},
+  {"id": "hana_lantern", "label": "Фонарь тебе", "glyph": "◉", "mood": "warm", "level": 5, "img": "res://assets/v10/stickers/hana_lantern.webp"}
+ ],
+ "yue": [
+  {"id": "yue_fan", "label": "Веер", "glyph": "◗", "mood": "tease", "level": 1, "img": "res://assets/v10/stickers/yue_fan.webp"},
+  {"id": "yue_curious", "label": "Любопытно…", "glyph": "?", "mood": "fun", "level": 1, "img": "res://assets/v10/stickers/yue_curious.webp"},
+  {"id": "yue_moon", "label": "Полумесяц", "glyph": "☾", "mood": "tired", "level": 1, "img": "res://assets/v10/stickers/yue_moon.webp"},
+  {"id": "yue_throne", "label": "Сверху вниз", "glyph": "♛", "mood": "win", "level": 1, "img": "res://assets/v10/stickers/yue_throne.webp"},
+  {"id": "yue_tea", "label": "Сливовый чай", "glyph": "茶", "mood": "warm", "level": 1, "img": "res://assets/v10/stickers/yue_tea.webp"},
+  {"id": "yue_smirk", "label": "Усмешка", "glyph": "◝", "mood": "tease", "level": 1, "img": "res://assets/v10/stickers/yue_smirk.webp"},
+  {"id": "yue_soft", "label": "Тёплый взгляд", "glyph": "◡", "mood": "warm", "level": 5, "img": "res://assets/v10/stickers/yue_soft.webp"},
+  {"id": "yue_waltz", "label": "Вальс?", "glyph": "♪", "mood": "warm", "level": 5, "img": "res://assets/v10/stickers/yue_waltz.webp"}
+ ],
+ "nova": [
+  {"id": "nova_dl", "label": "Скачано.", "glyph": "↓", "mood": "win", "level": 1, "img": "res://assets/v10/stickers/nova_dl.webp"},
+  {"id": "nova_ping", "label": "ping", "glyph": ">", "mood": "fun", "level": 1, "img": "res://assets/v10/stickers/nova_ping.webp"},
+  {"id": "nova_holo", "label": "Голо-фишка", "glyph": "◇", "mood": "fun", "level": 1, "img": "res://assets/v10/stickers/nova_holo.webp"},
+  {"id": "nova_glitch", "label": "Глитч", "glyph": "#", "mood": "tease", "level": 1, "img": "res://assets/v10/stickers/nova_glitch.webp"},
+  {"id": "nova_bike", "label": "Форсаж", "glyph": "»", "mood": "win", "level": 1, "img": "res://assets/v10/stickers/nova_bike.webp"},
+  {"id": "nova_ears", "label": "Ушки торчком", "glyph": "^^", "mood": "tease", "level": 1, "img": "res://assets/v10/stickers/nova_ears.webp"},
+  {"id": "nova_offline", "label": "Режим офлайн", "glyph": "○", "mood": "tired", "level": 5, "img": "res://assets/v10/stickers/nova_offline.webp"},
+  {"id": "nova_heart", "label": "Пиксельное сердце", "glyph": "♥", "mood": "warm", "level": 5, "img": "res://assets/v10/stickers/nova_heart.webp"}
+ ]
+}

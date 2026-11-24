@@ -1,0 +1,14 @@
+{
+ "v": 1,
+ "note": "Heroine chat meta. Birthdays per docs/0.10-spec.md §Р6 (MM-DD). Reactions per §Р8 п.5.",
+ "birthdays": {"mc": "04-07", "rin": "11-30", "hana": "07-18", "yue": "09-17", "nova": "12-12"},
+ "reactions": [
+  {"id": "heart", "label": "Сердце", "glyph": "♥"},
+  {"id": "laugh", "label": "Смешно", "glyph": "ха"},
+  {"id": "wow", "label": "Ого", "glyph": "!"},
+  {"id": "sad", "label": "Грустно", "glyph": "…"},
+  {"id": "fire", "label": "Огонь", "glyph": "✦"},
+  {"id": "tea", "label": "Пиала", "glyph": "茶"}
+ ],
+ "voice_sec": [2, 4]
+}
