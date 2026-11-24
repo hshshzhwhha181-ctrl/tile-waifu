@@ -46,6 +46,8 @@ var ring: Control
 var hero_holder: Control
 var rig: Node2D
 var hero_art: TextureRect
+var hero_art_face: = Rect2()  # face rect in hero_art texture px (cut-out sprites), empty for the card fallback
+var outfit_id: = "base"
 var scene_shade: Control
 var scene_fade: Control
 var tray: Control
@@ -129,6 +131,7 @@ func _ready() -> void:
 
 func configure(cfg: Dictionary) -> void:
 	hero_id = str(cfg.get("hero", hero_id))
+	outfit_id = str(cfg.get("outfit", outfit_id))
 	level_text = str(cfg.get("level", level_text))
 	total = int(cfg.get("total", total))
 	left = int(cfg.get("left", total))
@@ -261,18 +264,50 @@ func _build_hero() -> void:
 		hero_holder.add_child(r)
 		rig = r
 	else:
-		# fallback: the outfit card art (no alpha) as a cover in the scene
+		# no rig yet: her transparent cut-out (combo T1 sprite of the outfit, then of the base) with the face
+		# on the rig's face spot. The opaque outfit card is the last resort only: as a cover it read as a
+		# light «photo in a frame» in the dark scene and cut her head off (review of v10-hud2).
 		hero_art = TextureRect.new()
 		hero_art.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		hero_art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		hero_art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
-		var ap: = "res://assets/outfits/%s_base.webp" % hero_id
-		if ResourceLoader.exists(ap):
-			hero_art.texture = load(ap)
+		hero_art_face = Rect2()
+		var cut: = _cutout_path(hero_id, outfit_id)
+		if cut != "":
+			hero_art.texture = load(cut)
+			hero_art.stretch_mode = TextureRect.STRETCH_SCALE
+			var tsz: = hero_art.texture.get_size()
+			hero_art_face = Rect2(tsz.x * 0.4, tsz.y * 0.08, tsz.x * 0.2, tsz.y * 0.12)
+			var m: Dictionary = _combo_meta().get(cut.get_file().get_basename(), {})
+			if m.has("face"):
+				hero_art_face = Rect2(m.face[0], m.face[1], m.face[2], m.face[3])
+		else:
+			hero_art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+			var ap: = "res://assets/outfits/%s_base.webp" % hero_id
+			if ResourceLoader.exists(ap):
+				hero_art.texture = load(ap)
 		hero_holder.add_child(hero_art)
 	var bp: String = RIG_BG.get(hero_id, "res://assets/v10/rig/mc_gown/bg.png")
 	if ResourceLoader.exists(bp):
 		backdrop.texture = load(bp)
+
+
+const CUTOUT_DIR: = "res://assets/v10/hud2/combo/"
+
+
+static func _cutout_path(h: String, o: String) -> String:
+	for cand in ["%s%s_%s_t1.png" % [CUTOUT_DIR, h, o], "%s%s_t1.png" % [CUTOUT_DIR, h]]:
+		if ResourceLoader.exists(cand):
+			return cand
+	return ""
+
+
+static func _combo_meta() -> Dictionary:
+	var p: = CUTOUT_DIR + "combo_meta.json"
+	if FileAccess.file_exists(p):
+		var d: Variant = JSON.parse_string(FileAccess.get_file_as_string(p))
+		if d is Dictionary:
+			return d.get("sprites", {})
+	return {}
 
 
 # ------------------------------------------------------------------ layout
@@ -304,6 +339,12 @@ func layout_now() -> void:
 	if rig:
 		rig.position = hp
 		rig.scale = Vector2.ONE * float(L.hero_scale)
+	elif hero_art and hero_art_face.size.x > 0.0:
+		# face width and centre match the rig's, so layout, face guard and Caveat line stay the same
+		var hf: Rect2 = L.hero_face
+		var k: = hf.size.x / hero_art_face.size.x
+		hero_art.size = hero_art.texture.get_size() * k
+		hero_art.position = hf.get_center() - sc.position - hero_art_face.get_center() * k
 	elif hero_art:
 		var hv: Rect2 = L.hero_view
 		hero_art.position = Vector2(hv.position.x + hv.size.x * 0.3, hv.position.y - sc.position.y)

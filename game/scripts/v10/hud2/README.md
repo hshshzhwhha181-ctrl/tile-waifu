@@ -82,6 +82,9 @@ ffmpeg -i /abs/hud2_demo.avi -c:v libx264 -pix_fmt yuv420p -crf 20 -an /abs/hud2
    showcase.tutorial_level = lvl + 1 if mode == "" and lvl < 3 else 0
    showcase.input_paused.connect(func(on): board.set_process_input(not on); _frozen = on)
    ```
+   **Порядок слоёв:** витрина должна быть выше *всех* фишек, включая улетевшие в лоток (если они переносятся
+   в отдельный слой эффектов — этот слой ставить под `showcase`). Иначе фишки лотка не затемняются на T2/T3
+   и рисуются поверх её волос (так было в демо до ревью).
    `_process()` (стр. 745): при `_frozen` не уменьшать `blitz_left`, `fever_until` и таймеры подсказок.
 2. `_make_board()` (стр. 224–257): `slot_rects` брать из `hud2.tray_cell_rect(i)` (7 ячеек); `board.fit_into(hud2.board_rect())`.
 3. **Удалить** из `_build_hud()` (стр. 306–428): круглую «домой» (стр. 307; выход — через паузу), плашку цели `gp`

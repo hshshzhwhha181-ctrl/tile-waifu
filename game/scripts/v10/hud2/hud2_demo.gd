@@ -79,7 +79,7 @@ func _show(v: String) -> void:
 		"match":
 			hud = V10HudMatch.new()
 			add_child(hud)
-			hud.configure({"hero": "mc", "level": "1-2", "total": 30, "left": 30,
+			hud.configure({"hero": str(args.get("hero", "mc")), "level": "1-2", "total": 30, "left": 30,
 					"helpers": {"undo": 2, "hint": 3, "shuffle": 1}, "stake_offer": true})
 			hud.set_ult(0.35)
 			_build_board()
@@ -191,6 +191,9 @@ func _pick(i: int) -> void:
 	var gp: = tr.get_global_position()
 	tr.reparent(self)
 	tr.global_position = gp
+	# tray tiles belong to the table: they stay under the showcase (dimmed with it, behind her hair)
+	if is_instance_valid(sc):
+		move_child(tr, sc.get_index())
 	tray_tiles.append(tr)
 	hud.set_tray_fill(tray_tiles.size())
 	var tw: = create_tween().set_parallel(true)

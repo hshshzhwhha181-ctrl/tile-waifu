@@ -125,6 +125,9 @@ func _ready() -> void:
 	spine_l = V10Type.label("ЧАЙНАЯ · ВЕЧЕР", "overline", 15, Color(V10DS.PAPER_500, 0.4))
 	spine_l.rotation = -PI * 0.5
 	spine_l.clip_text = false
+	# off: 15 px text at α 0.4 lying on her hair reads as noise, not as a spine (owner: «дешёвый текст»,
+	# HUD_V2 §1.1 «UI не на ней»). The layout rect stays for a future painted spine outside her silhouette.
+	spine_l.visible = false
 	add_child(spine_l)
 	for i in 3:
 		var lt: = TextureRect.new()
@@ -239,7 +242,10 @@ class _Deco:
 		for i in 3:
 			var r: Rect2 = L.lanterns[i]
 			var x: = r.get_center().x
-			draw_line(Vector2(x, 0), Vector2(x, r.position.y + 4), Color(V10DS.PAPER_700, 0.5), 1.0, true)
+			# the thread fades in under the header row: it never crosses the avatar ring or the nick
+			var y0: = (L.avatar as Rect2).end.y + 8.0
+			draw_polyline_colors(PackedVector2Array([Vector2(x, y0), Vector2(x, r.position.y + 4)]),
+					PackedColorArray([Color(V10DS.PAPER_700, 0.0), Color(V10DS.PAPER_700, 0.5)]), 1.0, true)
 			if bool(h.lit[i]):
 				draw_texture_rect(h.glow, Rect2(r.get_center() - Vector2(64, 64), Vector2(128, 128)), false, Color(V10DS.GOLD_500, 0.22))
 
