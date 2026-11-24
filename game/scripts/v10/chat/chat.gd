@@ -35,14 +35,32 @@ static func default_state() -> Dictionary:
 		"flags": {}, "fired": {}, "react": {}, "st_key": -1, "st_n": {}}
 
 
-# idempotent: fills missing keys (old saves, partial dicts), never drops data
+# idempotent: fills missing keys (old saves, partial dicts), never drops data.
+# The game save is JSON (G.save → JSON.stringify), so every int comes back as a float: numbers are accepted in
+# either type and cast back to int — resetting them would zero the daily counters on every app restart.
 static func ensure(st: Dictionary) -> Dictionary:
 	var d: = default_state()
 	for k in d:
-		if not st.has(k) or typeof(st[k]) != typeof(d[k]):
+		if st.has(k) and typeof(d[k]) == TYPE_INT and typeof(st[k]) in [TYPE_INT, TYPE_FLOAT]:
+			st[k] = int(st[k])
+		elif not st.has(k) or typeof(st[k]) != typeof(d[k]):
 			st[k] = d[k]
 	st.v = VER
+	_close_orphans(st)
 	return st
+
+
+# a thread (or its current node) that a content update removed or renamed would stay «open» forever and eat one of
+# the MAX_OPEN slots; such chats are closed quietly (no affection) so the rhythm never jams
+static func _close_orphans(st: Dictionary) -> void:
+	for tid in st.chats:
+		var c: Variant = st.chats[tid]
+		if not c is Dictionary or bool(c.get("done", false)):
+			continue
+		var t: = D.thread(str(tid))
+		if t.is_empty() or not t.get("nodes", {}).has(str(c.get("pos", ""))):
+			c.done = true
+			c.done_day = int(c.get("day", 0))
 
 
 # --- text ---------------------------------------------------------------------

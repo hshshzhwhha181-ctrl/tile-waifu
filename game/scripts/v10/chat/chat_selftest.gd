@@ -373,6 +373,21 @@ static func _save() -> void:
 	ctx.day = 501
 	check(C.tick(b, ctx).size() <= C.MAX_NEW_PER_DAY, "tick after round-trip")
 	check(JSON.stringify(b).length() < 8000, "save stays small (%d bytes)" % JSON.stringify(b).length())
+	# review fix: the game save is JSON, ints come back as floats — an app restart must not reset today's counters
+	var r: = C.ensure({})
+	var rc: = _ctx(700)
+	var got: = 0
+	for i in 5:
+		for t2 in C.tick(r, rc):
+			got += 1
+			while C.awaiting(r, t2):
+				C.choose(r, t2, 0, rc)
+		r = C.ensure(JSON.parse_string(JSON.stringify(r)))
+	check(got <= C.MAX_DAILY_PER_DAY, "restarts on one day keep the daily limit (%d)" % got)
+	check(typeof(r.new_key) == TYPE_INT and int(r.new_key) == 700, "ensure casts JSON floats back to int")
+	# review fix: a thread/node removed by a content update must not stay «open» and jam MAX_OPEN
+	var o: = C.ensure({"chats": {"gone_thread": {"pos": "a", "done": false, "picks": [], "day": 5}}})
+	check(C.open_threads(o).is_empty(), "orphaned thread is closed by ensure")
 
 
 # --- reactions & stickers ------------------------------------------------------------------
@@ -442,6 +457,30 @@ static func _feed() -> void:
 	for p in vr:
 		all_rin = all_rin and p.hero == "rin"
 	check(all_rin and vr.size() == 1, "feed: only owned heroines, schedule per player (%d)" % vr.size())
+	# review fix: pulling a new heroine adds her posts, never moves or hides posts already shown
+	var fs: = F.ensure({})
+	var fc: = _ctx(2000, ["mc"])
+	F.visible(fs, fc)
+	fc.day = 2010
+	var before: = F.visible(fs, fc).map(func(p): return p.id)
+	fc.owned = ["mc", "hana"]
+	var after: = F.visible(fs, fc).map(func(p): return p.id)
+	var kept: = true
+	for id2 in before:
+		kept = kept and id2 in after
+	check(before.size() == 4 and kept, "feed: shown posts stay after a new heroine (%d → %d)" % [before.size(), after.size()])
+	fc.day = 2030
+	var n30: = F.visible(fs, fc).size()
+	fs = F.ensure(JSON.parse_string(JSON.stringify(fs)))
+	check(F.visible(fs, fc).size() == n30 and typeof(fs.next) == TYPE_INT, "feed survives the JSON save round-trip")
+	var ex: = F.ensure({})
+	var ec: = _ctx(3000, ["nova"])
+	F.visible(ex, ec)
+	ec.day = 3100
+	check(F.visible(ex, ec).size() == 4 and int(ex.next) == -1, "feed: pool exhausted → rhythm pauses")
+	ec.owned = ["nova", "yue"]
+	var ey: = F.visible(ex, ec)
+	check(ey[0].hero == "yue" and int(ey[0].day) == 3100, "feed: new heroine's first post opens the day she arrives")
 
 
 # --- history log ----------------------------------------------------------------------------

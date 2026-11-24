@@ -86,7 +86,7 @@ choice: {t,next,aff?,set?} | {sticker,next,aff?,set?}
 
 Текст в сейве не хранится, только `picks`. `V10Chat.transcript()` восстанавливает переписку детерминированно, поэтому потеря `user://v10_logs` ничего важного не стирает.
 
-Лента хранится в `S.v10_feed = V10ChatFeed.default_state()` (`liked`, `replied`, `first_day`, `seen_max`), как в §Р9.
+Лента хранится в `S.v10_feed = V10ChatFeed.default_state()` (`liked`, `replied`, `at`, `next`, `seen_max`), как в §Р9. День каждого поста фиксируется в `at` в момент открытия, поэтому новая героиня только добавляет свои посты в очередь, а уже показанные не сдвигаются и не пропадают.
 
 ## Хуки для интегратора (существующие файлы не правились)
 1. **Сейв (M1 `V10Save`):**
@@ -99,6 +99,9 @@ choice: {t,next,aff?,set?} | {sticker,next,aff?,set?}
    ```
    chat_tr = V10LocalTransport.new(G.S.v10_phone.chat, "user://v10_logs/")
    ```
+   Транспорт держит **ссылку** на словарь `G.S.v10_phone.chat`. `G.load_game()`, восстановление из `.bak`/V8Recovery
+   и сброс прогресса создают новый `S`, поэтому после них транспорт нужно пересоздать, иначе выборы игрока будут писаться
+   в старый словарь и пропадут при следующем сохранении. После `choose`/`tick`/`post_event`/`sticker`/`react` вызывать `G.save()`.
 3. **ctx:**
    ```
    {day = V10Meta.day_key(), md = "MM-DD", partner = S.partner, owned = <героини с хотя бы одним нарядом>,
