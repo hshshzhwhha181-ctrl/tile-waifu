@@ -76,16 +76,33 @@ static func video_wanted(h: String) -> bool:
 
 
 # the lobby loop over its own first frame; returns the player (null when the stream does not load)
+const VIDEO_SIZE: = Vector2(720, 1280)
+# what stays in view when the loop is cropped to cover a screen of another shape (her face and chest)
+const VIDEO_FOCUS: = Vector2(0.5, 0.4)
+
+
+# 0.10 M0: the loop is drawn «cover» over the whole viewport — never stretched (on 9:20 phones the 9:16 clip was
+# pulled 25 % taller and she looked squashed thin; on tablets it was pulled wide). The still under it gets the
+# same rect so the two line up frame for frame.
+static func video_rect(parent: Control, sz: Vector2) -> Rect2:
+	var area: = Rect2(Vector2.ZERO, sz)
+	if parent != null and parent.is_inside_tree() and sz.distance_to(parent.size) < 1.0:
+		area = V10Layout.bleed_rect(parent)
+	return V10Layout.cover_rect(VIDEO_SIZE, area, VIDEO_FOCUS)
+
+
 static func build_video(parent: Control, sz: Vector2) -> VideoStreamPlayer:
 	var stream = load(VIDEO_PATH)
 	if not (stream is VideoStream):
 		return null
+	var vr: = video_rect(parent, sz)
 	if ResourceLoader.exists(STILL_PATH):
 		var still: = TextureRect.new()
 		still.texture = load(STILL_PATH)
 		still.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		still.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
-		still.size = sz
+		still.stretch_mode = TextureRect.STRETCH_SCALE
+		still.position = vr.position
+		still.size = vr.size
 		still.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		still.name = "V9LobbyStill"
 		parent.add_child(still)
@@ -93,7 +110,8 @@ static func build_video(parent: Control, sz: Vector2) -> VideoStreamPlayer:
 	vp.name = "V9LobbyVideo"
 	vp.stream = stream
 	vp.expand = true
-	vp.size = sz
+	vp.position = vr.position
+	vp.size = vr.size
 	vp.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	vp.volume_db = -80.0
 	if "loop" in vp:
@@ -155,7 +173,9 @@ func to_art(p: Vector2) -> Vector2:
 			var sc: = _cover_scale()
 			var ctr: = art_focus.clamp(sc * 0.5, Vector2.ONE - sc * 0.5)
 			return (ctr + (uv - Vector2(0.5, 0.5)) * sc) * art_tex
-	return get_global_transform().affine_inverse() * p * (Vector2(720, 1280) / size)
+	if video and is_instance_valid(video):
+		return video.get_global_transform().affine_inverse() * p * (VIDEO_SIZE / video.size)
+	return get_global_transform().affine_inverse() * p * (VIDEO_SIZE / size)
 
 
 func from_art(p: Vector2) -> Vector2:
@@ -167,7 +187,9 @@ func from_art(p: Vector2) -> Vector2:
 			var ctr: = art_focus.clamp(sc * 0.5, Vector2.ONE - sc * 0.5)
 			var uv: = (p / art_tex - ctr) / sc + Vector2(0.5, 0.5)
 			return art.get_global_transform() * (uv * art.size)
-	return get_global_transform() * (p * (size / Vector2(720, 1280)))
+	if video and is_instance_valid(video):
+		return video.get_global_transform() * (p * (video.size / VIDEO_SIZE))
+	return get_global_transform() * (p * (size / VIDEO_SIZE))
 
 
 func _cover_scale() -> Vector2:

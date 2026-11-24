@@ -8,7 +8,11 @@ static func backdrop(parent: Control, bg: String, size: Vector2, blur: = 0.0, br
 		path = "res://assets/bg/%s_blur.webp" % bg
 		blur = 0.0
 	var tex: Texture2D = load(path)
-	var r: = UI.tex(tex, Rect2(Vector2.ZERO, size), false)
+	# 0.10 M0: a full-screen backdrop bleeds past the content column to the viewport edges (tablets, cut-outs);
+	# the shader covers its rect keeping the art's aspect (no stretched backgrounds)
+	var area: = _bleed_area(parent, size)
+	size = area.size
+	var r: = UI.tex(tex, area, false)
 	var m: = ShaderMaterial.new()
 	m.shader = preload("res://shaders/blurbg.gdshader")
 	m.set_shader_parameter("size", size)
@@ -23,9 +27,20 @@ static func backdrop(parent: Control, bg: String, size: Vector2, blur: = 0.0, br
 	parent.add_child(r)
 	return r
 
+# 0.10 M0: `size` is the parent's full size -> the whole viewport in the parent's coordinates (V10Layout.bleed_rect),
+# else the rect as asked
+static func _bleed_area(parent: Control, size: Vector2) -> Rect2:
+	if parent != null and parent.is_inside_tree() and size.distance_to(parent.size) < 1.0:
+		var br: Rect2 = V10Layout.bleed_rect(parent)
+		if br.size.x >= size.x and br.size.y >= size.y:
+			return br
+	return Rect2(Vector2.ZERO, size)
+
 static func vignette(parent: Control, size: Vector2, color: = Color(0.55, 0.2, 0.35, 1.0), amount: = 0.35) -> ColorRect:
 	var c: = ColorRect.new()
-	c.size = size
+	var area: = _bleed_area(parent, size)
+	c.position = area.position
+	c.size = area.size
 	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var m: = ShaderMaterial.new()
 	m.shader = preload("res://shaders/overlay.gdshader")
@@ -418,6 +433,7 @@ static func floor_fade(parent: Control, y0: float, y1: float, col: = Color(0.07,
 	tr.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	tr.name = "FloorFade"
 	parent.add_child(tr)
+	V10Layout.bleed_x(tr)
 	return tr
 
 # 0.8: soft edges for a scroll list (any background: no overlay colour to match). Each row of `list` fades by how
@@ -481,6 +497,9 @@ static func edge_shade(parent: Control, r: Rect2, dir: = 1, col: = Color(0.07, 0
 	tr.size = r.size
 	tr.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	parent.add_child(tr)
+	# 0.10 M0: a band across the whole column reaches the viewport edges (tablets)
+	if r.position.x <= 0.5 and absf(r.size.x - parent.size.x) < 1.0:
+		V10Layout.bleed_x(tr)
 	return tr
 
 # 0.8: one «selected» look for every tab bar and segmented choice: pink lacquer pill, gold rim, white caption.

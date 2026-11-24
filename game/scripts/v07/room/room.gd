@@ -77,6 +77,7 @@ func _render(greet: = false) -> void :
 	band.size = Vector2(W, 262.0)
 	band.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.add_child(band)
+	V10Layout.bleed_x(band)
 	V8Header.make(root, main, "Комната", main.back)
 	set_meta("v8_back", main.back)
 	_tabs()
@@ -616,7 +617,7 @@ func _play_scene(id: String) -> void :
 		G.S.gems = int(G.S.gems) + gems
 		G.save()
 		main.refresh_currency(true)
-		main.fly_gems(Vector2(W * 0.5, H * 0.5), 8)
+		main.fly_gems(global_position + Vector2(W * 0.5, H * 0.5), 8)
 		main.toast("Воспоминание сохранено · +%d кристаллов" % gems, "gem")
 		_render(false)
 		if int(r.aff) > 0:

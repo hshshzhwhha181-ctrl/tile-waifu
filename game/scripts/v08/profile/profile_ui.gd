@@ -107,7 +107,10 @@ static func league_info() -> Dictionary:
 # (blur / brightness / tint / slow drift) — Common.backdrop only knows res://assets/bg.
 static func backdrop(parent: Control, bg: String, size: Vector2, blur: = 0.0, bright: = 1.0, tint: = Color.WHITE, focus: = Vector2(0.5, 0.5)) -> TextureRect:
 	var tex: = V8Art.bg(bg)
-	var r: = UI.tex(tex, Rect2(Vector2.ZERO, size), false)
+	# 0.10 M0: bleeds to the viewport edges past the content column (tablets, cut-outs), aspect kept by the shader
+	var area: = Common._bleed_area(parent, size)
+	size = area.size
+	var r: = UI.tex(tex, area, false)
 	r.name = "Backdrop"
 	if tex != null:
 		var m: = ShaderMaterial.new()

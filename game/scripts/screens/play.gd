@@ -1828,7 +1828,10 @@ func v8_res_open(title: String, pal: = "pink", fs: = 44) -> Dictionary:
 	root.z_index = 300
 	add_child(root)
 	var dim: = ColorRect.new()
-	dim.size = size
+	# 0.10 M0: the dim reaches the viewport edges past the content column (tablets)
+	var dbr: = V10Layout.bleed_rect(self)
+	dim.position = dbr.position
+	dim.size = dbr.size
 	dim.color = Color(0.06, 0.04, 0.07, 0.0)
 	dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.add_child(dim)
@@ -2057,7 +2060,8 @@ var _v8_res_bust: Control = null
 
 func _v8_res_bust_make(root: Control, hid: String, emo: String, top: float, bottom: float) -> Control:
 	var foot: = H + 30.0
-	var bh: = minf(V8_BUST_H, foot - (top + 6.0))
+	# 0.10 M0: on phones taller than 9:16 she grows into the extra height instead of leaving a dark gap
+	var bh: = minf(V8_BUST_H + maxf(0.0, H - 1280.0) * 0.6, foot - (top + 6.0))
 	if bh < 320.0:
 		return null
 	var k: = bh / 800.0
@@ -2191,7 +2195,7 @@ func _victory(stars: int, reward: int, secs: float, first: bool) -> void :
 		V8Art.bust_bounce(_v8_res_bust, 0.03)
 	_v9_roll(gl, reward + gained, 0.75)
 	if reward + gained > 0:
-		main.fly_gems(plate.position + rr.position + Vector2(46, 42), 8)
+		main.fly_gems(global_position + plate.position + rr.position + Vector2(46, 42), 8)
 	if rank_box:
 		await _animate_rank(rank_box)
 	Sfx.music("menu")
@@ -2234,7 +2238,7 @@ func _blitz_result(record: bool, best: int, gems: int, ba: Dictionary) -> void :
 	v8_res_close(ctx, partner, V6Txt.s("common.again"), func(): main.go("play", {"mode": "blitz", "partner": partner, "retry": randi()}),
 		V6Txt.s("common.to_home"), func(): main.go("home"))
 	if gems > 0:
-		main.fly_gems(Vector2(W * 0.5, 420), 6)
+		main.fly_gems(global_position + Vector2(W * 0.5, 420), 6)
 
 const V8_HERO_H: = 760.0
 const V8_HERO_DROP: = 250.0

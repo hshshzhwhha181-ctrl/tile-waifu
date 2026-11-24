@@ -26,6 +26,7 @@ func build(m, args: Dictionary) -> void :
 	main = m
 	W = size.x
 	H = size.y
+	stage_dy = maxf(0.0, H - 1280.0) * 0.45
 	banner_i = int(args.get("banner", 0))
 	main.show_chrome(true, true)
 	Sfx.music("summon")
@@ -268,6 +269,9 @@ var dev_preview: = false
 const LANTERN_H: = 470.0
 const LANTERN_Y: = 176.0
 const FLOOR_Y: = 846.0
+# 0.10 M0: on phones taller than 9:16 the lantern stage (lantern, its caption and the lit floor) moves down with
+# part of the extra height, so it sits in the middle of the night instead of under the top edge
+var stage_dy: = 0.0
 const PITY_BAR: = Rect2(16, 38, 284, 12)
 
 func _alive() -> bool:
@@ -383,7 +387,9 @@ func _sequence(res: Array, ctx: = {}) -> void :
 	add_child(seq)
 	# night falls: a dim plus a radial vignette, so the lantern is the only light on screen
 	var dim: = ColorRect.new()
-	dim.size = size
+	var br: = V10Layout.bleed_rect(self)
+	dim.position = br.position
+	dim.size = br.size
 	dim.color = Color(0.04, 0.02, 0.08, 0.0)
 	dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	seq.add_child(dim)
@@ -400,7 +406,8 @@ func _sequence(res: Array, ctx: = {}) -> void :
 	gt.width = 256
 	gt.height = 256
 	vg.texture = gt
-	vg.size = size
+	vg.position = br.position
+	vg.size = br.size
 	vg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	vg.stretch_mode = TextureRect.STRETCH_SCALE
 	vg.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -409,13 +416,14 @@ func _sequence(res: Array, ctx: = {}) -> void :
 	vg.create_tween().tween_property(vg, "modulate:a", 1.0, 0.8)
 	# 0.9: one magic circle on the lantern stage — the lit floor under the lantern; the circle painted into the
 	# backdrop's bottom edge sinks into the night (it fades back with the other stage effects when the cards deal)
-	var ff: = Common.floor_fade(seq, FLOOR_Y + 180.0, FLOOR_Y + 290.0, Color(0.03, 0.01, 0.06), 1.0)
+	var ff: = Common.floor_fade(seq, (FLOOR_Y + stage_dy) + 180.0, (FLOOR_Y + stage_dy) + 290.0, Color(0.03, 0.01, 0.06), 1.0)
 	var fs: = ColorRect.new()
 	fs.color = Color(0.03, 0.01, 0.06)
-	fs.position = Vector2(0, FLOOR_Y + 289.0)
-	fs.size = Vector2(W, H - FLOOR_Y - 289.0)
+	fs.position = Vector2(0, (FLOOR_Y + stage_dy) + 289.0)
+	fs.size = Vector2(W, br.end.y - (FLOOR_Y + stage_dy) - 289.0)
 	fs.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	seq.add_child(fs)
+	V10Layout.bleed_x(fs)
 	for n in [ff, fs]:
 		n.modulate.a = 0.0
 		n.create_tween().tween_property(n, "modulate:a", 1.0, 0.8)
@@ -435,7 +443,7 @@ func _sequence(res: Array, ctx: = {}) -> void :
 	# the magic circle becomes the lit floor under the lantern
 	move_child(circle, get_child_count() - 1)
 	var ct: = create_tween().set_parallel()
-	ct.tween_property(circle, "position:y", FLOOR_Y - 310, 0.9).set_trans(Tween.TRANS_QUART).set_ease(Tween.EASE_IN_OUT)
+	ct.tween_property(circle, "position:y", (FLOOR_Y + stage_dy) - 310, 0.9).set_trans(Tween.TRANS_QUART).set_ease(Tween.EASE_IN_OUT)
 	ct.tween_property(circle, "scale", Vector2(0.86, 0.3), 0.9)
 	ct.tween_method( func(v): circle_mat.set_shader_parameter("power", v), 0.25, 0.55, 0.9)
 	move_child(seq, get_child_count() - 1)
@@ -448,9 +456,9 @@ func _sequence(res: Array, ctx: = {}) -> void :
 	seq.add_child(lantern)
 	# the counter stays above the lantern's cord
 	seq.move_child(top_hud, -1)
-	lantern.drop_in(-LANTERN_H - 80, LANTERN_Y, V9Summon.DROP)
+	lantern.drop_in(-LANTERN_H - 80, (LANTERN_Y + stage_dy), V9Summon.DROP)
 	Sfx.play("whoosh", 0.8, -6)
-	hint_lbl = UI.center_label(UI.label("Коснись фонаря, чтобы зажечь", 22, Color(1, 0.96, 0.88, 0.95), Color(0.12, 0.04, 0.16), 5), Rect2(0, FLOOR_Y + 150, W, 40))
+	hint_lbl = UI.center_label(UI.label("Коснись фонаря, чтобы зажечь", 22, Color(1, 0.96, 0.88, 0.95), Color(0.12, 0.04, 0.16), 5), Rect2(0, (FLOOR_Y + stage_dy) + 150, W, 40))
 	hint_lbl.modulate.a = 0.0
 	seq.add_child(hint_lbl)
 	var ht: = hint_lbl.create_tween()
@@ -581,7 +589,9 @@ func _flash(col: Color, a: float) -> void :
 	if not V9Feel.can_edge_flash():
 		a *= 0.5
 	var f: = ColorRect.new()
-	f.size = size
+	var fr: = V10Layout.bleed_rect(self)
+	f.position = fr.position
+	f.size = fr.size
 	f.color = Color(col.lerp(Color(1, 0.95, 0.85), 0.2), a)
 	f.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	seq.add_child(f)
@@ -595,7 +605,7 @@ func _show_caption(best: String) -> void :
 	var col: Color = V9Summon.COL[best]
 	lantern_cap = Control.new()
 	lantern_cap.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	lantern_cap.position = Vector2(0, LANTERN_Y + LANTERN_H + 14)
+	lantern_cap.position = Vector2(0, (LANTERN_Y + stage_dy) + LANTERN_H + 14)
 	lantern_cap.size = Vector2(W, 100)
 	lantern_cap.pivot_offset = Vector2(W * 0.5, 30)
 	seq.add_child(lantern_cap)

@@ -116,6 +116,7 @@ var _flash_on: = false
 var _flash_t: = 0.0
 
 var dim: ColorRect
+var _bleed: = Rect2()
 var flash: ColorRect
 var strips: CanvasLayer
 var band: Node2D
@@ -213,6 +214,12 @@ func _setup(parent: Control, outfit_id: String, opts: Dictionary) -> void :
 	H = parent.size.y if parent.size.y > 0 else 1280.0
 	cy = float(opts.get("cy", H * 0.5))
 	HW = W * 0.5 + 90.0
+	# 0.10 M0: on tablets the strip and the dim reach the viewport edges past the content column; the layout
+	# inside the strip (portrait, name) keeps the column's proportions
+	if parent.is_inside_tree():
+		var pbr: Rect2 = V10Layout.bleed_rect(parent)
+		_bleed = pbr
+		HW = maxf(HW, maxf(W * 0.5 - pbr.position.x, pbr.end.x - W * 0.5) + 90.0)
 	fx_ok = V9Feel.can_fx()
 	fx_k = V9Feel.fx_scale()
 	flash_peak = 0.3 if V9Feel.level() == "full" else 0.16
@@ -321,6 +328,9 @@ func _build(shout: String) -> void :
 	var ink: Color = pal.ink
 	dim = ColorRect.new()
 	dim.size = size
+	if _bleed.size.x > 0.0:
+		dim.position = _bleed.position
+		dim.size = _bleed.size
 	dim.color = Color(ink.r * 0.15, ink.g * 0.12, ink.b * 0.2, 0.0)
 	dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(dim)
@@ -698,7 +708,7 @@ func _apply(tt: float) -> void :
 	# eye close-up (SSR): enters from the far side, slow push, collapses as the main strip arrives
 	if eye:
 		var ein: = _out_expo(_seg(tt, 0.0, 0.2))
-		eye.position.x = W * 0.5 - dir * (1.0 - ein) * (W + 260.0)
+		eye.position.x = W * 0.5 - dir * (1.0 - ein) * (2.0 * HW + 80.0)
 		var col: = _seg(tt, T0 - 0.06, 0.14)
 		eye.scale.y = maxf(0.0, 1.0 - _in_cubic(col))
 		eye.visible = eye.scale.y > 0.01
@@ -707,7 +717,7 @@ func _apply(tt: float) -> void :
 	# main strip
 	var bin: = _out_expo(_seg(tt, T0, T_in))
 	var bout: = _in_cubic(_seg(tt, T_out, D_out))
-	band.position.x = W * 0.5 + dir * (1.0 - bin) * (W + 520.0) - dir * bout * (W + 520.0)
+	band.position.x = W * 0.5 + dir * (1.0 - bin) * (2.0 * HW + 340.0) - dir * bout * (2.0 * HW + 340.0)
 	band.visible = tt >= T0 - 0.001
 	var punch: = sin(_seg(tt, Ts, 0.2) * PI) * 0.03
 	band.scale = Vector2.ONE * (1.0 + punch)

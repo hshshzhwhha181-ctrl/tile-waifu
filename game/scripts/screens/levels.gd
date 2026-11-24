@@ -64,6 +64,10 @@ func build(m, args: Dictionary) -> void :
 	bgc.color = Color(0.1, 0.05, 0.16)
 	bgc.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(bgc)
+	# 0.10 M0: on tablets the plate under the map reaches the real edges
+	var bb: = V10Layout.bleed_rect(self)
+	bgc.position = bb.position
+	bgc.size = bb.size
 	var nw: = V6Worlds.world_count()
 	map_h = SH * nw + BOTTOM_PAD
 	map_root = Control.new()
@@ -129,6 +133,22 @@ func _world_panel(w: int) -> void :
 	m.set_shader_parameter("bright", 1.0 if open else 0.62)
 	m.set_shader_parameter("fog_amt", 0.0 if open else 0.6)
 	r.material = m
+	# 0.10 M0: on tablets the map continues past the 720 px column as dimmed mirror copies of the same panel
+	# (seamless at the column edges, never stretched); they scroll with the map
+	var bx: = V10Layout.bleed_rect(self)
+	if bx.size.x > W + 1.0:
+		for sgn in [-1, 1]:
+			var mr: = TextureRect.new()
+			mr.texture = tex
+			mr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			mr.stretch_mode = TextureRect.STRETCH_SCALE
+			mr.flip_h = true
+			mr.position = Vector2(sgn * W, top)
+			mr.size = Vector2(W, h)
+			mr.material = m
+			mr.modulate = Color(0.62, 0.56, 0.66)
+			mr.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			map_root.add_child(mr)
 	map_root.add_child(r)
 	panels.append(r)
 

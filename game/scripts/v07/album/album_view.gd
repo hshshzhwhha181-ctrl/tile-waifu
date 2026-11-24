@@ -31,6 +31,11 @@ static func open(m, which: = "stamps", closed: = Callable()) -> V7AlbumView:
 	v.on_close = closed
 	var vs: Vector2 = m.get_viewport_rect().size
 	v.size = vs
+	# 0.10 M0: the album is laid out like a screen, in main's content column (below a camera cut-out, ≤720 wide);
+	# its dim and vignette bleed to the viewport edges
+	if "CR" in m:
+		v.position = m.CR.position
+		v.size = m.CR.size
 	v.set_meta("popup", true)
 	v.set_meta("v8_back", v.close)
 	m.overlay.add_child(v)
@@ -42,9 +47,12 @@ func _build() -> void :
 	H = size.y
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	var bg: = ColorRect.new()
-	bg.size = size
+	var bbr: = V10Layout.bleed_rect(self)
+	bg.position = bbr.position
+	bg.size = bbr.size
 	bg.color = Color(0.045, 0.038, 0.05, 0.0)
-	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	# the album is modal: taps beside the column (tablets) stop here too
+	bg.mouse_filter = Control.MOUSE_FILTER_STOP
 	add_child(bg)
 	bg.create_tween().tween_property(bg, "color:a", 0.94, 0.25)
 	Common.vignette(self, size, Color(0.35, 0.12, 0.2), 0.45)
