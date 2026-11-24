@@ -265,6 +265,17 @@ func set_selected(s: bool) -> void :
 		t.tween_property(shadow, "position", Vector2(9, 15), 0.16)
 		t.tween_method( func(v): mat.set_shader_parameter("sel", v), 1.0, 0.0, 0.16)
 
+# 0.9: the instant answer to a good tap (before the flight to the tray): a short warm light on the face, so the
+# finger sees «taken» on the very frame it lands. Sound and haptic come from V9Feel.tile_tap (the board calls it).
+var _glint_tw: Tween
+func press_glint() -> void :
+	if mat == null:
+		return
+	if _glint_tw and _glint_tw.is_valid():
+		_glint_tw.kill()
+	_glint_tw = create_tween()
+	_glint_tw.tween_method( func(v): mat.set_shader_parameter("flash", v), 0.42, 0.0, 0.2).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+
 func deny() -> void :
 	var t: = create_tween()
 	for i in 4:

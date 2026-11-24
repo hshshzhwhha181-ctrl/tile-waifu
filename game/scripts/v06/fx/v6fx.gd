@@ -1,13 +1,15 @@
 extends Node
 
-
-
-
-
-
-
-
-
+# V6Fx — screen-level effects (autoload): particles over the screen, shake, hit-stop, flash, shockwave, speed
+# lines, colour grade, and the board hooks (match, ice, flip, danger, clear).
+# 0.9 (spec §A/§D): every effect asks the «Эффекты» level (S.fx_level) through V9Feel:
+#   shake, shockwave, speed lines      full only (can_shake / can_edge_flash)
+#   flash                              full; «умеренные» a third as bright; «минимум» none
+#   particles (burst)                  count × V9Feel.fx_scale(); «минимум» none
+#   glow, rays, glint, hit-stop        not at «минимум»
+#   grade (danger / fever / fail tint) every level: it carries information, not decoration
+# In a match nothing here lights the middle of the table: the combo tiers light the screen edges (V7Combo), not
+# a flash over the tiles. The match chime follows the combo pitch ladder (Sfx.combo_pitch), like the board's.
 
 const SND: = "res://assets/v06/fx/%s.wav"
 const SH: = "res://shaders/v06/fx/"
@@ -241,19 +243,21 @@ func music_transition() -> void :
 
 
 func shake(amount: = 0.3) -> void :
-	if not opt("shake"):
+	if not opt("shake") or not V9Feel.can_shake():
 		return
 	trauma = clampf(trauma + amount, 0.0, 1.0)
 
 func hit_stop(dur: = 0.06, scale: = 0.06) -> void :
-	if not opt("hitstop"):
+	if not opt("hitstop") or not V9Feel.can_fx():
 		return
 	hitstop_left = maxf(hitstop_left, dur)
 	Engine.time_scale = minf(Engine.time_scale, scale)
 	hitstop_on = true
 
 func flash(color: = Color(1, 0.96, 0.88), amount: = 0.6, dur: = 0.3, pos: = Vector2(-1, -1), radius: = 0.0, full: = 0.0) -> void :
-	if not opt("flash"):
+	if not V9Feel.can_fx():
+		return
+	if not opt("flash") or not V9Feel.can_edge_flash():
 		amount *= 0.35
 	if pos.x < 0:
 		pos = vp * 0.5
@@ -267,6 +271,8 @@ func flash(color: = Color(1, 0.96, 0.88), amount: = 0.6, dur: = 0.3, pos: = Vect
 	t.tween_callback( func(): flash_rect.visible = false)
 
 func shockwave(pos: Vector2, strength: = 16.0, speed: = 1400.0, life: = 0.55) -> void :
+	if not V9Feel.can_shake():
+		return
 	var slot: = 0
 	for i in 3:
 		if waves[i].w <= 0.0:
@@ -279,6 +285,8 @@ func shockwave(pos: Vector2, strength: = 16.0, speed: = 1400.0, life: = 0.55) ->
 	wave_life[slot] = life
 
 func speedlines(amount: = 0.5, dur: = 0.5, color: = Color(1, 0.97, 0.9, 0.85), focus: = Vector2(-1, -1)) -> void :
+	if not V9Feel.can_edge_flash():
+		return
 	if not opt("flash"):
 		amount *= 0.4
 	if focus.x < 0:
@@ -309,7 +317,7 @@ func grade_reset(dur: = 0.5) -> void :
 
 
 func glint(c: Control, delay: = 0.0, color: = Color(1, 0.95, 0.8, 0.9)) -> void :
-	if not is_instance_valid(c):
+	if not is_instance_valid(c) or not V9Feel.can_fx():
 		return
 	var r: = ColorRect.new()
 	r.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -636,6 +644,7 @@ func _kind(kind: String, power: float) -> Array:
 
 
 func burst(pos: Vector2, kind: = "spark", amount: = 24, color: = Color(1, 0.9, 0.6), power: = 1.0, parent: Node = null, extent: = Vector2.ZERO, dir: = Vector2.ZERO) -> Node2D:
+	amount = Fx.scaled(amount)
 	if emitters >= MAX_EMITTERS or amount <= 0:
 		return null
 	var k: = _kind(kind, power)
@@ -684,6 +693,8 @@ func burst(pos: Vector2, kind: = "spark", amount: = 24, color: = Color(1, 0.9, 0
 
 
 func glow(pos: Vector2, color: = Color(1, 0.9, 0.7), size: = 2.0, dur: = 0.35, parent: Node = null) -> void :
+	if not V9Feel.can_fx():
+		return
 	var s: = Sprite2D.new()
 	s.texture = G.fx("glow")
 	s.material = Fx.add_mat()
@@ -698,6 +709,8 @@ func glow(pos: Vector2, color: = Color(1, 0.9, 0.7), size: = 2.0, dur: = 0.35, p
 
 
 func rays(pos: Vector2, size: = 900.0, color: = Color(1, 0.88, 0.55, 0.8), dur: = 2.0) -> void :
+	if not V9Feel.can_fx():
+		return
 	var r: = ColorRect.new()
 	r.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	r.size = Vector2(size, size)
@@ -737,10 +750,12 @@ func on_match(pos: Vector2, combo: = 1, gold: = false, shard: = "") -> void :
 	burst(pos, "chip", 8 + mini(c, 6), Color(1, 0.98, 0.94), 1.0)
 	burst(pos, "glint", 3 + c, Color(1, 0.95, 0.85), 1.0)
 	glow(pos, warm, 1.6 + c * 0.12, 0.3)
-	layers([["thump", 1.0 + c * 0.02, -9.0 + mini(c, 6) * 0.6], ["chime%d" % clampi(c - 1, 0, 7), 1.0, -13.0, 0.02]])
+	# 0.9: the chime climbs the same semitone ladder as the board's match chime (Sfx.combo_step), so the two
+	# never clash; the thump stays put and only gets a touch louder
+	layers([["thump", 1.0, -9.0 + mini(c, 6) * 0.6], ["chime0", Sfx.combo_pitch(combo), -13.0, 0.02]])
 	if c >= 2:
-		sound("shimmer", 1.0 + c * 0.02, -17.0 + mini(c, 6), 0.04)
-		shockwave(pos, 6.0 + c * 2.0, 1100.0, 0.4)
+		sound("shimmer", Sfx.combo_pitch(combo), -17.0 + mini(c, 6), 0.04)
+		shockwave(pos, 4.0 + mini(c, 8) * 1.5, 1000.0, 0.32)
 	if gold:
 		burst(pos, "coin", 6, Color.WHITE, 0.8)
 		layers([["coin", 1.0, -8.0, 0.06], ["coin", 1.12, -11.0, 0.14]])
@@ -753,24 +768,25 @@ func on_match(pos: Vector2, combo: = 1, gold: = false, shard: = "") -> void :
 func combo_tier(combo: int, pos: = Vector2(-1, -1)) -> void :
 	if pos.x < 0:
 		pos = vp * 0.5
+	# 0.9: the tier steps (V7Combo.TIERS) are the milestones. A light shake that grows with the tier (full only),
+	# speed lines that live at the screen edges (their inner radius keeps the middle of the table clear), no flash
+	# over the table: V7Combo lights the screen edges and the table frame in the tier colour instead.
 	var milestone: = combo in [3, 5, 8, 12, 16, 20] or (combo > 20 and combo % 5 == 0)
 	if milestone and combo >= 5:
-		hit_stop(0.075)
-		shake(0.34)
-		speedlines(0.7, 0.7)
-		flash(Color(1, 0.92, 0.8), 0.32, 0.3, pos, vp.y * 0.35)
-		shockwave(pos, 22.0, 1500.0, 0.6)
+		hit_stop(0.06)
+		shake(0.26 + mini(combo, 20) * 0.006)
+		speedlines(0.45, 0.55)
+		shockwave(pos, 14.0, 1300.0, 0.45)
 		sound("combo_big", 1.0 + mini(combo - 5, 15) * 0.02, -4.0)
 		burst(pos, "star", 10, Color(1, 0.9, 0.6), 1.3)
 		burst(pos, "petal", 14, Color.WHITE, 1.4)
 	elif milestone:
-		hit_stop(0.045)
-		shake(0.18)
-		speedlines(0.38, 0.4)
+		hit_stop(0.04)
+		shake(0.16)
+		speedlines(0.3, 0.35)
 		sound("combo_hit", 1.0, -7.0)
 	elif combo >= 3:
-		shake(0.07)
-		speedlines(0.15, 0.22)
+		shake(0.06 + mini(combo, 16) * 0.004)
 
 
 func deny(pos: = Vector2(-1, -1)) -> void :
@@ -1002,6 +1018,9 @@ func _attach_board(b: Node) -> void :
 	music_filter(20500.0)
 	b.matched.connect( func(mid: Vector2, combo: int, gold: bool, shard: String):
 		if is_instance_valid(b):
+			# 0.9: a pair removed by an ult (play.v9_from_ult) does not extend the combo: no tier effects for it
+			if is_instance_valid(scr) and scr.get("v9_from_ult") == true:
+				combo = 1
 			on_match(_canvas(mid), combo, gold, shard))
 	b.denied.connect( func(t): deny(_tile_pos(b, t)))
 	b.tray_changed.connect( func(): _on_tray(b))

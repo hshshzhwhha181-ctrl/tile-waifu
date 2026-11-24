@@ -125,7 +125,8 @@ static func run(play) -> void :
 	_check("aiming (%s)" % target, ult.aiming == (target != "none"))
 	match target:
 		"pair":
-			var ps: = ult.pairs()
+			# a pair whose tile is the topmost at its spot (a touch hits what is on top)
+			var ps: = ult.pairs().filter( func(pr): return bd.tile_at(V9UltCast.pos_of(pr[0])) == pr[0])
 			if not ps.is_empty():
 				expect = ps.back()
 				var at: = V9UltCast.pos_of(expect[0])
@@ -133,8 +134,9 @@ static func run(play) -> void :
 				_touch(play, at, false)
 		"tier":
 			var ps: = ult.pairs()
-			if not ps.is_empty():
-				var t: Tile = ps[0][0]
+			var top: = ps.filter( func(pr): return bd.tile_at(V9UltCast.pos_of(pr[0])) == pr[0])
+			if not top.is_empty():
+				var t: Tile = top[0][0]
 				var gz: = t.gz
 				var cand: = ps.filter( func(pr): return pr[0].gz == gz or pr[1].gz == gz)
 				expect = cand.back()

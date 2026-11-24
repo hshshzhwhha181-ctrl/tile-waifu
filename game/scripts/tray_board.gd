@@ -42,7 +42,13 @@ var opened: = {}
 const MAX_COLS: = 6
 const MAX_ROWS: = 9
 
+# 0.9: tap / match / tray feedback goes through V9Feel (one place for «всё приятно нажимается»): the select
+# click and haptic, the deny, the combo pitch ladder with its haptic in step, the «one slot left» warning. The
+# meta tells V7Haptics not to add its own board haptics on top.
 func _ready() -> void :
+	set_meta("v9_feel", true)
+	failed.connect( func(): V9Feel.haptic("fail"))
+	cleared.connect( func(): V9Feel.haptic("clear"))
 	floor_layer = Node2D.new()
 	tile_layer = Node2D.new()
 	add_child(floor_layer)
@@ -372,7 +378,7 @@ func tap(t: Tile) -> void :
 		return
 	if not is_free(t):
 		t.deny()
-		Sfx.play("deny")
+		V9Feel.tile_tap(false)
 		denied.emit(t)
 		return
 	if t.ice > 0:
@@ -381,11 +387,12 @@ func tap(t: Tile) -> void :
 		t.crack()
 		cracks += 1
 		Sfx.play("clack1", 1.3, -6)
+		V9Feel.haptic("flip" if t.ice <= 0 else "select")
 		tray_changed.emit()
 		return
 	for x in tiles:
 		x.hint(false)
-	Sfx.play("select", randf_range(0.96, 1.06))
+	t.press_glint()
 	var twin: Tile = null
 	for x in tray:
 		if x.face == t.face:
@@ -407,6 +414,12 @@ func tap(t: Tile) -> void :
 		history.append(t)
 		display.append(t)
 	max_tray = maxi(max_tray, tray.size())
+	# the click and the haptic: a pair-to-be is a plain select (its chime follows in _match); one slot left warns
+	if twin == null and slots >= 4 and tray.size() == slots - 1:
+		V9Feel.sound("select", randf_range(0.96, 1.06))
+		V9Feel.haptic("danger")
+	else:
+		V9Feel.tile_tap(true)
 	_layout_tray(t)
 	reveal_free()
 	tray_changed.emit()
@@ -477,7 +490,10 @@ func _match(a: Tile, b: Tile) -> void :
 		tw.tween_property(t, "scale", Vector2.ZERO, 0.14).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
 		tw.parallel().tween_property(t, "modulate:a", 0.0, 0.14)
 		tw.tween_callback(t.hide)
-	Sfx.play("match%d" % clampi(combo - 1, 0, 7))
+	# 0.9: each pair of a combo chimes a semitone higher (Sfx.combo_step, up to an octave) with its haptic in step
+	V9Feel.tile_match(combo, a.gold)
+	if a.shard != "":
+		V9Feel.haptic("reveal")
 	Sfx.play("clack0", 1.15, -4)
 	matched.emit(tile_layer.get_global_transform_with_canvas() * mid, combo, a.gold, a.shard)
 	await get_tree().create_timer(0.2).timeout

@@ -1,6 +1,13 @@
 class_name Fx
 extends RefCounted
 
+# Fx — one-shot particles, rings, glows and floating text (static).
+# 0.9 (spec §A, «Эффекты»): every decorative effect here follows S.fx_level through V9Feel:
+#   burst / ambient   particle count × V9Feel.fx_scale() (full 1.0, mid 0.55, min — none)
+#   ring / flash_glow decor: skipped at «минимум»
+#   float_text        information («+12», «−10 с»): always shown
+#   shake             a node shake used as fail feedback: kept at every level, but at «минимум» it is halved
+
 
 static var _add: CanvasItemMaterial
 
@@ -33,7 +40,17 @@ static func particles(tex: String, amount: int, lifetime: float) -> CPUParticles
 	p.local_coords = false
 	return p
 
+# particle count after the «Эффекты» level (0 = skip the emitter)
+static func scaled(count: int) -> int:
+	var k: = V9Feel.fx_scale()
+	if k <= 0.0 or count <= 0:
+		return 0
+	return maxi(1, int(round(count * k)))
+
 static func burst(parent: Node, pos: Vector2, kind: = "sparkle", count: = 24, color: = Color(1, 0.9, 0.6), power: = 1.0) -> void :
+	count = scaled(count)
+	if count <= 0 or parent == null or not is_instance_valid(parent):
+		return
 	var p: CPUParticles2D
 	match kind:
 		"sparkle":
@@ -127,6 +144,8 @@ static func burst(parent: Node, pos: Vector2, kind: = "sparkle", count: = 24, co
 	p.finished.connect(p.queue_free)
 
 static func ring(parent: Node, pos: Vector2, color: = Color(1, 0.9, 0.6), size: = 1.6, dur: = 0.5) -> void :
+	if not V9Feel.can_fx() or parent == null or not is_instance_valid(parent):
+		return
 	var s: = Sprite2D.new()
 	s.texture = G.fx("ring")
 	s.material = add_mat()
@@ -140,6 +159,8 @@ static func ring(parent: Node, pos: Vector2, color: = Color(1, 0.9, 0.6), size: 
 	t.chain().tween_callback(s.queue_free)
 
 static func flash_glow(parent: Node, pos: Vector2, color: = Color(1, 1, 0.9), size: = 2.0, dur: = 0.35) -> void :
+	if not V9Feel.can_fx() or parent == null or not is_instance_valid(parent):
+		return
 	var s: = Sprite2D.new()
 	s.texture = G.fx("glow")
 	s.material = add_mat()
@@ -169,6 +190,8 @@ static func float_text(parent: Node, pos: Vector2, text: String, color: = Color.
 	return l
 
 static func shake(n: Node, amount: = 10.0, dur: = 0.3) -> void :
+	if V9Feel.level() == "min":
+		amount *= 0.5
 	var base: Vector2 = n.get_meta("shake_base", n.position)
 	n.set_meta("shake_base", base)
 	var t: Tween = n.create_tween()
@@ -182,6 +205,9 @@ static func shake(n: Node, amount: = 10.0, dur: = 0.3) -> void :
 static func ambient(parent: Node, kind: String, area: Vector2) -> Node2D:
 	var root: = Node2D.new()
 	parent.add_child(root)
+	# «минимум»: no ambient particles (the root stays, callers keep and free it as before)
+	if V9Feel.fx_scale() <= 0.0:
+		return root
 	match kind:
 		"petals":
 			var p: = particles("petal", 26, 9.0)
@@ -339,4 +365,8 @@ static func ambient(parent: Node, kind: String, area: Vector2) -> Node2D:
 			p.color = Color(1, 0.95, 0.85)
 			p.color_ramp = _grad([Color(1, 1, 1, 0), Color(1, 1, 1, 1), Color(1, 1, 1, 0)])
 			root.add_child(p)
+	if V9Feel.fx_scale() < 1.0:
+		for c in root.get_children():
+			if c is CPUParticles2D:
+				(c as CPUParticles2D).amount = scaled((c as CPUParticles2D).amount)
 	return root

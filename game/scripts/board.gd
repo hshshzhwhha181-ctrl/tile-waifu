@@ -239,13 +239,13 @@ func tap(t: Tile) -> void :
 		x.hint(false)
 	if not selectable(t):
 		t.deny()
-		Sfx.play("deny")
+		V9Feel.tile_tap(false)
 		denied.emit(t)
 		return
 	if selected == null:
 		selected = t
 		t.set_selected(true)
-		Sfx.play("select", randf_range(0.96, 1.06))
+		V9Feel.tile_tap(true)
 		picked.emit(t)
 		return
 	if selected == t:
@@ -259,7 +259,7 @@ func tap(t: Tile) -> void :
 		selected.set_selected(false)
 		selected = t
 		t.set_selected(true)
-		Sfx.play("select", randf_range(0.96, 1.06))
+		V9Feel.tile_tap(true)
 		picked.emit(t)
 
 func _match(a: Tile, b: Tile) -> void :
@@ -288,7 +288,7 @@ func _match(a: Tile, b: Tile) -> void :
 		tw.parallel().tween_property(t, "modulate:a", 0.0, 0.14)
 		tw.tween_callback(t.hide)
 	await get_tree().create_timer(0.27).timeout
-	Sfx.play("match%d" % clampi(combo - 1, 0, 7))
+	V9Feel.tile_match(combo)
 	Sfx.play("clack0", 1.15, -4)
 	var gmid: = tile_layer.get_global_transform_with_canvas() * mid
 	matched.emit(a, b, gmid, combo)
