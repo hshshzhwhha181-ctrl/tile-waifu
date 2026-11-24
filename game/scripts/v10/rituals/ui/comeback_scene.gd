@@ -130,7 +130,7 @@ func _title(text: String, at_y: float, delay: float) -> void:
 
 func _warm() -> void:
 	_bg("res://assets/bg/bg_teahouse.webp", 0.5)
-	var p: = _portrait(_h(), 980, size.x * 0.62)
+	var p: = _portrait(_h(), 980, size.x * 0.7)
 	var end_x: = p.position.x
 	p.position.x = size.x + 40
 	p.modulate.a = 0.0
@@ -148,7 +148,7 @@ func _warm() -> void:
 	var tw: = create_tween()
 	tw.tween_interval(0.9)
 	tw.tween_callback(func():
-		V10RitUI.voice(_stage, line, Vector2(40, 170), 420, 40, 0.0)
+		V10RitUI.voice(_stage, line, Vector2(36, 170), 330, 40, 0.0)
 		V10RitUI.sfx("tea_pour", "sparkle", 1.0, -6.0))
 	tw.tween_interval(1.0)
 	tw.tween_callback(func(): _rested_chip(Vector2(232, size.y - 316)))
@@ -190,7 +190,7 @@ func _waited() -> void:
 	glow.modulate = Color(V10RitUI.GOLD500, 0.0)
 	glow.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_stage.add_child(glow)
-	var p: = _portrait(_h(), 1000, size.x * 0.6)
+	var p: = _portrait(_h(), 1000, size.x * 0.7)
 	p.modulate = Color(0.0, 0.0, 0.02, 0.0)
 	p.scale = Vector2(-1, 1)           # back to us: facing the window
 	_stage.add_child(V10RitUI.grad(Rect2(0, size.y * 0.6, size.x, size.y * 0.4), Color(V10RitUI.NIGHT900, 0), Color(V10RitUI.NIGHT900, 0.94)))
@@ -212,7 +212,7 @@ func _waited() -> void:
 	t.parallel().tween_property(p, "modulate", Color.WHITE, 0.5)
 	t.tween_callback(func():
 		_breathe(p)
-		V10RitUI.voice(_stage, V10RitLines.pick("comeback_waited", _h(), 0), Vector2(40, 170), 400, 40, 0.0))
+		V10RitUI.voice(_stage, V10RitLines.pick("comeback_waited", _h(), 0), Vector2(36, 170), 330, 40, 0.0))
 	# 4.5 s: the stack of letters fans out and flies into the Phone badge
 	t.tween_interval(1.2)
 	t.tween_callback(func(): _letters(int(opts.get("letters", 5)), Vector2(size.x * 0.42, size.y * 0.62)))
@@ -307,6 +307,8 @@ func _winds() -> void:
 		t.tween_interval(step - 0.5)
 		if i < hs.size() - 1:
 			t.tween_property(p, "modulate:a", 0.0, 0.4)
+		else:
+			t.tween_property(p, "modulate:a", 0.3, 0.6)
 	var after: = 0.3 + hs.size() * step
 	var t2: = create_tween()
 	t2.tween_interval(after - 0.6)

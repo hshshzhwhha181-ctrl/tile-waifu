@@ -54,13 +54,13 @@ func _ready() -> void:
 	_tray.add_child(over)
 	# cards on the lacquer (perspective: the tray surface is ~ y 14%..80% of the image)
 	var n: = cards.size()
-	var cw: = minf(150.0, (TRAY_W - 140) / maxf(1, n) - 16)
-	var chh: = cw * 1.3
+	var cw: = minf(136.0, (TRAY_W - 160) / maxf(1, n) - 16)
+	var chh: = minf(cw * 1.3, th * 0.66)
 	var total: = n * cw + (n - 1) * 16
 	var x0: = (TRAY_W - total) * 0.5
 	for i in n:
 		var c: = _card(cards[i], cw, chh)
-		c.position = Vector2(x0 + i * (cw + 16), th * 0.47 - chh * 0.5)
+		c.position = Vector2(x0 + i * (cw + 16), th * 0.5 - chh * 0.5)
 		c.rotation = deg_to_rad((i - (n - 1) * 0.5) * 2.2)
 		_tray.add_child(c)
 		_cards_nodes.append(c)

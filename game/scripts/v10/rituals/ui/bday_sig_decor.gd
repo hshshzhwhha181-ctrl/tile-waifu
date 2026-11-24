@@ -7,6 +7,8 @@ extends RefCounted
 #   V10BdaySigDecor.apply(tile: CanvasItem, icon_path, face_rect: Rect2) -> TextureRect
 #   V10BdaySigDecor.remove(tile)
 # face_rect is the face area in the tile's local coordinates (tile.gd draws its face there).
+# The two overlaid kinds use ov.icons[0] (her emblem) and ov.icons[1] (her cake) so they never look alike:
+#   V10BdaySigDecor.icon_for(ov, face) -> path
 
 const META: = "v10_bday_sig"
 
@@ -26,6 +28,14 @@ static func apply(tile: CanvasItem, icon_path: String, face_rect: Rect2) -> Text
 	tile.add_child(t)
 	tile.set_meta(META, t)
 	return t
+
+
+static func icon_for(ov: Dictionary, face: int) -> String:
+	var i: = (ov.get("faces", []) as Array).find(face)
+	if i < 0:
+		return ""
+	var icons: Array = ov.get("icons", [ov.get("icon", "")])
+	return str(icons[mini(i, icons.size() - 1)])
 
 
 static func remove(tile: CanvasItem) -> void:

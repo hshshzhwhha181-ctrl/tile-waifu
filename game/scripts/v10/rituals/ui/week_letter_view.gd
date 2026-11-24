@@ -84,12 +84,21 @@ func _ready() -> void:
 		y += lines * lh + 22
 	var sign: = V10RitUI.label("— " + str(letter.get("sign", "")), 46, Color("7a3a4a"), "hand")
 	sign.label_settings.shadow_color = Color(0, 0, 0, 0)
-	sign.position = Vector2(_paper.size.x - 300, minf(y + 6, ph - 90))
+	sign.position = Vector2(40, minf(y + 6, ph - 90))
+	sign.size.x = _paper.size.x - 80
+	sign.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	sign.modulate.a = 0.0
 	_paper.add_child(sign)
 	var seal: = V10RitUI.tex(V10RitUI.ART + "envelope.webp", Rect2(_paper.size.x - 150, ph - 86, 110, 84))
 	seal.modulate.a = 0.0
 	_paper.add_child(seal)
+	# the sheet is as tall as the letter
+	ph = minf(ph, y + 130)
+	_paper.size.y = ph
+	sheet.size.y = ph
+	pm.set_shader_parameter("rect_size", _paper.size)
+	sign.position.y = y + 4
+	seal.position = Vector2(40, ph - 100)
 	var ok: = V10RitUI.button("Ответить улыбкой", Rect2((W - 560) * 0.5, size.y - 150, 560, 104), "primary", _close)
 	add_child(ok)
 	ok.modulate.a = 0.0
@@ -103,7 +112,7 @@ func _ready() -> void:
 	_tw.parallel().tween_callback(func(): V10RitUI.sfx("paper_fan", "whoosh", 1.3, -8.0))
 	for b in _blocks:
 		var mat: ShaderMaterial = b.material
-		var dur: = 1.2 if b == _blocks[0] else 0.8
+		var dur: = 0.9 if b == _blocks[0] else 0.55
 		_tw.tween_callback(func(): V10RitUI.sfx("pen_scratch", "flip", randf_range(0.95, 1.08), -6.0))
 		_tw.tween_method(func(v: float): mat.set_shader_parameter("progress", v), 0.0, 1.1, dur if fx else 0.12)
 	_tw.tween_property(sign, "modulate:a", 1.0, 0.4)

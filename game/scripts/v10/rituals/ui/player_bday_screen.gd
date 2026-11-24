@@ -157,7 +157,9 @@ func _ask() -> void:
 	paper.add_child(txt)
 	var sign: = V10RitUI.label("— " + V10RitBridge.short_name(h), 32, Color("7a4a56"), "hand")
 	sign.label_settings.shadow_color = Color(0, 0, 0, 0)
-	sign.position = Vector2(W - 2 * M - 220, 186)
+	sign.position = Vector2(28, 186)
+	sign.size.x = W - 2 * M - 56
+	sign.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	paper.add_child(sign)
 	# two buttons of EQUAL weight (152-ФЗ: refusing is as easy as agreeing)
 	var bw: = (W - 2 * M - 16) * 0.5
@@ -284,14 +286,14 @@ func _answer(kind: String) -> void:
 	p.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	p.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT
 	p.size = Vector2(980 * 848.0 / 1264.0, 980)
-	p.position = Vector2(W - p.size.x + 80, size.y - 980 - 140)
+	p.position = Vector2(W - p.size.x + 170, size.y - 980 - 140)
 	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_body.add_child(p)
 	_body.add_child(V10RitUI.grad(Rect2(0, size.y * 0.6, W, size.y * 0.4), Color(V10RitUI.NIGHT900, 0), V10RitUI.NIGHT900))
-	V10RitUI.voice(_body, V10RitLines.pick(group, h, 0), Vector2(32, 150), 420, 40, 0.0)
+	var vl: = V10RitUI.voice(_body, V10RitLines.pick(group, h, 0), Vector2(32, 130), 330, 40, 0.0)
 	if kind != "declined" and V10PlayerBday.has_date():
 		var d: = V10RitUI.label(V10RitClock.fmt_date(int(V10PlayerBday.st().m), int(V10PlayerBday.st().d)), 52, V10RitUI.GOLD300, "title", 700)
-		d.position = Vector2(32, 320)
+		d.position = Vector2(32, 410)
 		_body.add_child(d)
 		V10RitUI.inhale([d], 0.6)
 	var ok: = V10RitUI.button("Хорошо", Rect2((W - 560) * 0.5, size.y - 150, 560, 104), "primary", func():

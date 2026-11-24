@@ -104,7 +104,7 @@ func _ready() -> void:
 	t.tween_callback(func():
 		var rows: Array = opts.get("rows", [])
 		if not rows.is_empty():
-			V10RitUI.cascade(self, rows, Vector2(W * 0.5, size.y - 300)))
+			V10RitUI.cascade(self, rows, Vector2(W * 0.5, size.y - 252)))
 	var ok: = V10RitUI.button("Спасибо!", Rect2((W - 560) * 0.5, size.y - 150, 560, 104), "primary", func():
 		var ft: = create_tween()
 		ft.tween_property(self, "modulate:a", 0.0, 0.3)

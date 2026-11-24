@@ -42,16 +42,22 @@ static var _players: = []
 
 static func hand_font() -> Font:
 	if _hand == null:
-		if ResourceLoader.exists(HAND_FONT):
-			_hand = load(HAND_FONT)
-		else:
-			_hand = UI.font("title", 600)
-			var it: = load("res://assets/fonts/playfair-i-cyr.woff2")
-			if it:
-				var fv: = FontVariation.new()
-				fv.base_font = it
-				fv.fallbacks = [UI.font("body", 700)]
-				_hand = fv
+		# Caveat 600 (v10-fonts) when merged, else Playfair Display Italic; Latin digits and symbols from the
+		# Latin subset, then Nunito (the 0.8 Cyrillic subsets carry no digits)
+		var fv: = FontVariation.new()
+		var chain: = []
+		for p in [HAND_FONT, "res://assets/fonts/playfair-i-cyr.woff2", "res://assets/fonts/playfair-i-lat.woff2"]:
+			if ResourceLoader.exists(p):
+				chain.append(load(p))
+		if chain.is_empty():
+			return UI.font("title", 600)
+		fv.base_font = chain[0]
+		var fb: = []
+		for i in range(1, chain.size()):
+			fb.append(chain[i])
+		fb.append(UI.font("body", 700))
+		fv.fallbacks = fb
+		_hand = fv
 	return _hand
 
 

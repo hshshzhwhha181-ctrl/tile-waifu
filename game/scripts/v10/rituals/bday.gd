@@ -85,7 +85,12 @@ static func sig_overlay(cfg: Dictionary, key: = "") -> Dictionary:
 	var b: int = faces[posmod(seed * 7 + 3, faces.size())]
 	if b == a:
 		b = faces[posmod(faces.find(a) + 1, faces.size())]
-	return {"h": w.h, "faces": [a, b], "icon": sig_icon(w.h)}
+	# two kinds must stay distinguishable: kind A wears her emblem, kind B her birthday cake
+	return {"h": w.h, "faces": [a, b], "icon": sig_icon(w.h), "icons": [sig_icon(w.h), cake_icon(w.h)]}
+
+
+static func cake_icon(h: String) -> String:
+	return "res://assets/v10/rituals/%s.webp" % str(V10BdayData.CAKE.get(h, "cake_tier"))
 
 
 static func _prog(key: String) -> Dictionary:

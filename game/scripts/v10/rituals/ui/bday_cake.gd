@@ -59,7 +59,9 @@ class Candles extends Control:
 			var wick: = Vector2(base.x, base.y - hgt - 6)
 			draw_line(wick + Vector2(0, 6), wick, Color(0.2, 0.15, 0.12), 2.0)
 			var l: float = lit[i]
-			if l <= 0.01:
+			if l <= 0.18:
+				if l > 0.01:
+					draw_circle(wick + Vector2(0, -3), 4.0 * l / 0.18, Color(1.0, 0.75, 0.35, 0.9))
 				continue
 			var fl: = 1.0 + 0.08 * sin(t * 17.0 + i * 1.7) + 0.05 * sin(t * 29.0 + i)
 			var b: float = bend[i]
@@ -158,7 +160,7 @@ func _ready() -> void:
 	_portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	_portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT
 	_portrait.size = Vector2(ph * 848.0 / 1264.0, ph)
-	_portrait.position = Vector2(size.x - _portrait.size.x + 70, size.y - ph - 150)
+	_portrait.position = Vector2(size.x - _portrait.size.x + 130, size.y - ph - 150)
 	_portrait.pivot_offset = Vector2(_portrait.size.x * 0.5, ph)
 	_portrait.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_portrait)
@@ -188,7 +190,7 @@ func _ready() -> void:
 	var over: = V10RitUI.label("День рождения · %s" % V10RitBridge.short_name(h), 15, V10RitUI.GOLD500, "over")
 	over.position = Vector2(32, 250)
 	add_child(over)
-	V10RitUI.voice(self, V10RitLines.pick("bday_wish", h, 0), Vector2(32, 280), 400, 40, 0.0)
+	V10RitUI.voice(self, V10RitLines.pick("bday_wish", h, 0), Vector2(32, 280), 300, 40, 0.0)
 	var hint: = V10RitUI.label("Коснись торта", 18, V10RitUI.PAPER300)
 	hint.name = "hint"
 	hint.position = Vector2(70, size.y - 150)
@@ -254,5 +256,5 @@ func blow() -> void:
 		V10RitUI.sfx("bell", "sparkle", 1.0, -3.0))
 	t.tween_interval(0.5)
 	t.tween_callback(func():
-		V10RitUI.voice(self, V10RitLines.pick("bday_blown", h, 0), Vector2(32, 380), 400, 36, 0.0)
+		V10RitUI.voice(self, V10RitLines.pick("bday_blown", h, 0), Vector2(32, 400), 300, 36, 0.0)
 		blown.emit())

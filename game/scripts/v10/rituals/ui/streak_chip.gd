@@ -48,7 +48,7 @@ func _build() -> void:
 	glow.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	glow.name = "glow"
 	add_child(glow)
-	_steam = V10RitUI.steam(self, Vector2(W * 0.5, 44), 54, 14, Color(1, 0.98, 0.94, 0.42))
+	_steam = V10RitUI.steam(self, Vector2(W * 0.5, 44), 54, 16, Color(1, 0.98, 0.94, 0.62))
 	_bowl = V10RitUI.tex(V10RitUI.ART + "bowl.webp", Rect2(17, 28, 116, 108))
 	add_child(_bowl)
 	_leaves = []

@@ -145,8 +145,8 @@ func _run(sc: String, dir: String) -> void:
 			chip.setup(V10Streak.view())
 			var cards: = [
 				{"id": "seven", "icon": "res://assets/icons/ticket.png", "title": "Семь встреч", "text": "День 3", "rewards": {"tickets": 1}},
-				{"id": "streak_leaf", "icon": V10RitUI.ART + "leaf.webp", "title": "Чайный лист", "text": "Листьев: 2 из 2", "rewards": {}},
-				{"id": "card", "icon": "res://assets/icons/gem.png", "title": "Абонемент", "text": "+30 кристаллов", "rewards": {"gems": 30}},
+				{"id": "streak_leaf", "icon": V10RitUI.ART + "leaf.webp", "title": "Чайный лист", "text": "Листья: 2/2", "rewards": {}},
+				{"id": "card", "icon": "res://assets/icons/gem.png", "title": "Абонемент", "text": "+30", "rewards": {"gems": 30}},
 			]
 			var tv: = V10TrayView.open(root, cards, {"default": ctr.gems.global_position + Vector2(30, 26), "gems": ctr.gems, "tickets": ctr.tickets})
 			tv.claim_fn = func():
@@ -189,7 +189,7 @@ func _run(sc: String, dir: String) -> void:
 				await _wait(0.6)
 				await _shot(dir, "forgiven_mid")
 			await _wait(0.7)
-			V10RitUI.voice(root, V10RitLines.pick("forgiven", "mc", 0), Vector2(32, 520), 400, 38, 3.0)
+			V10RitUI.voice(root, V10RitLines.pick("forgiven", "mc", 0), Vector2(32, 520), 300, 38, 3.0)
 			if shoot:
 				await _wait(1.2)
 				await _shot(dir, "forgiven_line")
@@ -292,7 +292,7 @@ func _run(sc: String, dir: String) -> void:
 			if shoot:
 				await _wait(1.5)
 				await _shot(dir, "week_letter_ink")
-				await _wait(3.4)
+				await _wait(3.6)
 				await _shot(dir, "week_letter")
 		"rested":
 			_hud_mock()
@@ -310,29 +310,31 @@ func _sig_tiles() -> void:
 	var ov: = V10Bday.sig_overlay({"ranked": false, "faces": faces, "seed": 5}, "2026-11-30")
 	var y: = 120.0
 	for hero in ["rin", "mc", "hana", "yue", "nova"]:
-		var lbl: = V10RitUI.label(V10RitBridge.short_name(hero), 22, V10RitUI.PAPER300)
+		var lbl: = V10RitUI.wrap_w(V10RitUI.label(V10RitBridge.short_name(hero), 18, V10RitUI.PAPER300), 140)
 		lbl.position = Vector2(32, y + 34)
 		root.add_child(lbl)
 		for i in 6:
 			var f: int = faces[i]
 			var tile: = Control.new()
-			tile.position = Vector2(150 + i * 92, y)
-			tile.size = Vector2(84, 104)
+			tile.position = Vector2(176 + i * 88, y)
+			tile.size = Vector2(80, 104)
 			root.add_child(tile)
-			tile.add_child(V10RitUI.panel(Rect2(0, 6, 84, 98), Color("cdbfa8"), 10))
-			tile.add_child(V10RitUI.panel(Rect2(0, 0, 84, 96), Color("f6efe2"), 10, Color("d9c9ae"), 2))
+			tile.add_child(V10RitUI.panel(Rect2(0, 6, 80, 98), Color("cdbfa8"), 10))
+			tile.add_child(V10RitUI.panel(Rect2(0, 0, 80, 96), Color("f6efe2"), 10, Color("d9c9ae"), 2))
 			var face: = TextureRect.new()
 			face.texture = G.tile_tex(f)
 			face.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 			face.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 			face.position = Vector2(8, 8)
-			face.size = Vector2(68, 80)
+			face.size = Vector2(64, 80)
 			tile.add_child(face)
 			if f in (ov.get("faces", []) as Array):
 				face.modulate.a = 0.0
-				V10BdaySigDecor.apply(tile, V10Bday.sig_icon(hero), Rect2(8, 8, 68, 80))
+				var ovh: = ov.duplicate()
+				ovh.icons = [V10Bday.sig_icon(hero), V10Bday.cake_icon(hero)]
+				V10BdaySigDecor.apply(tile, V10BdaySigDecor.icon_for(ovh, f), Rect2(8, 8, 64, 80))
 		y += 150
-	var note: = V10RitUI.wrap_w(V10RitUI.label("Две масти рисуются эмблемой именинницы. Номера фишек не меняются: раздача, боты и коды вызова те же. В рейтинге подмены нет.", 20, V10RitUI.PAPER500, "body", 700), W - 64)
+	var note: = V10RitUI.wrap_w(V10RitUI.label("Две масти рисуются её эмблемой и её тортом. Номера фишек не меняются: раздача, боты и коды вызова те же. В рейтинге подмены нет.", 20, V10RitUI.PAPER500, "body", 700), W - 64)
 	note.position = Vector2(32, y + 10)
 	root.add_child(note)
 	var gc: = V10BdayGoalChip.make({"h": "rin", "n": 12, "goal": 24, "icon": V10Bday.sig_icon("rin")})

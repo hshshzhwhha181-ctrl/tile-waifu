@@ -39,7 +39,8 @@ func _ready() -> void:
 	_sheet.position = Vector2(0, H)
 	_sheet.mouse_filter = Control.MOUSE_FILTER_STOP
 	add_child(_sheet)
-	_sheet.add_child(V10RitUI.panel(Rect2(0, 0, W, sh_h + 40), V10RitUI.NIGHT800, 4))
+	var bgp: = V10RitUI.panel(Rect2(0, 0, W, sh_h + 40), V10RitUI.NIGHT800, 4)
+	_sheet.add_child(bgp)
 	_sheet.add_child(V10RitUI.panel(Rect2(W * 0.5 - 32, 12, 64, 5), V10RitUI.NIGHT600, 3))
 	var v: = V10Streak.view(_key)
 	var M: = 32.0
@@ -106,12 +107,12 @@ func _ready() -> void:
 	for i in cal.size():
 		var c: Dictionary = cal[i]
 		var cell: = _cell(c, cw)
-		cell.position = Vector2((i % 7) * cw, (i / 7) * 74)
+		cell.position = Vector2((i % 7) * cw, (i / 7) * 64)
 		grid.add_child(cell)
 		if V9Feel.can_fx():
 			cell.modulate.a = 0.0
 			cell.create_tween().tween_property(cell, "modulate:a", 1.0, 0.2).set_delay(0.18 + 0.012 * i)
-	y += 5 * 74 + 12
+	y += 5 * 64 + 10
 	# milestones
 	var ml: = V10RitUI.label("Рубежи", 15, V10RitUI.GOLD500, "over")
 	ml.position = Vector2(M, y)
@@ -123,7 +124,7 @@ func _ready() -> void:
 		var m: int = MILES[i]
 		var done: = m in got
 		var nxt: = m == int(v.next)
-		var card: = V10RitUI.panel(Rect2(M + i * (mw + 10), y, mw, 112), V10RitUI.NIGHT700, 12,
+		var card: = V10RitUI.panel(Rect2(M + i * (mw + 10), y, mw, 100), V10RitUI.NIGHT700, 12,
 			V10RitUI.GOLD500 if nxt else Color(V10RitUI.GOLD700, 0.35), 2 if nxt else 1)
 		_sheet.add_child(card)
 		var ic: = V10RitUI.tex(str(V10RitBridge.ICONS.get(MILE_ICON[m], "")), Rect2(mw * 0.2, 10, mw * 0.6, mw * 0.6))
@@ -131,19 +132,23 @@ func _ready() -> void:
 			ic.modulate = Color(1, 1, 1, 0.45)
 		card.add_child(ic)
 		var ln: = V10RitUI.label(str(m), 22, V10RitUI.GOLD300 if (done or nxt) else V10RitUI.PAPER500, "num")
-		ln.position = Vector2(0, 70)
+		ln.position = Vector2(0, 64)
 		ln.size = Vector2(mw, 30)
 		ln.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		card.add_child(ln)
 		if done:
 			var hk: = V10RitUI.hanko(card, Vector2(mw - 14, 18), "✓", 30)
 			hk.modulate.a = 1.0
-	y += 128
+	y += 114
 	var rule: = V10RitUI.wrap_w(V10RitUI.label(V10Streak.RULE_TEXT + ".", 18, V10RitUI.PAPER500, "body", 700), W - 2 * M)
 	rule.position = Vector2(M, y)
 	_sheet.add_child(rule)
-	y += 92
-	var ok: = V10RitUI.button("Понятно", Rect2((W - 560) * 0.5, minf(y, sh_h - 128), 560, 104), "primary", close)
+	y += 84
+	# the sheet is as tall as its content (the repair plate adds a row)
+	sh_h = minf(y + 136, H - 40)
+	_sheet.size.y = sh_h
+	bgp.size.y = sh_h + 40
+	var ok: = V10RitUI.button("Понятно", Rect2((W - 560) * 0.5, sh_h - 124, 560, 104), "primary", close)
 	ok.breathing = false
 	_sheet.add_child(ok)
 	var help: = V10RitUI.button("?", Rect2(W - M - 64, 28, 64, 64), "quiet", func(): pass)
@@ -156,10 +161,10 @@ func _ready() -> void:
 
 func _cell(c: Dictionary, cw: float) -> Control:
 	var box: = Control.new()
-	box.size = Vector2(cw, 70)
+	box.size = Vector2(cw, 62)
 	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var r: = 26.0
-	var ctr: = Vector2(cw * 0.5, 30)
+	var r: = 25.0
+	var ctr: = Vector2(cw * 0.5, 28)
 	var stt: = str(c.state)
 	var fill: = Color(0, 0, 0, 0)
 	var ring: = Color(V10RitUI.PAPER700, 0.5)

@@ -91,7 +91,7 @@ static func hero_name(h: String) -> String:
 
 
 static func short_name(h: String) -> String:
-	return "Мадж" if h == "mc" else hero_name(h)
+	return hero_name(h)
 
 
 # genitive for «Праздник Ханы», «торт Новы» (indeclinable names stay as they are)

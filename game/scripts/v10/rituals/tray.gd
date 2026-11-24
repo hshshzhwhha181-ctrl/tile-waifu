@@ -53,7 +53,7 @@ static func _leaf_card(key: String) -> Dictionary:
 	if str(s.get("leaf_new_key", "")) != key:
 		return {}
 	return {"icon": "res://assets/v10/rituals/leaf.webp", "title": "Чайный лист",
-		"text": "Листьев: %d из %d" % [int(s.leaves), V10Streak.LEAF_MAX], "rewards": {},
+		"text": "Листья: %d/%d" % [int(s.leaves), V10Streak.LEAF_MAX], "rewards": {},
 		"claim": func(): s.leaf_new_key = ""}
 
 

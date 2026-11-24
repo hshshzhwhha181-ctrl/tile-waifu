@@ -318,6 +318,7 @@ static func _bday() -> void:
 	var ov: = V10Bday.sig_overlay(cfg, "2027-07-18")
 	_t(ov.get("h", "") == "hana" and (ov.faces as Array).size() == 2 and ov.faces[0] != ov.faces[1], "overlay: 2 face kinds")
 	_t(hash(cfg) == h0, "overlay does not change the deal hash")
+	_t((ov.icons as Array).size() == 2 and ov.icons[0] != ov.icons[1], "the two overlaid kinds stay distinguishable")
 	_t(V10Bday.sig_overlay(cfg, "2027-07-18") == ov, "overlay deterministic")
 	cfg.ranked = true
 	_t(V10Bday.sig_overlay(cfg, "2027-07-18").is_empty(), "no overlay in ranked")
