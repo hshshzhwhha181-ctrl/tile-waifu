@@ -788,7 +788,7 @@ func _on_match(mid: Vector2, combo: int, gold: bool, shard: String) -> void :
 	# sparkles; petals only from ×3 (the combo pill and the tier stamps carry the rest)
 	if V9Feel.can_fx():
 		Fx.flash_glow(fx_layer, mid, Color(V9Cutin.flash_color(G.HEROES[partner].color), 0.8), 1.4, 0.3)
-	Fx.ring(fx_layer, mid, Color(1, 0.85, 0.5), 1.1)
+	Fx.ring(fx_layer, mid, Color(1, 0.85, 0.5, 0.7), 1.0)
 	Fx.burst(fx_layer, mid, "sparkle", 8 + mini(combo, 8) * 2, Color(1, 0.9, 0.55) if not gold else Color(1, 0.8, 0.2), 1.0 + mini(combo, 8) * 0.05)
 	if combo >= 3:
 		Fx.burst(fx_layer, mid, "petal", 4 + mini(combo, 6))

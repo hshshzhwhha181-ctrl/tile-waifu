@@ -360,20 +360,18 @@ func say(text: String, emo: = "", voice: = "", talk: = true) -> void:
 	if bubble and is_instance_valid(bubble):
 		bubble.queue_free()
 	var with_av: = mode != "rig"
-	# the lobby video frames her head high: the bubble sits right under the clock plate and only grazes her hair
 	var head: = from_art(geom.head)
 	var pos: = Vector2(BUBBLE_X, 176.0)
 	var tail_up: = false
-	if mode != "video":
-		# 0.9: anchored by its bottom edge to a line above her face, so extra lines grow upward; when there is no
-		# room under the clock plate it hangs just under her chin with the tail pointing up — never over her eyes
-		var hr: float = (from_art(geom.head + Vector2(0, float(geom.head_r))) - head).y
-		var h: = _bubble_h(text, with_av)
-		print("DBG bubble head=", head, " hr=", hr, " h=", h)
-		pos.y = head.y - hr - 30.0 - h
-		if pos.y < BUBBLE_TOP:
-			pos.y = head.y + hr * 0.85 + 26.0
-			tail_up = true
+	# 0.9: anchored by its bottom edge above her face, so extra lines grow upward (never lower than the clock plate
+	# allows: the video frames her head high, so its bubble may start at 176). When a long line would still reach her
+	# eyes (bottom past head − 0.45 r), it hangs just under her chin with the tail pointing up instead.
+	var hr: float = (from_art(geom.head + Vector2(0, float(geom.head_r))) - head).y
+	var h: = _bubble_h(text, with_av)
+	pos.y = maxf(176.0 if mode == "video" else BUBBLE_TOP, head.y - hr - 30.0 - h)
+	if pos.y + h > head.y - hr * 0.45:
+		pos.y = head.y + hr * 0.85 + 26.0
+		tail_up = true
 	bubble = _bubble(text, pos, _paint_emo(emo) if with_av else emo, with_av, tail_up, head.x - pos.x)
 	home.set("bubble", bubble)
 	var dur: = minf(0.4 + text.length() * 0.045, 4.0)

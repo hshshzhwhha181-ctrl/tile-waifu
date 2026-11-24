@@ -749,7 +749,7 @@ func on_match(pos: Vector2, combo: = 1, gold: = false, shard: = "") -> void :
 	# 0.9: no white-out over the tray (HEROINES §2 «без белых вспышек»): cream chips, a few glints and an additive
 	# glow in a ≤ 70 %-value warm tint that stays about one tile wide
 	burst(pos, "spark", 10 + c * 2, warm, 1.0 + c * 0.04)
-	burst(pos, "chip", 6 + mini(c, 4), Color(1, 0.88, 0.7), 1.0)
+	burst(pos, "chip", 4 + mini(c, 3), Color(1, 0.88, 0.7), 0.85)
 	burst(pos, "glint", 2 + mini(c, 6) / 2, Color(1, 0.88, 0.7), 0.9)
 	glow(pos, Color(V9Cutin.flash_color(warm), 0.75), 1.2 + mini(c, 8) * 0.05, 0.28)
 	# 0.9: the chime climbs the same semitone ladder as the board's match chime (Sfx.combo_step), so the two
