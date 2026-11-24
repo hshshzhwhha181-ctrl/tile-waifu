@@ -128,6 +128,11 @@ func _build_main(nick0: String) -> void :
 	play_btn.set_sub(V8ProfileUI.s("card.play_sub"), 19)
 	play_btn.shine_every = 2.6
 	play_btn.pressed.connect(_on_play)
+	# 0.9: a bad nick is refused by the gate — the tap gets only the deny and the red hint says why
+	play_btn.set_gate( func(): return _done or G.nick_error(nick_le.text) == "", func():
+		nick_le.release_focus()
+		_validate(true)
+		V9Feel.deny(nick_le))
 	page_main.add_child(play_btn)
 	var note: = UI.label(V8ProfileUI.s("card.note"), 17, UI.MUTED, UI.DARK, 2, "body", 800)
 	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -173,8 +178,7 @@ func _on_play() -> void :
 		return
 	nick_le.release_focus()
 	if not _validate(true):
-		UI.punch(nick_le, 0.06)
-		Sfx.play("tap")
+		V9Feel.deny(nick_le)
 		return
 	if not G.set_profile(nick_le.text, avatar, true):
 		_validate(true)
@@ -213,8 +217,7 @@ func _show_code() -> void :
 			_on_imported()
 		else:
 			ui.error.text = V8Recovery.last_error
-			UI.punch(ui.field, 0.06)
-			Sfx.play("tap")
+			V9Feel.deny(ui.field)
 	ui.merge(V8ProfileUI.code_entry(page_code, Rect2(40, 106, PW - 80, 600), on_code, _hide_code))
 	UI.slide_in(page_code, Vector2(40, 0), 0.0, 0.25)
 

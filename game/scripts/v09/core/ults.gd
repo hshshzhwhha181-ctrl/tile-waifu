@@ -17,6 +17,8 @@ extends RefCounted
 #                SSR clips open on the top half of it). Scale to the real texture with V9Ults.rect_px().
 #     alt_rect:  Rect2 in 859×1280 art space: head to waist (modest mode crop, HEROINES.md §2 «Скромный режим»).
 #     mod:       "П" | "О" | "Л" | "В" | "Ц" | "С", or "" for the five base outfits (see MODS)
+#     eye_img / eye_rect, panel_img / panel_rect (optional): another painting of her (+ art-space face rect) for the SSR
+#                eye close-up / the art panel, used while ref_img is queued for an adult-face redraw (docs/ART.md)
 #     sfx:       name of the hit sound in res://assets/sfx (Sfx.play(sfx)) played on the strong beat
 #     fx:        short key of the board visual from the §5 table (the cut-in / fx stream maps it to an effect)
 #   }
@@ -72,13 +74,14 @@ const START: = {"R": 0, "SR": 2, "SSR": 3}
 
 const BASE: = {"mc": "o_base", "rin": "r_base", "hana": "h_base", "yue": "y_base", "nova": "n_base"}
 
+# chip: the player-facing line the ult shows when the modifier lands (V9UltCast._mod_chip); never the internal name
 const MODS: = {
-	"П": {"name": "Подсказка", "desc": "подсвечивает 1 пару на 3 секунды"},
-	"О": {"name": "Открытие", "desc": "открывает 1 закрытую фишку"},
-	"Л": {"name": "Лёд", "desc": "растапливает 1 лёд или замок; без льда открывает фишку"},
-	"В": {"name": "Возврат", "desc": "возвращает 1 фишку из лотка (у Рин +1 чашка пассивки)"},
-	"Ц": {"name": "Цель", "desc": "видимая автоцель: пара, которая освобождает больше всего фишек"},
-	"С": {"name": "Старшая", "desc": "подсвечивает пару для самой старой фишки в лотке"},
+	"П": {"name": "Подсказка", "desc": "подсвечивает 1 пару на 3 секунды", "chip": "Подсказка пары"},
+	"О": {"name": "Открытие", "desc": "открывает 1 закрытую фишку", "chip": "Открыта фишка"},
+	"Л": {"name": "Лёд", "desc": "растапливает 1 лёд или замок; без льда открывает фишку", "chip": "Растоплен лёд"},
+	"В": {"name": "Возврат", "desc": "возвращает 1 фишку из лотка (у Рин +1 чашка пассивки)", "chip": "Фишка из лотка вернулась"},
+	"Ц": {"name": "Цель", "desc": "видимая автоцель: пара, которая освобождает больше всего фишек", "chip": "Лучшая пара"},
+	"С": {"name": "Пара к старой фишке", "desc": "подсвечивает пару для самой старой фишки в лотке", "chip": "Пара к старой фишке"},
 }
 
 # target: how the player aims during TARGET_TIME — pair (tap a pair), swipe (direction of the dash),
@@ -165,6 +168,8 @@ const ULTS: = {
 		# 0.9: until mc_dragon is redrawn in the v2 direction (its face reads rounder / younger than her base art),
 		# the SSR eye close-up crops her base painting's mature face instead (eye_img / eye_rect, cutin.gd)
 		"eye_img": "res://assets/outfits/mc_base.webp", "eye_rect": Rect2(297, 48, 260, 260),
+		# …and so does the art panel (panel_img / panel_rect), so both clip beats show the same adult face
+		"panel_img": "res://assets/outfits/mc_base.webp", "panel_rect": Rect2(297, 48, 260, 260),
 		"mod": "Л", "sfx": "summon_boom", "fx": "jade_dragon"},
 	# ── Рин: нефрит 4fbf9f, золотые очки. Ядро: возвращает лоток (пуст — снимает пару).
 	"r_base": {"hero": "rin", "name": "Чайная пауза", "lines": ["Позволь.", "Чайная пауза.", "Не торопись."],
@@ -247,6 +252,10 @@ const ULTS: = {
 	"ev_mc": {"hero": "mc", "name": "Последний гость", "lines": ["Табличка «закрыто»!", "Только для своих~", "Партия окончена~"],
 		"palette": {"main": Color("ff8fb8"), "accent": Color("ffcf8a"), "ink": _MC_INK},
 		"ref_img": "res://assets/v07/event/cg_mc_card.webp", "face_rect": Rect2(168, 175, 468, 468), "alt_rect": Rect2(74, 80, 656, 820),
+		# cg_mc_card's face reads younger than her base art (queued for an adult-face redraw, docs/ART.md): the SSR eye
+		# close-up and the art panel use her base painting's mature face until then
+		"eye_img": "res://assets/outfits/mc_base.webp", "eye_rect": Rect2(297, 48, 260, 260),
+		"panel_img": "res://assets/outfits/mc_base.webp", "panel_rect": Rect2(297, 48, 260, 260),
 		"mod": "В", "sfx": "sparkle", "fx": "lamp_dim"},
 	"ev_rin": {"hero": "rin", "name": "Рой светлячков", "lines": ["Позволь.", "Светлячки, ко мне.", "Посидим у пруда."],
 		"palette": {"main": Color("4fbf9f"), "accent": Color("fff0a0"), "ink": _RIN_INK},

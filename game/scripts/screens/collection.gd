@@ -197,16 +197,26 @@ func _build() -> void :
 		card.add_child(rtag)
 		rtag.add_child(UI.center_label(UI.label(it.rar, 16, G.rar_color(it.rar).lerp(Color.WHITE, 0.45), UI.DARK, 2, "body", 900), Rect2(0, -1, rw, 22)))
 		if worn and own:
-			# inside the card (middle, over the art), so it never covers the strip caption or the rarity tag
-			var wl: = UI.rbox("pink", Rect2(cw * 0.5 - 36, 38, 72, 26), 13, 2, 4)
-			card.add_child(wl)
-			wl.add_child(UI.center_label(UI.label(V6Txt.s("coll.worn"), 16, Color.WHITE, Color("7a2346"), 3, "body", 900), Rect2(0, 0, 72, 26)))
+			# 0.9: «надет» is a jade band at the bottom of the art (behind the name) plus a small jade check badge in
+			# the top-left corner (mirroring the rarity tag) — never a pill over her face
+			var band_h: = 62.0
+			var wb: = UI.rbox("mint", Rect2(inner.position.x + 1, inner.end.y - band_h - 1, inner.size.x - 2, band_h), 10, 0, 2)
+			wb.colors(Color(0.12, 0.42, 0.34, 0.0), Color(0.08, 0.34, 0.27, 0.92))
+			wb.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			card.add_child(wb)
+			var wk: = UI.rbox("mint", Rect2(inner.position.x + 3, inner.position.y + 2, 24, 24), 12, 2, 2)
+			wk.colors(Color("4fbf9f"), Color("1f6b55")).borders(Color("ffe7a6"), Color("c58a2c"))
+			wk.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			wk.tooltip_text = V6Txt.s("coll.worn")
+			card.add_child(wk)
+			wk.add_child(UI.center_label(UI.label("✓", 16, Color.WHITE, Color(0.05, 0.2, 0.15), 3, "body", 900), Rect2(0, -1, 24, 24)))
 		# 0.8: name at 16 px (never smaller), up to three lines inside the frame; it wraps between words only —
 		# a word that is still too wide is drawn lighter and, as the last resort, trimmed with «…», never cut in two
+		# 0.9: 9 px of side padding and the last line ends 8 px above the frame's bottom rim
 		var nl: = UI.label(it.name, 16, Color.WHITE, Color(0.2, 0.05, 0.2), 4, "body", 800)
-		var nw: = cw - 2.0
+		var nw: = cw - 18.0
 		Common.fit_words(nl, nw, 3, 16)
-		nl.position = Vector2(1, 76)
+		nl.position = Vector2(9, minf(76.0, inner.end.y - 8.0 - 84.0))
 		nl.size = Vector2(nw, 84)
 		nl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		nl.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
@@ -218,7 +228,7 @@ func _build() -> void :
 			var nlh: = nls.font.get_height(nls.font_size) + nls.line_spacing
 			var nth: = nls.font.get_multiline_string_size(nl.text, HORIZONTAL_ALIGNMENT_CENTER, nw - nls.outline_size, nls.font_size, -1, TextServer.BREAK_MANDATORY | TextServer.BREAK_WORD_BOUND).y
 			var n_lines: = clampi(int(round(nth / nls.font.get_height(nls.font_size))), 1, 3)
-			var ly: = minf(62.0, 160.0 - n_lines * nlh - 42.0)
+			var ly: = minf(62.0, nl.position.y + 84.0 - n_lines * nlh - 42.0)
 			card.add_child(V8Art.rect(V8Art.icon("lock"), Rect2(cw * 0.5 - 20, ly, 40, 40)))
 		var itc: Dictionary = it
 		card.mouse_filter = Control.MOUSE_FILTER_STOP

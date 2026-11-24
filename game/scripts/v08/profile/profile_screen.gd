@@ -118,7 +118,7 @@ func _identity() -> void :
 	hit.mouse_filter = Control.MOUSE_FILTER_STOP
 	hit.gui_input.connect( func(e):
 		if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT:
-			UI.punch(a, 0.06)
+			V9Feel.press(a)
 			_avatar_popup())
 	c.add_child(hit)
 	var x: = 204.0
@@ -238,8 +238,7 @@ func _league() -> void :
 		l2.clip_text = true
 		b.gui_input.connect( func(e):
 			if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT:
-				Sfx.play("pop")
-				UI.punch(b, 0.06)
+				V9Feel.press(b)
 				main.go("v7tourney", {"tab": tab}))
 
 
@@ -389,15 +388,14 @@ func _nick_popup() -> void :
 		le.text = V8ProfileUI.random_nick()
 		le.caret_column = le.text.length())
 	var save: = JButton.make(V8ProfileUI.s("profile.save"), "gold", Rect2(60, 222, w - 120, 96), null, 30)
+	# 0.9: a bad nick is refused by the gate — the tap gets only the deny, the hint line turns red and says why
+	save.set_gate( func(): return G.nick_error(le.text) == "", func():
+		hint.text = G.nick_error(le.text)
+		var ls: = hint.label_settings.duplicate() as LabelSettings
+		ls.font_color = Color("ff9a9a")
+		hint.label_settings = ls
+		V9Feel.deny(le))
 	save.pressed.connect( func():
-		var err: = G.nick_error(le.text)
-		if err != "":
-			hint.text = err
-			var ls: = hint.label_settings.duplicate() as LabelSettings
-			ls.font_color = Color("ff9a9a")
-			hint.label_settings = ls
-			UI.punch(le, 0.06)
-			return
 		G.set_profile(le.text, "", true)
 		main.toast(V8ProfileUI.s("profile.saved"), "heart")
 		Common.close_popup(p)

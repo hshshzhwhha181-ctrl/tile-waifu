@@ -574,11 +574,12 @@ func _input(e: InputEvent) -> void :
 			match String(core.target):
 				"row":
 					_aim_pick = {"row_y": snap_row(p.y)}
-					V9Feel.haptic("button")
+					# the same confirm click as the pair / tier picks
+					V9Feel.press(null, "select", "button")
 					aiming = false
 				"swipe":
 					_aim_pick = swipe_pick(_aim_from, p)
-					V9Feel.haptic("button")
+					V9Feel.press(null, "select", "button")
 					aiming = false
 	elif e is InputEventScreenDrag and _aim_down:
 		get_viewport().set_input_as_handled()
@@ -593,6 +594,7 @@ func _pick_pair_at(p: Vector2) -> void :
 	var bd: = _board()
 	var t: = bd.tile_at(p)
 	if t == null:
+		_aim_miss()
 		return
 	for pr in pairs():
 		if t in pr:
@@ -609,6 +611,7 @@ func _pick_tier_at(p: Vector2) -> void :
 	var bd: = _board()
 	var t: = bd.tile_at(p)
 	if t == null:
+		_aim_miss()
 		return
 	var gz: = t.gz
 	var cand: = pairs().filter( func(pr): return pr[0].gz == gz or pr[1].gz == gz)
@@ -620,6 +623,15 @@ func _pick_tier_at(p: Vector2) -> void :
 	V9Feel.haptic("button")
 	Sfx.play("select", 1.3, -4)
 	aiming = false
+
+
+# a tap on a gap inside the board while aiming: a deny and a short pulse of the aim frame (never silence)
+func _aim_miss() -> void :
+	V9Feel.deny(null)
+	if _frame and is_instance_valid(_frame):
+		var tw: = _frame.create_tween()
+		tw.tween_property(_frame, "width", 7.0, 0.07)
+		tw.tween_property(_frame, "width", 3.0, 0.18)
 
 
 # the y of the tile row nearest to y (canvas)
@@ -839,6 +851,9 @@ func _apply(pick: Dictionary, pal: Dictionary) -> void :
 func _mark(lay: Node, at: Vector2, col: Color, k: float) -> void :
 	if not V9Feel.can_fx() or lay == null or not is_instance_valid(lay):
 		return
+	# the fx layer sits above the cut-in: no rings on the strip (the ult name / her face)
+	if V9Cutin.covers(at):
+		return
 	var fc: = V9Cutin.flash_color(col)
 	var r: = Sprite2D.new()
 	r.texture = G.fx("ring")
@@ -879,7 +894,7 @@ func _take(pr: Array, col: Color) -> void :
 	var pb: = pos_of(b)
 	_mark(lay, pa, col, 1.0)
 	_mark(lay, pb, col, 1.0)
-	if V9Feel.can_fx():
+	if V9Feel.can_fx() and not V9Cutin.covers((pa + pb) * 0.5):
 		var n: = int(14 * V9Feel.fx_scale())
 		if n > 0:
 			Fx.burst(lay, (pa + pb) * 0.5, "sparkle", n, col.lightened(0.4), 1.0)
@@ -1034,6 +1049,8 @@ func _modifier(col: Color) -> void :
 	if mod == "":
 		return
 	var done: = false
+	var m: Dictionary = V9Ults.MODS.get(mod, {})
+	var chip: = String(m.get("chip", m.get("name", "")))
 	match mod:
 		"П":
 			_hint_pair(3.0)
@@ -1041,9 +1058,14 @@ func _modifier(col: Color) -> void :
 		"О":
 			done = _open_one(col)
 		"Л":
-			done = _melt_one(col) or _open_one(col)
+			done = _melt_one(col)
+			if not done:
+				done = _open_one(col)
+				chip = String(V9Ults.MODS["О"].chip)
 		"В":
 			done = _rin_cup() if hero == "rin" else _return_one(col)
+			if hero == "rin":
+				chip = "+1 чашка"
 		"Ц":
 			if hero in ["rin", "yue"]:
 				var bp: = best_pairs(1)
@@ -1054,8 +1076,48 @@ func _modifier(col: Color) -> void :
 			done = _oldest_twin(col)
 	if not done:
 		_hint_pair(3.0)
+		chip = String(V9Ults.MODS["П"].chip)
+	_mod_chip(chip)
+
+
+# the modifier's result as a small lacquer chip (gold glyph + player-facing line) that slides out to the LEFT of the
+# portrait card, level with its ult bar: never on her portrait or its plates, never over the board
+func _mod_chip(txt: String) -> void :
 	var st: V6HeroStage = play.stage
-	if st and is_instance_valid(st):
-		var m: Dictionary = V9Ults.MODS.get(mod, {})
-		var at: = st.position + Vector2(st.size.x * 0.5, st.size.y - 40.0) if not st.compact else st.position + st.size * 0.5
-		Fx.float_text(play.fx_layer, at, "+ %s" % String(m.get("name", "")), col.lightened(0.5), 22, Color(0.1, 0.04, 0.12))
+	if txt == "" or st == null or not is_instance_valid(st):
+		return
+	var fs: = 18
+	var f: = UI.font("body", 800)
+	while fs > 16 and f.get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > 250.0:
+		fs -= 1
+	var tw: = minf(250.0, f.get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x)
+	var h: = 40.0
+	var w: = 14.0 + 26.0 + 8.0 + tw + 16.0
+	var right: = st.position.x - 6.0
+	var y: = st.position.y + st.size.y - h - 8.0
+	if st.compact:
+		right = st.position.x + st.size.x + 6.0 + w
+		y = st.position.y + (st.size.y - h) * 0.5
+	var c: = UI.rbox("plum", Rect2(right - w, y, w, h), h * 0.5, 2, 6)
+	c.set_param("border_top", Color("ffe7a6")).set_param("border_bottom", Color("c58a2c"))
+	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	c.z_index = 230
+	var ic: = V9ModIcon.make(mod, 26.0)
+	ic.position = Vector2(14.0, (h - 26.0) * 0.5)
+	c.add_child(ic)
+	var l: = UI.label(txt, fs, Color("fff2d2"), Color(0.08, 0.03, 0.1), 3, "body", 800)
+	l.position = Vector2(14.0 + 26.0 + 8.0, 0)
+	l.size = Vector2(tw + 4.0, h)
+	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	c.add_child(l)
+	play.add_child(c)
+	c.pivot_offset = Vector2(w, h * 0.5)
+	c.modulate.a = 0.0
+	c.position.x += 18.0
+	var tw2: = c.create_tween()
+	tw2.tween_property(c, "modulate:a", 1.0, 0.16)
+	tw2.parallel().tween_property(c, "position:x", c.position.x - 18.0, 0.22).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tw2.tween_interval(1.5)
+	tw2.tween_property(c, "modulate:a", 0.0, 0.3)
+	tw2.tween_callback(c.queue_free)

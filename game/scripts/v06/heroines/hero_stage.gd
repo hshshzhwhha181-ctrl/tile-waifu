@@ -596,10 +596,8 @@ func set_ult_badge(letter: String, c: Color, hint: = "") -> void :
 	b.tooltip_text = hint
 	b.z_index = 4
 	add_child(b)
-	var l: = UI.label(letter, 18, Color("fff2d2"), Color(0.08, 0.03, 0.1), 3, "body", 900)
-	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	l.size = Vector2(d, d)
-	l.position = Vector2(0, -1)
-	b.add_child(l)
+	# 0.9: the modifier's gold glyph (V9ModIcon), not a bare Cyrillic letter
+	var ic: = V9ModIcon.make(letter, d - 10.0)
+	ic.position = Vector2(5, 5)
+	b.add_child(ic)
 	ult_badge = b

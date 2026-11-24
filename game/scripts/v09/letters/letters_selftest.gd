@@ -285,6 +285,6 @@ static func _taps() -> void:
 		spam = spam or d.kind == "spam"
 	check(spam, "%d quick taps -> spam reaction" % V9Touch.SPAM_N)
 	d = t3.decide("head", 51.8)
-	check(d.kind == "quiet", "after spam: quiet for %.0f s" % V9Touch.SPAM_CD)
+	check(d.kind == "cool" and not d.line and not d.aff, "after spam: soft bounces only for %.0f s" % V9Touch.SPAM_CD)
 	d = t3.decide("head", 50.0 + 1.2 + V9Touch.SPAM_CD + 0.5)
 	check(d.kind == "react", "spam cooldown ends")

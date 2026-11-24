@@ -815,7 +815,10 @@ func _shift_clear() -> void :
 	G.add_pass_xp(30)
 	if table < V6ModesData.SHIFT_TABLES:
 		Sfx.play("win", 1.2, -6)
-		Fx.burst(fx_layer, Vector2(W * 0.5, 640), "confetti", 50, Color.WHITE, 1.0)
+		# 0.9: petals and gold dust under the (empty) board, not flat confetti over the next table
+		var ub: = _v9_under_board_fx()
+		Fx.burst(ub, board_rect.get_center(), "petal", 24, Color(1, 0.8, 0.88), 1.3)
+		Fx.burst(ub, board_rect.get_center(), "sparkle", 30, Color(1, 0.86, 0.5), 1.3)
 		Fx.float_text(fx_layer, Vector2(W * 0.5, 620), "Стол убран · несут следующий", Color("ffe7a6"), 34)
 		await get_tree().create_timer(0.9).timeout
 		if not is_inside_tree():
@@ -919,8 +922,10 @@ func _skill_ready() -> void :
 
 func _help_ok(kind: String) -> bool:
 	if mode == "etude":
-		# etude: only undo, and it also works while stuck (input off) — its handler refuses an empty history itself
-		return kind == "undo"
+		# etude: only undo, and it also works while stuck (input off); an empty history is refused by the gate, so
+		# the button gives only the deny (its handler then says why), never a success pop that does nothing
+		var hist = board.get("history") if board else null
+		return kind == "undo" and not (hist is Array and (hist as Array).is_empty())
 	return super._help_ok(kind)
 
 func _hint() -> void :
@@ -953,6 +958,9 @@ func _undo() -> void :
 			if rib:
 				rib.queue_free()
 		_etude_update()
+	else:
+		V9Feel.deny(btn_undo)
+		main.toast(V8PlayRules.T.undo_none, "undo")
 	_refresh()
 
 func _refresh() -> void :

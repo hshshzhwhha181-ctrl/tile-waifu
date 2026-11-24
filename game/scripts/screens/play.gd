@@ -152,8 +152,8 @@ func build(m, args: Dictionary) -> void :
 	add_child(fx_layer)
 	v7combo = V7Combo.new().setup(self)
 	add_child(v7combo)
-	fever_overlay = Common.vignette(self, size, Color(1.0, 0.55, 0.2), 0.0)
-	fever_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	# 0.9: no full-screen fever vignette — it pulsed over the board at every fx level; V7Combo's burning table
+	# frame (outside the tiles, gated by S.fx_level) carries the fever now
 	_build_bottom()
 	if mode == "duel":
 		duel = V6Duel.new()
@@ -362,12 +362,17 @@ func _build_hud() -> void :
 	if ult.mod != "":
 		stage.set_ult_badge(ult.mod, G.HEROES[partner].color, String(V9Ults.MODS[ult.mod].desc))
 	stage.pressed.connect( func():
-		if ult.busy:
+		# 0.9: every portrait tap is answered. Busy (a cast running) or ready-but-the-board-is-busy (deal, fail
+		# delay, clear) is a deny — never silence and never a chat that hides the ready glow. A talk tap gets the
+		# press; the bubble has its own cooldown so mashing does not stack lines.
+		if ult.busy or (skill_ready and not board.input_on):
+			V9Feel.deny(stage)
 			return
-		if skill_ready and board.input_on:
+		if skill_ready:
 			_use_skill()
 		else:
-			_speak("aff"))
+			V9Feel.press(stage, "pop", "tap")
+			_speak("aff", true))
 	portrait = stage
 
 
@@ -713,7 +718,12 @@ static func pairs_text(n: int) -> String:
 func _bubble(text: String) -> void :
 	stage.say_text(text)
 
-func _speak(kind: String) -> void :
+var _speak_t: = -99.0
+
+func _speak(kind: String, tapped: = false) -> void :
+	if tapped and now() - _speak_t < 1.6:
+		return
+	_speak_t = now()
 	stage.react("smug")
 	stage.say(kind)
 
@@ -974,16 +984,7 @@ func _fever() -> void :
 	v8_band(rib, 1.0, true, 1)
 	if rib.is_inside_tree():
 		UI.pop_in(rib, 0.0, 0.6)
-	fever_fx = Fx.ambient(self, "embers", size)
-	var m: ShaderMaterial = fever_overlay.material
-	m.set_shader_parameter("pulse", 1.0)
-	create_tween().tween_method( func(v): m.set_shader_parameter("vignette", v), 0.0, 0.5, 0.4)
-	await get_tree().create_timer(8.0).timeout
-	if not is_inside_tree():
-		return
-	create_tween().tween_method( func(v): m.set_shader_parameter("vignette", v), 0.5, 0.0, 0.6)
-	if fever_fx:
-		fever_fx.queue_free()
+	# the frame of V7Combo carries the fever (no full-screen vignette or embers over the tiles)
 
 func _on_deny(_t: Tile) -> void :
 	denies += 1
@@ -1295,9 +1296,10 @@ func v8_note(text: String, col: = Color("ffe7a6"), secs: = 4.0) -> Control:
 	get_tree().call_group("v8_note", "queue_free")
 	var f: = UI.font("body", 900)
 	var fs: = 17
-	while fs > 16 and f.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x + 28.0 > V8_NOTE_RECT.size.x:
+	# ≥ 16 px of side padding inside the plate (the rim is 2 px): text never touches the rims
+	while fs > 16 and f.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x + 36.0 > V8_NOTE_RECT.size.x:
 		fs -= 1
-	var w: = clampf(f.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x + 28.0, 120.0, V8_NOTE_RECT.size.x)
+	var w: = clampf(f.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x + 36.0, 120.0, V8_NOTE_RECT.size.x)
 	var chip: = UI.rbox("plum", Rect2(V8_NOTE_RECT.end.x - w, V8_NOTE_RECT.position.y, w, V8_NOTE_RECT.size.y), 20, 2, 8)
 	chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	chip.add_to_group("v6_chip")
@@ -1307,7 +1309,7 @@ func v8_note(text: String, col: = Color("ffe7a6"), secs: = 4.0) -> Control:
 	# the combo pill owns this slot while it runs: the note waits hidden under it (V7Combo._hide_notes)
 	if v7combo and v7combo.shown and not v7combo.stopped:
 		chip.visible = false
-	var l: = UI.center_label(UI.label(text, fs, col, UI.DARK, 3, "body", 900), Rect2(0, 0, w, V8_NOTE_RECT.size.y))
+	var l: = UI.center_label(UI.label(text, fs, col, UI.DARK, 3, "body", 900), Rect2(16, 0, w - 32, V8_NOTE_RECT.size.y))
 	l.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	l.clip_text = true
 	chip.add_child(l)
@@ -1392,7 +1394,11 @@ func _show_fortune() -> void :
 const V8_FORTUNE_SECS: = 2.4
 
 func _v8_fortune_chip() -> void :
-	v8_note("%s · %s" % [fortune.rank, fortune.name])
+	# a long «Великая удача · <name>» does not fit the plate at 16 px: the rank folds into a small gold star
+	var t: = "%s · %s" % [fortune.rank, fortune.name]
+	if UI.font("body", 900).get_string_size(t, HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x + 36.0 > V8_NOTE_RECT.size.x:
+		t = "★ %s" % fortune.name
+	v8_note(t)
 
 func _skill_ready() -> void :
 	skill_ready = true
@@ -1472,8 +1478,12 @@ func _open_gift(mid: Vector2) -> void :
 			G.add_aff(partner, 15)
 			text = V6Txt.s("play.gift_note") % G.HEROES[partner].name
 	Sfx.play("reveal_ssr", 1.2, -2)
-	Fx.burst(fx_layer, mid, "confetti", 40, Color.WHITE, 1.0)
-	Fx.burst(fx_layer, mid, "heart", 10)
+	# 0.9: nothing bursts over the tiles — a gold glint UNDER the board where the gift tile was, and the hearts and
+	# sparkles pop at the HUD gem counter (outside the board rect)
+	Fx.burst(_v9_under_board_fx(), mid, "sparkle", 16, Color(1, 0.86, 0.5), 0.8)
+	var hud_at: = Vector2(70, 154)
+	Fx.burst(fx_layer, hud_at, "sparkle", 18, Color(1, 0.86, 0.5), 0.6)
+	Fx.burst(fx_layer, hud_at, "heart", 6, Color.WHITE, 0.6)
 	main.toast(text, "gift")
 	_refresh()
 
@@ -1570,8 +1580,19 @@ func _check_riichi_force() -> void :
 func _riichi_make() -> void :
 	var d: = 108.0
 	var cx: = btn_sound.position.x + btn_sound.size.x * 0.5 if btn_sound else 117.0
-	riichi_btn = JButton.make(V6Txt.s("play.riichi"), "gold", Rect2(cx - d * 0.5, H - 170, d, d), null, 22, d * 0.5)
-	riichi_btn.set_sub(V6Txt.s("play.riichi_sub"), 16)
+	# 0.9: the same round lacquer disc as the helps beside it (gold rim, gloss), with a crimson core — the flat tan
+	# «gold» disc read as a placeholder — and a centred two-line caption
+	riichi_btn = JButton.make("", "graphite", Rect2(cx - d * 0.5, H - 170, d, d), null, 20, d * 0.5)
+	riichi_btn.box.set_param("border", 4.0).set_param("gloss", 0.16)
+	riichi_btn.box.colors(Color("c23a4e"), Color("5a0f1e")).borders(Color("ffe7a6"), Color("c58a2c"))
+	var rt: String = V6Txt.s("play.riichi").to_lower()
+	rt = rt.left(1).to_upper() + rt.substr(1)
+	var rl: = UI.center_label(UI.label(rt, 22, Color("fff2d2"), Color("3a0812"), 5, "body", 900), Rect2(0, d * 0.5 - 30, d, 30))
+	rl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	riichi_btn.add_child(rl)
+	var rs: = UI.center_label(UI.label(V6Txt.s("play.riichi_sub"), 16, Color("ffe7a6"), Color("3a0812"), 4, "body", 900), Rect2(0, d * 0.5 + 2, d, 24))
+	rs.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	riichi_btn.add_child(rs)
 	riichi_btn.z_index = 40
 	add_child(riichi_btn)
 	if btn_sound:
@@ -1658,7 +1679,10 @@ func _on_clear() -> void :
 			Fx.float_text(fx_layer, Vector2(W * 0.5, 660), V8PlayRules.award_text(za), Color("a9d9c4"), 30)
 			_v8_rank_float(za, Vector2(W * 0.5, 720))
 		Sfx.play("win", 1.2, -6)
-		Fx.burst(fx_layer, Vector2(W * 0.5, 600), "confetti", 50, Color.WHITE, 1.0)
+		# 0.9: petals and gold dust under the (now empty) board, not flat confetti over the next deal
+		var ub: = _v9_under_board_fx()
+		Fx.burst(ub, board_rect.get_center(), "petal", 24, Color(1, 0.8, 0.88), 1.3)
+		Fx.burst(ub, board_rect.get_center(), "sparkle", 30, Color(1, 0.86, 0.5), 1.3)
 		await get_tree().create_timer(0.8).timeout
 		if not is_inside_tree():
 			return
@@ -2094,8 +2118,16 @@ func _victory(stars: int, reward: int, secs: float, first: bool) -> void :
 	var root: Control = ctx.root
 	var plate: Control = ctx.plate
 	var pw: float = ctx.w
-	Fx.burst(root, Vector2(W * 0.2, H), "confetti", 70, Color.WHITE, 1.1)
-	Fx.burst(root, Vector2(W * 0.8, H), "confetti", 70, Color.WHITE, 1.1)
+	# 0.9: the summon showcase's treatment instead of flat pink confetti bars — sakura petals and gold dust, on a
+	# layer UNDER the result panel (it sits right behind the plate in the tree), so nothing crosses its text
+	var wparts: = Control.new()
+	wparts.size = size
+	wparts.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	root.add_child(wparts)
+	root.move_child(wparts, plate.get_index())
+	Fx.burst(wparts, Vector2(W * 0.2, H * 0.14), "petal", 30, Color(1, 0.8, 0.88), 1.5)
+	Fx.burst(wparts, Vector2(W * 0.8, H * 0.14), "petal", 30, Color(1, 0.8, 0.88), 1.5)
+	Fx.burst(wparts, Vector2(W * 0.5, H * 0.12), "sparkle", 40, Color(1, 0.86, 0.5), 1.4)
 	var star_nodes: = v8_res_stars(ctx, V8PlayRules.T.star_rule)
 	v8_res_line(ctx, V8PlayRules.T.stats % [int(secs), boosters_used, fails], 19, UI.INK, 4.0)
 	var rw: = v8_res_reward(ctx, 0, "+10 симпатии" if mode != "trial" else "")
@@ -2126,7 +2158,7 @@ func _victory(stars: int, reward: int, secs: float, first: bool) -> void :
 	# 0.9: the yaku stamps come after the stars, the reward roll and the rank bar, one per beat
 	_v9_yaku_at = V9_STAR_AT + V9_BEAT * mini(stars, 3) + (0.25 + V9_RANK_FILL if rank_box else 0.5)
 	# (the chip tweens read _v9_yaku_at while they are built, so the computed beat holds; no reset afterwards)
-	ctx.y = _v8_yaku_chips(plate, V8_RES_PAD, ctx.y, pw - V8_RES_PAD * 2.0) + 4.0
+	ctx.y = _v8_yaku_chips(plate, V8_RES_PAD, ctx.y, pw - V8_RES_PAD * 2.0) + 10.0
 	# 0.8: the album chip («Альбом: +N марок») sits inside the panel, right under the yaku, not hanging off its edge
 	var album_y: = -1.0
 	if not (V7Album.st().new as Array).is_empty():
@@ -2468,6 +2500,7 @@ func _v8_yaku_chips(parent: Control, x: float, y: float, w: float) -> float:
 			y += 42
 		var c: = UI.rbox("plum", Rect2(cx, y, cw, 36), 18, 2, 4)
 		c.borders(Color("ffe7a6"), Color("8a6a3a"))
+		c.set_meta("yaku_hi", x + w)
 		parent.add_child(c)
 		c.add_child(UI.center_label(UI.label(txt, 17, Color("ffe7a6"), UI.DARK, 2, "body", 900), Rect2(0, 0, cw, 36)))
 		# 0.9: stamped one by one on the beat (V9_YAKU_BEAT), from _v9_yaku_at (the victory sets it after the bar)
@@ -2699,13 +2732,20 @@ func _v9_star_impact(ctx: Dictionary, s: TextureRect, i: int, last: bool) -> voi
 		dt.tween_property(plate, "position:y", y0 + 3.0 + 2.0 * i, 0.05).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 		dt.tween_property(plate, "position:y", y0, 0.28).set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
 
-# a yaku chip stamped onto the panel: drops from 1.6×, lands with a click a semitone above the one before
+# a yaku chip stamped onto the panel: drops from 1.25×, lands with a click a semitone above the one before.
+# 0.9: the pivot keeps the scaled chip inside its row — its left edge never moves left (so it never covers the chip
+# stamped before it, nor the panel's left frame) and its right edge never passes the yaku block's right side
+const V9_STAMP_FROM: = 1.25
+
 func _v9_stamp_chip(c: Control, i: int) -> void :
 	if not is_instance_valid(c) or not is_inside_tree():
 		return
-	c.pivot_offset = c.size * 0.5
-	c.scale = Vector2.ONE * 1.6
-	c.rotation = -0.07 if i % 2 == 0 else 0.07
+	var s0: = V9_STAMP_FROM
+	var hi: = float(c.get_meta("yaku_hi", c.position.x + c.size.x * s0))
+	var px: = maxf(0.0, (c.position.x + c.size.x * s0 - hi) / (s0 - 1.0))
+	c.pivot_offset = Vector2(minf(px, c.size.x), c.size.y * 0.5)
+	c.scale = Vector2.ONE * s0
+	c.rotation = -0.035 if i % 2 == 0 else 0.035
 	var t: = c.create_tween().set_parallel()
 	t.tween_property(c, "scale", Vector2.ONE * 0.94, 0.11).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	t.tween_property(c, "modulate:a", 1.0, 0.07)

@@ -748,10 +748,13 @@ func on_match(pos: Vector2, combo: = 1, gold: = false, shard: = "") -> void :
 	var warm: = Color(1, 0.86, 0.5) if not gold else Color(1, 0.78, 0.2)
 	# 0.9: no white-out over the tray (HEROINES §2 «без белых вспышек»): cream chips, a few glints and an additive
 	# glow in a ≤ 70 %-value warm tint that stays about one tile wide
-	burst(pos, "spark", 10 + c * 2, warm, 1.0 + c * 0.04)
-	burst(pos, "chip", 4 + mini(c, 3), Color(1, 0.88, 0.7), 0.85)
-	burst(pos, "glint", 2 + mini(c, 6) / 2, Color(1, 0.88, 0.7), 0.9)
-	glow(pos, Color(V9Cutin.flash_color(warm), 0.75), 1.2 + mini(c, 8) * 0.05, 0.28)
+	# (this layer is above an ult cut-in: a pair the ult takes under the strip gets no chips over the ult name)
+	var under_clip: = V9Cutin.covers(pos)
+	if not under_clip:
+		burst(pos, "spark", 10 + c * 2, warm, 1.0 + c * 0.04)
+		burst(pos, "chip", 4 + mini(c, 3), Color(1, 0.88, 0.7), 0.85)
+		burst(pos, "glint", 2 + mini(c, 6) / 2, Color(1, 0.88, 0.7), 0.9)
+		glow(pos, Color(V9Cutin.flash_color(warm), 0.75), 1.2 + mini(c, 8) * 0.05, 0.28)
 	# 0.9: the chime climbs the same semitone ladder as the board's match chime (Sfx.combo_step), so the two
 	# never clash; the thump stays put and only gets a touch louder
 	layers([["thump", 1.0, -9.0 + mini(c, 6) * 0.6], ["chime0", Sfx.combo_pitch(combo), -13.0, 0.02]])

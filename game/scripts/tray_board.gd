@@ -313,8 +313,18 @@ func tile_at(gp: Vector2) -> Tile:
 			return t
 	return null
 
+var dealing: = false
+
 func _unhandled_input(e: InputEvent) -> void :
 	if not input_on:
+		# 0.9: a tap while the deal is still landing is answered (a glint on the tile + a light tap haptic), so the
+		# board never feels dead in its first second; it is not played
+		if dealing and e is InputEventScreenTouch and e.pressed:
+			var dt: = tile_at(e.position)
+			if dt:
+				dt.press_glint()
+				V9Feel.haptic("tap")
+				get_viewport().set_input_as_handled()
 		return
 	if e is InputEventScreenTouch and e.pressed:
 		var t: = tile_at(e.position)
@@ -704,17 +714,22 @@ func reassign_faces(ts: Array) -> void :
 
 func deal() -> void :
 	input_on = false
+	dealing = true
 	var order: = tiles.duplicate()
+	var last: = 0.0
 	for i in order.size():
 		var t: Tile = order[i]
 		t.position = t.home + Vector2(0, -60)
 		t.modulate.a = 0.0
 		var d: = 0.012 * i + t.gz * 0.12
+		last = maxf(last, d)
 		var tw: Tween = t.create_tween().set_parallel()
 		tw.tween_property(t, "position", t.home, 0.32).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT).set_delay(d)
 		tw.tween_property(t, "modulate:a", 1.0, 0.18).set_delay(d)
 		if i % 6 == 0:
 			get_tree().create_timer(d + 0.2).timeout.connect( func(): Sfx.play("clack%d" % (randi() % 3), randf_range(0.9, 1.1), -8))
-	await get_tree().create_timer(0.012 * order.size() + 0.9).timeout
+	# input opens as the last tile lands (its 0.32 s drop + a beat), not a fixed 0.9 s after the last start
+	await get_tree().create_timer(last + 0.32 + 0.12).timeout
+	dealing = false
 	input_on = true
 	reveal_free()

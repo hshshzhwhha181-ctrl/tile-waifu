@@ -216,6 +216,12 @@ func _tap(p: Vector2, force: = "") -> void:
 		# 0.9 (spec §C): a tap on «body» (chest, hips, legs) gets no answer at all — no squash, haptic, sound or line,
 		# and it does not count toward the «не так быстро» spam line either (decide() returns before the tally)
 		return
+	if d.kind == "cool":
+		# after «не так быстро»: a light bounce, tap haptic and a soft click — no line, no affection
+		_bump(0.5)
+		V9Feel.haptic("tap")
+		V9Feel.sound("pop", 1.12 + randf() * 0.06, -12)
+		return
 	_react(d, p)
 
 

@@ -280,6 +280,7 @@ class AvatarRow extends Control:
 	signal picked(hero: String)
 	var selected: = "mc"
 	var slot: = 120.0
+	var avs: = {}
 
 	func setup(sel: String, w: float) -> AvatarRow:
 		selected = sel if G.HEROES.has(sel) else "mc"
@@ -296,6 +297,7 @@ class AvatarRow extends Control:
 		_fill()
 
 	func _fill() -> void :
+		avs.clear()
 		for c in get_children():
 			remove_child(c)
 			c.queue_free()
@@ -320,6 +322,7 @@ class AvatarRow extends Control:
 				glow.modulate = Color(1.0, 0.82, 0.45, 0.55)
 				add_child(glow)
 			var a: = V8Art.avatar(self, h, Rect2(x, 8, av, av))
+			avs[h] = a
 			if not on:
 				a.modulate = Color(0.62, 0.58, 0.6, 0.92)
 				a.scale = Vector2(0.9, 0.9)
@@ -327,11 +330,13 @@ class AvatarRow extends Control:
 			add_child(nm)
 			hit.gui_input.connect( func(e):
 				if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT:
+					# 0.9: V9Feel press (dip + spring, click, haptic) on the newly selected avatar (_fill rebuilt it)
 					if h != selected:
-						Sfx.play("pop")
 						select(h)
-						UI.punch(a, 0.12)
-						picked.emit(h))
+						V9Feel.press(avs.get(h) as CanvasItem)
+						picked.emit(h)
+					else:
+						V9Feel.press(a, "", "tap"))
 
 
 static func avatar_row(sel: String, rect: Rect2) -> AvatarRow:
@@ -412,11 +417,16 @@ static func code_entry(parent: Control, rect: Rect2, on_code: Callable, on_back:
 		go = JButton.make(s("code.go"), "gold", Rect2(x, by, w, 88), null, 28)
 	go.pressed.connect( func():
 		var c: = te.text.strip_edges()
-		if c == "":
-			err.text = s("code.empty")
-			UI.punch(te, 0.06)
-			return
 		on_code.call(c))
+	# 0.9: an empty or malformed code is refused by the gate (V8Recovery.decode is pure): the tap gets only the deny,
+	# the error line says why — never the gold button's success pop followed by a shaking field
+	go.set_gate( func(): return te.text.strip_edges() != "" and bool(V8Recovery.decode(te.text).get("ok", false)), func():
+		if te.text.strip_edges() == "":
+			err.text = s("code.empty")
+		else:
+			V8Recovery.decode(te.text)
+			err.text = V8Recovery.last_error
+		V9Feel.deny(te))
 	parent.add_child(go)
 	return {"field": te, "error": err, "go": go}
 
@@ -429,8 +439,7 @@ static func enter_code_popup(main) -> RBox:
 		var chk: = V8Recovery.decode(code)
 		if not chk.get("ok", false):
 			ui.error.text = V8Recovery.last_error if V8Recovery.last_error != "" else str(chk.get("err", ""))
-			UI.punch(ui.field, 0.06)
-			Sfx.play("tap")
+			V9Feel.deny(ui.field)
 			return
 		var do_import: = func():
 			if V8Recovery.import_code(code):

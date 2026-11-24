@@ -10,7 +10,8 @@ extends RefCounted
 #   torso, never its middle) > "body" (anything else on her: a quiet bounce, no line, no affection) > "bg" (the room).
 #   Only tasteful zones react: chest, hips and legs fall into "body".
 # Taps (decide): an instance per home screen keeps the cooldowns.
-#   decide(zone, now) -> {kind: "react" | "spam" | "quiet", zone, line: bool, aff: bool, i: line index}
+#   decide(zone, now) -> {kind: "react" | "spam" | "cool" | "quiet", zone, line: bool, aff: bool, i: line index}
+#   ("cool": a tap during the spam cooldown — soft bounce only; "quiet": the «body» zone — no answer at all)
 #   - a new bubble at most every TALK_CD s (a tap in between only bounces / changes her face)
 #   - SPAM_N taps on her inside SPAM_WIN s -> one «hey, not so fast» reaction, then SPAM_CD s of quiet bounces
 #   - affection +AFF on a tap on head / hand / outfit while G.pet_left() > 0 (the 0.8 daily cap of 3 touches),
@@ -136,6 +137,9 @@ func decide(zone: String, now: float) -> Dictionary:
 	while not taps.is_empty() and now - taps[0] > SPAM_WIN:
 		taps.pop_front()
 	if now < spam_until:
+		# the spam cooldown still answers the touch (a soft bounce + tap haptic in V9HomeLive), with no line and no
+		# affection; only «body» stays fully quiet
+		out.kind = "cool"
 		return out
 	if taps.size() >= SPAM_N:
 		spam_until = now + SPAM_CD

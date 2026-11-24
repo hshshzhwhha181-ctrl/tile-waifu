@@ -300,11 +300,10 @@ func settings() -> void :
 	fb.pressed.connect( func():
 		G.S.side = "f"
 		G.save())
-	# 0.9: «мужская сторона» is not available yet: it looks like a tab but answers with a deny, not a success press
-	mb.sound = ""
-	mb.pressed.connect( func():
-		V9Feel.deny(mb)
-		toast(V6Txt.s("settings.side_m_toast"), "heart"))
+	# 0.9: «мужская сторона» is not available yet: a closed gate, so a tap gets only the deny (no dip-and-overshoot
+	# press first) and the toast says why; dimmed like a locked option
+	mb.set_gate( func(): return false, func(): toast(V6Txt.s("settings.side_m_toast"), "heart"))
+	mb.modulate = Color(1, 1, 1, 0.72)
 	p.add_child(fb)
 	p.add_child(mb)
 	var eg: = UI.label("Тайники найдены: %d из %d" % [V7Eggs.found_count(), V7Eggs.total()], 18, Color("d9c4e6"))

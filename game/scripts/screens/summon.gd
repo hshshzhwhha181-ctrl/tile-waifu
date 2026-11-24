@@ -280,12 +280,30 @@ func _wait_tap(t: float) -> void :
 	while _alive() and not skipping and not tapped and Time.get_ticks_msec() < end:
 		await get_tree().process_frame
 
+var _seq_tap_t: = 0
+
 func _seq_input(e: InputEvent) -> void :
 	if not (e is InputEventMouseButton and e.pressed):
 		return
 	tapped = true
-	if stage == "deal":
-		hurry = true
+	# 0.9: every tap in the sequence is answered (at most one answer per 90 ms of mashing). The climb and hold
+	# cannot be skipped on a first summon, but a tap still sways the lantern with a soft chime; the deal's «hurry»
+	# tap gets a click.
+	var now: = Time.get_ticks_msec()
+	if now - _seq_tap_t < 90:
+		if stage == "deal":
+			hurry = true
+		return
+	_seq_tap_t = now
+	match stage:
+		"climb":
+			V9Feel.haptic("tap")
+			V9Feel.sound("sparkle", randf_range(1.5, 1.7), -16.0)
+			if is_instance_valid(lantern) and lantern.has_method("_punch"):
+				lantern._punch(1.04)
+		"deal":
+			hurry = true
+			V9Feel.press(null, "select", "tap")
 
 # own music player on the Music bus: the summon loop slowed down while the lantern is dark, then at the
 # rarity's pitch once it has its colour (Sfx ducking still works on it)

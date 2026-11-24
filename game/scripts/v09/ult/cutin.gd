@@ -39,6 +39,8 @@ static var dev_name: = "ult"
 static var dev_freeze: = -1.0
 static var _flash_times: Array = []
 static var _mirror_flip: = false
+# the clips on screen now (covers(): board effects skip their particles where they would land on a strip)
+static var _live: Array = []
 
 var id: = ""
 var u: Dictionary = {}
@@ -108,6 +110,7 @@ var name_clip: Control
 var name_l: Label
 var name_w: = 0.0
 var sparks: Node2D
+var slash_fx: Node2D
 var underline: Polygon2D
 var shout_l: Label
 var _shout_y: = 0.0
@@ -138,6 +141,24 @@ static func flash_color(c: Color) -> Color:
 	var s: = maxf(c.s, 0.45)
 	var v: = minf(c.v, V9Ults.FLASH_MAX)
 	return Color.from_hsv(h, s, v)
+
+
+# true while a live clip's strip (or SSR eye strip) is over canvas point p (12 px margin): board-level effects that
+# draw above the clip (V6Fx's match chips, the ult's target marks) skip their particles there, so nothing lands on
+# the ult name, the tag or her face
+static func covers(p: Vector2) -> bool:
+	for c in _live:
+		if not is_instance_valid(c) or c._done:
+			continue
+		for nd in [c.band, c.eye]:
+			if nd == null or not (nd as Node2D).visible:
+				continue
+			var h: = BAND_H if nd == c.band else EYE_H
+			var k: = K if nd == c.band else K * 0.55
+			var lp: Vector2 = (nd as Node2D).get_global_transform_with_canvas().affine_inverse() * p
+			if lp.y >= c._edge(lp.x, true, h, k) - 12.0 and lp.y <= c._edge(lp.x, false, h, k) + 12.0:
+				return true
+	return false
 
 
 static func next_mirror() -> bool:
@@ -193,6 +214,8 @@ func _setup(parent: Control, outfit_id: String, opts: Dictionary) -> void :
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	gui_input.connect(_on_input)
+	_live.append(self)
+	tree_exiting.connect( func(): _live.erase(self))
 	_build(shout)
 	_apply(0.0)
 
@@ -280,11 +303,20 @@ func _build(shout: String) -> void :
 		_tex = load("res://assets/outfits/mc_base.webp")
 		sh = V9Ults.shown("o_base")
 	_face_px = V9Ults.rect_px(sh.face_rect, _tex.get_size())
+	# an entry whose painting is queued for an adult-face redraw (docs/ART.md «Очередь перерисовки») points the art
+	# panel at another painting of her (panel_img + panel_rect, art space), so both clip beats show the same face
+	var own: = String(sh.img) == String(u.get("ref_img", ""))
+	var pimg: = String(u.get("panel_img", ""))
+	if pimg != "" and u.has("panel_rect") and own and ResourceLoader.exists(pimg):
+		var pt: Texture2D = load(pimg)
+		if pt:
+			_tex = pt
+			_face_px = V9Ults.rect_px(u.panel_rect, pt.get_size())
 	_eye_tex = _tex
 	_eye_face_px = _face_px
 	# an entry may point its eye close-up at another painting of her (eye_img + eye_rect, art space)
 	var ei: = String(u.get("eye_img", ""))
-	if ei != "" and u.has("eye_rect") and String(sh.img) == String(u.get("ref_img", "")) and ResourceLoader.exists(ei):
+	if ei != "" and u.has("eye_rect") and own and ResourceLoader.exists(ei):
 		var et: Texture2D = load(ei)
 		if et:
 			_eye_tex = et
@@ -376,6 +408,9 @@ func _build_band(shout: String, main: Color, accent: Color, ink: Color) -> void 
 		band.add_child(_line(PackedVector2Array([Vector2(- HW, _edge(- HW, top) + o), Vector2(HW, _edge(HW, top) + o)]), Color(main.lightened(0.3), 0.85), 3.0))
 		band.add_child(_line(PackedVector2Array([Vector2(- HW, _edge(- HW, top)), Vector2(HW, _edge(HW, top))]), GOLD, 3.5))
 
+	# the slash's strong-beat sparks: a layer below the text panel, so they can never sit on the name or the tag
+	slash_fx = Node2D.new()
+	band.add_child(slash_fx)
 	_build_text(shout, main, accent, ink)
 
 
@@ -506,10 +541,10 @@ func _build_text(shout: String, main: Color, accent: Color, ink: Color) -> void 
 	_shout_y = y
 	shout_l.position = Vector2(- tw * 0.5, y)
 	shout_l.visible = mode != "short"
-	text.add_child(tag_l)
 	# the strong beat's sparks live here: under the name, the tag and the underline, never over the letters
 	sparks = Node2D.new()
 	text.add_child(sparks)
+	text.add_child(tag_l)
 	text.add_child(underline)
 	text.add_child(name_clip)
 	text.add_child(shout_l)
@@ -561,7 +596,25 @@ func _build_eyes() -> void :
 	# and widen the crop instead, so the eye line stays as crisp as the tiles beside it
 	_eye_s = minf(W * 0.82 / _eye_face_px.size.x, EYE_MAX_ZOOM)
 	eye_art.uv = _uv(_eye_pts, Vector2.ZERO, _eye_px(), _eye_s)
+	# 0.9: the paintings have light backdrops (mc_base is cream): toned to the clip palette and closed off by ink at
+	# both ends, so the strip never reads as a white bar across the board (value ≤ FLASH_MAX away from the face)
+	var ink: Color = pal.ink
+	eye_art.color = Color(1, 1, 1).lerp((pal.main as Color).lightened(0.2), 0.16) * Color(0.9, 0.9, 0.9, 1.0)
 	eye.add_child(eye_art)
+	var ink_a: = Color(ink.darkened(0.55), 0.94)
+	var ink_0: = Color(ink.darkened(0.55), 0.0)
+	var ink_m: = Color(ink.darkened(0.4), 0.5)
+	for sx in [-1.0, 1.0]:
+		var pts: = PackedVector2Array()
+		var cols: = PackedColorArray()
+		# solid ink at the far end, a soft fade towards the face (the face spans about ±150 px)
+		for seg in [[HW, 300.0, ink_a, ink_a], [300.0, 220.0, ink_a, ink_m], [220.0, 160.0, ink_m, ink_0]]:
+			var x0: float = sx * float(seg[0])
+			var x1: float = sx * float(seg[1])
+			var q: = _quad(minf(x0, x1), maxf(x0, x1), EYE_H, k)
+			var c_lo: Color = seg[2] if x0 < x1 else seg[3]
+			var c_hi: Color = seg[3] if x0 < x1 else seg[2]
+			eye.add_child(_poly(q, [c_lo, c_hi, c_hi, c_lo]))
 	for top in [true, false]:
 		var o: = -6.0 if top else 6.0
 		eye.add_child(_line(PackedVector2Array([Vector2(- HW, _edge(- HW, top, EYE_H, k) + o), Vector2(HW, _edge(HW, top, EYE_H, k) + o)]), Color(pal.main.lightened(0.3), 0.85), 3.0))
@@ -677,15 +730,16 @@ func _strong() -> void :
 		_flash_on = true
 		_flash_t = t
 	if fx_ok and _skip_t < 0.0 and fx_k > 0.0:
-		var c: = band.position
 		# 0.9: the accent sparks fly from both ends of the name, on a layer under the letters — the ult name is
 		# the cleanest thing on the strong beat (it used to burst right on top of it)
+		# (sparkle glyphs only, short reach, on a layer under the letters)
 		var half_w: = name_w * 0.5 + 26.0
 		for sx in [-1.0, 1.0]:
-			Fx.burst(sparks, Vector2(sx * half_w, 0.0), "sparkle", int(13 * fx_k), (pal.accent as Color).lightened(0.35), 0.8)
-		# gold sparks fly off the slash (never a blob over her face)
-		var sl: Vector2 = c + (_art_pts[0] + _art_pts[3]) * 0.5
-		Fx.burst(self, sl, "sparkle", int(18 * fx_k), GOLD, 0.8)
+			Fx.burst(sparks, Vector2(sx * half_w, 0.0), "sparkle", int(11 * fx_k), (pal.accent as Color).lightened(0.35), 0.55)
+		# gold sparks fly off the slash on the art side (never a blob over her face or the name): their layer sits
+		# under the text panel, and they start a little into the art panel
+		var sl: Vector2 = (_art_pts[0] + _art_pts[3]) * 0.5 + Vector2(dir * 22.0, 0.0)
+		Fx.burst(slash_fx, sl, "sparkle", int(16 * fx_k), GOLD, 0.5)
 	strong.emit()
 
 
@@ -756,15 +810,26 @@ func _on_input(e: InputEvent) -> void :
 	accept_event()
 	if mode == "short":
 		var gp: Vector2 = get_global_transform_with_canvas() * (e as InputEventMouseButton).position
-		buffered.append(gp)
-		# 0.9: answer the touch now (soft click, select haptic, glint on the tile) — it is replayed after the clip
-		V9Feel.haptic("select")
-		V9Feel.sound("select", randf_range(0.96, 1.06), -6.0)
+		# 0.9: answer the touch now by what is under the finger. A free tile: soft click, select haptic, glint, and the
+		# tap is replayed on the board after the clip. A blocked tile: its deny now (not an OK click and a late deny).
+		# A gap: a light tap haptic only, nothing is buffered.
 		var pp: = get_parent()
 		var pb = pp.get("board") if pp else null
+		var tt = null
 		if pb is Node and is_instance_valid(pb) and pb.has_method("tile_at"):
-			var tt = pb.tile_at(gp)
-			if tt and tt.has_method("press_glint"):
-				tt.press_glint()
+			tt = pb.tile_at(gp)
+		if tt == null:
+			V9Feel.haptic("tap")
+			return
+		if pb.has_method("is_free") and not pb.is_free(tt):
+			if tt.has_method("deny"):
+				tt.deny()
+			V9Feel.tile_tap(false)
+			return
+		buffered.append(gp)
+		V9Feel.haptic("select")
+		V9Feel.sound("select", randf_range(0.96, 1.06), -6.0)
+		if tt.has_method("press_glint"):
+			tt.press_glint()
 		return
 	skip()

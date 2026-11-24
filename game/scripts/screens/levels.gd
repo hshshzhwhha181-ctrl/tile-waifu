@@ -913,17 +913,15 @@ func pick_partner(level: int) -> void :
 		pk.position = Vector2(132, 52)
 		pk.size = Vector2(pk_w, 28)
 		if u_mod != "":
-			# the outfit modifier as a small gold-rim letter badge (П/О/Л/В/Ц/С)
-			var mb: = UI.rbox("gold", Rect2(132 + pk_w + 8, 50, 34, 34), 17, 2, 4)
+			# the outfit modifier as a small lacquer badge with its gold glyph (V9ModIcon, П/О/Л/В/Ц/С)
+			var mb: = UI.rbox("plum", Rect2(132 + pk_w + 8, 50, 34, 34), 17, 2, 4)
+			mb.set_param("border_top", Color("ffe7a6")).set_param("border_bottom", Color("c58a2c"))
 			mb.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			mb.tooltip_text = String(V9Ults.MODS.get(u_mod, {}).get("name", ""))
 			row.add_child(mb)
-			var ml: = UI.label(u_mod, 18, UI.DARK, Color.WHITE, 0, "body", 900)
-			ml.size = mb.size
-			ml.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-			ml.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-			ml.mouse_filter = Control.MOUSE_FILTER_IGNORE
-			mb.add_child(ml)
+			var mi: = V9ModIcon.make(u_mod, 24.0)
+			mi.position = Vector2(5, 5)
+			mb.add_child(mi)
 		pk.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 		pk.clip_text = true
 		row.add_child(pk)

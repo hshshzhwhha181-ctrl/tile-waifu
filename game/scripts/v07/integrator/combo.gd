@@ -273,10 +273,17 @@ func _draw() -> void :
 			ir.size.x *= f
 			_sb_fill.bg_color = Color(pc.r, pc.g, pc.b, 0.4 * a)
 			draw_style_box(_sb_fill, ir)
-			# a bright leading edge on the time-left fill
+			# 0.9: a soft leading edge in the tier colour (it fades back over ~14 px) — a hard white line ran through
+			# the title like a rendering seam. The fill sits under the labels (they are the pill's children).
 			if f < 0.995:
 				var ex: = ir.end.x
-				draw_line(Vector2(ex - 1.5, ir.position.y + 6), Vector2(ex - 1.5, ir.end.y - 6), Color(1, 1, 1, 0.55 * a), 2.0, true)
+				var ec: = pc.lightened(0.3)
+				for i in 5:
+					var ew: = 3.0
+					var x0: = ex - ew * (i + 1)
+					if x0 < ir.position.x:
+						break
+					draw_rect(Rect2(x0, ir.position.y + 4, ew, ir.size.y - 8), Color(ec.r, ec.g, ec.b, 0.16 * (1.0 - i / 5.0) * a))
 		# beads just under the lower rim (clear of the sub-line): one per tier reached
 		if tier_i >= 0:
 			var nb: = tier_i + 1
