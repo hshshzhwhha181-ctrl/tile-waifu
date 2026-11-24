@@ -1051,6 +1051,7 @@ func _modifier(col: Color) -> void :
 	var done: = false
 	var m: Dictionary = V9Ults.MODS.get(mod, {})
 	var chip: = String(m.get("chip", m.get("name", "")))
+	var chip_l: = mod
 	match mod:
 		"П":
 			_hint_pair(3.0)
@@ -1062,6 +1063,7 @@ func _modifier(col: Color) -> void :
 			if not done:
 				done = _open_one(col)
 				chip = String(V9Ults.MODS["О"].chip)
+				chip_l = "О"
 		"В":
 			done = _rin_cup() if hero == "rin" else _return_one(col)
 			if hero == "rin":
@@ -1077,12 +1079,13 @@ func _modifier(col: Color) -> void :
 	if not done:
 		_hint_pair(3.0)
 		chip = String(V9Ults.MODS["П"].chip)
-	_mod_chip(chip)
+		chip_l = "П"
+	_mod_chip(chip, chip_l)
 
 
 # the modifier's result as a small lacquer chip (gold glyph + player-facing line) that slides out to the LEFT of the
 # portrait card, level with its ult bar: never on her portrait or its plates, never over the board
-func _mod_chip(txt: String) -> void :
+func _mod_chip(txt: String, letter: = "") -> void :
 	var st: V6HeroStage = play.stage
 	if txt == "" or st == null or not is_instance_valid(st):
 		return
@@ -1094,7 +1097,8 @@ func _mod_chip(txt: String) -> void :
 	var h: = 40.0
 	var w: = 14.0 + 26.0 + 8.0 + tw + 16.0
 	var right: = st.position.x - 6.0
-	var y: = st.position.y + st.size.y - h - 8.0
+	# level with the bottom of the card, below the fortune panel's text, still clear of the board's frame
+	var y: = minf(st.position.y + st.size.y - h + 8.0, (play.board_rect as Rect2).position.y - h - 4.0)
 	if st.compact:
 		right = st.position.x + st.size.x + 6.0 + w
 		y = st.position.y + (st.size.y - h) * 0.5
@@ -1102,7 +1106,7 @@ func _mod_chip(txt: String) -> void :
 	c.set_param("border_top", Color("ffe7a6")).set_param("border_bottom", Color("c58a2c"))
 	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	c.z_index = 230
-	var ic: = V9ModIcon.make(mod, 26.0)
+	var ic: = V9ModIcon.make(letter if letter != "" else mod, 26.0)
 	ic.position = Vector2(14.0, (h - 26.0) * 0.5)
 	c.add_child(ic)
 	var l: = UI.label(txt, fs, Color("fff2d2"), Color(0.08, 0.03, 0.1), 3, "body", 800)

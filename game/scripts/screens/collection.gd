@@ -212,11 +212,17 @@ func _build() -> void :
 			wk.add_child(UI.center_label(UI.label("✓", 16, Color.WHITE, Color(0.05, 0.2, 0.15), 3, "body", 900), Rect2(0, -1, 24, 24)))
 		# 0.8: name at 16 px (never smaller), up to three lines inside the frame; it wraps between words only —
 		# a word that is still too wide is drawn lighter and, as the last resort, trimmed with «…», never cut in two
-		# 0.9: 9 px of side padding and the last line ends 8 px above the frame's bottom rim
+		# 0.9: 6 px of side padding (+ the 4 px outline) and the last line ends 8 px above the frame's bottom rim
 		var nl: = UI.label(it.name, 16, Color.WHITE, Color(0.2, 0.05, 0.2), 4, "body", 800)
-		var nw: = cw - 18.0
+		var nw: = cw - 12.0
+		# a single word wider than that at 16 px («Спортивный» on a 96 px card) takes the full inner width
+		# instead of being split with a hyphen
+		var lf: = UI.font("body", 800)
+		for wd in String(it.name).split(" ", false):
+			if lf.get_string_size(wd, HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x + 5.0 > nw:
+				nw = cw - 2.0
 		Common.fit_words(nl, nw, 3, 16)
-		nl.position = Vector2(9, minf(76.0, inner.end.y - 8.0 - 84.0))
+		nl.position = Vector2((cw - nw) * 0.5, minf(76.0, inner.end.y - 8.0 - 84.0))
 		nl.size = Vector2(nw, 84)
 		nl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		nl.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
