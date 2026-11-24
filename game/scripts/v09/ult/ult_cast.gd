@@ -169,6 +169,19 @@ static func pos_of(t: Tile) -> Vector2:
 	return t.get_global_transform_with_canvas().origin
 
 
+# 0.10 M0: the play screen sits in the content column, not at the viewport origin (tablets: x, phones with a cut-out:
+# y). Positions here are viewport points (pos_of, input events), so the aim and fx layers are set to draw in viewport
+# coordinates, and the board rect (play-local) is taken to the viewport before it meets them.
+func _br() -> Rect2:
+	var br: Rect2 = play.board_rect
+	var xf: = (play as CanvasItem).get_global_transform_with_canvas()
+	return Rect2(xf * br.position, xf.basis_xform(br.size)).abs()
+
+
+func _canvas_space(n: Node2D) -> void:
+	n.transform = (play as CanvasItem).get_global_transform_with_canvas().affine_inverse()
+
+
 # ── what is on the table ────────────────────────────────────────────────────
 
 func pairs() -> Array:
@@ -347,9 +360,9 @@ func strip_y(pick: Dictionary) -> float:
 	for pr in pick.get("pairs", []):
 		for t in pr:
 			if is_instance_valid(t):
-				pts.append(pos_of(t).y)
+				pts.append(V10Layout.local_of(play, pos_of(t)).y)
 	if pick.has("row_y"):
-		pts.append(float(pick.row_y))
+		pts.append(V10Layout.local_of(play, Vector2(0.0, float(pick.row_y))).y)
 	var cands: = [br.get_center().y, br.position.y + half - 4.0, br.end.y - half + 4.0]
 	var best: float = cands[0]
 	var best_n: = 999
@@ -389,7 +402,7 @@ func auto_pick() -> Dictionary:
 			return {"pairs": ps.slice(0, 1)}
 		"yue":
 			var t: = bd.best_move()
-			return {"row_y": pos_of(t).y if t else (play.board_rect as Rect2).get_center().y}
+			return {"row_y": pos_of(t).y if t else _br().get_center().y}
 		"nova":
 			if mod == "Ц":
 				return {"pairs": best_pairs(1)}
@@ -555,7 +568,7 @@ func _input(e: InputEvent) -> void :
 	var bd: = _board()
 	if bd == null:
 		return
-	var br: Rect2 = (play.board_rect as Rect2).grow(12.0)
+	var br: Rect2 = _br().grow(12.0)
 	if e is InputEventScreenTouch:
 		var p: Vector2 = e.position
 		if e.pressed:
@@ -719,6 +732,7 @@ func _aim_layer() -> Node2D:
 		_aim_fx = Node2D.new()
 		_aim_fx.z_index = 130
 		play.add_child(_aim_fx)
+		_canvas_space(_aim_fx)
 	return _aim_fx
 
 
@@ -727,7 +741,7 @@ func _beam_preview(y: float, l: Node2D = null) -> void :
 		l = _aim_layer()
 	for c in l.get_children():
 		c.queue_free()
-	var br: Rect2 = play.board_rect
+	var br: = _br()
 	# 0.9 (HEROINES §2: no white, ≤70 % value): the palette's flash colour in normal blend — an additive glow under an
 	# additive line clipped the whole row to pure white on bright tiles
 	var col: Color = V9Cutin.flash_color(palette().main)
@@ -798,6 +812,7 @@ func _fx_layer() -> Node2D:
 		_fx = Node2D.new()
 		_fx.z_index = 320
 		play.add_child(_fx)
+		_canvas_space(_fx)
 	return _fx
 
 
@@ -823,7 +838,7 @@ func _apply(pick: Dictionary, pal: Dictionary) -> void :
 			if core.get("highlight_pair", false):
 				_hint_pair(3.0)
 		"yue":
-			var y: float = pick.get("row_y", (play.board_rect as Rect2).get_center().y)
+			var y: float = pick.get("row_y", _br().get_center().y)
 			_clear_aim_fx(0.0)
 			var beam: = Node2D.new()
 			lay.add_child(beam)

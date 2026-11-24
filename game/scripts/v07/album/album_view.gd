@@ -236,7 +236,7 @@ func _claim(id: String, r: Rect2, parent: Control) -> void :
 		return
 	Sfx.play("reveal_sr")
 	var p: = parent.get_global_transform_with_canvas() * r.get_center()
-	Fx.burst(self, p, "sparkle", 40, Color(1, 0.85, 0.45), 1.3)
+	Fx.burst(self, V10Layout.local_of(self, p), "sparkle", 40, Color(1, 0.85, 0.45), 1.3)
 	main.fly_gems(p, 8)
 	main.toast("Набор собран! +%d кристаллов, бонус уже работает" % g, "star")
 	_refresh()

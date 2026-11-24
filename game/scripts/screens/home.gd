@@ -458,7 +458,7 @@ func _say(text: String) -> void :
 		return
 	if bubble:
 		bubble.queue_free()
-	var head: = hero.head_global()
+	var head: = V10Layout.local_of(self, hero.head_global())
 	bubble = Common.bubble(self, text, Vector2(114, maxf(head.y - 250, 186.0)), 300, false)
 	var b: = bubble
 	var t: Tween = b.create_tween()

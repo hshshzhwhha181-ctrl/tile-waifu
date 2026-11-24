@@ -246,7 +246,7 @@ func _btn(text: String, sub: String, pal: String, r: Rect2, icon: String) -> JBu
 
 func _on_hero_tap() -> void :
 	hero.react("happy")
-	Fx.burst(root, hero.head_global() + Vector2(0, -40), "heart", 6)
+	Fx.burst(root, _head() + Vector2(0, -40), "heart", 6)
 	var line: = V7RoomData.room_line(h)
 	hero.talk_left = minf(0.4 + line.length() * 0.045, 4.0)
 	_say(line)
@@ -256,7 +256,7 @@ func _say(text: String) -> void :
 		return
 	if bubble and is_instance_valid(bubble):
 		bubble.queue_free()
-	var head: = hero.head_global()
+	var head: = _head()
 	bubble = Common.bubble(root, text, Vector2(16, PANEL_Y + 226), 300, false)
 	var b: = bubble
 	var t: Tween = b.create_tween()
@@ -264,6 +264,10 @@ func _say(text: String) -> void :
 	t.tween_property(b, "modulate:a", 0.0, 0.3)
 	t.tween_callback(b.queue_free)
 
+
+# 0.10 M0: her head in `root`'s coordinates (the screen sits in the content column, not at the viewport origin)
+func _head() -> Vector2:
+	return V10Layout.local_of(root, hero.head_global())
 
 func _gain(n: int, at: Vector2) -> void :
 	var old: = G.aff_level(h)
@@ -380,7 +384,7 @@ func _give(gid: String) -> void :
 	var ic: = UI.tex(G.tile_tex(gd.tile), Rect2(W * 0.5 - 55, H - 300, 110, 114))
 	ic.pivot_offset = Vector2(55, 57)
 	root.add_child(ic)
-	var to: = hero.head_global() + Vector2(-55, 60)
+	var to: = _head() + Vector2(-55, 60)
 	var t: = ic.create_tween()
 	t.tween_property(ic, "position", to, 0.55).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	t.parallel().tween_property(ic, "rotation", 0.3, 0.55)
@@ -400,7 +404,7 @@ func _give(gid: String) -> void :
 	_say(line)
 	if first and tst != "plain":
 		main.toast("Ты узнал: %s %s «%s»" % [G.HEROES[h].name, "обожает" if tst == "love" else "любит", gd.name], "heart")
-	await _gain(n, hero.head_global() + Vector2(60, -80))
+	await _gain(n, _head() + Vector2(60, -80))
 
 
 func _date_popup() -> void :
@@ -517,7 +521,7 @@ func _date_result(pid: String, grade: int, aff: int, fav: bool, fav_new: bool, p
 
 func _after_date(aff: int) -> void :
 	if is_inside_tree():
-		_gain(aff, hero.head_global() + Vector2(60, -80))
+		_gain(aff, _head() + Vector2(60, -80))
 
 
 func _scenes_popup() -> void :
@@ -621,7 +625,7 @@ func _play_scene(id: String) -> void :
 		main.toast("Воспоминание сохранено · +%d кристаллов" % gems, "gem")
 		_render(false)
 		if int(r.aff) > 0:
-			_gain(int(r.aff), hero.head_global() + Vector2(60, -80))
+			_gain(int(r.aff), _head() + Vector2(60, -80))
 	else:
 		_refresh()
 

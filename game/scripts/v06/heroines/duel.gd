@@ -229,7 +229,7 @@ func _stolen(at: Tile) -> void :
 	if taunt_cd <= 0.0:
 		taunt_cd = 3.0
 		stage.say_text(V6Heroines.line(rival, "steal"))
-	Fx.float_text(play.fx_layer, V6Skills._pos(at) + Vector2(0, -60), "Перехват!", Color("9fe8d0"), 32)
+	Fx.float_text(play.fx_layer, V10Layout.local_of(play.fx_layer, V6Skills._pos(at)) + Vector2(0, -60), "Перехват!", Color("9fe8d0"), 32)
 
 
 func _take(pair: Array, talk: bool) -> void :
@@ -258,7 +258,7 @@ func _take(pair: Array, talk: bool) -> void :
 	board.reveal_free()
 	board.tray_changed.emit()
 	var col: Color = G.HEROES[rival].color
-	Fx.burst(play.fx_layer, mid, "sparkle", 18, col.lightened(0.3), 1.0)
+	Fx.burst(play.fx_layer, V10Layout.local_of(play.fx_layer, mid), "sparkle", 18, col.lightened(0.3), 1.0)
 	Sfx.play("match0", 0.85)
 	Sfx.play("clack0", 1.0, -4)
 	t_next = pace * randf_range(0.85, 1.15)

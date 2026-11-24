@@ -103,7 +103,7 @@ func _build() -> void :
 	else:
 		hero.tapped.connect( func():
 			hero.react("happy")
-			Fx.burst(stage, hero.head_global(), "heart", 8)
+			Fx.burst(stage, V10Layout.local_of(stage, hero.head_global()), "heart", 8)
 			Sfx.say(cur, "aff"))
 	UI.slide_in(hero, Vector2(-60, 0), 0.0, 0.5)
 

@@ -442,7 +442,7 @@ func _buy(s: Dictionary, b: Control) -> void :
 		main.toast(why, "gift")
 		return
 	Sfx.play("reveal_sr", 1.0, -4)
-	Fx.burst(self, b.get_global_rect().get_center(), "sparkle", 30, Color(1, 0.9, 0.6), 1.0)
+	Fx.burst(self, V10Layout.local_of(self, b.get_global_rect().get_center()), "sparkle", 30, Color(1, 0.9, 0.6), 1.0)
 	if s.kind == "outfit":
 		main.toast("«%s» теперь твой! Надень его в Гардеробе" % def.outfit.name, "wardrobe")
 		Sfx.play("reveal_ssr", 1.0, -2)

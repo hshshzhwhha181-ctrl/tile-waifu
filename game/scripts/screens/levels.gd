@@ -631,7 +631,9 @@ func _input(e: InputEvent) -> void :
 	if not is_visible_in_tree() or _anim:
 		return
 	if e is InputEventScreenTouch:
-		if e.pressed and e.position.y > V8Header.CONTENT_Y and e.position.y < H - 132 and not _popup_open():
+		# 0.10 M0: the touch is a viewport point, the header / nav band limits are this screen's (it sits below a cut-out)
+		var ty: float = V10Layout.local_of(self, e.position).y
+		if e.pressed and ty > V8Header.CONTENT_Y and ty < H - 132 and not _popup_open():
 			_drag = true
 			_drag_y = e.position.y
 			_moved = 0.0

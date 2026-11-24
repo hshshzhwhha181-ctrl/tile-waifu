@@ -531,7 +531,10 @@ func cast(title: String, targets: Array, sub: = "") -> void :
 	for i in targets.size():
 		var d: = 0.07 * i
 		last = d
-		_orb(layer, from, targets[i], d)
+		# 0.10 M0: targets are viewport points (tiles); the orbs fly in the layer's own coordinates (the screen sits in
+		# the content column, not at the viewport origin)
+		var to: Vector2 = V10Layout.local_of(layer as CanvasItem, targets[i]) if layer is CanvasItem else targets[i]
+		_orb(layer, from, to, d)
 	await get_tree().create_timer(last + 0.48).timeout
 
 func _orb(layer: Node, from: Vector2, to: Vector2, delay: float) -> void :

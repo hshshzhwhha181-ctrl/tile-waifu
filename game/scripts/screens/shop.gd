@@ -397,7 +397,7 @@ func _buy_outfit_do(it: Dictionary, b: JButton) -> void :
 	main.refresh_currency(true)
 	Sfx.play("reveal_sr")
 	if is_instance_valid(b):
-		Fx.burst(self, b.get_global_rect().get_center(), "sparkle", 40, Color(1, 0.85, 0.6), 1.4)
+		Fx.burst(self, V10Layout.local_of(self, b.get_global_rect().get_center()), "sparkle", 40, Color(1, 0.85, 0.6), 1.4)
 	Sfx.say(it.hero, "outfit")
 	main.toast(V6Txt.s("shop.bought") % it.name, "wardrobe")
 	_build_body()
@@ -482,7 +482,7 @@ func _buy(gems: int, from: Control) -> void :
 	G.S.gems += gems
 	G.save()
 	Sfx.play("win", 1.2, -6)
-	Fx.burst(self, from.get_global_rect().get_center(), "sparkle", 30, Color(1, 0.8, 0.9), 1.2)
+	Fx.burst(self, V10Layout.local_of(self, from.get_global_rect().get_center()), "sparkle", 30, Color(1, 0.8, 0.9), 1.2)
 	main.fly_gems(from.get_global_rect().get_center(), 8)
 	main.toast(V6Txt.s("shop.gems_got") % UI.fmt(gems), "gem")
 	_build_body()
