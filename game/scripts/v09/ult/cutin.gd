@@ -97,6 +97,8 @@ var streaks: Node2D
 var _streak_x0: Array = []
 var _streak_v: Array = []
 var sheen: Polygon2D
+var _sheen_col: = Color.WHITE
+var _sheen_ok: = false
 var text: Node2D
 var tag_l: Label
 var name_clip: Control
@@ -345,14 +347,14 @@ func _build_band(shout: String, main: Color, accent: Color, ink: Color) -> void 
 	band.add_child(_line(PackedVector2Array([top_i + Vector2(0, -6), bot_i + Vector2(0, 6)]), GOLD, 3.0))
 
 	# sheen across the strip on the strong beat (additive, palette tinted)
+	# (re-shaped every frame by _sheen_at so it always sits inside the strip: never a bar across the HUD)
 	sheen = Polygon2D.new()
-	var sw: = 70.0
-	sheen.polygon = PackedVector2Array([Vector2(-sw, - BAND_H), Vector2(0, - BAND_H), Vector2(sw, BAND_H), Vector2(0, BAND_H)])
-	sheen.color = Color(accent.lightened(0.55).lerp(GOLD, 0.4), 0.0)
+	_sheen_col = accent.lightened(0.45).lerp(GOLD, 0.4)
+	_sheen_at(- dir * HW, 0.0)
 	var am: = CanvasItemMaterial.new()
 	am.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
 	sheen.material = am
-	sheen.visible = fx_ok and V9Feel.level() == "full"
+	_sheen_ok = fx_ok and V9Feel.level() == "full"
 	band.add_child(sheen)
 
 	# rims: gold edge + her colour outside it
@@ -492,6 +494,25 @@ func _build_text(shout: String, main: Color, accent: Color, ink: Color) -> void 
 	text.add_child(shout_l)
 
 
+# the sheen: a soft leaning band centred on x, its top and bottom on the strip edges, bright only in the middle
+func _sheen_at(x: float, a: float) -> void :
+	var sw: = 44.0
+	var lean: = 34.0 * dir
+	var pts: = PackedVector2Array()
+	var cols: = PackedColorArray()
+	for i in 3:
+		var xt: = x - lean + (i - 1) * sw
+		pts.append(Vector2(xt, _edge(xt, true)))
+		cols.append(Color(_sheen_col, a if i == 1 else 0.0))
+	for i in range(2, -1, -1):
+		var xb: = x + lean + (i - 1) * sw
+		pts.append(Vector2(xb, _edge(xb, false)))
+		cols.append(Color(_sheen_col, a if i == 1 else 0.0))
+	sheen.polygon = pts
+	sheen.vertex_colors = cols
+	sheen.visible = a > 0.002 and _sheen_ok
+
+
 func _name_font() -> FontVariation:
 	var ts: = TextServerManager.get_primary_interface()
 	var fv: = FontVariation.new()
@@ -593,10 +614,9 @@ func _apply(tt: float) -> void :
 	medal.scale = Vector2.ONE * (0.9 + 0.1 * _out_cubic(_seg(tt, T0, 0.4)))
 	medal.visible = fx_ok
 	# sheen sweeps over the strip on the strong beat
-	if sheen.visible:
+	if _sheen_ok:
 		var sp: = _seg(tt, Ts, 0.32)
-		sheen.position = Vector2(lerpf(- dir * HW, dir * HW, sp), 0)
-		sheen.color.a = sin(sp * PI) * 0.55 if tt >= Ts else 0.0
+		_sheen_at(lerpf(- dir * HW, dir * HW, sp), sin(sp * PI) * 0.4 if tt >= Ts else 0.0)
 	# palette pulse
 	if _flash_on:
 		var fp: = _seg(tt, _flash_t, 0.28)

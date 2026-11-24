@@ -755,11 +755,12 @@ func on_match(pos: Vector2, combo: = 1, gold: = false, shard: = "") -> void :
 	layers([["thump", 1.0, -9.0 + mini(c, 6) * 0.6], ["chime0", Sfx.combo_pitch(combo), -13.0, 0.02]])
 	if c >= 2:
 		sound("shimmer", Sfx.combo_pitch(combo), -17.0 + mini(c, 6), 0.04)
-		shockwave(pos, 4.0 + mini(c, 8) * 1.5, 1000.0, 0.32)
+		# a small ripple that stays in the tray row (radius ≈ 150 px), never across the table
+		shockwave(pos, 4.0 + mini(c, 8) * 1.2, 700.0, 0.22)
 	if gold:
 		burst(pos, "coin", 6, Color.WHITE, 0.8)
 		layers([["coin", 1.0, -8.0, 0.06], ["coin", 1.12, -11.0, 0.14]])
-	combo_tier(c, pos)
+	combo_tier(combo, pos)
 	if shard != "":
 		unlock(pos)
 
@@ -768,25 +769,24 @@ func on_match(pos: Vector2, combo: = 1, gold: = false, shard: = "") -> void :
 func combo_tier(combo: int, pos: = Vector2(-1, -1)) -> void :
 	if pos.x < 0:
 		pos = vp * 0.5
-	# 0.9: the tier steps (V7Combo.TIERS) are the milestones. A light shake that grows with the tier (full only),
-	# speed lines that live at the screen edges (their inner radius keeps the middle of the table clear), no flash
-	# over the table: V7Combo lights the screen edges and the table frame in the tier colour instead.
-	var milestone: = combo in [3, 5, 8, 12, 16, 20] or (combo > 20 and combo % 5 == 0)
-	if milestone and combo >= 5:
-		hit_stop(0.06)
-		shake(0.26 + mini(combo, 20) * 0.006)
-		speedlines(0.45, 0.55)
-		shockwave(pos, 14.0, 1300.0, 0.45)
-		sound("combo_big", 1.0 + mini(combo - 5, 15) * 0.02, -4.0)
-		burst(pos, "star", 10, Color(1, 0.9, 0.6), 1.3)
-		burst(pos, "petal", 14, Color.WHITE, 1.4)
-	elif milestone:
-		hit_stop(0.04)
-		shake(0.16)
-		speedlines(0.3, 0.35)
-		sound("combo_hit", 1.0, -7.0)
+	# 0.9: the tier steps (V7Combo.TIERS: ×2 ×3 ×4 ×5 ×8 ×12 ×16, then every 5) are the beats of the ladder. A light
+	# shake that grows with the tier («Эффекты: полные» only), a hit-stop and a low thump. No speed lines and no
+	# flash: they crossed the table. V7Combo lights the screen edges, the table frame and the heroine's card in the
+	# tier colour instead, and the pill grows and changes colour.
+	var ti: = V7Combo._tier_index(combo)
+	var step: = combo >= 3 and (combo == int(V7Combo.TIERS[ti][0]) or (combo > 20 and combo % 5 == 0))
+	if step and ti >= 3:
+		hit_stop(0.05 + mini(ti, 6) * 0.004)
+		shake(0.2 + mini(ti, 6) * 0.03)
+		shockwave(pos, 10.0, 900.0, 0.3)
+		sound("combo_big", 1.0 + mini(ti - 3, 6) * 0.04, -5.0)
+		burst(pos, "star", 8 + ti, Color(V7Combo.TIERS[ti][2]).lightened(0.3), 1.1)
+	elif step:
+		hit_stop(0.035)
+		shake(0.12 + ti * 0.02)
+		sound("combo_hit", 1.0 + ti * 0.03, -7.0)
 	elif combo >= 3:
-		shake(0.06 + mini(combo, 16) * 0.004)
+		shake(0.05 + mini(combo, 16) * 0.004)
 
 
 func deny(pos: = Vector2(-1, -1)) -> void :
@@ -911,8 +911,8 @@ func set_danger(on: bool) -> void :
 
 func fever(on: bool, color: = Color(1.0, 0.55, 0.2)) -> void :
 	if on:
+		# 0.9: no speed lines (they crossed the table); the fever reads from the burning table frame (V7Combo)
 		grade(1.12, 1.03, 0.25, 0.26, color, 0.5, 0.4)
-		speedlines(0.45, 0.8, Color(1, 0.85, 0.6, 0.8))
 		shake(0.15)
 	else:
 		grade_reset(0.6)

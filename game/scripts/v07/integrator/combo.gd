@@ -22,7 +22,7 @@ extends Control
 #
 # Dev: --v9_combo_shots=3,5,8 --shots=<dir> [--name=n] saves <dir>/<n>_c<k>.png 0.14 s after the pair that makes
 # combo k (play it with --v6fx_play=1); --v9_combo_after=<s> adds one more <n>_after.png s seconds after the last;
-# --v9_combo_quit=1 quits after it.
+# --v9_combo_quit=1 quits after it; --v9_fx=full|mid|min sets «Эффекты» for the run.
 
 const TIERS: = [
 	[2, "Дуэт", Color("ffd98a")],
@@ -228,7 +228,7 @@ func _process(dt: float) -> void :
 		_fever_sub()
 	glow_target = 0.0 if not alive else clampf(0.3 + 0.1 * (b.combo - 2), 0.3, 1.0)
 	glow = move_toward(glow, glow_target, dt * (2.5 if glow_target > glow else 1.2))
-	flash_k = move_toward(flash_k, 0.0, dt * 3.2)
+	flash_k = move_toward(flash_k, 0.0, dt * 4.5)
 	edge_k = move_toward(edge_k, 0.0, dt * 2.2)
 	aura_kick = move_toward(aura_kick, 0.0, dt * 2.5)
 	if sheen_t >= 0.0:
@@ -347,7 +347,7 @@ func _draw_glow() -> void :
 		var pr: = _pill_rect()
 		var a: = pill.modulate.a
 		if flash_k > 0.01:
-			_sb_fill.bg_color = Color(1, 1, 1, 0.22 * flash_k * a)
+			_sb_fill.bg_color = Color(1, 1, 1, 0.13 * flash_k * a)
 			L.draw_style_box(_sb_fill, pr.grow(-3))
 		if sheen_t >= 0.0 and lvl != "min":
 			_draw_sheen(L, pr.grow(-4), sheen_t, a)
@@ -607,7 +607,7 @@ func _on_fever(on: bool) -> void :
 		flash_k = 1.0
 		sheen_t = 0.0
 		if V9Feel.can_fx() and pill.visible:
-			Fx.ring(play.fx_layer, pill.position + pill.size * 0.5, FEVER_GOLD, 1.8, 0.45)
+			Fx.ring(play.fx_layer, pill.position + pill.size * 0.5, Color(FEVER_GOLD.r, FEVER_GOLD.g, FEVER_GOLD.b, 0.8), 1.1, 0.45)
 
 func on_match(mid: Vector2, n: int, gain: int) -> void :
 	if n < 2 or stopped:
@@ -644,7 +644,8 @@ func on_match(mid: Vector2, n: int, gain: int) -> void :
 	var dst: = pill.position + pill.size * 0.5
 	if V9Feel.can_fx():
 		_spark(mid, dst)
-	Fx.ring(play.fx_layer, dst, col, 1.0 + mini(n, 12) * 0.08, 0.4)
+	# a ring the size of the pill (not a halo over the HUD row and the tray)
+	Fx.ring(play.fx_layer, dst, Color(col.r, col.g, col.b, 0.7), 0.7 + mini(n, 12) * 0.04, 0.35)
 	if n in [3, 5, 8, 12, 16] or (n >= 20 and n % 5 == 0):
 		_milestone(n, dst)
 	_dev_shot(n)
@@ -723,7 +724,7 @@ func _milestone(n: int, at: Vector2) -> void :
 		return
 	# 0.8: the milestone reward is said inside the pill (its second line), not as a float that would rise into
 	# the yaku plaque or the luck strip
-	pill_sub.text = what
+	_set_sub(what, "Лихорадка ×2" if n == 5 else "")
 	pill_sub.label_settings.font_color = Color("9fe8d0")
 	sub_hold_until = G.time + 1.4
 	UI.punch(pill_sub, 0.15)
@@ -750,6 +751,18 @@ func _milestone(n: int, at: Vector2) -> void :
 				play._refresh()
 			ic.queue_free())
 
+# the sub-line is 16 px (the floor for Russian text) and never trims: a line that does not fit the pill takes its
+# short form (or loses its tail after « · »)
+func _set_sub(t: String, short: = "") -> void :
+	var f: = UI.font("body", 900)
+	var room: = pill.size.x - 20.0
+	if f.get_string_size(t, HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x > room:
+		if short != "":
+			t = short
+		elif " · " in t:
+			t = t.substr(0, t.rfind(" · "))
+	pill_sub.text = t
+
 # ---- dev screenshots ----------------------------------------------------------------------------------------------
 
 func _dev_setup() -> void :
@@ -757,6 +770,9 @@ func _dev_setup() -> void :
 		if s.begins_with("--") and "=" in s:
 			var kv: = s.substr(2).split("=", true, 1)
 			_dev[kv[0]] = kv[1]
+	# --v9_fx=full|mid|min: «Эффекты» for this dev run (screenshots of each level)
+	if _dev.has("v9_fx") and String(_dev.v9_fx) in G.FX_LEVELS:
+		G.set_fx_level(String(_dev.v9_fx))
 	if not (_dev.has("v9_combo_shots") and _dev.has("shots")):
 		_dev = {}
 		return

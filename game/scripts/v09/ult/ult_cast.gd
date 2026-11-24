@@ -95,6 +95,28 @@ func ult_name() -> String:
 	return String(V9Ults.get_ult(id).get("name", "Ульта"))
 
 
+# her shout for this cast: never the line used last time, and never one that only repeats the ult name in the strip
+# right above it («Чистая операция» / «Чистая операция.») when she has another
+func pick_line(last: int) -> int:
+	var lines: Array = V9Ults.get_ult(id).get("lines", [])
+	var nm: = _bare(ult_name())
+	var ok: = []
+	for i in lines.size():
+		if i != last and _bare(String(lines[i])) != nm:
+			ok.append(i)
+	if ok.is_empty():
+		return V9Ults.line(id, last)
+	return int(ok[randi() % ok.size()])
+
+
+static func _bare(s: String) -> String:
+	var out: = ""
+	for ch in s.to_lower():
+		if ch.is_valid_identifier() or ch == "ё" or (ch >= "а" and ch <= "я") or ch.is_valid_int():
+			out += ch
+	return out
+
+
 func need() -> int:
 	return V9Ults.need(G.aff_level(hero), ranked)
 
@@ -272,7 +294,7 @@ func begin(auto: = false) -> void :
 		return
 	var pal: = palette()
 	var mode: = cutin_mode()
-	_last_line = V9Ults.line(id, _last_line)
+	_last_line = pick_line(_last_line)
 	_mark_seen()
 	var buffered: Array = []
 	_applied = false

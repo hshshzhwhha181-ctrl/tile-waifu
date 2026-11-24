@@ -225,5 +225,17 @@ static func run(play) -> void :
 		if tapped:
 			_check("buffered tap replayed", bd.tray.has(tapped) or not tapped.alive or tapped.pending)
 
+	# ── 6. her shout never just repeats the ult name (when she has another line) and never the last one ──
+	var lines: Array = V9Ults.get_ult(ult.id).get("lines", [])
+	var echo: = lines.filter( func(x): return V9UltCast._bare(String(x)) == V9UltCast._bare(ult.ult_name()))
+	var bad_line: = 0
+	var last: = -1
+	for i in 40:
+		var li: = ult.pick_line(last)
+		if (echo.size() < lines.size() and V9UltCast._bare(String(lines[li])) == V9UltCast._bare(ult.ult_name())) or (lines.size() > 1 and li == last):
+			bad_line += 1
+		last = li
+	_check("shout: no name echo, no repeat", bad_line == 0, "%d" % bad_line)
+
 	print("ULT SELFTEST %s %d/%d" % [hero, ok_n, ok_n + bad_n])
 	play.get_tree().quit(1 if bad_n > 0 else 0)

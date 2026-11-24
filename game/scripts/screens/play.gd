@@ -1818,18 +1818,16 @@ func v8_res_stars(ctx: Dictionary, rule: String) -> Array:
 	ctx.y += 24.0 * lines + 6.0
 	return nodes
 
+# 0.9 (spec §D): the stars are stamped one per beat (V9_BEAT): each drops from 2.3× onto its socket, lands with a
+# thump, a gold ring, sparks, a haptic and a short dip of the panel (the dip at «Эффекты: полные» only)
 func v8_res_light_stars(ctx: Dictionary, nodes: Array, n: int) -> void :
-	await get_tree().create_timer(0.6).timeout
-	for i in mini(n, nodes.size()):
+	await get_tree().create_timer(V9_STAR_AT).timeout
+	var k: = mini(n, nodes.size())
+	for i in k:
 		if not is_inside_tree():
 			return
-		var s: TextureRect = nodes[i]
-		s.texture = V8Art.star(true)
-		UI.pop_in(s, 0.0, 2.2)
-		Sfx.play("star%d" % i)
-		var plate: Control = ctx.plate
-		Fx.burst(ctx.root, plate.position + s.position + s.size * 0.5, "sparkle", 26, Color(1, 0.85, 0.4), 1.2)
-		await get_tree().create_timer(0.3).timeout
+		_v9_stamp_star(ctx, nodes[i], i, i == k - 1)
+		await get_tree().create_timer(V9_BEAT).timeout
 
 # the reward row: cur/<cur> art + «+N» (counted up by the caller or set at once) and, under it, the affection line
 # with icon/heart. Returns {row, lbl}.
@@ -2028,6 +2026,7 @@ func _v8_rank_float(a: Dictionary, at: Vector2) -> void :
 # shard / item → rank bar → league line → compact yaku; album / photo row and the buttons under the panel.
 func _victory(stars: int, reward: int, secs: float, first: bool) -> void :
 	print("VICTORY stars=%d" % stars)
+	_v9_win_dev()
 	Sfx.music("")
 	Sfx.play("win")
 	var ctx: = v8_res_open(V6Txt.s("play.win") if not riichi else V6Txt.s("play.win_riichi"), "pink" if not riichi else "red", 54 if not riichi else 42)
@@ -2064,7 +2063,10 @@ func _victory(stars: int, reward: int, secs: float, first: bool) -> void :
 	var rank_box: Control = null
 	if mode != "trial":
 		rank_box = v8_res_rank(ctx, {})
+	# 0.9: the yaku stamps come after the stars, the reward roll and the rank bar, one per beat
+	_v9_yaku_at = V9_STAR_AT + V9_BEAT * mini(stars, 3) + (0.25 + V9_RANK_FILL if rank_box else 0.5)
 	ctx.y = _v8_yaku_chips(plate, V8_RES_PAD, ctx.y, pw - V8_RES_PAD * 2.0) + 4.0
+	_v9_yaku_at = 1.3
 	# 0.8: the album chip («Альбом: +N марок») sits inside the panel, right under the yaku, not hanging off its edge
 	var album_y: = -1.0
 	if not (V7Album.st().new as Array).is_empty():
@@ -2099,8 +2101,7 @@ func _victory(stars: int, reward: int, secs: float, first: bool) -> void :
 	Sfx.say(partner, "win")
 	if _v8_res_bust and is_instance_valid(_v8_res_bust):
 		V8Art.bust_bounce(_v8_res_bust, 0.03)
-	var tw: = create_tween()
-	tw.tween_method( func(v): gl.text = "+%d" % int(v), 0.0, float(reward + gained), 0.8)
+	_v9_roll(gl, reward + gained, 0.75)
 	if reward + gained > 0:
 		main.fly_gems(plate.position + rr.position + Vector2(46, 42), 8)
 	if rank_box:
@@ -2301,11 +2302,13 @@ func _v8_rank_block(parent: Control, r: Rect2) -> Control:
 	tl.size = Vector2(r.size.x - 108 - 196, 36)
 	tl.clip_text = true
 	box.add_child(tl)
-	var gl: = UI.label(V8PlayRules.T.rank_gain % [rp_gain, V8PlayRules.points_word(rp_gain)], 19, Color("ffd34d"), UI.DARK, 3, "body", 900)
+	# 0.9: the gain rolls up from +0 while the bar fills (_animate_rank)
+	var gl: = UI.label(V8PlayRules.T.rank_gain % [0, V8PlayRules.points_word(0)] if rp_gain > 0 else V8PlayRules.T.rank_gain % [rp_gain, V8PlayRules.points_word(rp_gain)], 19, Color("ffd34d"), UI.DARK, 3, "body", 900)
 	gl.position = Vector2(r.size.x - 206, 10)
 	gl.size = Vector2(192, 30)
 	gl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	box.add_child(gl)
+	box.set_meta("gain_lbl", gl)
 	var bw: = r.size.x - 108 - 16
 	var f0: = 0.0 if up else clampf(float(before.into) / maxf(1.0, before.need), 0.0, 1.0)
 	var f1: = clampf(float(after.into) / maxf(1.0, after.need), 0.0, 1.0)
@@ -2407,11 +2410,11 @@ func _v8_yaku_chips(parent: Control, x: float, y: float, w: float) -> float:
 		c.borders(Color("ffe7a6"), Color("8a6a3a"))
 		parent.add_child(c)
 		c.add_child(UI.center_label(UI.label(txt, 17, Color("ffe7a6"), UI.DARK, 2, "body", 900), Rect2(0, 0, cw, 36)))
+		# 0.9: stamped one by one on the beat (V9_YAKU_BEAT), from _v9_yaku_at (the victory sets it after the bar)
 		c.modulate.a = 0.0
 		var tw: Tween = c.create_tween()
-		tw.tween_interval(1.3 + i * 0.16)
-		tw.tween_property(c, "modulate:a", 1.0, 0.15)
-		tw.tween_callback( func(): Sfx.play("star%d" % mini(i, 2), 1.2, -6))
+		tw.tween_interval(_v9_yaku_at + i * V9_YAKU_BEAT)
+		tw.tween_callback(_v9_stamp_chip.bind(c, i))
 		cx += cw + 8.0
 	return y + 36
 
@@ -2423,8 +2426,11 @@ func _animate_rank(box: Control) -> void :
 		return
 	var fill: Control = box.get_meta("bar")
 	if fill:
+		# 0.9: the bar fills with sparks at its tip while «+N очков ранга» rolls up, then a shimmer runs along it
 		var w: float = maxf(fill.size.y, float(box.get_meta("bar_w")) * float(box.get_meta("f1")))
-		fill.create_tween().tween_property(fill, "size:x", w, 0.6).set_trans(Tween.TRANS_QUAD)
+		var tw: = fill.create_tween()
+		tw.tween_method(_v9_rank_fill.bind(box, fill, fill.size.x, w, [0.0, -1]), 0.0, 1.0, V9_RANK_FILL).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+		tw.tween_callback(_v9_rank_done.bind(box, fill))
 	if rank_ups.size() > 0:
 		var up: Dictionary = rank_ups[-1]
 		var em: Control = box.get_node_or_null("Em")
@@ -2540,3 +2546,232 @@ func dev_act(a: String) -> void :
 			if duel:
 				duel.her += 4
 				duel.finish()
+
+
+# ---- 0.9 victory juice (spec §D): stamped stars and yaku, rolling counters, a shimmering rank bar ---------------
+# Rhythm: stars from V9_STAR_AT, one per V9_BEAT → the reward rolls (V9_ROLL) → the rank bar fills (V9_RANK_FILL)
+# → the yaku chips are stamped one per V9_YAKU_BEAT. Decor follows «Эффекты» (Fx.burst / ring scale or skip by
+# themselves; panel dip at «полные» only, glows and shimmer not at «минимум»); the stamp, the sound and the haptic
+# always play. Everything here is inside the result window: the match is over, the table takes no taps.
+# Dev: --v9_win_shots=0.3,0.9,… --shots=<dir> [--name=n] saves <dir>/<n>_w<ms>.png that many seconds after the
+# victory window opens (use with --v8_win=1 [--v8_yaku=1] [--v8_rankup=1]); --v9_win_quit=1 quits after the last;
+# --v9_fx=full|mid|min sets «Эффекты» for the run (dev saves go to a separate file).
+const V9_STAR_AT: = 0.6
+const V9_BEAT: = 0.3
+const V9_SLAM: = 0.13
+const V9_ROLL: = 0.75
+const V9_RANK_FILL: = 0.85
+const V9_YAKU_BEAT: = 0.22
+const V9_GOLD: = Color(1, 0.85, 0.4)
+var _v9_yaku_at: = 1.3
+
+func _v9_fx_sound(n: String, pitch: = 1.0, db: = 0.0) -> void :
+	var fx: = get_node_or_null("/root/V6Fx")
+	if fx and fx.has_method("sound"):
+		fx.sound(n, pitch, db)
+
+# a node's centre in the coordinates of `space` (both under the same unscaled canvas)
+func _v9_centre_in(n: Control, space: Control) -> Vector2:
+	var xf: = space.get_global_transform_with_canvas().affine_inverse() * n.get_global_transform_with_canvas()
+	return xf * (n.size * 0.5)
+
+func _v9_stamp_star(ctx: Dictionary, s: TextureRect, i: int, last: bool) -> void :
+	if not is_instance_valid(s):
+		return
+	s.pivot_offset = s.size * 0.5
+	s.texture = V8Art.star(true)
+	s.modulate.a = 0.0
+	s.scale = Vector2.ONE * 2.3
+	s.rotation = -0.3 if i != 1 else 0.3
+	var t: = s.create_tween().set_parallel()
+	t.tween_property(s, "scale", Vector2.ONE * 0.9, V9_SLAM).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	t.tween_property(s, "modulate:a", 1.0, V9_SLAM * 0.6)
+	t.tween_property(s, "rotation", 0.0, V9_SLAM).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	t.chain().tween_callback(_v9_star_impact.bind(ctx, s, i, last))
+	t.chain().tween_property(s, "scale", Vector2.ONE, 0.4).set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
+	_v9_fx_sound("swoosh", 1.35 + 0.08 * i, -16.0)
+
+func _v9_star_impact(ctx: Dictionary, s: TextureRect, i: int, last: bool) -> void :
+	if not is_inside_tree() or not is_instance_valid(s):
+		return
+	var root: Control = ctx.root
+	var plate: Control = ctx.plate
+	var c: = _v9_centre_in(s, root)
+	Sfx.play("star%d" % mini(i, 2))
+	_v9_fx_sound("thump", 1.15 - 0.06 * i, -5.0)
+	V9Feel.haptic("gold" if last and i >= 2 else "match")
+	Fx.ring(root, c, Color(V9_GOLD.r, V9_GOLD.g, V9_GOLD.b, 0.9), 1.0 + 0.18 * i, 0.38)
+	Fx.burst(root, c, "sparkle", 18 + 8 * i, V9_GOLD, 1.0 + 0.15 * i)
+	if last and i >= 2:
+		Fx.flash_glow(root, c, Color(1, 0.8, 0.45), 2.6, 0.45)
+	# a warm glow stays under each stamped star and breathes
+	if V9Feel.can_fx():
+		var g: = TextureRect.new()
+		g.texture = G.fx("glow")
+		g.material = Fx.add_mat()
+		g.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		g.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		g.stretch_mode = TextureRect.STRETCH_SCALE
+		g.size = s.size * 1.9
+		g.position = s.position + s.size * 0.5 - g.size * 0.5
+		g.pivot_offset = g.size * 0.5
+		g.modulate = Color(1, 0.78, 0.35, 0.0)
+		s.get_parent().add_child(g)
+		s.get_parent().move_child(g, s.get_index())
+		var gt: = g.create_tween()
+		gt.tween_property(g, "modulate:a", 0.75, 0.12)
+		gt.tween_property(g, "modulate:a", 0.38, 0.5)
+		gt.tween_callback( func():
+			if is_instance_valid(g):
+				var lt: = g.create_tween().set_loops()
+				lt.tween_property(g, "modulate:a", 0.5, 1.1).set_trans(Tween.TRANS_SINE)
+				lt.tween_property(g, "modulate:a", 0.3, 1.1).set_trans(Tween.TRANS_SINE))
+	# the panel takes the hit: a short dip and back
+	if V9Feel.can_shake() and is_instance_valid(plate):
+		var y0: float = plate.get_meta("v9_y0", plate.position.y)
+		plate.set_meta("v9_y0", y0)
+		var old = plate.get_meta("v9_dip") if plate.has_meta("v9_dip") else null
+		if old is Tween and (old as Tween).is_valid():
+			(old as Tween).kill()
+		plate.position.y = y0
+		var dt: = plate.create_tween()
+		plate.set_meta("v9_dip", dt)
+		dt.tween_property(plate, "position:y", y0 + 3.0 + 2.0 * i, 0.05).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		dt.tween_property(plate, "position:y", y0, 0.28).set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
+
+# a yaku chip stamped onto the panel: drops from 1.6×, lands with a click a semitone above the one before
+func _v9_stamp_chip(c: Control, i: int) -> void :
+	if not is_instance_valid(c) or not is_inside_tree():
+		return
+	c.pivot_offset = c.size * 0.5
+	c.scale = Vector2.ONE * 1.6
+	c.rotation = -0.07 if i % 2 == 0 else 0.07
+	var t: = c.create_tween().set_parallel()
+	t.tween_property(c, "scale", Vector2.ONE * 0.94, 0.11).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	t.tween_property(c, "modulate:a", 1.0, 0.07)
+	t.tween_property(c, "rotation", 0.0, 0.11)
+	t.chain().tween_callback( func():
+		if not is_instance_valid(c):
+			return
+		Sfx.play("star%d" % mini(i, 2), 1.1 * Sfx.combo_pitch(i + 1), -5.0)
+		_v9_fx_sound("thump", 1.3, -12.0)
+		V9Feel.haptic("select")
+		var par: Node = c.get_parent()
+		var at: = c.position + c.size * 0.5
+		Fx.ring(par, at, Color(1, 0.9, 0.6, 0.7), 0.55 + c.size.x / 400.0, 0.3)
+		Fx.burst(par, at, "sparkle", 8, Color(1, 0.9, 0.6), 0.7))
+	t.chain().tween_property(c, "scale", Vector2.ONE, 0.3).set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
+
+# a rolling counter: «+0» → «+to» with an ease-out, a tick a few times a second (rising), a punch and sparks at
+# the end. fmt gets the formatted number (UI.fmt: 1 240).
+func _v9_roll(l: Label, to: int, dur: = V9_ROLL, fmt: = "+%s") -> void :
+	if not is_instance_valid(l):
+		return
+	l.text = fmt % "0"
+	if to <= 0:
+		return
+	var st: = [-1, -1.0]
+	var step: = func(k: float) -> void :
+		var v: = int(round(to * k))
+		if v == int(st[0]):
+			return
+		st[0] = v
+		l.text = fmt % UI.fmt(v)
+		var now_t: = Time.get_ticks_msec() / 1000.0
+		if now_t - float(st[1]) >= 0.055:
+			st[1] = now_t
+			_v9_fx_sound("tick", 0.95 + 0.45 * k, -9.0)
+	var tw: = l.create_tween()
+	tw.tween_method(step, 0.0, 1.0, dur).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_OUT)
+	tw.tween_callback( func():
+		if not is_instance_valid(l):
+			return
+		l.text = fmt % UI.fmt(to)
+		_v9_fx_sound("reward_pop", 1.0, -6.0)
+		V9Feel.haptic("match")
+		# punch from the left edge: the number is left-aligned, so it swells in place
+		l.pivot_offset = Vector2(0, l.size.y * 0.5)
+		var pt: = l.create_tween()
+		pt.tween_property(l, "scale", Vector2.ONE * 1.2, 0.08).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		pt.tween_property(l, "scale", Vector2.ONE, 0.36).set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
+		var f: = l.get_theme_font("font") if l.label_settings == null else l.label_settings.font
+		var fs: = l.label_settings.font_size if l.label_settings else 40
+		var tw_x: = f.get_string_size(l.text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x if f else 80.0
+		Fx.burst(l.get_parent(), l.position + Vector2(tw_x * 0.5, l.size.y * 0.5), "sparkle", 16, Color(1, 0.8, 0.9), 0.9))
+
+func _v9_rank_fill(k: float, box: Control, fill: Control, w0: float, w1: float, st: Array) -> void :
+	if not is_instance_valid(fill) or not is_instance_valid(box):
+		return
+	fill.size.x = lerpf(w0, w1, k)
+	var gl = box.get_meta("gain_lbl") if box.has_meta("gain_lbl") else null
+	if gl is Label and is_instance_valid(gl) and rp_gain > 0:
+		var v: = int(round(rp_gain * k))
+		if v != int(st[1]):
+			st[1] = v
+			(gl as Label).text = V8PlayRules.T.rank_gain % [v, V8PlayRules.points_word(v)]
+	# sparks off the tip of the bar while it moves, a soft tick with them
+	var now_t: = Time.get_ticks_msec() / 1000.0
+	if k < 0.98 and now_t - float(st[0]) >= 0.06 and w1 > w0 + 2.0:
+		st[0] = now_t
+		var bg: Control = fill.get_parent()
+		var tip: = bg.position + fill.position + Vector2(fill.size.x - 2.0, fill.size.y * 0.5)
+		Fx.burst(box, tip, "sparkle", 4, Color(1, 0.88, 0.5), 0.55)
+		_v9_fx_sound("tick", 1.1 + 0.5 * k, -13.0)
+
+func _v9_rank_done(box: Control, fill: Control) -> void :
+	if not is_instance_valid(fill) or not is_instance_valid(box):
+		return
+	var bg: Control = fill.get_parent()
+	var tip: = bg.position + fill.position + Vector2(fill.size.x - 2.0, fill.size.y * 0.5)
+	Fx.ring(box, tip, Color(1, 0.88, 0.5, 0.85), 0.7, 0.32)
+	Fx.burst(box, tip, "sparkle", 12, Color(1, 0.88, 0.5), 0.8)
+	Sfx.play("sparkle", 1.15, -6.0)
+	var gl = box.get_meta("gain_lbl") if box.has_meta("gain_lbl") else null
+	if gl is Label and is_instance_valid(gl):
+		UI.punch(gl, 0.14)
+	_v9_shimmer(fill)
+
+# a band of light that runs along a filled bar every couple of seconds (decor: not at «минимум»)
+func _v9_shimmer(fill: Control) -> void :
+	if not V9Feel.can_fx() or not is_instance_valid(fill) or fill.size.x < 30.0:
+		return
+	fill.clip_contents = true
+	var g: = Gradient.new()
+	g.offsets = PackedFloat32Array([0.0, 0.5, 1.0])
+	g.colors = PackedColorArray([Color(1, 1, 1, 0), Color(1, 0.98, 0.85, 0.75), Color(1, 1, 1, 0)])
+	var gt: = GradientTexture2D.new()
+	gt.gradient = g
+	gt.width = 64
+	gt.height = 4
+	var sh: = TextureRect.new()
+	sh.name = "V9Shimmer"
+	sh.texture = gt
+	sh.material = Fx.add_mat()
+	sh.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	sh.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	sh.stretch_mode = TextureRect.STRETCH_SCALE
+	sh.size = Vector2(64, fill.size.y)
+	sh.position = Vector2(-70, 0)
+	fill.add_child(sh)
+	var t: = sh.create_tween().set_loops()
+	t.tween_property(sh, "position:x", fill.size.x + 6.0, 0.75).from(-70.0).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	t.tween_interval(1.6)
+
+func _v9_win_dev() -> void :
+	var a: = {}
+	for x in OS.get_cmdline_user_args():
+		if x.begins_with("--") and "=" in x:
+			var kv: = x.substr(2).split("=", true, 1)
+			a[kv[0]] = kv[1]
+	if not (a.has("v9_win_shots") and a.has("shots")):
+		return
+	var times: = Array(String(a.v9_win_shots).split(",")).map( func(x): return float(x))
+	var t0: = 0.0
+	for t in times:
+		await get_tree().create_timer(maxf(0.0, t - t0)).timeout
+		t0 = t
+		await RenderingServer.frame_post_draw
+		get_viewport().get_texture().get_image().save_png("%s/%s_w%04d.png" % [a.shots, a.get("name", "win"), int(t * 1000.0)])
+		print("V9WIN shot %.2f" % t)
+	if a.get("v9_win_quit", "") == "1":
+		get_tree().quit()
