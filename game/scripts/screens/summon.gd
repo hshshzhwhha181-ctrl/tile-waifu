@@ -374,10 +374,17 @@ func _sequence(res: Array, ctx: = {}) -> void :
 	vg.create_tween().tween_property(vg, "modulate:a", 1.0, 0.8)
 	# 0.9: one magic circle on the lantern stage — the lit floor under the lantern; the circle painted into the
 	# backdrop's bottom edge sinks into the night (it fades back with the other stage effects when the cards deal)
-	var ff: = Common.floor_fade(seq, FLOOR_Y + 196.0, H, Color(0.03, 0.01, 0.06), 0.97)
-	ff.modulate.a = 0.0
-	ff.create_tween().tween_property(ff, "modulate:a", 1.0, 0.8)
-	seq_fx.append(ff)
+	var ff: = Common.floor_fade(seq, FLOOR_Y + 180.0, FLOOR_Y + 290.0, Color(0.03, 0.01, 0.06), 1.0)
+	var fs: = ColorRect.new()
+	fs.color = Color(0.03, 0.01, 0.06)
+	fs.position = Vector2(0, FLOOR_Y + 289.0)
+	fs.size = Vector2(W, H - FLOOR_Y - 289.0)
+	fs.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	seq.add_child(fs)
+	for n in [ff, fs]:
+		n.modulate.a = 0.0
+		n.create_tween().tween_property(n, "modulate:a", 1.0, 0.8)
+		seq_fx.append(n)
 	Sfx.music("")
 	_mus(V9Summon.SUSPENSE_PITCH, V9Summon.SUSPENSE_DB, 1.2)
 	Sfx.say(b.hero, "gacha")

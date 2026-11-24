@@ -190,13 +190,14 @@ func _actions() -> void :
 	root.add_child(actions)
 	var bw: = (W - 32 - 24) / 3.0
 	# 0.9: the row sits 16 px higher, so the centre nav star (it rises above the nav bar) clears the button rims
-	var y: = H - 132 - 144.0
+	var y: = H - 132 - 150.0
 	var left: = V7RoomData.gifts_left(h)
 	var g: = _btn("Подарок", "сегодня ещё %d" % left if left > 0 else "завтра снова", "rose", Rect2(16, y, bw, 108), "gift")
 	g.pressed.connect(_gift_popup)
 	actions.add_child(g)
 	var inv: = V7RoomData.invites()
-	var d: = _btn("Свидание", "%d %s" % [inv, V8PlayRules.plural(inv, "приглашение", "приглашения", "приглашений")] if inv > 0 else "нет приглашений", "gold", Rect2(16 + bw + 12, y, bw, 108), "heart")
+	# 0.9: a short sub-line («ещё 2», like the gift's «сегодня ещё 3»): «2 приглашения» ran into the sakura cap
+	var d: = _btn("Свидание", "ещё %d" % inv if inv > 0 else "завтра снова", "gold", Rect2(16 + bw + 12, y, bw, 108), "heart")
 	d.pressed.connect(_date_popup)
 	if inv > 0:
 		d.shine_every = 3.2
