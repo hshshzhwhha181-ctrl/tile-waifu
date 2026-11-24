@@ -1,0 +1,840 @@
+{
+ "version": 1,
+ "trigger": "twmaster style",
+ "sampler": {
+  "steps": 9,
+  "guidance": 0.0
+ },
+ "items": [
+  {
+   "id": "e01_heroines_mc_tile_flick",
+   "category": "heroines",
+   "split": "in",
+   "prompt": "twmaster style, heroines, Mahjong-chan, adult woman with long wavy pink twin tails tied with jade knots and sakura flowers, rose-pink eyes, curvy hourglass figure, base salon hostess look: knee-length sakura-pink cheongsam with jade piping and sheer sleeves, blush-pink sheer stockings with small embroidered sakura petals, pink pumps, standing side-on to a green-felt mahjong table in a wide planted stance with the torso turned to the viewer, flicking a spinning blank ivory tile off her thumb toward the camera, other hand catching the end of a twin tail, playful wink and confident smile, knees-up, lantern-lit Five Winds salon with sakura paper lanterns and bronze wind chimes, sakura pink, jade and warm amber palette, silk brocade and felt, anime gacha heroine card art, cute adult Japanese gacha face with soft gradient iris, thin warm-colored lineart, soft painterly shading on a cel-shaded base, matte skin, highlights only in eyes and lips, detailed layered costume fabrics, heroine is the brightest and sharpest element, muted desaturated hazy background, no text",
+   "w": 832,
+   "h": 1216,
+   "seed": 41017,
+   "checks": [
+    "Mahjong-chan identity: long wavy PINK twin tails with jade knots and sakura flowers, rose-pink eyes",
+    "sakura-pink cheongsam with jade piping; no props of other heroines (no glasses, horns, cat-ear headphones)",
+    "flicked tile is blank ivory or a clean glyph, never garbled pseudo-characters",
+    "both hands: 5 fingers each, thumb-flick gesture reads clearly",
+    "feet planted parallel to the table edge, legs not spread toward the camera, camera at eye level",
+    "adult face and adult proportions (about 7.5 heads), no childlike features",
+    "background muted and hazy, heroine is the brightest element",
+    "no text or watermark"
+   ]
+  },
+  {
+   "id": "e02_heroines_rin_fogged_glasses",
+   "category": "heroines",
+   "split": "in",
+   "prompt": "twmaster style, heroines, Rin, adult woman with a long dark-green side braid over one shoulder, thin round gold glasses, jade drop earrings, tall slender hourglass figure, waist-up portrait, high stand-collar ivory silk blouse with jade frog buttons, dark high-waisted pencil skirt, holding a celadon tea bowl at chest height with a thin wisp of steam, pushing her steam-fogged gold glasses up onto her forehead with one finger, squinting with a quiet defeated frown, tall tea library shelves and a skylight behind, ivory, dark jade and brass palette, silk and porcelain, anime gacha heroine card art, cute adult Japanese gacha face with soft gradient iris, thin warm-colored lineart, soft painterly shading on a cel-shaded base, matte skin, highlights only in eyes and lips, detailed layered costume fabrics, heroine is the brightest and sharpest element, muted desaturated hazy background, no text",
+   "w": 1024,
+   "h": 1024,
+   "seed": 41029,
+   "checks": [
+    "Rin identity: dark-green side braid over ONE shoulder, thin ROUND GOLD glasses, jade drop earrings",
+    "glasses geometry: two round lenses of equal size, temples not melted into hair, glasses pushed up on the forehead as prompted",
+    "index finger on the glasses, other hand holds the bowl: 5 fingers each, bowl not fused with the hand",
+    "celadon bowl is a round single object, steam is a thin wisp (not a cloud)",
+    "adult face and adult proportions (about 7.5 heads), no childlike features, mature face with visible cheekbones",
+    "no text"
+   ]
+  },
+  {
+   "id": "e03_heroines_hana_combo_quad_stretch",
+   "category": "heroines",
+   "split": "in",
+   "prompt": "twmaster style, heroines, Hana, adult woman with a wavy orange bob, sunflower hair clip, amber eyes, light freckles, sun-tanned skin, sporty soft figure, orange-and-white zip sports top, open pink track jacket, high-waisted orange running shorts over sheer black athletic tights with an orange side stripe, white sneakers, one-leg quad stretch balancing on her straight left leg with her right hand holding her right ankle behind her, left arm raised overhead holding a sunflower, competitive grin at the viewer, full body, orange, pink and white palette, warm golden glow, anime gacha heroine combo showcase sprite, cute adult Japanese gacha face, thin warm-colored lineart, soft painterly shading on a cel-shaded base, matte skin, detailed costume fabrics, isolated character on a plain dark plum background, no scene, no text",
+   "w": 832,
+   "h": 1216,
+   "seed": 41039,
+   "checks": [
+    "isolated full-body figure on a plain dark plum background, no scene elements",
+    "balance pose anatomy: standing leg straight, bent knee points down, hand grips the ankle, exactly two legs and two arms",
+    "Hana identity: wavy orange bob, sunflower hair clip, freckles, amber eyes, tanned skin",
+    "sunflower held in the raised hand (not floating)",
+    "adult face and adult proportions (about 7.5 heads), no childlike features, soft figure without visible muscles",
+    "no text"
+   ]
+  },
+  {
+   "id": "e04_heroines_yue_fan_s_curve",
+   "category": "heroines",
+   "split": "in",
+   "prompt": "twmaster style, heroines, Yue, tall adult woman with waist-length wavy lavender hair, small golden horns, crescent-moon forehead tiara, violet eyes, lavender hanfu gown with bare shoulders, embroidered bodice and sash-cinched waist, long layered skirt with a side slit, sheer white stockings, silver embroidered slippers, standing tall in a court-lady S-curve with one foot crossed in front, open folding fan held at her lips, long trailing sleeve, chin raised, amused eyes gazing past the viewer, knees-up, cloud-high terrace of the Moon Palace with a huge pale full moon behind her like a halo, lavender, silver and night indigo palette, silk and chiffon, anime gacha heroine card art, cute adult Japanese gacha face with soft gradient iris, thin warm-colored lineart, soft painterly shading on a cel-shaded base, matte skin, highlights only in eyes and lips, detailed layered costume fabrics, heroine is the brightest and sharpest element, muted desaturated hazy background, no text",
+   "w": 832,
+   "h": 1216,
+   "seed": 41051,
+   "checks": [
+    "Yue identity: waist-length wavy lavender hair, TWO small golden horns (symmetric), crescent tiara on the forehead, violet eyes",
+    "fan held at the lips by a correct hand; fan ribs radiate from one pivot",
+    "two legs clearly readable in the S-curve, crossed foot not fused",
+    "gaze goes past the viewer (Yue never stares into the lens here)",
+    "moon disc behind her reads as a halo, muted",
+    "adult face and adult proportions (about 7.5 heads), no childlike features, tall statuesque figure",
+    "no text"
+   ]
+  },
+  {
+   "id": "e05_heroines_nova_air_typing",
+   "category": "heroines",
+   "split": "in",
+   "prompt": "twmaster style, heroines, Nova, adult woman with an asymmetric cyan-to-pink gradient bob, glowing cat-ear headphones, transparent visor, small face-paint lines, base netrunner look: cropped charcoal techwear jacket over a high-collar fitted bodysuit, utility mini skirt with straps, two-tone black and cyan tights with laser-cut slashes at the knees, chunky platform boots, slouched with one hip cocked, typing on a floating translucent hologram keyboard at waist height, visor down, smug smirk, thighs-up, garage workshop under an elevated highway with stacked old monitors and a motorcycle, lit from below by screens, black, cyan and magenta palette, nylon and hologram light, anime gacha heroine card art, cute adult Japanese gacha face with soft gradient iris, thin warm-colored lineart, soft painterly shading on a cel-shaded base, matte skin, highlights only in eyes and lips, detailed layered costume fabrics, heroine is the brightest and sharpest element, muted desaturated hazy background, no text",
+   "w": 832,
+   "h": 1216,
+   "seed": 41063,
+   "checks": [
+    "Nova identity: asymmetric cyan-to-pink bob, cat-ear headphones (her only cat element), transparent visor, face-paint lines",
+    "hologram keyboard translucent, fingers stay separate from the keys, no readable fake text on holograms or monitors",
+    "slashes only at knees/shins (distressed by design), nothing torn above the knee",
+    "background neon stays muted (no neon clutter), heroine brightest",
+    "hands: 5 fingers each",
+    "adult face and adult proportions (about 7.5 heads), no childlike features"
+   ]
+  },
+  {
+   "id": "e06_heroines_kohaku_tail_hug",
+   "category": "heroines",
+   "split": "in",
+   "prompt": "twmaster style, heroines, Kohaku, adult fox shrine maiden with long white hair fading to red tips, white fox ears, fluffy white fox tail with red tip, white fox mask on the side of her head, gold eyes, base shrine maiden look: white top with detached sleeves, vermilion hakama with gold embroidery, white thigh-highs with red bell bows, red-thonged zori, sitting sideways on a stone stair step with both legs together stretched down the steps, hugging her big fluffy tail with both arms and pressing her cheek into the fur, ears flattened back, pouting, glossy eyes on the viewer, full body at eye level, framed between two vermilion torii pillars, night torii stairway with stone lanterns and foxfire wisps, vermilion, white and gold palette, silk and fur, anime gacha heroine card art, cute adult Japanese gacha face with soft gradient iris, thin warm-colored lineart, soft painterly shading on a cel-shaded base, matte skin, highlights only in eyes and lips, detailed layered costume fabrics, heroine is the brightest and sharpest element, muted desaturated hazy background, no text",
+   "w": 832,
+   "h": 1216,
+   "seed": 41077,
+   "checks": [
+    "exactly ONE fox tail (white with red tip) and two fox ears; no extra human ears visible",
+    "seated pose: legs together and angled down the steps, not spread toward the camera, hakama stays in place",
+    "camera at her eye level (no high angle down the neckline, no low angle up the hakama)",
+    "arms wrap the tail with readable hands",
+    "stone lanterns and torii present, no text on torii",
+    "adult face and adult proportions (about 7.5 heads), no childlike features"
+   ]
+  },
+  {
+   "id": "e07_heroines_mc_pagoda_hostess_new_outfit",
+   "category": "heroines",
+   "split": "held_out",
+   "prompt": "twmaster style, heroines, Mahjong-chan, adult woman with long wavy pink twin tails tied with jade knots and sakura flowers, rose-pink eyes, curvy hourglass figure, new Pagoda hostess look: midnight-blue velvet cheongsam coat-dress with silver wind-swirl embroidery and a jade-green sash, short silver capelet, sheer navy stockings with small silver sakura, navy pumps, standing turned three-quarters away with knees touching, reaching one hand toward the viewer as if pinching their sleeve, winding the tip of a twin tail around her finger, jealous pout with a blush, eyes flicking back to the viewer, knees-up, upper tier of a wooden pagoda salon with lattice windows and sakura paper lanterns, midnight blue, silver and sakura pink palette, velvet and silver thread, anime gacha heroine card art, cute adult Japanese gacha face with soft gradient iris, thin warm-colored lineart, soft painterly shading on a cel-shaded base, matte skin, highlights only in eyes and lips, detailed layered costume fabrics, heroine is the brightest and sharpest element, muted desaturated hazy background, no text",
+   "w": 832,
+   "h": 1216,
+   "seed": 41089,
+   "checks": [
+    "identity survives an unseen costume: pink twin tails with jade knots and sakura flowers, rose-pink eyes",
+    "costume is MIDNIGHT-BLUE velvet with silver embroidery (the LoRA must not revert to her default sakura-pink cheongsam)",
+    "foreshortened reaching hand: 5 fingers, plausible scale",
+    "knees touching, one heel lifted, two legs readable",
+    "adult face and adult proportions (about 7.5 heads), no childlike features",
+    "no text"
+   ]
+  },
+  {
+   "id": "e08_heroines_lian_glowstring",
+   "category": "heroines",
+   "split": "held_out",
+   "prompt": "twmaster style, heroines, Lian, tall adult pipa musician with floor-length straight teal-black hair in a hime cut with blunt bangs, lotus hairpins with pearl tassels, soft grey-teal eyes, willowy figure with a long neck and long fingers, short embroidered beizi jacket over a form-fitting teal midi dress with a high side slit, white silk stockings with a pink lotus embroidered on the outer side, embroidered shoes, standing with the feet close together, holding a pipa upright by its neck in one hand, other arm extended toward the viewer drawing a single glowing golden string of light toward the camera, head inclined, half-lidded knowing eyes, faint smile, knees-up, off-center three-quarter view through hanging bead strings, river music barge at night with red lacquer pillars and lotus candles floating on black water, deep teal, coral and old gold palette, silk brocade and pearls, anime gacha heroine card art, cute adult Japanese gacha face with soft gradient iris, thin warm-colored lineart, soft painterly shading on a cel-shaded base, matte skin, highlights only in eyes and lips, detailed layered costume fabrics, heroine is the brightest and sharpest element, muted desaturated hazy background, no text",
+   "w": 832,
+   "h": 1216,
+   "seed": 41101,
+   "checks": [
+    "pipa reads as a pipa: pear-shaped body, short neck with frets, four strings (not a guitar or violin)",
+    "floor-length hime-cut hair with blunt bangs, lotus hairpins with pearl tassels",
+    "glowing string starts at her thumb and index finger; long fingers anatomically correct",
+    "a new character, not a recolor of a founder face",
+    "no moon in the sky (moon belongs to Yue)",
+    "adult face and adult proportions (about 7.5 heads), no childlike features",
+    "no text"
+   ]
+  },
+  {
+   "id": "e09_heroines_jess_lasso_win",
+   "category": "heroines",
+   "split": "held_out",
+   "prompt": "twmaster style, heroines, Jess, adult cowgirl caravan driver with sandy wheat-blonde hair in two long low braids, cowboy hat with feathers and silver conchos, sky-blue eyes, light freckles on a mature face, tall long-legged figure, plaid shirt tied in a knot above a soft midriff, high-waisted denim shorts, dusty brown over-the-knee socks with a frayed cuff, tooled leather cowboy boots, belt with a horseshoe buckle, standing in three-quarter view with knees slightly bent, spinning a big flat lasso loop above her head with one arm, slapping her falling hat back onto her head with the other hand, both braids swinging, whooping laugh, cowboy shot cropped at mid-thigh, caravan corral in a copper-red canyon with a covered wagon of tea crates and a windmill, harsh noon sun, terracotta, denim blue and wheat palette, denim, plaid flannel and tooled leather, anime gacha heroine card art, cute adult Japanese gacha face with soft gradient iris, thin warm-colored lineart, soft painterly shading on a cel-shaded base, matte skin, highlights only in eyes and lips, detailed layered costume fabrics, heroine is the brightest and sharpest element, muted desaturated hazy background, no text",
+   "w": 832,
+   "h": 1216,
+   "seed": 41113,
+   "checks": [
+    "lasso is one continuous rope loop held by the hand (no broken or doubled rope)",
+    "exactly one hat, two low braids, freckles on a MATURE face (not childlike)",
+    "both arms anatomically correct while raised; 5 fingers on the hat hand",
+    "three-quarter stance, not legs spread toward the camera",
+    "no text or brands on crates or wagon",
+    "adult face and adult proportions (about 7.5 heads), no childlike features"
+   ]
+  },
+  {
+   "id": "e10_heroines_tsuru_noren_welcome",
+   "category": "heroines",
+   "split": "held_out",
+   "prompt": "twmaster style, heroines, Tsuru, adult hot-spring inn proprietress with a chocolate-brown elegant updo with a crane kanzashi and loose framing strands, warm hazel-gold eyes, beauty mark under one eye, voluptuous soft figure, knee-length fitted indigo kimono dress with a wide persimmon obi, haori with a crane crest on her shoulders, sheer dark-indigo stockings with a white steam-swirl pattern, lacquered geta, parting a crane-crest noren curtain with one hand as she steps over the threshold, other hand extended palm-up in welcome, slight inviting bow of the head, warm crescent-eyed smile, eyes level with the viewer, knees-up, hearth room of a mountain onsen ryokan with an irori hearth, iron kettle and tatami, autumn sun in striped bars through the shoji, indigo, persimmon and cream palette, silk crepe and lacquer, anime gacha heroine card art, cute adult Japanese gacha face with soft gradient iris, thin warm-colored lineart, soft painterly shading on a cel-shaded base, matte skin, highlights only in eyes and lips, detailed layered costume fabrics, heroine is the brightest and sharpest element, muted desaturated hazy background, no text",
+   "w": 832,
+   "h": 1216,
+   "seed": 41129,
+   "checks": [
+    "mature 31-year-old face, beauty mark under one eye, crane kanzashi in the updo",
+    "noren is fabric with a crane crest only, no kanji or text on it",
+    "palm-up welcoming hand: 5 fingers, natural wrist",
+    "no bath, towels or bathers anywhere (inn hostess only)",
+    "kimono hem stays in place while stepping",
+    "adult face and adult proportions (about 7.5 heads), no childlike features"
+   ]
+  },
+  {
+   "id": "e11_heroines_marisol_deck_point",
+   "category": "heroines",
+   "split": "held_out",
+   "prompt": "twmaster style, heroines, Marisol, adult tea clipper captain with wild crimson-red curls in a loose low ponytail, tricorne hat with a white plume, sea-green eyes, compass pendant, tall full figure, white shirt with an open neckline under a fitted corset vest, tight dark leather trousers, glossy black over-the-knee boots with brass buckles, long navy coat with gold buttons draped over her shoulders, red silk sash, standing on a tea chest in a braced sailor's stance seen from the side, thumb hooked in her sash, other arm pointing past the camera toward the horizon, coat flaring, bold smirk with one eyebrow raised, knees-up, slight Dutch tilt, foredeck of a tea clipper in a passing squall with rigging, furled sails and sea spray, navy, crimson and brass gold palette, leather, linen and wool, anime gacha heroine card art, cute adult Japanese gacha face with soft gradient iris, thin warm-colored lineart, soft painterly shading on a cel-shaded base, matte skin, highlights only in eyes and lips, detailed layered costume fabrics, heroine is the brightest and sharpest element, muted desaturated hazy background, no text",
+   "w": 832,
+   "h": 1216,
+   "seed": 41141,
+   "checks": [
+    "one tricorne hat with a white plume; crimson curls; compass pendant",
+    "pointing arm and hand correct (index finger extended, 5 fingers total)",
+    "rigging lines continuous and consistent with the Dutch tilt",
+    "no barrels or bottles (no alcohol cues)",
+    "trousers and boots, so stance is safe; stance seen from the side",
+    "adult face and adult proportions (about 7.5 heads), no childlike features",
+    "no text on chests or sails"
+   ]
+  },
+  {
+   "id": "e12_heroines_hibana_kamae_lunge",
+   "category": "heroines",
+   "split": "held_out",
+   "prompt": "twmaster style, heroines, Hibana, adult taiko drummer with a medium wolf-cut of slate-grey hair with an electric-yellow inner color, small tomoe hair ornaments, electric yellow-gold eyes, soft sturdy figure with wide hips and no visible muscles, short happi jacket slipping off the shoulders over a fitted high-neck crop top, twisted rope obi, hakama shorts, black thigh-high stockings with a yellow lightning-zigzag stripe, straw sandals, deep forward lunge toward a giant drum in profile three-quarter view, one drumstick raised straight to the sky and the other pointed at the viewer, fierce grin, eyes locked on the camera, thighs-up, drum tower above terraced tea plantations in a dusk thunderstorm with slanting rain and distant yellow lightning, slate violet, storm grey and electric yellow palette, cotton and rope, anime gacha heroine card art, cute adult Japanese gacha face with soft gradient iris, thin warm-colored lineart, soft painterly shading on a cel-shaded base, matte skin, highlights only in eyes and lips, detailed layered costume fabrics, heroine is the brightest and sharpest element, muted desaturated hazy background, no text",
+   "w": 832,
+   "h": 1216,
+   "seed": 41153,
+   "checks": [
+    "lunge anatomy: front knee over the foot, back leg straight, two clearly separate legs, stance in profile (not toward the camera)",
+    "exactly two straight drumsticks, one per hand",
+    "soft figure: no visible abs or muscle definition",
+    "slate-grey wolf cut with a yellow inner color, tomoe ornaments",
+    "adult face and adult proportions (about 7.5 heads), no childlike features",
+    "no text"
+   ]
+  },
+  {
+   "id": "e13_heroines_kira_finger_gun_low_angle",
+   "category": "heroines",
+   "split": "held_out",
+   "prompt": "twmaster style, heroines, Kira, adult mecha ace pilot with a short silver-white layered bob with longer front locks, red pilot headset with a small antenna, warm red gradient eyes, chrysanthemum emblem on the shoulder, curvy figure, form-fitting white-and-red pilot bodysuit with armor plates on the shoulders and hips, front zipper lowered to the upper chest, fitted gloves, armored knee boots, standing with boots planted and knees slightly bent, torso twisted to the camera, one arm extended straight toward the lens in a finger-gun, one eye closed sighting along the arm, other hand pressing the headset microphone, sharp focused grin, dynamic low angle, knees-up, tea house courtyard at night where a giant white mecha kneels after a crash, cables and tarps, sodium work lights and a red warning strobe, white, signal red and navy palette, glossy composite armor and stretch fabric, anime gacha heroine card art, cute adult Japanese gacha face with soft gradient iris, thin warm-colored lineart, soft painterly shading on a cel-shaded base, matte skin, highlights only in eyes and lips, detailed layered costume fabrics, heroine is the brightest and sharpest element, muted desaturated hazy background, no text",
+   "w": 832,
+   "h": 1216,
+   "seed": 41167,
+   "checks": [
+    "foreshortened finger-gun: index and thumb extended, other fingers curled, 5 fingers total",
+    "low angle is allowed ONLY because she wears a bodysuit: the face is the focal point, the crotch is not centered or emphasized",
+    "zipper not lower than the upper chest; armor plates symmetric",
+    "mecha reads as a giant robot with straight hard-surface lines",
+    "no numbers or text on armor or mecha",
+    "adult face and adult proportions (about 7.5 heads), no childlike features"
+   ]
+  },
+  {
+   "id": "e14_heroines_vesper_parasol_tendu",
+   "category": "heroines",
+   "split": "held_out",
+   "prompt": "twmaster style, heroines, Vesper, tall adult vampire countess with long black-cherry wine-colored ringlets in a half-up style with a small black lace veil fascinator, ruby-red gradient eyes, cameo choker with a crimson rose, voluptuous figure, black-and-crimson gothic gown with a corset bodice, high thigh slit, sheer lace sleeves and long satin gloves, high bat-wing cape collar, sheer black stockings with a blood-red rose lace pattern, pointed heeled boots, standing tall with an open black lace parasol on her shoulder casting lace shadow across half her face, one leg extended forward in a ballet tendu with the pointed toe touching the floor, gloved fingers hiding her lips, narrowed amused eyes looking down at the camera, knees-up, gothic castle music salon with a black harpsichord, candelabras and a ruby stained-glass window, candlelight only, wine red, black and pale silver palette, velvet, satin and lace, anime gacha heroine card art, cute adult Japanese gacha face with soft gradient iris, thin warm-colored lineart, soft painterly shading on a cel-shaded base, matte skin, highlights only in eyes and lips, detailed layered costume fabrics, heroine is the brightest and sharpest element, muted desaturated hazy background, no text",
+   "w": 832,
+   "h": 1216,
+   "seed": 41179,
+   "checks": [
+    "no blood, no biting, no fangs on display, no wine glass (she drinks pomegranate tea only)",
+    "parasol ribs radiate from one center, one shaft held by one hand",
+    "tendu leg passes through the slit without widening it; skirt opaque; camera at chest level, not low",
+    "looking down at the camera with narrowed eyes (Vesper's signature gaze)",
+    "adult face and adult proportions (about 7.5 heads), no childlike features",
+    "no text"
+   ]
+  },
+  {
+   "id": "e15_environments_salon_hall_dawn",
+   "category": "environments",
+   "split": "in",
+   "prompt": "twmaster style, environments, Five Winds salon gaming hall in the early morning, square green-felt mahjong table with a neat wall of blank ivory tiles and four carved rosewood chairs, sakura paper lanterns still glowing, bronze wind chimes, round lattice window with pale dawn light and blossoming branches, painted folding screens, jade vase, floral rug on polished floorboards, rosewood, jade and pale peach palette, horizontal 16:9, muted desaturated painted anime gacha background, lowered saturation and contrast, light atmospheric haze, gentle darkening toward the edges, fewer details in the distance, thin warm-colored lineart, lost edges in highlights, soft painterly shading on a cel-shaded base, matte surfaces, empty scene, no characters, no text",
+   "w": 1216,
+   "h": 832,
+   "seed": 41191,
+   "checks": [
+    "tile wall: equal tiles in straight aligned rows, blank or clean glyphs",
+    "square table with four symmetric chairs, consistent perspective",
+    "reads as the same salon as the dataset (rosewood, jade, sakura lanterns)",
+    "no people, no text on screens or scrolls",
+    "muted, hazy, edges gently darkened"
+   ]
+  },
+  {
+   "id": "e16_environments_path_spring_vertical",
+   "category": "environments",
+   "split": "in",
+   "prompt": "twmaster style, environments, Path chapter 1 spring valley, vertical, stone path winding up a hillside past cherry trees to a small teahouse pavilion, red arched bridge over a stream, little waterfall, stone lanterns, misty mountain ridges fading into haze, scattered petals, pastel pink, sage and pearl-grey palette, muted desaturated painted anime gacha background, lowered saturation and contrast, light atmospheric haze, gentle darkening toward the edges, fewer details in the distance, thin warm-colored lineart, lost edges in highlights, soft painterly shading on a cel-shaded base, matte surfaces, empty scene, no characters, no text",
+   "w": 768,
+   "h": 1344,
+   "seed": 41203,
+   "checks": [
+    "vertical composition leads the eye from the bottom up along the path (usable as a level-map backdrop)",
+    "depth through haze: fewer details in the distance",
+    "bridge and pavilion structurally plausible",
+    "no characters, no text",
+    "pastel palette lowered in saturation"
+   ]
+  },
+  {
+   "id": "e17_environments_torii_tunnel_night",
+   "category": "environments",
+   "split": "in",
+   "prompt": "twmaster style, environments, tunnel of a thousand vermilion torii gates climbing a mountain stairway at night, vertical, worn stone steps, stone fox statues and stone lanterns with small flames, floating foxfire wisps, cedar trunks and maple leaves at the edges, deep indigo, vermilion and amber palette, muted desaturated painted anime gacha background, lowered saturation and contrast, light atmospheric haze, gentle darkening toward the edges, fewer details in the distance, thin warm-colored lineart, lost edges in highlights, soft painterly shading on a cel-shaded base, matte surfaces, empty scene, no characters, no text",
+   "w": 768,
+   "h": 1344,
+   "seed": 41219,
+   "checks": [
+    "torii repeat with consistent perspective: two pillars and two crossbeams each",
+    "stair continuous without broken steps",
+    "fox statues stay statues (not people or living animals)",
+    "torii pillars are blank: no inscriptions or fake kanji",
+    "no characters"
+   ]
+  },
+  {
+   "id": "e18_environments_salon_z2_dusty_before",
+   "category": "environments",
+   "split": "in",
+   "prompt": "twmaster style, environments, salon zone 2 tea counter abandoned before restoration, dusty carved rosewood counter with a cracked celadon tea set and a torn runner, toppled stool, empty shelves with broken tea jars, faded torn paper lantern, cobwebs, dust hanging in grey light from a boarded window, desaturated slate and ash palette, horizontal 4:3 zone painting, muted desaturated painted anime gacha background, lowered saturation and contrast, light atmospheric haze, gentle darkening toward the edges, fewer details in the distance, thin warm-colored lineart, lost edges in highlights, soft painterly shading on a cel-shaded base, matte surfaces, empty scene, no characters, no text",
+   "w": 1216,
+   "h": 832,
+   "seed": 41231,
+   "checks": [
+    "layout of a tea counter zone (counter, shelves) so before/after pairs work",
+    "desaturated slate palette (broken state), still the same lineart and finish",
+    "dust and cobwebs read as painted, not noise artifacts",
+    "no characters, no text"
+   ]
+  },
+  {
+   "id": "e19_environments_pagoda_guardian_floor",
+   "category": "environments",
+   "split": "held_out",
+   "prompt": "twmaster style, environments, guardian floor on the fifth tier of the Pagoda of the Moon, vertical, octagonal wooden chamber with red lacquer pillars, a closed lacquered treasure chest with gold fittings on a low dais, round green-felt mahjong table with a square wall of blank tiles in front of it, five unlit lanterns hanging in a row, lattice windows onto a misty night lake, blank silk banners, rosewood, plum and indigo palette, muted desaturated painted anime gacha background, lowered saturation and contrast, light atmospheric haze, gentle darkening toward the edges, fewer details in the distance, thin warm-colored lineart, lost edges in highlights, soft painterly shading on a cel-shaded base, matte surfaces, empty scene, no characters, no text",
+   "w": 768,
+   "h": 1344,
+   "seed": 41243,
+   "checks": [
+    "octagonal chamber reads; pillars vertical",
+    "one treasure chest with a straight lid and symmetric fittings",
+    "tile wall square and even",
+    "five lanterns in a row (count)",
+    "banners blank, no text",
+    "no characters"
+   ]
+  },
+  {
+   "id": "e20_environments_dungeon_neon_labyrinth",
+   "category": "environments",
+   "split": "held_out",
+   "prompt": "twmaster style, environments, Nova's tale dungeon backdrop, neon labyrinth, vertical, maze of narrow rainy alleys and steep stairways stacked under elevated rail bridges, blank glowing signboards in soft cyan and magenta without letters, tangled cables, paper lanterns between fire escapes, puddles with soft reflections, a faint glitch shimmer in the far haze, muted teal, plum and dusty magenta palette, muted desaturated painted anime gacha background, lowered saturation and contrast, light atmospheric haze, gentle darkening toward the edges, fewer details in the distance, thin warm-colored lineart, lost edges in highlights, soft painterly shading on a cel-shaded base, matte surfaces, empty scene, no characters, no text",
+   "w": 768,
+   "h": 1344,
+   "seed": 41257,
+   "checks": [
+    "neon kept MUTED: lowered saturation, no neon clutter, still matches the salon finish",
+    "signboards blank: no letters, no fake kanji or Latin",
+    "layered depth usable for 3-layer parallax (foreground, mid, far)",
+    "no characters",
+    "stairs and bridges structurally plausible"
+   ]
+  },
+  {
+   "id": "e21_environments_salon_z6_nova_loft",
+   "category": "environments",
+   "split": "held_out",
+   "prompt": "twmaster style, environments, salon zone 6 Nova's loft restored at night, attic room under slanted rosewood beams, low sofa with knitted throws, desk with old monitors glowing soft teal, cables tidied along the beams, round attic window with distant city lights, small mahjong table with blank tiles, sakura paper lantern, potted plants, warm lamp light, rosewood, teal and amber palette, horizontal 4:3 zone painting, muted desaturated painted anime gacha background, lowered saturation and contrast, light atmospheric haze, gentle darkening toward the edges, fewer details in the distance, thin warm-colored lineart, lost edges in highlights, soft painterly shading on a cel-shaded base, matte surfaces, empty scene, no characters, no text",
+   "w": 1216,
+   "h": 832,
+   "seed": 41269,
+   "checks": [
+    "blends the salon look (rosewood, lantern) with Nova's tech without neon clutter",
+    "monitors show soft glow only, no UI text",
+    "slanted beams in consistent perspective",
+    "no characters"
+   ]
+  },
+  {
+   "id": "e22_environments_mech_courtyard_crash",
+   "category": "environments",
+   "split": "held_out",
+   "prompt": "twmaster style, environments, tea house courtyard at night after a crash landing, a giant white-and-red mecha kneeling on scorched raked gravel with one hand resting on the ground, toppled stone water basin, split bamboo fence, tarps, thick cables and tool carts, tiled tea house eaves above, warm sodium work lights from the side, small red warning light, cold blue sensor glow, white, signal red and indigo palette, horizontal 16:9, muted desaturated painted anime gacha background, lowered saturation and contrast, light atmospheric haze, gentle darkening toward the edges, fewer details in the distance, thin warm-colored lineart, lost edges in highlights, soft painterly shading on a cel-shaded base, matte surfaces, empty scene, no characters, no text",
+   "w": 1216,
+   "h": 832,
+   "seed": 41281,
+   "checks": [
+    "mecha hard-surface: symmetric, plausible joints, straight panel lines, not melted",
+    "still painterly gacha finish (not a photoreal or 3D render)",
+    "no pilot, no people",
+    "no numbers or text on the mecha"
+   ]
+  },
+  {
+   "id": "e23_environments_garden_of_promises",
+   "category": "environments",
+   "split": "held_out",
+   "prompt": "twmaster style, environments, Garden of Promises tea domain at dawn, terraced rows of tea bushes with thin silk ribbons tied to the branches, small wooden pavilion with a low tea table, mossy stone path, wisteria arbor, mist in the valley, distant mountains, soft peach, tea green and lilac palette, horizontal 16:9, muted desaturated painted anime gacha background, lowered saturation and contrast, light atmospheric haze, gentle darkening toward the edges, fewer details in the distance, thin warm-colored lineart, lost edges in highlights, soft painterly shading on a cel-shaded base, matte surfaces, empty scene, no characters, no text",
+   "w": 1216,
+   "h": 832,
+   "seed": 41293,
+   "checks": [
+    "terraces read as tea bushes (not rice paddies)",
+    "ribbons blank, no writing",
+    "pavilion structurally plausible",
+    "no characters, no text"
+   ]
+  },
+  {
+   "id": "e24_ui_match_hud_rin",
+   "category": "ui",
+   "split": "in",
+   "prompt": "twmaster style, ui, full mobile game screen, match hud, top bar with a dark pause disc without rim, cream serif level text '2-5 · Осталось 26' and a thin jade progress line, pyramid of ivory mahjong tiles with bamboo, circle and sakura picture tiles on dark green felt, dark lacquer tray with seven slots holding three tiles, lower scene with anime heroine Rin, adult woman with a long dark-green side braid, thin round gold glasses and jade drop earrings, ivory silk blouse with jade frog buttons, holding a celadon tea bowl, calm small smile, waist-up on the right, thin jade charge ring behind her, three dark help discs with monoline undo, bulb and shuffle icons and cream numerals '2', '1' on the left, the third disc half transparent with a small plus, quiet lacquer mobile game ui, near-black night background, graphite lacquer plates with one thin low-opacity gold hairline on the top edge, 4px corner radius, dusty rose pill only on the primary button with dark text, elegant high-contrast editorial serif display type, clean rounded sans ui text, cream text, grey captions, soft gold numerals, thin monoline icons, no thick frames, no outlines or shadows on text, calm expensive editorial minimalism, crisp pixel-sharp rendering, anime gacha heroine art, cute adult Japanese gacha face, thin warm-colored lineart, soft painterly shading on a cel-shaded base, muted desaturated background",
+   "w": 768,
+   "h": 1344,
+   "seed": 41307,
+   "checks": [
+    "exactly five HUD elements: level line with pause, board, tray, help row, heroine; no currencies, badges or extra buttons",
+    "tray has 7 equal slots; tile pyramid rows even and centered",
+    "level text '2-5 · Осталось 26' legible Cyrillic",
+    "third help disc dimmed with '+' instead of a number",
+    "Rin identity (braid, round gold glasses); heroine does not overlap the board or the tray",
+    "no glossy plastic, no thick frames"
+   ]
+  },
+  {
+   "id": "e25_ui_victory_rewards",
+   "category": "ui",
+   "split": "in",
+   "prompt": "twmaster style, ui, full mobile game screen, victory screen, large centered cream serif 'Стол чист' with three soft gold stars, grey caption '2-5 · Ледяной павильон', row of three painterly reward items without rims, pale violet moonstone crystal, white candle and pink sakura petal with gold numerals '+80', '+1', '+20', two row plates 'Симпатия 4/5' and 'Путь 15/20' with thin jade progress lines, wide dusty rose pill 'Ещё уровень · 6', quiet text link 'В чайную' with a thin arrow, dim blurred tea library background, no characters, quiet lacquer mobile game ui, near-black night background, graphite lacquer plates with one thin low-opacity gold hairline on the top edge, 4px corner radius, dusty rose pill only on the primary button with dark text, elegant high-contrast editorial serif display type, clean rounded sans ui text, cream text, grey captions, soft gold numerals, thin monoline icons, no thick frames, no outlines or shadows on text, calm expensive editorial minimalism, crisp pixel-sharp rendering",
+   "w": 768,
+   "h": 1344,
+   "seed": 41323,
+   "checks": [
+    "'Стол чист' legible and centered (only ceremony text is centered)",
+    "exactly one dusty rose pill (primary)",
+    "reward items painterly without round rims or medallions",
+    "three equal stars",
+    "no confetti, no coin fountain",
+    "plates graphite with one thin gold hairline on top"
+   ]
+  },
+  {
+   "id": "e26_ui_asset_button_classes",
+   "category": "ui",
+   "split": "in",
+   "prompt": "twmaster style, ui, ui asset sheet, four button classes stacked with spacing, wide dusty rose primary pill 'Играть' with dark serif text, dark cashier button with a thin gold outline 'Набор · 149 ₽', quiet secondary text link 'Подробнее' with a thin arrow, row of three dark circle icon buttons without rim with monoline back, close and more icons, plain dark background, isolated elements, quiet lacquer mobile game ui, near-black night background, graphite lacquer plates with one thin low-opacity gold hairline on the top edge, 4px corner radius, dusty rose pill only on the primary button with dark text, elegant high-contrast editorial serif display type, clean rounded sans ui text, cream text, grey captions, soft gold numerals, thin monoline icons, no thick frames, no outlines or shadows on text, calm expensive editorial minimalism, crisp pixel-sharp rendering",
+   "w": 1024,
+   "h": 1024,
+   "seed": 41339,
+   "checks": [
+    "exactly one rose pill; the ₽ button is the dark cashier class with a thin gold outline",
+    "icons monoline with uniform stroke, no fills, no gold-rimmed medallions",
+    "'Играть' and 'Подробнее' legible Cyrillic",
+    "no drop shadows, no glossy bevel",
+    "elements aligned on a clean grid"
+   ]
+  },
+  {
+   "id": "e27_ui_wishes_banner_kohaku",
+   "category": "ui",
+   "split": "in",
+   "prompt": "twmaster style, ui, full mobile gacha wish screen, left aligned serif title 'Желания' with grey caption 'Результат случайный · шансы рядом', monoline info icon 'Шансы', full bleed banner art of anime heroine Kohaku, adult fox shrine maiden with long white hair fading to red tips, white fox ears and one fluffy white fox tail, gold eyes, leaning out from a vermilion torii pillar with a wink, uppercase gold overline 'S · ЛИСИЙ ОГОНЬ' and large italic cream serif name 'Кохаку', page dots, dark secondary button 'Загадать ×1', candle pity ring with a thin gold arc '38/60', dusty rose pill 'Загадать ×10', quiet lacquer mobile game ui, near-black night background, graphite lacquer plates with one thin low-opacity gold hairline on the top edge, 4px corner radius, dusty rose pill only on the primary button with dark text, elegant high-contrast editorial serif display type, clean rounded sans ui text, cream text, grey captions, soft gold numerals, thin monoline icons, no thick frames, no outlines or shadows on text, calm expensive editorial minimalism, crisp pixel-sharp rendering, anime gacha heroine art, cute adult Japanese gacha face, thin warm-colored lineart, soft painterly shading on a cel-shaded base, muted desaturated background",
+   "w": 768,
+   "h": 1344,
+   "seed": 41351,
+   "checks": [
+    "magazine-cover layout: heroine to the right, title and overline on the left",
+    "buttons and plates do not cover her face",
+    "one fox tail, fox ears, white-to-red hair",
+    "one rose pill only ('Загадать ×10')",
+    "title 'Желания' and name 'Кохаку' legible"
+   ]
+  },
+  {
+   "id": "e28_ui_pagoda_floor_select",
+   "category": "ui",
+   "split": "held_out",
+   "prompt": "twmaster style, ui, full mobile game screen, Pagoda floor select 'Пагода Луны', back chevron and serif title, tall painted pagoda rising through night mist in the center with each tier marked by a small glowing lantern node, floors '11' to '15' along a thin gold line, current floor '12' in a bright gold ring, a small gold flag mark 'Рекорд · 14' at the side, lacquer scroll plate 'Проклятия' with three small monoline seal icons, gold numerals 'Жар 12 · очки ×2,2', row plate 'Партнёр' with a small round avatar in a thin gold ring of an anime woman with pink twin tails, wide dusty rose pill 'Подняться', quiet lacquer mobile game ui, near-black night background, graphite lacquer plates with one thin low-opacity gold hairline on the top edge, 4px corner radius, dusty rose pill only on the primary button with dark text, elegant high-contrast editorial serif display type, clean rounded sans ui text, cream text, grey captions, soft gold numerals, thin monoline icons, no thick frames, no outlines or shadows on text, calm expensive editorial minimalism, crisp pixel-sharp rendering, anime gacha heroine art, cute adult Japanese gacha face, thin warm-colored lineart, soft painterly shading on a cel-shaded base, muted desaturated background",
+   "w": 768,
+   "h": 1344,
+   "seed": 41363,
+   "checks": [
+    "floor nodes in vertical order with sequential legible numbers 11-15; current floor 12 highlighted by a gold ring",
+    "one primary pill 'Подняться'",
+    "scroll plate is a flat lacquer plate (no parchment with thick frame)",
+    "no lock icon on every element, no 'НОВОЕ' or '-20%' stickers",
+    "title 'Пагода Луны' legible",
+    "pagoda art painterly and muted under the UI"
+   ]
+  },
+  {
+   "id": "e29_ui_hand_reading_guess",
+   "category": "ui",
+   "split": "held_out",
+   "prompt": "twmaster style, ui, full mobile game screen, hand reading mode 'Чтение руки', back chevron, serif title and grey caption 'Что она ждёт?', top row of thirteen face-down mahjong tiles with dark jade backs as the heroine's hidden hand, four of them flipped face up showing circle suit tiles, small round portrait of anime heroine Yue with lavender hair and small golden horns in a thin gold ring beside the row, ivory mahjong tile board on dark green felt in the middle, bottom sheet 'Догадка' with a neat grid of thirty-four small ivory riichi tiles in four rows of nine, nine, nine and seven, several tiles dimmed grey as impossible, one circle-suit tile selected with a gold hairline, wide dusty rose pill 'Да', quiet lacquer mobile game ui, near-black night background, graphite lacquer plates with one thin low-opacity gold hairline on the top edge, 4px corner radius, dusty rose pill only on the primary button with dark text, elegant high-contrast editorial serif display type, clean rounded sans ui text, cream text, grey captions, soft gold numerals, thin monoline icons, no thick frames, no outlines or shadows on text, calm expensive editorial minimalism, crisp pixel-sharp rendering, anime gacha heroine art, cute adult Japanese gacha face, thin warm-colored lineart, soft painterly shading on a cel-shaded base, muted desaturated background",
+   "w": 768,
+   "h": 1344,
+   "seed": 41377,
+   "checks": [
+    "hidden hand row has exactly 13 equal tiles; flipped tiles show valid circle-suit faces",
+    "guess drawer: 34 tiles laid out 9/9/9/7 (three suits of nine + seven honors)",
+    "suit faces plausible: circles 1-9 dots, bamboo sticks, characters 萬; honors 東南西北 白 發 中",
+    "impossible tiles visibly dimmed; one tile selected with a gold hairline",
+    "no betting words ('ставка', 'пари'), only 'Догадка'",
+    "Yue mini portrait: lavender hair, golden horns"
+   ]
+  },
+  {
+   "id": "e30_ui_duel_result",
+   "category": "ui",
+   "split": "held_out",
+   "prompt": "twmaster style, ui, full mobile game screen, ranked duel result, large left aligned cream serif 'Победа', grey caption 'Дуэль · Рейтинговая', opponent card with a muted painted bust portrait of anime heroine Yue, tall adult woman with waist-length lavender hair, small golden horns and a crescent tiara, gracious defeated smile, small dark badge 'ИИ · героиня', gold numerals 'ДР 1 284' with a jade '+24', round dark lacquer rank medallion engraved with a gold pearl with a thin gold edge, serif rank 'Жемчуг III' with grey caption 'новая ступень', thin jade progress line, row plates 'Время 1:42' and 'Пар снято 38', dusty rose pill 'Ещё дуэль', quiet link 'К дуэлям' with arrow, quiet lacquer mobile game ui, near-black night background, graphite lacquer plates with one thin low-opacity gold hairline on the top edge, 4px corner radius, dusty rose pill only on the primary button with dark text, elegant high-contrast editorial serif display type, clean rounded sans ui text, cream text, grey captions, soft gold numerals, thin monoline icons, no thick frames, no outlines or shadows on text, calm expensive editorial minimalism, crisp pixel-sharp rendering, anime gacha heroine art, cute adult Japanese gacha face, thin warm-colored lineart, soft painterly shading on a cel-shaded base, muted desaturated background",
+   "w": 768,
+   "h": 1344,
+   "seed": 41389,
+   "checks": [
+    "badge 'ИИ · героиня' present on the opponent card",
+    "'+24' in jade, rating numerals in soft gold",
+    "rank medallion is dark lacquer with a thin edge (no shiny gold coin with a thick rim)",
+    "one rose pill only",
+    "Yue identity in the portrait",
+    "'Победа' legible, left aligned"
+   ]
+  },
+  {
+   "id": "e31_ui_phone_chat_thread",
+   "category": "ui",
+   "split": "held_out",
+   "prompt": "twmaster style, ui, full mobile game screen, in-game messenger chat thread 'Хана', back chevron, small round avatar in a thin gold ring with anime heroine Hana with a wavy orange bob and a sunflower clip, grey status 'в сети', chat column of graphite message plates on the left from her with cream text 'Реванш сегодня?' and 'Я уже размялась!' and a painterly sticker of a sunflower giving a thumbs-up, player replies on the right as dark plates with a thin gold hairline 'Во сколько?', small grey timestamps '21:40', two reply chips at the bottom 'В девять' and 'Завтра', no keyboard, quiet lacquer mobile game ui, near-black night background, graphite lacquer plates with one thin low-opacity gold hairline on the top edge, 4px corner radius, dusty rose pill only on the primary button with dark text, elegant high-contrast editorial serif display type, clean rounded sans ui text, cream text, grey captions, soft gold numerals, thin monoline icons, no thick frames, no outlines or shadows on text, calm expensive editorial minimalism, crisp pixel-sharp rendering, anime gacha heroine art, cute adult Japanese gacha face, thin warm-colored lineart, soft painterly shading on a cel-shaded base, muted desaturated background",
+   "w": 768,
+   "h": 1344,
+   "seed": 41401,
+   "checks": [
+    "her messages left, player's right, consistently",
+    "flat graphite plates with 4px radius (no cartoon bubbles with tails, no gloss)",
+    "sticker painterly in the game style",
+    "message texts legible Cyrillic",
+    "Hana avatar: orange bob, sunflower clip",
+    "at most one rose dot, no rose pill misuse"
+   ]
+  },
+  {
+   "id": "e32_ui_shop_pack_confirm",
+   "category": "ui",
+   "split": "held_out",
+   "prompt": "twmaster style, ui, full mobile game screen, shop pack purchase, dim shop 'Лавка' behind, bottom sheet 'Подтверждение' rising with rounded top corners and a drag handle, pack card 'Набор «Первый чай»' with a bevelled top-right corner and a painterly still life of a pale violet moonstone crystal pile, a folded paper wish ticket with a red ribbon and a celadon tea bowl, list rows with small painterly icons and gold numerals '300 Лунного камня', '2 Билета желания', '1 Чайный лист', grey caption 'Ты точно знаешь, что получишь', wide dark cashier button with a thin gold outline 'Оплатить 149 ₽', small grey link 'Отмена', no characters, quiet lacquer mobile game ui, near-black night background, graphite lacquer plates with one thin low-opacity gold hairline on the top edge, 4px corner radius, dusty rose pill only on the primary button with dark text, elegant high-contrast editorial serif display type, clean rounded sans ui text, cream text, grey captions, soft gold numerals, thin monoline icons, no thick frames, no outlines or shadows on text, calm expensive editorial minimalism, crisp pixel-sharp rendering",
+   "w": 768,
+   "h": 1344,
+   "seed": 41413,
+   "checks": [
+    "the ₽ purchase uses the dark cashier button with a thin gold outline, NOT the rose pill (UX_RULES 6.5)",
+    "pack card has the bevelled top-right corner (tile-shaped card)",
+    "items painterly without round rims",
+    "no '-20%', 'НОВОЕ' or 'ШАНС' stickers, no confetti",
+    "'Ты точно знаешь, что получишь' and price legible"
+   ]
+  },
+  {
+   "id": "e33_tiles_fx_set_sky_six",
+   "category": "tiles_fx",
+   "split": "in",
+   "prompt": "twmaster style, tiles_fx, picture tile set, sky suit, top-down view of six carved ivory bone mahjong tiles with softly rounded bevels, a thin inset gold rim line and engraved hand-painted motifs with fine warm outline and soft watercolor fill in two even rows of three on dark green felt: crescent moon with a small star, sun with soft rays, white cloud, rainbow arc, snowflake, raindrop, even spacing, soft contact shadows, painted anime gacha game art, thin warm-colored lineart, soft painterly shading on a cel-shaded base, matte surfaces, restrained highlights, quiet luxurious palette of night plum, ivory, muted gold, jade green and dusty rose, soft light from the top left, no text, no logos, no people",
+   "w": 1216,
+   "h": 832,
+   "seed": 41427,
+   "checks": [
+    "exactly 6 tiles in 2 rows of 3, same size, even gaps",
+    "every motif distinct and recognizable",
+    "thin inset gold rim on every tile, softly rounded bevels",
+    "top-down without perspective warp",
+    "no text"
+   ]
+  },
+  {
+   "id": "e34_tiles_fx_back_five_winds_row",
+   "category": "tiles_fx",
+   "split": "in",
+   "prompt": "twmaster style, tiles_fx, tile back theme Five Winds, row of six mahjong tiles lying face down with deep jade lacquer backs, a thin gold rim and a small gold four-pointed star inlay, thick ivory body layers, one ivory tile standing upright at the end with an engraved sakura branch, dark green felt, three-quarter view from above, painted anime gacha game art, thin warm-colored lineart, soft painterly shading on a cel-shaded base, matte surfaces, restrained highlights, quiet luxurious palette of night plum, ivory, muted gold, jade green and dusty rose, soft light from the top left, no text, no logos, no people",
+   "w": 1216,
+   "h": 832,
+   "seed": 41441,
+   "checks": [
+    "6 face-down tiles + 1 standing tile (count)",
+    "two-layer construction (jade back + ivory body) identical on every tile",
+    "all backs identical, perspective consistent",
+    "standing tile sakura motif clean",
+    "no text"
+   ]
+  },
+  {
+   "id": "e35_tiles_fx_fx_pair_burst",
+   "category": "tiles_fx",
+   "split": "in",
+   "prompt": "twmaster style, tiles_fx, VFX sprite, matched pair burst, two ivory mahjong tiles with identical sakura branch faces touching at an angle in the center, a ring of soft gold light, four-pointed glints and pink petals bursting outward, on a plain very dark night-plum background, painted anime gacha game art, thin warm-colored lineart, soft painterly shading on a cel-shaded base, matte surfaces, restrained highlights, quiet luxurious palette of night plum, ivory, muted gold, jade green and dusty rose, soft light from the top left, no text, no logos, no people",
+   "w": 1024,
+   "h": 1024,
+   "seed": 41453,
+   "checks": [
+    "the two tiles carry the SAME motif (it is a matched pair)",
+    "burst roughly radial, centered, sprite-ready plain night-plum background",
+    "glints and petals painted, matte (no photographic lens flare)",
+    "no text"
+   ]
+  },
+  {
+   "id": "e36_tiles_fx_back_birch_maple",
+   "category": "tiles_fx",
+   "split": "held_out",
+   "prompt": "twmaster style, tiles_fx, tile back theme Birch and Maple, row of six mahjong tiles face down with pale birch-bark backs with fine dark bark lines and a small carved red maple leaf, thin gold rims, thick ivory body layers, one tile face up with an engraved maple leaf, mossy green felt with fallen leaves, three-quarter view from above, painted anime gacha game art, thin warm-colored lineart, soft painterly shading on a cel-shaded base, matte surfaces, restrained highlights, quiet luxurious palette of night plum, ivory, muted gold, jade green and dusty rose, soft light from the top left, no text, no logos, no people",
+   "w": 1216,
+   "h": 832,
+   "seed": 41467,
+   "checks": [
+    "birch texture reads, but tiles stay tiles: rounded bevel and ivory body layer",
+    "all backs identical",
+    "face-up tile shows a correct maple leaf (5-7 lobes)",
+    "7 tiles total",
+    "no text"
+   ]
+  },
+  {
+   "id": "e37_tiles_fx_felt_aurora_ice",
+   "category": "tiles_fx",
+   "split": "held_out",
+   "prompt": "twmaster style, tiles_fx, table material Aurora Ice, top-down corner of a mahjong table with pale blue frosted felt and a faint hoarfrost lattice, carved white ice rim with silver inlay, soft violet-green aurora reflection gliding across the surface, three ivory picture tiles with snowflake, aurora ribbon and frosted fir, silver candle holder and a frosted fir sprig in the corner, painted anime gacha game art, thin warm-colored lineart, soft painterly shading on a cel-shaded base, matte surfaces, restrained highlights, quiet luxurious palette of night plum, ivory, muted gold, jade green and dusty rose, soft light from the top left, no text, no logos, no people",
+   "w": 1024,
+   "h": 1024,
+   "seed": 41479,
+   "checks": [
+    "same top-down corner layout as other table materials (rim on two edges)",
+    "aurora is a soft reflection, not a neon stripe",
+    "felt stays matte cloth; tiles keep strong contrast against it (playable)",
+    "3 tiles of equal size",
+    "no text"
+   ]
+  },
+  {
+   "id": "e38_tiles_fx_riichi_honor_glyphs",
+   "category": "tiles_fx",
+   "split": "held_out",
+   "prompt": "twmaster style, tiles_fx, honor tile set, top-down view of seven carved ivory bone mahjong tiles with softly rounded bevels and a thin inset gold rim line in one even row on dark green felt, classic riichi honor faces engraved with clean ink strokes: east wind 東, south wind 南, west wind 西, north wind 北 in dark navy, white dragon as an empty frame, green dragon 發 in jade green, red dragon 中 in red, even spacing, soft contact shadows, painted anime gacha game art, thin warm-colored lineart, soft painterly shading on a cel-shaded base, matte surfaces, restrained highlights, quiet luxurious palette of night plum, ivory, muted gold, jade green and dusty rose, soft light from the top left, tile glyphs only, no other text",
+   "w": 1216,
+   "h": 832,
+   "seed": 41491,
+   "checks": [
+    "exact glyphs in order: 東 南 西 北 (navy), white dragon blank or framed, 發 green, 中 red",
+    "no extra or invented pseudo-kanji, no Latin letters",
+    "7 tiles in one row, equal size, even spacing",
+    "tile proportions about 3:4, gold rim on all"
+   ]
+  },
+  {
+   "id": "e39_tiles_fx_fx_chain_lightning",
+   "category": "tiles_fx",
+   "split": "held_out",
+   "prompt": "twmaster style, tiles_fx, VFX sprite, chain lightning, a crackling electric-yellow lightning bolt jumping in three arcs between three ivory mahjong tiles with lightning-bolt faces, small violet sparks, faint storm haze, on a plain very dark night-plum background, painted anime gacha game art, thin warm-colored lineart, soft painterly shading on a cel-shaded base, matte surfaces, restrained highlights, quiet luxurious palette of night plum, ivory, muted gold, jade green and dusty rose, soft light from the top left, no text, no logos, no people",
+   "w": 1024,
+   "h": 1024,
+   "seed": 41503,
+   "checks": [
+    "lightning stylized and painted (not photographic plasma)",
+    "3 tiles, arcs connect them",
+    "same matte finish as the petal and gold FX",
+    "plain night-plum background, sprite-ready",
+    "no text"
+   ]
+  },
+  {
+   "id": "e40_tiles_fx_spirit_teapot_sprite",
+   "category": "tiles_fx",
+   "split": "held_out",
+   "prompt": "twmaster style, tiles_fx, battle spirit sprite, a cute-creepy living cast-iron teapot spirit with one big round eye, tiny stubby legs and a puff of steam from its spout, a few blank ivory mahjong tiles orbiting around it, earth-element amber glow, centered on a plain very dark night-plum background, painted anime gacha game art, thin warm-colored lineart, soft painterly shading on a cel-shaded base, matte surfaces, restrained highlights, quiet luxurious palette of night plum, ivory, muted gold, jade green and dusty rose, soft light from the top left, no text, no logos, no people",
+   "w": 1024,
+   "h": 1024,
+   "seed": 41519,
+   "checks": [
+    "non-humanoid creature (no woman or girl form): spirits never compete with heroines for appeal",
+    "cute-creepy, no blood or gore",
+    "one eye, teapot anatomy readable (lid, spout, handle)",
+    "same thin warm lineart and matte finish as tiles",
+    "orbiting tiles blank, no text"
+   ]
+  },
+  {
+   "id": "e41_scenes_mc_across_table_pov",
+   "category": "scenes",
+   "split": "in",
+   "prompt": "twmaster style, scenes, player's view across a green-felt mahjong table in the lantern-lit Five Winds salon, Mahjong-chan, adult woman with long wavy pink twin tails tied with jade knots and sakura flowers, rose-pink eyes, curvy hourglass figure, sakura-pink cheongsam with jade piping, seated on the far side of the table with her chin on one hand, sliding a blank ivory tile toward the viewer with two fingers, teasing smile, waist-up, a neat wall of blank tiles and a celadon teacup on the felt in the foreground, sakura paper lanterns and wind chimes behind, sakura pink, jade and warm amber palette, silk brocade and felt, anime gacha story CG, cute adult Japanese gacha face with soft gradient iris, thin warm-colored lineart, soft painterly shading on a cel-shaded base, matte skin, highlights only in eyes and lips, detailed layered costume fabrics, heroine is the brightest and sharpest element, muted desaturated hazy background, light atmospheric haze, gentle darkening toward the edges, no text",
+   "w": 1216,
+   "h": 832,
+   "seed": 41531,
+   "checks": [
+    "POV composition: table plane and tile rows in correct perspective toward the viewer",
+    "she is waist-up behind the table (no under-table view)",
+    "hand sliding the tile: 5 fingers, tile not fused",
+    "Mahjong-chan identity",
+    "adult face and adult proportions (about 7.5 heads), no childlike features",
+    "no text"
+   ]
+  },
+  {
+   "id": "e42_scenes_rin_serving_tea",
+   "category": "scenes",
+   "split": "in",
+   "prompt": "twmaster style, scenes, Ice Pavilion tea library at a quiet overcast noon, Rin, adult woman with a long dark-green side braid over one shoulder, thin round gold glasses, jade drop earrings, tall slender hourglass figure, ivory silk blouse with jade frog buttons and a dark pencil skirt, standing behind a long pale-wood counter and setting a celadon tea bowl down in front of the viewer, a thin wisp of steam, soft smile with lowered eyes, waist-up, a small stack of blank ivory mahjong tiles and brass scales on the counter, towering shelves of tea jars and a rolling ladder behind, skylight, ivory, celadon and brass palette, silk and porcelain, anime gacha story CG, cute adult Japanese gacha face with soft gradient iris, thin warm-colored lineart, soft painterly shading on a cel-shaded base, matte skin, highlights only in eyes and lips, detailed layered costume fabrics, heroine is the brightest and sharpest element, muted desaturated hazy background, light atmospheric haze, gentle darkening toward the edges, no text",
+   "w": 1216,
+   "h": 832,
+   "seed": 41543,
+   "checks": [
+    "counter in front at waist height, bowl on the counter as one object",
+    "Rin identity: braid, round gold glasses, jade earrings",
+    "shelves and ladder in consistent perspective",
+    "tile stack tidy, blank",
+    "adult face and adult proportions (about 7.5 heads), no childlike features",
+    "no text on jars"
+   ]
+  },
+  {
+   "id": "e43_scenes_hana_lantern_relay",
+   "category": "scenes",
+   "split": "in",
+   "prompt": "twmaster style, scenes, lantern relay at the stadium at sunset, Hana, adult woman with a wavy orange bob, sunflower hair clip, amber eyes, light freckles, sun-tanned skin, sporty soft figure, lantern runner look: short orange haori over a fitted closed navy jumpsuit, white sneakers, running toward the viewer and holding out a glowing paper lantern on a short pole as if passing it to the player, bright grin, knees-up, red running track with lane lines, floodlight masts and grandstand in warm backlit haze, orange, navy and sunset gold palette, cotton and paper, anime gacha story CG, cute adult Japanese gacha face with soft gradient iris, thin warm-colored lineart, soft painterly shading on a cel-shaded base, matte skin, highlights only in eyes and lips, detailed layered costume fabrics, heroine is the brightest and sharpest element, muted desaturated hazy background, light atmospheric haze, gentle darkening toward the edges, no text",
+   "w": 832,
+   "h": 1216,
+   "seed": 41557,
+   "checks": [
+    "running anatomy: opposite arm and leg forward, exactly two legs",
+    "one lantern on one pole held by a correct hand",
+    "lane lines converge correctly",
+    "no text or numbers on the track or grandstand",
+    "Hana identity",
+    "adult face and adult proportions (about 7.5 heads), no childlike features"
+   ]
+  },
+  {
+   "id": "e44_scenes_miel_tea_at_salon",
+   "category": "scenes",
+   "split": "in",
+   "prompt": "twmaster style, scenes, afternoon tea at the Five Winds salon, Miel, adult patissiere with big caramel-blonde curls in a side ponytail with a white satin bow, macaron hair clip, amber eyes, soft pear-shaped figure, cream off-shoulder puff-sleeve blouse with a corset apron skirt, caramel over-the-knee socks with ribbon bows, red lacquer heels, carrying a silver tray of macarons and a small cake to a green-felt mahjong table, cheerful puffed-cheek smile, knees-up three-quarter view, a wall of blank tiles on the table, sakura paper lanterns, rosewood chairs and a round lattice window behind, cream, caramel and rosewood palette, cotton lace and silver, anime gacha story CG, cute adult Japanese gacha face with soft gradient iris, thin warm-colored lineart, soft painterly shading on a cel-shaded base, matte skin, highlights only in eyes and lips, detailed layered costume fabrics, heroine is the brightest and sharpest element, muted desaturated hazy background, light atmospheric haze, gentle darkening toward the edges, no text",
+   "w": 832,
+   "h": 1216,
+   "seed": 41569,
+   "checks": [
+    "tray held level by correct hands, sweets sit on the tray (not floating)",
+    "Miel identity: caramel-blonde side ponytail, white bow, macaron clip",
+    "salon matches the environment set (rosewood, jade felt, sakura lanterns)",
+    "no alcohol",
+    "adult face and adult proportions (about 7.5 heads), no childlike features",
+    "no text"
+   ]
+  },
+  {
+   "id": "e45_scenes_duel_faceoff_mc_yue",
+   "category": "scenes",
+   "split": "held_out",
+   "prompt": "twmaster style, scenes, ranked duel face-off in the duel hall, two heroines on opposite sides of a green-felt mahjong table with a square wall of blank tiles between them, on the left Mahjong-chan, adult woman with long wavy pink twin tails tied with jade knots and sakura flowers, rose-pink eyes, curvy hourglass figure, sakura-pink cheongsam with jade piping, leaning forward with a confident grin and a blank tile between two fingers, on the right Yue, tall adult woman with waist-length wavy lavender hair, small golden horns, crescent-moon forehead tiara, violet eyes, dark-violet qipao with silver crescent embroidery, calm smile with a folding fan at her lips, both waist-up, aisle of red lacquer pillars with blank crimson and teal banners, sakura lantern overhead, sakura pink, violet and rosewood palette, silk and felt, anime gacha story CG, cute adult Japanese gacha faces with soft gradient iris, thin warm-colored lineart, soft painterly shading on a cel-shaded base, matte skin, highlights only in eyes and lips, detailed layered costume fabrics, heroines are the brightest and sharpest elements, muted desaturated hazy background, light atmospheric haze, gentle darkening toward the edges, no text",
+   "w": 1216,
+   "h": 832,
+   "seed": 41581,
+   "checks": [
+    "two distinct identities with NO attribute bleed: no horns on Mahjong-chan, no pink twin tails on Yue",
+    "each heroine has two hands with 5 fingers; fan and tile held correctly",
+    "table and tile wall consistent between them",
+    "banners blank",
+    "both clearly adult",
+    "balanced composition, both readable at thumbnail size"
+   ]
+  },
+  {
+   "id": "e46_scenes_shirin_hand_reading",
+   "category": "scenes",
+   "split": "held_out",
+   "prompt": "twmaster style, scenes, hand reading in the fortune-teller tent, Shirin, adult caravan dancer with warm brown skin, hip-length plum-black wavy hair woven with gold coin chains, gold forehead chain, kohl-lined honey eyes, teal-and-gold embroidered choli top with sheer sleeves and a layered teal-plum skirt, sitting on cushions with her knees together and legs folded to the side behind a low brass-edged table, a row of thirteen face-down mahjong tiles with teal backs standing in front of her as her hidden hand, one hand hovering over them, mysterious smile, eyes on the viewer, waist-up, kilim carpets, hanging brass lamps on chains and a turquoise canopy in the blue hour, teal, plum and gold palette, chiffon, brocade and coins, anime gacha story CG, cute adult Japanese gacha face with soft gradient iris, thin warm-colored lineart, soft painterly shading on a cel-shaded base, matte skin, highlights only in eyes and lips, detailed layered costume fabrics, heroine is the brightest and sharpest element, muted desaturated hazy background, light atmospheric haze, gentle darkening toward the edges, no text",
+   "w": 1216,
+   "h": 832,
+   "seed": 41593,
+   "checks": [
+    "exactly 13 tiles standing in a row, equal size, backs toward the viewer",
+    "seated with knees together, legs folded aside",
+    "coin chains in the hair, gold forehead chain",
+    "hovering hand correct (5 fingers)",
+    "no crystal ball, tarot or text props",
+    "adult face and adult proportions (about 7.5 heads), no childlike features"
+   ]
+  },
+  {
+   "id": "e47_scenes_kohaku_vs_karakasa",
+   "category": "scenes",
+   "split": "held_out",
+   "prompt": "twmaster style, scenes, dungeon battle in Kohaku's tale, Kohaku, adult fox shrine maiden with long white hair fading to red tips, white fox ears, fluffy white fox tail with red tip, white fox mask on the side of her head, gold eyes, white top with detached sleeves and vermilion hakama, standing in three-quarter view with a blank paper charm raised between two fingers and blue-white foxfire circling her hand, determined grin, knees-up on the left, facing a cute-creepy one-eyed paper umbrella spirit hopping on a single wooden leg with its long tongue out on the right, a green-felt mahjong table with a wall of blank tiles between them, night torii tunnel with stone lanterns, vermilion, white and foxfire blue palette, silk and oiled paper, anime gacha story CG, cute adult Japanese gacha face with soft gradient iris, thin warm-colored lineart, soft painterly shading on a cel-shaded base, matte skin, highlights only in eyes and lips, detailed layered costume fabrics, heroine is the brightest and sharpest element, muted desaturated hazy background, light atmospheric haze, gentle darkening toward the edges, no text",
+   "w": 1216,
+   "h": 832,
+   "seed": 41609,
+   "checks": [
+    "spirit is a non-human object creature (umbrella, one eye, one leg), not a woman",
+    "no blood or gore",
+    "paper charm blank (no writing)",
+    "one fox tail; Kohaku identity",
+    "clear spatial read: heroine - table - spirit",
+    "adult face and adult proportions (about 7.5 heads), no childlike features"
+   ]
+  },
+  {
+   "id": "e48_scenes_yue_pagoda_stairs",
+   "category": "scenes",
+   "split": "held_out",
+   "prompt": "twmaster style, scenes, climbing the Pagoda of the Moon, Yue, tall adult woman with waist-length wavy lavender hair, small golden horns, crescent-moon forehead tiara, violet eyes, lavender hanfu with bare shoulders and long trailing sleeves, white lace stockings, silver slippers, pausing on a spiral wooden staircase around a red lacquer pillar holding a small lantern, looking back down the stairs past the viewer with a knowing smile, camera at her eye level, knees-up, octagonal tier with lattice windows full of night sky and a pale moon, blank silk banners, rosewood, lavender and indigo palette, silk and chiffon, anime gacha story CG, cute adult Japanese gacha face with soft gradient iris, thin warm-colored lineart, soft painterly shading on a cel-shaded base, matte skin, highlights only in eyes and lips, detailed layered costume fabrics, heroine is the brightest and sharpest element, muted desaturated hazy background, light atmospheric haze, gentle darkening toward the edges, no text",
+   "w": 832,
+   "h": 1216,
+   "seed": 41621,
+   "checks": [
+    "camera at HER eye level: never from below the stairs looking up the skirt (red line)",
+    "spiral stair continuous around the pillar",
+    "gaze past the viewer",
+    "one lantern held by a correct hand",
+    "Yue identity",
+    "adult face and adult proportions (about 7.5 heads), no childlike features"
+   ]
+  },
+  {
+   "id": "e49_scenes_four_founders_table",
+   "category": "scenes",
+   "split": "held_out",
+   "prompt": "twmaster style, scenes, four-player table night at the Five Winds salon, four adult heroines around a square green-felt mahjong table seen from a slightly raised eye-level angle, Mahjong-chan with long wavy pink twin tails and jade knots in a sakura-pink cheongsam laughing, Rin with a long dark-green side braid and thin round gold glasses in an ivory blouse studying her tiles, Hana with a wavy orange bob and a sunflower clip in an orange track jacket cheering with a raised fist, Nova with an asymmetric cyan-to-pink bob and glowing cat-ear headphones in a black techwear jacket smirking, each with a neat row of standing tiles, sakura paper lanterns and a round lattice window behind, sakura pink, jade, orange and cyan accents on rosewood, silk and felt, anime gacha story CG, cute adult Japanese gacha faces with soft gradient iris, thin warm-colored lineart, soft painterly shading on a cel-shaded base, matte skin, highlights only in eyes and lips, detailed layered costume fabrics, heroines are the brightest and sharpest elements, muted desaturated hazy background, light atmospheric haze, gentle darkening toward the edges, no text",
+   "w": 1216,
+   "h": 832,
+   "seed": 41633,
+   "checks": [
+    "four distinct identities, no bleed: glasses only on Rin, cat-ear headphones only on Nova, sunflower only on Hana, pink twin tails only on Mahjong-chan",
+    "4 tile rows and 4 seats; table square in perspective",
+    "8 hands total with plausible fingers, no extra arms",
+    "all four faces clearly adult",
+    "consistent figure scale around the table",
+    "no text"
+   ]
+  },
+  {
+   "id": "e50_scenes_minamo_summon_reveal",
+   "category": "scenes",
+   "split": "held_out",
+   "prompt": "twmaster style, scenes, SSR summon reveal in the summoning hall, Minamo, adult pearl-palace princess with long flowing pastel aqua-pearl wavy hair drifting as if underwater, pearl strands and a coral comb in her hair, aqua-violet gradient eyes, soft rounded figure, form-fitting sea-green hanfu-inspired gown with bare shoulders, pearl-embroidered bodice and a side slit, floating translucent shawl, rising weightlessly out of a large shimmering bubble above the round jade altar, both legs together bent to one side like a mermaid tail, arms drifting open, dreamy half-lidded smile, full body, circular stone hall with carved pillars, paper lanterns and a round oculus of soft daylight, drifting pearls and light motes, aqua, pearl white and indigo palette, silk and pearls, anime gacha story CG, cute adult Japanese gacha face with soft gradient iris, thin warm-colored lineart, soft painterly shading on a cel-shaded base, matte skin, highlights only in eyes and lips, detailed layered costume fabrics, heroine is the brightest and sharpest element, muted desaturated hazy background, light atmospheric haze, gentle darkening toward the edges, no text",
+   "w": 832,
+   "h": 1216,
+   "seed": 41647,
+   "checks": [
+    "full body with pointed toes visible, feet off the ground",
+    "gown opaque; only the shawl is translucent",
+    "bubble reads as a transparent sphere around/below her",
+    "reveal glow is soft (no white flash blowout)",
+    "distinct from Yue: aqua hair, no horns, no moon",
+    "adult face and adult proportions (about 7.5 heads), no childlike features"
+   ]
+  }
+ ]
+}
