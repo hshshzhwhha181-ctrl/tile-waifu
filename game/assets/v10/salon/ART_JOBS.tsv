@@ -1,0 +1,20 @@
+name	job_id	note
+salon_z1_done	e491e494-e3c8-4b09-b78c-b279370e024f	gate, restored (z1_done.webp)
+salon_z1_broken	a51d6824-5898-46fa-b489-4023bd4eedbd	edit of z1_done (z1_broken.webp)
+salon_z1_broken_b	d2d7010c-6ee8-404c-9acd-39a10adf7cf3	variant, unused
+salon_z1_lobby	1c421287-880e-46b8-93ea-77afee80a19a	9:16 (z1_lobby.webp)
+salon_z2_done	50b96f52-c5db-4e4a-8a3c-0cdc4ad9e7b3	tea counter, restored (z2_done.webp, z2_lobby.webp crop)
+salon_z2_done_b	aa10b156-13ae-42af-9b5d-7db53cf1bbd6	variant, unused
+salon_z2_broken	572d96f7-0c92-48e6-a0ff-1cdd6e650c4f	edit of z2_done (z2_broken.webp)
+salon_z2_broken_b	3b6e3977-88d6-4152-9608-4791269b1d99	variant, unused
+salon_z3_done	f0f15580-4f5f-49e0-8898-531109606be4	study, restored (z3_done.webp)
+salon_z3_done_b	f870ce3e-41dd-45bd-8f0c-347d9bde0cc6	variant, unused
+salon_z3_broken	529908f3-42d1-4881-b2cd-f58f60d1f020	edit of z3_done (z3_broken.webp)
+salon_z3_broken_b	9b952d24-7369-4c3d-a223-ec29a9553e76	variant, unused
+salon_z3_lobby	8e0ea79d-aa82-4bfd-9745-09133e8c1a58	9:16 (z3_lobby.webp)
+salon_rin_scene	209f243f-d5b6-4a98-a831-b9af4cee3d60	Rin pouring tea, full body (z2_scene_rin.webp, rin_cut.png); anatomy checked
+salon_rin_scene_close	7078a1a8-7507-4f1b-981d-48f0c3a29296	Rin pouring tea, knees-up (z2_scene_rin_close.webp); anatomy checked
+sfx_salon_thud	b5fa57fe-993e-4b6c-9720-8e5754deeefe	mirelo 2 s, sfx/salon_thud.wav
+sfx_salon_sweep	fec683d5-16fc-4918-9c09-15a184c64641	mirelo 2 s, sfx/salon_sweep.wav
+sfx_salon_zone_sting	80597697-ea9b-468f-96f8-6a47416310ad	mirelo 4 s koto + bell, sfx/salon_zone_sting.wav
+sfx_salon_shutter	ed25c0ea-c9ab-477e-a459-cf9544e10839	mirelo 2 s, sfx/salon_shutter.wav
