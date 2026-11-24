@@ -7,7 +7,7 @@ extends RefCounted
 #
 #   first_ssr_dist(hard) -> Array   P(first SSR exactly at pull k), k = 1..hard (index k-1)
 #   expected_to_ssr(hard) -> float  mean pulls per SSR
-#   consolidated(hard) -> {"SSR","S","A"}  long-run share of each rarity with pity (stationary chain over (p, s))
+#   consolidated(hard) -> {"SSR","S","A"}  long-run share of each rarity with pity (renewal over the SSR cycle)
 #   featured_expected(hard) / featured_worst(hard)   pulls per featured SSR on a limited banner (50/50 + guarantee)
 #   disclosure(banner_id, gacha=null) -> Dictionary  everything the odds screen shows, numbers + RU lines
 #   rub_label(pulls) -> String      «≈ 1 317–1 975 ₽» from the best and the base pack
@@ -33,47 +33,40 @@ static func expected_to_ssr(hard: int = V10Catalog.SSR_HARD) -> float:
 	return e
 
 
-# stationary distribution of the (pulls since SSR, pulls since S+) chain → long-run rarity shares
+# long-run rarity shares with pity. Every SSR resets both counters to (0, 0), so the process is a renewal process
+# with the SSR as the renewal: share = expected count per cycle / expected cycle length (renewal-reward theorem).
+# One forward pass over the cycle (hard × S_HARD states) gives the exact stationary values — no iteration, so the odds
+# screen opens instantly on a mid Android (the old power iteration took ~250 ms on desktop).
 static func consolidated(hard: int = V10Catalog.SSR_HARD) -> Dictionary:
 	var key: = "cons%d" % hard
 	if _cache.has(key):
 		return _cache[key]
 	var SH: = V10Catalog.S_HARD
-	var n: = hard * SH
-	var pi: = PackedFloat64Array()
-	pi.resize(n)
-	pi.fill(0.0)
-	pi[0] = 1.0
-	var ssr: = 0.0
-	var s: = 0.0
-	for it in 4000:
+	var dist: = PackedFloat64Array()      # mass still without an SSR, by pulls since the last S-or-better
+	dist.resize(SH)
+	dist.fill(0.0)
+	dist[0] = 1.0
+	var e_len: = 0.0
+	var e_s: = 0.0
+	for p in hard:
 		var nx: = PackedFloat64Array()
-		nx.resize(n)
+		nx.resize(SH)
 		nx.fill(0.0)
-		ssr = 0.0
-		s = 0.0
-		for p in hard:
-			for q in SH:
-				var w: = pi[p * SH + q]
-				if w == 0.0:
-					continue
-				var p2: = p + 1
-				var q2: = q + 1
-				var r: = V10Gacha.rate_at(p2, hard)
-				var rs: = (1.0 - r) if q2 >= SH else minf(V10Catalog.S_BASE, 1.0 - r)
-				ssr += w * r
-				s += w * rs
-				nx[0] += w * r
-				if p2 < hard:
-					nx[p2 * SH + 0] += w * rs
-					if q2 < SH:
-						nx[p2 * SH + q2] += w * (1.0 - r - rs)
-		var diff: = 0.0
-		for i in n:
-			diff += absf(nx[i] - pi[i])
-		pi = nx
-		if diff < 1e-13:
-			break
+		var r: = V10Gacha.rate_at(p + 1, hard)
+		for q in SH:
+			var w: = dist[q]
+			if w == 0.0:
+				continue
+			var q2: = q + 1
+			var rs: = (1.0 - r) if q2 >= SH else minf(V10Catalog.S_BASE, 1.0 - r)
+			e_len += w
+			e_s += w * rs
+			nx[0] += w * rs
+			if q2 < SH:
+				nx[q2] += w * (1.0 - r - rs)
+		dist = nx
+	var ssr: = 1.0 / e_len
+	var s: = e_s / e_len
 	var out: = {"SSR": ssr, "S": s, "A": 1.0 - ssr - s}
 	_cache[key] = out
 	return out
@@ -111,7 +104,7 @@ static func disclosure(bid: String, gacha: V10Gacha = null) -> Dictionary:
 	if b.is_empty():
 		return {}
 	var hard: = int(b.get("hard", V10Catalog.SSR_HARD))
-	var cons: = consolidated(V10Catalog.SSR_HARD)
+	var cons: = consolidated(hard)
 	var cost: = int(b.cost)
 	var ppull: = float(cost) / float(V10Catalog.PULL_COST)       # beginner pulls cost 0.8 of a pull
 	var d: = {
@@ -120,7 +113,7 @@ static func disclosure(bid: String, gacha: V10Gacha = null) -> Dictionary:
 		"base": {"SSR": V10Catalog.SSR_BASE, "S": V10Catalog.S_BASE, "A": 1.0 - V10Catalog.SSR_BASE - V10Catalog.S_BASE},
 		"consolidated": cons,
 		"soft_from": V10Catalog.SOFT_FROM, "soft_step": V10Catalog.SOFT_STEP, "hard": hard, "s_hard": V10Catalog.S_HARD,
-		"expected_ssr": expected_to_ssr(V10Catalog.SSR_HARD),
+		"expected_ssr": expected_to_ssr(hard),
 		"soft": [],
 		"items": [],
 	}

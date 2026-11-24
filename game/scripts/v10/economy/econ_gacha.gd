@@ -197,6 +197,10 @@ func pull(bid: String, n: int) -> Array:
 	var res: = []
 	for i in n:
 		var p_before: = int(c.p)
+		if b.kind == "newbie" and not bool(st.newbie.ssr):
+			# the SSR is promised within the banner's 50 pulls, whatever the counter says (a migrated 0.9 save has
+			# used beginner pulls but a fresh counter): pull #50 of the banner is forced
+			hard = mini(hard_of(b), p_before + V10Catalog.NEWBIE_HARD - int(st.newbie.n))
 		var rar: = roll_rar(c, hard)
 		var r: = {"rar": rar, "pity": p_before + 1, "banner": bid, "featured": false}
 		if b.kind == "newbie":

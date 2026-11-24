@@ -131,7 +131,10 @@ func can_buy(id: String) -> Dictionary:
 		return {"ok": false, "reason": "no_provider"}
 	for oid in st.orders:
 		var o: Dictionary = st.orders[oid]
-		if o.sku == id and String(o.st) in ["created", "pending"]:
+		# an order the store never answered (app killed mid-purchase, abandoned SBP) must not lock the SKU forever;
+		# a late "paid" for it is still delivered by _on_result / reconcile
+		if o.sku == id and String(o.st) in ["created", "pending"] \
+				and clock.now() - int(o.get("t", 0)) < V10Catalog.ORDER_STALE_SEC:
 			return {"ok": false, "reason": "in_progress"}
 	var c: = spend.check(int(sku(id).rub))
 	if not c.ok:
@@ -255,9 +258,10 @@ func reconcile() -> Array:
 		var s: = sku(String(p.get("product_id", "")))
 		if String(p.status) == "paid":
 			if have.is_empty():
-				var o: Dictionary = st.orders.get(String(p.get("order_id", "")), {})
+				var poid: = String(p.get("order_id", ""))
+				var o: Dictionary = st.orders.get(poid, {}) if poid != "" else {}
 				if o.is_empty():
-					o = {"oid": String(p.get("order_id", "ext-" + pid)), "sku": String(p.product_id), "rub": int(s.get("rub", 0)),
+					o = {"oid": poid if poid != "" else "ext-" + pid, "sku": String(p.product_id), "rub": int(s.get("rub", 0)),
 						"t": int(p.get("t", 0)), "st": "created"}
 					st.orders[o.oid] = o
 				_deliver(o, {"purchase_id": pid, "product_id": p.product_id, "order_id": o.oid, "status": "paid"})

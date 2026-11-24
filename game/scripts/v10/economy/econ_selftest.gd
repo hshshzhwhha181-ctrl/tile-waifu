@@ -50,6 +50,7 @@ static func run(scale: float = 1.0) -> int:
 	_pass()
 	_summon_flow()
 	_save()
+	_review()
 	print("ECON_SELFTEST %d/%d (%.1f s)" % [ok, total, float(Time.get_ticks_msec() - t) / 1000.0])
 	return ok
 
@@ -114,16 +115,32 @@ static func _clock() -> void:
 	_check(c.now() == T0, "manual clock")
 	c.set_manual(T0 + 60, 60000)
 	_check(c.now() == T0 + 60, "clock follows a consistent wall + monotonic clock")
-	# player moves the wall clock 10 h forward while the game runs → ignored
-	c.set_manual(T0 + 36000 + 70, 70000)
-	_check(c.now() == T0 + 70 and int(cs.jumps) == 1, "in-session forward jump ignored and counted (%d)" % c.now())
-	c.set_manual(T0 + 36000 + 80, 80000)
+	# player moves the wall clock 1 h back while the game runs → ignored, monotonic time keeps going
+	c.set_manual(T0 - 3600 + 70, 70000)
+	_check(c.now() == T0 + 70 and int(cs.jumps) == 1, "in-session backward jump ignored and counted (%d)" % c.now())
+	c.set_manual(T0 - 3600 + 80, 80000)
 	_check(c.now() == T0 + 80 and int(cs.jumps) == 1, "jump counted once, monotonic time keeps going")
+	# … and moved forward again to the real time: no gain (re-anchors on the wall clock)
+	c.set_manual(T0 + 90, 90000)
+	_check(c.now() == T0 + 90 and int(cs.fwd) == 1, "back-then-forward gives no extra time (%d)" % c.now())
+	# device slept 8 h with the game in background: wall ran ahead, Android's monotonic clock stood still → accepted
+	c.set_manual(T0 + 90 + 8 * 3600, 91000)
+	_check(c.now() == T0 + 90 + 8 * 3600 and int(cs.fwd) == 2, "sleep with the game in background counts (%d)" % c.now())
+	c.set_manual(T0 + 100 + 8 * 3600, 101000)
+	_check(c.now() == T0 + 100 + 8 * 3600, "after the sleep time follows the monotonic clock again")
+	var hwm: = T0 + 100 + 8 * 3600
 	# new session with the clock rolled back a day → time frozen at the high-water mark
 	c.new_session(T0 - 86400)
-	_check(c.now() == T0 + 80 and int(cs.rollbacks) == 1, "rollback across sessions freezes time")
+	_check(c.now() == hwm and int(cs.rollbacks) == 1, "rollback across sessions freezes time")
 	c.set_manual(T0 - 86400 + 100, 100000)
-	_check(c.now() == T0 + 80 and int(cs.rollbacks) == 1, "still frozen, rollback counted once")
+	_check(c.now() == hwm and int(cs.rollbacks) == 1, "still frozen, rollback counted once")
+	# resume() drops server time (monotonic clock missed the sleep) until the next sync
+	var c3: = V10Clock.new({})
+	c3.new_session(T0)
+	c3.sync_server(T0 + 10)
+	c3.set_manual(T0 + 7200, 1000)
+	c3.resume()
+	_check(not c3.trusted() and c3.now() == T0 + 7200, "resume: back to the wall clock until the next server sync")
 	# a small NTP correction is not a rollback
 	var c2: = V10Clock.new({})
 	c2.new_session(T0)
@@ -199,11 +216,16 @@ static func _energy() -> void:
 	# clock rolled back to yesterday in a new session: refill counters do NOT reset
 	e.clock.new_session(e.clock._m_wall - 86400)
 	_check(en.refills_left() == 0, "rollback cannot reset the daily refill limit")
-	# in-session forward jump: no free tea
+	# in-session forward jump (or device sleep): treated like an app restart — tea bounded by the bar + thermos,
+	# and moving the clock back afterwards freezes regen until real time catches up
 	var e3: = _econ()
 	e3.energy.spend(160)
 	e3.clock.set_manual(T0 + 86400 * 3, 1000)
-	_check(e3.energy.value() == 0, "a wall-clock jump inside the session gives no tea")
+	_check(e3.energy.value() == 160 and e3.energy.thermos() <= V10Catalog.THERMOS_CAP, "in-session forward jump fills at most bar + thermos")
+	e3.energy.spend(160)
+	e3.clock.new_session(T0 + 2000)
+	e3.clock.set_manual(T0 + 2000 + 86400, 86400000)
+	_check(e3.energy.value() == 0, "clock moved back after the jump: no regen until real time catches up")
 	# across sessions the gain is bounded by the cap (no thermos fill beyond real time once rolled back)
 	var e4: = _econ()
 	e4.energy.spend(160)
@@ -663,7 +685,7 @@ static func _shop() -> void:
 	var e2: = _econ(null)
 	_check(e2.shop.can_buy("month_449").reason == "no_provider", "no provider → no purchase")
 	var rel: = V10StubPay.new()
-	_check(rel.is_available() == OS.is_debug_build(), "stub store only in debug builds")
+	_check(rel.is_available() == OS.has_feature("editor"), "stub store only in the editor, never in an exported APK")
 	_check(e.audit().filter(func(x): return not x.begins_with("clock")).is_empty(), "economy audit clean after purchases: %s" % str(e.audit()))
 
 
@@ -908,3 +930,49 @@ static func _save() -> void:
 	_check(em.audit().is_empty(), "migrated state audits clean: %s" % str(em.audit()))
 	var empty: = V10Econ.from_legacy({"gems": 0, "unlocked": 1}, T0)
 	_check(V10Econ.new(empty, null, [], T0).audit().is_empty(), "migrating a minimal save works")
+
+
+# ================================================================= review fixes (edge cases)
+static func _review() -> void:
+	# a migrated 0.9 save with beginner pulls used and no SSR yet still gets its SSR within the 50
+	var all_ok: = true
+	for seed in 300:
+		var ms: = V10Econ.from_legacy({"gems": 0, "newbie_left": 10, "newbie_ssr": false}, T0)
+		var em: = V10Econ.new(ms, null, [], T0)
+		em.gacha.rng.seed = seed
+		var got: = false
+		for r in em.gacha.pull("newbie", em.gacha.newbie_left()):
+			got = got or r.rar == "SSR"
+		all_ok = all_ok and got and em.gacha.newbie_left() == 0
+	_check(all_ok, "migrated beginner banner (10 used, no SSR) keeps the SSR-within-50 promise")
+	# refill refused (and nothing charged) when the tea would not fit under the hard max
+	var e: = _econ()
+	e.wallet.add("crystal", 500, "t")
+	e.energy.add(V10Catalog.TEA_HARD_MAX)
+	var rf: = e.energy.refill(e.wallet)
+	_check(not rf.ok and rf.reason == "full" and e.wallet.balance("crystal") == 500, "refill at the tea hard max costs nothing")
+	_check(not e.energy.ad_refill().ok and e.energy.ad_refills_left() == 1, "ad refill at the hard max is not used up")
+	# zero / negative pull counts
+	_check(not e.summon("std", 0).ok and not e.summon("std", -3).ok and e.wallet.balance("crystal") == 500, "0 or negative pulls refused")
+	_check(not e.summon_free("newbie", 10).ok and e.gacha.newbie_left() == V10Catalog.NEWBIE_PULLS, "gifted pulls never use the beginner banner")
+	# an order the store never answered stops blocking the SKU after ORDER_STALE_SEC; a late payment is still delivered
+	var p: = _stub()
+	var e2: = _econ(p)
+	e2.spend.set_age_verified(true)
+	p.instant = false
+	var b1: = e2.shop.buy("month_449")
+	_check(b1.ok and e2.shop.can_buy("month_449").reason == "in_progress", "unanswered order blocks a second one at first")
+	_adv(e2, V10Catalog.ORDER_STALE_SEC + 1)
+	_check(e2.shop.can_buy("month_449").ok, "stale unanswered order no longer locks the SKU")
+	p.flush()
+	_check(e2.shop.st.orders[b1.oid].st == "delivered" and e2.shop.month_days_left() == 30, "late payment of the stale order still delivered")
+	# odds: the renewal computation equals 1 / mean pulls per SSR; beginner disclosure uses its own 50-pull guarantee
+	var c60: = V10Odds.consolidated(60)
+	_near(float(c60.SSR), 1.0 / V10Odds.expected_to_ssr(60), 1e-12, "consolidated SSR = 1 / E[pulls per SSR]")
+	var dn: = V10Odds.disclosure("newbie")
+	_near(float(dn.consolidated.SSR), 1.0 / V10Odds.expected_to_ssr(50), 1e-12, "beginner odds use the 50-pull guarantee")
+	var t: = Time.get_ticks_usec()
+	V10Odds._cache.clear()
+	V10Odds.consolidated(60)
+	var ms_: = float(Time.get_ticks_usec() - t) / 1000.0
+	_check(ms_ < 20.0, "odds chain is cheap (%.2f ms)" % ms_)

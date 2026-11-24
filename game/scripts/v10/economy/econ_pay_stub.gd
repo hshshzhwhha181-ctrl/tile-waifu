@@ -1,8 +1,8 @@
 class_name V10StubPay
 extends V10PaymentProvider
 
-# V10StubPay — a fake store for development and selftests. It NEVER works in a release build (is_available() is
-# false unless OS.is_debug_build() or force = true), so a shipped APK cannot hand out paid goods for free the way the
+# V10StubPay — a fake store for development and selftests. It NEVER works in an exported build, release or debug
+# (is_available() is false unless running in the editor binary or force = true), so a shipped APK cannot hand out paid goods for free the way the
 # 0.8 shop did (CEO_PLAN §1.1).
 #
 # Knobs:
@@ -31,7 +31,8 @@ func id() -> String:
 
 
 func is_available() -> bool:
-	return force or OS.is_debug_build()
+	# not OS.is_debug_build(): a sideloaded debug APK for testers must not hand out month cards and passes either
+	return force or OS.has_feature("editor")
 
 
 func _time() -> int:

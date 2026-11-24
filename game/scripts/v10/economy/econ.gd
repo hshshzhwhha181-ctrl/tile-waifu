@@ -121,6 +121,8 @@ func can_summon(bid: String, n: int) -> Dictionary:
 	var b: = gacha.banner(bid)
 	if b.is_empty():
 		return {"ok": false, "reason": "unknown"}
+	if n <= 0:
+		return {"ok": false, "reason": "bad_count"}
 	if not gacha.is_open(b):
 		return {"ok": false, "reason": "closed"}
 	if b.kind == "newbie" and n > gacha.newbie_left():
@@ -149,6 +151,8 @@ func summon(bid: String, n: int) -> Dictionary:
 
 # gifted pulls (login calendar, return ladder): no payment, same rules
 func summon_free(bid: String, n: int) -> Dictionary:
+	if gacha.banner(bid).get("kind", "") == "newbie":
+		return {"ok": false, "reason": "closed"}     # gifted pulls never eat the 50 discounted beginner pulls
 	var res: = gacha.pull(bid, n)
 	if res.is_empty():
 		return {"ok": false, "reason": "closed"}

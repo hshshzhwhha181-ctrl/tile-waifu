@@ -151,6 +151,9 @@ func ad_refills_left() -> int:
 func refill(wallet: V10Wallet) -> Dictionary:
 	if refills_left() <= 0:
 		return {"ok": false, "reason": "daily_limit"}
+	tick()
+	if int(st.v) + V10Catalog.TEA_REFILL > V10Catalog.TEA_HARD_MAX:
+		return {"ok": false, "reason": "full"}
 	if wallet.premium() < V10Catalog.TEA_REFILL_COST:
 		return {"ok": false, "reason": "no_crystals"}
 	var paid: = wallet.spend_premium(V10Catalog.TEA_REFILL_COST, "tea_refill")
@@ -163,6 +166,9 @@ func refill(wallet: V10Wallet) -> Dictionary:
 func ad_refill() -> Dictionary:
 	if ad_refills_left() <= 0:
 		return {"ok": false, "reason": "daily_limit"}
+	tick()
+	if int(st.v) + V10Catalog.TEA_REFILL > V10Catalog.TEA_HARD_MAX:
+		return {"ok": false, "reason": "full"}
 	st.ad = int(st.ad) + 1
 	return {"ok": true, "tea": add(V10Catalog.TEA_REFILL)}
 

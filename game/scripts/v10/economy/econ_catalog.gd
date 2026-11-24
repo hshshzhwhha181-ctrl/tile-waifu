@@ -105,6 +105,7 @@ const LADDER_MAX: = 3.0
 const KIT_MAX_RUB: = 4990                     # no SKU above 4990 ₽
 const BASE_SKU: = "moon_180"
 const NEWBIE_WINDOW_DAYS: = 14                # beginner sets stay in the shop 14 days from install, no countdown popup
+const ORDER_STALE_SEC: = 1800                 # an order with no answer for 30 min no longer blocks buying the SKU again
 const MONTH_DAYS: = 30
 const MONTH_STACK_MAX: = 180
 const MONTH_NOW: = {"moon": 300}
