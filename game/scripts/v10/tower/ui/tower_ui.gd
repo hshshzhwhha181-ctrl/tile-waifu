@@ -103,13 +103,37 @@ static func save_now() -> void:
 		G.save()
 
 # reward tokens for a result window (≤ 3 shown, UX §9 P0-3): [[key, amount, caption]]
-const REWARD_NAMES: = {"gems": "кристаллы", "coins": "монеты", "petals": "лепестки", "tickets": "билет желания", "pass_xp": "опыт сезона"}
+# [one, few, many]: «1 кристалл», «3 кристалла», «140 кристаллов»
+const REWARD_NAMES: = {"gems": ["кристалл", "кристалла", "кристаллов"], "coins": ["монета", "монеты", "монет"],
+	"petals": ["лепесток", "лепестка", "лепестков"], "tickets": ["билет желания", "билета желания", "билетов желания"],
+	"pass_xp": ["очко сезона", "очка сезона", "очков сезона"]}
 
+static func plural(n: int, forms: Array) -> String:
+	var a: = absi(n) % 100
+	var b: = a % 10
+	if a > 10 and a < 20:
+		return String(forms[2])
+	if b == 1:
+		return String(forms[0])
+	if b >= 2 and b <= 4:
+		return String(forms[1])
+	return String(forms[2])
+
+# «12 345» with a thin no-break space between thousands (UX: табличные цифры)
+static func num(n: int) -> String:
+	var s: = str(absi(n))
+	var out: = ""
+	while s.length() > 3:
+		out = " " + s.substr(s.length() - 3) + out
+		s = s.substr(0, s.length() - 3)
+	return ("-" if n < 0 else "") + s + out
+
+# [[key, amount, caption]] — caption already agrees with the amount («+140 кристаллов»)
 static func reward_tokens(reward: Dictionary, max_n: = 3) -> Array:
 	var out: = []
 	for k in ["tickets", "gems", "petals", "coins", "pass_xp"]:
 		if int(reward.get(k, 0)) > 0 and out.size() < max_n:
-			out.append([k, int(reward[k]), String(REWARD_NAMES[k])])
+			out.append([k, int(reward[k]), plural(int(reward[k]), REWARD_NAMES[k])])
 	return out
 
 # ---------------------------------------------------------------- text
