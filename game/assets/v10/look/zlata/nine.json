@@ -1,0 +1,149 @@
+{
+ "btn_cash": {
+  "file": "btn_cash.png",
+  "margins": [
+   48,
+   79,
+   48,
+   79
+  ],
+  "size": [
+   708,
+   160
+  ]
+ },
+ "btn_play": {
+  "file": "btn_play.png",
+  "margins": [
+   104,
+   103,
+   104,
+   103
+  ],
+  "size": [
+   904,
+   208
+  ]
+ },
+ "corner": {
+  "file": "corner.png",
+  "size": [
+   256,
+   256
+  ]
+ },
+ "currency": {
+  "file": "currency.png",
+  "margins": [
+   94,
+   63,
+   94,
+   63
+  ],
+  "size": [
+   392,
+   128
+  ]
+ },
+ "feather": {
+  "file": "feather.png",
+  "size": [
+   119,
+   256
+  ]
+ },
+ "feather_tile": {
+  "file": "feather_tile.png",
+  "size": [
+   52,
+   112
+  ]
+ },
+ "header": {
+  "file": "header.webp",
+  "size": [
+   1440,
+   156
+  ]
+ },
+ "loading": {
+  "file": "loading.webp",
+  "size": [
+   1020,
+   1536
+  ]
+ },
+ "medallion": {
+  "file": "medallion.png",
+  "size": [
+   256,
+   256
+  ]
+ },
+ "menu_bg": {
+  "file": "menu_bg.webp",
+  "size": [
+   1080,
+   1910
+  ]
+ },
+ "plate_l": {
+  "file": "plate_l.png",
+  "margins": [
+   90,
+   159,
+   90,
+   159
+  ],
+  "size": [
+   747,
+   320
+  ]
+ },
+ "plate_m": {
+  "file": "plate_m.png",
+  "margins": [
+   45,
+   79,
+   45,
+   79
+  ],
+  "size": [
+   373,
+   160
+  ]
+ },
+ "plate_s": {
+  "file": "plate_s.png",
+  "margins": [
+   27,
+   47,
+   27,
+   47
+  ],
+  "size": [
+   224,
+   96
+  ]
+ },
+ "table": {
+  "file": "table.webp",
+  "size": [
+   1080,
+   1446
+  ]
+ },
+ "window": {
+  "file": "window.png",
+  "margins": [
+   104,
+   104,
+   104,
+   104
+  ],
+  "size": [
+   1024,
+   1024
+  ]
+ }
+}
