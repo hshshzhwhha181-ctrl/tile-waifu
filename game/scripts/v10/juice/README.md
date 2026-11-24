@@ -17,7 +17,11 @@
 3. **Одна декорация лихорадки.** Сейчас её несёт рамка `V7Combo`. Подключая `V10Juice.fever_aura`, выключить огонь рамки V7Combo
    (или наоборот) — не две ауры сразу.
 4. **Награда летит из источника** (сундук, поле, карточка), а не из-за героини: фонтан из центра экрана проходит через фигуру героини.
-5. Эффекты вешаются на слой `V10Juice_fx` (CanvasLayer 70: над экранами, попапами и сеткой V6Fx). Переходы — `V10JuiceTransition` (CanvasLayer 96).
+5. **≤ 1 блика на экран** (BENCHMARK MD-9): блики всех `idle_sparkle` идут по общим часам, двух одновременно не бывает.
+   `idle_sparkle` — только на 1–2 главные платные/премиальные кнопки экрана.
+6. **«Без тряски и вспышек»** (BENCHMARK MD-6): ключ сохранения `a11y_calm = true` выключает тряску V10Juice при любом уровне FX
+   (тумблер в настройках делает дорожка доступности; `V6Fx.shake` пусть проверяет `V10Juice.calm()` так же).
+7. Эффекты вешаются на слой `V10Juice_fx` (CanvasLayer 70: над экранами, попапами и сеткой V6Fx). Переходы — `V10JuiceTransition` (CanvasLayer 96).
 
 ## Уровни FX
 
@@ -77,6 +81,7 @@ fever_aura = V10Juice.fever_aura(self, board_rect_local)    # и выключи�
 # конец лихорадки (там, где fever_until истёк / V7Combo._on_fever(false)):
 V10Juice.stop(fever_aura)
 
+# последнее свободное место лотка (BENCHMARK MD-2): danger = V10Juice.danger_beat(tray_slot) / V10Juice.stop(danger)
 # ульта готова (skill_charge >= SKILL_NEED, стр. ~792 / 1397 / 1449):
 ult_beat = V10Juice.ult_ready(ult_button)          # кнопка/портрет ульты
 # каст ульты или конец партии:

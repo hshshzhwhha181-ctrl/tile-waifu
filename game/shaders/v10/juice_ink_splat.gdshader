@@ -16,6 +16,10 @@ float vnoise(vec2 p) {
 	return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), u.x), mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x), u.y);
 }
 
+// modulate (and a parent fade) reaches the output: this shader writes COLOR itself
+varying vec4 vcol;
+void vertex() { vcol = COLOR; }
+
 void fragment() {
 	vec2 q = (UV - 0.5) * 2.0;
 	float d = length(q);
@@ -40,4 +44,5 @@ void fragment() {
 	col = mix(col, rim.rgb, (1.0 - smoothstep(0.0, 0.025, abs(d + wobble - rad - 0.01))) * 0.35 * (1.0 - soak));
 	float a = m * alpha * (1.0 - soak) * (0.82 + 0.18 * vnoise(q * 22.0));
 	COLOR = vec4(col, a);
+	COLOR *= vcol;
 }

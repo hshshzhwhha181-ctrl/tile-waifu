@@ -29,6 +29,10 @@ float fbm(vec2 p) {
 	return v;
 }
 
+// modulate (and a parent fade) reaches the output: this shader writes COLOR itself
+varying vec4 vcol;
+void vertex() { vcol = COLOR; }
+
 void fragment() {
 	float asp = size.x / size.y;
 	vec2 p = vec2(UV.x * asp, UV.y);
@@ -62,4 +66,5 @@ void fragment() {
 	// rice-paper fibres
 	col += 0.012 * (vnoise(p * vec2(260.0, 40.0)) - 0.5);
 	COLOR = vec4(col, a);
+	COLOR *= vcol;
 }

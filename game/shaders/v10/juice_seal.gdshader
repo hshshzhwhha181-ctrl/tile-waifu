@@ -19,6 +19,10 @@ float sd_rbox(vec2 p, vec2 b, float r) {
 	return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - r;
 }
 
+// modulate (and a parent fade) reaches the output: this shader writes COLOR itself
+varying vec4 vcol;
+void vertex() { vcol = COLOR; }
+
 void fragment() {
 	vec2 p = UV - 0.5;
 	float d = sd_rbox(p, vec2(0.44), 0.07);
@@ -29,4 +33,5 @@ void fragment() {
 	float n = vnoise(UV * 18.0 + seed) * 0.6 + vnoise(UV * 60.0 - seed) * 0.4;
 	float ink = clamp(max(frame_m, field), 0.0, 1.0) * smoothstep(erosion - 0.08, erosion + 0.08, n + 0.25);
 	COLOR = vec4(color.rgb * (0.9 + 0.1 * n), ink * color.a);
+	COLOR *= vcol;
 }

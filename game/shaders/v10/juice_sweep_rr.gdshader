@@ -16,6 +16,10 @@ float sd_rbox(vec2 p, vec2 b, float r) {
 	return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - r;
 }
 
+// modulate (and a parent fade) reaches the output: this shader writes COLOR itself
+varying vec4 vcol;
+void vertex() { vcol = COLOR; }
+
 void fragment() {
 	float p = pos;
 	if (period > 0.0) {
@@ -28,4 +32,5 @@ void fragment() {
 	float b = exp(-pow((x - p) / width, 2.0)) + 0.45 * exp(-pow((x - p + width * 2.6) / (width * 0.3), 2.0));
 	float a = clamp(b * color.a * inside, 0.0, 0.6);
 	COLOR = vec4(color.rgb * a, a);
+	COLOR *= vcol;
 }

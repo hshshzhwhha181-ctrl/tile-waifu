@@ -6,6 +6,9 @@ uniform float radius = 10.0;
 uniform float strength = 0.9;
 uniform float pulse = 0.0;
 uniform float pulse_speed = 2.4;
+varying vec4 vcol;
+
+void vertex() { vcol = COLOR; }
 
 void fragment() {
 	vec4 c = COLOR; // Godot 4: COLOR already holds texture × modulate
@@ -19,6 +22,11 @@ void fragment() {
 	}
 	a = clamp(a / 13.0, 0.0, 1.0);
 	float k = strength * (1.0 - pulse * 0.5 + pulse * 0.5 * sin(TIME * pulse_speed * 6.2832));
-	float g = a * (1.0 - c.a) * k;
-	COLOR = vec4(mix(glow_color.rgb, c.rgb, c.a), clamp(c.a + g * glow_color.a, 0.0, 1.0));
+	// glow only where the texture itself is empty; it follows the item's modulate / fade (vcol.a), and the item's
+	// own pixels keep their colour while fading (composited "over", not mixed toward the glow colour)
+	float ta = texture(TEXTURE, UV).a;
+	float g = clamp(a * (1.0 - ta) * k * glow_color.a, 0.0, 1.0) * vcol.a;
+	float outa = c.a + g * (1.0 - c.a);
+	vec3 rgb = (c.rgb * c.a + glow_color.rgb * g * (1.0 - c.a)) / max(outa, 0.0001);
+	COLOR = vec4(rgb, outa);
 }

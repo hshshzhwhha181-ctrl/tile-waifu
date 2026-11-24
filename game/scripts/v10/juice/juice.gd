@@ -66,8 +66,13 @@ static func can_fx() -> bool:
 	return level() != "min"
 
 
+# BENCHMARK MD-6: a separate «Без тряски и вспышек» switch (save key `a11y_calm`), independent of the FX level
+static func calm() -> bool:
+	return G.S is Dictionary and bool(G.S.get("a11y_calm", false))
+
+
 static func can_shake() -> bool:
-	return level() == "full"
+	return level() == "full" and not calm()
 
 
 static func scale() -> float:
@@ -539,6 +544,14 @@ static func ult_ready(target: Control, color_a: = Color(1.0, 0.36, 0.5), color_b
 	p.move_child(a, target.get_index())
 	a.setup_heartbeat(target, color_a, color_b, with_sound)
 	return a
+
+
+# BENCHMARK MD-2: «сердцебиение» on the last free tray slot — the same lub-dub glow in warning red.
+# Off at «минимум» (it is a mood, the tray itself shows the danger).
+static func danger_beat(slot: Control) -> Node:
+	if not can_fx():
+		return null
+	return ult_ready(slot, Color(1.0, 0.22, 0.26), Color(1.0, 0.5, 0.3), true)
 
 
 static func stop(node: Node, dur: = 0.35) -> void:

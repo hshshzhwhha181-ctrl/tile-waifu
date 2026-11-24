@@ -11,6 +11,10 @@ uniform vec4 glow : source_color = vec4(0.86, 0.55, 0.26, 1.0);
 uniform vec4 glow_deep : source_color = vec4(0.62, 0.2, 0.18, 1.0);
 uniform float ribs = 18.0;
 
+// modulate (and a parent fade) reaches the output: this shader writes COLOR itself
+varying vec4 vcol;
+void vertex() { vcol = COLOR; }
+
 void fragment() {
 	vec2 p = UV * size;
 	vec2 q = p - center;
@@ -35,4 +39,5 @@ void fragment() {
 	float a = max(outside, (band * 0.45 + inner * 0.12) * on);
 	vec3 c2 = mix(warm, col, outside);
 	COLOR = vec4(mix(c2, col, outside), a);
+	COLOR *= vcol;
 }

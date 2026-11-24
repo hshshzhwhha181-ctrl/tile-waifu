@@ -13,6 +13,10 @@ uniform float falloff = 1.2;
 
 float hash(float x) { return fract(sin(x * 91.7) * 43758.5453); }
 
+// modulate (and a parent fade) reaches the output: this shader writes COLOR itself
+varying vec4 vcol;
+void vertex() { vcol = COLOR; }
+
 void fragment() {
 	vec2 q = UV - origin;
 	float d = length(q) * 2.0;
@@ -28,4 +32,5 @@ void fragment() {
 	float fall = pow(max(0.0, 1.0 - d), falloff);
 	float a = clamp((rays * fall + core) * cone * intensity, 0.0, 0.85);
 	COLOR = vec4(color.rgb * a, a);
+	COLOR *= vcol;
 }

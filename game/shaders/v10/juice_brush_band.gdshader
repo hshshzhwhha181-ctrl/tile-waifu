@@ -16,6 +16,10 @@ float vnoise(vec2 p) {
 	return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), u.x), mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x), u.y);
 }
 
+// modulate (and a parent fade) reaches the output: this shader writes COLOR itself
+varying vec4 vcol;
+void vertex() { vcol = COLOR; }
+
 void fragment() {
 	vec2 uv = UV;
 	// stroke thickness profile: fat at the start, thinner and ragged at the tail
@@ -43,4 +47,5 @@ void fragment() {
 	float fl = step(0.9, hash(fid + seed)) * (1.0 - smoothstep(0.16, 0.26, length(ff))) * body;
 	col = mix(col, fleck.rgb * 0.9, fl * 0.85);
 	COLOR = vec4(col, a * 0.94);
+	COLOR *= vcol;
 }

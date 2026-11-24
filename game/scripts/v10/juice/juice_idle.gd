@@ -15,6 +15,9 @@ var sheen: ColorRect
 var sheen_t: = -1.0
 var stars: Array = []   # [sprite, age, life]
 
+# BENCHMARK MD-9 «≤ 1 блик на экран»: sheens of all idle buttons share one clock, never two at once
+static var sheen_busy_until: = 0
+
 
 func setup(tgt: Control, c: Color, e: float, radius: float) -> void:
 	target = tgt
@@ -48,7 +51,11 @@ func _process(dt: float) -> void:
 			_spawn_star()
 	if full:
 		t_sheen -= dt
-		if t_sheen <= 0.0 and sheen_t < 0.0:
+		var now: = Time.get_ticks_msec()
+		if t_sheen <= 0.0 and sheen_t < 0.0 and now < sheen_busy_until:
+			t_sheen = randf_range(0.4, 1.0)
+		elif t_sheen <= 0.0 and sheen_t < 0.0:
+			sheen_busy_until = now + 1300
 			t_sheen = every * 2.0
 			sheen_t = 0.0
 			sheen.visible = true

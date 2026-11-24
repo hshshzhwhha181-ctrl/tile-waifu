@@ -8,6 +8,10 @@ uniform float thickness = 0.06;
 uniform float echo = 0.55;
 uniform float shimmer = 1.0;
 
+// modulate (and a parent fade) reaches the output: this shader writes COLOR itself
+varying vec4 vcol;
+void vertex() { vcol = COLOR; }
+
 void fragment() {
 	vec2 q = UV - 0.5;
 	float d = length(q) * 2.0;
@@ -23,4 +27,5 @@ void fragment() {
 	float inner = (1.0 - smoothstep(0.0, r, d)) * 0.12 * (1.0 - t);
 	float a = clamp((ring * caus + ring2 + inner) * fade, 0.0, 0.8);
 	COLOR = vec4(color.rgb * a, a);
+	COLOR *= vcol;
 }

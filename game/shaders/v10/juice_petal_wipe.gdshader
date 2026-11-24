@@ -26,6 +26,10 @@ float petal(vec2 f, float s, float rot) {
 	return max(body, -notch);
 }
 
+// modulate (and a parent fade) reaches the output: this shader writes COLOR itself
+varying vec4 vcol;
+void vertex() { vcol = COLOR; }
+
 void fragment() {
 	vec2 p = UV * size;
 	vec2 g = p / cell;
@@ -51,4 +55,5 @@ void fragment() {
 	col = mix(col, edge.rgb * mix(1.0, 0.55, age), rimv * 0.7);
 	col = mix(col, gold.rgb * 0.8, rimv * step(0.88, hash(id + 5.0)) * 0.6);
 	COLOR = vec4(col, max(a, rimv * 0.8));
+	COLOR *= vcol;
 }
