@@ -38,3 +38,12 @@
 - Сборка: `cd game && GODOT_ANDROID_KEYSTORE_RELEASE_{PATH,USER,PASSWORD} godot --headless --export-release Android ../build/TileWaifu-X.apk`
   (тулчейн: /opt/tw-tools/setup.sh — Godot 4.5.1, шаблоны Android, SDK 35).
 - Дальше: docs/ROADMAP.md (0.9 «Живая чайная»), docs/HEROINES.md (ульты нарядов, волна 1).
+
+## 0.8.1 (2026-11-24) — исправление белого экрана
+- Причина: в export_presets.cfg из APK были исключены файлы самотестов (`scripts/*/*selftest*`), а g.gd, main.gd и event.gd
+  ссылаются на их классы → на телефоне autoload G не компилировался → белый экран загрузки. В редакторе/xvfb это не видно,
+  потому что там запускается полный проект.
+- Исправлено: exclude_filter пуст; «Лектор салона» (mc_tutor, перерисован) тоже снова в сборке. versionCode 9, ставится поверх 0.8.
+- **Обязательная проверка перед каждой сборкой:** экспортировать пакет и прогнать на нём playtest:
+  `godot --headless --path game --export-pack Android /tmp/x.pck` затем
+  `xvfb-run ... godot --main-pack /tmp/x.pck --rendering-driver opengl3 --audio-driver Dummy --resolution 720x1280 -- --pt=fresh --shots=<dir>` → `PT OK 51`.
