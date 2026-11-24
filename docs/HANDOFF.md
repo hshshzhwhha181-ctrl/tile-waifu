@@ -283,3 +283,30 @@ scratchpad/uilora/combo_v2) → критики. GPU-бокс обязан быт
 | v10-tutorial | 01ca8d3 | v10-tutorial review: UX_RULES names (приём, Героини, Столы, С� |
 
 Оркестры, которые ещё идут в старой сессии (session_015DEnYgjuvjgqAwMSfCumJh): tw-010-mega (M0–M6, дорожки в сборке), tw-ui-lora (датасет/обучение UI-LoRA на GPU-боксе 84935f98, затем кит v10-uikit и витрины комбо v2 в scratchpad/uilora/combo_v2), tw-master-style (курирование датасета мастер-модели), tw-av-style (библии звука/видео, голоса), tw-mahjong-core (режимы v10-mj-*). Бокс 84935f98 (L40S, 71 кр/ч) арендован дорожкой UI-LoRA и останавливается ею в конце обучения; если сессия оборвалась — проверить gpu_my и остановить вручную.
+
+## 26. ОСТАНОВКА 2026-11-24 ~22:05 UTC и ПЕРЕДАЧА в тред проекта (session_015DEnYin3Up1whR5MHPXPB3)
+Владелец ушёл спать («пока всё останавливаем») и поручил передать работу 1-в-1 сессии треда проекта (у неё нужные разрешения).
+**Остановлено (TaskStop) на этих фазах:**
+- `tw-010-mega` — шла фаза Build (≈10 из 21 дорожек в сборке/ревью; интеграция M0–M6 НЕ начиналась, gh-pages не трогали).
+  Ветки дорожек: v10-responsive, v10-meta, v10-path, v10-salon, v10-rituals, v10-phone, v10-gacha, v10-shop, v10-look, v10-rig-rin, v10-rig-hana
+  (у части — ревью не завершено). Не начаты: rig_yue, rig_nova, rig_mc, emotions, hudfx, wave1, tower_ui, palm, duels, modes_extra.
+- `tw-ui-lora` — датасет готов (scratchpad uilora/ds → архив A), обучение tw_ui_v1 прервано; GPU 84935f98 ОСТАНОВЛЕН (60 кр).
+  Чекпоинты, если успели сохраниться, — /workspace/tw/output/tw_ui_v1/ (диск постоянный). Кит v10-uikit и витрины комбо v2 НЕ сделаны.
+- `tw-master-style` — курирование: готово ds/environments 82, heroines 121, tiles_fx 61, ui 73 (сцены не начаты) → архив A; обучение не начиналось.
+- `tw-av-style` — AUDIO_BIBLE и VIDEO_BIBLE частично (в gh-pages), голоса частично (av/voices → архив A), видео-пилоты → архив B.
+- `tw-mahjong-core` — MODES.md готов; ветки v10-mj-* (stage, look, riichi, sanma, koikoi, classic, triples, connect) — часть с ревью, часть WIP.
+**Все ветки v10-* запушены на origin** (без -f, в gh-pages НЕ влиты, кроме rig-pilot/rig-v2): audio, auth, chat, clarity, economy, fonts, gacha, hud2, hud2-doc,
+juice, levels, look, meta, mj-classic, mj-connect, mj-koikoi, mj-look, mj-riichi, mj-sanma, mj-stage, mj-triples, path, phone, profile, responsive,
+rig-hana, rig-pilot, rig-rin, rig-v2, rituals, salon, shop, tower, tutorial.
+Внимание: WIP-коммиты «stopped overnight» есть в v10-rig-rin, v10-rig-hana, v10-mj-classic, v10-mj-connect (незаконченная работа агентов — проверить).
+**Архивы (постоянные ссылки):**
+- Ветки (git bundle, актуальный): https://d2ol7oe51mr4n9.cloudfront.net/user_3L5lNdYfxsf6b0O0pIlvJXXfClr/a4408b88-a923-4b10-8457-adcb77278d6f.zip
+- Данные A (датасет мастер-модели, датасет UI-LoRA + train, финалы волны 1 PNG, сэмплер музыки, макеты HUD v2, голоса av/voices):
+  https://d2ol7oe51mr4n9.cloudfront.net/user_3L5lNdYfxsf6b0O0pIlvJXXfClr/12f7b79f-3d5a-4137-b68e-5dfc5b66ae18.zip
+- Данные B (витрины комбо v1 hudv2/combo, видео-пилоты av/video_pilots):
+  https://d2ol7oe51mr4n9.cloudfront.net/user_3L5lNdYfxsf6b0O0pIlvJXXfClr/125a25f6-2085-44e2-a572-89cde63a504c.zip
+**Как продолжать (для новой сессии):** воркфлоу старой сессии возобновить нельзя (resume работает только внутри той же сессии) — перезапустить
+недоделанное заново по разделам 7–24 этого файла, используя готовые ветки; порядок: (1) доделать дорожки мега-прогона и интеграцию M0–M6 в gh-pages
+по docs/0.10-spec.md + UX_RULES + HUD_V2 (HUD v2 заменяет старый HUD); (2) влить audio, juice, auth, tutorial (переписать под новый UI), clarity
+(имена по UX_RULES), hud2, mj-*; (3) UI-LoRA и мастер-модель — из датасетов архива A; (4) шлифовка с 6 персонами, критики, APK 0.10.0
+(ключ подписи — у владельца). Higgsfield: баланс ~2700 кр, бюджет «безграничный» по словам владельца.
