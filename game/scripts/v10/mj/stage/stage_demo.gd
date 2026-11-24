@@ -98,6 +98,8 @@ func _build() -> void:
 	tray_bg.position = tray_rect.position + Vector2(40, 34)
 	tray_bg.size = Vector2(tray_rect.size.x - 80, tray_rect.size.y - 68)
 	add_child(tray_bg)
+	# the sacred «tray» is the visible tray (where tiles land), not the whole 120–300 strip of the frame
+	tray_rect = Rect2(tray_bg.position, tray_bg.size)
 	slot_rects.clear()
 	var sw: = (tray_bg.size.x - 40) / 4.0
 	for i in 4:
@@ -206,18 +208,15 @@ func _bot() -> void:
 	# beat 1: a pair (two taps of twins); shot while the motes fly to her window
 	_next_beat()
 	var guard: = 0
-	var pairs0: = board.board_count()
-	while board.board_count() == pairs0 and guard < 12:
+	while guard < 12 and presence.trail.alive() == 0:
 		_pair_move()
 		guard += 1
-		for k in 8:
+		for k in 20:
+			await _wait(0.03)
 			if presence.trail.alive() > 0:
 				break
-			await _wait(0.04)
-		if presence.trail.alive() > 0:
-			break
-	# the motes are in the air, half-way to her window
-	await _wait(0.14)
+	# the motes are in the air, on their way to her window
+	await _wait(0.1)
 	await _shot("pair")
 	await _wait(0.9)
 	# beat 2: a run of pairs → ×5
@@ -241,11 +240,11 @@ func _bot() -> void:
 			break
 		if used.has(t.face) or board.tray.any(func(x): return x.face == t.face):
 			continue
-		if board.free_tiles().filter(func(o): return o != t and o.face == t.face).size() > 0:
-			continue
 		used[t.face] = true
 		tap(t)
 		await _wait(0.25)
+	if not _danger:
+		presence.on("danger", {"on": true})  # the bot found too few distinct free faces: say it as the host would
 	await _wait(0.6)
 	_quiet_v6_tint()
 	await _wait(0.4)

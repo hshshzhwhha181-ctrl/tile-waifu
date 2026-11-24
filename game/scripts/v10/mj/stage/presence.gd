@@ -523,6 +523,9 @@ func _peek(ev: String, slot: String, acts: Array, finale: = false) -> void:
 	if z.is_empty():
 		return
 	if peek.play(hero_id, slot, z, {"fx": fx, "hold": 1.6 if finale else 1.0}):
+		# a line still on screen never sits under her: it goes (the new line finds its own place)
+		if barks.is_showing() and barks.label.get_global_rect().intersects(peek.final_rect):
+			barks.hide_now()
 		counts.peek += 1
 		acts.append("peek:" + String(z.edge))
 		_sfx("peek_in", -8.0)

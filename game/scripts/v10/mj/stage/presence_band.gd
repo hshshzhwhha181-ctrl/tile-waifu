@@ -159,7 +159,7 @@ func _focus_from_def(path: String) -> Rect2:
 		if String(b.get("name", "")) == "head":
 			var h: = Vector2(b.pos[0], b.pos[1])
 			# bust: a bit above the hair top to just under the chest
-			return Rect2(h.x - 330.0, h.y - 340.0, 660.0, 780.0)
+			return Rect2(h.x - 330.0, h.y - 380.0, 660.0, 800.0)
 	return _rig_focus
 
 
