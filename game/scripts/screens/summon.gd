@@ -72,7 +72,8 @@ func _build_banner() -> void :
 		var tfs: = 22
 		while tfs > 16 and UI.font("body", 900).get_string_size(bb.name, HORIZONTAL_ALIGNMENT_LEFT, -1, tfs).x > tw - 28:
 			tfs -= 1
-		var tb: = JButton.make(bb.name, "lav" if i == banner_i else "glass", Rect2(24 + k * (tw + 10), TABS_Y, tw, 60), null, tfs, -1.0, false)
+		var tb: = JButton.make(bb.name, "pink" if i == banner_i else "glass", Rect2(24 + k * (tw + 10), TABS_Y, tw, 60), null, tfs, -1.0, false)
+		Common.tab_paint(tb, i == banner_i)
 		tb.pressed.connect( func():
 			if i != banner_i:
 				banner_i = i
@@ -150,13 +151,16 @@ func _build_banner() -> void :
 	var free: bool = G.S.free10 and not newbie
 	if not newbie:
 		pull1_btn = JButton.make(V6Txt.s("summon.pull1"), "lav", Rect2(24, by, 320, 124), null, 30)
-		pull1_btn.set_sub(V6Txt.s("common.gems_n") % UI.fmt(G.PULL_COST), 20)
+		pull1_btn.set_cost(V8Art.cur("gem"), G.PULL_COST, 22)
 		pull1_btn.pressed.connect( func(): _pull(1))
 		banner_root.add_child(pull1_btn)
 		UI.slide_in(pull1_btn, Vector2(0, 60), 0.1)
 	var r10: = Rect2(W - 344, by, 320, 124) if not newbie else Rect2(W * 0.5 - 220, by, 440, 124)
 	pull10_btn = JButton.make(V6Txt.s("summon.pull10"), "gold", r10, null, 30)
-	pull10_btn.set_sub(V6Txt.s("summon.free") if free else (V6Txt.s("common.gems_n") % UI.fmt(G.NEWBIE_COST if newbie else G.PULL_COST * 10)), 20)
+	if free:
+		pull10_btn.set_sub(V6Txt.s("summon.free"), 20)
+	else:
+		pull10_btn.set_cost(V8Art.cur("gem"), G.NEWBIE_COST if newbie else G.PULL_COST * 10, 22)
 	pull10_btn.shine_every = 2.0
 	pull10_btn.pulse = free or newbie
 	pull10_btn.pressed.connect( func(): _pull(10))
@@ -204,7 +208,7 @@ func _pull(n: int) -> void :
 		G.S.free10 = false
 	G.S.gems -= cost
 	main.refresh_currency(true)
-	var res: = G.pull(n, b)
+	var res: = G.pull(n, b, free)
 	last_n = n
 	_sequence(res)
 
@@ -285,17 +289,26 @@ func _sequence(res: Array) -> void :
 func _deal_cards(res: Array) -> void :
 	cards.clear()
 	var n: = res.size()
-	var cw: = 124.0 if n > 1 else 300.0
+	# 0.8: a 10-pull is dealt 3-4-3 at 160×240 (was 2×5 at 124×186) and centred between the «Результаты» ribbon
+	# and the button row, so the cards read and the screen has no dead band above the buttons
+	var cw: = 160.0 if n > 1 else 300.0
 	var ch: = cw * 1.5
-	var gap: = 12.0
-	var cols: = 5 if n > 1 else 1
-	var rows: = ceili(float(n) / cols)
-	var total_w: = cols * cw + (cols - 1) * gap
-	var x0: = (W - total_w) * 0.5
-	var y0: = H * 0.5 - (rows * ch + (rows - 1) * 40) * 0.5 - 30
+	var gap: = 14.0
+	var vgap: = 22.0
+	var row_n: = [3, 4, 3] if n == 10 else ([n] if n <= 5 else [5, n - 5])
+	var slots: = []
+	var top: = 170.0
+	var bottom: = H - 190.0
+	var grid_h: = row_n.size() * ch + (row_n.size() - 1) * vgap
+	var y0: = top + (bottom - top - grid_h) * 0.5 if n > 1 else H * 0.5 - ch * 0.5 - 30
+	for ri in row_n.size():
+		var rn: int = row_n[ri]
+		var rw: = rn * cw + (rn - 1) * gap
+		for ci in rn:
+			slots.append(Vector2((W - rw) * 0.5 + ci * (cw + gap), y0 + ri * (ch + vgap)))
 	for i in n:
 		var r: Dictionary = res[i]
-		var pos: = Vector2(x0 + (i % cols) * (cw + gap), y0 + (i / cols) * (ch + 40))
+		var pos: Vector2 = slots[i]
 		var c: = _card(r, Vector2(cw, ch))
 		c.position = Vector2(W * 0.5 - cw * 0.5, H * 0.5 - ch * 0.5)
 		c.scale = Vector2(0.2, 0.2)
@@ -371,7 +384,7 @@ func _card(r: Dictionary, sz: Vector2) -> Control:
 	front.add_child(art)
 	Common.card_frame(front, r.rar, Rect2(Vector2.ZERO, sz))
 	var small: = sz.x < 200
-	var fs: = 16 if small else 26
+	var fs: = (16 if sz.x < 150 else 18) if small else 26
 	# rarity tag: a pill in the top-right corner, inside the frame and clear of its crest and flowers
 	var rfs: = 16 if small else 24
 	var rw: = UI.font("body", 900).get_string_size(r.rar, HORIZONTAL_ALIGNMENT_LEFT, -1, rfs).x + (14.0 if small else 22.0)
@@ -401,6 +414,18 @@ func _card(r: Dictionary, sz: Vector2) -> Control:
 	nl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	nl.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
 	front.add_child(nl)
+	if not r.get("new", false) and r.has("id"):
+		# 0.8: a repeat says what it turned into («+25» crystals, G.give) and steps back a little, so the new
+		# pieces and the SSR stand out in a 10-pull
+		var dr: = Rect2(-8, -14, 78, 28) if small else Rect2(-12, -12, 120, 38)
+		var db: = UI.rbox("graphite", dr, dr.size.y * 0.5, 2, 4)
+		db.borders(Color("ffe7a6"), Color("c58a2c"))
+		db.name = "Dup"
+		front.add_child(db)
+		var gsz: = dr.size.y + 4.0
+		db.add_child(V8Art.rect(V8Art.cur("gem"), Rect2(-2, -2, gsz, gsz)))
+		db.add_child(UI.center_label(UI.label("+%d" % G.DUP_GEMS, 16 if small else 22, Color("ffe7a6"), UI.DARK, 3, "body", 900), Rect2(gsz - 6, 0, dr.size.x - gsz, dr.size.y)))
+		art.modulate = Color(0.8, 0.78, 0.84)
 	if r.get("new", false):
 		# 0.8: «НОВОЕ» hangs off the top-left corner; the rarity tag is top-right, so they never overlap
 		var nr: = Rect2(-8, -14, 76, 26) if small else Rect2(-12, -12, 110, 34)
@@ -508,13 +533,15 @@ func _results(res: Array) -> void :
 	if nb and int(G.S.newbie_left) <= 0:
 		banner_i = 1
 		nb = false
-	var again: = JButton.make(V6Txt.s("summon.more") % res.size(), "gold", Rect2(30, by, 320, 110), null, 32)
-	again.set_sub(V6Txt.s("common.gems_n") % UI.fmt(G.NEWBIE_COST if nb and res.size() == 10 else G.PULL_COST * res.size()), 19)
+	# 0.8: «Ещё ×N» is the one primary; «Готово» is the quiet graphite secondary
+	var again: = JButton.make(V6Txt.s("summon.more") % res.size(), "pink", Rect2(30, by, 320, 110), null, 32)
+	again.set_cost(V8Art.cur("gem"), G.NEWBIE_COST if nb and res.size() == 10 else G.PULL_COST * res.size(), 22)
+	again.shine_every = 2.4
 	again.pressed.connect( func():
 		_close_seq()
 		_pull(res.size()))
 	seq.add_child(again)
-	var ok: = JButton.make(V6Txt.s("common.done"), "pink", Rect2(W - 350, by, 320, 110), null, 34)
+	var ok: = JButton.make(V6Txt.s("common.done"), "graphite", Rect2(W - 350, by, 320, 110), null, 34)
 	ok.pressed.connect(_close_seq)
 	seq.add_child(ok)
 	UI.slide_in(again, Vector2(0, 80), 0.0)

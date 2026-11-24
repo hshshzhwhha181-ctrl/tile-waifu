@@ -397,7 +397,11 @@ func _build_hud() -> void :
 	mb.visible = false
 
 func _build_bottom() -> void :
-	var xs: = [W * 0.5 - 200, W * 0.5 - 56, W * 0.5 + 88]
+	# 0.8: sound (84) + undo / hint / shuffle (112 each) are one row centred under the board with equal 50 px gaps,
+	# so the left and right margins match (was 25 px left, 160 px right)
+	var gap: = 50.0
+	var x0: = (W - (84.0 + 3.0 * 112.0 + 3.0 * gap)) * 0.5
+	var xs: = [x0 + 84.0 + gap, x0 + 84.0 + 112.0 + 2.0 * gap, x0 + 84.0 + 224.0 + 3.0 * gap]
 	btn_undo = _action("undo", V6Txt.s("play.undo"), xs[0], "rose")
 	btn_undo.pressed.connect(_undo)
 	btn_hint = _action("hint", V6Txt.s("play.hint"), xs[1], "gold")
@@ -405,7 +409,7 @@ func _build_bottom() -> void :
 	btn_shuffle = _action("shuffle", V6Txt.s("play.shuffle"), xs[2], "mint")
 	btn_shuffle.pressed.connect(_shuffle)
 	# 0.8: sound on / off right in the match (icon/sound, icon/sound_off), bottom left beside the helps
-	btn_sound = _v8_round_btn(V8Art.icon("sound" if _v8_sound_on() else "sound_off"), Rect2(28, H - 154, 84, 84), 0.6, _v8_toggle_sound)
+	btn_sound = _v8_round_btn(V8Art.icon("sound" if _v8_sound_on() else "sound_off"), Rect2(x0, H - 158, 84, 84), 0.6, _v8_toggle_sound)
 
 func _action(icon: String, text: String, x: float, pal: String) -> JButton:
 
@@ -763,6 +767,7 @@ func _on_match(mid: Vector2, combo: int, gold: bool, shard: String) -> void :
 		var tiers: = ["", "", "Дуэт", "Трио", "Каскад", "Цветение", "Небесный поток"]
 		if combo in [3, 5, 8, 12, 16] or (combo >= 20 and combo % 5 == 0):
 			_combo_banner("%s ×%d" % [V7Combo.TIERS.filter( func(x): return combo >= int(x[0])).back()[1], combo], combo)
+			stage.flash_emotion(_v8_combo_emotion(combo))
 		if combo >= 3:
 			Sfx.play("combo", 1.0 + combo * 0.03)
 		if cfg.fx == "lanterns":
@@ -815,6 +820,25 @@ func _combo_banner(word: String, combo: int) -> void :
 	var t: Tween = l.create_tween()
 	t.tween_property(l, "scale", Vector2.ONE, 0.16).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
+
+# 0.8: the heroine's emotion pop on the portrait card at a combo milestone: ×3 glad, ×5 (fever) amazed, ×8 glad or
+# shy once she is fond of the player, then amazed / glad in turn
+func _v8_combo_emotion(combo: int) -> String:
+	match combo:
+		3:
+			return "happy"
+		5:
+			return "surprised"
+		8:
+			return V8Art.win_emotion(partner)
+		12:
+			return "surprised"
+		16:
+			return "happy"
+	return "surprised" if (combo / 5) % 2 == 0 else "happy"
+
+# a failed move (a blocked tile tapped): a pout at most every 2.5 s, so a burst of taps never flickers the card
+var _v8_pout_t: = -10.0
 
 # 0.8: one transient plaque at a time (combo word, notices, yaku, fever, riichi) in the slim strip between the
 # table frame and the tops of the action buttons: it never covers a tile, an action button or its caption, and it
@@ -924,6 +948,9 @@ func _fever() -> void :
 func _on_deny(_t: Tile) -> void :
 	denies += 1
 	stage.react("deny")
+	if now() - _v8_pout_t > 2.5:
+		_v8_pout_t = now()
+		stage.flash_emotion("pout")
 	if talk_cd <= 0.0:
 		talk_cd = 5.0
 		_bubble(V6Txt.s("play.blocked"))
@@ -931,6 +958,8 @@ func _on_deny(_t: Tile) -> void :
 
 func _on_fail() -> void :
 	_v6_clear_tips()
+	if stage:
+		stage.flash_emotion("sad")
 	if mode == "zen" or mode == "blitz" or mode == "duel" or free_rescue_left > 0:
 		if duel:
 			duel.on_overflow()
@@ -961,7 +990,10 @@ func _on_fail() -> void :
 		return
 	_v8_modal_open()
 	var p: = Common.popup(main, V6Txt.s("play.full_t"), 440, "cream", 660.0, false)
-	p.add_child(Common.avatar(partner, Rect2(30, 60, 120, 120), "pink"))
+	# 0.8: her sad face (emotion art; the base portrait when the file is missing), settling in with a soft pop
+	var fav: = V8Art.emotion_avatar(partner, "sad", Rect2(30, 60, 120, 120), "pink")
+	p.add_child(fav)
+	UI.pop_in(fav, 0.15, 0.85)
 	var l: = UI.label(V6Txt.s("play.full_d"), 21, UI.INK)
 	l.position = Vector2(170, 70)
 	p.add_child(l)
@@ -1843,11 +1875,13 @@ func v8_res_close(ctx: Dictionary, hid: String, main_text: String, main_cb: Call
 	plate.pivot_offset = plate.size * 0.5
 	UI.pop_in(plate, 0.2, 0.85)
 	var by: = H - 132.0
-	var bm: = JButton.make(main_text, "pink", Rect2(W * 0.5 + 10, by, 280, 96), main_icon, 26)
+	# 0.8: one column grid for both rows: the secondary column (alt button, «Повтор» above it) is V8_RES_COL1 wide
+	# from the left edge, the primary CTA takes the rest, so its 26 px caption fits without shrinking
+	var bm: = JButton.make(main_text, "pink", Rect2(16.0 + V8_RES_COL1 + V8_RES_GAP, by, W - 32.0 - V8_RES_COL1 - V8_RES_GAP, 96), main_icon, 26)
 	bm.shine_every = 2.5
 	bm.pressed.connect(main_cb)
 	root.add_child(bm)
-	var ba: = JButton.make(alt_text, "lav", Rect2(W * 0.5 - 290, by, 280, 96), alt_icon, 26 if alt_icon == null else 28)
+	var ba: = JButton.make(alt_text, "lav", Rect2(16.0, by, V8_RES_COL1, 96), alt_icon, 26 if alt_icon == null else 28)
 	ba.pressed.connect(alt_cb)
 	root.add_child(ba)
 	for b in [bm, ba]:
@@ -1860,6 +1894,19 @@ func v8_res_close(ctx: Dictionary, hid: String, main_text: String, main_cb: Call
 	# the heroine stands behind the panel and the buttons (right after the dim and the rays)
 	if not Hero.RIGS.has(hid):
 		hid = partner if Hero.RIGS.has(partner) else "mc"
+	# 0.8: her emotion portrait (ctx.emo: the caller's choice; a win is happy, or shy once she is fond of the player).
+	# A rank-up turns her surprised for a moment (_animate_rank). No emotion art: the rigged base portrait as before.
+	var emo: String = String(ctx.get("emo", V8Art.win_emotion(hid)))
+	_v8_res_bust = null
+	if V8Art.has_emotion(hid, emo):
+		var b: = _v8_res_bust_make(root, hid, emo, ctx.plate_end, by)
+		ctx["bust"] = b
+		if ctx.has("rank_box") and not ctx.get("own_rank_anim", false):
+			var bx0: = [ctx.rank_box]
+			get_tree().create_timer(0.9).timeout.connect( func():
+				if is_inside_tree() and is_instance_valid(bx0[0]):
+					_animate_rank(bx0[0]))
+		return [bm, ba]
 	var vh: = Hero.new().setup(hid, V8_HERO_H)
 	vh.position = Vector2(W * 0.74, H + V8_HERO_DROP)
 	vh.interactive = false
@@ -1875,6 +1922,47 @@ func v8_res_close(ctx: Dictionary, hid: String, main_text: String, main_cb: Call
 			if is_inside_tree() and is_instance_valid(bx[0]):
 				_animate_rank(bx[0]))
 	return [bm, ba]
+
+# the result-window bust: in the free column right of the content, from under the panel down past the screen edge
+# (the waist cut is off screen and fades), face centred in the column. Too little room for her face above the
+# buttons: no bust, the window never shows a face cut by the buttons.
+const V8_BUST_H: = 600.0
+var _v8_res_bust: Control = null
+
+func _v8_res_bust_make(root: Control, hid: String, emo: String, top: float, bottom: float) -> Control:
+	var foot: = H + 30.0
+	var bh: = minf(V8_BUST_H, foot - (top + 6.0))
+	if bh < 320.0:
+		return null
+	var k: = bh / 800.0
+	var fw: = V8Art.emotion_face_w(hid, emo) * k
+	var face: = V8Art.emotion_face(hid, emo)
+	var at: = Vector2((V8_LEFT_COL + 16.0 + W) * 0.5, foot - bh + face.y * k)
+	if at.y + fw * 0.75 > bottom - 4.0:
+		return null
+	var b: = V8Art.bust(hid, emo, size, at, fw, 0.08)
+	root.add_child(b)
+	root.move_child(b, 2)
+	_v8_res_bust = b
+	UI.slide_in(b, Vector2(110, 0), 0.25, 0.6)
+	get_tree().create_timer(0.85).timeout.connect( func():
+		if is_instance_valid(b):
+			V8Art.bust_bounce(b, 0.03))
+	return b
+
+# the result bust changes expression (crossfade + a small bounce); back_after > 0 returns to the one before
+func _v8_res_react(e: String, back_after: = 0.0) -> void :
+	var b: = _v8_res_bust
+	if b == null or not is_instance_valid(b) or not V8Art.has_emotion(String(b.get_meta("hero")), e):
+		return
+	var was: = V8Art.bust_emo(b)
+	V8Art.bust_set(b, e, 0.34)
+	V8Art.bust_bounce(b, 0.03)
+	if back_after <= 0.0 or was == e:
+		return
+	await get_tree().create_timer(back_after).timeout
+	if is_instance_valid(b) and V8Art.bust_emo(b) == V8Art.emo_name(e):
+		V8Art.bust_set(b, was, 0.4)
 
 # zen has no result window: a rank-up shows as a float over the table, never as a toast over the HUD
 func _v8_rank_float(a: Dictionary, at: Vector2) -> void :
@@ -1919,12 +2007,17 @@ func _victory(stars: int, reward: int, secs: float, first: bool) -> void :
 	if shards_found > 0 and cfg.has("shard"):
 		var sh: String = cfg.shard
 		var have: = mini(int(G.S.shards.get(sh, 0)), G.SHARDS_NEED)
-		Common.chip(plate, null, V6Txt.s("play.shard_chip") % [G.HEROES[sh].name, have, G.SHARDS_NEED, V6Txt.s("play.shard_full") if have >= G.SHARDS_NEED else ""], Rect2(V8_RES_PAD, ctx.y, pw - V8_RES_PAD * 2.0, 34), "gold", 17)
-		ctx.y += 42.0
+		_v8_shard_line(plate, sh, have, Rect2(V8_RES_PAD, ctx.y, pw - V8_RES_PAD * 2.0, 40))
+		ctx.y += 48.0
 	var rank_box: Control = null
 	if mode != "trial":
 		rank_box = v8_res_rank(ctx, {})
 	ctx.y = _v8_yaku_chips(plate, V8_RES_PAD, ctx.y, pw - V8_RES_PAD * 2.0) + 4.0
+	# 0.8: the album chip («Альбом: +N марок») sits inside the panel, right under the yaku, not hanging off its edge
+	var album_y: = -1.0
+	if not (V7Album.st().new as Array).is_empty():
+		album_y = ctx.y + 4.0
+		ctx.y += 56.0
 
 	var next_text: = V6Txt.s("play.next") if mode == "" else (V6Txt.s("common.to_home") if mode == "daily" else V6Txt.s("play.to_banner"))
 	var summon_ok: = G.summon_open()
@@ -1945,12 +2038,15 @@ func _victory(stars: int, reward: int, secs: float, first: bool) -> void :
 		null, V8Art.nav("wishes") if summon_ok else V8Art.nav("home"))
 	victory_next_btn = btns[0]
 	victory_summon_btn = btns[1]
-	_v8_photo_row(root, stars, secs, ctx.plate_end, ctx.by)
+	_v8_photo_row(root, stars, secs, ctx.plate_end, ctx.by, plate.position + Vector2(V8_RES_PAD, album_y) if album_y >= 0.0 else Vector2(-1, -1), pw - V8_RES_PAD * 2.0)
+	_v8_res_settle(ctx, album_y)
 
 	await v8_res_light_stars(ctx, star_nodes, stars)
 	if not is_inside_tree():
 		return
 	Sfx.say(partner, "win")
+	if _v8_res_bust and is_instance_valid(_v8_res_bust):
+		V8Art.bust_bounce(_v8_res_bust, 0.03)
 	var tw: = create_tween()
 	tw.tween_method( func(v): gl.text = "+%d" % int(v), 0.0, float(reward + gained), 0.8)
 	if reward + gained > 0:
@@ -1963,6 +2059,26 @@ func _victory(stars: int, reward: int, secs: float, first: bool) -> void :
 		if is_inside_tree():
 			_summon_unlocked()
 
+# 0.8: with no heroine bust in the band under a short panel (no room for her face), the ribbon and the panel
+# move down so the panel ends 24 px above the «Повтор» / «Фото» row instead of leaving the board showing through
+func _v8_res_settle(ctx: Dictionary, album_y: float) -> void :
+	if _v8_res_bust != null and is_instance_valid(_v8_res_bust):
+		return
+	if ctx.has("hero") and is_instance_valid(ctx.hero) and (ctx.hero as CanvasItem).visible:
+		return
+	var free: float = (float(ctx.by) - 76.0) - float(ctx.plate_end)
+	if free <= 48.0:
+		return
+	var d: = free - 24.0
+	var plate: Control = ctx.plate
+	plate.position.y += d
+	(ctx.rib as Control).position.y += d * 0.5
+	ctx["plate_end"] = float(ctx.plate_end) + d
+	if album_y >= 0.0:
+		for c in (ctx.root as Control).get_children():
+			if c is RBox and c.get_node_or_null("Hit") != null:
+				(c as Control).position.y += d
+
 # Блиц: the score, clean tables, record, crystals, then the rank bar and league line
 func _blitz_result(record: bool, best: int, gems: int, ba: Dictionary) -> void :
 	var ctx: = v8_res_open(V6Txt.s("play.time_up"))
@@ -1972,6 +2088,8 @@ func _blitz_result(record: bool, best: int, gems: int, ba: Dictionary) -> void :
 	if gems > 0:
 		v8_res_reward(ctx, gems)
 	v8_res_rank(ctx, ba)
+	if record:
+		ctx["emo"] = "surprised"
 	v8_res_close(ctx, partner, V6Txt.s("common.again"), func(): main.go("play", {"mode": "blitz", "partner": partner, "retry": randi()}),
 		V6Txt.s("common.to_home"), func(): main.go("home"))
 	if gems > 0:
@@ -1981,7 +2099,44 @@ const V8_HERO_H: = 760.0
 const V8_HERO_DROP: = 250.0
 
 # album chip, replay and photo buttons (V7Photo.victory_hook) moved into the column under the plate
-func _v8_photo_row(root: Control, stars: int, secs: float, plate_end: float, by: float) -> void :
+# shard progress on a result window: the heroine's round portrait, «Осколок портрета · Рин», a 5-pip bar and «2/5»
+# (not a full-width gold capsule, which read as a finished bar right above the rank bar)
+func _v8_shard_line(parent: Control, sh: String, have: int, r: Rect2) -> void :
+	var row: = Control.new()
+	row.position = r.position
+	row.size = r.size
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	parent.add_child(row)
+	row.add_child(Common.avatar(sh, Rect2(2, 0, 40, 40), "gold"))
+	var full: = have >= G.SHARDS_NEED
+	var pip_w: = 26.0
+	var pip_gap: = 6.0
+	var cnt_w: = 52.0
+	var pips_w: = G.SHARDS_NEED * pip_w + (G.SHARDS_NEED - 1) * pip_gap
+	var px: = r.size.x - cnt_w - pips_w
+	var t: = "Портрет собран: %s" % G.HEROES[sh].name if full else "Осколок портрета · %s" % G.HEROES[sh].name
+	var l: = UI.label(t, 18, Color("ffd98a") if full else Color.WHITE, UI.DARK, 3, "body", 900)
+	l.position = Vector2(52, 0)
+	l.size = Vector2(px - 52 - 10, r.size.y)
+	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	l.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	row.add_child(l)
+	for i in G.SHARDS_NEED:
+		var on: = i < have
+		var pip: = UI.rbox("gold" if on else "glass", Rect2(px + i * (pip_w + pip_gap), 13, pip_w, 14), 7, 2, 2)
+		if not on:
+			pip.colors(Color(0.16, 0.14, 0.18, 0.9), Color(0.1, 0.08, 0.11, 0.9))
+		row.add_child(pip)
+		if on and i == have - 1:
+			UI.pop_in(pip, 0.9, 0.3)
+	var cl: = UI.label("%d/%d" % [have, G.SHARDS_NEED], 20, Color("ffd98a"), UI.DARK, 3, "body", 900)
+	cl.position = Vector2(r.size.x - cnt_w + 6, 0)
+	cl.size = Vector2(cnt_w - 6, r.size.y)
+	cl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	cl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	row.add_child(cl)
+
+func _v8_photo_row(root: Control, stars: int, secs: float, plate_end: float, by: float, album_at: = Vector2(-1, -1), album_w: = 0.0) -> void :
 	var n0: = root.get_child_count()
 	V7Photo.victory_hook(self, root, stars, secs)
 	var btns: = []
@@ -1995,16 +2150,48 @@ func _v8_photo_row(root: Control, stars: int, secs: float, plate_end: float, by:
 	var row_y: = by - 76.0
 	# 0.8: the album chip and the replay / photo row keep to the left column; the right column under the plate
 	# is the heroine's (her face must never sit behind the chip)
-	if chip:
+	if chip and album_at.x >= 0.0:
+		chip.position = album_at
+		_v8_span_chip(chip, album_w)
+	elif chip:
 		chip.position = Vector2(16, minf(plate_end + 12.0, row_y - 54.0))
 		_v8_narrow_chip(chip, V8_LEFT_COL)
 	var x0: = 16.0
 	for b in btns:
 		var jb: JButton = b
 		jb.position = Vector2(x0, row_y)
-		x0 += jb.size.x + 8.0
+		x0 += jb.size.x + V8_RES_GAP
+
+# 0.8: the in-panel album chip spans the content column like the rank and league rows (V8_RES_PAD … pw − PAD):
+# the star sits inside its left cap, the label after it, the claim badge on the right edge
+func _v8_span_chip(chip: Control, w: float) -> void :
+	var h: = chip.size.y
+	chip.size.x = w
+	if chip is RBox:
+		(chip as RBox).size = Vector2(w, h)
+	var x0: = 12.0
+	for c in chip.get_children():
+		if c is TextureRect and (c as Control).position.x < 0.0:
+			var ic: Control = c
+			ic.position = Vector2(6, (h - (h + 4.0)) * 0.5)
+			ic.size = Vector2(h + 4.0, h + 4.0)
+			x0 = 6.0 + h + 4.0 + 6.0
+	for c in chip.get_children():
+		if not c is Control:
+			continue
+		var cc: Control = c
+		if cc.name == "L":
+			cc.position.x = x0
+			cc.size.x = w - x0 - 52.0
+		elif cc.name == "Hit":
+			cc.size.x = w
+		elif cc is RBox:
+			# the claim badge (Common.badge): on the chip's right end, inside the panel
+			cc.position = Vector2(w - 42.0, (h - cc.size.y) * 0.5)
 
 const V8_LEFT_COL: = 440.0
+const V8_RES_COL1: = 250.0
+const V8_RES_GAP: = 10.0
 
 func _v8_narrow_chip(chip: Control, w: float) -> void :
 	if chip.size.x <= w:
@@ -2122,8 +2309,7 @@ func _v8_league_row(parent: Control, r: Rect2, li: Dictionary, week_gain: = 0) -
 	# near the bottom of the quarter table (a new player) the row says what the points are for, not «1001 из 1001»
 	var qt: = int(li.get("q_total", 1001))
 	var t2: String = V8PlayRules.T.quarter % [UI.fmt(int(li.q_place)), UI.fmt(qt)] if V8League.quarter_shown({"place": int(li.q_place), "total": qt}) else V8League.Q_HIDDEN
-	if rp_gain > 0:
-		t2 += V8PlayRules.T.quarter_gain % [rp_gain, V8PlayRules.points_word(rp_gain)]
+	# 0.8: the rank card right above already says «+N очков ранга»; the league line does not repeat it
 	var b: = UI.label(t2, 16, Color("a9d9c4"), UI.DARK, 3, "body", 900)
 	b.position = Vector2(60, 30)
 	b.size = Vector2(r.size.x - 72, 24)
@@ -2199,6 +2385,7 @@ func _animate_rank(box: Control) -> void :
 			UI.pop_in(pill, 0.0, 0.8)
 		Sfx.play("reveal_ssr" if int(up.sub) == 0 else "reveal_sr")
 		Sfx.say(partner, "rankup")
+		_v8_res_react("surprised", 1.6)
 	await get_tree().create_timer(0.6).timeout
 
 func _banner_of(h: String) -> int:
@@ -2291,3 +2478,13 @@ func dev_act(a: String) -> void :
 			blitz_left = 0.01
 		"cutin":
 			_cutin()
+		"emo_combo":
+			stage.flash_emotion(_v8_combo_emotion(5))
+		"emo_pout":
+			stage.flash_emotion("pout")
+		"emo_sad":
+			stage.flash_emotion("sad")
+		"duel_lose":
+			if duel:
+				duel.her += 4
+				duel.finish()

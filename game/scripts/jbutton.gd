@@ -13,7 +13,12 @@ var art: NinePatchRect
 var sound: = "pop"
 var shine_every: = 0.0
 var pulse: = false
-var disabled: = false
+# 0.8: a disabled button looks it (dimmed, desaturated art, quieter caption) and answers a tap with a short
+# «no» shake, the deny sound and the deny haptic instead of the press bounce
+var disabled: = false:
+	set(v):
+		disabled = v
+		_apply_disabled()
 var _shine_t: = 0.0
 var _down: = false
 
@@ -73,7 +78,7 @@ func build(text: String, pal: String, icon: Texture2D, font_size: int, radius: f
 		var ix: = size.y * 0.06 + 4
 		if art:
 			s = size.y * 0.6
-			ix = maxf(x0 - 4.0, size.y * 0.16)
+			ix = maxf(x0, size.y * 0.16)
 		icon_rect = UI.tex(icon, Rect2(ix, (size.y - s) * 0.5, s, s))
 		if art:
 			icon_rect.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
@@ -86,6 +91,7 @@ func build(text: String, pal: String, icon: Texture2D, font_size: int, radius: f
 		if art and not "\n" in text:
 			_fit_label(size.x - x0 - x1)
 		add_child(lbl)
+	_apply_disabled()
 
 # [colour, outline colour, outline size] of the caption on a palette
 static func _text_style(pal: String) -> Array:
@@ -139,6 +145,29 @@ func _fit_label(w: float) -> void :
 		ls.font_size = fs
 		lbl.label_settings = ls
 
+# a cost line «◆ 1 500»: the currency glyph and the number as one centred group under the caption
+var sub_icon: TextureRect
+
+func set_cost(icon: Texture2D, n: int, size_px: = 22) -> void :
+	set_sub(UI.fmt(n), size_px)
+	var ls: LabelSettings = sub.label_settings
+	var f: Font = ls.font if ls.font else UI.font("body", 900)
+	var tw: = f.get_string_size(sub.text, HORIZONTAL_ALIGNMENT_LEFT, -1, ls.font_size).x
+	var isz: = minf(sub.size.y * 1.15, float(size_px) * 1.5)
+	if sub_icon == null:
+		sub_icon = TextureRect.new()
+		sub_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		sub_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		sub_icon.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+		sub_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		add_child(sub_icon)
+	sub_icon.texture = icon
+	var gw: = isz + 4.0 + tw
+	var cx: = sub.position.x + sub.size.x * 0.5
+	sub_icon.position = Vector2(cx - gw * 0.5, sub.position.y + (sub.size.y - isz) * 0.5)
+	sub_icon.size = Vector2(isz, isz)
+	sub.position.x += (isz + 4.0) * 0.5
+
 func set_sub(text: String, size_px: = 20) -> void :
 	if sub == null:
 		sub = UI.label(text, size_px, lbl.label_settings.font_color if lbl else Color.WHITE, lbl.label_settings.outline_color if lbl else UI.PAL["gold"][2], 2 if lbl and lbl.label_settings.outline_size <= 2 else 4)
@@ -148,6 +177,17 @@ func set_sub(text: String, size_px: = 20) -> void :
 	# on the btn art both lines keep clear of the gold rim (top ~12 %, bottom ~14 % of the height)
 	lbl.position.y = size.y * (0.15 if art else 0.1)
 	UI.center_label(sub, Rect2(lbl.position.x, size.y * (0.5 if art else 0.52), lbl.size.x, size.y * (0.34 if art else 0.4)))
+	# never past the caps: shrink to 16 px, then trim
+	var ls: LabelSettings = sub.label_settings
+	var f: Font = ls.font if ls.font else UI.font("body", 800)
+	var fs: = ls.font_size
+	while fs > 16 and f.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > lbl.size.x:
+		fs -= 1
+	if fs != ls.font_size:
+		ls = ls.duplicate()
+		ls.font_size = fs
+		sub.label_settings = ls
+	sub.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 
 func badge(text: = "!") -> void :
 	var d: = UI.rbox("red", Rect2(size.x - 26, -8, 32, 32), 16, 3, 6)
@@ -190,9 +230,52 @@ func _gui_input(e: InputEvent) -> void :
 			_release(hit_rect().has_point(e.position))
 		accept_event()
 
+const DESAT_SHADER: = "shader_type canvas_item;\nvoid fragment() {\n\tvec4 c = texture(TEXTURE, UV) * COLOR;\n\tfloat g = dot(c.rgb, vec3(0.299, 0.587, 0.114));\n\tCOLOR = vec4(mix(c.rgb, vec3(g) * vec3(0.86, 0.84, 0.9), 0.82), c.a);\n}\n"
+static var _desat_mat: ShaderMaterial
+
+static func desat_material() -> ShaderMaterial:
+	if _desat_mat == null:
+		var sh: = Shader.new()
+		sh.code = DESAT_SHADER
+		_desat_mat = ShaderMaterial.new()
+		_desat_mat.shader = sh
+	return _desat_mat
+
+func _apply_disabled() -> void :
+	if box == null or (not disabled and not _dimmed):
+		return
+	_dimmed = disabled
+	modulate = Color(0.86, 0.84, 0.9, 0.6) if disabled else Color.WHITE
+	if art:
+		art.material = desat_material() if disabled else null
+	if icon_rect:
+		icon_rect.material = desat_material() if disabled else null
+	if disabled:
+		shine_every = 0.0
+		pulse = false
+		scale = Vector2.ONE
+
+var _dimmed: = false
+var _shake_tw: Tween
+
+func _deny_shake() -> void :
+	Sfx.play("deny")
+	var hp = get_node_or_null("/root/V7Haptics")
+	if hp:
+		hp.kind("deny")
+	if _shake_tw and _shake_tw.is_valid():
+		_shake_tw.kill()
+		position.x = _shake_x
+	_shake_x = position.x
+	_shake_tw = create_tween()
+	for dx in [-6.0, 6.0, -4.0, 3.0, 0.0]:
+		_shake_tw.tween_property(self, "position:x", _shake_x + dx, 0.036)
+
+var _shake_x: = 0.0
+
 func _press_down() -> void :
 	if disabled:
-		Sfx.play("deny")
+		_deny_shake()
 		return
 	_down = true
 	box.set_param("pressed", 1.0)

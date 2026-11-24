@@ -108,6 +108,20 @@ func _on_node_added(n: Node) -> void :
 		n.pressed.connect( func(): pulse(8, 0.25))
 	elif n is Hero:
 		n.tapped.connect( func(): kind("pet"))
+	elif n is Control:
+		_hook_card.call_deferred(n)
+
+# 0.8: cards wired through gui_input lambdas (league card, banners, mode tiles, rating rows, outfits…) get the
+# same light tap pulse as a JButton. Checked a frame later, once the screen has connected its handler.
+# A node can opt out with set_meta("no_haptic", true) (modal backdrops, passive panels).
+func _hook_card(n) -> void :
+	if not is_instance_valid(n) or not (n is Control) or n.mouse_filter != Control.MOUSE_FILTER_STOP or n.has_meta("no_haptic"):
+		return
+	if n.get_signal_connection_list("gui_input").is_empty():
+		return
+	n.gui_input.connect( func(e):
+		if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT and not n.has_meta("no_haptic"):
+			pulse(8, 0.25))
 
 func _attach_board(b: Node) -> void :
 	if not is_instance_valid(b) or _boards.has(b.get_instance_id()):

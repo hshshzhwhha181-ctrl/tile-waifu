@@ -68,6 +68,15 @@ func _render(greet: = false) -> void :
 	root.add_child(hero)
 	hero.tapped.connect(_on_hero_tap)
 	UI.slide_in(hero, Vector2(40, 40), 0.05, 0.55)
+	# 0.8: the fade is all but opaque by the top of the action row and stays solid under it down to the navbar,
+	# so no shoe or sole shows between «Подарок» / «Свидание» / «Сцены» or under them
+	Common.floor_fade(root, H - 560.0, H - 262.0, Color(0.07, 0.045, 0.07), 0.95)
+	var band: = ColorRect.new()
+	band.color = Color(0.07, 0.045, 0.07, 0.95)
+	band.position = Vector2(0, H - 262.0)
+	band.size = Vector2(W, 262.0)
+	band.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	root.add_child(band)
 	V8Header.make(root, main, "Комната", main.back)
 	set_meta("v8_back", main.back)
 	_tabs()
@@ -187,7 +196,7 @@ func _actions() -> void :
 	g.pressed.connect(_gift_popup)
 	actions.add_child(g)
 	var inv: = V7RoomData.invites()
-	var d: = _btn("Свидание", "приглашений: %d" % inv, "gold", Rect2(16 + bw + 12, y, bw, 108), "heart")
+	var d: = _btn("Свидание", "%d %s" % [inv, V8PlayRules.plural(inv, "приглашение", "приглашения", "приглашений")] if inv > 0 else "нет приглашений", "gold", Rect2(16 + bw + 12, y, bw, 108), "heart")
 	d.pressed.connect(_date_popup)
 	if inv > 0:
 		d.shine_every = 3.2
@@ -213,14 +222,18 @@ func _btn(text: String, sub: String, pal: String, r: Rect2, icon: String) -> JBu
 	var isz: = 52.0
 	var x1: = 8.0
 	if b.art:
+		# 0.8: glyph, caption and sub-line all stay inside nine_content(): clear of the sakura caps on both ends
 		var cr: = V8Art.nine_content(b._art_name, r.size)
-		ix = maxf(cr.position.x - 4.0, 16.0)
-		isz = 44.0
-		x1 = maxf(r.size.x - cr.end.x - 10.0, 12.0)
+		ix = cr.position.x
+		isz = 40.0
+		x1 = r.size.x - cr.end.x
 	var x0: = ix + isz + 4.0
 	b.lbl.position.x = x0
 	b.lbl.size.x = r.size.x - x0 - x1
+	b._fit_label(b.lbl.size.x)
 	UI.center_label(b.sub, Rect2(x0, b.sub.position.y, r.size.x - x0 - x1, b.sub.size.y))
+	b.sub.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	b.sub.clip_text = true
 	# 0.8: gift / heart / star are the gold glyphs of the 0.8 set (star = the sakura star, nav/play)
 	b.add_child(V8Art.rect(Common.ui_icon(icon), Rect2(ix, (r.size.y - isz) * 0.5, isz, isz)))
 	return b

@@ -73,7 +73,8 @@ func _tabs() -> void :
 		c.size = Vector2(bw, 64)
 		c.mouse_filter = Control.MOUSE_FILTER_STOP
 		seg.add_child(c)
-		var pill: = UI.rbox("gold", Rect2(0, 4, bw, 56), 28, 2, 4)
+		var pill: = UI.rbox("pink", Rect2(0, 4, bw, 56), 28, 3, 4)
+		pill.borders(Color("ffe7a6"), Color("c58a2c"))
 		pill.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		pill.name = "Pill"
 		c.add_child(pill)
@@ -94,9 +95,9 @@ func _paint_tabs() -> void :
 		var on: bool = id == tab
 		(c.get_node("Pill") as Control).visible = on
 		var l: Label = c.get_node("L")
-		l.label_settings.font_color = Color("3a2410") if on else UI.INK
-		l.label_settings.outline_color = Color(1, 0.95, 0.8, 0.5) if on else UI.DARK
-		l.label_settings.outline_size = 2 if on else 3
+		l.label_settings.font_color = Color.WHITE if on else UI.INK
+		l.label_settings.outline_color = UI.PAL.pink[2] if on else UI.DARK
+		l.label_settings.outline_size = 5 if on else 3
 
 func _show(id: String, animate: bool) -> void :
 	tab = id
@@ -193,40 +194,49 @@ func _week_card(t: Dictionary, L: Dictionary, place: int) -> void :
 	strip.add_child(pll)
 	UI.slide_in(card, Vector2(0, -20), 0.0, 0.4)
 
+# 0.8: a table card is the table's art strip (mipmapped, darkened at the bottom under the title), its layout and
+# best score on the dark body, and a real JButton («Играть» / gold «Улучшить», 60 px, button art and press-down);
+# a tap anywhere on the card presses that button
+const TABLE_H: = 178.0
+
 func _tables(t: Dictionary) -> void :
 	var bw: = (W - 32 - 20) / 3.0
 	var y: = Y_PAGE + 188.0
 	for k in V7Ladder.TABLES:
 		var cfg: = V7Ladder.table_cfg(k, int(t.start))
-		var r: = Rect2(16 + k * (bw + 10), y, bw, 132)
+		var r: = Rect2(16 + k * (bw + 10), y, bw, TABLE_H)
 		var c: = UI.rbox("plum", r, 24, 3, 8)
 		c.colors(Color(0.14, 0.08, 0.16, 0.96), Color(0.08, 0.04, 0.1, 0.97)).borders(Color("ffe7a6"), Color("c58a2c"))
 		c.mouse_filter = Control.MOUSE_FILTER_STOP
 		c.pivot_offset = r.size * 0.5
 		page.add_child(c)
-		var art: = Common.card_art(load("res://assets/bg/%s.webp" % cfg.bg), Rect2(4, 4, bw - 8, 56), Vector2(0.5, 0.5), 1.0, 18)
+		var art: = Common.card_art(load("res://assets/bg/%s.webp" % cfg.bg), Rect2(4, 4, bw - 8, 58), Vector2(0.5, 0.5), 1.0, 20)
+		(art.material as ShaderMaterial).set_shader_parameter("bottom_shade", 0.85)
 		c.add_child(art)
-		c.add_child(UI.center_label(UI.label(["Стол I", "Стол II", "Стол III"][k], 22, Color.WHITE, UI.DARK, 4, "body", 900), Rect2(0, 10, bw, 34)))
-		var feat: = UI.label(V6Layouts.shape_name(cfg.shape) + (" · ★" if k == 2 else ""), 16, Color("ddd2c4"), UI.DARK, 2)
-		feat.position = Vector2(0, 40)
-		feat.size = Vector2(bw, 22)
+		c.add_child(UI.center_label(UI.label(["Стол I", "Стол II", "Стол III"][k], 24, Color.WHITE, UI.DARK, 5, "body", 900), Rect2(0, 18, bw, 36)))
+		var feat: = UI.label(V6Layouts.shape_name(cfg.shape) + (" · ★" if k == 2 else ""), 16, Color("e9dfd2"), UI.DARK, 3, "body", 800)
+		feat.position = Vector2(6, 64)
+		feat.size = Vector2(bw - 12, 22)
 		feat.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		feat.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 		c.add_child(feat)
 		var best: = int(t.best[k])
 		var bl: = UI.label(("Лучший: %s" % UI.fmt(best)) if best > 0 else "Не сыгран", 18, Color("ffe7a6") if best > 0 else Color("bfb3a8"), UI.DARK, 3, "body", 900)
-		bl.position = Vector2(0, 64)
+		bl.position = Vector2(0, 86)
 		bl.size = Vector2(bw, 26)
 		bl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		c.add_child(bl)
-		var go: = UI.rbox("pink" if best == 0 else "gold", Rect2(12, 94, bw - 24, 30), 15, 2, 4)
-		c.add_child(go)
-		go.add_child(UI.center_label(UI.label("ИГРАТЬ" if best == 0 else "УЛУЧШИТЬ", 16, Color.WHITE if best == 0 else Color("3a2410"), UI.DARK if best == 0 else Color(1, 1, 1, 0.4), 2, "body", 900), Rect2(0, 0, bw - 24, 30)))
 		var kk: = k
+		var go_play: = func():
+			main.go("v7play", {"mode": "v7tourney", "table": kk, "partner": G.S.level_partner if G.hero_unlocked(G.S.level_partner) else "mc"})
+		var go: = JButton.make("Играть" if best == 0 else "Улучшить", "pink" if best == 0 else "gold", Rect2(8, 112, bw - 16, 60), null, 22)
+		go.name = "Go"
+		go.pressed.connect(go_play)
+		c.add_child(go)
 		c.gui_input.connect(func(e):
 			if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT:
-				Sfx.play("pop")
-				UI.punch(c, 0.08)
-				main.go("v7play", {"mode": "v7tourney", "table": kk, "partner": G.S.level_partner if G.hero_unlocked(G.S.level_partner) else "mc"}))
+				UI.tap(c, 0.04)
+				go_play.call())
 		UI.slide_in(c, Vector2(0, 30), 0.12 + k * 0.05, 0.4)
 		table_btns.append(c)
 
@@ -238,7 +248,9 @@ func _frame(top: float, bottom: float, title: String) -> void :
 	hd.position = Vector2(36, top + 10)
 	page.add_child(hd)
 
-func _make_scroll(top: float, h: float) -> void :
+func _make_scroll(top: float, h: float) -> float:
+	# 0.8: the list is a whole number of rows high, so at rest no row is cut in half against the header or «…»
+	h = maxf(ROW_H, floorf((h + 6.0) / (ROW_H + 6.0)) * (ROW_H + 6.0) - 6.0)
 	scroll = ScrollContainer.new()
 	scroll.position = Vector2(24, top)
 	scroll.size = Vector2(W - 48, h)
@@ -249,9 +261,11 @@ func _make_scroll(top: float, h: float) -> void :
 	list.custom_minimum_size = Vector2(W - 48, 0)
 	list.add_theme_constant_override("separation", 6)
 	scroll.add_child(list)
+	Common.scroll_fade(scroll, list, ROW_H * 0.9, 0.05)
+	return h
 
 func _board(t: Dictionary, rows: Array) -> void :
-	var top: = Y_PAGE + 332.0
+	var top: = Y_PAGE + 188.0 + TABLE_H + 12.0
 	var bottom: = H - 140.0
 	var league: = int(t.league)
 	var can_down: = V8League.can_demote(league, String(t.week))
@@ -352,8 +366,7 @@ func _row_input(e: InputEvent, c: Control, pid: int, ctx: Dictionary) -> void :
 		var p0: Vector2 = _press[k]
 		_press.erase(k)
 		if p0.distance_to(e.global_position) < 16.0:
-			Sfx.play("pop")
-			UI.punch(c, 0.03)
+			UI.tap(c, 0.03)
 			V8League.open_card(main, pid, ctx)
 
 
@@ -405,7 +418,7 @@ func _quarter_page() -> void :
 	var in_top: = int(me.place) <= rows.size()
 	_frame(top, bottom, V8League.TXT.top)
 	var list_h: = bottom - top - 50 - (0.0 if in_top else ROW_H + 22.0)
-	_make_scroll(top + 40, list_h)
+	list_h = _make_scroll(top + 40, list_h)
 	var me_i: = 0
 	for i in rows.size():
 		var row: Dictionary = rows[i]

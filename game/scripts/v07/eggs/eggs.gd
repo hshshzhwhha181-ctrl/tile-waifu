@@ -60,12 +60,16 @@ func found_count() -> int:
 func total() -> int:
 	return V7Lines.EGG_NAMES.size()
 
-func discover(id: String) -> void :
+# toast_delay: a find announced by a heroine's line waits until her bubble is gone, so the line and the
+# «Тайник найден» toast never sit on top of each other (and a toast never lands on an open popup: main.toast)
+func discover(id: String, toast_delay: = 0.0) -> void :
 	var st: = state()
 	if st.found.has(id):
 		return
 	st.found[id] = G.today()
 	G.save()
+	if toast_delay > 0.0:
+		await get_tree().create_timer(toast_delay).timeout
 	var h = get_node_or_null("/root/V7Haptics")
 	if h:
 		h.kind("egg")
@@ -336,7 +340,7 @@ func _home_line(home: Node, h: String, line: String, egg: String, delay: = 2.6) 
 		dn.say_home(home, h, line)
 	elif home.has_method("_say"):
 		home.call("_say", line)
-	discover(egg)
+	discover(egg, 4.2)
 
 func _cameo(home: Node, h: String, moon: bool) -> void :
 	await get_tree().create_timer(4.2 if not moon else 3.0).timeout
@@ -348,15 +352,27 @@ func _cameo(home: Node, h: String, moon: bool) -> void :
 	var hero: = Hero.new().setup(h, H * 0.5)
 	hero.name = "V7Cameo"
 	hero.rotation = deg_to_rad(-15)
-	hero.position = Vector2(W + 260, H + 60)
+	hero.position = Vector2(W + 260, H - 40)
 	if locked:
 		hero.mat.set_shader_parameter("silhouette", 1.0)
 		hero.modulate = Color(1, 1, 1, 0.8)
 
 	var main_hero = home.get("hero")
-	home.add_child(hero)
+	# 0.8: a visiting heroine peeks in above the button band (clipped at the top of «Режимы»), never behind the
+	# CTAs and the nav bar
+	# the clip's bottom edge runs behind the middle of «Режимы» (H - 348), so the cut line is never seen
+	var clip: = Control.new()
+	clip.name = "V7CameoClip"
+	clip.size = Vector2(W, H - 348.0)
+	clip.clip_contents = true
+	clip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	home.add_child(clip)
 	if main_hero and main_hero.get_parent() == home:
-		home.move_child(hero, main_hero.get_index() + 1)
+		home.move_child(clip, main_hero.get_index() + 1)
+	clip.add_child(hero)
+	hero.tree_exited.connect( func():
+		if is_instance_valid(clip):
+			clip.queue_free())
 	var shown_x: = W + 10.0
 	var t: = hero.create_tween()
 	t.tween_property(hero, "position:x", shown_x, 0.6).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)

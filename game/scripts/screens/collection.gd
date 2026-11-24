@@ -126,7 +126,9 @@ func _build() -> void :
 	perks.position = Vector2(22, 214)
 	ic.add_child(perks)
 	if unl:
-		var pb: = JButton.make(V6Txt.s("coll.partner_on") if G.S.partner == cur else V6Txt.s("coll.partner"), "pink" if G.S.partner != cur else "mint", Rect2(18, 272, 244, 62), null, 22)
+		# 0.8: the three actions all draw button art (≥ 60 px: btn/primary or the jade «on» state, then the graphite
+		# secondary for «Голос» / «Фишки») — no procedural lavender pills
+		var pb: = JButton.make(V6Txt.s("coll.partner_on") if G.S.partner == cur else V6Txt.s("coll.partner"), "pink" if G.S.partner != cur else "mint", Rect2(18, 262, 244, 62), null, 22)
 		pb.pressed.connect( func():
 			G.S.partner = cur
 			G.save()
@@ -134,17 +136,17 @@ func _build() -> void :
 			main.toast(V6Txt.s("coll.partner_toast") % G.HEROES[cur].name, "heart")
 			_build())
 		ic.add_child(pb)
-		var vb: = JButton.make(V6Txt.s("coll.voice"), "lav", Rect2(18, 340, 118, 50), null, 20)
+		var vb: = JButton.make(V6Txt.s("coll.voice"), "graphite", Rect2(18, 332, 118, 60), null, 20)
 		vb.pressed.connect( func(): Sfx.say(cur, "greet");hero.react("happy"))
 		ic.add_child(vb)
-		var tb: = JButton.make(V6Txt.s("coll.skins"), "lav", Rect2(144, 340, 118, 50), null, 20)
+		var tb: = JButton.make(V6Txt.s("coll.skins"), "graphite", Rect2(144, 332, 118, 60), null, 20)
 		tb.pressed.connect( func(): Common.skin_picker(main, func(): pass))
 		ic.add_child(tb)
 	else:
 		var lb: = UI.label(V6Txt.s("coll.shards") % [mini(int(G.S.shards.get(cur, 0)), G.SHARDS_NEED), G.SHARDS_NEED], 22, Color("7a4a6a"), Color.WHITE, 3, "body", 900)
 		lb.position = Vector2(22, 280)
 		ic.add_child(lb)
-		var go: = JButton.make(V6Txt.s("coll.to_wish"), "lav", Rect2(18, 336, 244, 54), null, 22)
+		var go: = JButton.make(V6Txt.s("coll.to_wish"), "graphite", Rect2(18, 330, 244, 60), null, 22)
 		go.pressed.connect( func(): main.go("summon", {"banner": 1 if cur == "nova" else 0}))
 		ic.add_child(go)
 	UI.slide_in(ic, Vector2(60, 0), 0.1)
@@ -194,8 +196,6 @@ func _build() -> void :
 		rtag.borders(G.rar_color(it.rar).lerp(Color.WHITE, 0.35), G.rar_color(it.rar).darkened(0.45))
 		card.add_child(rtag)
 		rtag.add_child(UI.center_label(UI.label(it.rar, 16, G.rar_color(it.rar).lerp(Color.WHITE, 0.45), UI.DARK, 2, "body", 900), Rect2(0, -1, rw, 22)))
-		if not own:
-			card.add_child(V8Art.rect(V8Art.icon("lock"), Rect2(cw * 0.5 - 20, 62, 40, 40)))
 		if worn and own:
 			# inside the card (middle, over the art), so it never covers the strip caption or the rarity tag
 			var wl: = UI.rbox("pink", Rect2(cw * 0.5 - 36, 38, 72, 26), 13, 2, 4)
@@ -211,11 +211,20 @@ func _build() -> void :
 		nl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		nl.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
 		card.add_child(nl)
+		if not own:
+			# the padlock sits above the name: a name that wraps to a third line («Хозяйка / после / закрытия»)
+			# lifts it by that line, so the lock never sits under the text
+			var nls: LabelSettings = nl.label_settings
+			var nlh: = nls.font.get_height(nls.font_size) + nls.line_spacing
+			var nth: = nls.font.get_multiline_string_size(nl.text, HORIZONTAL_ALIGNMENT_CENTER, nw - nls.outline_size, nls.font_size, -1, TextServer.BREAK_MANDATORY | TextServer.BREAK_WORD_BOUND).y
+			var n_lines: = clampi(int(round(nth / nls.font.get_height(nls.font_size))), 1, 3)
+			var ly: = minf(62.0, 160.0 - n_lines * nlh - 42.0)
+			card.add_child(V8Art.rect(V8Art.icon("lock"), Rect2(cw * 0.5 - 20, ly, 40, 40)))
 		var itc: Dictionary = it
 		card.mouse_filter = Control.MOUSE_FILTER_STOP
 		card.gui_input.connect( func(e):
 			if e is InputEventMouseButton and e.pressed:
-				Sfx.play("pop")
+				UI.tap(card, 0.06)
 				if own:
 					_preview(itc)
 				else:

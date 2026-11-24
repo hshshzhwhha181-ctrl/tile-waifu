@@ -8,6 +8,9 @@ var accent: = Color("ff9cc0")
 var _box: StyleBoxFlat
 var _side: StyleBoxFlat
 var _t: = 0.0
+# 0.8: tiles are drawn with the real tile-back art (assets/v06/flip/tile_back.png, ivory-tinted per layer) on a
+# coloured side, so the preview on the level card reads as the board's tiles, not blank cream rectangles
+var _back: Texture2D = preload("res://assets/v06/flip/tile_back.png")
 
 func setup(cfg: Dictionary, acc: Color) -> void :
 	pos = TrayBoard.gen_layout(cfg)
@@ -56,16 +59,11 @@ func _draw() -> void :
 		var o: Vector2 = off + Vector2((p.x - minx) * cw, (p.y - miny) * ch) + Vector2(dz.x, dz.y) * cw * p.z
 		o.y -= (1.0 - appear) * 10.0
 		var k: float = float(p.z) / max(1, maxz)
-		var face: = Color("d9cbb8").lerp(Color("fffdf6"), 0.35 + k * 0.65)
+		var face: = Color("e6d6bd").lerp(Color("fff8ea"), 0.35 + k * 0.65)
 		var side: = accent.darkened(0.45 - k * 0.2)
 		side.a = appear
 		face.a = appear
 		_side.bg_color = side
 		_side.set_corner_radius_all(int(max(2.0, tw * 0.16)))
 		draw_style_box(_side, Rect2(o + Vector2(tw * 0.06, th * 0.14), Vector2(tw, th)))
-		_box.bg_color = face
-		_box.set_corner_radius_all(int(max(2.0, tw * 0.16)))
-		_box.border_color = accent.lerp(Color.WHITE, 0.35)
-		_box.border_color.a = appear
-		_box.set_border_width_all(1)
-		draw_style_box(_box, Rect2(o, Vector2(tw, th)))
+		draw_texture_rect(_back, Rect2(o, Vector2(tw, th)), false, face)

@@ -144,6 +144,7 @@ func _on_fail() -> void :
 	overflows += 1
 	fails += 1
 	stage.react("fail")
+	stage.flash_emotion("sad")
 	Sfx.play("deny", 0.8)
 	Fx.shake(tray_box, 8, 0.3)
 	if mode == "v7tourney":
@@ -241,6 +242,7 @@ func _event_clear() -> void :
 	var nxt: = node_i + 1
 	var has_next: = nxt < V7EventData.NODES
 	var go_next: = func(): main.go("v7play", {"mode": "v7event", "node": nxt if has_next else node_i, "partner": partner, "retry": randi()})
+	ctx["emo"] = V8Art.win_emotion(String(def.hero)) if stars >= 2 else "happy"
 	v8_res_close(ctx, String(def.hero), "Следующий стол" if has_next else "Ещё раз", go_next,
 		"К карте ивента", func(): main.go("v7event"))
 	Fx.burst(ctx.root, Vector2(W * 0.5, 300), "confetti", 60, Color.WHITE, 1.1)
@@ -308,6 +310,8 @@ func _tour_finish(cleared: bool) -> void :
 		zc = Color("e3a3b2")
 	v8_res_line(ctx, pl_, 22, zc)
 	v8_res_rank(ctx, ta, maxi(0, int(res.best) - int(res.old)))
+	# 0.8: a new table record amazes her; a cleared table is a win; a table lost to overflows saddens her
+	ctx["emo"] = "surprised" if res.improved else (V8Art.win_emotion(partner) if cleared else "sad")
 	v8_res_close(ctx, partner, "Ещё раз", func(): main.go("v7play", {"mode": "v7tourney", "table": table_k, "partner": partner, "retry": randi()}),
 		"К турниру", func(): main.go("v7tourney"))
 	if res.improved:

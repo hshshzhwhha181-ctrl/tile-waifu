@@ -315,7 +315,7 @@ func _tile(r: Rect2, id: String, title: String, bg: String) -> Control:
 	card.add_child(sl)
 	card.gui_input.connect( func(e):
 		if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT:
-			UI.punch(card, 0.06)
+			UI.tap(card, 0.06, "")
 			_open(id))
 	return card
 

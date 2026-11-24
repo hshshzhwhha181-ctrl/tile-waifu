@@ -29,12 +29,14 @@ const HOURS: = [0.55, 0.32, 0.18, 0.1, 0.07, 0.07, 0.14, 0.38, 0.66, 0.78, 0.8, 
 const FACES: = {
 	"hana_base": [0.52, 0.15, 4.6], "hana_beach": [0.545, 0.225, 4.6], "hana_gym": [0.52, 0.18, 4.6], "hana_street": [0.57, 0.2, 4.6],
 	"hana_winter": [0.47, 0.175, 4.6], "mc_base": [0.51, 0.17, 4.4], "mc_cafe": [0.5, 0.18, 4.4], "mc_cozy": [0.5, 0.18, 4.4],
-	"mc_dragon": [0.46, 0.2, 4.8], "mc_tutor": [0.47, 0.2, 4.6], "nova_base": [0.5, 0.2, 4.8], "nova_offline": [0.5, 0.21, 5.0],
+	"mc_dragon": [0.46, 0.2, 4.8], "nova_base": [0.5, 0.2, 4.8], "nova_offline": [0.5, 0.21, 5.0],
 	"nova_ssr": [0.56, 0.25, 5.2], "rin_after": [0.55, 0.2, 5.0], "rin_agent": [0.5, 0.16, 4.8], "rin_base": [0.48, 0.17, 4.6],
 	"rin_idol": [0.46, 0.19, 4.6], "rin_maid": [0.49, 0.14, 4.6], "rin_yukata": [0.52, 0.14, 4.8], "yue_ball": [0.5, 0.15, 4.8],
 	"yue_base": [0.5, 0.16, 4.8], "yue_duel": [0.5, 0.21, 5.0], "yue_queen": [0.52, 0.18, 4.3],
 }
-const AVATARS: = ["hana_base", "hana_street", "hana_winter", "mc_base", "mc_cafe", "mc_cozy", "mc_dragon", "mc_tutor",
+# HEROINES.md §4-5: mc_base / mc_cafe / mc_cozy and hana_base / hana_street still carry the teen-coded look (white
+# thigh-highs, sneakers, pleats, crop hoodie) until they are redrawn, so no league bot wears them as a face
+const AVATARS: = ["hana_winter", "mc_dragon",
 	"nova_base", "nova_offline", "rin_after", "rin_agent", "rin_base", "rin_idol", "rin_maid", "rin_yukata",
 	"yue_ball", "yue_base", "yue_queen"]
 
@@ -508,7 +510,7 @@ static func my_avatar_img() -> String:
 		if G.S.get("modest", false) and it.get("bold", false) and it.has("alt"):
 			return String(it.alt)
 		if it.has("img"):
-			return String(it.img)
+			return G.item_img(it)
 	return "%s_base" % h
 
 # Round portrait in the gold avatar frame (V8Art.avatar). top = the Dragon/Celestial frame (V8Art.top_tier).

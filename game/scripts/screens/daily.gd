@@ -115,9 +115,17 @@ static func tasks(main, home) -> void :
 		var rw: = Common.chip(row, V8Art.cur("gem"), "%d" % td.gems, Rect2(112, 90, 110, 30), "plum", 17)
 		var done: bool = v >= td.goal
 		var claimed: bool = t.claimed[i]
-		var b: = JButton.make("✓" if claimed else (V6Txt.s("common.claim") if done else V6Txt.s("daily.in_progress")), "mint" if claimed else ("gold" if done else "glass"), Rect2(440, 26, 156, 72), null, 24)
-		b.disabled = claimed or not done
+		# 0.8: only a claimable task gets a button; in-progress and claimed rows show a quiet status, not a CTA
+		if claimed:
+			row.add_child(_task_status(V6Txt.s("daily.claimed"), true))
+			continue
+		if not done:
+			row.add_child(_task_status(V6Txt.s("daily.in_progress") + "\n" + "ещё %d" % (td.goal - v), false))
+			continue
+		var b: = JButton.make(V6Txt.s("common.claim"), "gold", Rect2(440, 26, 156, 72), null, 24)
+		b.shine_every = 2.6
 		var idx: = i
+		var rw_row: = row
 		b.pressed.connect( func():
 			if G.tasks().claimed[idx] or int(G.tasks()[td.key]) < td.goal:
 				return
@@ -127,13 +135,30 @@ static func tasks(main, home) -> void :
 			G.save()
 			main.fly_gems(b.get_global_rect().get_center(), 5)
 			Sfx.play("win", 1.3, -6)
-			b.lbl.text = "✓"
-			b.set_pal("mint")
+			var st: = _task_status(V6Txt.s("daily.claimed"), true)
+			rw_row.add_child(st)
+			UI.pop_in(st, 0.0, 0.7)
+			b.queue_free()
 			if home and home.has_method("refresh_badges"):
 				home.refresh_badges())
 		row.add_child(b)
 	var note: = UI.center_label(UI.label(V6Txt.s("daily.tasks_note"), 17, Color("8a5a7a")), Rect2(0, 492, 660, 28))
 	p.add_child(note)
+
+# status pill in place of a button: jade «Получено ✓» stamp, or a flat «В процессе / ещё N» note
+static func _task_status(text: String, ok: bool) -> Control:
+	var r: = Rect2(440, 26, 156, 72)
+	var c: = UI.rbox("mint" if ok else "glass", r, 20, 2, 6)
+	if not ok:
+		c.colors(Color(0.25, 0.2, 0.28, 0.55), Color(0.18, 0.14, 0.2, 0.55))
+	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var l: = UI.label(text, 18 if not ok else 20, Color.WHITE if ok else Color("e9dcef"), Color("1f5a46") if ok else UI.DARK, 3, "body", 900)
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	l.position = Vector2.ZERO
+	l.size = r.size
+	c.add_child(l)
+	return c
 
 static func calendar(main) -> void :
 	var p: = Common.popup(main, V6Txt.s("daily.cal_t"), 800)
@@ -146,6 +171,16 @@ static func calendar(main) -> void :
 	var days_in: int = [31, 29 if year % 4 == 0 else 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][mi - 1]
 	var today_d: = int(G.today().substr(8, 2))
 	var done: Array = dm.done.map( func(x): return int(x))
+	# 0.8: a day counts as missed only from the save's first day on (profile «created»); days before the player
+	# existed are neutral cells, not a wall of dashes
+	var first_d: = 1
+	var created: = int(G.profile().get("created", 0))
+	if created > 0:
+		var cday: = Time.get_date_string_from_unix_time(created)
+		if cday.substr(0, 7) == month:
+			first_d = int(cday.substr(8, 2))
+		elif cday.substr(0, 7) > month:
+			first_d = today_d
 	var htxt: = "%s %d" % [MONTHS[mi - 1], year]
 	var hl: = UI.center_label(UI.title(htxt, 30, UI.INK, Color.WHITE), Rect2(0, 48, 660, 44))
 	p.add_child(hl)
@@ -162,14 +197,30 @@ static func calendar(main) -> void :
 		var x: = 24.0 + (cell % 7) * (cw + 4)
 		var y: = 122.0 + (cell / 7) * 74
 		var is_done: = d in done
-		var pal: = "mint" if is_done else ("pink" if d == today_d else ("cream" if d < today_d else "glass"))
+		var before: = d < first_d and d < today_d and not is_done
+		var pal: = "mint" if is_done else ("pink" if d == today_d else ("glass" if before else ("cream" if d < today_d else "glass")))
 		var c: = UI.rbox(pal, Rect2(x, y, cw, 66), 14, 2, 4)
 		p.add_child(c)
 		c.add_child(UI.center_label(UI.label(str(d), 20, Color.WHITE if pal in ["pink", "mint"] else UI.INK, Color("7a2346") if pal == "pink" else (Color("1f5e49") if pal == "mint" else Color.WHITE), 3, "body", 900), Rect2(4, 2, 34, 28)))
+		# 0.8: every day says what it is: solved = jade + lit star; missed = faded, a quiet dash; today = pink and
+		# breathing; ahead = an unlit star (the day's star still to win)
 		if is_done:
 			c.add_child(V8Art.star_rect(true, Rect2(36, 22, 44, 44)))
-		elif d > today_d:
-			c.modulate.a = 0.6
+		elif before:
+			c.modulate = Color(1, 1, 1, 0.55)
+		elif d < today_d:
+			c.modulate = Color(0.75, 0.72, 0.78, 0.5)
+			c.add_child(UI.center_label(UI.label("—", 20, UI.MUTED), Rect2(40, 26, 40, 34)))
+		elif d == today_d:
+			c.add_child(V8Art.star_rect(false, Rect2(38, 24, 40, 40)))
+			c.pivot_offset = c.size * 0.5
+			var bt: Tween = c.create_tween().set_loops()
+			bt.tween_property(c, "scale", Vector2(1.06, 1.06), 0.6).set_trans(Tween.TRANS_SINE)
+			bt.tween_property(c, "scale", Vector2.ONE, 0.6).set_trans(Tween.TRANS_SINE)
+		else:
+			var us: = V8Art.star_rect(false, Rect2(42, 30, 32, 32))
+			us.modulate.a = 0.55
+			c.add_child(us)
 	var solved: = done.size()
 	var tr: = UI.rbox("gold", Rect2(24, 576, 612, 86), 22, 3, 8)
 	p.add_child(tr)

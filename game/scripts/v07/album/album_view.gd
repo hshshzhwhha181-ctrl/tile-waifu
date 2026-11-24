@@ -62,6 +62,7 @@ func _build() -> void :
 	for i in TABS.size():
 		var id: String = TABS[i][0]
 		var b: = JButton.make(TABS[i][1], "pink" if id == tab else "graphite", Rect2(30 + i * tw, TABS_Y, tw - 8, 58), null, 22, -1.0, false)
+		Common.tab_paint(b, id == tab)
 		b.pressed.connect( func(): _switch(id))
 		add_child(b)
 		tab_nodes[id] = b
@@ -118,6 +119,7 @@ func _switch(id: String) -> void :
 	for i in TABS.size():
 		var tid: String = TABS[i][0]
 		var b: = JButton.make(TABS[i][1], "pink" if tid == tab else "graphite", Rect2(30 + i * tw, TABS_Y, tw - 8, 58), null, 22, -1.0, false)
+		Common.tab_paint(b, tid == tab)
 		b.pressed.connect( func(): _switch(tid))
 		add_child(b)
 		tab_nodes[tid] = b
@@ -189,6 +191,7 @@ func _on_tap(c: Control, cb: Callable) -> void :
 	c.mouse_filter = Control.MOUSE_FILTER_PASS
 	c.gui_input.connect( func(e):
 		if e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT and not e.pressed and _moved < 14.0:
+			UI.tap(c, 0.04, "")
 			cb.call())
 
 func _button(text: String, pal: String, r: Rect2, cb: Callable, fs: = 20) -> JButton:

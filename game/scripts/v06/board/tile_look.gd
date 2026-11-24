@@ -96,7 +96,8 @@ static func _post(t: Tile) -> void :
 			var m: = ShaderMaterial.new()
 			m.shader = FACE_SHADER
 			m.set_shader_parameter("bevel", tex("tile_bevel"))
-			m.set_shader_parameter("gold", 1.0)
+			# 0.8: the shard tile is ivory like every other face (its portrait sits in a gold ring, shard_face)
+			m.set_shader_parameter("gold", 0.0)
 			_apply_light(m)
 			c.material = m
 

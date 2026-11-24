@@ -43,6 +43,8 @@ func build(m, _args: Dictionary) -> void :
 	add_child(hero)
 	hero.tapped.connect(on_hero_tap)
 	UI.slide_in(hero, Vector2(0, 60), 0.05, 0.6)
+	# 0.8: her legs fade out at the knees under the button cluster (no shoes peeking between the plate and the CTA)
+	Common.floor_fade(self, H - 520.0, H - 150.0)
 	var oid: = G.equipped(G.S.partner)
 	if oid != "":
 
@@ -262,6 +264,9 @@ func _build_right() -> void :
 	league_card = _league_card(Rect2(x, y, CARD_W, 176))
 	UI.slide_in(league_card, Vector2(60, 0), 0.2)
 	y += 176 + 12
+	# 0.8: the column holds two cards at most — the event and the summon banner share the second slot and take
+	# turns, so nothing ever covers her raised hand with the 中 tile (y ≈ 485-520 under the column)
+	var slot2: Array[Control] = []
 	if V7Event.is_open():
 		var def: = V7EventData.cur_def()
 		var ev: = V7EventData.st()
@@ -277,14 +282,14 @@ func _build_right() -> void :
 				UI.punch(c1, 0.06)
 				main.go("v7event"))
 		UI.slide_in(c1, Vector2(60, 0), 0.28)
-		y += 156 + 12
+		slot2.append(c1)
 	if G.summon_open():
 		var nb: Control
 		if int(G.S.newbie_left) > 0:
 			nb = _banner_card(Rect2(x, y, CARD_W, 168), G.art_tex(G.ITEM["o_dragon"]), "−20%", V6Txt.s("home.newbie"), V6Txt.s("home.newbie_sub"), "gold", Vector2(0.5, 0.22))
 			nb.gui_input.connect( func(e):
 				if e is InputEventMouseButton and e.pressed:
-					Sfx.play("pop")
+					UI.tap(nb, 0.06)
 					main.go("summon", {"banner": 0}))
 			if G.S.free10:
 				Common.badge(nb, 0, Vector2(CARD_W - 22, -10))
@@ -296,8 +301,47 @@ func _build_right() -> void :
 					UI.punch(nb, 0.06)
 					main.go("summon", {"banner": 2}))
 		UI.slide_in(nb, Vector2(60, 0), 0.34)
+		slot2.append(nb)
+	_rotate_slot(slot2)
 	G.save()
 	V7Event.show_pending(self, main)
+
+# the second right-column slot: one card shows, the others wait hidden; with two or more they cross-fade every
+# 5 s (a hidden card takes no taps) and two small dots under the slot say there is more than one
+func _rotate_slot(cards: Array[Control]) -> void :
+	if cards.size() < 2:
+		return
+	for i in range(1, cards.size()):
+		cards[i].visible = false
+	var bottom: = 0.0
+	for c in cards:
+		bottom = maxf(bottom, c.position.y + c.size.y)
+	var dots: Array[Control] = []
+	var dx0: = cards[0].position.x + CARD_W * 0.5 - (cards.size() * 16.0 - 6.0) * 0.5
+	for i in cards.size():
+		var d: = UI.rbox("gold", Rect2(dx0 + i * 16.0, bottom + 6.0, 10, 10), 5, 1, 2)
+		d.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		d.modulate.a = 1.0 if i == 0 else 0.4
+		add_child(d)
+		dots.append(d)
+	var at: = [0]
+	var t: = create_tween().set_loops()
+	t.tween_interval(5.0)
+	t.tween_callback( func():
+		var a: Control = cards[at[0]]
+		at[0] = (at[0] + 1) % cards.size()
+		var b: Control = cards[at[0]]
+		if not is_instance_valid(a) or not is_instance_valid(b):
+			return
+		b.modulate.a = 0.0
+		b.visible = true
+		var ft: = a.create_tween()
+		ft.tween_property(a, "modulate:a", 0.0, 0.3)
+		ft.tween_callback(a.hide)
+		ft.tween_property(a, "modulate:a", 1.0, 0.0)
+		b.create_tween().tween_property(b, "modulate:a", 1.0, 0.3)
+		for i in dots.size():
+			dots[i].modulate.a = 1.0 if i == at[0] else 0.4)
 
 func _league_card(r: Rect2) -> Control:
 	var w: = _league_call("my_week")
@@ -396,6 +440,7 @@ func _build_affection() -> void :
 	aff_root.mouse_filter = Control.MOUSE_FILTER_STOP
 	aff_root.gui_input.connect( func(e):
 		if e is InputEventMouseButton and e.pressed:
+			UI.tap(aff_root, 0.06)
 			main.go("room", {"hero": G.S.partner}))
 	aff_root.add_child(V8Art.rect(V8Art.icon("heart"), Rect2(8, 8, 56, 56)))
 	var tw: = r.size.x - 70.0 - 12.0
@@ -436,6 +481,21 @@ func _say(text: String) -> void :
 	t.tween_property(b, "modulate:a", 0.0, 0.3)
 	t.tween_callback(b.queue_free)
 
+# 0.8 (main.toast): home toasts live in the speech-bubble band between the left icon column and the right cards,
+# so they never cover the league / event cards; the bubble steps aside while a toast is up
+func v8_toast_rect() -> Rect2:
+	var x0: = 112.0
+	var x1: = W - CARD_W - 16.0 - 10.0
+	return Rect2(x0, 186.0, x1 - x0, 80.0)
+
+func v8_toast_shown(dur: float) -> void :
+	if bubble and is_instance_valid(bubble):
+		var b: = bubble
+		bubble = null
+		var t: Tween = b.create_tween()
+		t.tween_property(b, "modulate:a", 0.0, 0.12)
+		t.tween_callback(b.queue_free)
+
 func on_hero_tap() -> void :
 	var h: String = G.S.partner
 	if G.pet_left() > 0:
@@ -473,6 +533,10 @@ func dev_act(a: String) -> void :
 			main.android_back()
 		"pet":
 			on_hero_tap()
+		"toast":
+			main.toast("Тайник найден: Особая минута · 2 из 10", "star")
+		"cameo":
+			V7Eggs._cameo(self, "yue", false)
 		"blink":
 			hero.set_process(false)
 			hero.mat.set_shader_parameter("blink", 1.0)

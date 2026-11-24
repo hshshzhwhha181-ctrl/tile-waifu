@@ -33,12 +33,15 @@ static func victory_hook(p, root: Control, st: int, s: float) -> void :
 	var w: float = p.size.x
 	var h: float = p.size.y
 	var by: = h - 150.0 - 76.0
-	if V7Replay.has_log(p.board):
-		var rb: = JButton.make("Повтор", "graphite", Rect2(w * 0.5 - 230, by, 220, 62), V8Art.icon("undo"), 22)
+	# 0.8 widths follow the result window's column grid (play.V8_RES_COL1 = 250, gap 10): «Повтор» over the
+	# secondary button, «Фото» starting where the primary CTA starts
+	var has_rb: bool = V7Replay.has_log(p.board)
+	if has_rb:
+		var rb: = JButton.make("Повтор", "graphite", Rect2(w * 0.5 - 230, by, 250, 62), V8Art.icon("undo"), 22)
 		rb.pressed.connect( func(): V7Replay.run(p, root))
 		root.add_child(rb)
 		UI.pop_in(rb, 1.1)
-	var fb: = JButton.make("Фото", "graphite", Rect2(w * 0.5 + 10, by, 220, 62), null, 22)
+	var fb: = JButton.make("Фото", "graphite", Rect2(w * 0.5 + 10, by, 190 if has_rb else 250, 62), null, 22)
 	fb.pressed.connect( func(): V7Photo.open(p, root, st, s))
 	root.add_child(fb)
 	UI.pop_in(fb, 1.15)
@@ -56,12 +59,12 @@ static func victory_hook(p, root: Control, st: int, s: float) -> void :
 		hit.mouse_filter = Control.MOUSE_FILTER_STOP
 		hit.gui_input.connect( func(e):
 			if e is InputEventMouseButton and e.pressed:
-				Sfx.play("pop")
+				UI.tap(ch, 0.05)
 				V7AlbumView.open(p.main, "stamps"))
 		ch.add_child(hit)
 		UI.pop_in(ch, 1.3)
 		if V7Album.claimable() > 0:
-			Common.badge(ch, 0, Vector2(486, -10))
+			Common.badge(ch, V7Album.claimable(), Vector2(486, -10))
 
 	var dw: = String(V7Album.dev.get("win", ""))
 	if dw != "":

@@ -29,18 +29,18 @@ var save_ok: = true
 var _main_ok: = false
 
 const HEROES: = {
-	"mc": {"name": "Маджонг-тян", "title": "Хозяйка «Пяти ветров»", "color": Color("ff8fb8")}, 
-	"rin": {"name": "Рин", "title": "Мастер чая", "color": Color("b48cff")}, 
-	"hana": {"name": "Хана", "title": "Капитан эстафеты", "color": Color("ffb35c")}, 
-	"yue": {"name": "Юэ", "title": "Лунная принцесса", "color": Color("8fb4ff")}, 
-	"nova": {"name": "Нова", "title": "Нетраннер", "color": Color("4fe3ff")}, 
+	"mc": {"name": "Маджонг-тян", "title": "Хозяйка салона, 26 лет", "age": "26 лет", "job": "хозяйка салона «Пять ветров»", "color": Color("ff8fb8")}, 
+	"rin": {"name": "Рин", "title": "Мастер чая, 27 лет", "age": "27 лет", "job": "мастер чая, хозяйка «Ледяного павильона»", "color": Color("4fbf9f")}, 
+	"hana": {"name": "Хана", "title": "Тренер, 24 года", "age": "24 года", "job": "тренер спорткомплекса и капитан фонарной эстафеты", "color": Color("ffb35c")}, 
+	"yue": {"name": "Юэ", "title": "Царица луны, на вид 27", "age": "на вид 27", "job": "правительница Лунного дворца", "color": Color("c8b6ff")}, 
+	"nova": {"name": "Нова", "title": "Белый хакер, 23 года", "age": "23 года", "job": "специалист по кибербезопасности и гонщица", "color": Color("4fe3ff")}, 
 }
 const HERO_ORDER: = ["mc", "rin", "hana", "yue", "nova"]
 
 
 var ITEMS: = [
 	{"id": "o_base", "cat": "outfit", "hero": "mc", "rar": "R", "name": "Ципао наставницы", "img": "mc_base", "start": true}, 
-	{"id": "o_tutor", "cat": "outfit", "hero": "mc", "rar": "SR", "name": "Репетитор после уроков", "img": "mc_tutor"}, 
+	{"id": "o_tutor", "cat": "outfit", "hero": "mc", "rar": "SR", "name": "Лектор салона", "img": "mc_tutor", "alt": "mc_base", "nogacha": true, "hidden": true}, 
 	{"id": "o_cafe", "cat": "outfit", "hero": "mc", "rar": "SR", "name": "Официантка чайной", "img": "mc_cafe"}, 
 	{"id": "o_dragon", "cat": "outfit", "hero": "mc", "rar": "SSR", "name": "Императрица дракона", "img": "mc_dragon"}, 
 	{"id": "r_base", "cat": "outfit", "hero": "rin", "rar": "R", "name": "Мастер чая", "img": "rin_base"}, 
@@ -50,8 +50,8 @@ var ITEMS: = [
 	{"id": "r_idol", "cat": "outfit", "hero": "rin", "rar": "SSR", "name": "Звёздная айдол", "img": "rin_idol"}, 
 	{"id": "h_base", "cat": "outfit", "hero": "hana", "rar": "R", "name": "Спортивный стиль", "img": "hana_base"}, 
 	{"id": "h_street", "cat": "outfit", "hero": "hana", "rar": "SR", "name": "Уличный раннер", "img": "hana_street"}, 
-	{"id": "h_beach", "cat": "outfit", "hero": "hana", "rar": "SR", "name": "Летний пляж", "img": "hana_beach", "bold": true, "alt": "hana_base"}, 
-	{"id": "h_gym", "cat": "outfit", "hero": "hana", "rar": "SSR", "name": "Чемпионка зала", "img": "hana_gym", "bold": true, "alt": "hana_street"}, 
+	{"id": "h_beach", "cat": "outfit", "hero": "hana", "rar": "SR", "name": "Летний пляж", "img": "hana_beach", "bold": true, "alt": "hana_winter"}, 
+	{"id": "h_gym", "cat": "outfit", "hero": "hana", "rar": "SSR", "name": "Чемпионка зала", "img": "hana_gym", "bold": true, "alt": "hana_winter"}, 
 	{"id": "y_base", "cat": "outfit", "hero": "yue", "rar": "SR", "name": "Лунная принцесса", "img": "yue_base"}, 
 	{"id": "y_duel", "cat": "outfit", "hero": "yue", "rar": "SSR", "name": "Драконья дуэлянтка", "img": "yue_duel", "bold": true, "alt": "yue_base"}, 
 	{"id": "y_queen", "cat": "outfit", "hero": "yue", "rar": "SSR", "name": "Королева лунной ночи", "img": "yue_queen"}, 
@@ -430,6 +430,7 @@ func _process(dt: float) -> void :
 func _ready() -> void :
 	for it in ITEMS:
 		ITEM[it.id] = it
+	_collect_hidden_items()
 	_build_levels()
 	demo = "--demo" in OS.get_cmdline_user_args()
 	rng.randomize()
@@ -517,7 +518,44 @@ func default_state() -> Dictionary:
 		"profile": new_profile(), "profile_done": false, "stats": {},
 	}
 
+# Compliance wave 0 (docs/HEROINES.md §6): an item marked "hidden" is retired — never sold, pulled,
+# put on a banner or listed. It stays in ITEM (lookup, equip), and ITEMS — the list the wardrobe,
+# album counters, shop and gacha pools iterate — carries it only while the current save owns it.
+var _hidden_items: = []
+
+
+func _collect_hidden_items() -> void :
+	_hidden_items.clear()
+	for i in ITEMS.size():
+		if ITEMS[i].get("hidden", false):
+			_hidden_items.append([i, ITEMS[i]])
+
+
+func sync_hidden_items() -> void :
+	var owned = S.get("owned", {})
+	var missing: = 0
+	for h in _hidden_items:
+		var it: Dictionary = h[1]
+		var at: = -1
+		for i in ITEMS.size():
+			if ITEMS[i].id == it.id:
+				at = i
+				break
+		var own: bool = owned is Dictionary and owned.has(it.id)
+		if own and at < 0:
+			ITEMS.insert(clampi(int(h[0]) - missing, 0, ITEMS.size()), it)
+		elif not own and at >= 0:
+			ITEMS.remove_at(at)
+		if not own:
+			missing += 1
+
+
 func load_game() -> void :
+	_load_game()
+	sync_hidden_items()
+
+
+func _load_game() -> void :
 	S = default_state()
 	loaded_from = ""
 	_main_ok = false
@@ -574,6 +612,7 @@ func apply_state(d: Dictionary) -> bool:
 	if not (S.get("stars") is Dictionary) or not (S.get("owned") is Dictionary):
 		S = prev
 		return false
+	sync_hidden_items()
 	return true
 
 
@@ -656,10 +695,13 @@ func level_stars(i: int) -> int:
 func owns(id: String) -> bool:
 	return S.owned.has(id)
 
+# a duplicate pull turns into this many crystals (summon shows it on the card)
+const DUP_GEMS: = 25
+
 func give(id: String) -> bool:
 
 	if owns(id):
-		S.gems += 25
+		S.gems += DUP_GEMS
 		return false
 	S.owned[id] = true
 	return true
@@ -670,9 +712,16 @@ func add_aff(hero: String, n: int) -> void :
 func aff_level(hero: String) -> int:
 	return 1 + int(S.aff.get(hero, 0)) / 100
 
+# the outfit image an item actually shows: a retired (hidden) item never shows its own art, even to a save that
+# owns it (o_tutor: HEROINES.md §6) — it draws its "alt" until it is redrawn
+func item_img(it: Dictionary) -> String:
+	if it.get("hidden", false) and it.has("alt"):
+		return String(it.alt)
+	return String(it.get("img", ""))
+
 func item_tex(it: Dictionary) -> Texture2D:
 	if it.has("img"):
-		return load("res://assets/outfits/%s.webp" % it.img)
+		return load("res://assets/outfits/%s.webp" % item_img(it))
 	if it.has("tile"):
 		return tile_tex(it.tile)
 	if it.has("bg"):
@@ -804,9 +853,33 @@ func roll() -> String:
 		return "SR"
 	return "R"
 
-func pull(n: int, banner: Dictionary) -> Array:
+# one item from pool that this pull has not drawn yet (unowned ones first when prefer_new); once every item in it
+# has come up the pool starts a new pass (so 8 R cards from 5 R items are 5 + 3 different ones, never 4× one item)
+func _draw_fresh(pool: Array, drawn: Dictionary, prefer_new: bool) -> Dictionary:
+	var left: = pool.filter( func(x): return not drawn.has(x.id))
+	if left.is_empty():
+		# every item of this pool came up once: start a fresh pass, again without replacement, and not with the
+		# item that closed the last pass (no two of the same card side by side)
+		for x in pool:
+			drawn.erase(x.id)
+		var last: = String(drawn.get("_last", ""))
+		left = pool.filter( func(x): return x.id != last) if pool.size() > 1 else pool
+	if prefer_new:
+		var fresh: = left.filter( func(x): return not owns(x.id))
+		if not fresh.is_empty():
+			left = fresh
+	var it: Dictionary = left[rng.randi() % left.size()]
+	drawn["_last"] = it.id
+	return it
+
+func pull(n: int, banner: Dictionary, gifted: bool = false) -> Array:
 	var res: = []
 	var newbie: bool = banner.get("newbie", false)
+	# 0.8: inside one pull R and SR items are drawn without replacement (the pool refills only when it runs dry),
+	# and the player's first 10-pull prefers pieces they do not own yet, so a gifted 10-pull is not three of the
+	# same background
+	var first: bool = n == 10 and (gifted or newbie or int(S.pulls) == 0)
+	var drawn: = {}
 	for i in n:
 		var rar: = roll()
 		if demo_force_ssr and n == 10 and i == 6:
@@ -820,8 +893,8 @@ func pull(n: int, banner: Dictionary) -> Array:
 				rar = "SSR"
 				S.pity = 0
 				S.newbie_ssr = true
-		var pool: = ITEMS.filter( func(x): return x.rar == rar and not x.get("start", false) and not x.get("nogacha", false))
-		var it: Dictionary = pool[rng.randi() % pool.size()]
+		var pool: = ITEMS.filter( func(x): return x.rar == rar and not x.get("start", false) and not x.get("nogacha", false) and not x.get("hidden", false))
+		var it: Dictionary = _draw_fresh(pool, drawn, first)
 		if rar == "SSR":
 			if newbie:
 				pool = pool.filter( func(x): return x.cat == "outfit")
@@ -833,6 +906,7 @@ func pull(n: int, banner: Dictionary) -> Array:
 				var off: = pool.filter( func(x): return x.id != banner.item)
 				it = off[rng.randi() % off.size()]
 				S.guar = true
+		drawn[it.id] = true
 		var is_new: = give(it.id)
 		var r: = it.duplicate()
 		r["new"] = is_new

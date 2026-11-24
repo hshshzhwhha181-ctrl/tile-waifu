@@ -443,6 +443,8 @@ func _climb_over(by_choice: bool) -> void :
 			break
 	v8_res_avatars(ctx, run.bless.keys().map( func(id): return V6ModesData.BLESS[id].hero), 56.0)
 	v8_res_rank(ctx, ra)
+	# 0.8: her face on the result: a new climb record amazes her, a run lost on its last lantern saddens her
+	ctx["emo"] = "surprised" if reached > 0 and reached >= best else (V8Art.win_emotion(partner) if by_choice else "sad")
 	v8_res_close(ctx, partner, "Новое восхождение", func(): main.go("arena", {"mode": "climb", "partner": G.S.level_partner, "retry": randi()}),
 		"К режимам", func(): main.go("modes"))
 
@@ -536,6 +538,7 @@ func _etude_clear() -> void :
 			main.go("modes", {"open": "etude"})
 		else:
 			main.go("arena", {"mode": "etude", "etude": etude_i + 1, "partner": partner})
+	ctx["emo"] = V8Art.win_emotion("mc") if stars >= 2 else ("happy" if stars == 1 else "pout")
 	v8_res_close(ctx, "mc", "Следующий этюд" if not last else "К этюдам", go_next,
 		"Ещё раз", func(): main.go("arena", {"mode": "etude", "etude": etude_i, "partner": partner, "retry": randi()}))
 	if gems > 0:
@@ -855,6 +858,7 @@ func _shift_end() -> void :
 	v8_res_line(ctx, "Твои героини дают чаевые ×1,5", 17, Color("cbb5dc"), 2.0)
 	v8_res_avatars(ctx, V6ModesData.GUESTS, 56.0, func(h): return "gold" if G.hero_unlocked(String(h)) else "plum")
 	v8_res_rank(ctx, sa)
+	ctx["emo"] = "surprised" if record else (V8Art.win_emotion(partner) if served > missed else "pout")
 	v8_res_close(ctx, partner, "Новая смена", func(): main.go("arena", {"mode": "shift", "partner": partner, "retry": randi()}),
 		"К режимам", func(): main.go("modes"))
 	if tips > 0:

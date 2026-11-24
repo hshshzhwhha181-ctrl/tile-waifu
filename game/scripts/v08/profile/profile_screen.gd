@@ -40,6 +40,16 @@ func build(m, args: Dictionary) -> void :
 	list.custom_minimum_size = Vector2(cw, 0)
 	list.add_theme_constant_override("separation", 14)
 	scroll.add_child(list)
+	Common.scroll_fade(scroll, list, 90.0, 0.6)
+	# 0.8: the edges where the list runs under the header and into the nav bar are solid for one text line, then
+	# soft: a tall section scrolled half out never shows a cut line of text. A 24 px lead spacer (and the 60 px
+	# tail pad) keep the sections clear of the solid parts at rest and at the end of the scroll.
+	Common.edge_shade(self, Rect2(0, top - 6, W, 62), 1, Color(0.07, 0.05, 0.07), 0.97, 0.45)
+	Common.edge_shade(self, Rect2(0, bottom - 72, W, 72), -1, Color(0.07, 0.05, 0.07), 0.97, 0.4)
+	var lead: = Control.new()
+	lead.custom_minimum_size = Vector2(cw, 10)
+	lead.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	list.add_child(lead)
 	_identity()
 	_rank()
 	_league()

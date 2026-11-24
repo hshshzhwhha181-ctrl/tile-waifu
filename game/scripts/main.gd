@@ -109,6 +109,16 @@ func _splash() -> void :
 	hero.interactive = false
 	sp.add_child(hero)
 	UI.slide_in(hero, Vector2(0, 120), 0.4, 0.9)
+	# 0.8: she is cropped at the knee by a soft dark fade that is solid under the «Играть» plate and the version
+	# line, so no legs or shoes show below the CTA (or below the profile-card modal over this screen)
+	var ff: = Common.floor_fade(sp, H - 470.0, H - 290.0, Color(0.08, 0.03, 0.12), 0.96)
+	ff.name = "TitleFade"
+	var fb: = ColorRect.new()
+	fb.color = Color(0.08, 0.03, 0.12, 0.96)
+	fb.position = Vector2(0, H - 290.0)
+	fb.size = Vector2(W, 290.0)
+	fb.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	sp.add_child(fb)
 	var logo: = V8Art.rect(V8Art.misc("logo"), Rect2(W * 0.5 - 270, H * 0.04, 540, 306))
 	logo.pivot_offset = Vector2(270, 153)
 	sp.add_child(logo)
@@ -273,6 +283,8 @@ func settings() -> void :
 	p.add_child(sl)
 	var fb: = JButton.make(V6Txt.s("settings.side_f"), "pink" if G.S.side == "f" else "glass", Rect2(220, 732, 196, 64), null, 22, -1.0, false)
 	var mb: = JButton.make(V6Txt.s("settings.side_m"), "glass", Rect2(428, 732, 200, 64), null, 20, -1.0, false)
+	Common.tab_paint(fb, G.S.side == "f")
+	Common.tab_paint(mb, false)
 	fb.pressed.connect( func():
 		G.S.side = "f"
 		G.save())
@@ -875,7 +887,38 @@ func toast(text: String, icon: = "") -> void :
 				ft.tween_callback(c.queue_free)
 			else:
 				y = maxf(y, float(c.get_meta("v8_toast")) + 82.0)
-	var p: = UI.rbox("plum", Rect2((W - w) * 0.5, y, w, 70), 35, 3, 12)
+	var x: = (W - w) * 0.5
+	var th: = 70.0
+	# 0.8: a toast never covers a modal's ribbon or body: with a popup open it goes into the free band under the
+	# panel (or above the ribbon when the panel reaches the bottom). Without one, a screen may give its own slot
+	# (home: the speech-bubble band left of the cards; the bubble steps aside while the toast is up).
+	var pop_r: = _open_popup_rect()
+	if not in_match and pop_r.size != Vector2.ZERO:
+		var vh: = get_viewport_rect().size.y
+		var nav_top: = vh - 150.0 if navbar and navbar.visible else vh - 24.0
+		if pop_r.end.y + 16.0 + th <= nav_top:
+			y = pop_r.end.y + 16.0
+		else:
+			y = maxf(V8Header.CONTENT_Y * 0.5, pop_r.position.y - 46.0 - th - 10.0)
+		for c in overlay.get_children():
+			if c.has_meta("v8_toast") and not c.is_queued_for_deletion() and not c.has_meta("fading"):
+				c.set_meta("fading", true)
+				var ft2: Tween = c.create_tween()
+				ft2.tween_property(c, "modulate:a", 0.0, 0.12)
+				ft2.tween_callback(c.queue_free)
+	elif not in_match and screen and is_instance_valid(screen) and screen.has_method("v8_toast_rect"):
+		var sr: Rect2 = screen.v8_toast_rect()
+		if sr.size != Vector2.ZERO:
+			x = sr.position.x
+			w = sr.size.x
+			th = sr.size.y
+			y = sr.position.y
+			for c in overlay.get_children():
+				if c.has_meta("v8_toast") and not c.is_queued_for_deletion() and not c.has_meta("fading"):
+					y = maxf(y, float(c.get_meta("v8_toast")) + th + 10.0)
+			if screen.has_method("v8_toast_shown"):
+				screen.v8_toast_shown(2.6)
+	var p: = UI.rbox("plum", Rect2(x, y, w, th), 35, 3, 12)
 	p.set_param("border_top", Color("ffe7a6")).set_param("border_bottom", Color("c58a2c"))
 	p.set_meta("v8_toast", y)
 	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -887,11 +930,13 @@ func toast(text: String, icon: = "") -> void :
 	var fs: = 22
 	if UI.font("body", 800).get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > (w - x0 - 16) * 2.0:
 		fs = 19
+	if w < 480.0:
+		fs = mini(fs, 19)
 	var l: = UI.label(text, fs, Color.WHITE, Color(0.2, 0.05, 0.2), 3)
 	# wrap mode first: a Label sized before autowrap is on keeps the one-line width and runs past the pill
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	l.position = Vector2(x0, 0)
-	l.size = Vector2(w - x0 - 16, 70)
+	l.size = Vector2(w - x0 - 16, th)
 	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	p.add_child(l)
@@ -902,6 +947,16 @@ func toast(text: String, icon: = "") -> void :
 	t.tween_property(p, "modulate:a", 0.0, 0.3)
 	t.tween_callback(p.queue_free)
 
+
+# the panel of the topmost open Common.popup (its ribbon pokes ~40 px above), or an empty rect
+func _open_popup_rect() -> Rect2:
+	for i in range(overlay.get_child_count() - 1, -1, -1):
+		var c: = overlay.get_child(i)
+		if c.has_meta("popup") and not c.is_queued_for_deletion() and c is Control and (c as Control).visible:
+			for k in c.get_children():
+				if k is RBox and k.has_meta("root"):
+					return Rect2((k as Control).position, (k as Control).size)
+	return Rect2()
 
 func fly_gems(from: Vector2, n: int) -> void :
 	for i in min(n, 8):

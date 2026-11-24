@@ -735,60 +735,84 @@ func open_card(i: int) -> void :
 			UI.pop_in(s, 0.1 + q * 0.08, 0.3)
 	y += 84.0
 
-	var pb: = UI.rbox("glass", Rect2(30, y, 600, 370), 26, 3, 8)
-	pb.borders(look.accent.lerp(Color.WHITE, 0.3), look.deep)
+	var n_pos: = TrayBoard.gen_layout(lv.duplicate(true)).size()
+	var nt: = n_pos - n_pos % 2
+	# 0.8: every info tag is the same graphite chip; a small coloured dot says what kind of tag it is
+	var tags: Array = [["%d фишек" % nt, Color("f2e6d0")], [V6Layouts.shape_name(lv.shape), Color("c8b6ff")]]
+	if lv.gold > 0:
+		tags.append(["Золото", Color("ffd34d")])
+	if lv.ice > 0:
+		tags.append(["Лёд", Color("8fd8ff")])
+	if lv.hidden:
+		tags.append(["Тайные", Color("d08cff")])
+	if lv.get("upper", "") != "":
+		tags.append([V6Layouts.UPPER_NAMES.get(lv.upper, ""), Color("7fe0b4")])
+	tags.append(["%d слоёв" % lv.layers if lv.layers >= 5 else "%d слоя" % lv.layers, Color("e9a8c4")])
+	if int(lv.hard) > 0:
+		tags.append([_t("levels.hard%d" % lv.hard, G.HARD_NAMES[lv.hard]), Color("ff6f7f")])
+	# the preview takes the height the popup has left over (tags may wrap to a second row), so there is no dead
+	# band above the buttons
+	var tag_rows: = 1
+	var tx: = 30.0
+	for tg in tags:
+		var tw0: float = UI.font("body", 900).get_string_size(tg[0], HORIZONTAL_ALIGNMENT_LEFT, -1, 18).x + 50.0
+		if tx + tw0 > 630.0:
+			tx = 30.0
+			tag_rows += 1
+		tx += tw0 + 8.0
+	var pv_h: = clampf((ph - 122.0 - 18.0) - y - 12.0 - (tag_rows * 46.0 + 8.0) - 64.0, 280.0, 440.0)
+	# 0.8: the layout preview sits on this chapter's table (the board's own felt-and-frame shader and colours) and
+	# its tiles use the tile-back art, so it reads as the board the player is about to sit at
+	var pb: = Control.new()
+	pb.position = Vector2(30, y)
+	pb.size = Vector2(600, pv_h)
+	pb.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	p.add_child(pb)
+	_felt(pb, String(G.LOCS[w].bg), Rect2(Vector2.ZERO, pb.size))
 	var pv: = V6LayoutPreview.new()
-	pv.position = Vector2(20, 14)
-	pv.size = Vector2(560, 300)
+	pv.position = Vector2(34, 30)
+	pv.size = Vector2(532, pv_h - 60.0)
 	pb.add_child(pv)
 	pv.setup(lv.duplicate(true), look.accent)
-	var nt: = pv.pos.size() - pv.pos.size() % 2
-	Common.chip(pb, null, "%d фишек" % nt, Rect2(14, 322, 150, 36), "plum", 17)
-	y += 382.0
+	y += pv_h + 12.0
 
-	var tags: Array = [[V6Layouts.shape_name(lv.shape), "lav"]]
-	if lv.gold > 0:
-		tags.append(["Золото", "gold"])
-	if lv.ice > 0:
-		tags.append(["Лёд", "sky"])
-	if lv.hidden:
-		tags.append(["Тайные", "plum"])
-	if lv.get("upper", "") != "":
-		tags.append([V6Layouts.UPPER_NAMES.get(lv.upper, ""), "mint"])
-	tags.append(["%d слоёв" % lv.layers if lv.layers >= 5 else "%d слоя" % lv.layers, "plum"])
-	if int(lv.hard) > 0:
-		tags.append([_t("levels.hard%d" % lv.hard, G.HARD_NAMES[lv.hard]), "red"])
 	var x: = 30.0
 	var ty: = y
 	for tg in tags:
-		var tw: float = UI.font("body", 900).get_string_size(tg[0], HORIZONTAL_ALIGNMENT_LEFT, -1, 18).x + 34.0
+		var tw: float = UI.font("body", 900).get_string_size(tg[0], HORIZONTAL_ALIGNMENT_LEFT, -1, 18).x + 50.0
 		if x + tw > 630.0:
 			x = 30.0
 			ty += 46.0
-		var ch: = UI.rbox(tg[1], Rect2(x, ty, tw, 38), 19, 2, 4)
+		var ch: = UI.rbox("graphite", Rect2(x, ty, tw, 38), 19, 2, 4)
+		ch.borders(Color("ffe7a6").darkened(0.15), Color("6a4a20"))
 		p.add_child(ch)
-		var light: bool = tg[1] in ["gold", "sky", "mint", "lav"]
-		ch.add_child(UI.center_label(UI.label(tg[0], 18, Color("3a1a30") if light else Color.WHITE, Color(1, 1, 1, 0.5) if light else UI.DARK, 2, "body", 900), Rect2(0, 0, tw, 38)))
+		var dot: = UI.rbox("gold", Rect2(14, 13, 12, 12), 6, 1, 2)
+		dot.colors(tg[1].lightened(0.25), tg[1].darkened(0.2))
+		ch.add_child(dot)
+		ch.add_child(UI.center_label(UI.label(tg[0], 18, Color("f6ecdc"), UI.DARK, 2, "body", 900), Rect2(30, 0, tw - 40, 38)))
 		x += tw + 8.0
-	y = ty + 56.0
+	y = ty + 54.0
 
+	# 0.8: the reward row is one chip style: crystals, the item, «Осколок · Рин» with her portrait inside its chip
 	var rl: = UI.label("Награда", 18, Color("cbb5dc"), UI.DARK, 2, "body", 900)
 	rl.position = Vector2(34, y + 14)
 	p.add_child(rl)
-	Common.chip(p, V8Art.cur("gem"), str(lv.reward.gems), Rect2(130, y, 150, 52), "plum", 22)
-	var rx: = 296.0
+	Common.chip(p, V8Art.cur("gem"), str(lv.reward.gems), Rect2(130, y, 130, 52), "plum", 22)
+	var rx: = 272.0
 	if lv.reward.has("item"):
 		var itd: Dictionary = G.ITEM[lv.reward.item]
-		var ib: = UI.rbox("gold" if not G.owns(itd.id) else "plum", Rect2(rx, y - 2, 56, 56), 14, 3, 4)
+		var ib: = UI.rbox("plum", Rect2(rx, y, 64, 52), 26, 3, 8)
+		ib.borders(Color("ffe7a6"), Color("c58a2c"))
 		p.add_child(ib)
-		ib.add_child(UI.tex(G.item_tex(itd), Rect2(5, 5, 46, 46)))
-		rx += 66.0
+		ib.add_child(UI.tex(G.item_tex(itd), Rect2(12, 6, 40, 40)))
+		rx += 76.0
 	var sh_h: String = lv.shard
-	p.add_child(Common.avatar(sh_h, Rect2(rx, y - 2, 56, 56), "pink"))
-	var shl: = UI.label("осколок\n%s" % G.HEROES[sh_h].name, 16, UI.INK, UI.DARK, 2, "body", 900)
-	shl.position = Vector2(rx + 62, y)
-	p.add_child(shl)
+	var sc: = Common.chip(p, null, "Осколок · %s" % G.HEROES[sh_h].name, Rect2(rx, y, 630.0 - rx, 52), "plum", 20)
+	sc.add_child(Common.avatar(sh_h, Rect2(4, 4, 44, 44), "gold"))
+	var scl: Label = sc.get_node("L")
+	scl.position.x = 56.0
+	scl.size.x = sc.size.x - 66.0
+	y += 64.0
 
 	var skin_btn: = JButton.make(_t("levels.skins", "Фишки"), "lav", Rect2(30, ph - 122, 190, 92), G.tile_tex(G.ITEM[G.S.get("skin", "s_sakura")].tile), 22)
 	skin_btn.pressed.connect( func(): Common.skin_picker(main, func(): pass))
@@ -799,6 +823,35 @@ func open_card(i: int) -> void :
 		Common.close_popup(p)
 		pick_partner(i))
 	p.add_child(go)
+
+# the board table under the level-card preview: V6BoardTable's felt / frame shader with this chapter's theme
+func _felt(parent: Control, bg: String, r: Rect2) -> void :
+	var th: Dictionary = V6BoardTable.theme_for(bg)
+	var m: = 8.0
+	var cr: = ColorRect.new()
+	cr.position = r.position - Vector2(m, m)
+	cr.size = r.size + Vector2(m, m) * 2.0
+	cr.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var mat: = ShaderMaterial.new()
+	mat.shader = V6BoardTable.SHADER
+	cr.material = mat
+	mat.set_shader_parameter("size", cr.size)
+	mat.set_shader_parameter("margin", m)
+	mat.set_shader_parameter("frame_w", 14.0)
+	mat.set_shader_parameter("radius", 22.0)
+	mat.set_shader_parameter("noise", load("res://assets/v06/board/table_noise.png"))
+	for key in ["frame_a", "frame_b", "trim", "mat_a", "mat_b", "pat_col"]:
+		mat.set_shader_parameter(key, th[key])
+	mat.set_shader_parameter("pat_alpha", th.pat_alpha)
+	mat.set_shader_parameter("pattern", th.pattern)
+	mat.set_shader_parameter("pat_scale", th.pat_scale * 0.6)
+	mat.set_shader_parameter("fibre", th.fibre)
+	mat.set_shader_parameter("neon", th.get("neon", 0.0))
+	var lc: Color = th.lamp_col
+	mat.set_shader_parameter("lamp_col", Vector3(lc.r, lc.g, lc.b))
+	mat.set_shader_parameter("lamp_k", th.lamp_k)
+	mat.set_shader_parameter("t", G.time)
+	parent.add_child(cr)
 
 func pick_skin() -> void :
 	Common.skin_picker(main, func(): pass)
@@ -856,7 +909,7 @@ func pick_partner(level: int) -> void :
 		partner_rows[h] = row
 		row.gui_input.connect( func(e):
 			if e is InputEventMouseButton and e.pressed:
-				Sfx.play("pop")
+				UI.tap(row, 0.04)
 				cur_h[0] = h
 				Sfx.say(h, "greet")
 				for k in partner_rows:

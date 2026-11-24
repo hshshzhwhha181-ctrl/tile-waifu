@@ -398,6 +398,108 @@ static func chip(parent: Control, icon: Texture2D, text: String, rect: Rect2, pa
 	b.add_child(l)
 	return b
 
+# 0.8: a soft floor shadow over the lower part of a standing heroine, under the bottom button cluster: her legs
+# fade out at the knees into the band of buttons instead of showing shoes between them (home, room)
+static func floor_fade(parent: Control, y0: float, y1: float, col: = Color(0.07, 0.045, 0.07), a: = 0.9) -> TextureRect:
+	var g: = Gradient.new()
+	g.offsets = PackedFloat32Array([0.0, 0.55, 1.0])
+	g.colors = PackedColorArray([Color(col, 0.0), Color(col, a * 0.7), Color(col, a)])
+	var gt: = GradientTexture2D.new()
+	gt.gradient = g
+	gt.fill_from = Vector2(0, 0)
+	gt.fill_to = Vector2(0, 1)
+	gt.width = 4
+	gt.height = 128
+	var tr: = TextureRect.new()
+	tr.texture = gt
+	tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	tr.stretch_mode = TextureRect.STRETCH_SCALE
+	tr.position = Vector2(0, y0)
+	tr.size = Vector2(parent.size.x, y1 - y0)
+	tr.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	tr.name = "FloorFade"
+	parent.add_child(tr)
+	return tr
+
+# 0.8: soft edges for a scroll list (any background: no overlay colour to match). Each row of `list` fades by how
+# much of it is cut off at the top or bottom edge of the scroll, so no hard half-row ever sits under a header.
+# `delay` lets a screen's own fade-in of the first rows finish before the edge fade takes over modulate.
+static func scroll_fade(scroll: ScrollContainer, list: Control, ref_h: = 80.0, delay: = 0.0) -> void :
+	var tick: = func():
+		if not is_instance_valid(scroll) or not is_instance_valid(list):
+			return
+		var vt: = float(scroll.scroll_vertical)
+		var vh: = scroll.size.y
+		for c in list.get_children():
+			if not (c is Control) or not (c as Control).visible:
+				continue
+			var cc: Control = c
+			var top: = cc.position.y - vt
+			var bot: = top + cc.size.y
+			var ref: = minf(cc.size.y, ref_h)
+			if ref <= 1.0:
+				continue
+			var vis: = minf(bot, vh) - maxf(top, 0.0)
+			var a: = 1.0
+			if top < 0.0 or bot > vh:
+				a = clampf(vis / ref, 0.0, 1.0)
+				a = a * a * (3.0 - 2.0 * a)
+			cc.modulate.a = a
+	var start: = func():
+		if not is_instance_valid(scroll):
+			return
+		scroll.get_v_scroll_bar().value_changed.connect( func(_v): tick.call())
+		scroll.resized.connect(tick)
+		list.resized.connect(tick)
+		tick.call()
+	if delay > 0.0:
+		scroll.get_tree().create_timer(delay).timeout.connect(start)
+	else:
+		start.call_deferred()
+
+# a soft shadow strip under a header / above a footer over a scroll list: tall sections that scroll under the
+# header fade into it instead of showing a half-cut line of text. dir 1 = dark at the top, -1 = dark at the bottom
+# `hold` > 0 keeps the strip at full `a` for that share of its height first (it covers a whole text line there)
+static func edge_shade(parent: Control, r: Rect2, dir: = 1, col: = Color(0.07, 0.05, 0.07), a: = 0.92, hold: = 0.0) -> TextureRect:
+	var g: = Gradient.new()
+	if hold > 0.0:
+		g.offsets = PackedFloat32Array([0.0, hold, hold + (1.0 - hold) * 0.45, 1.0])
+		g.colors = PackedColorArray([Color(col, a), Color(col, a), Color(col, a * 0.55), Color(col, 0.0)])
+	else:
+		g.offsets = PackedFloat32Array([0.0, 0.45, 1.0])
+		g.colors = PackedColorArray([Color(col, a), Color(col, a * 0.55), Color(col, 0.0)])
+	var gt: = GradientTexture2D.new()
+	gt.gradient = g
+	gt.fill_from = Vector2(0, 0) if dir > 0 else Vector2(0, 1)
+	gt.fill_to = Vector2(0, 1) if dir > 0 else Vector2(0, 0)
+	gt.width = 4
+	gt.height = 64
+	var tr: = TextureRect.new()
+	tr.texture = gt
+	tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	tr.stretch_mode = TextureRect.STRETCH_SCALE
+	tr.position = r.position
+	tr.size = r.size
+	tr.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	parent.add_child(tr)
+	return tr
+
+# 0.8: one «selected» look for every tab bar and segmented choice: pink lacquer pill, gold rim, white caption.
+# Unselected: the quiet glass pill. (Jade stays reserved for on/off toggles.)
+static func tab_paint(b: JButton, on: bool) -> void :
+	var pal: = "pink" if on else "glass"
+	b.box.colors(UI.PAL[pal][0], UI.PAL[pal][1])
+	if on:
+		b.box.borders(Color("ffe7a6"), Color("c58a2c"))
+	else:
+		b.box.borders(Color(1.0, 0.9, 0.7, 0.32), Color(0, 0, 0, 0.35))
+	if b.lbl:
+		var ls: LabelSettings = b.lbl.label_settings.duplicate()
+		ls.font_color = Color.WHITE if on else UI.PAL.glass[2]
+		ls.outline_color = UI.PAL.pink[2] if on else UI.DARK
+		ls.outline_size = 5 if on else 4
+		b.lbl.label_settings = ls
+
 static func badge(parent: Control, n: int, pos: Vector2) -> Control:
 	var d: = UI.rbox("red", Rect2(pos, Vector2(30, 30)), 15, 2, 4)
 	parent.add_child(d)
@@ -538,10 +640,10 @@ static func skin_picker(main, on_done: Callable) -> void :
 		card.add_child(st)
 		card.gui_input.connect( func(e):
 			if e is InputEventMouseButton and e.pressed:
+				UI.tap(card, 0.06, "pop" if own else "deny")
 				if not own:
 					main.toast(V6Txt.s("skins.where") % [it.name.replace("Фишки ", ""), G.skin_source(it.id)], "gift")
 					return
-				Sfx.play("pop")
 				G.S.skin = it.id
 				G.save()
 				main.toast(V6Txt.s("skins.set") % it.name.replace("Фишки ", ""), "star")

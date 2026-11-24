@@ -36,6 +36,7 @@ func build(m, args: Dictionary) -> void :
 	var tw: = (W - 48 - 20) / 3.0
 	for i in 3:
 		var b: = JButton.make(TABS[i], "pink" if i == tab else "glass", Rect2(24 + i * (tw + 10), TABS_Y, tw, 60), null, 23, -1.0, false)
+		Common.tab_paint(b, i == tab)
 		var idx: = i
 		b.pressed.connect( func(): _set_tab(idx))
 		add_child(b)
@@ -47,10 +48,7 @@ func _set_tab(i: int) -> void :
 		return
 	tab = i
 	for k in 3:
-		var b: JButton = tab_btns[k]
-		var pal: = "pink" if k == tab else "glass"
-		b.box.colors(UI.PAL[pal][0], UI.PAL[pal][1])
-		b.lbl.label_settings.font_color = Color.WHITE if k == tab else UI.PAL.glass[2]
+		Common.tab_paint(tab_btns[k], k == tab)
 	_build_body()
 
 func _build_body() -> void :
@@ -60,11 +58,12 @@ func _build_body() -> void :
 	body.size = size
 	body.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(body)
+	var ny: = _note_y()
 	match tab:
-		0: _recommended()
+		0: ny = minf(ny, _recommended() + 18.0)
 		1: _outfits()
 		2: _gems()
-	var note: = UI.center_label(UI.label(V6Txt.s("shop.test_note"), 16, Color.WHITE, Color(0.3, 0.1, 0.25), 3), Rect2(0, _note_y(), W, 24))
+	var note: = UI.center_label(UI.label(V6Txt.s("shop.test_note"), 16, Color.WHITE, Color(0.3, 0.1, 0.25), 3), Rect2(0, ny, W, 24))
 	body.add_child(note)
 
 
@@ -72,7 +71,16 @@ func _note_y() -> float:
 	return H - 132.0 - 64.0
 
 
-func _recommended() -> void :
+# 0.8: one price button for the whole shop: the lacquered primary art (never the flat pill, which the art only
+# replaces from 60 px up), a currency glyph for crystal prices, «₽» in the caption for real money
+const PRICE_H: = 60.0
+
+func _price_btn(text: String, r: Rect2, icon: Texture2D = null, fs: = 24) -> JButton:
+	var rr: = Rect2(r.position, Vector2(r.size.x, maxf(r.size.y, PRICE_H)))
+	return JButton.make(text, "pink", rr, icon, fs)
+
+# returns the bottom of the last card (the test-build note sits right under it)
+func _recommended() -> float:
 	var y: = TOP
 
 	var mc: = UI.rbox("sky", Rect2(18, y, W - 36, 212), 30, 5, 14)
@@ -99,7 +107,7 @@ func _recommended() -> void :
 	var days: = G.month_card_days()
 	var mb: JButton
 	if days <= 0:
-		mb = JButton.make("449 ₽", "gold", Rect2(228, 144, W - 36 - 250, 56), null, 28)
+		mb = _price_btn("449 ₽", Rect2(228, 140, W - 36 - 250, 60), null, 28)
 		mb.shine_every = 2.4
 		mb.pressed.connect( func():
 			G.S.month_card = {"until": Time.get_date_string_from_unix_time(int(Time.get_unix_time_from_system()) + 30 * 86400), "last": G.today()}
@@ -110,7 +118,7 @@ func _recommended() -> void :
 			_build_body())
 	else:
 		var can: bool = G.S.month_card.get("last", "") != G.today()
-		mb = JButton.make(V6Txt.s("shop.month_claim") if can else V6Txt.s("shop.month_active") % days, "mint" if can else "glass", Rect2(228, 144, W - 36 - 250, 56), V8Art.cur("gem") if can else null, 26)
+		mb = JButton.make(V6Txt.s("shop.month_claim") if can else V6Txt.s("shop.month_active") % days, "mint" if can else "glass", Rect2(228, 140, W - 36 - 250, 60), V8Art.cur("gem") if can else null, 26)
 		mb.pressed.connect( func():
 			if G.S.month_card.get("last", "") == G.today():
 				main.toast(V6Txt.s("shop.month_got"), "calendar")
@@ -143,7 +151,7 @@ func _recommended() -> void :
 	tl.position = Vector2(228, 116)
 	pc.add_child(tl)
 	Common.progress_bar(pc, Rect2(228, 148, W - 36 - 250, 20), float(tier) / 30.0, "gold")
-	pass_btn = JButton.make(V6Txt.s("shop.pass_open") if G.S.pass.owned else V6Txt.s("shop.pass_more"), "gold" if not G.S.pass.owned else "pink", Rect2(228, 178, W - 36 - 250, 56), null, 24)
+	pass_btn = _price_btn(V6Txt.s("shop.pass_open") if G.S.pass.owned else V6Txt.s("shop.pass_more"), Rect2(228, 176, W - 36 - 250, 60), null, 24)
 	pass_btn.shine_every = 2.8
 	pass_btn.pressed.connect( func(): pass_popup())
 	pc.add_child(pass_btn)
@@ -177,7 +185,7 @@ func _recommended() -> void :
 		lt.size = Vector2(W - 36 - 404, 30)
 		lt.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 		fr.add_child(lt)
-		var b3: = JButton.make("149 ₽", "gold", Rect2(158, 88, 220, 52), null, 24)
+		var b3: = _price_btn("149 ₽", Rect2(158, 82, 220, 60), null, 24)
 		b3.pressed.connect( func():
 			G.S.gems += V8Starter.GEMS
 			G.give(V8Starter.ITEM)
@@ -201,12 +209,56 @@ func _recommended() -> void :
 		var l4: = UI.label("300 кристаллов\nразовое предложение", 17, Color.WHITE, Color("1f5e49"), 4, "body", 900)
 		l4.position = Vector2(134, 52)
 		fb.add_child(l4)
-		var b4: = JButton.make("79 ₽", "gold", Rect2(W - 36 - 186, 62, 170, 50), null, 24)
+		var b4: = _price_btn("79 ₽", Rect2(W - 36 - 186, 52, 170, 60), null, 24)
 		b4.pressed.connect( func():
 			G.S.first_buy["first"] = true
 			_buy(300, b4))
 		fb.add_child(b4)
 		UI.pop_in(fb, 0.22, 0.9)
+		y += 120 + 10
+	# 0.8: the showcase fills the page down to the test note: the free space takes a featured outfit from the
+	# «Наряды» tab (one the player does not own yet), its button opens that tab
+	var room: = (_note_y() - 16.0) - y
+	var feat: = _featured_outfit()
+	if room >= 150.0 and not feat.is_empty():
+		var fh: = minf(room, 280.0)
+		var oc: = UI.rbox("plum", Rect2(18, y, W - 36, fh), 30, 5, 14)
+		oc.colors(Color(0.2, 0.1, 0.2, 0.96), Color(0.1, 0.05, 0.11, 0.97)).borders(Color("ffe7a6"), Color("c58a2c"))
+		body.add_child(oc)
+		var aw: = minf(196.0, (fh - 20.0) * 0.8)
+		var oa: = Common.card_art(G.art_tex(feat), Rect2(10, 10, aw, fh - 20.0), Vector2(0.5, 0.26), 1.0, 22)
+		oc.add_child(oa)
+		_rar_tag(oc, String(feat.rar), Vector2(10 + aw - 6, 16))
+		var tx: = aw + 30.0
+		var t5: = UI.title("Новое в гардеробе", 30, Color.WHITE, Color("3f2a7a"))
+		t5.position = Vector2(tx - 2, 10)
+		oc.add_child(t5)
+		var n5: = UI.label("«%s»" % feat.name, 22, Color("ffe7a6"), UI.DARK, 4, "body", 900)
+		n5.position = Vector2(tx, 52)
+		n5.size = Vector2(W - 36 - tx - 16, 30)
+		n5.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		oc.add_child(n5)
+		var h5: = UI.label("%s · %s" % [G.HEROES[feat.hero].name, String(G.HEROES[feat.hero].job)], 17, Color.WHITE, UI.DARK, 3, "body", 800)
+		h5.position = Vector2(tx, 94)
+		h5.size = Vector2(W - 36 - tx - 16, 50)
+		h5.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		h5.visible = fh >= 230.0
+		oc.add_child(h5)
+		var pr: = Common.chip(oc, V8Art.cur("gem"), UI.fmt(int(feat.shop)), Rect2(tx, fh - 72.0, 130, 60), "plum", 24)
+		pr.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var b5: = JButton.make("К нарядам", "pink", Rect2(tx + 142, fh - 73.0, W - 36 - tx - 16 - 142, 62), null, 24)
+		b5.pressed.connect( func(): _set_tab(1))
+		oc.add_child(b5)
+		UI.pop_in(oc, 0.28, 0.9)
+		y += fh + 10
+	return y - 10.0
+
+# a shop outfit the player does not own yet (HEROINES.md: the redrawn adult looks first), {} when all are owned
+func _featured_outfit() -> Dictionary:
+	for id in ["n_offline", "r_yukata", "h_winter"]:
+		if G.ITEM.has(id) and not G.owns(id) and not G.ITEM[id].get("hidden", false):
+			return G.ITEM[id]
+	return {}
 
 
 func pass_popup() -> void :
@@ -307,12 +359,12 @@ func _outfits() -> void :
 		Common.card_frame(c, it.rar, Rect2(Vector2.ZERO, r.size))
 		_rar_tag(c, it.rar, Vector2(cw - 22, 22))
 		var nl: = UI.label(it.name, 22, Color.WHITE, Color(0.2, 0.05, 0.2), 5, "body", 900)
-		nl.position = Vector2(20, ch - 130)
+		nl.position = Vector2(20, ch - 138)
 		c.add_child(Common.fit_line(nl, cw - 40))
 		var hl: = UI.label(G.HEROES[it.hero].name + (V6Txt.s("shop.animated") if it.rar == "SSR" else ""), 17, Color("ffe7a6"), Color(0.2, 0.05, 0.2), 4, "body", 900)
-		hl.position = Vector2(20, ch - 98)
+		hl.position = Vector2(20, ch - 106)
 		c.add_child(Common.fit_line(hl, cw - 40))
-		var b: = JButton.make(V6Txt.s("shop.owned") if own else UI.fmt(it.shop), "mint" if own else "pink", Rect2(22, ch - 70, cw - 44, 54), null if own else V8Art.cur("gem"), 24)
+		var b: = JButton.make(V6Txt.s("shop.owned"), "mint", Rect2(22, ch - 76, cw - 44, 60), null, 24) if own else _price_btn(UI.fmt(it.shop), Rect2(22, ch - 76, cw - 44, 60), V8Art.cur("gem"), 24)
 		b.pressed.connect( func(): _buy_outfit(it, b))
 		c.add_child(b)
 		UI.pop_in(c, 0.05 * i, 0.85)
@@ -346,7 +398,7 @@ func _buy_outfit_do(it: Dictionary, b: JButton) -> void :
 func _gems() -> void :
 	var gy: = TOP
 	var cw: = (W - 36 - 24) / 3.0
-	var chh: = 250.0
+	var chh: = 272.0
 	for i in PACKS.size():
 		var p: Dictionary = PACKS[i]
 		var r: = Rect2(18 + (i % 3) * (cw + 12), gy + (i / 3) * (chh + 16), cw, chh)
@@ -371,19 +423,21 @@ func _gems() -> void :
 			gi.rotation = ang * 0.5
 			c.add_child(gi)
 		var first: bool = not G.S.first_buy.has(str(i))
-		var gl: = UI.center_label(UI.title(UI.fmt(p.gems), 32, Color("f2799f"), Color.WHITE), Rect2(0, 128, cw, 40))
+		# 0.8: amount / bonus / price stacked with 8–10 px gaps; light amount on the graphite card (the mauve one was
+		# low-contrast); tags sit inside the card, inset 8 px
+		var gl: = UI.center_label(UI.title(UI.fmt(p.gems), 32, Color("fff1f4"), Color("7a2346")), Rect2(0, 124, cw, 40))
 		c.add_child(gl)
 		if first:
-			var b: = UI.rbox("mint", Rect2(cw - 92, -10, 100, 30), 12, 2, 6)
+			var b: = UI.rbox("mint", Rect2(cw - 108, 8, 100, 30), 12, 2, 6)
 			c.add_child(b)
 			b.add_child(UI.center_label(UI.label(V6Txt.s("shop.x2"), 16, Color.WHITE, Color("1f5e49"), 3, "body", 900), Rect2(0, 0, 100, 30)))
-			var bl: = UI.center_label(UI.label(V6Txt.s("shop.bonus") % UI.fmt(p.gems), 16, Color("1f8a62"), Color.WHITE, 3, "body", 900), Rect2(0, 166, cw, 24))
+			var bl: = UI.center_label(UI.label(V6Txt.s("shop.bonus") % UI.fmt(p.gems), 17, Color("a9e8c8"), UI.DARK, 3, "body", 900), Rect2(0, 172, cw, 24))
 			c.add_child(bl)
 		if p.get("best", false):
-			var bb: = UI.rbox("pink", Rect2(-6, -12, 90, 30), 12, 2, 6)
+			var bb: = UI.rbox("pink", Rect2(8, 8, 90, 30), 12, 2, 6)
 			c.add_child(bb)
 			bb.add_child(UI.center_label(UI.label(V6Txt.s("shop.hit"), 16, Color.WHITE, Color("7a2346"), 3, "body", 900), Rect2(0, 0, 90, 30)))
-		var pb: = JButton.make(p.price, "pink", Rect2(10, chh - 60, cw - 20, 50), null, 22)
+		var pb: = _price_btn(p.price, Rect2(10, chh - 70, cw - 20, 60), null, 22)
 		var gems: int = p.gems
 		var idx: = i
 		pb.pressed.connect( func():

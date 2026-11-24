@@ -272,6 +272,62 @@ func react(kind: String) -> void :
 	if compact or hero == null:
 		UI.punch(self, 0.12 if kind == "match" else 0.25)
 
+# 0.8: a short emotion pop on the portrait card (HUD edge, never over the board, takes no taps): the rig crossfades
+# into her emotion bust with a subtle bounce, holds, and crossfades back — ≤ 1.2 s in all. A pop while one is up
+# crossfades the bust to the new emotion and restarts the hold. Missing art: the rig just reacts (base art).
+const EMO_IN: = 0.2
+const EMO_OUT: = 0.26
+var _emo_pop: = 0
+var _emo_av: Control = null
+
+func flash_emotion(kind: String, hold: = 0.6) -> void :
+	var e: = V8Art.emo_name(kind)
+	if e == "" or not is_visible_in_tree():
+		return
+	var p: = get_parent()
+	if p and (p.get("_v8_modal") == true or p.get("_v8_over") == true):
+		return
+	if not V8Art.has_emotion(hero_id, e):
+		return
+	hold = clampf(hold, 0.2, 1.2 - EMO_IN - EMO_OUT * 1.3)
+	_emo_pop += 1
+	var my: = _emo_pop
+	if compact:
+		_emo_compact(e, hold, my)
+		return
+	if hero == null:
+		return
+	var was_up: = hero.emo != ""
+	# 0.8: the bust is drawn at the rig's own face size (was 1.3×), so the pop keeps her hair and ribbons inside the
+	# card frame exactly where the resting portrait is; the expression change carries the beat, not a zoom
+	hero.set_emotion(e, EMO_IN, 1.0, 0.12)
+	if not was_up and hero.emo_bust:
+		V8Art.bust_bounce(hero.emo_bust, 0.045)
+	await get_tree().create_timer(EMO_IN + hold).timeout
+	if my != _emo_pop or not is_instance_valid(hero):
+		return
+	hero.set_emotion("", EMO_OUT)
+
+func _emo_compact(e: String, hold: float, my: int) -> void :
+	if _emo_av and is_instance_valid(_emo_av):
+		_emo_av.queue_free()
+	var av: = V8Art.emotion_avatar(hero_id, e, Rect2(Vector2(6, 6), size - Vector2(12, 12)), "pink")
+	_emo_av = av
+	add_child(av)
+	move_child(av, mini(1, get_child_count() - 1))
+	av.modulate.a = 0.0
+	av.scale = Vector2.ONE * 0.92
+	var t: = av.create_tween()
+	t.tween_property(av, "modulate:a", 1.0, EMO_IN).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	t.parallel().tween_property(av, "scale", Vector2.ONE * 1.06, EMO_IN).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	t.tween_property(av, "scale", Vector2.ONE, 0.3).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	t.tween_interval(maxf(0.0, hold - 0.3))
+	t.tween_property(av, "modulate:a", 0.0, EMO_OUT).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+	t.tween_callback( func():
+		if my == _emo_pop:
+			_emo_av = null
+		av.queue_free())
+
 func emote(kind: String) -> void :
 	var hp: = head_pos() - position
 	var at: = hp + Vector2( - size.x * 0.28, -40) if not compact else Vector2(size.x * 0.85, 0)

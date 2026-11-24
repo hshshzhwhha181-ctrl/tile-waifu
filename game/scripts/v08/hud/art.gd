@@ -25,6 +25,8 @@ extends RefCounted
 #   V8Art.avatar(parent, src, r, top) round portrait inside the gold avatar frame; r is the FRAME box (square),
 #                                     the portrait sits in the frame's hole (see hole_rect()). src = hero id ("mc"),
 #                                     outfit image id ("rin_base") or a Texture2D. top = Dragon/Celestial frame.
+#   V8Art.emotion(hero, emo)          heroine emotion portrait (assets/v08/emotions), base portrait when missing;
+#                                     busts, crossfades and round emotion avatars — see «heroine emotions» below
 
 const ROOT: = "res://assets/v08/ui/"
 const TIER_NAMES: = ["bamboo", "jade", "pearl", "gold", "dragon", "celestial"]
@@ -36,6 +38,8 @@ const ICON_ALIAS: = {"mail": "letters", "letter": "letters", "rank": "rating", "
 const GLYPH_ALIAS: = {"star": "nav/play", "star_flat": "nav/play"}
 const NAV_ALIAS: = {"wardrobe": "wardrobe", "closet": "wardrobe", "summon": "wishes", "wish": "wishes", "modes": "play"}
 const CUR_ALIAS: = {"gems": "gem", "coins": "coin", "tickets": "ticket"}
+# outfit art retired from every surface (HEROINES.md §6) -> what is drawn in its place
+const RETIRED_IMG: = {"mc_tutor": "mc_base"}
 
 # Nine-patch margins in source pixels (left, top, right, bottom), measured on the PNGs:
 #   primary 600×199: pill caps + sakura end at x≈120, the straight run is uniform x 120…480, rows 92…106
@@ -280,6 +284,9 @@ static func _portrait(src, r: Rect2) -> TextureRect:
 			focus = Vector2(rig.head_c.x / float(t.get_width()), (rig.head_c.y + 15.0) / float(t.get_height()))
 			zoom = 4.6
 		else:
+			# retired art (o_tutor, HEROINES.md §6) never shows, even from an old save or a stored league avatar
+			if RETIRED_IMG.has(s):
+				s = RETIRED_IMG[s]
 			var p: = "res://assets/outfits/%s.webp" % s
 			if not ResourceLoader.exists(p):
 				p = "res://assets/outfits/mc_base.webp"
@@ -322,3 +329,233 @@ static func avatar(parent: Control, src, r: Rect2, top: = false) -> Control:
 # Dragon (4) and Celestial (5) players wear the ornate frame.
 static func top_tier(tier: int) -> bool:
 	return tier >= 4
+
+
+# ------------------------------------------------------------------ heroine emotions
+#
+# Waist-up emotion portraits (docs/ART.md «Эмоции героинь»): assets/v08/emotions/<hero>_<emotion>.webp,
+# hero ∈ mc hana rin yue nova, emotion ∈ happy sad surprised pout shy, transparent, ≈600×800.
+#
+#   V8Art.emotion(hero, emo)            the texture; a missing file falls back to the base portrait assets/hero/<hero>.png
+#   V8Art.has_emotion(hero, emo)        true when the emotion file exists (callers keep the rigged Hero otherwise)
+#   V8Art.emo_name(kind)                normalise a reaction kind («big», «smug», «fail», «deny» …) to one of EMOTIONS
+#   V8Art.win_emotion(hero)             «happy», or «shy» once her affection level is high (SHY_LEVEL)
+#   V8Art.emotion_face(hero, emo)       face centre in texture pixels (between the eyes and the mouth)
+#   V8Art.emotion_face_w(hero, emo)     face width (cheek to cheek) in texture pixels — the scale anchor
+#   V8Art.rig_face(hero) / RIG_FACE_W   the same two numbers on the rigged base art (assets/hero/<hero>.png)
+#   V8Art.emotion_avatar(h, e, r, pal)  round portrait in a ring (Common.avatar look) cropped on the emotion face
+#   V8Art.bust(h, e, size, at, face_w)  Control that draws the emotion bust with its face centre at `at` and the face
+#                                       `face_w` px wide; the bottom (the waist cut) fades out. Never takes taps.
+#   V8Art.bust_set(bust, emo, dur)      crossfade (+ slight scale) to another emotion, faces stay aligned, no pops
+#   V8Art.bust_bounce(bust, amt)        subtle springy bounce around the face
+
+const EMO_ROOT: = "res://assets/v08/emotions/"
+const EMOTIONS: = ["happy", "sad", "surprised", "pout", "shy"]
+const EMO_ALIAS: = {"big": "happy", "smug": "happy", "win": "happy", "joy": "happy", "combo": "happy", "greet": "happy",
+	"lose": "sad", "fail": "sad", "cry": "sad", "deny": "pout", "anger": "pout", "angry": "pout", "steal": "pout",
+	"wow": "surprised", "rankup": "surprised", "record": "surprised", "danger": "surprised", "blush": "shy", "love": "shy"}
+# affection level from which a win makes her shy instead of plainly happy (room scenes open at 2 / 4 / 7 / 10)
+const SHY_LEVEL: = 7
+
+# Face centre of every emotion file as a fraction of the image (x, y), measured on the art: the eyes-to-mouth middle.
+const EMO_FACE: = {
+	"mc": {"happy": [0.49, 0.28], "sad": [0.5, 0.3], "surprised": [0.5, 0.265], "pout": [0.5, 0.29], "shy": [0.5, 0.29]},
+	"hana": {"happy": [0.5, 0.27], "sad": [0.5, 0.31], "surprised": [0.5, 0.29], "pout": [0.48, 0.31], "shy": [0.5, 0.31]},
+	"rin": {"happy": [0.5, 0.31], "sad": [0.5, 0.35], "surprised": [0.5, 0.31], "pout": [0.5, 0.34], "shy": [0.53, 0.35]},
+	"yue": {"happy": [0.46, 0.27], "sad": [0.5, 0.28], "surprised": [0.48, 0.21], "pout": [0.5, 0.32], "shy": [0.5, 0.31]},
+	"nova": {"happy": [0.52, 0.27], "sad": [0.5, 0.33], "surprised": [0.5, 0.33], "pout": [0.5, 0.3], "shy": [0.52, 0.35]},
+}
+# face width (cheek to cheek at the eyes) in px: emotion art / rigged base art — the ratio keeps a swap the same size
+const EMO_FACE_W: = {"mc": 180.0, "hana": 172.0, "rin": 188.0, "yue": 170.0, "nova": 180.0}
+const RIG_FACE_W: = {"mc": 100.0, "hana": 90.0, "rin": 76.0, "yue": 80.0, "nova": 86.0}
+
+const BUST_SHADER: = "shader_type canvas_item;\nvarying vec4 vcol;\nuniform float fade = 0.16;\nuniform float flash = 0.0;\n" + \
+	"void vertex() { vcol = COLOR; }\nvoid fragment() {\n\tvec4 c = texture(TEXTURE, UV);\n" + \
+	"\tc.rgb = mix(c.rgb, vec3(1.0), flash);\n\tc.a *= 1.0 - smoothstep(1.0 - max(fade, 0.001), 1.0, UV.y);\n\tCOLOR = c * vcol;\n}\n"
+
+
+static func emo_hero(hero: String) -> String:
+	if Hero.RIGS.has(hero):
+		return hero
+	var p: = hero.get_slice("_", 0)
+	return p if Hero.RIGS.has(p) else hero
+
+
+static func emo_name(kind: String) -> String:
+	if kind in EMOTIONS:
+		return kind
+	return String(EMO_ALIAS.get(kind, ""))
+
+
+static func emotion_path(hero: String, emo: String) -> String:
+	return EMO_ROOT + "%s_%s.webp" % [emo_hero(hero), emo_name(emo)]
+
+
+static func has_emotion(hero: String, emo: String) -> bool:
+	return emo_name(emo) != "" and ResourceLoader.exists(emotion_path(hero, emo))
+
+
+static func emotion(hero: String, emo: String) -> Texture2D:
+	if has_emotion(hero, emo):
+		return tex(emotion_path(hero, emo))
+	var h: = emo_hero(hero)
+	if not Hero.RIGS.has(h):
+		h = "mc"
+	return tex("res://assets/hero/%s.png" % h)
+
+
+static func win_emotion(hero: String) -> String:
+	return "shy" if G.aff_level(emo_hero(hero)) >= SHY_LEVEL else "happy"
+
+
+# face centre on the rigged base art: halfway between the eye line and the mouth
+static func rig_face(hero: String) -> Vector2:
+	var rig: Dictionary = Hero.RIGS.get(emo_hero(hero), Hero.RIGS.mc)
+	var el: Vector4 = rig.eye_l
+	var er: Vector4 = rig.eye_r
+	var m: Vector4 = rig.mouth
+	return Vector2((el.x + er.x + m.x * 2.0) * 0.25, ((el.y + er.y) * 0.5 + m.y) * 0.5)
+
+
+static func emotion_face(hero: String, emo: String) -> Vector2:
+	var h: = emo_hero(hero)
+	if not has_emotion(h, emo):
+		return rig_face(h)
+	var t: = emotion(h, emo)
+	var f: Array = EMO_FACE.get(h, {}).get(emo_name(emo), [0.5, 0.3])
+	return Vector2(t.get_width() * float(f[0]), t.get_height() * float(f[1]))
+
+
+static func emotion_face_w(hero: String, emo: String) -> float:
+	var h: = emo_hero(hero)
+	if not has_emotion(h, emo):
+		return float(RIG_FACE_W.get(h, 90.0))
+	return float(EMO_FACE_W.get(h, 180.0))
+
+
+# round emotion portrait inside a ring, the same build as Common.avatar (ring rbox, 5 px inset, round crop)
+static func emotion_avatar(hero: String, emo: String, r: Rect2, ring_pal: = "gold") -> Control:
+	var h: = emo_hero(hero)
+	if not has_emotion(h, emo) and Hero.RIGS.has(h):
+		return Common.avatar(h, r, ring_pal)
+	var c: = Control.new()
+	c.position = r.position
+	c.size = r.size
+	c.pivot_offset = r.size * 0.5
+	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	c.name = "V8EmoAvatar"
+	c.add_child(UI.rbox(ring_pal, Rect2(Vector2.ZERO, r.size), r.size.x * 0.5, 3, 8))
+	var t: = emotion(h, emo)
+	var face: = emotion_face(h, emo)
+	var fw: = emotion_face_w(h, emo)
+	var inner: = Rect2(Vector2(5, 5), r.size - Vector2(10, 10))
+	# the face (plus a little hair and the chin) fills the circle: visible width ≈ 1.6 face widths
+	var zoom: = maxf(1.0, float(t.get_width()) / (fw * 1.6))
+	var focus: = Vector2(face.x / t.get_width(), (face.y + fw * 0.08) / t.get_height())
+	var art: = Common.card_art(t, inner, focus, zoom, inner.size.x * 0.5)
+	(art.material as ShaderMaterial).set_shader_parameter("bottom_shade", 0.0)
+	art.name = "Pic"
+	c.add_child(art)
+	return c
+
+
+# the waist-fade shader lives on the bust (shared by its layers), not in a static: nothing outlives the screen
+static func _bust_mat(b: Control) -> ShaderMaterial:
+	var sh = b.get_meta("shader") if b.has_meta("shader") else null
+	if not sh is Shader:
+		sh = Shader.new()
+		(sh as Shader).code = BUST_SHADER
+		b.set_meta("shader", sh)
+	var m: = ShaderMaterial.new()
+	m.shader = sh
+	m.set_shader_parameter("fade", float(b.get_meta("fade")))
+	return m
+
+
+static func _bust_layer(b: Control, emo: String) -> TextureRect:
+	var h: String = b.get_meta("hero")
+	var t: = emotion(h, emo)
+	var face: = emotion_face(h, emo)
+	var k: float = float(b.get_meta("face_w")) / emotion_face_w(h, emo)
+	var at: Vector2 = b.get_meta("at")
+	var tr: = TextureRect.new()
+	tr.texture = t
+	tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	tr.stretch_mode = TextureRect.STRETCH_SCALE
+	tr.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	tr.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	tr.size = Vector2(t.get_width(), t.get_height()) * k
+	tr.position = at - face * k
+	tr.pivot_offset = face * k
+	tr.material = _bust_mat(b)
+	tr.name = "Emo_" + emo_name(emo)
+	return tr
+
+
+# the bust container: `size` is the box it lives in (for the caller's layout), `at` the face centre in it
+static func bust(hero: String, emo: String, size: Vector2, at: Vector2, face_w: float, fade: = 0.16) -> Control:
+	var b: = Control.new()
+	b.name = "V8EmoBust"
+	b.size = size
+	b.pivot_offset = at
+	b.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	b.set_meta("hero", emo_hero(hero))
+	b.set_meta("at", at)
+	b.set_meta("face_w", face_w)
+	b.set_meta("fade", fade)
+	var e: = emo_name(emo)
+	if e == "":
+		e = "happy"
+	b.set_meta("emo", e)
+	var l: = _bust_layer(b, e)
+	b.add_child(l)
+	b.set_meta("layer", l)
+	return b
+
+
+static func bust_emo(b: Control) -> String:
+	return String(b.get_meta("emo", "")) if b and is_instance_valid(b) else ""
+
+
+# crossfade to `emo`: the new face fades in over the old one (slightly zoomed, settling to 1.0), the old one fades
+# a beat later, so the swap never shows the background through a half-transparent pair; dur 0 swaps at once
+static func bust_set(b: Control, emo: String, dur: = 0.32) -> void:
+	if b == null or not is_instance_valid(b):
+		return
+	var e: = emo_name(emo)
+	if e == "" or e == bust_emo(b):
+		return
+	b.set_meta("emo", e)
+	var old = b.get_meta("layer", null)
+	var nl: = _bust_layer(b, e)
+	b.add_child(nl)
+	b.set_meta("layer", nl)
+	if dur <= 0.0:
+		if old != null and is_instance_valid(old):
+			(old as Node).queue_free()
+		return
+	nl.modulate.a = 0.0
+	nl.scale = Vector2.ONE * 1.035
+	var t: = nl.create_tween().set_parallel()
+	t.tween_property(nl, "modulate:a", 1.0, dur).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	t.tween_property(nl, "scale", Vector2.ONE, dur * 1.4).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	if old != null and is_instance_valid(old):
+		var o: Control = old
+		var to: = o.create_tween().set_parallel()
+		to.tween_property(o, "modulate:a", 0.0, dur * 0.6).set_delay(dur * 0.45).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+		to.tween_property(o, "scale", Vector2.ONE * 0.985, dur).set_trans(Tween.TRANS_SINE)
+		to.chain().tween_callback(o.queue_free)
+
+
+static func bust_bounce(b: Control, amt: = 0.035) -> void:
+	if b == null or not is_instance_valid(b):
+		return
+	if b.has_meta("bounce_tw"):
+		var old = b.get_meta("bounce_tw")
+		if old is Tween and (old as Tween).is_valid():
+			(old as Tween).kill()
+	b.scale = Vector2.ONE
+	var t: = b.create_tween()
+	t.tween_property(b, "scale", Vector2(1.0 - amt * 0.4, 1.0 + amt), 0.12).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	t.tween_property(b, "scale", Vector2.ONE, 0.38).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	b.set_meta("bounce_tw", t)

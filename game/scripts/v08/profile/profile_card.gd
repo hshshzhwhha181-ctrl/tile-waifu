@@ -57,6 +57,7 @@ func _build() -> void :
 	dim.mouse_filter = Control.MOUSE_FILTER_STOP
 	add_child(dim)
 	dim.create_tween().tween_property(dim, "color:a", 0.62, 0.3)
+	dim.set_meta("no_haptic", true)
 	dim.gui_input.connect(_on_bg_input)
 	var y: = clampf((size.y - PH) * 0.5 + 40.0, 150.0, 400.0)
 	panel = UI.rbox("cream", Rect2((size.x - PW) * 0.5, y, PW, PH), 34, 5, 16)
@@ -67,6 +68,7 @@ func _build() -> void :
 	art.name = "PanelArt"
 	panel.add_child(art)
 	panel.mouse_filter = Control.MOUSE_FILTER_STOP
+	panel.set_meta("no_haptic", true)
 	panel.gui_input.connect(_on_bg_input)
 	add_child(panel)
 	panel.pivot_offset = panel.size * 0.5

@@ -128,8 +128,7 @@ func _badges() -> void :
 func _show(id: String) -> void :
 	tab = id
 	for k in tab_btns:
-		var b: JButton = tab_btns[k]
-		b.box.colors(UI.PAL["pink" if k == id else "glass"][0], UI.PAL["pink" if k == id else "glass"][1])
+		Common.tab_paint(tab_btns[k], k == id)
 	for c in body.get_children():
 		c.queue_free()
 	node_btns.clear()
@@ -157,30 +156,60 @@ func _map() -> void :
 			c = cols - 1 - c
 		pts.append(Vector2(W * (0.2 + 0.3 * c), top + rh * (r + 0.5)))
 
-	var line: = Line2D.new()
-	line.width = 10
-	line.default_color = Color(1.0, 0.88, 0.6, 0.35)
-	line.joint_mode = Line2D.LINE_JOINT_ROUND
-	line.begin_cap_mode = Line2D.LINE_CAP_ROUND
-	line.end_cap_mode = Line2D.LINE_CAP_ROUND
-	for p in pts:
-		line.add_point(p)
-	body.add_child(line)
-	var done: = Line2D.new()
-	done.width = 10
-	done.default_color = Color(def.color, 0.9)
-	done.joint_mode = Line2D.LINE_JOINT_ROUND
-	for i in V7EventData.NODES:
-		if V7EventData.node_stars(i) > 0:
-			done.add_point(pts[i])
-			if i + 1 < pts.size():
-				done.add_point(pts[i + 1])
-	body.add_child(done)
 	var cur_i: = -1
 	for i in V7EventData.NODES:
 		if V7EventData.node_open(i) and V7EventData.node_stars(i) == 0:
 			cur_i = i
 			break
+	# 0.8: the same painted road as the Path map (dark bed + stepping stones, shaders/v06/map/path), drawn along a
+	# smooth curve through the tables; the stones up to the current table glow gold
+	var curve: = PackedVector2Array()
+	var node_d: = []
+	var total: = 0.0
+	for i in pts.size():
+		if i == pts.size() - 1:
+			if curve.size() > 0:
+				total += (pts[i] as Vector2).distance_to(curve[curve.size() - 1])
+			node_d.append(total)
+			curve.append(pts[i])
+			break
+		node_d.append(total if curve.is_empty() else total + (pts[i] as Vector2).distance_to(curve[curve.size() - 1]))
+		var p0: Vector2 = pts[maxi(i - 1, 0)]
+		var p1: Vector2 = pts[i]
+		var p2: Vector2 = pts[i + 1]
+		var p3: Vector2 = pts[mini(i + 2, pts.size() - 1)]
+		for s in 16:
+			var t: = s / 16.0
+			var t2: = t * t
+			var t3: = t2 * t
+			var q: = 0.5 * ((2.0 * p1) + (-p0 + p2) * t + (2.0 * p0 - 5.0 * p1 + 4.0 * p2 - p3) * t2 + (-p0 + 3.0 * p1 - 3.0 * p2 + p3) * t3)
+			if curve.size() > 0:
+				total += q.distance_to(curve[curve.size() - 1])
+			curve.append(q)
+	var road: = Line2D.new()
+	road.points = curve
+	road.width = 44
+	road.default_color = Color(0.16, 0.04, 0.16, 0.42)
+	road.joint_mode = Line2D.LINE_JOINT_ROUND
+	road.begin_cap_mode = Line2D.LINE_CAP_ROUND
+	road.end_cap_mode = Line2D.LINE_CAP_ROUND
+	body.add_child(road)
+	var stones: = Line2D.new()
+	stones.points = curve
+	stones.width = 28
+	stones.texture = G.fx("white")
+	stones.texture_mode = Line2D.LINE_TEXTURE_STRETCH
+	stones.joint_mode = Line2D.LINE_JOINT_ROUND
+	var pm: = ShaderMaterial.new()
+	pm.shader = preload("res://shaders/v06/map/path.gdshader")
+	pm.set_shader_parameter("len", total)
+	pm.set_shader_parameter("width", 28.0)
+	pm.set_shader_parameter("spacing", 30.0)
+	pm.set_shader_parameter("done_col", Color(def.color.lerp(Color("ffdb6e"), 0.6), 1.0))
+	var prog_i: int = cur_i if cur_i >= 0 else (V7EventData.NODES - 1 if V7EventData.cleared_count() >= V7EventData.NODES else 0)
+	pm.set_shader_parameter("progress", float(node_d[prog_i]) + 1.0)
+	stones.material = pm
+	body.add_child(stones)
 	for i in V7EventData.NODES:
 		var n: = _node(i, pts[i], i == cur_i)
 		UI.pop_in(n, 0.03 * i, 0.4)
@@ -235,9 +264,30 @@ func _node(i: int, p: Vector2, current: bool) -> Control:
 		var cr: = UI.rbox("red", Rect2(s * 0.5 - 52, -24, 104, 28), 14, 2, 4)
 		c.add_child(cr)
 		cr.add_child(UI.center_label(UI.label("СЛОЖНЫЙ" if i < V7EventData.NODES - 1 else "ФИНАЛ", 16, Color.WHITE, Color("42101a"), 2, "body", 900), Rect2(0, 0, 104, 28)))
-	if open:
+	if boss:
+		# hard and final tables get their own frame: a crimson-and-gold halo ring behind the node
+		var halo: = UI.rbox("red", Rect2(-10, -10, s + 20, s + 20), (s + 20) * 0.5, 4, 4)
+		halo.borders(Color("ffe7a6"), Color("c58a2c"))
+		halo.modulate.a = 0.85 if open else 0.55
+		c.add_child(halo)
+		c.move_child(halo, 0)
+	# a played table shows its stars; one not played yet shows what its first clear pays instead (same slot)
+	if open and stars > 0:
 		for k in 3:
 			c.add_child(V8Art.star_rect(k < stars, Rect2(s * 0.5 - 39 + k * 26, s - 18, 26, 26)))
+	if stars == 0:
+		# what the first clear pays: event currency glyph + amount, under the node
+		var rw: int = int((V7EventData.clear_reward(i, 0, true, "", def).parts[0] as Array)[1])
+		var rt: = "+%d" % rw
+		var tw: = UI.font("body", 900).get_string_size(rt, HORIZONTAL_ALIGNMENT_LEFT, -1, 17).x + 40.0
+		var chip: = UI.rbox("graphite", Rect2((s - tw) * 0.5, s - 16, tw, 28), 14, 2, 4)
+		chip.borders(Color("ffe7a6"), Color("c58a2c"))
+		chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		c.add_child(chip)
+		chip.add_child(V8Art.rect(V7Event.cur_icon(def), Rect2(2, -2, 32, 32)))
+		chip.add_child(UI.center_label(UI.label(rt, 17, Color("ffe7a6"), UI.DARK, 3, "body", 900), Rect2(32, 0, tw - 36, 28)))
+		if not open:
+			chip.modulate.a = 0.75
 	if current:
 		var av: = Common.avatar(def.hero, Rect2(s - 34, -18, 50, 50), "pink")
 		c.add_child(av)

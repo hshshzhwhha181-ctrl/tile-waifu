@@ -5,6 +5,34 @@ extends Control
 
 const EMO: = {"happy": "happy", "big": "big", "sad": "sad", "tap": "tap", "shy": "tap"}
 
+# 0.8: the emotion portrait of a line (V8Art.emotion, assets/v08/emotions). A line's tag wins (happy / sad / shy;
+# «big» is glad, or amazed when the line asks and exclaims); an untagged («tap» or none) line is read for simple
+# cues; nothing found = the rigged base portrait (her neutral face). Only the portrait changes, never the text.
+const EMO_TAG: = {"happy": "happy", "sad": "sad", "shy": "shy", "pout": "pout", "surprised": "surprised"}
+const EMO_CUES: = [
+	["surprised", ["?!", "!?", "Ой!", "Ой,", "Ах!", "Неужели", "Не может быть", "Вот это да"]],
+	["pout", ["Хм", "Не смотри", "Не пойми неправильно", "Опять", "Ну и ну", "Вообще-то", "Не обижусь", "заноза", "Ещё чего"]],
+	["sad", ["Глупо", "Прости", "жаль", "Жаль", "грустно", "одиноко", "плакать", "Холодно"]],
+	["shy", ["…Ладно", "покраснела", "Спасибо тебе", "Не уходи", "смущ", "мне нравится", "Мне нравится"]],
+]
+
+static func line_emotion(text: String, tag: String) -> String:
+	if EMO_TAG.has(tag):
+		return EMO_TAG[tag]
+	var cue: = ""
+	for c in EMO_CUES:
+		for w in c[1]:
+			if text.find(w) >= 0:
+				cue = c[0]
+				break
+		if cue != "":
+			break
+	if tag == "big":
+		return "surprised" if cue == "surprised" or (text.find("?") >= 0 and text.find("!") >= 0) else "happy"
+	if cue != "":
+		return cue
+	return "happy" if text.ends_with("!") else ""
+
 var W: = 720.0
 var H: = 1280.0
 var heroes: = {}
@@ -80,6 +108,11 @@ func _build(d: Dictionary, id: String) -> void :
 		hero.position = Vector2(x, H + 40)
 		if cast.size() > 1:
 			hero.scale = Vector2(0.92, 0.92)
+		# 0.8: with emotion art she stands as her waist-up emotion portrait, the waist behind the dialogue box
+		# (the rigged full-length art stays when the files are missing)
+		if hero.use_bust(_first_emotion(d, h), 760.0 if cast.size() == 1 else 640.0, -250.0) and cast.size() > 1:
+			# two busts are wider than two full-length figures: a little further apart, overlapping only at the arms
+			hero.position.x = W * (0.26 if k == 0 else 0.75)
 		add_child(hero)
 		UI.slide_in(hero, Vector2(0 if cast.size() == 1 else (-80 if k == 0 else 80), 60), 0.1 + k * 0.15, 0.6)
 		heroes[h] = hero
@@ -112,6 +145,15 @@ func _build(d: Dictionary, id: String) -> void :
 	choice_layer.size = size
 	choice_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(choice_layer)
+
+# her face when she first appears: the emotion of her first line that has one, else glad
+func _first_emotion(d: Dictionary, h: String) -> String:
+	for e in d.lines:
+		if e is Array and e.size() > 1 and String(e[0]) == h:
+			var em: = line_emotion(String(e[1]), String(e[2]) if e.size() > 2 else "")
+			if em != "":
+				return em
+	return "happy"
 
 func _on_input(e: InputEvent) -> void :
 	if e is InputEventMouseButton and e.pressed:
@@ -147,6 +189,8 @@ func _say(who: String, text: String, emo: = "") -> void :
 	more.visible = false
 	if heroes.has(who):
 		var hero: Hero = heroes[who]
+		# 0.8: crossfade (+ slight zoom) to the line's emotion portrait, face on the rig's face; neutral = the rig
+		hero.set_emotion(line_emotion(text, emo), 0.34, 1.0, 0.14)
 		hero.react(EMO.get(emo, "happy" if emo == "" else "tap"))
 		hero.talk_left = minf(0.4 + text.length() * 0.045, 5.0)
 	Sfx.play("pop", 1.3, -12)
@@ -194,7 +238,7 @@ func _ask(e: Dictionary) -> void :
 		G.save()
 		var pos: = Vector2(W * 0.5, H * 0.42)
 		if heroes.has(who):
-			pos = heroes[who].head_global() + Vector2(0, -40)
+			pos = heroes[who].head_global_any() + Vector2(0, -40)
 		Fx.float_text(self, pos, V6Txt.s("story.aff") % [aff, G.HEROES[who].name], Color("ffd0e0"), 34)
 		Sfx.play("gem", 1.2, -8)
 	await _say(who, o[1], "happy")

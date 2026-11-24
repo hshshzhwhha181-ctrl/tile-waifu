@@ -225,6 +225,7 @@ func _stolen(at: Tile) -> void :
 	steals += 1
 	t_next = pace * 0.75
 	stage.react("anger")
+	stage.flash_emotion("pout")
 	if taunt_cd <= 0.0:
 		taunt_cd = 3.0
 		stage.say_text(V6Heroines.line(rival, "steal"))
@@ -350,11 +351,13 @@ func on_player_pair(_mid: Vector2) -> void :
 	if taunt_cd <= 0.0 and me - her == 3:
 		taunt_cd = 5.0
 		stage.react("deny")
+		stage.flash_emotion("sad")
 		stage.say_text(V6Heroines.line(rival, "behind"))
 
 func on_overflow() -> void :
 	her += 1
 	stage.react("smug")
+	stage.flash_emotion("happy")
 	Fx.float_text(play.fx_layer, Vector2(play.W * 0.5, 330), "Лоток полон: пара сопернице", Color("ff8a9a"), 30)
 	_update_score()
 
@@ -388,6 +391,8 @@ func finish() -> void :
 	_end_line = V6Heroines.line(rival, "lose" if win else ("draw" if draw else "win"))
 	stage.say_text(_end_line, 3.0)
 	play.stage.react("win" if win else "fail")
+	stage.flash_emotion("surprised" if draw else ("pout" if win else "happy"))
+	play.stage.flash_emotion("surprised" if draw else (V8Art.win_emotion(play.partner) if win else "sad"))
 	Sfx.play("win" if win or draw else "deny", 1.0 if win else 0.8)
 	await get_tree().create_timer(1.2).timeout
 	if not is_inside_tree() or not is_instance_valid(play) or not play.is_inside_tree():
@@ -406,8 +411,12 @@ func _result(win: bool, draw: bool, gems: int, shard: bool) -> void :
 		Fx.burst(ctx.root, Vector2(play.W * 0.5, 200), "confetti", 60, Color.WHITE, 1.1)
 	var rc: Color = G.HEROES[rival].color
 	var y0: float = ctx.y
-	plate.add_child(Common.avatar(play.partner, Rect2(40, y0, 120, 120), "gold" if win else "pink"))
-	plate.add_child(Common.avatar(rival, Rect2(pw - 160, y0, 120, 120), "pink" if win else "gold"))
+	# 0.8: both faces show the outcome (emotion art, base portrait when a file is missing): the winner glad, the
+	# loser pouting (the rival) or sad (your partner); a draw surprises both
+	var my_emo: = "surprised" if draw else (V8Art.win_emotion(play.partner) if win else "sad")
+	var her_emo: = "surprised" if draw else ("pout" if win else "happy")
+	plate.add_child(V8Art.emotion_avatar(play.partner, my_emo, Rect2(40, y0, 120, 120), "gold" if win else "pink"))
+	plate.add_child(V8Art.emotion_avatar(rival, her_emo, Rect2(pw - 160, y0, 120, 120), "pink" if win else "gold"))
 	var tl: = UI.label("ТЫ", 16, Color("cbb5dc"), Color(0.1, 0.05, 0.2), 2, "body", 900)
 	plate.add_child(UI.center_label(tl, Rect2(40, y0 + 120, 120, 24)))
 	var rl: = UI.label(G.HEROES[rival].name, 16, rc.lightened(0.45), Color(0.1, 0.05, 0.2), 2, "body", 900)
@@ -431,6 +440,7 @@ func _result(win: bool, draw: bool, gems: int, shard: bool) -> void :
 		Common.chip(plate, null, "Осколок %s: %d/%d%s" % [G.HEROES[rival].name, have, G.SHARDS_NEED, " · она с тобой!" if have >= G.SHARDS_NEED else ""], Rect2(play.V8_RES_PAD, ctx.y, pw - play.V8_RES_PAD * 2.0, 36), "gold", 18)
 		ctx.y += 44.0
 	play.v8_res_rank(ctx, award)
+	ctx["emo"] = her_emo
 	play.v8_res_close(ctx, rival, "Реванш", func(): main.go("play", {"mode": "duel", "rival": rival, "partner": play.partner, "retry": randi()}),
 		"Режимы", func(): main.go("modes" if main.SCREENS.has("modes") else "home"))
 	play.set_meta("v6_duel_result", {"win": win, "me": me, "her": her})

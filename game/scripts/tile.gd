@@ -304,13 +304,26 @@ func set_shard(h: String) -> void :
 	var at: = AtlasTexture.new()
 	at.atlas = load("res://assets/hero/%s.png" % h)
 	at.region = Rect2(rig.head_c.x - r, rig.head_c.y - r * 1.05, r * 2, r * 2)
+	# 0.8: an ivory face (like every other tile) with the portrait in a gold-ringed circle, a shard glyph in the
+	# corner and a slow shimmer (shaders/shard_face.gdshader); the old flat pale-yellow square read as a placeholder
 	var bg: = Sprite2D.new()
 	bg.texture = G.fx("tile_mask")
 	bg.scale = Vector2(S, S)
-	bg.modulate = Color("fff1c9")
+	bg.modulate = Color("fbf3e2")
 	add_child(bg)
 	move_child(bg, face_spr.get_index())
 	face_spr.texture = at
-	var sc: = (TW * 0.86) / (r * 2)
+	var sc: = (TW * 0.9) / (r * 2)
 	face_spr.scale = Vector2(sc, sc)
+	face_spr.self_modulate = Color.WHITE
+	var old: ShaderMaterial = mat
+	mat = ShaderMaterial.new()
+	mat.shader = preload("res://shaders/shard_face.gdshader")
+	var asz: = Vector2(at.atlas.get_width(), at.atlas.get_height())
+	mat.set_shader_parameter("region", Vector4(at.region.position.x / asz.x, at.region.position.y / asz.y, at.region.size.x / asz.x, at.region.size.y / asz.y))
+	for pn in ["dim", "sel", "flash", "shine", "ice", "shade"]:
+		var v = old.get_shader_parameter(pn)
+		if v != null:
+			mat.set_shader_parameter(pn, v)
 	mat.set_shader_parameter("gold", 1.0)
+	face_spr.material = mat

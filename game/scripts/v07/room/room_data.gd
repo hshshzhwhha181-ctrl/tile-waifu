@@ -352,7 +352,7 @@ static func next_unlock(h: String) -> String:
 	for id in V7RoomScenes.for_hero(h):
 		var need: = int(V7RoomScenes.SCENES[id].lv)
 		if need > lv:
-			return "Симпатия %d · сцена «%s»" % [need, V7RoomScenes.SCENES[id].title]
+			return "Симпатия %d · «%s»" % [need, V7RoomScenes.SCENES[id].title]
 	return "Все сцены открыты"
 
 

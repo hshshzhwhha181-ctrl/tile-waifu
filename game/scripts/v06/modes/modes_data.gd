@@ -42,7 +42,7 @@ const FLOOR_NAMES: = ["Нижний сад", "Чайная терраса", "М�
 
 const BLESS: = {
 	"lamp": {"hero": "mc", "name": "Тёплое слово", "desc": "+1 фонарь", "plus": "+2 фонаря"}, 
-	"tips": {"hero": "mc", "name": "Шпаргалка", "desc": "+2 подсказки", "plus": "+3 подсказки"}, 
+	"tips": {"hero": "mc", "name": "Совет хозяйки", "desc": "+2 подсказки", "plus": "+3 подсказки"}, 
 	"cup": {"hero": "rin", "name": "Лишняя чашка", "desc": "+1 место в лотке", "plus": "+1 место и +1 отмена"}, 
 	"pause": {"hero": "rin", "name": "Чайная пауза", "desc": "+3 отмены", "plus": "+4 отмены"}, 
 	"breath": {"hero": "hana", "name": "Второе дыхание", "desc": "Комбо держится на 1,5 с дольше", "plus": "Комбо держится на 2,5 с дольше"}, 
@@ -129,7 +129,7 @@ static func floor_gems(f: int) -> int:
 
 
 const ETUDES: = 30
-const ETUDE_CHAPTERS: = ["Ученица", "Мастер", "Наставница"]
+const ETUDE_CHAPTERS: = ["Гость", "Игрок", "Мастер"]
 const ETUDE_SLOTS: = 3
 
 static func etude_cfg(i: int) -> Dictionary:

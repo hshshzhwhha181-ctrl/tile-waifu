@@ -292,7 +292,10 @@ func _milestone(n: int, at: Vector2) -> void :
 					play._skill_ready()
 				what = "+1 к умению"
 				icon = "rating"
-				target = st
+				# 0.8: the reward flies into the «умение» bar under her portrait, not onto the middle of the card
+				# (where the icon and its landing ring sat on her chest during the combo pop)
+				var gb = st.get("gauge") if st else null
+				target = (gb as Control).get_parent() as Control if gb is Control and is_instance_valid(gb) and (gb as Control).get_parent() is Control else st
 		5:
 			what = "Лихорадка: кристаллы ×2"
 			icon = "gem"
