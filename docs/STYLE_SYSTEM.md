@@ -26,3 +26,12 @@ LEGWEAR.md (ножки и горячие жесты), POSES.md (уникальн
 ## Петля улучшения
 Каждый новый одобренный ассет (после аудита) → добавляется в датасет (tools/art/captions_*, docs/concepts) и в элемент героини →
 при накоплении 20–30 новых — переобучение LoRA. Брак в датасет не попадает никогда (двойной аудит анатомии).
+
+## Где лежат веса (бэкапы, HANDOFF §24)
+| что | где | дата |
+|---|---|---|
+| `tw_ui_v1` (`twui style`, 1800 шагов, rank 32, Z-Image Turbo) — **боевая UI-LoRA** + `tw_heroines_v2b` (`twaifu4 style`) — **боевая LoRA героинь**, конфиги обучения, сэмплы | https://d2ol7oe51mr4n9.cloudfront.net/user_3L5lNdYfxsf6b0O0pIlvJXXfClr/2df5fc5c-6fe1-4c1d-aae5-85b1fe68b3c0.zip (340 МБ) | 2026-11-24 |
+| Те же веса на постоянном диске Higgsfield | `/workspace/tw/output/tw_ui_v1/tw_ui_v1.safetensors`, `/workspace/tw/output/tw_heroines_v2b/tw_heroines_v2b.safetensors` | 2026-11-24 |
+| Кэш базовой модели Z-Image Turbo + адаптер обучения ostris | `/workspace/tw/base_models/` (HF-кэш, для офлайн-обучения: `HF_HOME` указать на копию или `--local-dir`) | 2026-11-24 |
+Следующие версии (`tw_heroines_v3`, `tw_master_v1`, …) — новым файлом и новой строкой здесь; старые не перезаписывать.
+Отложено до пополнения кредитов: генерация UI-кита `v10-uikit` на tw_ui_v1, витрины комбо v2, обучение tw_heroines_v3 и tw_master_v1.
