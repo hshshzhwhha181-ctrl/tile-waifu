@@ -3,15 +3,25 @@ extends Node2D
 
 
 const RIGS: = {
-	"mc": {"head_c": Vector2(440, 210), "head_r": 170.0, "neck": Vector2(445, 300), "chest_c": Vector2(440, 430), "chest_r": Vector2(150, 110), 
-		"waist_y": 700.0, "feet": Vector2(440, 1232), "hair_l": Vector4(255, 250, 30, 9), "hair_r": Vector4(632, 420, 25, 9), 
-		"eye_l": Vector4(400, 225, 17, 13), "eye_r": Vector4(468, 228, 17, 12), "mouth": Vector4(440, 270, 20, 13), "lash": Color(0.36, 0.17, 0.2)}, 
+	# mc / hana: measured on the adult redraw (assets/hero/<id>.png 848×1264, debug overlays of every point).
+	# "av" = round-avatar crop on the face: Vector3(focus x px, focus y px, zoom) — the face centre raised by 0.15
+	# face width, ≈2 face widths across the circle (rigs without "av" use head_c + 15 px at zoom 4.6).
+	# "zoom_k" = how much smaller the face is than on the art the fixed-zoom face crops (story cut-in) were tuned on.
+	# "mouth" = Vector4(x, y, half-w, half-h); half-w 0 turns the talking flap off (Hana's art has an open toothy grin,
+	# which the squash warp smears: only x, y are used, by V8Art.rig_face).
+	# "lid_l"/"lid_r"/"lid_tilt" (optional) = blink tuning: upper-lid skin sample points (x1, y1, x2, y2) and eye slant (rad).
+	"mc": {"head_c": Vector2(420, 132), "head_r": 112.0, "neck": Vector2(425, 222), "chest_c": Vector2(455, 322), "chest_r": Vector2(98, 72), 
+		"waist_y": 540.0, "feet": Vector2(415, 1240), "hair_l": Vector4(215, 240, 15, 9), "hair_r": Vector4(605, 340, 18, 9), 
+		"eye_l": Vector4(390.5, 149, 14.5, 5.5), "eye_r": Vector4(445, 143, 16, 5), "mouth": Vector4(422, 186, 17, 6), "lash": Color(0.28, 0.1, 0.09), 
+		"lid_l": Vector4(384, 138, 399, 139), "av": Vector3(420, 152, 4.46), "zoom_k": 1.25}, 
 	"rin": {"head_c": Vector2(425, 195), "head_r": 120.0, "neck": Vector2(430, 280), "chest_c": Vector2(440, 420), "chest_r": Vector2(120, 90), 
 		"waist_y": 620.0, "feet": Vector2(415, 1238), "hair_l": Vector4(0, 0, 0, 0), "hair_r": Vector4(0, 0, 0, 0), 
 		"eye_l": Vector4(398, 217, 13, 9), "eye_r": Vector4(450, 215, 13, 9), "mouth": Vector4(423, 255, 14, 8), "lash": Color(0.2, 0.25, 0.22)}, 
-	"hana": {"head_c": Vector2(425, 230), "head_r": 125.0, "neck": Vector2(420, 305), "chest_c": Vector2(440, 430), "chest_r": Vector2(120, 90), 
-		"waist_y": 620.0, "feet": Vector2(440, 1232), "hair_l": Vector4(0, 0, 0, 0), "hair_r": Vector4(0, 0, 0, 0), 
-		"eye_l": Vector4(414, 225, 16, 13), "eye_r": Vector4(477, 230, 16, 13), "mouth": Vector4(439, 257, 18, 12), "lash": Color(0.35, 0.15, 0.1)}, 
+	"hana": {"head_c": Vector2(397, 135), "head_r": 115.0, "neck": Vector2(412, 240), "chest_c": Vector2(445, 335), "chest_r": Vector2(95, 70), 
+		"waist_y": 560.0, "feet": Vector2(400, 1240), "hair_l": Vector4(0, 0, 0, 0), "hair_r": Vector4(0, 0, 0, 0), 
+		"eye_l": Vector4(401, 150.5, 17.5, 6.5), "eye_r": Vector4(452, 165, 12.5, 5.5), "mouth": Vector4(418, 195, 0, 10), "lash": Color(0.2, 0.08, 0.06), 
+		"lid_l": Vector4(393, 140, 407, 139), "lid_r": Vector4(441, 154, 459, 155), "lid_tilt": Vector2(0.29, -0.07), 
+		"av": Vector3(422, 163, 4.76), "zoom_k": 1.25}, 
 	"yue": {"head_c": Vector2(425, 215), "head_r": 125.0, "neck": Vector2(425, 300), "chest_c": Vector2(425, 420), "chest_r": Vector2(120, 90), 
 		"waist_y": 640.0, "feet": Vector2(420, 1212), "hair_l": Vector4(235, 360, 40, 10), "hair_r": Vector4(630, 360, 40, 10), 
 		"eye_l": Vector4(397, 227, 14, 9), "eye_r": Vector4(452, 227, 14, 9), "mouth": Vector4(425, 265, 14, 8), "lash": Color(0.35, 0.22, 0.28)}, 
@@ -56,6 +66,10 @@ func setup(id: String, h: float) -> Hero:
 	mat.shader = load("res://shaders/hero.gdshader")
 	for k in ["head_c", "head_r", "neck", "chest_c", "chest_r", "waist_y", "feet", "hair_l", "hair_r", "eye_l", "eye_r", "mouth"]:
 		mat.set_shader_parameter(k, rig[k])
+	# optional blink tuning: lid skin samples above the eye + eye slant (Hana's eyes slant and sit near hair/shadow)
+	for k in ["lid_l", "lid_r", "lid_tilt"]:
+		if rig.has(k):
+			mat.set_shader_parameter(k, rig[k])
 	mat.set_shader_parameter("lash_color", rig.lash)
 	mat.set_shader_parameter("phase", randf() * 10.0)
 	sprite.material = mat
@@ -63,6 +77,17 @@ func setup(id: String, h: float) -> Hero:
 	Sfx.voice_started.connect(_on_voice)
 	blink_t = randf_range(1.0, 3.0)
 	return self
+
+# round-avatar crop on the heroine's base art (Common.avatar, V8Art.avatar, main.gd): focus as a share of the texture
+static func av_focus(id: String) -> Vector2:
+	var rig: Dictionary = RIGS.get(id, RIGS.mc)
+	var av: Vector3 = rig.get("av", Vector3(rig.head_c.x, rig.head_c.y + 15.0, 4.6))
+	return Vector2(av.x / 848.0, av.y / 1264.0)
+
+static func av_zoom(id: String) -> float:
+	var rig: Dictionary = RIGS.get(id, RIGS.mc)
+	var av: Vector3 = rig.get("av", Vector3(0, 0, 4.6))
+	return av.z
 
 func head_global() -> Vector2:
 	var rig: Dictionary = RIGS[hero_id]
@@ -157,7 +182,7 @@ func use_bust(e: String, bust_h: float, foot_y: = 0.0, fade: = 0.12) -> bool:
 	shadow.visible = false
 	var k: = bust_h / 800.0
 	var at: = Vector2(0.0, foot_y - bust_h + 800.0 * 0.3 * k)
-	emo_bust = V8Art.bust(hero_id, en, Vector2.ZERO, at, float(V8Art.EMO_FACE_W.get(hero_id, 180.0)) * k, fade)
+	emo_bust = V8Art.bust(hero_id, en, Vector2.ZERO, at, V8Art.emotion_face_w(hero_id, en) * k, fade)
 	add_child(emo_bust)
 	return true
 

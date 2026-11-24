@@ -280,9 +280,8 @@ static func _portrait(src, r: Rect2) -> TextureRect:
 		var s: = String(src)
 		if Hero.RIGS.has(s) and ResourceLoader.exists("res://assets/hero/%s.png" % s):
 			t = load("res://assets/hero/%s.png" % s)
-			var rig: Dictionary = Hero.RIGS[s]
-			focus = Vector2(rig.head_c.x / float(t.get_width()), (rig.head_c.y + 15.0) / float(t.get_height()))
-			zoom = 4.6
+			focus = Hero.av_focus(s)
+			zoom = Hero.av_zoom(s)
 		else:
 			# retired art (o_tutor, HEROINES.md §6) never shows, even from an old save or a stored league avatar
 			if RETIRED_IMG.has(s):
@@ -359,15 +358,21 @@ const SHY_LEVEL: = 7
 
 # Face centre of every emotion file as a fraction of the image (x, y), measured on the art: the eyes-to-mouth middle.
 const EMO_FACE: = {
-	"mc": {"happy": [0.49, 0.28], "sad": [0.5, 0.3], "surprised": [0.5, 0.265], "pout": [0.5, 0.29], "shy": [0.5, 0.29]},
-	"hana": {"happy": [0.5, 0.27], "sad": [0.5, 0.31], "surprised": [0.5, 0.29], "pout": [0.48, 0.31], "shy": [0.5, 0.31]},
+	# mc / hana: the adult redraw, eyes and mouth measured per file (same formula as rig_face; an open mouth counts at
+	# its closed-lip line so a gasp does not drop the face point)
+	"mc": {"happy": [0.528, 0.259], "sad": [0.506, 0.26], "surprised": [0.522, 0.234], "pout": [0.5, 0.264], "shy": [0.517, 0.274]},
+	"hana": {"happy": [0.528, 0.2675], "sad": [0.589, 0.288], "surprised": [0.549, 0.261], "pout": [0.571, 0.28], "shy": [0.556, 0.304]},
 	"rin": {"happy": [0.5, 0.31], "sad": [0.5, 0.35], "surprised": [0.5, 0.31], "pout": [0.5, 0.34], "shy": [0.53, 0.35]},
 	"yue": {"happy": [0.46, 0.27], "sad": [0.5, 0.28], "surprised": [0.48, 0.21], "pout": [0.5, 0.32], "shy": [0.5, 0.31]},
 	"nova": {"happy": [0.52, 0.27], "sad": [0.5, 0.33], "surprised": [0.5, 0.33], "pout": [0.5, 0.3], "shy": [0.52, 0.35]},
 }
-# face width (cheek to cheek at the eyes) in px: emotion art / rigged base art — the ratio keeps a swap the same size
-const EMO_FACE_W: = {"mc": 180.0, "hana": 172.0, "rin": 188.0, "yue": 170.0, "nova": 180.0}
-const RIG_FACE_W: = {"mc": 100.0, "hana": 90.0, "rin": 76.0, "yue": 80.0, "nova": 86.0}
+# face width (cheek to cheek at the eyes) in px: emotion art / rigged base art — the ratio keeps a swap the same size.
+# A hero entry is one width for all her files, or a per-emotion dictionary (mc / hana: 1.75 × the eye distance,
+# cross-checked against eyes-to-mouth, measured on every file of the redraw).
+const EMO_FACE_W: = {"mc": {"happy": 157.0, "sad": 152.0, "surprised": 147.0, "pout": 148.0, "shy": 154.0},
+	"hana": {"happy": 138.0, "sad": 145.0, "surprised": 136.0, "pout": 132.0, "shy": 136.0},
+	"rin": 188.0, "yue": 170.0, "nova": 180.0}
+const RIG_FACE_W: = {"mc": 95.0, "hana": 89.0, "rin": 76.0, "yue": 80.0, "nova": 86.0}
 
 const BUST_SHADER: = "shader_type canvas_item;\nvarying vec4 vcol;\nuniform float fade = 0.16;\nuniform float flash = 0.0;\n" + \
 	"void vertex() { vcol = COLOR; }\nvoid fragment() {\n\tvec4 c = texture(TEXTURE, UV);\n" + \
@@ -430,7 +435,10 @@ static func emotion_face_w(hero: String, emo: String) -> float:
 	var h: = emo_hero(hero)
 	if not has_emotion(h, emo):
 		return float(RIG_FACE_W.get(h, 90.0))
-	return float(EMO_FACE_W.get(h, 180.0))
+	var w = EMO_FACE_W.get(h, 180.0)
+	if w is Dictionary:
+		return float((w as Dictionary).get(emo_name(emo), 150.0))
+	return float(w)
 
 
 # round emotion portrait inside a ring, the same build as Common.avatar (ring rbox, 5 px inset, round crop)

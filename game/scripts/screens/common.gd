@@ -520,12 +520,11 @@ static func avatar(hero: String, r: Rect2, ring_pal: = "gold") -> Control:
 	var t: = UI.tex(load("res://assets/hero/%s.png" % hero), Rect2(Vector2(5, 5), r.size - Vector2(10, 10)), false)
 	var m: = ShaderMaterial.new()
 	m.shader = preload("res://shaders/card.gdshader")
-	var rig: Dictionary = Hero.RIGS[hero]
 	m.set_shader_parameter("size", t.size)
 	m.set_shader_parameter("radius", t.size.x * 0.5)
 	m.set_shader_parameter("tex_size", Vector2(848, 1264))
-	m.set_shader_parameter("focus", Vector2(rig.head_c.x / 848.0, (rig.head_c.y + 15) / 1264.0))
-	m.set_shader_parameter("zoom", 4.6)
+	m.set_shader_parameter("focus", Hero.av_focus(hero))
+	m.set_shader_parameter("zoom", Hero.av_zoom(hero))
 	m.set_shader_parameter("bottom_shade", 0.0)
 	t.material = m
 	t.name = "Pic"
@@ -790,9 +789,10 @@ static func confirm(main, title: String, text: String, price_icon: String, price
 	return p
 
 
-static func living_art(parent: Control, tex: Texture2D, r: Rect2, focus: = Vector2(0.5, 0.35)) -> TextureRect:
+static func living_art(parent: Control, tex: Texture2D, r: Rect2, focus: = Vector2(0.5, 0.35), top_fade: = 0.0) -> TextureRect:
 	var art: = card_art(tex, r, focus, 1.0, 0.0)
 	(art.material as ShaderMaterial).set_shader_parameter("bottom_shade", 0.0)
+	(art.material as ShaderMaterial).set_shader_parameter("top_fade", top_fade / maxf(r.size.y, 1.0))
 	art.pivot_offset = r.size * Vector2(0.5, 0.4)
 	parent.add_child(art)
 	var t: = art.create_tween().set_loops()

@@ -11,6 +11,7 @@ uniform float holo = 0.0;
 uniform float bottom_shade = 0.55;
 uniform float flash = 0.0;
 uniform float gray = 0.0;
+uniform float top_fade = 0.0;  // share of the height over which the top edge fades in (0 = hard edge)
 float sd_rbox(vec2 p, vec2 b, float r) { vec2 q = abs(p) - b + r; return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - r; }
 void fragment() {
 	vec2 p = UV * size;
@@ -33,5 +34,6 @@ void fragment() {
 	float sheen = pow(0.5 + 0.5 * sin((UV.x - UV.y) * 9.0 + TIME * 2.2), 6.0);
 	col += holo * (rainbow * 0.16 + sheen * 0.25);
 	col = mix(col, vec3(1.0), flash);
+	if (top_fade > 0.0) a *= smoothstep(0.0, top_fade, UV.y);
 	COLOR = vec4(col, a * c.a) * vcol;
 }

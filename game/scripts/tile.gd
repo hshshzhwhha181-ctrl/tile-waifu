@@ -303,7 +303,8 @@ func set_shard(h: String) -> void :
 	var r: float = rig.head_r * 1.15
 	var at: = AtlasTexture.new()
 	at.atlas = load("res://assets/hero/%s.png" % h)
-	at.region = Rect2(rig.head_c.x - r, rig.head_c.y - r * 1.05, r * 2, r * 2)
+	# the redrawn mc / hana have the head near the top edge of the art: keep the region inside the texture
+	at.region = Rect2(rig.head_c.x - r, maxf(0.0, rig.head_c.y - r * 1.05), r * 2, r * 2)
 	# 0.8: an ivory face (like every other tile) with the portrait in a gold-ringed circle, a shard glyph in the
 	# corner and a slow shimmer (shaders/shard_face.gdshader); the old flat pale-yellow square read as a placeholder
 	var bg: = Sprite2D.new()

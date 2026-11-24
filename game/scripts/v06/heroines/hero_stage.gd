@@ -604,9 +604,13 @@ func _cutin(p: Control, title: String, sub: String) -> void :
 	m.set_shader_parameter("size", face.size)
 	m.set_shader_parameter("radius", 0.0)
 	m.set_shader_parameter("tex_size", Vector2(848, 1264))
-	m.set_shader_parameter("focus", Vector2(rig.head_c.x / 848.0, (rig.head_c.y + 40) / 1264.0))
-	m.set_shader_parameter("zoom", 2.2)
+	# redrawn rigs (zoom_k) frame on the measured face centre; the older art on head_c + 40 px (its face centre)
+	var fc: Vector2 = V8Art.rig_face(hero_id) if rig.has("zoom_k") else rig.head_c + Vector2(0, 40)
+	m.set_shader_parameter("focus", Vector2(fc.x / 848.0, fc.y / 1264.0))
+	m.set_shader_parameter("zoom", 2.2 * float(rig.get("zoom_k", 1.0)))
 	m.set_shader_parameter("bottom_shade", 0.0)
+	# the face rect pokes 40 px above the band: fade the hair out instead of slicing it with a hard edge
+	m.set_shader_parameter("top_fade", 0.3)
 	face.material = m
 	root.add_child(face)
 	var tl: = UI.title(title, 40, Color("ffe7a6"), Color(0.25, 0.04, 0.16))

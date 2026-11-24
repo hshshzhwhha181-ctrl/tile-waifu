@@ -526,12 +526,11 @@ func _avatar(hero: String, r: Rect2) -> TextureRect:
 	var t: = UI.tex(load("res://assets/hero/%s.png" % hero), r, false)
 	var m: = ShaderMaterial.new()
 	m.shader = preload("res://shaders/card.gdshader")
-	var rig: Dictionary = Hero.RIGS[hero]
 	m.set_shader_parameter("size", r.size)
 	m.set_shader_parameter("radius", r.size.x * 0.5)
 	m.set_shader_parameter("tex_size", Vector2(848, 1264))
-	m.set_shader_parameter("focus", Vector2(rig.head_c.x / 848.0, (rig.head_c.y + 15) / 1264.0))
-	m.set_shader_parameter("zoom", 4.6)
+	m.set_shader_parameter("focus", Hero.av_focus(hero))
+	m.set_shader_parameter("zoom", Hero.av_zoom(hero))
 	m.set_shader_parameter("bottom_shade", 0.0)
 	t.material = m
 	return t

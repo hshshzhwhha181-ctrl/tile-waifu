@@ -26,17 +26,18 @@ const TOP_SPAN: = 3000
 const HOURS: = [0.55, 0.32, 0.18, 0.1, 0.07, 0.07, 0.14, 0.38, 0.66, 0.78, 0.8, 0.88, 1.1, 1.08, 0.9, 0.9, 1.0, 1.12, 1.3, 1.6, 1.8, 1.8, 1.5, 1.0]
 
 # outfit image -> [focus x, focus y, zoom] for a round face crop (Common.card_art)
+# (mc_* / hana_base / hana_street: measured on the adult redraw — focus = the eyes-to-mouth centre raised by 0.15 face
+# width, zoom = ≈2 face widths across the circle: the whole head, like the other heroines' crops)
 const FACES: = {
-	"hana_base": [0.52, 0.15, 4.6], "hana_beach": [0.545, 0.225, 4.6], "hana_gym": [0.52, 0.18, 4.6], "hana_street": [0.57, 0.2, 4.6],
-	"hana_winter": [0.47, 0.175, 4.6], "mc_base": [0.51, 0.17, 4.4], "mc_cafe": [0.5, 0.18, 4.4], "mc_cozy": [0.5, 0.18, 4.4],
+	"hana_base": [0.518, 0.156, 4.72], "hana_beach": [0.545, 0.225, 4.6], "hana_gym": [0.52, 0.18, 4.6], "hana_street": [0.626, 0.184, 4.99],
+	"hana_winter": [0.47, 0.175, 4.6], "mc_base": [0.513, 0.1164, 4.9], "mc_cafe": [0.508, 0.1336, 4.38], "mc_cozy": [0.515, 0.1117, 4.21], "mc_tutor": [0.375, 0.132, 4.25],
 	"mc_dragon": [0.46, 0.2, 4.8], "nova_base": [0.5, 0.2, 4.8], "nova_offline": [0.5, 0.21, 5.0],
 	"nova_ssr": [0.56, 0.25, 5.2], "rin_after": [0.55, 0.2, 5.0], "rin_agent": [0.5, 0.16, 4.8], "rin_base": [0.48, 0.17, 4.6],
 	"rin_idol": [0.46, 0.19, 4.6], "rin_maid": [0.49, 0.14, 4.6], "rin_yukata": [0.52, 0.14, 4.8], "yue_ball": [0.5, 0.15, 4.8],
 	"yue_base": [0.5, 0.16, 4.8], "yue_duel": [0.5, 0.21, 5.0], "yue_queen": [0.52, 0.18, 4.3],
 }
-# HEROINES.md §4-5: mc_base / mc_cafe / mc_cozy and hana_base / hana_street still carry the teen-coded look (white
-# thigh-highs, sneakers, pleats, crop hoodie) until they are redrawn, so no league bot wears them as a face
-const AVATARS: = ["hana_winter", "mc_dragon",
+# Outfit art used as league player avatars (mc/hana redrawn as clearly adult in 0.8; tutor art stays out)
+const AVATARS: = ["hana_base", "hana_street", "hana_winter", "mc_base", "mc_cafe", "mc_cozy", "mc_dragon",
 	"nova_base", "nova_offline", "rin_after", "rin_agent", "rin_base", "rin_idol", "rin_maid", "rin_yukata",
 	"yue_ball", "yue_base", "yue_queen"]
 

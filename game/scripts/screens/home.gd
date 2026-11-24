@@ -48,7 +48,17 @@ func build(m, _args: Dictionary) -> void :
 	var oid: = G.equipped(G.S.partner)
 	if oid != "":
 
-		var art: = Common.living_art(self, G.art_tex(G.ITEM[oid]), Rect2(0, 0, W, H), Vector2(0.5, 0.4))
+		# the outfit art is a full-height painting with the face near its top (y ≈ 0.11…0.19): drawn edge to edge it
+		# sits under the top bar and the greeting bubble. Push it down so her face lands where the rigged hero's face
+		# is (the bubble is placed from that head), centre the face horizontally, and fade the art's top edge in.
+		var otex: = G.art_tex(G.ITEM[oid])
+		var okey: = otex.resource_path.get_file().get_basename()
+		var ofc: Array = V8Population.FACES.get(okey, [0.5, 0.17, 4.6])
+		var osc: = maxf(W / float(otex.get_width()), H / float(otex.get_height()))
+		var rig: Dictionary = Hero.RIGS.get(G.S.partner, Hero.RIGS.mc)
+		var face_y: float = floor_y - (rig.feet.y - V8Art.rig_face(G.S.partner).y) * (H * 0.64 / 1160.0) - 10.0
+		var dy: = clampf(face_y - float(ofc[1]) * otex.get_height() * osc, 0.0, 280.0)
+		var art: = Common.living_art(self, otex, Rect2(0, dy, W, H), Vector2(float(ofc[0]), 0.4), 110.0 if dy > 0.0 else 0.0)
 		move_child(art, 1)
 		var shade: = Common.vignette(self, size, Color(0.1, 0.03, 0.15), 0.45)
 		move_child(shade, 2)
@@ -474,7 +484,7 @@ func _say(text: String) -> void :
 	if bubble:
 		bubble.queue_free()
 	var head: = hero.head_global()
-	bubble = Common.bubble(self, text, Vector2(114, maxf(head.y - 250, 140.0)), 300, false)
+	bubble = Common.bubble(self, text, Vector2(114, maxf(head.y - 250, 186.0)), 300, false)
 	var b: = bubble
 	var t: Tween = b.create_tween()
 	t.tween_interval(3.8)
