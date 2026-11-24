@@ -160,7 +160,8 @@ static func chest_open(chest: Control, reward: Dictionary, fx_parent: Control) -
 		var k: = 0
 		for key in reward:
 			var txt: = "+%d %s" % [int(reward[key]), {"gems": "кристаллов", "coins": "монет", "petals": "Лепестков", "tickets": "билет"}.get(key, key)]
-			var l: = Fx.float_text(fx_parent, c + Vector2(0, -60 - 46 * k), txt, Color("fff3d6"), 30, Color(0.25, 0.1, 0.05))
+			var tx: = clampf(c.x, 190.0, fx_parent.size.x - 190.0)
+			Fx.float_text(fx_parent, Vector2(tx, c.y - 60 - 46 * k), txt, Color("fff3d6"), 30, Color(0.25, 0.1, 0.05))
 			k += 1)
 	t.tween_property(chest, "scale", Vector2.ONE, 0.35).set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
 
