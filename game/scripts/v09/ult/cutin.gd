@@ -637,7 +637,9 @@ func _strong() -> void :
 		var c: = band.position
 		var name_at: = band.position + text.position
 		Fx.burst(self, name_at, "sparkle", int(26 * fx_k), (pal.accent as Color).lightened(0.35), 1.1)
-		Fx.burst(self, c + _art_c, "glow", int(16 * fx_k), (pal.main as Color).lightened(0.2), 1.0)
+		# gold sparks fly off the slash (never a blob over her face)
+		var sl: Vector2 = c + (_art_pts[0] + _art_pts[3]) * 0.5
+		Fx.burst(self, sl, "sparkle", int(18 * fx_k), GOLD, 0.8)
 	strong.emit()
 
 

@@ -477,9 +477,23 @@ func _show_pill(pal: Dictionary) -> void :
 	tw.tween_property(_pill, "modulate:a", 1.0, 0.12)
 	tw.tween_property(_pill, "scale", Vector2.ONE, 0.22).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	Sfx.play("summon_charge", 1.6, -12)
+	# the action buttons under the prompt step back while she aims
+	for b in _bottom_btns():
+		b.create_tween().tween_property(b, "modulate:a", 0.0, 0.12)
+
+
+func _bottom_btns() -> Array:
+	var out: = []
+	for k in ["btn_undo", "btn_hint", "btn_shuffle", "btn_sound"]:
+		var b = play.get(k)
+		if b is CanvasItem and is_instance_valid(b):
+			out.append(b)
+	return out
 
 
 func _hide_pill() -> void :
+	for b in _bottom_btns():
+		b.create_tween().tween_property(b, "modulate:a", 1.0, 0.18)
 	for n in [_pill, _frame]:
 		if n and is_instance_valid(n):
 			var tw: = (n as CanvasItem).create_tween()

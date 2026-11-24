@@ -299,7 +299,7 @@ func open_letter(id: int) -> void:
 	var ps_h: = body_font.get_multiline_string_size(v.ps, HORIZONTAL_ALIGNMENT_LEFT, tw, 18, -1, flags).y
 	var paper_h: = 28.0 + body_h + 16.0 + 40.0 + 10.0 + ps_h + 26.0
 	var head_h: = maxf(150.0, 58.0 + subj_h + 46.0)
-	var reply_h: = 210.0
+	var reply_h: = 236.0
 	var ph: = head_h + paper_h + reply_h + 30.0
 	pop = Common.popup(main, G.HEROES[h].name, ph, "cream", pw)
 	pop_id = id

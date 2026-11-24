@@ -636,13 +636,38 @@ func _fresh() -> String:
 	e = await tap_node(home.side_btns["mail"], "«Письма»")
 	if e != "":
 		return e
-	await wait(0.6)
+	# 0.9: «Письма» is the letters screen (scripts/v09/letters): open the newest letter, answer it, back home
+	e = await on("letters")
+	if e != "":
+		return e
 	await shot("mail")
-	if popup() != null:
-		e = await close_popup()
+	var card: Control = null
+	for c in main.screen.list.get_children():
+		if str(c.name).begins_with("Letter"):
+			card = c
+			break
+	if card != null:
+		e = await tap_node(card, "letter card")
 		if e != "":
 			return e
-	await wait(2.0)
+		await wait(0.7)
+		await shot("letter")
+		var rb = popup().get_node_or_null("Reply0") if popup() != null else null
+		if rb != null:
+			e = await tap_node(rb, "letter reply")
+			if e != "":
+				return e
+			await wait(0.9)
+			await shot("letter_reply")
+		if popup() != null:
+			e = await close_popup()
+			if e != "":
+				return e
+	e = await go_tab("home")
+	if e != "":
+		return e
+	home = main.screen
+	await wait(1.0)
 	# ---- tournament: quarter, a player card, week
 	step = "rating"
 	e = await tap_node(home.side_btns["rating"], "«Рейтинг»")
