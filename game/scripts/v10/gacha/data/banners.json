@@ -1,0 +1,17 @@
+{
+  "anchor": "2026-11-23",
+  "phase_days": 21,
+  "std": {"id": "five_winds", "kind": "std", "name": "Пять ветров", "sub": "Постоянные желания", "art": "res://assets/v10/gacha/key_five_winds.webp", "color": "e8c47e"},
+  "newbie": {"id": "first_guest", "kind": "newbie", "name": "Первый гость", "sub": "SSR-наряд — не позже 50-го желания", "art": "res://assets/v10/gacha/key_first_guest.webp", "color": "ecc0c9", "hero": "mc"},
+  "phases": [
+    {"id": "nm_dragon", "kind": "phase", "half": "A", "name": "Новая луна", "sub": "Императрица дракона", "ssr": ["o_dragon"], "s_up": ["o_cafe", "r_maid", "h_street"], "hero": "mc", "color": "ffcf4a", "font": "playfair"},
+    {"id": "fm_yue_nova", "kind": "phase", "half": "B", "name": "Полнолуние", "sub": "Юэ и Нова", "ssr": ["y_queen", "n_ssr"], "s_up": ["y_base", "n_base", "r_after"], "hero": "yue", "color": "c99bff", "font": "playfair"},
+    {"id": "nm_idol", "kind": "phase", "half": "A", "name": "Новая луна", "sub": "Звёздная айдол", "ssr": ["r_idol"], "s_up": ["r_maid", "r_after", "o_cafe"], "hero": "rin", "color": "ecc0c9", "font": "playfair"},
+    {"id": "fm_dragon_agent", "kind": "phase", "half": "B", "name": "Полнолуние", "sub": "Маджонг-тян и Рин", "ssr": ["o_dragon", "r_agent"], "s_up": ["o_cafe", "h_street", "y_base"], "hero": "rin", "color": "ffcf4a", "font": "playfair"},
+    {"id": "nm_champion", "kind": "phase", "half": "A", "name": "Новая луна", "sub": "Чемпионка зала", "ssr": ["h_gym"], "s_up": ["h_street", "h_beach", "n_base"], "hero": "hana", "color": "ffb35c", "font": "playfair"},
+    {"id": "fm_idol_queen", "kind": "phase", "half": "B", "name": "Полнолуние", "sub": "Рин и Юэ", "ssr": ["r_idol", "y_queen"], "s_up": ["r_maid", "y_base", "o_cafe"], "hero": "yue", "color": "c99bff", "font": "playfair"},
+    {"id": "nm_agent", "kind": "phase", "half": "A", "name": "Новая луна", "sub": "Городской агент", "ssr": ["r_agent"], "s_up": ["r_after", "n_base", "h_street"], "hero": "rin", "color": "4fbf9f", "font": "playfair"},
+    {"id": "fm_gym_neon", "kind": "phase", "half": "B", "name": "Полнолуние", "sub": "Хана и Нова", "ssr": ["h_gym", "n_ssr"], "s_up": ["h_beach", "n_base", "y_base"], "hero": "nova", "color": "4fe3ff", "font": "playfair"},
+    {"id": "nm_duelist", "kind": "phase", "half": "A", "name": "Новая луна", "sub": "Драконья дуэлянтка", "ssr": ["y_duel"], "s_up": ["y_base", "o_cafe", "r_maid"], "hero": "yue", "color": "c8b6ff", "font": "playfair"}
+  ]
+}
