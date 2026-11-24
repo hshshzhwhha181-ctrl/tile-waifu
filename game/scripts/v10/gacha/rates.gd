@@ -156,14 +156,14 @@ static func ref_rub_per_pull() -> float:
 
 static func rub_text(rub: float) -> String:
 	var r: = int(round(rub / 100.0)) * 100
-	return "≈ %s ₽" % group(r)
+	return "≈\u00a0%s\u00a0₽" % group(r)
 
 
 static func group(n: int) -> String:
 	var s: = str(absi(n))
 	var out: = ""
 	while s.length() > 3:
-		out = " " + s.substr(s.length() - 3) + out
+		out = "\u00a0" + s.substr(s.length() - 3) + out
 		s = s.substr(0, s.length() - 3)
 	return ("-" if n < 0 else "") + s + out
 

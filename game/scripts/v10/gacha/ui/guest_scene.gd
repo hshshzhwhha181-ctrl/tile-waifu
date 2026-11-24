@@ -60,9 +60,9 @@ func _build() -> void:
 	var y: = H * 0.7
 	for i in LINES.size():
 		var l: = V10GUI.lbl(LINES[i], 40 if i == 0 else 26, V10GUI.PAPER_100 if i == 0 else V10GUI.PAPER_300, "title", 700 if i == 0 else 500)
-		l.position = Vector2(40, y)
 		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		l.size = Vector2(W - 80, 10)
+		l.position = Vector2(40, y)
 		V10GUI.shadowed(l, 0.9)
 		add_child(l)
 		l.visible_ratio = 0.0
@@ -81,7 +81,7 @@ func _build() -> void:
 	ct.tween_property(chip, "modulate:a", 1.0, 0.3)
 	ct.tween_callback(func():
 		Sfx.play("win", 1.0, -6.0)
-		V10GUI.hanko(self, Vector2(W - 110, H * 0.7 - 80), "СВОЙ", 128, -8.0))
+		V10GUI.hanko(self, Vector2(W - 96, chip.position.y + 24), "СВОЙ", 112, -8.0))
 	var tap: = V10GUI.lbl("Коснись, чтобы продолжить", 18, V10GUI.PAPER_500, "body", 700)
 	UI.center_label(tap, Rect2(0, H - 70, W, 30))
 	add_child(tap)

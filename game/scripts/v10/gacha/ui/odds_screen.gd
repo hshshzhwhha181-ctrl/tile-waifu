@@ -137,14 +137,15 @@ func _row(list: Control, y: float, cols: Array, sizes: Array, colors: Array, xs:
 	var h: = 0.0
 	for k in cols.size():
 		var l: = V10GUI.lbl(String(cols[k]), int(sizes[k]), colors[k], "body", weight)
-		l.position = Vector2(xs[k], y)
+		# (a Label's position is set after autowrap + size, or it keeps its one-line width)
 		if k > 0:
 			l.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 			l.size = Vector2(130, 10)
-			l.position.x = xs[k] - 130
+			l.position = Vector2(xs[k] - 130, y)
 		else:
 			l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 			l.size = Vector2(W * 0.5, 10)
+			l.position = Vector2(xs[k], y)
 		list.add_child(l)
 		h = maxf(h, l.get_minimum_size().y)
 	return y + h
@@ -158,9 +159,9 @@ func _odds(list: Control) -> float:
 		var col: Color = V10GUI.RAR[s.rar]
 		y = _row(list, y, [s.rar, V10Rates.pct(s.base), V10Rates.pct(s.total)], [26, 24, 24], [col, V10GUI.PAPER_100, V10GUI.PAPER_100], xs, 900) + 10
 	var note: = V10GUI.lbl("Итоговый шанс учитывает, что SSR приходит не позже 60-го желания и S или выше — хотя бы раз в 10 желаний. Редкость — это сколько косметики у наряда, силы в рейтинге она не даёт.", 18, V10GUI.PAPER_500, "body", 700)
-	note.position = Vector2(32, y + 4)
 	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	note.size = Vector2(W - 64, 10)
+	note.position = Vector2(32, y + 4)
 	list.add_child(note)
 	y += note.get_minimum_size().y + 28
 	if gacha == null:
@@ -201,15 +202,15 @@ func _rules(list: Control) -> float:
 	]
 	for it in items:
 		var t: = V10GUI.lbl(it[0], 24, V10GUI.PAPER_100, "body", 900)
-		t.position = Vector2(32, y)
 		t.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		t.size = Vector2(W - 64, 10)
+		t.position = Vector2(32, y)
 		list.add_child(t)
 		y += t.get_minimum_size().y + 4
 		var d: = V10GUI.lbl(it[1], 19, V10GUI.PAPER_300, "body", 700)
-		d.position = Vector2(32, y)
 		d.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		d.size = Vector2(W - 64, 10)
+		d.position = Vector2(32, y)
 		list.add_child(d)
 		y += d.get_minimum_size().y + 22
 	var box: = V10GUI.sheet(Rect2(24, y, W - 48, 10), 0.9)
@@ -221,23 +222,23 @@ func _rules(list: Control) -> float:
 	by += 30
 	for line in V10Rates.worst_lines():
 		var l: = V10GUI.lbl(line, 21, V10GUI.GOLD_300, "body", 900)
-		l.position = Vector2(18, by)
 		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		l.size = Vector2(W - 84, 10)
+		l.position = Vector2(18, by)
 		box.add_child(l)
 		by += l.get_minimum_size().y + 8
 	var pl: = V10GUI.lbl("Расчёт: ≈ %d ₽ за желание по пакету Лунного камня за %s ₽" % [int(round(V10Rates.ref_rub_per_pull())), V10Rates.group(int(V10Rates.REF_PACK_RUB))], 17, V10GUI.PAPER_500, "body", 700)
-	pl.position = Vector2(18, by)
 	pl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	pl.size = Vector2(W - 84, 10)
+	pl.position = Vector2(18, by)
 	box.add_child(pl)
 	by += pl.get_minimum_size().y + 16
 	box.size.y = by
 	y += by + 24
 	var cl: = V10GUI.lbl("Сундуки салона, глав и лестницы возврата — без случайности: что написано, то и внутри.", 18, V10GUI.PAPER_500, "body", 700)
-	cl.position = Vector2(32, y)
 	cl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	cl.size = Vector2(W - 64, 10)
+	cl.position = Vector2(32, y)
 	list.add_child(cl)
 	return y + cl.get_minimum_size().y
 

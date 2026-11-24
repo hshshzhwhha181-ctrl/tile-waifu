@@ -36,9 +36,9 @@ static func constellation(gacha: V10Gacha2, it: Dictionary, r: Rect2, on_change:
 		var have: bool = lv >= int(u.lv)
 		var nxt: bool = int(u.lv) == lv + 1
 		var t: = V10GUI.lbl("✦%d  %s" % [u.lv, u.text], 18, V10GUI.PAPER_100 if have else (V10GUI.PAPER_300 if nxt else V10GUI.PAPER_700), "body", 800 if have or nxt else 700)
-		t.position = Vector2(18, y)
 		t.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		t.size = Vector2(r.size.x - 36, 10)
+		t.position = Vector2(18, y)
 		p.add_child(t)
 		y += t.get_minimum_size().y + 6
 	var petals: = int(G.S.get("petals", 0))
@@ -74,10 +74,10 @@ static func mastery_ring(it: Dictionary, r: Rect2) -> Control:
 	ring.tex = G.art_tex(it)
 	ring.pal = V10Mastery.palette(G.S, String(it.id))
 	var cap: = V10GUI.lbl(String(pr.next_text), 17, V10GUI.PAPER_300, "body", 800)
-	cap.position = Vector2(-40, r.size.y + 8)
-	cap.size = Vector2(r.size.x + 80, 10)
 	cap.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	cap.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	cap.size = Vector2(r.size.x + 80, 10)
+	cap.position = Vector2(-40, r.size.y + 8)
 	ring.add_child(cap)
 	return ring
 

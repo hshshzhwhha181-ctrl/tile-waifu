@@ -37,14 +37,14 @@ func _build(title: String, text: String, yes: String, no: String, art: Texture2D
 		sh.add_child(a)
 		tx = 172.0
 	var t: = V10GUI.h1(title, 38)
-	t.position = Vector2(tx, 36)
 	t.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	t.size = Vector2(W - tx - 32, 10)
+	t.position = Vector2(tx, 36)
 	sh.add_child(t)
 	var l: = V10GUI.lbl(text, 21, V10GUI.PAPER_300, "body", 700)
-	l.position = Vector2(tx, 36 + t.get_minimum_size().y + 8)
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	l.size = Vector2(W - tx - 32, 10)
+	l.position = Vector2(tx, 36 + t.get_minimum_size().y + 8)
 	sh.add_child(l)
 	var yb: = JButton.make(yes, "pink", Rect2(24, h - 140, W * 0.62 - 30, 104), null, 28)
 	yb.set_meta("ux_role", "primary")

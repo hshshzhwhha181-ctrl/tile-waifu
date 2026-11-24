@@ -53,9 +53,9 @@ func _build() -> void:
 	t.position = Vector2(30, 48)
 	sheet.add_child(t)
 	var sub: = V10GUI.lbl("Любая SSR постоянных желаний или текущей фазы. Если она уже у тебя — звезда Созвездия ✦.", 18, V10GUI.PAPER_300, "body", 700)
-	sub.position = Vector2(32, 104)
 	sub.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	sub.size = Vector2(W - 64, 10)
+	sub.position = Vector2(32, 104)
 	sheet.add_child(sub)
 	var sc: = ScrollContainer.new()
 	sc.position = Vector2(0, 150)

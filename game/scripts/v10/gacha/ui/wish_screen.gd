@@ -7,7 +7,7 @@ extends "res://scripts/screens/summon.gd"
 #
 # Banner page (magazine cover, UX_RULES §6.8): full-bleed key art, the banner card(s) in the lacquer frame on the
 # right, overline + Playfair title on the left, one lacquer sheet with the SSR line, the promise line and the
-# candelabra, then «Загадать ×1» (secondary) and «Загадать ×10» (primary). «ⓘ Шансы» in the art corner and
+# candelabra, then «Загадать ×1» (secondary) and «Загадать ×10» (primary). The header «?» and
 # «Шансы и правила ›» in the sheet open V10OddsScreen. Swipe or the tab spine switches banners (≤ 3).
 #
 # Integrator: main.SCREENS["summon"] → this script (one line, hook H1 in README); dev acts: see dev_act().
@@ -120,9 +120,12 @@ func _art_layer() -> void:
 func _card_rect() -> Rect2:
 	var top: = SPINE_Y + 70.0
 	var bottom: = H - NAV_H - 360.0
+	# the card never takes more than 58 % of the width (the title column keeps ≥ 40 %) and centres in the free band
 	var h: = clampf(bottom - top, 380.0, 640.0)
-	var w: = h * 0.75
-	return Rect2(W - w - 18.0, top, w, h)
+	var w: = minf(h * 0.75, W * 0.58)
+	h = w / 0.75
+	var y: = top + maxf(0.0, (bottom - top - h) * 0.4)
+	return Rect2(W - w - 18.0, y, w, h)
 
 
 # phase A: one framed card; phase B: two fanned cards, the target in front (tap the back one to switch target)
@@ -373,9 +376,9 @@ func _sheet() -> void:
 		_:
 			l2t = "SSR — не позже 60-го желания · все постоянные наряды"
 	var l2: = V10GUI.lbl(l2t, 18, V10GUI.GOLD_300 if gacha.guar(cur_b) else V10GUI.PAPER_300, "body", 700)
-	l2.position = Vector2(20, 66)
 	l2.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	l2.size = Vector2(r.size.x * 0.6, 10)
+	l2.position = Vector2(20, 66)
 	sh.add_child(l2)
 	# candelabra + «Свечи: 137/200» on the right
 	var cw: = r.size.x * 0.36
@@ -761,20 +764,20 @@ func _results(res: Array) -> void:
 		gems += int(r.get("gems", 0))
 	var chips: = []
 	if stars > 0:
-		chips.append(V10GUI.chip("Созвездие +%d ✦" % stars, null, 44, V10GUI.LAV))
+		chips.append(V10GUI.chip("Созвездие +%d ✦" % stars, null, 40, V10GUI.LAV))
 	if petals > 0:
-		chips.append(V10GUI.chip("+%d %s" % [petals, V10GachaBank.plural(petals, "Лепесток", "Лепестка", "Лепестков")], null, 44, V10GUI.ROSE_300))
+		chips.append(V10GUI.chip("+%d %s" % [petals, V10GachaBank.plural(petals, "Лепесток", "Лепестка", "Лепестков")], null, 40, V10GUI.ROSE_300))
 	if gems > 0:
-		chips.append(V10GUI.chip("+%d" % gems, V8Art.cur("gem"), 44, V10GUI.GOLD_300))
+		chips.append(V10GUI.chip("+%d" % gems, V8Art.cur("gem"), 40, V10GUI.GOLD_300))
 	# the candles chip is a small live candelabra: the new candles light up in it, one note each
-	var cc: = V10GUI.sheet(Rect2(0, 0, 250, 44), 0.9)
+	var cc: = V10GUI.sheet(Rect2(0, 0, 190, 40), 0.9)
 	var cd: = V10Candelabra.new()
-	cd.size = Vector2(130, 44)
+	cd.size = Vector2(96, 42)
 	cd.position = Vector2(6, -6)
 	cd.set_count(_candles_before)
 	cc.add_child(cd)
 	var cl: = V10GUI.lbl("%d/%d" % [mini(int(G.S.candles), V10Rates.SPARK), V10Rates.SPARK], 20, V10GUI.PAPER_300, "body", 900)
-	cl.position = Vector2(142, 8)
+	cl.position = Vector2(102, 6)
 	cc.add_child(cl)
 	chips.append(cc)
 	if _candles_before / V10Candelabra.PER < mini(10, int(G.S.candles) / V10Candelabra.PER):
@@ -783,14 +786,24 @@ func _results(res: Array) -> void:
 				cd.animate_to(int(G.S.candles)))
 	else:
 		cd.set_count(int(G.S.candles))
-	var tw: = 0.0
+	# one row when it fits the width, otherwise two rows (narrow phones, long numbers)
+	var rows: = [[]]
+	var rw: = 0.0
 	for c in chips:
-		tw += c.size.x + 10
-	var x: = (W - tw + 10) * 0.5
-	for c in chips:
-		c.position = Vector2(x, by - 64)
-		x += c.size.x + 10
-		seq.add_child(c)
+		if rw + c.size.x > W - 32.0 and not rows[-1].is_empty():
+			rows.append([])
+			rw = 0.0
+		rows[-1].append(c)
+		rw += c.size.x + 10
+	for ri in rows.size():
+		var tw: = 0.0
+		for c in rows[ri]:
+			tw += c.size.x + 10
+		var x: = (W - tw + 10) * 0.5
+		for c in rows[ri]:
+			c.position = Vector2(x, by - 64 - (rows.size() - 1 - ri) * 52)
+			x += c.size.x + 10
+			seq.add_child(c)
 	V10GUI.cascade(chips, 0.2)
 
 
@@ -819,15 +832,22 @@ func _open_spark() -> void:
 		if r.is_empty():
 			return
 		G.save()
-		await _showcase(to09(r))
-		_build_banner())
+		await _ceremony(to09(r)))
+
+
+# a showcase outside the pull sequence (Свеча, первая SSR): the chrome steps aside like during a pull
+func _ceremony(r09: Dictionary) -> void:
+	main.show_chrome(false, false)
+	await _showcase(r09)
+	main.show_chrome(true, true)
+	main.refresh_currency()
+	_build_banner()
 
 
 func _open_first_pick() -> void:
 	first_view = V10FirstPickView.open(_overlay(), gacha, func(r: Dictionary):
 		G.save()
-		await _showcase(to09(r))
-		_build_banner()
+		await _ceremony(to09(r))
 		_ask_partner(r))
 
 

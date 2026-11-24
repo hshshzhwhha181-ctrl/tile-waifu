@@ -69,8 +69,8 @@ func _rates() -> void:
 	check(absf(c1.SSR * 100.0 - 3.85) < 0.02, "consolidated v1 SSR 3.85")
 	check(V10Rates.ssr_rate(45, 2) == 0.016 and absf(V10Rates.ssr_rate(46, 2) - 0.076) < 1e-6 and V10Rates.ssr_rate(60, 2) == 1.0, "soft pity from #46, hard #60")
 	var lines: = V10Rates.worst_lines()
-	check("19 700 ₽" in lines[0] and "120" in lines[0], "worst case 120 ≈ 19 700 ₽")
-	check("32 800 ₽" in lines[1] and "200" in lines[1], "candle 200 ≈ 32 800 ₽")
+	check("19\u00a0700\u00a0₽" in lines[0] and "120" in lines[0], "worst case 120 ≈ 19 700 ₽")
+	check("32\u00a0800\u00a0₽" in lines[1] and "200" in lines[1], "candle 200 ≈ 32 800 ₽")
 
 
 func _monte_carlo() -> void:
@@ -362,11 +362,11 @@ func _mastery() -> void:
 
 func _misc() -> void:
 	check(V10GachaBank.plural(1, "a", "b", "c") == "a" and V10GachaBank.plural(3, "a", "b", "c") == "b" and V10GachaBank.plural(11, "a", "b", "c") == "c", "plural")
-	check(V10GachaBank.split_text({"tickets": 3, "gems": 450, "moon": 0}) == "Спишется: 3 билета → 450 кристаллов", "split text")
+	check(V10GachaBank.split_text({"tickets": 3, "gems": 1050, "moon": 0}) == "Спишется: 3 билета → 1\u00a0050 кристаллов", "split text")
 	var S: = fresh({"gems": 100})
 	var g: = gacha(S)
 	check(g.pull(V10Banners.std(), 1).is_empty() and int(S.gems) == 100, "no pull without crystals, nothing spent")
-	check(V10Rates.group(19656) == "19 656" and V10Rates.pct(2.9) == "2,90 %", "number format")
+	check(V10Rates.group(19656) == "19\u00a0656" and V10Rates.pct(2.9) == "2,90 %", "number format")
 
 
 # visible strings of the lane must not use banned jargon (UX_RULES §4.3)
