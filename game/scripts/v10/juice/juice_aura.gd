@@ -41,10 +41,10 @@ func setup_fever(frame: Rect2, a: Color, b: Color, radius: float) -> void:
 	position = frame.position - Vector2(pad, pad)
 	size = frame.size + Vector2(pad, pad) * 2.0
 	var lvl: = V10Juice.level()
-	_make_glow(frame.size, radius, a, b, 0 if lvl != "min" else 1, 0.8 if lvl == "full" else (0.62 if lvl == "mid" else 0.4))
+	_make_glow(frame.size, radius, a, b, 0 if lvl != "min" else 1, 0.8 if lvl == "full" else (0.62 if lvl == "mid" else 0.7))
 	glow.size = size
 	if lvl == "min":
-		V10Juice.param(glow, "beat", 0.5)
+		V10Juice.param(glow, "beat", 0.75)
 	else:
 		# ignite: the aura swells in
 		modulate.a = 0.0
