@@ -582,8 +582,8 @@ func _pill_out() -> void :
 
 # the pill while only the fever runs (the combo broke): «Лихорадка» and the seconds left
 func _fever_pill() -> void :
-	if pill_lbl.text != "Лихорадка":
-		pill_lbl.text = "Лихорадка"
+	if pill_lbl.text != "Полнолуние":
+		pill_lbl.text = "Полнолуние"
 		_set_width(tier_width(3), true)
 		_fit_title(tier_width(3) - 24.0)
 	pill_lbl.label_settings.font_color = _fever_col().lightened(0.3)
@@ -599,7 +599,7 @@ func _fever_sub() -> void :
 		return
 	var s: = maxi(1, int(ceil(fever_left)))
 	var mult: = (1 + (last_n - 1) / 2) * 2
-	var t: = "лихорадка · ×%d · %d с" % [mult, s]
+	var t: = "полнолуние · ×%d · %d с" % [mult, s]
 	if pill_sub.text != t:
 		pill_sub.text = t
 		pill_sub.label_settings.font_color = FEVER_GOLD
@@ -702,7 +702,7 @@ func _milestone(n: int, at: Vector2) -> void :
 			icon = "gem"
 			target = play.gems_lbl
 		5:
-			what = "Лихорадка: кристаллы ×2"
+			what = "Полнолуние: кристаллы ×2"
 			icon = "gem"
 		8:
 			play.hint_n += 1
@@ -731,7 +731,7 @@ func _milestone(n: int, at: Vector2) -> void :
 		return
 	# 0.8: the milestone reward is said inside the pill (its second line), not as a float that would rise into
 	# the yaku plaque or the luck strip
-	_set_sub(what, "Лихорадка ×2" if n == 5 else "")
+	_set_sub(what, "Полнолуние ×2" if n == 5 else "")
 	pill_sub.label_settings.font_color = Color("9fe8d0")
 	sub_hold_until = G.time + 1.4
 	UI.punch(pill_sub, 0.15)

@@ -315,6 +315,7 @@ func settings() -> void :
 	vl.size = Vector2(592, 24)
 	vl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	p.add_child(vl)
+	V10Clarity.settings_hook(self, p)  # v10-clarity hook: «Фишки и словарь»
 
 
 # one 3-way setting: caption, three segments (the chosen one painted like a selected tab) and a hint line

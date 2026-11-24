@@ -197,6 +197,7 @@ func setup(cfg: Dictionary) -> void :
 		t.home = off + Vector2((t.gx - minx) * UX, (t.gy - miny) * UY) + DZ * t.gz
 		t.position = t.home
 		t.build(look)
+		V10TileMarks.attach(t)  # v10-clarity hook: suit mark / back badge
 		if t.shard != "":
 			t.set_shard(t.shard)
 		t.mat.set_shader_parameter("dim", 0.0)
@@ -332,6 +333,9 @@ func _unhandled_input(e: InputEvent) -> void :
 			skip_deal()
 		return
 	if e is InputEventScreenTouch and e.pressed:
+		if V10TileInfo.intercept(self, e):  # v10-clarity hook: long press / lupa / close the tile bubble
+			get_viewport().set_input_as_handled()
+			return
 		var t: = tile_at(e.position)
 		if t:
 			tap(t)
