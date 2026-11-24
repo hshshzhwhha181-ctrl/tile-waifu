@@ -1,0 +1,8 @@
+name	job_id	note
+stk_sheet_mc	3c990812-b9b2-43f6-bcb2-2805b1222a83	4x2 sheet, ref cute_mc
+stk_sheet_rin	afa1ae55-28d4-4a2e-846d-fab2308d945f	4x2 sheet, ref cute_rin
+stk_sheet_hana	9afbb72c-0727-4c29-ad72-d41d520fdb81	4x2 sheet, ref adult_hana_base (hana_start replaced)
+stk_sheet_yue	e4a74a82-26cc-47cc-a5b8-f51f0804348e	4x2 sheet, ref cute_yue
+stk_sheet_nova	08831094-314d-45fe-8091-cbf61b79dc52	4x2 sheet, ref cute_nova
+stk_sheet_common	0854c744-c907-4658-8bc5-cabfe91350fd	4x2 objects sheet
+stk_hana_start	72838dcc-9f6e-4487-b9a0-a05708128f78	single, zipped jacket (replaces leaning pose)
