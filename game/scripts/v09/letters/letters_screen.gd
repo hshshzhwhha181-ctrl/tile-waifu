@@ -70,7 +70,7 @@ func _fill() -> void:
 	for l in letters:
 		var c: = _card(l)
 		list.add_child(c)
-		UI.slide_in(c, Vector2(0, 26), 0.04 + mini(i, 6) * 0.05, 0.4)
+		_appear(c, 0.04 + mini(i, 6) * 0.06)
 		i += 1
 	if not legacy.is_empty():
 		_section("Записки и сцены")
@@ -80,6 +80,15 @@ func _fill() -> void:
 		V9Letters.mark_legacy_seen()
 		G.save()
 	_spacer(60)
+
+
+# a row of the list fades in with a small settle (the VBox owns its position, so only alpha and scale move)
+func _appear(c: Control, delay: float) -> void:
+	c.modulate.a = 0.0
+	c.scale = Vector2.ONE * 0.96
+	var t: = c.create_tween().set_parallel()
+	t.tween_property(c, "modulate:a", 1.0, 0.28).set_delay(delay)
+	t.tween_property(c, "scale", Vector2.ONE, 0.42).set_delay(delay).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 
 func _spacer(h: float) -> void:
@@ -434,6 +443,11 @@ func dev_act(a: String) -> void:
 			var ls: = V9Letters.list()
 			if not ls.is_empty():
 				open_letter(int(ls[0].id))
+		"open_unreplied":
+			for l in V9Letters.list():
+				if int(l.get("reply", -1)) < 0:
+					open_letter(int(l.id))
+					return
 		"open_replied":
 			for l in V9Letters.list():
 				if int(l.get("reply", -1)) >= 0:

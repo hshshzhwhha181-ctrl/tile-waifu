@@ -1381,7 +1381,8 @@ func _v9_dev() -> void :
 		return
 	G.save_path = "user://dev_v9_ult.json"
 	ult.force_mode = String(a.get("v9_cutin", "full"))
-	ult.force_auto = true
+	# --v9_aim=1: open the 2 s aim window instead of the auto-target (screenshots of the prompt)
+	ult.force_auto = a.get("v9_aim", "") != "1"
 	if a.has("v9_ult_shots") and a.has("shots"):
 		V9Cutin.dev_dir = String(a.shots)
 		V9Cutin.dev_name = String(a.get("name", "ult"))

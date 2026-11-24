@@ -767,9 +767,9 @@ func _apply(pick: Dictionary, pal: Dictionary) -> void :
 
 
 func _mark(lay: Node, at: Vector2, col: Color, k: float) -> void :
-	Fx.ring(lay, at, col.lightened(0.25), 0.8 * k, 0.36)
+	Fx.ring(lay, at, col.lightened(0.12), 0.8 * k, 0.36)
 	if V9Feel.can_fx():
-		Fx.flash_glow(lay, at, Color(col.lightened(0.3), 0.7), 1.3 * k, 0.3)
+		Fx.flash_glow(lay, at, Color(col, 0.6), 1.2 * k, 0.3)
 
 
 func _take(pr: Array, col: Color) -> void :

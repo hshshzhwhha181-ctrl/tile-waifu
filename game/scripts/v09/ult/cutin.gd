@@ -106,6 +106,7 @@ var underline: Polygon2D
 var shout_l: Label
 var _shout_y: = 0.0
 var glow: Sprite2D
+var medal: Node2D
 
 
 static func run(parent: Control, outfit_id: String, opts: = {}) -> V9Cutin:
@@ -376,6 +377,27 @@ func _build_text(shout: String, main: Color, accent: Color, ink: Color) -> void 
 	glow.modulate = Color(main, 0.32)
 	glow.scale = Vector2(3.4, 1.5)
 	text.add_child(glow)
+	# a faint lacquer medallion behind the name: two thin rings in her colour, turning slowly
+	medal = Node2D.new()
+	text.add_child(medal)
+	for r in [118.0, 98.0]:
+		var ring: = Line2D.new()
+		var rp: = PackedVector2Array()
+		for i in 73:
+			var a: = TAU * i / 72.0
+			rp.append(Vector2(cos(a), sin(a)) * r)
+		ring.points = rp
+		ring.width = 2.0 if r > 100.0 else 1.2
+		ring.default_color = Color(main.lightened(0.45), 0.16 if r > 100.0 else 0.1)
+		ring.antialiased = true
+		medal.add_child(ring)
+	for i in 8:
+		var a: = TAU * i / 8.0
+		var tick: = Line2D.new()
+		tick.points = PackedVector2Array([Vector2(cos(a), sin(a)) * 100.0, Vector2(cos(a), sin(a)) * 116.0])
+		tick.width = 1.5
+		tick.default_color = Color(GOLD, 0.14)
+		medal.add_child(tick)
 
 	var hero_name: String = String(G.HEROES.get(hero, {}).get("name", "")).to_upper()
 	tag_l = UI.label("УЛЬТА · %s" % hero_name, 17, GOLD, ink.darkened(0.5), 4, "body", 900)
@@ -567,6 +589,9 @@ func _apply(tt: float) -> void :
 	shout_l.position.y = _shout_y + (1.0 - _out_cubic(sa)) * 10.0
 	glow.modulate.a = 0.28 + 0.3 * sin(_seg(tt, Ts, 0.4) * PI)
 	text.scale = Vector2.ONE * (1.0 + sin(_seg(tt, Ts, 0.22) * PI) * 0.045)
+	medal.rotation = (tt - T0) * 0.5 * -dir
+	medal.scale = Vector2.ONE * (0.9 + 0.1 * _out_cubic(_seg(tt, T0, 0.4)))
+	medal.visible = fx_ok
 	# sheen sweeps over the strip on the strong beat
 	if sheen.visible:
 		var sp: = _seg(tt, Ts, 0.32)
