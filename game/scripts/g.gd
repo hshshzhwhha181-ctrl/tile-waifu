@@ -716,13 +716,19 @@ func set_ult_cutin(m: String) -> void :
 	settings_changed.emit("ult_cutin")
 
 
-# V6Fx.shake()/flash() read S.v6_fx.shake/flash: only the "full" level keeps them on
+# V6Fx.shake()/flash() read S.v6_fx.shake/flash (missing = on): only the "full" level keeps them on. Writes only
+# what differs, so a save that never touched the keys round-trips unchanged.
 func _sync_v6_fx() -> void :
-	if not (S.get("v6_fx") is Dictionary):
-		S.v6_fx = {}
 	var on: = str(S.get("fx_level", "full")) == "full"
-	S.v6_fx.shake = on
-	S.v6_fx.flash = on
+	var d = S.get("v6_fx")
+	if not (d is Dictionary):
+		if on:
+			return
+		d = {}
+		S.v6_fx = d
+	for k in ["shake", "flash"]:
+		if bool(d.get(k, true)) != on:
+			d[k] = on
 
 
 func _tmp_path() -> String:

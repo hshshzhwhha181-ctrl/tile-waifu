@@ -53,7 +53,7 @@ static func _cyr(s: String) -> bool:
 
 static func _table() -> void :
 	var ids: = _outfits()
-	_check("23+ outfits known", ids.size() >= 23, str(ids.size()))
+	_check("28+ outfits known (23 + 5 event)", ids.size() >= 28, str(ids.size()))
 	for id in ids:
 		_check("ULTS has %s" % id, V9Ults.has(id))
 	for id in V9Ults.ULTS:
@@ -73,7 +73,7 @@ static func _table() -> void :
 		_check("%s palette main = heroine colour" % id, pal.get("main") is Color and pal.main.is_equal_approx(G.HEROES[h].color))
 		_check("%s palette accent + ink" % id, pal.get("accent") is Color and pal.get("ink") is Color and pal.ink.get_luminance() < 0.3)
 		var img: String = u.get("ref_img", "")
-		_check("%s ref_img is the item art" % id, img == "res://assets/outfits/%s.webp" % String(it.get("img", "")), img)
+		_check("%s ref_img is the item art" % id, img == ("res://assets/outfits/%s.webp" % String(it.get("img", ""))).simplify_path(), img)
 		_check("%s ref_img exists" % id, ResourceLoader.exists(img), img)
 		var key: = img.get_file().get_basename()
 		_check("%s rects measured" % id, V9Ults.RECTS.has(key))
@@ -81,21 +81,23 @@ static func _table() -> void :
 		var ar: Rect2 = u.get("alt_rect", Rect2())
 		var art: = Rect2(Vector2.ZERO, V9Ults.ART_SIZE)
 		_check("%s face_rect = RECTS" % id, V9Ults.RECTS.has(key) and fr == V9Ults.RECTS[key][0] and ar == V9Ults.RECTS[key][1])
-		_check("%s face_rect inside art, 180-320 px" % id, art.encloses(fr) and fr.size.x >= 180 and fr.size.x <= 320 and is_equal_approx(fr.size.x, fr.size.y), str(fr))
+		_check("%s face_rect inside art, 180-320 px" % id, art.encloses(fr) and fr.size.x >= 180 and fr.size.x <= 480 and is_equal_approx(fr.size.x, fr.size.y), str(fr))
 		_check("%s alt_rect inside art, holds the face centre" % id, art.encloses(ar) and ar.has_point(fr.get_center()) and ar.size.y > fr.size.y, str(ar))
 		_check("%s face in the upper half" % id, fr.get_center().y < 640.0)
 		var m: String = u.get("mod", "?")
+		# list of [mod, rarity] of this heroine's outfits so far (ULTS order: base first, event outfits last)
+		var seen: Array = mods_by_hero.get(h, [])
 		if id in G.BASE_OUTFITS:
 			_check("%s base outfit has no mod" % id, m == "")
 		else:
 			_check("%s mod is one of П/О/Л/В/Ц/С" % id, V9Ults.MODS.has(m), m)
-			var seen: Dictionary = mods_by_hero.get(h, {})
 			var rar: = String(it.get("rar", ""))
 			# §2: no repeat within a heroine; from her 6th outfit a repeat is allowed only from another rarity
-			if seen.has(m):
-				_check("%s mod %s repeats only across rarities after 5 outfits" % [id, m], seen[m] != rar and seen.size() >= 5)
-			seen[m] = rar
-			mods_by_hero[h] = seen
+			for e in seen:
+				if e[0] == m:
+					_check("%s mod %s repeats only from the 6th outfit, across rarities" % [id, m], seen.size() >= 5 and e[1] != rar)
+		seen.append([m, String(it.get("rar", ""))])
+		mods_by_hero[h] = seen
 		var sfx: String = u.get("sfx", "")
 		_check("%s sfx exists" % id, ResourceLoader.exists("res://assets/sfx/%s.wav" % sfx), sfx)
 		_check("%s fx key" % id, String(u.get("fx", "")) != "")
@@ -214,7 +216,7 @@ static func _settings() -> void :
 	_check("v6 -> v7: shake off becomes mid", G.fx_level() == "mid" and G.ult_cutin() == "full")
 	v6.v6_fx = {"shake": true}
 	G.apply_state(JSON.parse_string(JSON.stringify(v6)))
-	_check("v6 -> v7: shake on becomes full", G.fx_level() == "full" and G.S.v6_fx.flash == true)
+	_check("v6 -> v7: shake on becomes full", G.fx_level() == "full" and V6Fx.opt("flash"))
 	v6.erase("v6_fx")
 	v6.cutins = false
 	G.apply_state(JSON.parse_string(JSON.stringify(v6)))
@@ -228,9 +230,9 @@ static func _settings() -> void :
 	var cb: = func(k): seen.append(k)
 	G.settings_changed.connect(cb)
 	G.set_fx_level("min")
-	_check("set_fx_level min: shake/flash off", G.fx_level() == "min" and G.S.v6_fx.shake == false and G.S.v6_fx.flash == false)
+	_check("set_fx_level min: shake/flash off", G.fx_level() == "min" and V6Fx.opt("shake") == false and V6Fx.opt("flash") == false)
 	G.set_fx_level("full")
-	_check("set_fx_level full: shake/flash on", G.S.v6_fx.shake == true and G.S.v6_fx.flash == true)
+	_check("set_fx_level full: shake/flash on", V6Fx.opt("shake") and V6Fx.opt("flash"))
 	G.set_fx_level("bogus")
 	_check("set_fx_level ignores unknown", G.fx_level() == "full")
 	G.set_ult_cutin("short")
@@ -239,6 +241,10 @@ static func _settings() -> void :
 	_check("set_ult_cutin ignores unknown", G.ult_cutin() == "short")
 	G.settings_changed.disconnect(cb)
 	_check("settings_changed emitted", seen == ["fx_level", "fx_level", "ult_cutin"], str(seen))
+	var fresh: = G.default_state()
+	G.apply_state(JSON.parse_string(JSON.stringify(fresh)))
+	_check("full level adds no v6_fx keys to a clean save", not G.S.has("v6_fx"))
+	G.set_ult_cutin("short")
 	var rt: = JSON.parse_string(JSON.stringify(G.S))
 	_check("v7 round trip keeps settings", G.apply_state(rt) and G.ult_cutin() == "short" and G.fx_level() == "full")
 

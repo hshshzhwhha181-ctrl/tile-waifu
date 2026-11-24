@@ -11,7 +11,7 @@ extends RefCounted
 #     name:      ult name, Russian (HEROINES.md §5)
 #     lines:     2–3 short Russian shouts; pick with V9Ults.line() (no repeat of the last one)
 #     palette:   {main: heroine signature colour, accent: outfit accent, ink: dark outline/text colour}
-#     ref_img:   "res://assets/outfits/<img>.webp" — the outfit's OWN art. To draw, call V9Ults.shown(id), which
+#     ref_img:   the outfit's OWN art (res://assets/outfits/<img>.webp; event outfits res://assets/v07/event/cg_*_card.webp). To draw, call V9Ults.shown(id), which
 #                swaps retired (hidden) and, in modest mode, bold outfits to their "alt" art with that art's rects.
 #     face_rect: Rect2 in 859×1280 art space: head-and-shoulders square, face at ~45 % height (close-up / eye strip:
 #                SSR clips open on the top half of it). Scale to the real texture with V9Ults.rect_px().
@@ -129,6 +129,12 @@ const RECTS: = {
 	"yue_base": [Rect2(280, 137, 260, 260), Rect2(220, 84, 381, 476)],
 	"yue_duel": [Rect2(299, 135, 260, 260), Rect2(222, 82, 414, 518)],
 	"yue_queen": [Rect2(313, 151, 260, 260), Rect2(234, 98, 418, 522)],
+	# event outfits (V7EventData.limited_items): close-up cards, faces are larger
+	"cg_mc_card": [Rect2(168, 175, 468, 468), Rect2(74, 80, 656, 820)],
+	"cg_rin_card": [Rect2(449, 140, 390, 390), Rect2(308, 61, 551, 689)],
+	"cg_hana_card": [Rect2(417, 145, 442, 442), Rect2(163, 55, 696, 870)],
+	"cg_yue_card": [Rect2(136, 117, 338, 338), Rect2(66, 48, 478, 597)],
+	"cg_nova_card": [Rect2(559, 148, 234, 234), Rect2(491, 100, 368, 460)],
 }
 
 const ULTS: = {
@@ -229,6 +235,28 @@ const ULTS: = {
 		"palette": {"main": Color("4fe3ff"), "accent": Color("ffb8e6"), "ink": _NOVA_INK},
 		"ref_img": "res://assets/outfits/nova_offline.webp", "face_rect": Rect2(322, 125, 260, 260), "alt_rect": Rect2(257, 72, 390, 488),
 		"mod": "В", "sfx": "sparkle", "fx": "offline"},
+	# ── event outfits (SSR, limited; not in the §5 tables — names in the same voice). From a heroine's 6th outfit a
+	# modifier may repeat if it came from another rarity (§2); the §5 slots of future outfits are left free.
+	"ev_mc": {"hero": "mc", "name": "Последний гость", "lines": ["Табличка «закрыто»!", "Только для своих~", "Партия окончена~"],
+		"palette": {"main": Color("ff8fb8"), "accent": Color("ffcf8a"), "ink": _MC_INK},
+		"ref_img": "res://assets/v07/event/cg_mc_card.webp", "face_rect": Rect2(168, 175, 468, 468), "alt_rect": Rect2(74, 80, 656, 820),
+		"mod": "В", "sfx": "sparkle", "fx": "lamp_dim"},
+	"ev_rin": {"hero": "rin", "name": "Рой светлячков", "lines": ["Позволь.", "Светлячки, ко мне.", "Посидим у пруда."],
+		"palette": {"main": Color("4fbf9f"), "accent": Color("fff0a0"), "ink": _RIN_INK},
+		"ref_img": "res://assets/v07/event/cg_rin_card.webp", "face_rect": Rect2(449, 140, 390, 390), "alt_rect": Rect2(308, 61, 551, 689),
+		"mod": "С", "sfx": "sparkle", "fx": "fireflies"},
+	"ev_hana": {"hero": "hana", "name": "Финиш на закате", "lines": ["На старт!", "До заката!", "Бежим вместе!"],
+		"palette": {"main": Color("ffb35c"), "accent": Color("ff7a8a"), "ink": _HANA_INK},
+		"ref_img": "res://assets/v07/event/cg_hana_card.webp", "face_rect": Rect2(417, 145, 442, 442), "alt_rect": Rect2(163, 55, 696, 870),
+		"mod": "Ц", "sfx": "whoosh", "fx": "sunset_lane"},
+	"ev_yue": {"hero": "yue", "name": "Роса полнолуния", "lines": ["Любопытно…", "Полнолуние.", "Роса, проснись."],
+		"palette": {"main": Color("c8b6ff"), "accent": Color("9fd8ff"), "ink": _YUE_INK},
+		"ref_img": "res://assets/v07/event/cg_yue_card.webp", "face_rect": Rect2(136, 117, 338, 338), "alt_rect": Rect2(66, 48, 478, 597),
+		"mod": "О", "sfx": "reveal_sr", "fx": "moon_dew"},
+	"ev_nova": {"hero": "nova", "name": "Зелёная волна", "lines": ["Скачано.", "Все светофоры мои!", "Догоняй."],
+		"palette": {"main": Color("4fe3ff"), "accent": Color("ff6fd8"), "ink": _NOVA_INK},
+		"ref_img": "res://assets/v07/event/cg_nova_card.webp", "face_rect": Rect2(559, 148, 234, 234), "alt_rect": Rect2(491, 100, 368, 460),
+		"mod": "Ц", "sfx": "gem", "fx": "green_wave"},
 }
 
 
@@ -260,7 +288,7 @@ static func shown(id: String, modest = null) -> Dictionary:
 	if it.has("alt") and (it.get("hidden", false) or (modest and it.get("bold", false))):
 		alt = String(it.alt)
 	if alt != "":
-		img = "res://assets/outfits/%s.webp" % alt
+		img = ("res://assets/outfits/%s.webp" % alt).simplify_path()
 	var key: = img.get_file().get_basename()
 	var r: Array = RECTS.get(key, [u.get("face_rect", Rect2(Vector2.ZERO, ART_SIZE)), u.get("alt_rect", Rect2(Vector2.ZERO, ART_SIZE))])
 	return {"img": img, "face_rect": r[0], "alt_rect": r[1]}
