@@ -322,7 +322,6 @@ func _unhandled_input(e: InputEvent) -> void :
 		# 0.9: a tap on the table while the deal is still landing is never dropped: the tile under the finger
 		# glints, a soft clack and a light tap haptic answer it, and the rest of the deal lands at once (skip_deal)
 		# so the very next tap plays. The skipping tap itself is not played (a tile still in flight is no target).
-		if dealing and e is InputEventScreenTouch: print("DBG touch ", e.position, " hit=", _deal_hit(e.position))
 		if dealing and e is InputEventScreenTouch and e.pressed and _deal_hit(e.position):
 			var dt: = tile_at(e.position)
 			if dt:

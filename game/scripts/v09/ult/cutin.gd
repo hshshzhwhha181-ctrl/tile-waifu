@@ -8,15 +8,23 @@ extends Control
 #   await c.finished    the clip is gone; give the board back to the player
 #
 # Look: the board dims to 60 %, a diagonal strip in the heroine colour slides in. One panel of it is a stop-frame of
-# the equipped outfit art (V9Ults.shown: alt art in modest mode / for retired outfits) framed on face_rect, cut off
-# by a gold diagonal slash; the other panel holds «УЛЬТА · <героиня>», the ult name in Playfair italic with a brush
-# underline, and her shout. On the strong beat: one palette-coloured pulse (never white, ≤ 70 % value, ≤ 3 flashes
-# per second across all cut-ins), a sheen over the strip, sparks and her hit sound. SSR clips open with two beats of
-# an eye close-up strip. R/SR ≈ 1.33 s (Юэ in 3/4), SSR ≈ 2 s, short ≤ 0.6 s (V9Ults.clip_len).
+# the equipped outfit art (V9Ults.clip_art: alt art in modest mode / for retired outfits, her base portrait while the
+# outfit's painting is queued for an adult-face redraw) framed on face_rect, cut off by a gold diagonal slash; the
+# other panel holds «УЛЬТА · <героиня>», the ult name in Playfair italic with a brush underline, and her shout. On
+# the strong beat: one palette-coloured pulse (never white, ≤ 70 % value, ≤ 3 flashes per second across all cut-ins),
+# a sheen over the strip, sparks and her hit sound. SSR clips open with two beats of an eye close-up strip.
+# R/SR ≈ 1.33 s (Юэ in 3/4), SSR ≈ 2 s, short ≤ 0.6 s (V9Ults.clip_len).
+# The paintings in the strips go through TONE (value ≤ V9Ults.FLASH_MAX, light backdrops take the palette hue), so
+# no strip is ever a white bar across the board. The strips live on their own canvas layer (STRIP_LAYER) above the
+# play screen and V6Fx's particle layer: board effects fired on the strong beat (the ult's marks, match chips) draw
+# over the dim but always under the strip, never on the ult name or her face. The clip's own sparks fly outward
+# from the text block and along the slash, never over the letters.
 #
 # Everything is a pure function of the clip time t (_apply), so a skip, a freeze or a screenshot at an exact time is
 # the same code path. A tap skips the visuals of a full clip at once (strong still fires if it has not yet); in a short
-# clip taps are buffered (`buffered`, canvas positions) for the caller to replay on the board.
+# clip taps are buffered (`buffered`, canvas positions; `buffered_tiles`, the tile under each, same order) for the
+# caller to replay on the board. A buffered tap gets only a neutral touch now (glint + light haptic, no click): the
+# replay decides and plays the select click or the deny, so a tap never says «yes» now and «no» half a second later.
 # Effects follow S.fx_level: «mid» = no sheen, softer pulse, fewer sparks; «min» = no streaks, sparks or pulse.
 #
 # Dev (screenshots): V9Cutin.dev_shots = [0.1, 0.5, …] + dev_dir / dev_name save the viewport at those clip times
@@ -32,6 +40,30 @@ const PANEL_GAP: = 150.0
 const GOLD: = Color("ffe7a6")
 const GOLD_DEEP: = Color("c58a2c")
 const NAME_COL: = Color("fff2d2")
+# above V6Fx's particle layer (60) and the easter-egg layer (55): nothing drawn by the board lands on the strip
+const STRIP_LAYER: = 61
+# the paintings in the strips: near-neutral light pixels (cream / paper backdrops) take the palette hue, and every
+# value is eased under vmax with a soft knee (dark and mid tones untouched), so a strip never reads as a white bar
+const TONE: = """
+shader_type canvas_item;
+uniform vec4 tint : source_color = vec4(1.0);
+uniform float vmax = 0.7;
+uniform float knee = 0.48;
+uniform float wash = 0.6;
+void fragment() {
+	vec4 c = COLOR;
+	float v = max(c.r, max(c.g, c.b));
+	float lo = min(c.r, min(c.g, c.b));
+	float sat = (v - lo) / max(v, 0.0001);
+	float w = smoothstep(0.5, 0.88, v) * (1.0 - smoothstep(0.06, 0.32, sat));
+	vec3 rgb = mix(c.rgb, tint.rgb * v, w * wash);
+	v = max(rgb.r, max(rgb.g, rgb.b));
+	float r = vmax - knee;
+	float nv = v <= knee ? v : knee + r * (1.0 - exp(-(v - knee) / r));
+	COLOR = vec4(rgb * (nv / max(v, 0.0001)), c.a);
+}
+"""
+static var _tone_shader: Shader
 
 static var dev_shots: Array = []
 static var dev_dir: = ""
@@ -72,6 +104,7 @@ var fx_ok: = true
 var fx_k: = 1.0
 var flash_peak: = 0.3
 var buffered: Array = []
+var buffered_tiles: Array = []
 
 var _strong_done: = false
 var _done: = false
@@ -84,6 +117,7 @@ var _flash_t: = 0.0
 
 var dim: ColorRect
 var flash: ColorRect
+var strips: CanvasLayer
 var band: Node2D
 var eye: Node2D
 var art: Polygon2D
@@ -297,39 +331,44 @@ func _build(shout: String) -> void :
 	flash.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(flash)
 
-	var sh: = V9Ults.shown(id)
+	# the art panel and the SSR eye close-up show ONE painting: the outfit's (V9Ults.clip_art), or her adult base
+	# portrait while the outfit's painting is queued for an adult-face redraw (docs/ART.md «Очередь перерисовки»)
+	var sh: = V9Ults.clip_art(id)
 	_tex = load(String(sh.img)) if ResourceLoader.exists(String(sh.img)) else null
 	if _tex == null:
 		_tex = load("res://assets/outfits/mc_base.webp")
 		sh = V9Ults.shown("o_base")
 	_face_px = V9Ults.rect_px(sh.face_rect, _tex.get_size())
-	# an entry whose painting is queued for an adult-face redraw (docs/ART.md «Очередь перерисовки») points the art
-	# panel at another painting of her (panel_img + panel_rect, art space), so both clip beats show the same face
-	var own: = String(sh.img) == String(u.get("ref_img", ""))
-	var pimg: = String(u.get("panel_img", ""))
-	if pimg != "" and u.has("panel_rect") and own and ResourceLoader.exists(pimg):
-		var pt: Texture2D = load(pimg)
-		if pt:
-			_tex = pt
-			_face_px = V9Ults.rect_px(u.panel_rect, pt.get_size())
 	_eye_tex = _tex
 	_eye_face_px = _face_px
-	# an entry may point its eye close-up at another painting of her (eye_img + eye_rect, art space)
-	var ei: = String(u.get("eye_img", ""))
-	if ei != "" and u.has("eye_rect") and own and ResourceLoader.exists(ei):
-		var et: Texture2D = load(ei)
-		if et:
-			_eye_tex = et
-			_eye_face_px = V9Ults.rect_px(u.eye_rect, et.get_size())
+	# the strips: their own canvas layer (following the view, so a screen shake still moves them with the board)
+	strips = CanvasLayer.new()
+	strips.layer = STRIP_LAYER
+	strips.follow_viewport_enabled = true
+	add_child(strips)
 	if eyes:
 		_build_eyes()
 	_build_band(shout, main, accent, ink)
 
 
+# the tone material for a painting in a strip (TONE), tinted by the clip palette
+func _tone_mat() -> ShaderMaterial:
+	if _tone_shader == null:
+		_tone_shader = Shader.new()
+		_tone_shader.code = TONE
+	var m: = ShaderMaterial.new()
+	m.shader = _tone_shader
+	var main: Color = pal.main
+	m.set_shader_parameter("tint", Color.from_hsv(main.h, clampf(main.s * 0.75, 0.3, 0.6), 1.0))
+	m.set_shader_parameter("vmax", V9Ults.FLASH_MAX)
+	return m
+
+
 func _build_band(shout: String, main: Color, accent: Color, ink: Color) -> void :
 	band = Node2D.new()
 	band.position = Vector2(W * 0.5, cy)
-	add_child(band)
+	band.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	strips.add_child(band)
 	# backing: deep ink at the text end → her colour towards the art
 	var c_out: = ink.darkened(0.45)
 	var c_in: = main.darkened(0.18).lerp(ink, 0.25)
@@ -374,6 +413,7 @@ func _build_band(shout: String, main: Color, accent: Color, ink: Color) -> void 
 	_art_s = BAND_H * 0.98 / _face_px.size.y
 	_art_c = Vector2(xa, - K * dir * xa)
 	art.uv = _uv(_art_pts, _art_c, _face_px.get_center(), _art_s)
+	art.material = _tone_mat()
 	band.add_child(art)
 	# depth: a soft shadow just inside the slash, then her colour as a rim light on the far edge
 	var sd: = (bot_i - top_i).orthogonal().normalized() * (- dir)
@@ -584,7 +624,8 @@ func _name_font() -> FontVariation:
 func _build_eyes() -> void :
 	eye = Node2D.new()
 	eye.position = Vector2(W * 0.5, cy)
-	add_child(eye)
+	eye.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	strips.add_child(eye)
 	var k: = K * 0.55
 	_eye_pts = _quad(- HW, HW, EYE_H, k)
 	eye.add_child(_poly(_eye_pts, [Color(pal.ink.darkened(0.5))]))
@@ -596,10 +637,14 @@ func _build_eyes() -> void :
 	# and widen the crop instead, so the eye line stays as crisp as the tiles beside it
 	_eye_s = minf(W * 0.82 / _eye_face_px.size.x, EYE_MAX_ZOOM)
 	eye_art.uv = _uv(_eye_pts, Vector2.ZERO, _eye_px(), _eye_s)
-	# 0.9: the paintings have light backdrops (mc_base is cream): toned to the clip palette and closed off by ink at
-	# both ends, so the strip never reads as a white bar across the board (value ≤ FLASH_MAX away from the face)
+	# 0.9: the paintings have light backdrops (mc_base is cream): TONE washes them in the clip palette and eases every
+	# value under FLASH_MAX, and ink closes off both ends, so the strip never reads as a white bar across the board
 	var ink: Color = pal.ink
-	eye_art.color = Color(1, 1, 1).lerp((pal.main as Color).lightened(0.2), 0.16) * Color(0.9, 0.9, 0.9, 1.0)
+	var em: = _tone_mat()
+	# the close-up is mostly backdrop: a stronger palette wash and a slightly lower ceiling than the art panel
+	em.set_shader_parameter("wash", 0.75)
+	em.set_shader_parameter("vmax", V9Ults.FLASH_MAX - 0.04)
+	eye_art.material = em
 	eye.add_child(eye_art)
 	var ink_a: = Color(ink.darkened(0.55), 0.94)
 	var ink_0: = Color(ink.darkened(0.55), 0.0)
@@ -697,9 +742,15 @@ func _apply(tt: float) -> void :
 	if _flash_on:
 		var fp: = _seg(tt, _flash_t, 0.28)
 		flash.modulate.a = flash_peak * pow(1.0 - fp, 2.0)
-	# a skip fades everything out quickly
+	# a skip fades everything out quickly (the strips sit on their own canvas layer: modulate does not reach them)
 	if _skip_t >= 0.0:
 		modulate.a = 1.0 - _seg(tt, _skip_t, 0.14)
+		band.modulate.a = modulate.a
+		if eye:
+			eye.modulate.a = modulate.a
+	# the strip layer keeps the clip's own placement in the canvas (the view's shake comes from follow_viewport)
+	if is_inside_tree():
+		strips.transform = get_global_transform()
 
 
 func _events_at(tt: float) -> void :
@@ -730,17 +781,71 @@ func _strong() -> void :
 		_flash_on = true
 		_flash_t = t
 	if fx_ok and _skip_t < 0.0 and fx_k > 0.0:
-		# 0.9: the accent sparks fly from both ends of the name, on a layer under the letters — the ult name is
-		# the cleanest thing on the strong beat (it used to burst right on top of it)
-		# (sparkle glyphs only, short reach, on a layer under the letters)
-		var half_w: = name_w * 0.5 + 26.0
+		# 0.9: the accent sparks start OUTSIDE the text block (tag, name and shout: _text_half_w) at both ends of the
+		# name and fly outward in a narrow fan with a short reach, so none of them crosses the letters — the ult name
+		# is the cleanest thing on the strong beat
+		var hx: = _text_half_w() + 14.0
 		for sx in [-1.0, 1.0]:
-			Fx.burst(sparks, Vector2(sx * half_w, 0.0), "sparkle", int(11 * fx_k), (pal.accent as Color).lightened(0.35), 0.55)
-		# gold sparks fly off the slash on the art side (never a blob over her face or the name): their layer sits
-		# under the text panel, and they start a little into the art panel
-		var sl: Vector2 = (_art_pts[0] + _art_pts[3]) * 0.5 + Vector2(dir * 22.0, 0.0)
-		Fx.burst(slash_fx, sl, "sparkle", int(16 * fx_k), GOLD, 0.5)
+			_spark_fan(sparks, Vector2(sx * hx, 0.0), 0.0 if sx > 0.0 else PI, 22.0, int(9 * fx_k),
+				(pal.accent as Color).lightened(0.35), Vector2(90.0, 230.0))
+		# gold sparks shed along the slash, flying into the art panel (away from the text, a short hop: never a
+		# blob over her face or the name)
+		var top_i: Vector2 = _art_pts[0]
+		var bot_i: Vector2 = _art_pts[3]
+		var along: = bot_i - top_i
+		var rot: = along.angle() - PI * 0.5
+		# the emitter's local x runs across the slash: aim it at the art side
+		var into: = rot if cos(rot) * dir > 0.0 else rot + PI
+		_spark_fan(slash_fx, (top_i + bot_i) * 0.5 + Vector2(dir * 6.0, 0.0), into, 18.0, int(16 * fx_k), GOLD,
+			Vector2(60.0, 190.0), Vector2(2.0, along.length() * 0.42), rot)
 	strong.emit()
+
+
+# half the width of the text block (the tag, the ult name and her shout), in the text panel's own space
+func _text_half_w() -> float:
+	var w: = name_w
+	for l in [tag_l, shout_l]:
+		if l == null or not (l as Label).visible or (l as Label).text == "":
+			continue
+		var ls: LabelSettings = (l as Label).label_settings
+		if ls and ls.font:
+			w = maxf(w, ls.font.get_string_size((l as Label).text, HORIZONTAL_ALIGNMENT_LEFT, -1, ls.font_size).x + 12.0)
+	return minf(w, 336.0) * 0.5
+
+
+# a one-shot fan of sparkle glyphs (the Fx «sparkle» look) from `pos` in the layer's space: `ang` is the centre of the
+# fan, `spread` its half-angle in degrees, `vel` the launch speed range; heavy damping keeps the reach short
+# (≤ vel.y² / 2·damping_min: ≈ 63 px at 230 px/s), so a fan aimed away from the text never reaches it. `ext` / `rot`: emit along a
+# rotated line instead of a point (the slash).
+func _spark_fan(layer: Node2D, pos: Vector2, ang: float, spread: float, count: int, col: Color, vel: Vector2,
+		ext: = Vector2.ZERO, rot: = 0.0) -> void :
+	if count <= 0 or layer == null or not is_instance_valid(layer):
+		return
+	var p: = Fx.particles("sparkle", count, 0.55)
+	p.material = Fx.add_mat()
+	p.one_shot = true
+	p.explosiveness = 0.9
+	p.local_coords = true
+	p.position = pos
+	p.rotation = rot
+	p.direction = Vector2.from_angle(ang - rot)
+	p.spread = spread
+	p.initial_velocity_min = vel.x
+	p.initial_velocity_max = vel.y
+	p.damping_min = 420.0
+	p.damping_max = 620.0
+	p.scale_amount_min = 0.12
+	p.scale_amount_max = 0.36
+	p.angular_velocity_min = -300.0
+	p.angular_velocity_max = 300.0
+	p.color = col
+	p.scale_amount_curve = Fx._curve([Vector2(0, 0.3), Vector2(0.15, 1), Vector2(1, 0)])
+	if ext != Vector2.ZERO:
+		p.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
+		p.emission_rect_extents = ext
+	layer.add_child(p)
+	p.emitting = true
+	p.finished.connect(p.queue_free)
 
 
 # ── run ─────────────────────────────────────────────────────────────────────
@@ -810,9 +915,10 @@ func _on_input(e: InputEvent) -> void :
 	accept_event()
 	if mode == "short":
 		var gp: Vector2 = get_global_transform_with_canvas() * (e as InputEventMouseButton).position
-		# 0.9: answer the touch now by what is under the finger. A free tile: soft click, select haptic, glint, and the
-		# tap is replayed on the board after the clip. A blocked tile: its deny now (not an OK click and a late deny).
-		# A gap: a light tap haptic only, nothing is buffered.
+		# 0.9: answer the touch now by what is under the finger, but never with a verdict that the replay could
+		# contradict. A free tile: a neutral touch (light haptic + glint, no click) and the tap is replayed on the
+		# board after the clip, where the board plays the select click — or the deny, if the ult changed things.
+		# A blocked tile: its deny now (the ult only frees tiles, nothing is replayed). A gap: a light tap haptic only.
 		var pp: = get_parent()
 		var pb = pp.get("board") if pp else null
 		var tt = null
@@ -827,8 +933,8 @@ func _on_input(e: InputEvent) -> void :
 			V9Feel.tile_tap(false)
 			return
 		buffered.append(gp)
-		V9Feel.haptic("select")
-		V9Feel.sound("select", randf_range(0.96, 1.06), -6.0)
+		buffered_tiles.append(tt)
+		V9Feel.haptic("tap")
 		if tt.has_method("press_glint"):
 			tt.press_glint()
 		return

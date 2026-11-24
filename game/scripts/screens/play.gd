@@ -731,7 +731,7 @@ func _speak(kind: String, tapped: = false) -> void :
 	stage.react("smug")
 	stage.say(kind)
 
-const V9_WAIT_LINES: = ["Умение готово — дай столу улечься.", "Секунду — стол ещё занят.", "Готова! Как только стол оживёт."]
+const V9_WAIT_LINES: = ["Ульта готова — дай столу улечься.", "Секунду — стол ещё занят.", "Готова! Как только стол оживёт."]
 
 func _speak_wait() -> void :
 	if now() - _speak_t < 1.6:
@@ -2569,6 +2569,10 @@ func _summon_unlocked() -> void :
 
 func dev_act(a: String) -> void :
 	match a:
+		"tapcard":
+			# a tap on the portrait card (the same signal a finger sends)
+			print("TAPCARD ready=%s input_on=%s busy=%s" % [skill_ready, board.input_on, ult.busy])
+			stage.pressed.emit()
 		"dealtap":
 			# a real touch on a tile while the deal is still landing (the deal-skip check)
 			var dt: Tile = null
@@ -2581,8 +2585,10 @@ func dev_act(a: String) -> void :
 				ev.pressed = true
 				ev.position = board.tile_layer.get_global_transform_with_canvas() * dt.home
 				Input.parse_input_event(ev)
-			await get_tree().create_timer(0.2).timeout
-			print("DEALTAP +0.2s dealing=%s input_on=%s" % [board.dealing, board.input_on])
+			var t0: = now()
+			while board.dealing and now() - t0 < 3.0:
+				await get_tree().process_frame
+			print("DEALTAP table open after %.2f s" % (now() - t0))
 		"match":
 			for i in 2:
 				var t: = board.best_move()

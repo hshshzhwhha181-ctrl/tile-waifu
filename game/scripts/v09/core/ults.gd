@@ -17,8 +17,8 @@ extends RefCounted
 #                SSR clips open on the top half of it). Scale to the real texture with V9Ults.rect_px().
 #     alt_rect:  Rect2 in 859×1280 art space: head to waist (modest mode crop, HEROINES.md §2 «Скромный режим»).
 #     mod:       "П" | "О" | "Л" | "В" | "Ц" | "С", or "" for the five base outfits (see MODS)
-#     eye_img / eye_rect, panel_img / panel_rect (optional): another painting of her (+ art-space face rect) for the SSR
-#                eye close-up / the art panel, used while ref_img is queued for an adult-face redraw (docs/ART.md)
+#     redraw:    true while ref_img is queued for an adult-face redraw (docs/ART.md «Очередь перерисовки»): the clip
+#                (art panel AND the SSR eye close-up) draws her BASE portrait instead (V9Ults.clip_art), in every mode
 #     sfx:       name of the hit sound in res://assets/sfx (Sfx.play(sfx)) played on the strong beat
 #     fx:        short key of the board visual from the §5 table (the cut-in / fx stream maps it to an effect)
 #   }
@@ -31,6 +31,8 @@ extends RefCounted
 #   V9Ults.get_ult(id) -> Dictionary            entry or {} (a duplicate is NOT made: do not mutate)
 #   V9Ults.for_hero(hero) -> String             outfit id whose ult the heroine casts now (equipped or her base)
 #   V9Ults.shown(id, modest = G modest) -> {img, face_rect, alt_rect}   art that is actually drawn + its rects
+#   V9Ults.clip_art(id, modest = G modest) -> {img, face_rect, alt_rect, redraw}   the art the cut-in shows: shown(id),
+#                                               or her base portrait's shown() while the entry is marked `redraw`
 #   V9Ults.rect_px(r, tex_size) -> Rect2        art-space rect (859×1280) -> pixel rect of a texture of tex_size
 #   V9Ults.line(id, last = -1) -> int           index of the shout to say (never `last` when there are 2+)
 #   V9Ults.palette(id, gold = false) -> Dictionary    gold variant (fever / affection 7) shifts palette only
@@ -165,11 +167,9 @@ const ULTS: = {
 	"o_dragon": {"hero": "mc", "name": "Пробуждение дракона", "lines": ["Пробудись, дракон!", "Партия окончена~", "Нефрит и пламя!"],
 		"palette": {"main": Color("ff8fb8"), "accent": Color("ffc93c"), "ink": Color("6a1020")},
 		"ref_img": "res://assets/outfits/mc_dragon.webp", "face_rect": Rect2(287, 119, 286, 286), "alt_rect": Rect2(230, 61, 399, 499),
-		# 0.9: until mc_dragon is redrawn in the v2 direction (its face reads rounder / younger than her base art),
-		# the SSR eye close-up crops her base painting's mature face instead (eye_img / eye_rect, cutin.gd)
-		"eye_img": "res://assets/outfits/mc_base.webp", "eye_rect": Rect2(297, 48, 260, 260),
-		# …and so does the art panel (panel_img / panel_rect), so both clip beats show the same adult face
-		"panel_img": "res://assets/outfits/mc_base.webp", "panel_rect": Rect2(297, 48, 260, 260),
+		# 0.9: mc_dragon's face reads rounder / younger than her base art (queued for the v2 adult-face redraw): the
+		# clip (art panel and eye close-up) shows her base portrait until then — clip_art()
+		"redraw": true,
 		"mod": "Л", "sfx": "summon_boom", "fx": "jade_dragon"},
 	# ── Рин: нефрит 4fbf9f, золотые очки. Ядро: возвращает лоток (пуст — снимает пару).
 	"r_base": {"hero": "rin", "name": "Чайная пауза", "lines": ["Позволь.", "Чайная пауза.", "Не торопись."],
@@ -249,13 +249,13 @@ const ULTS: = {
 		"mod": "В", "sfx": "sparkle", "fx": "offline"},
 	# ── event outfits (SSR, limited; not in the §5 tables — names in the same voice). From a heroine's 6th outfit a
 	# modifier may repeat if it came from another rarity (§2); the §5 slots of future outfits are left free.
-	"ev_mc": {"hero": "mc", "name": "Последний гость", "lines": ["Табличка «закрыто»!", "Только для своих~", "Партия окончена~"],
+	# 0.9: a salon-lamps ult in a neutral voice (no «closed sign» / «only for us» after-hours framing)
+	"ev_mc": {"hero": "mc", "name": "Вечерние фонари", "lines": ["Фонари, светлее!", "Ещё партию?", "Партия окончена~"],
 		"palette": {"main": Color("ff8fb8"), "accent": Color("ffcf8a"), "ink": _MC_INK},
 		"ref_img": "res://assets/v07/event/cg_mc_card.webp", "face_rect": Rect2(168, 175, 468, 468), "alt_rect": Rect2(74, 80, 656, 820),
-		# cg_mc_card's face reads younger than her base art (queued for an adult-face redraw, docs/ART.md): the SSR eye
-		# close-up and the art panel use her base painting's mature face until then
-		"eye_img": "res://assets/outfits/mc_base.webp", "eye_rect": Rect2(297, 48, 260, 260),
-		"panel_img": "res://assets/outfits/mc_base.webp", "panel_rect": Rect2(297, 48, 260, 260),
+		# cg_mc_card's face reads much younger than her base art (queued for an adult-face redraw, docs/ART.md): the
+		# clip shows her base portrait until then — clip_art()
+		"redraw": true,
 		"mod": "В", "sfx": "sparkle", "fx": "lamp_dim"},
 	"ev_rin": {"hero": "rin", "name": "Рой светлячков", "lines": ["Позволь.", "Светлячки, ко мне.", "Посидим у пруда."],
 		"palette": {"main": Color("4fbf9f"), "accent": Color("fff0a0"), "ink": _RIN_INK},
@@ -308,6 +308,20 @@ static func shown(id: String, modest = null) -> Dictionary:
 	var key: = img.get_file().get_basename()
 	var r: Array = RECTS.get(key, [u.get("face_rect", Rect2(Vector2.ZERO, ART_SIZE)), u.get("alt_rect", Rect2(Vector2.ZERO, ART_SIZE))])
 	return {"img": img, "face_rect": r[0], "alt_rect": r[1]}
+
+
+# the art the ult clip draws (V9Cutin: the art panel and the SSR eye close-up): shown(id), except for an entry whose
+# painting is queued for an adult-face redraw (`redraw`): then her base outfit's shown() (adult base portrait), in
+# every mode — modest, retired and alt art included — so no beat of the clip ever shows the queued face
+static func clip_art(id: String, modest = null) -> Dictionary:
+	var u: = get_ult(id)
+	if bool(u.get("redraw", false)):
+		var sh: = shown(String(BASE.get(String(u.get("hero", "mc")), "o_base")), modest)
+		sh["redraw"] = true
+		return sh
+	var out: = shown(id, modest)
+	out["redraw"] = false
+	return out
 
 
 static func rect_px(r: Rect2, tex_size: Vector2) -> Rect2:

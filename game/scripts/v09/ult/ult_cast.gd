@@ -53,6 +53,8 @@ var _frame: Line2D
 var _fx: Node2D
 var _last_line: = -1
 var _applying: = false
+# «выкл» clips: the ult name rides on the result chip (_mod_chip), never as float text over her portrait
+var _chip_title: = ""
 
 
 class AimRing extends Control:
@@ -301,7 +303,9 @@ func begin(auto: = false) -> void :
 	if mode == "full":
 		_mark_seen()
 	var buffered: Array = []
+	var buffered_tiles: Array = []
 	_applied = false
+	_chip_title = ""
 	if mode == "off":
 		_quiet_feedback(pal)
 		await _apply(pick, pal)
@@ -310,7 +314,9 @@ func begin(auto: = false) -> void :
 		var c: = V9Cutin.run(play, id, {"mode": mode, "gold": gold(), "line": _last_line, "mirror": V9Cutin.next_mirror(),
 			"cy": strip_y(pick)})
 		c.strong.connect( func(): _apply(pick, pal))
-		c.finished.connect( func(): buffered.append_array(c.buffered))
+		c.finished.connect( func():
+			buffered.append_array(c.buffered)
+			buffered_tiles.append_array(c.buffered_tiles))
 		await c.finished
 	while _applying and _alive():
 		await get_tree().process_frame
@@ -327,7 +333,7 @@ func begin(auto: = false) -> void :
 	bd = _board()
 	if was_on and bd.tiles.any( func(t): return t.alive) and not bool(play.get("_v8_over")):
 		bd.input_on = true
-		_replay(buffered)
+		_replay(buffered, buffered_tiles)
 	bd._check_clear()
 	play._refresh()
 
@@ -358,17 +364,19 @@ func strip_y(pick: Dictionary) -> float:
 	return best
 
 
-func _replay(taps: Array) -> void :
-	for p in taps:
+# taps made during a short clip (cutin.gd buffered them with only a neutral touch): the board answers them now with
+# its own select click or deny. A tile the ult took (or one now under another) is dropped silently: the finger meant
+# that tile, and a deny for a tile that is gone would read as a broken tap.
+func _replay(taps: Array, tiles: Array = []) -> void :
+	for i in taps.size():
 		var bd: = _board()
 		if bd == null or not bd.input_on:
 			return
-		var t: = bd.tile_at(p)
+		var t: = bd.tile_at(taps[i])
+		if i < tiles.size() and (not is_instance_valid(tiles[i]) or t != tiles[i]):
+			continue
 		if t:
-			# the touch was acknowledged when it was buffered (cutin.gd): replay it without a second click / haptic
-			V9Feel.quiet_tile_tap = true
 			bd.tap(t)
-			V9Feel.quiet_tile_tap = false
 			await get_tree().create_timer(0.06).timeout
 
 
@@ -391,13 +399,12 @@ func auto_pick() -> Dictionary:
 	return {"pairs": ps.slice(0, n)}
 
 
-func _quiet_feedback(pal: Dictionary) -> void :
+func _quiet_feedback(_pal: Dictionary) -> void :
 	var st: V6HeroStage = play.stage
 	Sfx.play(String(V9Ults.get_ult(id).get("sfx", "pop")), 1.06 if gold() else 1.0, -2)
 	V9Feel.success(st, "")
-	# inside the portrait card (HUD), never over the board
-	var at: = st.position + Vector2(st.size.x * 0.5, st.size.y - 70.0)
-	Fx.float_text(play.fx_layer, at, ult_name(), (pal.main as Color).lightened(0.45), 26, (pal.ink as Color))
+	# the ult name rides on the result chip beside the card (_mod_chip): no float text across her portrait
+	_chip_title = ult_name()
 
 
 # ── aim (2 s) ───────────────────────────────────────────────────────────────
@@ -565,8 +572,11 @@ func _input(e: InputEvent) -> void :
 					_aim_down = false
 					_pick_tier_at(p)
 				"row":
+					# the finger lands: a light touch now, the beam snaps to the nearest row (a gap included)
+					V9Feel.haptic("tap")
 					_beam_preview(p.y)
 				"swipe":
+					V9Feel.haptic("tap")
 					_arrow_preview(p, p)
 		elif _aim_down:
 			_aim_down = false
@@ -574,12 +584,11 @@ func _input(e: InputEvent) -> void :
 			match String(core.target):
 				"row":
 					_aim_pick = {"row_y": snap_row(p.y)}
-					# the same confirm click as the pair / tier picks
-					V9Feel.press(null, "select", "button")
+					_aim_ok(1.15)
 					aiming = false
 				"swipe":
 					_aim_pick = swipe_pick(_aim_from, p)
-					V9Feel.press(null, "select", "button")
+					_aim_ok(1.15 if (p - _aim_from).length() < 24.0 else 1.25)
 					aiming = false
 	elif e is InputEventScreenDrag and _aim_down:
 		get_viewport().set_input_as_handled()
@@ -593,14 +602,20 @@ func _input(e: InputEvent) -> void :
 func _pick_pair_at(p: Vector2) -> void :
 	var bd: = _board()
 	var t: = bd.tile_at(p)
+	var ps: = pairs()
 	if t == null:
-		_aim_miss()
-		return
-	for pr in pairs():
+		# a gap: snap to the pair tile nearest the finger (within about a tile), else a deny
+		var cand: = []
+		for pr in ps:
+			cand.append_array(pr)
+		t = _nearest_tile(p, cand)
+		if t == null:
+			_aim_miss()
+			return
+	for pr in ps:
 		if t in pr:
 			_aim_pick = {"pairs": [pr]}
-			V9Feel.haptic("button")
-			Sfx.play("select", 1.2, -4)
+			_aim_ok(1.2)
 			aiming = false
 			return
 	t.deny()
@@ -611,8 +626,11 @@ func _pick_tier_at(p: Vector2) -> void :
 	var bd: = _board()
 	var t: = bd.tile_at(p)
 	if t == null:
-		_aim_miss()
-		return
+		# a gap: the layer of the tile nearest the finger (within about a tile), else a deny
+		t = _nearest_tile(p, bd.tiles.filter( func(x): return bd.on_board(x) and not x.pending))
+		if t == null:
+			_aim_miss()
+			return
 	var gz: = t.gz
 	var cand: = pairs().filter( func(pr): return pr[0].gz == gz or pr[1].gz == gz)
 	if cand.is_empty():
@@ -620,9 +638,35 @@ func _pick_tier_at(p: Vector2) -> void :
 		V9Feel.deny(null)
 		return
 	_aim_pick = {"pairs": [cand.back()], "gz": gz}
-	V9Feel.haptic("button")
-	Sfx.play("select", 1.3, -4)
+	_aim_ok(1.3)
 	aiming = false
+
+
+# the tile of `from` nearest canvas point p, if it is within about one tile of it (a tap on a gap between tiles)
+func _nearest_tile(p: Vector2, from: Array) -> Tile:
+	var bd: = _board()
+	var reach: = Tile.TW * absf(bd.scale.x) * 0.9
+	var best: Tile = null
+	var best_d: = reach
+	for t in from:
+		if not is_instance_valid(t):
+			continue
+		var d: = (pos_of(t) - p).length()
+		if d <= best_d:
+			best_d = d
+			best = t
+	return best
+
+
+# a target is locked in (pair, tier, row or dash): the select click with a «button» haptic, and the aim frame
+# flares once in her colour — every confirm answers the same way
+func _aim_ok(pitch: = 1.2) -> void :
+	V9Feel.haptic("button")
+	V9Feel.sound("select", pitch, -3.0)
+	if _frame and is_instance_valid(_frame):
+		var tw: = _frame.create_tween()
+		tw.tween_property(_frame, "width", 6.0, 0.06)
+		tw.tween_property(_frame, "width", 3.0, 0.16)
 
 
 # a tap on a gap inside the board while aiming: a deny and a short pulse of the aim frame (never silence)
@@ -843,6 +887,8 @@ func _apply(pick: Dictionary, pal: Dictionary) -> void :
 				_open_one(col)
 	if _alive():
 		_modifier(col)
+		if mod == "" and _chip_title != "":
+			_mod_chip(_chip_title)
 	_applying = false
 
 
@@ -1041,7 +1087,11 @@ func _rin_cup() -> bool:
 		return false
 	pr.cups = int(pr.cups) + 1
 	pr._refresh_chip()
-	pr._pulse("+1 чашка")
+	# the passive chip punches; the line itself is the ult's result chip (_mod_chip «+1 чашка»), not a float text
+	# rising across her portrait
+	var pc = pr.get("chip")
+	if pc is CanvasItem and is_instance_valid(pc):
+		UI.punch(pc, 0.16)
 	return true
 
 
@@ -1080,12 +1130,13 @@ func _modifier(col: Color) -> void :
 		_hint_pair(3.0)
 		chip = String(V9Ults.MODS["П"].chip)
 		chip_l = "П"
-	_mod_chip(chip, chip_l)
+	_mod_chip(chip, chip_l, _chip_title)
 
 
 # the modifier's result as a small lacquer chip (gold glyph + player-facing line) that slides out to the LEFT of the
-# portrait card, level with its ult bar: never on her portrait or its plates, never over the board
-func _mod_chip(txt: String, letter: = "") -> void :
+# portrait card, level with its ult bar: never on her portrait or its plates, never over the board. `title` (a «выкл»
+# cast: the ult name) sits above the line in small gold caps; no `letter` (a base outfit) = no glyph.
+func _mod_chip(txt: String, letter: = "", title: = "") -> void :
 	var st: V6HeroStage = play.stage
 	if txt == "" or st == null or not is_instance_valid(st):
 		return
@@ -1094,8 +1145,13 @@ func _mod_chip(txt: String, letter: = "") -> void :
 	while fs > 16 and f.get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > 250.0:
 		fs -= 1
 	var tw: = minf(250.0, f.get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x)
-	var h: = 40.0
-	var w: = 14.0 + 26.0 + 8.0 + tw + 16.0
+	var ttl: = title.to_upper() if title != "" and title != txt else ""
+	var tf: = UI.font("body", 900)
+	if ttl != "":
+		tw = maxf(tw, minf(250.0, tf.get_string_size(ttl, HORIZONTAL_ALIGNMENT_LEFT, -1, 13).x + 6.0))
+	var icon_w: = 26.0 + 8.0 if letter != "" else 4.0
+	var h: = 40.0 if ttl == "" else 54.0
+	var w: = 14.0 + icon_w + tw + 16.0
 	var right: = st.position.x - 6.0
 	# level with the bottom of the card, below the fortune panel's text, still clear of the board's frame
 	var y: = minf(st.position.y + st.size.y - h + 8.0, (play.board_rect as Rect2).position.y - h - 4.0)
@@ -1106,13 +1162,25 @@ func _mod_chip(txt: String, letter: = "") -> void :
 	c.set_param("border_top", Color("ffe7a6")).set_param("border_bottom", Color("c58a2c"))
 	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	c.z_index = 230
-	var ic: = V9ModIcon.make(letter if letter != "" else mod, 26.0)
-	ic.position = Vector2(14.0, (h - 26.0) * 0.5)
-	c.add_child(ic)
+	if letter != "":
+		var ic: = V9ModIcon.make(letter, 26.0)
+		ic.position = Vector2(14.0, (h - 26.0) * 0.5)
+		c.add_child(ic)
+	var tx: = 14.0 + icon_w
+	if ttl != "":
+		var t2: = UI.label(ttl, 13, Color("ffd98a"), Color(0.08, 0.03, 0.1), 3, "body", 900)
+		t2.position = Vector2(tx, 7.0)
+		t2.size = Vector2(tw + 4.0, 16.0)
+		t2.clip_text = true
+		t2.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		t2.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		c.add_child(t2)
 	var l: = UI.label(txt, fs, Color("fff2d2"), Color(0.08, 0.03, 0.1), 3, "body", 800)
-	l.position = Vector2(14.0 + 26.0 + 8.0, 0)
-	l.size = Vector2(tw + 4.0, h)
+	l.position = Vector2(tx, 0.0 if ttl == "" else 20.0)
+	l.size = Vector2(tw + 4.0, h if ttl == "" else h - 24.0)
 	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	l.clip_text = true
+	l.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	c.add_child(l)
 	play.add_child(c)
