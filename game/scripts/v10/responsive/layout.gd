@@ -11,7 +11,7 @@ extends RefCounted
 # stretched art). On phones with a camera cut-out (the app draws edge to edge in immersive mode) the column also
 # starts below the cut-out: content_rect() is the safe column, bleed_rect() the whole viewport.
 #
-#   V10Layout.content_rect(vs) -> Rect2      the column screens are built in (main.go sizes screens to it)
+#   V10Layout.content_rect(vs, insets = live) the column screens are built in (main.go sizes screens to it)
 #   V10Layout.safe_insets(vs) -> Dictionary  {top, bottom, left, right} in viewport px
 #   V10Layout.bleed_rect(ctrl) -> Rect2      the whole viewport in ctrl's local coordinates
 #   V10Layout.cover_rect(tex, area, focus)   aspect-preserving «cover» rect of a texture over an area
@@ -101,8 +101,8 @@ static func is_tall(vs: Vector2) -> bool:
 
 
 # the rect every screen is built in: a column ≤ COL_MAX wide, centred, between the safe insets
-static func content_rect(vs: Vector2) -> Rect2:
-	var ins: = safe_insets(vs)
+static func content_rect(vs: Vector2, insets: = {}) -> Rect2:
+	var ins: Dictionary = insets if not insets.is_empty() else safe_insets(vs)
 	var x0: float = ins.left
 	var x1: float = vs.x - float(ins.right)
 	var w: = minf(COL_MAX, x1 - x0)

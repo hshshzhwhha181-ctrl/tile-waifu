@@ -400,10 +400,15 @@ func _selftest() -> void:
 		var k: = minf(px.x / 720.0, px.y / 1280.0)
 		var vs: = (px / k).round()
 		check.call(absf(vs.x - 720.0) < 1.0 or absf(vs.y - 1280.0) < 1.0, "%s: expand keeps one base side (%s)" % [r, vs])
-		var cr: = V10Layout.content_rect(vs)
+		var none: = {"top": 0.0, "bottom": 0.0, "left": 0.0, "right": 0.0}
+		var cr: = V10Layout.content_rect(vs, none)
 		check.call(cr.size.x <= V10Layout.COL_MAX + 0.5, "%s: column ≤ 720 (%s)" % [r, cr])
 		check.call(absf(cr.get_center().x - vs.x * 0.5) <= 1.0, "%s: column centred (%s)" % [r, cr])
-		check.call(cr.size.y >= 1150.0, "%s: column height ≥ 1150 (%s)" % [r, cr])
+		check.call(cr.size.y >= vs.y - 0.5, "%s: column takes the full height without insets (%s)" % [r, cr])
+		# a punch-hole phone: 70 px cut-out, 30 px gesture bar
+		var cut: = {"top": 70.0, "bottom": 30.0, "left": 0.0, "right": 0.0}
+		var cc: = V10Layout.content_rect(vs, cut)
+		check.call(cc.position.y == 70.0 and absf(cc.end.y - (vs.y - 30.0)) < 0.5, "%s: column between the insets (%s)" % [r, cc])
 		for tex in [Vector2(720, 1280), Vector2(1600, 893), Vector2(859, 1280), Vector2(2048, 2048)]:
 			var c: = V10Layout.cover_rect(tex, Rect2(Vector2.ZERO, vs), Vector2(0.5, 0.4))
 			check.call(c.encloses(Rect2(Vector2.ZERO, vs).grow(-0.5)), "%s: cover %s fills (%s)" % [r, tex, c])
