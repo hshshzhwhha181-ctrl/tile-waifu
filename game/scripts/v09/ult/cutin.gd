@@ -453,6 +453,13 @@ func _build_text(shout: String, main: Color, accent: Color, ink: Color) -> void 
 	underline.color = GOLD
 	underline.antialiased = true
 	underline.position = Vector2(- uw * 0.5, y + 4.0)
+	# gold diamonds at the brush ends
+	for e in [Vector2(-10.0, 0.0), Vector2(uw + 10.0, -2.0)]:
+		var dm: = Polygon2D.new()
+		dm.polygon = PackedVector2Array([e + Vector2(0, -5), e + Vector2(5, 0), e + Vector2(0, 5), e + Vector2(-5, 0)])
+		dm.color = GOLD
+		dm.antialiased = true
+		underline.add_child(dm)
 	y += 16.0
 	_shout_y = y
 	shout_l.position = Vector2(- tw * 0.5, y)
@@ -497,7 +504,7 @@ func _build_eyes() -> void :
 
 # the eye line: a little above the face centre of face_rect (face at ~45 % of it)
 func _eye_px() -> Vector2:
-	return _face_px.position + _face_px.size * Vector2(0.5, 0.385)
+	return _face_px.position + _face_px.size * Vector2(0.5, 0.4)
 
 
 # ── time line ───────────────────────────────────────────────────────────────

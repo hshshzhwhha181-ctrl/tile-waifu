@@ -217,10 +217,19 @@ func _letter_arrived() -> void :
 # without an ult entry falls back to the 0.8 face crop (V8Population.FACES)
 static func _face_rect(oid: String, tex: Texture2D, ofc: Array) -> Rect2:
 	var ts: = Vector2(tex.get_width(), tex.get_height())
+	var key: = tex.resource_path.get_file().get_basename()
 	if V9Ults.has(oid):
 		var sh: = V9Ults.shown(oid)
-		if str(sh.img).get_file().get_basename() == tex.resource_path.get_file().get_basename():
-			return V9Ults.rect_px(sh.face_rect, ts)
+		if str(sh.img).get_file().get_basename() == key:
+			var r: = V9Ults.rect_px(sh.face_rect, ts)
+			# a square that sits low (rin_maid: the face is at its top, not at ~45 %) is pulled halfway to the 0.8
+			# face crop point when the two disagree by more than a fifth of the square
+			if V8Population.FACES.has(key):
+				var fy: float = float(V8Population.FACES[key][1]) * ts.y
+				var hy: = r.position.y + r.size.y * 0.42
+				if absf(fy - hy) > r.size.x * 0.2:
+					r.position.y += (fy - hy) * 0.5
+			return r
 	var side: = ts.x * 0.3
 	var c: = Vector2(float(ofc[0]) * ts.x, float(ofc[1]) * ts.y)
 	return Rect2(c - Vector2(side * 0.5, side * 0.42), Vector2(side, side))

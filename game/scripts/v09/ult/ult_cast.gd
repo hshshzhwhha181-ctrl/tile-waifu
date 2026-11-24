@@ -260,6 +260,9 @@ func begin(auto: = false) -> void :
 	play._refresh()
 	V9Feel.press(play.stage, "pop", "button")
 	play.stage.react("big")
+	var bub = play.stage.bubble_node
+	if bub and is_instance_valid(bub) and not bub.is_queued_for_deletion():
+		bub.queue_free()
 	var pick: Dictionary
 	if auto or force_auto or String(core.get("target", "none")) == "none":
 		pick = auto_pick()
@@ -279,7 +282,7 @@ func begin(auto: = false) -> void :
 	else:
 		Sfx.duck(-8.0, V9Ults.clip_len(rar, hero, mode) + 0.35)
 		var c: = V9Cutin.run(play, id, {"mode": mode, "gold": gold(), "line": _last_line, "mirror": V9Cutin.next_mirror(),
-			"cy": (play.board_rect as Rect2).get_center().y if play.board_rect is Rect2 else 640.0})
+			"cy": strip_y(pick)})
 		c.strong.connect( func(): _apply(pick, pal))
 		c.finished.connect( func(): buffered.append_array(c.buffered))
 		await c.finished
@@ -301,6 +304,32 @@ func begin(auto: = false) -> void :
 		_replay(buffered)
 	bd._check_clear()
 	play._refresh()
+
+
+# where the cut-in strip goes: the third of the board (top / middle / bottom) that hides the fewest targets, so
+# the effect on the strong beat is seen beside the strip, not under it (ties: the middle)
+func strip_y(pick: Dictionary) -> float:
+	var br: Rect2 = play.board_rect
+	var half: = V9Cutin.BAND_H * 0.5 + V9Cutin.K * (br.size.x * 0.5 + 90.0) + 8.0
+	var pts: Array = []
+	for pr in pick.get("pairs", []):
+		for t in pr:
+			if is_instance_valid(t):
+				pts.append(pos_of(t).y)
+	if pick.has("row_y"):
+		pts.append(float(pick.row_y))
+	var cands: = [br.get_center().y, br.position.y + half - 4.0, br.end.y - half + 4.0]
+	var best: float = cands[0]
+	var best_n: = 999
+	for cy in cands:
+		var n: = 0
+		for y in pts:
+			if absf(float(y) - cy) < half + Tile.TH * 0.3:
+				n += 1
+		if n < best_n:
+			best_n = n
+			best = cy
+	return best
 
 
 func _replay(taps: Array) -> void :
