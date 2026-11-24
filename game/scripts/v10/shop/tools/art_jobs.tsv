@@ -1,0 +1,8 @@
+name	job_id	model	what
+shop_moon_sheet	070cdd3f-f16c-448e-9899-8be9e7c5ed68	gpt_image_2_6 high 2k transparent	moon_1..moon_6 (6 moonstone packs)
+shop_items_sheet	ad6c72a0-3f75-4325-8fff-88caffdd625a	gpt_image_2_6 high 2k transparent	item_crystal, item_wish, item_petal, item_gift, item_month, item_pass
+shop_ladder_sheet	09c936aa-b1a3-4952-8698-1f40b3f8920a	gpt_image_2_6 high 2k transparent	set_cup, set_guest, set_novice, set_growth, set_traveler, hanko
+shop_bg_night	eae250fc-2726-466d-ae7b-e5799103a99a	gpt_image_2_6 high 2k 9:16	bg_shop (+ bg_shop_blur)
+shop_bg_pass_scroll	d7c33e7c-95fd-4046-8268-8276438ea027	gpt_image_2_6 high 2k 21:9	bg_pass
+shop_bg_age_doors	7b9afb59-887d-41ec-be6f-17ce595e13ce	gpt_image_2_6 high 2k 9:16	bg_age
+shop_extra_sheet	6ec3ce3d-363b-40a9-aa9a-01011d55e6b0	gpt_image_2_6 high 2k transparent	item_coin, item_tea, item_frame, boost_lantern, boost_wind, boost_scroll
