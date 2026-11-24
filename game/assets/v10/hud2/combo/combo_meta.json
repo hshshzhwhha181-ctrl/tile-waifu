@@ -1,0 +1,380 @@
+{
+ "_doc": "HUD_V2 §7.5. crop = [x, y, w, h] of the cropped sprite inside the 2:3 source; face = [x, y, w, h] in cropped px (approximate, by eye); framing knees = cut at the shin/calf (anchor bottom to the screen edge), full = feet visible. All sprites face frame-left and enter from the right.",
+ "sprites": {
+  "mc_t1": {
+   "file": "mc_t1.png",
+   "hero": "mc",
+   "tier": 1,
+   "pose": "combo1 edge-lean-tile-salute",
+   "job": "9b019f1b-53a2-42ee-bc16-6494aa25ec61",
+   "framing": "knees",
+   "src_size": [
+    1360,
+    2048
+   ],
+   "crop": [
+    0,
+    7,
+    1353,
+    2041
+   ],
+   "face": [
+    580,
+    209,
+    341,
+    341
+   ],
+   "enter": "right"
+  },
+  "mc_t2": {
+   "file": "mc_t2.png",
+   "hero": "mc",
+   "tier": 2,
+   "pose": "combo2 slit-step-tail-lift",
+   "job": "2af597a2-a2e5-42e7-9016-5c0c90c77f61",
+   "framing": "knees",
+   "src_size": [
+    1360,
+    2048
+   ],
+   "crop": [
+    5,
+    15,
+    1355,
+    2033
+   ],
+   "face": [
+    518,
+    189,
+    318,
+    318
+   ],
+   "enter": "right"
+  },
+  "mc_t3": {
+   "file": "mc_t3.png",
+   "hero": "mc",
+   "tier": 3,
+   "pose": "combo3 tile-fan-s-curve",
+   "job": "198295a0-84f5-4e15-ac1b-966a400825a5",
+   "framing": "full",
+   "src_size": [
+    1360,
+    2048
+   ],
+   "crop": [
+    22,
+    0,
+    1238,
+    2010
+   ],
+   "face": [
+    535,
+    125,
+    250,
+    250
+   ],
+   "enter": "right"
+  },
+  "rin_t1": {
+   "file": "rin_t1.png",
+   "hero": "rin",
+   "tier": 1,
+   "pose": "combo1 glasses-dip-edge",
+   "job": "cd649614-7f2c-409c-9378-25957cab958b",
+   "framing": "knees",
+   "src_size": [
+    1366,
+    2048
+   ],
+   "crop": [
+    236,
+    6,
+    994,
+    2042
+   ],
+   "face": [
+    117,
+    194,
+    250,
+    260
+   ],
+   "enter": "right"
+  },
+  "rin_t2": {
+   "file": "rin_t2.png",
+   "hero": "rin",
+   "tier": 2,
+   "pose": "combo2 glasses-temple-lip-three-quarter",
+   "job": "02d088ef-0a97-4da6-b378-2f728a44a0ac",
+   "framing": "full",
+   "src_size": [
+    1366,
+    2048
+   ],
+   "crop": [
+    401,
+    11,
+    549,
+    2032
+   ],
+   "face": [
+    172,
+    109,
+    150,
+    220
+   ],
+   "enter": "right"
+  },
+  "rin_t3": {
+   "file": "rin_t3.png",
+   "hero": "rin",
+   "tier": 3,
+   "pose": "combo3 braid-release-s-curve",
+   "job": "cd258161-0fbc-4282-8d7c-7b06d4027e7f",
+   "framing": "full",
+   "src_size": [
+    1366,
+    2048
+   ],
+   "crop": [
+    405,
+    6,
+    601,
+    2034
+   ],
+   "face": [
+    148,
+    104,
+    160,
+    190
+   ],
+   "enter": "right"
+  },
+  "hana_t1": {
+   "file": "hana_t1.png",
+   "hero": "hana",
+   "tier": 1,
+   "pose": "combo1 edge-highfive-pop",
+   "job": "854cbeec-7e76-445f-9295-7986ab7ec137",
+   "framing": "knees",
+   "src_size": [
+    1360,
+    2048
+   ],
+   "crop": [
+    159,
+    0,
+    1133,
+    2048
+   ],
+   "face": [
+    441,
+    180,
+    340,
+    320
+   ],
+   "enter": "right"
+  },
+  "hana_t2": {
+   "file": "hana_t2.png",
+   "hero": "hana",
+   "tier": 2,
+   "pose": "combo2 heel-flick-profile-hair-push",
+   "job": "d229b378-5d1d-4367-8ca9-f2d07af7e0ab",
+   "framing": "full",
+   "src_size": [
+    1360,
+    2048
+   ],
+   "crop": [
+    268,
+    7,
+    750,
+    2020
+   ],
+   "face": [
+    332,
+    173,
+    200,
+    200
+   ],
+   "enter": "right"
+  },
+  "hana_t3": {
+   "file": "hana_t3.png",
+   "hero": "hana",
+   "tier": 3,
+   "pose": "combo3 sunburst-stride",
+   "job": "3eaa7826-1ff0-46f5-9409-172aff392a28",
+   "framing": "full",
+   "src_size": [
+    1360,
+    2048
+   ],
+   "crop": [
+    5,
+    5,
+    1322,
+    2036
+   ],
+   "face": [
+    715,
+    155,
+    320,
+    260
+   ],
+   "enter": "right"
+  },
+  "yue_t1": {
+   "file": "yue_t1.png",
+   "hero": "yue",
+   "tier": 1,
+   "pose": "combo1 fan-lower-reveal",
+   "job": "893c2d1d-9587-48d1-9ded-ef9adaf96866",
+   "framing": "knees",
+   "src_size": [
+    1360,
+    2048
+   ],
+   "crop": [
+    2,
+    2,
+    1358,
+    2046
+   ],
+   "face": [
+    348,
+    148,
+    250,
+    300
+   ],
+   "enter": "right"
+  },
+  "yue_t2": {
+   "file": "yue_t2.png",
+   "hero": "yue",
+   "tier": 2,
+   "pose": "combo2 weightless-sleeve-arc-toe",
+   "job": "fd9b5150-c2ad-4867-aabf-8757cb857d4f",
+   "framing": "full",
+   "src_size": [
+    1360,
+    2048
+   ],
+   "crop": [
+    11,
+    9,
+    1338,
+    2025
+   ],
+   "face": [
+    419,
+    171,
+    160,
+    170
+   ],
+   "enter": "right"
+  },
+  "yue_t3": {
+   "file": "yue_t3.png",
+   "hero": "yue",
+   "tier": 3,
+   "pose": "combo3 crescent-step-descent",
+   "job": "bd11d7f4-43a0-468e-a2cc-1fd6aa1a896e",
+   "framing": "full",
+   "src_size": [
+    1360,
+    2048
+   ],
+   "crop": [
+    20,
+    0,
+    1336,
+    2026
+   ],
+   "face": [
+    380,
+    215,
+    160,
+    170
+   ],
+   "enter": "right"
+  },
+  "nova_t1": {
+   "file": "nova_t1.png",
+   "hero": "nova",
+   "tier": 1,
+   "pose": "combo1 glitch-headphone-tap",
+   "job": "347cbdfc-ce8d-4b7a-bab2-462a9afe1810",
+   "framing": "knees",
+   "src_size": [
+    1360,
+    2048
+   ],
+   "crop": [
+    81,
+    0,
+    1279,
+    2048
+   ],
+   "face": [
+    401,
+    210,
+    309,
+    321
+   ],
+   "enter": "right"
+  },
+  "nova_t2": {
+   "file": "nova_t2.png",
+   "hero": "nova",
+   "tier": 2,
+   "pose": "combo2 bike-seat-lean-heel-lift",
+   "job": "63db0587-fccd-4783-aceb-01380242f176",
+   "framing": "full",
+   "src_size": [
+    1360,
+    2048
+   ],
+   "crop": [
+    109,
+    2,
+    1251,
+    2045
+   ],
+   "face": [
+    583,
+    146,
+    297,
+    272
+   ],
+   "enter": "right"
+  },
+  "nova_t3": {
+   "file": "nova_t3.png",
+   "hero": "nova",
+   "tier": 3,
+   "pose": "combo3 holo-hip-drop-hand-in-hair",
+   "job": "c4097c91-40d2-4da3-a37f-c87d460be25d",
+   "framing": "full",
+   "src_size": [
+    1360,
+    2048
+   ],
+   "crop": [
+    320,
+    2,
+    824,
+    2041
+   ],
+   "face": [
+    261,
+    122,
+    309,
+    284
+   ],
+   "enter": "right"
+  }
+ }
+}
