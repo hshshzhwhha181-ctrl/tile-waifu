@@ -32,7 +32,7 @@ func build(m, args: Dictionary) -> void :
 	Common.backdrop(self, "menu", size, 2.4, 0.9)
 	Common.vignette(self, size, Color(0.4, 0.15, 0.3), 0.4)
 	Fx.ambient(self, "petals", size)
-	V8Header.make(self, main, "Лавка", main.back)
+	V8Header.make(self, main, "Лавка", Callable()).show_money(["gems", "coins"])  # 0.10 W1: tab root, currency where it is spent
 	var tw: = (W - 48 - 20) / 3.0
 	for i in 3:
 		var b: = JButton.make(TABS[i], "pink" if i == tab else "glass", Rect2(24 + i * (tw + 10), TABS_Y, tw, 60), null, 23, -1.0, false)
@@ -69,6 +69,7 @@ func _build_body() -> void :
 		# 0.9 (spec §B): outfits give ult modifiers and charge outside ranked play only
 		var fair: = UI.center_label(UI.label("В рейтинге наряды не дают силы", 16, Color("ffd98a"), Color(0.3, 0.1, 0.25), 3), Rect2(0, ny + 26.0, W, 24))
 		body.add_child(fair)
+	V10ShopGuard.guard(self)  # 0.10 (meta Ф7): store build — no ₽ buttons, a grey «Скоро» in their place
 
 
 func _note_y() -> float:
@@ -329,6 +330,7 @@ func pass_popup() -> void :
 			Common.close_popup(p)
 			_build_body())
 	p.add_child(b)
+	V10ShopGuard.guard(p)  # 0.10 (meta Ф7)
 
 func _pass_reward(k: int) -> Dictionary:
 	if k == 30:
@@ -479,6 +481,8 @@ func _gems() -> void :
 	UI.slide_in(d, Vector2(0, 40), 0.4)
 
 func _buy(gems: int, from: Control) -> void :
+	if not V10ShopGuard.can_buy():
+		return
 	V10Money.grant({"gems": gems}, "shop")
 	G.save()
 	Sfx.play("win", 1.2, -6)

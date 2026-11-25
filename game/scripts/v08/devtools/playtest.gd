@@ -486,33 +486,18 @@ func _fresh() -> String:
 		return e
 	if main.screen_id != "home":
 		return "profile back went to %s" % main.screen_id
-	# ---- modes
-	step = "modes"
-	e = await tap_node(main.screen.modes_btn, "home «Режимы»")
+	# ---- 0.10: «Столы» (tab) → the Path scroll → the map → the level card → partner → 1-2
+	step = "tables"
+	e = await go_tab("tables")
 	if e != "":
 		return e
-	e = await on("modes")
-	if e != "":
-		return e
-	await shot("modes")
-	step = "daily"
-	e = await tap_text(main.screen, "Раскладка дня")
-	if e != "":
-		return e
-	await wait(0.9)
-	if popup() == null:
-		return "«Раскладка дня» opened nothing"
-	await shot("daily_calendar")
-	e = await close_popup()
-	if e != "":
-		return e
-	step = "modes_back"
-	e = await header_back()
-	if e != "":
-		return e
-	# ---- levels: play 1-2 and 1-3 (opens Желания)
+	await wait(0.8)
+	await shot("tables")
+	var hub = main.screen
+	if hub.play_btn == null or not on_screen(hub.play_btn):
+		return "«Столы» has no «Играть»"
 	step = "levels"
-	e = await tap_node(main.screen.play_btn, "home «Играть»")
+	e = await tap_node(hub.scroll_plate, "«Столы» Path scroll")
 	if e != "":
 		return e
 	e = await on("levels")
@@ -537,14 +522,15 @@ func _fresh() -> String:
 	e = await play_level("lv2", true)
 	if e != "":
 		return e
+	# 0.10 (meta V10WinPanel): «Ещё уровень · 3» goes straight to the next table
+	step = "more_level"
+	if main.screen.victory_next_btn == null or str(main.screen.victory_next_btn.name) != "MoreLevel":
+		return "the Path win has no «Ещё уровень» (MoreLevel)"
+	await shot("lv2_more_level")
+	var lv2_screen = main.screen
 	await tap(pos_of(main.screen.victory_next_btn))
-	step = "level3_pick"
-	e = await on("levels", 10.0)
-	if e != "":
-		return e
-	e = await partner_go("lv3")
-	if e != "":
-		return e
+	if not await until(func(): return main.screen != lv2_screen and main.screen_id == "play", 10.0):
+		return "«Ещё уровень» did not start the next table (on %s)" % main.screen_id
 	step = "level3"
 	e = await play_level("lv3", false)
 	if e != "":
@@ -618,33 +604,41 @@ func _fresh() -> String:
 			return "Android back did not close the pull results"
 	else:
 		notes.append("summon: no free 10-pull button")
-	# ---- wardrobe, shop
+	# ---- Героини, Лавка (closed until L8: the tab denies and says when; the screen itself still renders)
 	step = "collection"
 	e = await go_tab("collection")
 	if e != "":
 		return e
 	await shot("collection")
+	step = "shop_locked"
+	if V10Nav.tab_open("shop"):
+		notes.append("Лавка is open at unlocked=%d" % int(G.S.unlocked))
+	else:
+		e = await tap_node(main.tab_nodes["shop"], "tab shop (closed)")
+		if e != "":
+			return e
+		await wait(0.5)
+		if main.screen_id == "shop":
+			return "the closed Лавка tab opened the shop before L8"
+		await shot("shop_locked")
 	step = "shop"
-	e = await go_tab("shop")
+	main.go("shop")
+	e = await on("shop")
 	if e != "":
 		return e
+	await wait(0.8)
 	await shot("shop")
 	await swipe(Vector2(360, 1000), Vector2(360, 500), 0.4)
 	await wait(0.8)
 	await shot("shop_scroll")
-	# ---- home again (starter offer after the 3rd Path win)
+	# ---- home again (0.10: no offer before L8, UX §3.5 / О-3)
 	step = "home2"
 	e = await go_tab("home")
 	if e != "":
 		return e
-	if await until(func(): return popup() != null, 4.0):
-		await wait(0.8)
+	if await until(func(): return popup() != null, 3.0):
 		await shot("home_offer")
-		e = await close_popup()
-		if e != "":
-			return e
-	else:
-		notes.append("starter offer did not show after the 3rd Path win")
+		return "an offer popped up on the tea house before L8"
 	await shot("home2")
 	step = "home_touch"
 	e = await home_touch()
@@ -652,31 +646,28 @@ func _fresh() -> String:
 		return e
 	await dismiss_popups("home_touch")
 	var home = main.screen
-	# ---- left column
-	step = "tasks"
-	e = await tap_node(home.side_btns["tasks"], "«Поручения»")
-	if e != "":
-		return e
-	await wait(0.9)
-	if popup() == null:
-		return "«Поручения» opened nothing"
-	await shot("tasks")
-	e = await close_popup()
-	if e != "":
-		return e
-	step = "login"
-	e = await tap_node(home.side_btns["login"], "«Визиты»")
-	if e != "":
-		return e
-	await wait(0.9)
-	if popup() == null:
-		return "«Визиты» opened nothing"
-	await shot("visits")
-	e = await close_popup()
-	if e != "":
-		return e
+	# ---- «Сегодня» sheet (the lantern opens after L6; the sheet itself is checked here): «Забрать всё»
+	step = "today"
+	var sh: = V10Nav.today_sheet(main)
+	await wait(0.8)
+	await shot("today_sheet")
+	var claim = sh.find_child("ClaimAll", true, false)
+	if claim != null:
+		var gems0: = V10Money.bal("gems")
+		e = await tap_node(claim, "«Забрать всё»")
+		if e != "":
+			return e
+		await wait(0.8)
+		if V10Money.bal("gems") <= gems0 and G.login_ready():
+			return "«Забрать всё» gave nothing"
+	elif G.login_ready() or G.tasks_ready() > 0:
+		return "«Сегодня» has something to claim but no «Забрать всё»"
+	if is_instance_valid(sh) and sh.is_inside_tree():
+		sh.close()
+		await wait(0.4)
 	step = "mail"
-	e = await tap_node(home.side_btns["mail"], "«Письма»")
+	home = main.screen
+	e = await tap_node(home.home2.phone_b, "«Телефон»")
 	if e != "":
 		return e
 	# 0.9: «Письма» is the letters screen (scripts/v09/letters): open the newest letter, answer it, back home
@@ -709,20 +700,17 @@ func _fresh() -> String:
 	e = await go_tab("home")
 	if e != "":
 		return e
-	home = main.screen
 	await wait(1.0)
-	# ---- tournament: quarter, a player card, week
+	# ---- tournament (0.10: a shelf of «Столы» and the «Неделя» row from L16; opened directly here)
 	step = "rating"
-	e = await tap_node(home.side_btns["rating"], "«Рейтинг»")
-	if e != "":
-		return e
+	main.go("v7tourney", {"tab": "quarter"})
 	e = await on("v7tourney")
 	if e != "":
 		return e
 	await shot("tourney_quarter")
 	var ts = main.screen
 	if ts.tab != "quarter":
-		return "«Рейтинг» opened tab %s, not the quarter" % ts.tab
+		return "the tournament opened tab %s, not the quarter" % ts.tab
 	var row: Control = null
 	if ts.list:
 		for c in ts.list.get_children():
@@ -762,26 +750,15 @@ func _fresh() -> String:
 	e = await on("home")
 	if e != "":
 		return "Android back from the tournament: " + e
-	# ---- league card → week tab
-	step = "league_card"
-	home = main.screen
-	e = await tap_node(home.league_card, "league card")
-	if e != "":
-		return e
-	e = await on("v7tourney")
-	if e != "":
-		return e
-	if main.screen.tab != "week":
-		return "league card opened tab %s" % main.screen.tab
-	await shot("league_card_week")
-	e = await header_back()
-	if e != "":
-		return e
-	# ---- event
+	# ---- event (a row of «Сегодня» while it runs)
 	step = "event"
-	home = main.screen
 	if V7Event.is_open():
-		e = await tap_text(home, "ИВЕНТ")
+		var esh: = V10Nav.today_sheet(main)
+		await wait(0.6)
+		var er = esh.find_child("Row_event", true, false)
+		if er == null:
+			return "the event is open but «Сегодня» has no «Событие» row"
+		e = await tap_node(er, "«Событие»")
 		if e != "":
 			return e
 		e = await on("v7event")
@@ -794,12 +771,21 @@ func _fresh() -> String:
 			return e
 	else:
 		notes.append("event is closed at unlocked=%d" % int(G.S.unlocked))
-	# ---- room
-	step = "room"
+	# ---- the partner plate → her card in «Героини»; the 0.9 room (W2: a salon zone scene) directly
+	step = "partner"
 	home = main.screen
-	e = await tap_node(home.aff_root, "affection plate")
+	e = await tap_node(home.home2.partner, "partner plate")
 	if e != "":
 		return e
+	e = await on("collection")
+	if e != "":
+		return e
+	await shot("partner_card")
+	e = await go_tab("home")
+	if e != "":
+		return e
+	step = "room"
+	main.go("room", {"hero": G.S.partner})
 	e = await on("room")
 	if e != "":
 		return e
@@ -808,6 +794,10 @@ func _fresh() -> String:
 	e = await header_back()
 	if e != "":
 		return e
+	if main.screen_id != "home":
+		e = await go_tab("home")
+		if e != "":
+			return e
 	step = "fx_level"
 	e = await fx_toggle()
 	if e != "":

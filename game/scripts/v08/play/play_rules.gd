@@ -117,6 +117,7 @@ static func story_stars(fails: int, boosters: int) -> int:
 
 # G.add_rp + G.record_game + G.save in one call. Returns {rp, ups, gems, title}.
 static func award(source: String, rp: int, won: bool) -> Dictionary:
+	rp *= V10Afisha.mult(source, "rank")  # 0.10 (meta Ф6): «Режим дня ×2» doubles rank points (never crystals)
 	var ups: Array = []
 	if rp != 0:
 		ups = G.add_rp(rp, source)

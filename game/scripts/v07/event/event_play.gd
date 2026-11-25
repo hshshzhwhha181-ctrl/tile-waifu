@@ -206,6 +206,7 @@ func _event_clear() -> void :
 	G.S.xp = int(G.S.xp) + 40
 	rp_before = int(G.S.rp)
 	var ea: = V8PlayRules.award("event", V8PlayRules.event_rp(stars), true)
+	_v10_ended(true, stars, int(rw.total), now() - start_t, first)  # 0.10 hook
 	rp_gain = int(ea.rp)
 	rank_ups = ea.ups
 	_v8_saved = true
@@ -278,6 +279,7 @@ func _tour_finish(cleared: bool) -> void :
 	V10Bond.gain(partner, 5, "event_win")
 	rp_before = int(G.S.rp)
 	var ta: = V8PlayRules.award("tourney", V8PlayRules.tourney_rp(cleared, total, int(res.place_before) - int(res.place_after)), cleared)
+	_v10_ended(cleared, 0, 0, secs, false, total)  # 0.10 hook
 	rp_gain = int(ta.rp)
 	rank_ups = ta.ups
 	_v8_saved = true

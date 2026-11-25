@@ -25,6 +25,7 @@ static func run() -> int:
 	_bad_codes()
 	_save_fallback()
 	_migration_v5()
+	_migration_v7()
 	_add_rp()
 	G.S = real_state
 	G.save_path = real_path
@@ -40,6 +41,12 @@ static func _check(name: String, ok: bool, info: = "") -> void :
 	else:
 		_fail += 1
 		printerr("FAIL ", name, " ", info)
+
+
+static func _norm_no_econ(d: Dictionary) -> String:
+	var c: = d.duplicate()
+	c.erase("econ")
+	return _norm(c)
 
 
 static func _norm(d) -> String:
@@ -77,7 +84,11 @@ static func late_game_state() -> Dictionary:
 static func _round_trip() -> void :
 	var st: = late_game_state()
 	G.S = st.duplicate(true)
-	var want: = _norm(G.S)
+	G.v10_attach()  # 0.10: a live save always carries the module keys and the sealed wallet (S.econ)
+	G.S.econ = G.econ.save_dict()
+	# the wallet's clock fields move with the wall clock between export and import: compared by balances below
+	var want: = _norm_no_econ(G.S)
+	var want_bal: = [V10Money.bal("gems"), V10Money.bal("coins")]
 	var code: = V8Recovery.export_code()
 	_check("code has TW8- prefix", code.begins_with("TW8-"))
 	var groups_ok: = true
@@ -90,7 +101,8 @@ static func _round_trip() -> void :
 	G.S = G.default_state()
 	var ok: = V8Recovery.import_code(code)
 	_check("import of exported code succeeds", ok, V8Recovery.last_error)
-	_check("round-trip state identical", _norm(G.S) == want)
+	_check("round-trip state identical", _norm_no_econ(G.S) == want)
+	_check("round-trip wallet identical", [V10Money.bal("gems"), V10Money.bal("coins")] == want_bal and V10Econ.verify(G.S.econ))
 	_check("round-trip progress (rp/gems/unlocked)", int(G.S.rp) == 1777 and int(G.S.gems) == 23456 and int(G.S.unlocked) == G.LEVELS.size())
 	_check("round-trip profile", str(G.S.profile.nick) == "Лунная Сова" and bool(G.S.profile_done))
 	_check("imported save written to disk", G.read_save_file(G.save_path) is Dictionary)
@@ -167,6 +179,66 @@ static func _migration_v5() -> void :
 	var code: = V8Recovery.export_code(d)
 	G.S = G.default_state()
 	_check("0.7 save code imports with migration", V8Recovery.import_code(code) and int(G.S.ver) == G.SAVE_VER and not G.S.profile_done)
+
+
+# 0.10 (docs/INTEGRATION_0.10.md §3.7): a 0.9 save (ver 7) → ver 8 exactly once; old keys kept, the W1 module keys
+# registered, the wallet built from the 0.9 balances and sealed, a second pass adds nothing, damaged new keys are
+# repaired, the .bak fallback works on ver 8, and the 0.9 mirrors S.gems / S.coins follow the wallet.
+const W1_KEYS: = ["v10_meta", "v10_afisha", "econ", "v10_shop", "v10_cos_owned", "v10_cos_seen", "v10_feats", "v10_auth",
+	"v10_tut", "v10_clarity", "look", "hero_combo", "a11y_calm"]
+
+static func _migration_v7() -> void :
+	var old: = late_game_state()
+	old.ver = 7
+	old.streak = 9
+	old.login = {"n": 12, "last": "2026-11-20"}
+	for k in W1_KEYS:
+		old.erase(k)
+	var d = JSON.parse_string(JSON.stringify(old))
+	_check("v7 save applies", G.apply_state(d))
+	_check("v7 -> v8: ver is 8", int(G.S.ver) == 8 and G.SAVE_VER == 8, str(G.S.ver))
+	var keep: = true
+	for k in old:
+		if k != "streak" and not G.S.has(k):
+			keep = false
+	_check("v7 -> v8: every 0.9 key kept", keep)
+	_check("v7 -> v8: progress kept", int(G.S.rp) == 1777 and int(G.S.unlocked) == G.LEVELS.size() and str(G.S.profile.nick) == "Лунная Сова")
+	var missing: = []
+	for k in W1_KEYS:
+		if not G.S.has(k):
+			missing.append(k)
+	_check("v7 -> v8: W1 module keys registered", missing.is_empty(), str(missing))
+	_check("v7 -> v8: v10_meta days_seen from the visits", int(G.S.v10_meta.get("days_seen", -1)) == 12)
+	_check("v7 -> v8: 0.9 visit streak reset (Серия starts at 0)", int(G.S.get("streak", -1)) == 0)
+	_check("v7 -> v8: wallet holds the 0.9 balances", V10Money.bal("gems") == 23456 and V10Money.bal("coins") == 98765,
+		"%d/%d" % [V10Money.bal("gems"), V10Money.bal("coins")])
+	G.save()
+	var disk = G.read_save_file(G.save_path)
+	_check("v7 -> v8: S.econ sealed on disk", disk is Dictionary and disk.get("econ") is Dictionary and V10Econ.verify(disk.econ))
+	var before: = _norm(G.S)
+	var rep: = V10Save.migrate(G.S)
+	V10Registry.ensure_all(G.S)
+	_check("second migrate adds nothing", (rep.added as Array).is_empty() and (rep.migrators as Array).is_empty() and _norm(G.S) == before, str(rep))
+	G.load_game()
+	_check("reload of a ver 8 save changes nothing", int(G.S.ver) == 8 and V10Money.bal("gems") == 23456 and G.loaded_from == G.save_path)
+	G.S.v10_clarity = 7
+	G.S.erase("v10_afisha")
+	G.v10_attach()
+	_check("damaged new keys repaired", G.S.v10_clarity is Dictionary and G.S.v10_afisha is Dictionary)
+	# the mirrors: a leftover direct write becomes a wallet operation; spend is all or nothing
+	G.S.gems = int(G.S.gems) + 44
+	G.save()
+	_check("direct S.gems write absorbed by the wallet", V10Money.bal("gems") == 23500 and int(G.S.gems) == 23500)
+	_check("spend all or nothing", not V10Money.spend({"gems": 10, "coins": 10 ** 9}, "test") and V10Money.bal("gems") == 23500)
+	_check("spend moves the mirror", V10Money.spend({"gems": 500}, "test") and int(G.S.gems) == 23000)
+	G.save()
+	G.save()
+	var f: = FileAccess.open(G.save_path, FileAccess.WRITE)
+	f.store_string("{\"ver\": 8, \"gem")
+	f.close()
+	G.load_game()
+	_check("ver 8: damaged main -> backup with the wallet", G.loaded_from == G._bak_path() and int(G.S.ver) == 8 and V10Money.bal("gems") == 23000)
+	_check("econ audit clean after migration", G.econ != null and (G.econ.audit() as Array).is_empty(), str(G.econ.audit() if G.econ else []))
 
 
 static func _add_rp() -> void :

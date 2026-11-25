@@ -49,8 +49,9 @@ static func path_wins() -> int:
 static func owned() -> bool:
 	return G.owns(ITEM) or bool(st().bought)
 
+# 0.10 (UX §3.5, С-2, О-3): no «₽» before L8 — the offer waits until the Лавка tab is open (after the boss of chapter 1)
 static func eligible() -> bool:
-	return not G.demo and not owned() and int(st().shown_at) == 0 and path_wins() >= WINS
+	return not G.demo and not owned() and int(st().shown_at) == 0 and path_wins() >= WINS and V10Nav.tab_open("shop")
 
 static func left_secs() -> int:
 	var s: = int(st().shown_at)

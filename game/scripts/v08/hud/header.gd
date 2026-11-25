@@ -21,6 +21,7 @@ var back_btn: JButton
 var help_btn: JButton
 var title_lbl: Label
 var _w: = 720.0
+var _bleed_top: = 0.0
 
 
 static func make(screen: Control, main, title: String, on_back: Callable, on_help: = Callable()) -> V8Header:
@@ -29,14 +30,17 @@ static func make(screen: Control, main, title: String, on_back: Callable, on_hel
 	# so «назад» and «?» sit at the real edges on tablets
 	h._w = screen.size.x
 	var bx: = 0.0
+	var by: = 0.0
 	if screen.is_inside_tree():
 		var br: Rect2 = V10Layout.bleed_rect(screen)
 		bx = br.position.x
+		by = minf(0.0, br.position.y)
 		h._w = br.size.x
-	# 0.10 W1 (HUD_V2 §8.6): ONE bar at the very top (88 + safe top), no status ribbon above it. The content keeps
-	# CONTENT_Y (the 0.9 screens lay out from it); the band under the bar is the screen's own background.
-	var st: = float(main.safe_top) if main != null and "safe_top" in main else 0.0
-	h.position = Vector2(bx, st)
+	# 0.10 W1 (HUD_V2 §8.6): ONE bar at the top of the column (the column already starts under the safe top), no
+	# status ribbon above it; its fade reaches up to the real screen edge. The content keeps CONTENT_Y (the 0.9
+	# screens lay out from it); the band under the bar is the screen's own background.
+	h._bleed_top = -by
+	h.position = Vector2(bx, 0.0)
 	h.size = Vector2(h._w, V2_H)
 	h.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	h.name = "V8Header"
@@ -54,8 +58,8 @@ const V2_H: = 88.0
 func _build(title: String, on_back: Callable, on_help: Callable) -> void :
 	var fade: = _Fade.new()
 	fade.size = Vector2(_w, V2_H + 24.0)
-	fade.position = Vector2(0, -position.y)
-	fade.size.y += position.y
+	fade.position = Vector2(0, -_bleed_top)
+	fade.size.y += _bleed_top
 	add_child(fade)
 	var cx: = floorf(maxf(0.0, (_w - 720.0) * 0.5))
 	if on_back.is_valid():
@@ -89,6 +93,8 @@ func set_title(text: String) -> void :
 	var cx: = floorf(maxf(0.0, (_w - 720.0) * 0.5))
 	var x0: = cx + (88.0 if back_btn else 24.0)
 	var x1: = cx + (632.0 if help_btn else 696.0)
+	if _money_x > 0.0:
+		x1 = minf(x1, _money_x - 16.0)
 	var fs: = 44
 	for k in [44, 32]:
 		fs = k
@@ -102,6 +108,36 @@ func set_title(text: String) -> void :
 	title_lbl.clip_text = true
 	title_lbl.name = "Title"
 	add_child(title_lbl)
+
+
+# 0.10 W1 (HUD_V2 §8.6): the currency being spent on this screen, as S-plates on the right of the bar (Numerals +
+# painted icon 24); only Желания and Лавка call it. main.refresh_currency() refreshes them (group "v10_money").
+const MONEY_ICON: = {"gems": "gem", "coins": "coin"}
+var money_plates: = {}
+var _money_x: = 0.0
+
+func show_money(keys: Array) -> void :
+	var cx: = floorf(maxf(0.0, (_w - 720.0) * 0.5))
+	var right: = cx + (632.0 if help_btn else 696.0)
+	for i in range(keys.size() - 1, -1, -1):
+		var k: String = keys[i]
+		var p: = V10Plate.make("S", 144, "", "", UI.fmt(V10Money.bal(k)))
+		p.icon_tex = V8Art.cur(MONEY_ICON.get(k, "gem"))
+		p.name = "Money_" + k
+		right -= 144.0
+		p.position = Vector2(right, 20.0)
+		right -= 8.0
+		add_child(p)
+		money_plates[k] = p
+	_money_x = right + 8.0
+	add_to_group("v10_money")
+	set_title(title_lbl.text if title_lbl else "")
+
+
+func refresh_money() -> void :
+	for k in money_plates:
+		if is_instance_valid(money_plates[k]):
+			(money_plates[k] as V10Plate).value = UI.fmt(V10Money.bal(k))
 
 
 class _Fade:

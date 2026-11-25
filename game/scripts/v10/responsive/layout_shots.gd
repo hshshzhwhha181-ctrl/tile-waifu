@@ -287,6 +287,7 @@ func _screens() -> void:
 		["home_outfit", "home", {"outfit": "o_dragon"}],
 		["profile", "profile", {"from": "home"}],
 		["levels", "levels", {"select": 4}],
+		["tables", "tables", {}],
 		["tutorial", "play", {"level": 0, "partner": "mc"}],
 		["play", "play", {"level": 6, "partner": "mc"}],
 		["summon", "summon", {}],
@@ -307,7 +308,7 @@ func _screens() -> void:
 	]
 	for st in steps:
 		var name: String = st[0]
-		if not want(name) and not (name == "home" and (want("settings") or want("tasks") or want("visits") or want("calendar") or want("album"))) \
+		if not want(name) and not (name == "home" and (want("settings") or want("tasks") or want("visits") or want("calendar") or want("album") or want("today"))) \
 				and not (name == "play" and (want("cutin") or want("victory"))) and not (name == "summon" and want("pull")):
 			continue
 		if name == "home_outfit":
@@ -327,6 +328,7 @@ func _screens() -> void:
 				await _popup_shot("visits", func(): Daily.login(main, main.screen))
 				await _popup_shot("calendar", func(): Daily.calendar(main))
 				await _popup_shot("album", func(): V7AlbumView.open(main))
+				await _popup_shot("today", func(): V10Nav.today_sheet(main))  # 0.10 W1: the «Сегодня» sheet
 			"play":
 				if want("cutin"):
 					await _cutin()

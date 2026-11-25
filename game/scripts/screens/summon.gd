@@ -59,7 +59,7 @@ func _build_banner() -> void :
 	add_child(banner_root)
 	var b: Dictionary = G.BANNERS[banner_i]
 	var newbie: bool = b.get("newbie", false)
-	V8Header.make(banner_root, main, "Желания", main.back)
+	V8Header.make(banner_root, main, "Желания", Callable()).show_money(["gems"])  # 0.10 W1: tab root, currency where it is spent
 	set_meta("v8_back", main.back)
 
 	var shown: Array = []

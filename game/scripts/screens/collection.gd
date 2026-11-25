@@ -46,7 +46,7 @@ func _build() -> void :
 	Common.backdrop(stage, bg, size, 2.2 if bg != "menu" else 0.0, 0.82, Color(1, 0.96, 0.98), Vector2(0.5, 0.5))
 	Common.vignette(stage, size, Color(0.3, 0.1, 0.25), 0.55)
 	Fx.ambient(stage, "fireflies", size)
-	V8Header.make(stage, main, "Гардероб", main.back)
+	V8Header.make(stage, main, "Героини", Callable())  # 0.10 W1: the tab «Героини» (UX §3.1), tab root
 	set_meta("v8_back", main.back)
 
 	var x: = 24.0 + (112.0 - AV) * 0.5

@@ -25,6 +25,11 @@ var path_name: = "Чайный сад"
 var affinity: = 6
 var lit: = [true, false, true]
 var own_figure: = false  # the screen already shows her (rig / video): do not add a second figure
+# integration (W1): the host screen owns the backdrop and main.gd owns the navbar; staged lanterns (UX §3.5)
+var own_backdrop: = false
+var own_nav: = false
+var shown: = [true, true, true]
+var phone_dot: = true
 var L: = {}
 
 var backdrop: TextureRect
@@ -85,6 +90,10 @@ func configure(cfg: Dictionary) -> void:
 	affinity = int(cfg.get("affinity", affinity))
 	lit = cfg.get("lit", lit)
 	own_figure = bool(cfg.get("own_figure", false))
+	own_backdrop = bool(cfg.get("own_backdrop", false))
+	own_nav = bool(cfg.get("own_nav", false))
+	shown = cfg.get("shown", shown)
+	phone_dot = bool(cfg.get("phone_dot", true))
 
 
 func _ready() -> void:
@@ -102,7 +111,7 @@ func _ready() -> void:
 	backdrop.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	backdrop.modulate = V10DS.TINT_HOME
 	var bp: String = V10HudMatch.RIG_BG.get(hero_id, "res://assets/v10/rig/mc_gown/bg.png")
-	if ResourceLoader.exists(bp):
+	if ResourceLoader.exists(bp) and not own_backdrop:
 		backdrop.texture = load(bp)
 	add_child(backdrop)
 	var rp: String = V10HudMatch.RIG_PATHS.get(hero_id, "")
@@ -158,8 +167,9 @@ func _ready() -> void:
 	add_child(play_b)
 	nav = _Nav.new()
 	nav.h = self
+	nav.visible = not own_nav
 	add_child(nav)
-	for i in TABS.size():
+	for i in (0 if own_nav else TABS.size()):
 		var tl: = V10Type.label(TABS[i][1], "ui", 18, V10DS.GOLD_300 if i == 0 else V10DS.PAPER_500)
 		tl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		add_child(tl)
@@ -188,6 +198,8 @@ func layout_now() -> void:
 	spine_l.position = Vector2(sp.position.x, sp.end.y)
 	for i in 3:
 		var r: Rect2 = L.lanterns[i]
+		lantern_tr[i].visible = bool(shown[i])
+		lantern_ls[i].visible = bool(shown[i])
 		lantern_tr[i].position = r.position
 		lantern_tr[i].size = r.size
 		lantern_ls[i].position = Vector2(r.position.x - 20, r.end.y + 8)
@@ -237,9 +249,12 @@ class _Deco:
 		V10Icons.draw(self, "avatar_ring", c, 40, V10DS.PAPER_500)
 		# «new» dot on the phone (12 px rose.300, no rim)
 		var pr: Rect2 = L.phone
-		draw_circle(pr.get_center() + Vector2(14, -18), 6, V10DS.ROSE_300, true, -1.0, true)
+		if h.phone_dot:
+			draw_circle(pr.get_center() + Vector2(14, -18), 6, V10DS.ROSE_300, true, -1.0, true)
 		# threads of the three lanterns (the lanterns themselves are painted TextureRects)
 		for i in 3:
+			if not bool(h.shown[i]):
+				continue
 			var r: Rect2 = L.lanterns[i]
 			var x: = r.get_center().x
 			# the thread fades in under the header row: it never crosses the avatar ring or the nick

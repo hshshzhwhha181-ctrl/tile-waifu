@@ -103,7 +103,7 @@ static func _touch_lines() -> void:
 
 
 static func _date(days_ago: int) -> String:
-	return Time.get_date_string_from_unix_time(int(Time.get_unix_time_from_system()) - days_ago * 86400)
+	return Time.get_date_string_from_unix_time(V10Meta.now_unix() - days_ago * 86400)
 
 
 # home on day D, the match ends after midnight: the win is recorded before the first tick of D+1 (whose rollover

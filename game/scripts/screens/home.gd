@@ -64,7 +64,6 @@ func build(m, _args: Dictionary) -> void :
 	UI.slide_in(hero, Vector2(0, 60), 0.05, 0.6)
 	# 0.8: her legs fade out under the button cluster (no shoes peeking between the plate and the CTA). 0.9: the fade
 	# starts at the top of the cluster (Режимы, y ≈ 900), not right under the hem — her legs stay skin and colour
-	Common.floor_fade(self, H - 400.0, H - 150.0)
 	var oid: = G.equipped(G.S.partner)
 	var live_opts: = {"hero": hero}
 	var live_mode: = "rig"
@@ -97,28 +96,11 @@ func build(m, _args: Dictionary) -> void :
 		live_opts.merge({"art": art, "tex_size": Vector2(otex.get_width(), otex.get_height()), "focus": Vector2(float(ofc[0]), 0.4),
 			"face_rect": _face_rect(oid, otex, ofc), "art_key": okey})
 	live = V9HomeLive.make(self, live_mode, live_opts)
-	_build_left()
-	_build_right()
-	_build_affection()
-
-	var lvl: int = min(int(G.S.unlocked), G.LEVELS.size()) - 1
-	play_btn = JButton.make(V6Txt.s("home.play"), "pink", Rect2(W - 418, H - 296, 400, 114), null, 36)
-	play_btn.set_sub(V6Txt.s("home.play_sub") % [G.LEVELS[lvl].code, G.LEVELS[lvl].name], 19)
-	play_btn.shine_every = 2.8
-	play_btn.pulse = true
-	play_btn.pressed.connect( func(): main.go("levels", {"select": lvl}))
-	add_child(play_btn)
-	UI.pop_in(play_btn, 0.35)
-	modes_btn = JButton.make("Режимы", "glass", Rect2(W - 418, H - 296 - 92, 400, 80), null, 28)
-	modes_btn.set_sub("Путь, турнир и другие столы", 17)
-	modes_btn.lbl.position.x += 34
-	modes_btn.lbl.size.x -= 34
-	modes_btn.sub.position.x += 34
-	modes_btn.sub.size.x -= 34
-	modes_btn.add_child(V8Art.rect(V8Art.nav("play"), Rect2(16, 8, 64, 64)))
-	modes_btn.pressed.connect( func(): main.go("modes"))
-	add_child(modes_btn)
-	UI.pop_in(modes_btn, 0.3)
+	# 0.10 W1 (UX §3.3, HUD_V2 §8.2): the v2 tea house — avatar + nick, Телефон, the lanterns, the partner plate and
+	# ONE «Играть · N». The 0.9 left column, the league / event / offer cards, «Режимы», «Сесть за стол», the currencies
+	# and the affection plate with «ещё N сегодня» are gone (their rows live in «Сегодня» and on «Столы»).
+	_build_v10(new_letters.size() > 0 or V9Letters.badge_count() > 0)
+	V10Hooks.emit_home_built(self)  # 0.10 hook: V10EntryQueue.run() (one full-screen scene per launch)
 	if not new_letters.is_empty():
 		_letter_arrived.call_deferred()
 	await get_tree().create_timer(0.9).timeout
@@ -198,10 +180,10 @@ func _rating_mark(b: Control) -> void :
 	pl.add_child(UI.center_label(UI.label(txt, 16, Color("3a2410"), Color(1, 1, 1, 0.4), 1, "body", 900), Rect2(0, 0, fw, 24)))
 
 func refresh_badges() -> void :
-	for k in side_btns:
-		side_btns[k].queue_free()
-	side_btns.clear()
-	_build_left()
+	if home2:
+		home2.phone_dot = V9Letters.badge_count() > 0
+		home2.lit = [V10Nav.today_open(), false, false]
+		home2.deco.queue_redraw()
 
 # «Письма» (0.9): the letters screen — heroines' letters with replies, plus the 0.7/0.8 date notes and scene notices.
 func open_mail() -> void :
@@ -210,9 +192,9 @@ func open_mail() -> void :
 # a letter was written while she was away: the Письма icon bows once with a little sparkle
 func _letter_arrived() -> void :
 	await get_tree().create_timer(1.1).timeout
-	if not is_inside_tree() or not side_btns.has("mail"):
+	if not is_inside_tree() or home2 == null:
 		return
-	var b: Control = side_btns["mail"]
+	var b: Control = home2.phone_b
 	V9Feel.success(b, "sparkle", 0.6)
 	if V9Feel.can_fx():
 		Fx.burst(self, b.position + b.size * 0.4, "sparkle", maxi(4, int(round(12 * V9Feel.fx_scale()))))
@@ -410,48 +392,6 @@ func _banner_card(r: Rect2, tex: Texture2D, tag_text: String, name_text: String,
 	ev.add_child(s)
 	return ev
 
-# ---------------------------------------------------------------- affection plate
-
-func _build_affection() -> void :
-	if aff_root:
-		aff_root.queue_free()
-	var h: String = G.S.partner
-	var r: = Rect2(16, H - 296, 270, 114)
-	aff_root = UI.rbox("glass", r, 26, 3, 12)
-	add_child(aff_root)
-	aff_root.mouse_filter = Control.MOUSE_FILTER_STOP
-	aff_root.gui_input.connect( func(e):
-		if e is InputEventMouseButton and e.pressed:
-			UI.tap(aff_root, 0.06)
-			main.go("room", {"hero": G.S.partner}))
-	aff_root.add_child(V8Art.rect(V8Art.icon("heart"), Rect2(8, 8, 56, 56)))
-	var tw: = r.size.x - 70.0 - 12.0
-	var name_s: String = G.HEROES[h].name
-	var fs: = 22
-	while fs > 16 and UI.font("body", 900).get_string_size(name_s, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > tw:
-		fs -= 1
-	var nm: = UI.label(name_s, fs, UI.INK, UI.DARK, 3, "body", 900)
-	nm.position = Vector2(70, 8)
-	nm.size = Vector2(tw, 28)
-	nm.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	aff_root.add_child(nm)
-	var lv: = UI.label("Симпатия %d" % G.aff_level(h), 17, Color("ffd2de"), UI.DARK, 3, "body", 900)
-	lv.position = Vector2(70, 36)
-	lv.size = Vector2(tw, 24)
-	lv.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	aff_root.add_child(lv)
-	Common.progress_bar(aff_root, Rect2(14, 66, r.size.x - 28, 14), float(int(G.S.aff.get(h, 0)) % 100) / 100.0, "pink")
-	var left: = G.pet_left()
-	var pet_s: String = V6Txt.s("home.pet_left") % left if left > 0 else V6Txt.s("home.pet_done")
-	var ps: = 16
-	while ps > 13 and UI.font("body", 800).get_string_size(pet_s, HORIZONTAL_ALIGNMENT_LEFT, -1, ps).x > r.size.x - 28:
-		ps -= 1
-	var pl: = UI.label(pet_s, ps, Color("8a4a6a"))
-	pl.position = Vector2(14, 84)
-	pl.size = Vector2(r.size.x - 28, 24)
-	pl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	aff_root.add_child(pl)
-
 func _say(text: String) -> void :
 	if live and is_instance_valid(live):
 		live.say(text, "", "", false)
@@ -469,9 +409,9 @@ func _say(text: String) -> void :
 # 0.8 (main.toast): home toasts live in the speech-bubble band between the left icon column and the right cards,
 # so they never cover the league / event cards; the bubble steps aside while a toast is up
 func v8_toast_rect() -> Rect2:
-	var x0: = 112.0
-	var x1: = W - CARD_W - 16.0 - 10.0
-	return Rect2(x0, 186.0, x1 - x0, 80.0)
+	# 0.10: above the action row, under her — never over her face or the lanterns
+	var py: = float((home2.L.play as Rect2).position.y) - float(main.CR.position.y) if home2 and not home2.L.is_empty() else H - 330.0
+	return Rect2(32.0, py - 112.0, W - 64.0, 80.0)
 
 func v8_toast_shown(dur: float) -> void :
 	if bubble and is_instance_valid(bubble):
@@ -534,3 +474,78 @@ func dev_act(a: String) -> void :
 		"blink":
 			hero.set_process(false)
 			hero.mat.set_shader_parameter("blink", 1.0)
+
+
+# ── 0.10 W1: V10HudHome over the living heroine (scripts/v10/hud2/hud_home.gd, HUD_V2 §8.2) ─────────────────────
+var home2: V10HudHome
+var avatar_hit: Control
+var v10_bubble_x = null  # V9HomeLive.say: x of the speech bubble (right of the lit lanterns)
+
+func _build_v10(mail_new: bool) -> void :
+	var pi: = V10Nav.path_info()
+	# a night.900 scrim behind the status row (avatar, nick, Телефон): paper text stays ≥ 4.5:1 on a bright room
+	var scrim: = TextureRect.new()
+	var gt: = GradientTexture2D.new()
+	gt.gradient = Gradient.new()
+	gt.gradient.set_color(0, Color(V10DS.NIGHT_900, 0.72))
+	gt.gradient.set_color(1, Color(V10DS.NIGHT_900, 0.0))
+	gt.fill_from = Vector2(0, 0)
+	gt.fill_to = Vector2(0, 1)
+	scrim.texture = gt
+	var br: = V10Layout.bleed_rect(self)
+	scrim.position = br.position
+	scrim.size = Vector2(br.size.x, -br.position.y + 150.0)
+	scrim.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	scrim.name = "StatusScrim"
+	add_child(scrim)
+	home2 = V10HudHome.new()
+	home2.configure({"hero": str(G.S.partner), "nick": G.nick(), "level": pi.code, "path": pi.loc,
+		"affinity": G.aff_level(str(G.S.partner)),
+		"own_figure": true, "own_backdrop": true, "own_nav": true, "phone_dot": mail_new,
+		# Сегодня from L6 (UX §3.5); Салон and Серия arrive with W2
+		"shown": [V10Nav.today_lit(), false, false], "lit": [V10Nav.today_open(), false, false]})
+	add_child(home2)
+	var shown_n: = 1 if V10Nav.today_lit() else 0
+	v10_bubble_x = 40.0 + shown_n * 112.0 + 4.0 if shown_n > 0 else null
+	# its layout is in viewport px; the screen sits in the content column
+	home2.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	home2.position = -main.CR.position
+	home2.size = get_viewport_rect().size
+	home2.name = "V10HudHome"
+	play_btn = null
+	aff_root = home2.partner
+	home2.play_b.set_meta("ux_role", "primary")
+	home2.partner.set_meta("ux_role", "secondary")
+	home2.phone_b.set_meta("ux_role", "tertiary")
+	home2.play_pressed.connect(func(): V10Nav.play_path(main))
+	home2.partner_pressed.connect(func(): main.go("collection", {"hero": str(G.S.partner)}))
+	home2.phone_pressed.connect(open_mail)
+	home2.lantern_pressed.connect(func(i: int):
+		if i == 0:
+			V10Nav.today_sheet(main))
+	# the player's own avatar in the ring + one tap area over avatar and nick → Профиль (1)
+	var L: Dictionary = home2.L
+	var ar: Rect2 = L.avatar
+	var av_id: = str(G.profile().get("avatar", "mc"))
+	if not Hero.RIGS.has(av_id):
+		av_id = "mc"
+	var av: TextureRect = main._avatar(av_id, Rect2(ar.position + Vector2(4, 4), ar.size - Vector2(8, 8)))
+	av.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	home2.add_child(av)
+	avatar_hit = Control.new()
+	avatar_hit.name = "AvatarHit"
+	avatar_hit.position = ar.position - Vector2(8, 8)
+	avatar_hit.size = Vector2((L.nick as Rect2).end.x - ar.position.x + 8.0, 80.0)
+	avatar_hit.mouse_filter = Control.MOUSE_FILTER_STOP
+	avatar_hit.set_meta("ux_role", "tertiary")
+	avatar_hit.gui_input.connect(func(e):
+		if (e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT) or (e is InputEventScreenTouch and e.pressed):
+			V9Feel.press(av)
+			main.go("profile", {"from": "home"}))
+	home2.add_child(avatar_hit)
+
+
+# V9HomeLive calls this after a touch added affection: the partner plate shows the new number
+func _build_affection() -> void :
+	if home2 and home2.partner:
+		home2.partner.subtitle = "Симпатия · %d" % G.aff_level(str(G.S.partner))

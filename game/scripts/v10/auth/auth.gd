@@ -45,11 +45,8 @@ static var _globals: = {}
 static func now() -> int:
 	if now_override >= 0:
 		return now_override
-	# 0.10 contract §2.5: one time source. V10Meta (meta lane) owns it; until it is merged, the system clock.
-	var meta = _global("V10Meta")
-	if meta != null and _has_static(meta, "now_unix"):
-		return int(meta.call("now_unix"))
-	return int(Time.get_unix_time_from_system())
+	# 0.10 contract §2.5: one time source — V10Meta (wired in W1)
+	return V10Meta.now_unix()
 
 
 static func _global(cname: String) -> Variant:

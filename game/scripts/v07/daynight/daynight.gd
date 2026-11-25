@@ -203,6 +203,8 @@ func _make_chip(home: Node) -> Control:
 	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	# 0.9: V9HomeLive fades it while a long reply bubble needs the room above her head
 	c.name = "V7ClockChip"
+	# 0.10 W1 (UX §3.3): the v2 tea house has 7 elements and no clock chip; the time of day stays in the light
+	c.visible = not ("home2" in home)
 	home.add_child(c)
 	_chip_lbl = UI.label("", 16, Color("fff1dc"), UI.DARK, 3, "body", 900)
 	_chip_lbl.size = c.size

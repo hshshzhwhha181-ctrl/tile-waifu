@@ -1,12 +1,14 @@
 extends Control
 
 
+# 0.10 W1 (UX_RULES §3.1, HUD_V2 §8.2): five EQUAL tabs, no star. Ids stay where the screen is the same (playtest,
+# tutorial, V10Music); the centre tab is the new «Столы» hub (scripts/v10/core/tables_hub.gd).
 const TABS: = [
-	{"id": "home", "name": "Чайная", "icon": "home"}, 
-	{"id": "collection", "name": "Гардероб", "icon": "wardrobe"}, 
-	{"id": "levels", "name": "Партия", "icon": "play", "big": true}, 
-	{"id": "summon", "name": "Желания", "icon": "wishes"}, 
-	{"id": "shop", "name": "Лавка", "icon": "shop"}, 
+	{"id": "home", "name": "Чайная", "icon": "tab_tea"}, 
+	{"id": "collection", "name": "Героини", "icon": "tab_heroines"}, 
+	{"id": "tables", "name": "Столы", "icon": "tab_tables"}, 
+	{"id": "summon", "name": "Желания", "icon": "tab_wishes"}, 
+	{"id": "shop", "name": "Лавка", "icon": "tab_shop"}, 
 ]
 var SCREENS: = {
 	"home": preload("res://scripts/screens/home.gd"), 
@@ -261,8 +263,8 @@ func _meet_scene(sp: Control, hero: Hero) -> void :
 const SETTINGS_SEG: = [
 	["fx_level", "Эффекты", [["full", "Полные"], ["mid", "Умеренные"], ["min", "Минимум"]],
 		{"full": "Вспышки, тряска, частицы и ауры", "mid": "Без тряски и вспышек по краям экрана", "min": "Только отклик на нажатия"}],
-	["ult_cutin", "Вставки умений", [["full", "Полностью"], ["short", "Коротко"], ["off", "Выкл"]],
-		{"full": "Полная сцена при первом умении дня в наряде", "short": "Короткая вставка, меньше секунды", "off": "Только эффект на поле"}],
+	["ult_cutin", "Вставки приёмов", [["full", "Полностью"], ["short", "Коротко"], ["off", "Выкл"]],
+		{"full": "Полная сцена при первом приёме дня в наряде", "short": "Короткая вставка, меньше секунды", "off": "Только эффект на поле"}],
 ]
 
 func settings() -> void :
@@ -334,6 +336,7 @@ func settings() -> void :
 	vl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	p.add_child(vl)
 	V10Clarity.settings_hook(self, p)  # v10-clarity hook: «Фишки и словарь»
+	V10Nav.settings_notify(self, p)  # 0.10 W1 (meta Ф1): «Уведомления»
 
 
 # one 3-way setting: caption, three segments (the chosen one painted like a selected tab) and a hint line
@@ -652,6 +655,8 @@ func _fit_currency(l: Label) -> void :
 		l.label_settings.font_size = fs
 
 func refresh_currency(punch: = false) -> void :
+	if is_inside_tree():
+		get_tree().call_group("v10_money", "refresh_money")  # 0.10: the header S-plates (V8Header.show_money)
 	gems_lbl.text = UI.fmt(G.S.gems)
 	_refresh_profile_chip()
 	coins_lbl.text = UI.fmt(G.S.coins)
@@ -663,144 +668,83 @@ func refresh_currency(punch: = false) -> void :
 func gem_target() -> Vector2:
 	return Vector2(W - 320, 58 + safe_top)
 
+# 0.10 W1 (HUD_V2 §8.2, §9.4): the v2 navbar — a night.900 band of 132 + B across the screen, one gold hairline,
+# five equal tabs (monoline icon 48 + Caption 18) centred in ≤ 720; the active tab is gold.300, the others paper.500.
+# A tab that is not open yet (UX §3.5) is dimmed, without caption or lock; a tap says when it opens (V10Nav).
 func _build_navbar() -> void :
-
 	navbar = Control.new()
 	navbar.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	navbar.position = Vector2(0, H - 132 - safe_bottom)
+	navbar.size = Vector2(W, 132 + safe_bottom)
 	add_child(navbar)
-	var fade: = TextureRect.new()
-	var fg: = GradientTexture2D.new()
-	fg.gradient = Gradient.new()
-	fg.gradient.set_color(0, Color(0.05, 0.04, 0.05, 0.0))
-	fg.gradient.set_color(1, Color(0.05, 0.04, 0.05, 0.75))
-	fg.fill_from = Vector2(0, 0)
-	fg.fill_to = Vector2(0, 1)
-	fade.texture = fg
-	fade.position = Vector2(0, -40)
-	fade.size = Vector2(W, 172 + safe_bottom)
-	fade.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	navbar.add_child(fade)
-	var plate: = UI.rbox("graphite", Rect2(8, 26, W - 16, 100), 30, 2, 14)
-	plate.set_param("pattern", 1.0)
-	navbar.add_child(plate)
-	# 0.10 M0: the plate spans the screen; on tablets the five tabs keep phone spacing in the middle
-	var tabs_w: = minf(W - 40, 820.0)
+	navbar.add_child(V10Nav.band(Vector2(W, 132 + safe_bottom)))
+	var tabs_w: = minf(W, 720.0)
 	var tw: = tabs_w / TABS.size()
 	var tx0: = (W - tabs_w) * 0.5
 	for i in TABS.size():
 		var tab: Dictionary = TABS[i]
 		var c: = Control.new()
 		c.position = Vector2(tx0 + i * tw, 0)
-		c.size = Vector2(tw, 126)
+		c.size = Vector2(tw, 132)
 		c.mouse_filter = Control.MOUSE_FILTER_STOP
-		c.pivot_offset = Vector2(tw * 0.5, 70)
-		var big: bool = tab.get("big", false)
-		var hl: = Sprite2D.new()
-		hl.texture = G.fx("glow")
-		hl.material = Fx.add_mat()
-		hl.position = Vector2(tw * 0.5, 62)
-		hl.scale = Vector2(1.5, 1.1)
-		hl.modulate = Color(UI.ROSE, 0.55)
-		hl.name = "HL"
-		hl.visible = false
-		c.add_child(hl)
-		var bar: = UI.rbox("gold", Rect2(tw * 0.5 - 22, 112, 44, 6), 3, 0, 4)
-		bar.set_param("shadow_color", Color(0, 0, 0, 0))
-		bar.name = "BAR"
-		bar.visible = false
-		c.add_child(bar)
-		if big:
-			var halo: = Sprite2D.new()
-			halo.texture = G.fx("glow")
-			halo.material = Fx.add_mat()
-			halo.position = Vector2(tw * 0.5, 28)
-			halo.scale = Vector2(2.4, 2.4)
-			halo.modulate = Color(0.95, 0.75, 0.45, 0.35)
-			c.add_child(halo)
-			var medal: = UI.rbox("gold", Rect2(tw * 0.5 - 60, -32, 120, 120), 60, 4, 12)
-			medal.name = "Medal"
-			c.add_child(medal)
-			var inner: = UI.rbox("pink", Rect2(tw * 0.5 - 49, -21, 98, 98), 49, 2, 6)
-			inner.colors(Color("4a3038"), Color("1e1519")).borders(Color("f3dca0"), Color("8a6228"))
-			inner.set_param("shadow_color", Color(0, 0, 0, 0))
-			inner.set_param("gloss", 0.08)
-			inner.name = "Inner"
-			c.add_child(inner)
-			var ring: = Common.rays(c, Vector2(tw * 0.5, 28), 150, Color(1, 0.85, 0.55, 1), 10, 0.03, 0.18)
-			ring.name = "Rays"
-			c.move_child(ring, inner.get_index())
-		var ic: = V8Art.rect(V8Art.nav(tab.icon), Rect2(tw * 0.5 - 27, 40, 54, 54) if not big else Rect2(tw * 0.5 - 38, -10, 76, 76))
+		c.pivot_offset = Vector2(tw * 0.5, 66)
+		var ic: = V10Icons.icon(tab.icon, 48, V10DS.PAPER_500)
 		ic.name = "IC"
-		ic.pivot_offset = ic.size * 0.5
-		if not big:
-			ic.modulate = NAV_OFF
+		ic.position = Vector2(tw * 0.5 - 24, 22)
+		ic.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		c.add_child(ic)
-		var l: = UI.center_label(UI.label(tab.name, 17 if not big else 19, UI.MUTED if not big else UI.GOLD, UI.DARK, 4, "body", 900), Rect2(0, 90, tw, 26))
+		var l: = V10Type.label(tab.name, "ui", 18, V10DS.PAPER_500)
 		l.name = "L"
+		l.position = Vector2(0, 78)
+		l.size = Vector2(tw, 26)
+		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		l.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		c.add_child(l)
+		c.set_meta("ux_role", "nav")
 		c.gui_input.connect( func(e):
-			if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT:
-				# 0.9: the tab itself dips (V9Feel) like every other press; a locked tab denies in go()
-				if tab.id == "summon" and not G.summon_open():
-					go(tab.id)
-				else:
-					V9Feel.press(c, "tap")
-					go(tab.id))
+			if (e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT) or (e is InputEventScreenTouch and e.pressed):
+				if not V10Nav.tab_open(tab.id):
+					V9Feel.deny(c)
+					toast(V10Nav.tab_lock_text(tab.id), "lock")
+					return
+				V9Feel.press(c, "tap")
+				go(tab.id))
 		navbar.add_child(c)
 		tab_nodes[tab.id] = c
 	refresh_nav()
 
 
+# colours of the tabs: active gold.300, open paper.500, closed paper.700 dimmed without caption; one dot at most
+# (UX §3.6: «есть что забрать», never «можно купить»; the shop gets none)
 func refresh_nav() -> void :
-	var c: Control = tab_nodes["summon"]
-	for n in c.get_children():
-		if n.has_meta("navmark"):
-			c.remove_child(n)
-			n.queue_free()
-	var tw: float = c.size.x
-	if not G.summon_open():
-		var lk: = UI.rbox("graphite", Rect2(tw * 0.5 + 2, 50, 38, 38), 19, 2, 6)
-		lk.set_meta("navmark", true)
-		lk.add_child(V8Art.rect(V8Art.icon("lock"), Rect2(6, 5, 26, 26)))
-		c.add_child(lk)
-		(c.get_node("IC") as CanvasItem).modulate = NAV_LOCKED
-	else:
-		if screen_id != "summon":
-			(c.get_node("IC") as CanvasItem).modulate = NAV_OFF
-		if G.S.free10 or int(G.S.ex) >= G.EXCHANGE_COST:
-			var d: = Common.badge(c, 0, Vector2(tw - 38, 20))
-			d.set_meta("navmark", true)
-
-func _select_tab(id: String) -> void :
-
 	for k in tab_nodes:
 		var c: Control = tab_nodes[k]
-		var on: bool = k == id
-		var ic: TextureRect = c.get_node("IC")
+		for n in c.get_children():
+			if n.has_meta("navmark"):
+				c.remove_child(n)
+				n.queue_free()
+		var open: = V10Nav.tab_open(k)
+		var on: bool = k == screen_id or (k == "tables" and screen_id in ["levels", "modes"])
+		var col: = V10DS.GOLD_300 if on else (V10DS.PAPER_500 if open else Color(V10DS.PAPER_700, 0.55))
+		var ic = c.get_node("IC")
+		ic.set("color", col)
+		(ic as CanvasItem).queue_redraw()
 		var l: Label = c.get_node("L")
-		var tab: Dictionary = {}
-		for t in TABS:
-			if t.id == k:
-				tab = t
-		if c.has_node("Medal"):
-			var mt: Tween = ic.create_tween()
-			mt.tween_property(ic, "scale", Vector2(1.1, 1.1) if on else Vector2.ONE, 0.25).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-			(c.get_node("Inner") as RBox).colors(Color("8e5464") if on else Color("4a3038"), Color("3a1a24") if on else Color("1e1519"))
-			continue
-		c.get_node("HL").visible = on
-		c.get_node("BAR").visible = on
-		l.label_settings = l.label_settings.duplicate()
-		l.label_settings.font_color = UI.GOLD if on else UI.MUTED
-		var t: Tween = ic.create_tween().set_parallel()
-		t.tween_property(ic, "scale", Vector2(1.18, 1.18) if on else Vector2.ONE, 0.28).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-		t.tween_property(ic, "position:y", 30.0 if on else 40.0, 0.28).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-		t.tween_property(ic, "modulate", Color.WHITE if on else (NAV_LOCKED if k == "summon" and not G.summon_open() else NAV_OFF), 0.2)
-		if on and not G.demo:
-			Fx.ring(c, Vector2(c.size.x * 0.5, 64), Color(1, 0.85, 0.6, 0.6), 0.6, 0.3)
+		l.visible = open
+		l.label_settings = V10Type.settings("ui", 18, V10DS.GOLD_300 if on else V10DS.PAPER_500)
+		if open and not on and V10Nav.tab_dot(k):
+			var d: = V10Nav.dot()
+			d.position = Vector2(c.size.x * 0.5 + 18, 20)
+			d.set_meta("navmark", true)
+			c.add_child(d)
 
-func show_chrome(top: bool, nav: bool) -> void :
-	topbar.visible = top
+func _select_tab(_id: String) -> void :
+	refresh_nav()
+
+func show_chrome(_top: bool, nav: bool) -> void :
+	# 0.10 W1 (HUD_V2 §8.6, UX §3.3): no status ribbon anywhere — the home screen has its own avatar + nick,
+	# currency is an S-plate in the header only where it is spent (Желания, Лавка)
+	topbar.visible = false
 	navbar.visible = nav
 
 
@@ -809,7 +753,7 @@ func go(id: String, args: = {}, animate: = true, remember: = true) -> void :
 		return
 	if id == "summon" and not G.summon_open():
 		V9Feel.deny(tab_nodes.get("summon"))
-		toast(V6Txt.s("summon.locked"), "gem")
+		toast(V10Nav.tab_lock_text("summon"), "lock")
 		return
 	var from_id: = screen_id
 	var from_args: Dictionary = screen.get_meta("v8_args", {}) if screen and is_instance_valid(screen) else {}
@@ -847,8 +791,6 @@ func go(id: String, args: = {}, animate: = true, remember: = true) -> void :
 	screen_root.add_child(screen)
 	screen.call("build", self, args)
 	V10Hooks.emit_screen_shown(id, screen)  # 0.10 hook
-	if tab_nodes.has(id):
-		_select_tab(id)
 	refresh_currency()
 	refresh_nav()
 	if animate:
@@ -1103,30 +1045,10 @@ func run_demo() -> void :
 	await tap_at(home.hero.head_global() + Vector2(0, 80))
 	home.on_hero_tap()
 	await wait(2.4)
-	await press(home.side_btns["login"])
-	await wait(2.0)
-	var pop: = _top_popup()
-	if pop:
-		var claim: = pop.get_children().filter( func(c): return c is JButton and c.size.x > 300)
-		if claim.size() > 0:
-			await press(claim[0])
+	# 0.10 W1: «Сегодня» → «Забрать всё», then the one «Играть · N» goes straight to the table
+	V10Nav.claim_all(self)
 	await wait(1.6)
-	await press(home.play_btn)
-	await wait(2.2)
-
-	var lv = screen
-	await press(lv.play_btn)
-	await wait(1.6)
-	var cpop: = _top_popup()
-	if cpop:
-		var gos: = cpop.get_children().filter( func(c): return c is JButton and c.size.x > 380)
-		if gos.size() > 0:
-			await press(gos[0])
-	await wait(1.4)
-	if lv.partner_go_btn == null or not is_instance_valid(lv.partner_go_btn):
-		lv.pick_partner(lv.cur)
-		await wait(1.0)
-	await press(lv.partner_go_btn)
+	await press(home.home2.play_b)
 	await wait(4.4)
 	var play = screen
 	var k: = 0

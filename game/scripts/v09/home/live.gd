@@ -426,7 +426,9 @@ func say(text: String, emo: = "", voice: = "", talk: = true) -> void:
 		bubble.queue_free()
 	var with_av: = mode != "rig"
 	var head: = from_art(geom.head)
-	var pos: = Vector2(BUBBLE_X, 176.0)
+	# 0.10 W1: the tea house moves the bubble right of its lanterns (home.v10_bubble_x)
+	var bx = home.get("v10_bubble_x")
+	var pos: = Vector2(float(bx) if bx != null else BUBBLE_X, 176.0)
 	var tail_up: = false
 	# 0.9: anchored by its bottom edge above her face, so extra lines grow upward (never lower than the clock plate
 	# allows: the video frames her head high, so its bubble may start at 176). When a long line would still reach her

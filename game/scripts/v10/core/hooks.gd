@@ -89,3 +89,7 @@ func _ready() -> void:
 		if g and g.has_method("save"):
 			g.save())
 	game_ended.connect(func(r: Dictionary) -> void: V10Afisha.on_game_ended(r))
+	# meta: at most one full-screen entry scene per launch, offered by the modules, run when the tea house is up
+	home_built.connect(func(_h: Node) -> void: V10EntryQueue.run())
+	# the W1 shell: Afisha providers (Неделя = турнир недели, партия дня from the 0.9 calendar)
+	V10Nav.install()

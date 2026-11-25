@@ -430,6 +430,7 @@ func _climb_over(by_choice: bool) -> void :
 		V8PlayRules.award("other", 0, false)
 	else:
 		G.save()
+	_v10_ended(reached > 0, 0, int(run.gems), now() - start_t, false, reached)  # 0.10 hook
 	_v8_saved = true
 	_v10_ended(true, 0, 0, now() - start_t, false)  # 0.10 hook
 	Sfx.play("win" if by_choice else "deny", 1.0 if by_choice else 0.6)
@@ -518,6 +519,7 @@ func _etude_clear() -> void :
 	G.add_pass_xp(50)
 	var ea: = V8PlayRules.award("etude", V8PlayRules.etude_rp(stars), true)
 	_v8_saved = true
+	_v10_ended(true, stars, gems, now() - start_t, prev == 0)  # 0.10 hook
 	_v10_ended(true, stars, 0, now() - start_t, false)  # 0.10 hook
 	_v8_end_overlays()
 	Sfx.play("win")
