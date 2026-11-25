@@ -10,9 +10,16 @@ extends Node
 #   godot --path game --resolution 1080x2400 -- --layout_shots=/abs/dir --save=user://layout_save.json \
 #         --save_wipe=1 --story_off=1 [--safe=120,48 --notch=1] [--layout_only=home,shop]
 #   bash game/scripts/v10/responsive/layout_shots.sh /abs/dir [WxH ...]      (all resolutions, contact sheets)
+#   --layout_fx=min shoots the same views at «Эффекты: минимум»
 #
 # --layout_selftest=1 (same runner) checks V10Layout's math at every listed resolution and quits:
 #   LAYOUT_SELFTEST ok/total.
+#
+# Probes (LAYOUT PROBE ok / LAYOUT WARN): screens sit in the content column, not at the viewport origin, so code that
+# draws a viewport point (a tile's canvas position, a TrayBoard.matched point, an input position) as a screen-local
+# one is off by the column's offset on tablets and phones with a cut-out. The runner checks the paths players see:
+# a tile tapped into the tray lands on its slot, the match effect sits on the matched pair, the 1-1 finger points at
+# its tile, and her speech bubble on the home screen stays off her eyes.
 
 const RES_LIST: = ["720x1280", "1080x1920", "1080x2340", "1080x2400", "1216x2688", "1440x3200", "1536x2048", "1600x2560"]
 
@@ -112,6 +119,10 @@ func _prep_save() -> void:
 	G.S.rp = 180
 	G.S.free10 = true
 	G.S.profile.nick = "Чайный Гость"
+	# --layout_fx=min|mid: the same views at «Эффекты: минимум / умеренные» (UX_RULES §6.7: all information stays)
+	for a in OS.get_cmdline_user_args():
+		if a.begins_with("--layout_fx="):
+			G.set_fx_level(a.substr(12))
 	G.S.profile.avatar = "rin"
 	for id in V6Scenes.SCENES:
 		V6Story.mark(id)
@@ -278,6 +289,12 @@ func _first_run() -> void:
 		V6Story.play("intro")
 		await wait(2.4)
 		await shot("intro")
+	if want("room_scene") and V7RoomScenes.SCENES.has("mc_2"):
+		# a date scene (V7RoomScene): a full-viewport layer like the story, with its own skip button and text box
+		await cleanup()
+		V7RoomScene.run(V7RoomScenes.to_play("mc_2"))
+		await wait(2.4)
+		await shot("room_scene")
 	await cleanup()
 
 
@@ -308,7 +325,8 @@ func _screens() -> void:
 	for st in steps:
 		var name: String = st[0]
 		if not want(name) and not (name == "home" and (want("settings") or want("tasks") or want("visits") or want("calendar") or want("album"))) \
-				and not (name == "play" and (want("cutin") or want("victory"))) and not (name == "summon" and want("pull")):
+				and not (name == "play" and (want("cutin") or want("victory") or want("play_match"))) and not (name == "summon" and want("pull")) \
+				and not (name == "home" and want("home_say")):
 			continue
 		if name == "home_outfit":
 			# her SSR outfit painting instead of the lobby video (home «art» mode)
@@ -316,6 +334,8 @@ func _screens() -> void:
 			G.S.outfit["mc"] = "o_dragon"
 		elif G.S.outfit.get("mc", "") == "o_dragon":
 			G.S.outfit["mc"] = "o_base"
+		# 1-1 as a first game: the finger shows the first pair
+		G.S.tut_done = name != "tutorial"
 		await go(st[1], st[2])
 		await wait(2.6 if st[1] in ["play", "arena"] else 1.8)
 		if want(name):
@@ -327,9 +347,18 @@ func _screens() -> void:
 				await _popup_shot("visits", func(): Daily.login(main, main.screen))
 				await _popup_shot("calendar", func(): Daily.calendar(main))
 				await _popup_shot("album", func(): V7AlbumView.open(main))
+				if want("home_say"):
+					await _say_probe("home_say")
+			"home_outfit":
+				await _say_probe("home_outfit_say")
+			"tutorial":
+				await _finger_probe()
+				G.S.tut_done = true
 			"play":
 				if want("cutin"):
 					await _cutin()
+				if want("play_match"):
+					await _play_probe()
 				if want("victory"):
 					await _victory()
 			"summon":
@@ -382,6 +411,120 @@ func _victory() -> void:
 	await shot("victory")
 
 
+# ------------------------------------------------------------------ probes
+
+func _probe(view: String, what: String, got: Vector2, want_pt: Vector2, tol: = 6.0) -> void:
+	var d: = got.distance_to(want_pt)
+	if d > tol:
+		var w: = "LAYOUT WARN %s: %s off by %.0f px (at %s, should be %s)" % [view, what, d, str(got.round()), str(want_pt.round())]
+		warns.append(w)
+		print(w)
+	else:
+		print("LAYOUT PROBE %s: %s ok (%.1f px)" % [view, what, d])
+
+
+static func _canvas(n: CanvasItem) -> Vector2:
+	return n.get_global_transform_with_canvas().origin
+
+
+# a tile tapped into the tray lands on its slot; the match effect (ring, «+N») sits on the pair
+func _play_probe() -> void:
+	var p = main.screen
+	if p == null or not ("board" in p) or p.board == null:
+		return
+	var bd = p.board
+	var t0: = Time.get_ticks_msec()
+	while is_instance_valid(p) and not bd.input_on and Time.get_ticks_msec() - t0 < 6000:
+		await get_tree().process_frame
+	if not is_instance_valid(p) or not bd.input_on:
+		return
+	var by: = {}
+	for t in bd.free_tiles():
+		if t.pending or t.shard != "" or ("spec" in bd and bd.spec.has(t)):
+			continue
+		by[t.face] = by.get(t.face, []) + [t]
+	var pair: Array = []
+	for f in by:
+		if (by[f] as Array).size() >= 2:
+			pair = (by[f] as Array).slice(0, 2)
+			break
+	if pair.is_empty() or not bd.tray.is_empty():
+		print("LAYOUT PROBE play_match: no free pair, skipped")
+		return
+	bd.tap(pair[0])
+	await wait(0.7)
+	var i: int = bd.display.find(pair[0])
+	if i >= 0 and i < p.slot_rects.size():
+		_probe("play_match", "tray tile", _canvas(pair[0]), p.get_global_transform_with_canvas() * (p.slot_rects[i] as Rect2).get_center())
+	var got: = [null]
+	var cb: = func(mid: Vector2, _c: int, _g: bool, _s: String): got[0] = mid
+	bd.matched.connect(cb, CONNECT_ONE_SHOT)
+	var before: Array = p.fx_layer.get_children()
+	bd.tap(pair[1])
+	await wait(0.3)
+	if got[0] == null:
+		print("LAYOUT PROBE play_match: no match, skipped")
+		return
+	var ring_tex: Texture2D = G.fx("ring")
+	for c in p.fx_layer.get_children():
+		if c in before:
+			continue
+		if c is Sprite2D and (c as Sprite2D).texture == ring_tex:
+			_probe("play_match", "match ring", _canvas(c), got[0])
+			break
+		if c is Label:
+			# Fx.float_text: a 300 px wide label centred on the point (it only rises)
+			_probe("play_match", "match «+N» x", Vector2((c as Label).get_global_rect().get_center().x, 0), Vector2(got[0].x, 0))
+			break
+	await shot("play_match")
+
+
+# the 1-1 finger points at the tile it asks for
+func _finger_probe() -> void:
+	var p = main.screen
+	if p == null or not ("board" in p) or p.board == null:
+		return
+	var fin: Texture2D = G.fx("finger")
+	# the finger comes after the level's intro tip (+1.4 s), later than the screen shot
+	var t0: = Time.get_ticks_msec()
+	while is_instance_valid(p) and p.is_inside_tree() and Time.get_ticks_msec() - t0 < 8000:
+		for c in p.get_children():
+			if c is Sprite2D and (c as Sprite2D).texture == fin:
+				var t = p.board.best_move()
+				if t:
+					_probe("tutorial", "finger", _canvas(c), _canvas(t))
+				return
+		await get_tree().process_frame
+	print("LAYOUT PROBE tutorial: no finger, skipped")
+
+
+# a line from her on the home screen: the bubble keeps off her eyes (UX_RULES Г-1)
+func _say_probe(view: String) -> void:
+	var h = main.screen
+	if h == null or not ("live" in h) or h.live == null or not is_instance_valid(h.live):
+		return
+	var lv = h.live
+	lv.say("Чайник как раз закипел. Садись, раздам фишки.", "happy", "", false)
+	await wait(0.6)
+	var b: Control = lv.bubble
+	if b == null or not is_instance_valid(b):
+		return
+	var br: = Rect2()
+	for c in b.get_children():
+		if c is Control:
+			br = (c as Control).get_global_rect() if br.size == Vector2.ZERO else br.merge((c as Control).get_global_rect())
+	var head: Vector2 = lv.from_art(lv.geom.head)
+	var hr: float = absf((lv.from_art(lv.geom.head + Vector2(0, float(lv.geom.head_r))) - head).y)
+	var eyes: = Rect2(head.x - hr * 0.8, head.y - hr * 0.45, hr * 1.6, hr * 1.2)
+	if br.intersects(eyes):
+		var w: = "LAYOUT WARN %s: speech bubble %s covers her face %s" % [view, str(br), str(eyes)]
+		warns.append(w)
+		print(w)
+	else:
+		print("LAYOUT PROBE %s: bubble clear of her face" % view)
+	await shot(view)
+
+
 # ------------------------------------------------------------------ selftest
 
 func _selftest() -> void:
@@ -422,6 +565,11 @@ func _selftest() -> void:
 	check.call(main.screen != null and main.screen.position == main.CR.position and main.screen.size == main.CR.size, "screen sits in the column")
 	check.call(absf(main.navbar.position.y - (lvs.y - 132.0 - main.safe_bottom)) < 0.5, "navbar on the bottom edge")
 	check.call(absf(main.topbar.position.y - main.safe_top) < 0.5, "top bar below the cut-out")
+	# viewport point <-> screen point (effects at tiles, toasts, fly_gems): the screen's origin is the column's corner
+	if main.screen != null:
+		check.call(V10Layout.to_canvas(main.screen, Vector2.ZERO).is_equal_approx(main.CR.position), "screen origin = column corner in viewport points")
+		var q: = Vector2(37.0, 512.0)
+		check.call(V10Layout.local_of(main.screen, V10Layout.to_canvas(main.screen, q)).is_equal_approx(q), "local_of(to_canvas(p)) = p")
 	for f in fails:
 		print("LAYOUT_SELFTEST FAIL %s" % f)
 	print("LAYOUT_SELFTEST %d/%d" % [cnt[0], cnt[1]])
