@@ -1,0 +1,643 @@
+--- a/game/scripts/screens/levels.gd
++++ b/game/scripts/screens/levels.gd
+@@ -922,9 +922,9 @@
+ 		Common.chip(row, V8Art.icon("heart"), "ур. %d" % G.aff_level(h), Rect2(450, 14, 140, 40), "pink", 18)
+ 		# 0.9 (spec §B): one name for the ability everywhere — «Ульта», named per equipped outfit (HEROINES §5)
+ 		var u_id: = V9Ults.for_hero(h)
+-		var u_name: String = String(V9Ults.get_ult(u_id).get("name", G.SKILLS[h].name))
++		var u_name: String = String(V9Ults.get_ult(u_id).get("name", V10W1Play.skill(h).name))
+ 		var u_mod: = V9Ults.mod(u_id)
+-		var pk_t: String = _t("levels.skill", "Умение «%s»: %s") % [u_name, String(V9Ults.core(h).get("desc", G.SKILLS[h].desc))]
++		var pk_t: String = _t("levels.skill", "Умение «%s»: %s") % [u_name, String(V9Ults.core(h).get("desc", V10W1Play.skill(h).desc))]
+ 		var pk_w: = 452.0 if u_mod == "" else 408.0
+ 		var pk_fs: = 17
+ 		while pk_fs > 16 and UI.font("body", 900).get_string_size(pk_t, HORIZONTAL_ALIGNMENT_LEFT, -1, pk_fs).x > pk_w:
+@@ -945,7 +945,7 @@
+ 		pk.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+ 		pk.clip_text = true
+ 		row.add_child(pk)
+-		var bonus: = UI.label(_t("levels.perk", "Перк: %s") % G.PERKS[h], 16, Color("e9cfe0"), UI.DARK, 2, "body", 800)
++		var bonus: = UI.label(_t("levels.perk", "Перк: %s") % V10W1Play.perk(h), 16, Color("e9cfe0"), UI.DARK, 2, "body", 800)
+ 		bonus.position = Vector2(132, 84)
+ 		bonus.size = Vector2(452, 24)
+ 		bonus.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+--- a/game/scripts/screens/play.gd
++++ b/game/scripts/screens/play.gd
+@@ -292,6 +292,9 @@
+ 		"nova":
+ 			shuffle_n += 1
+ 			gem_bonus = 0.1
++		_:
++			if V10Wave1.released():
++				V10W1Play.apply_perk(self, partner)
+ 	gem_bonus += 0.05 * (G.aff_level(partner) - 1)
+ 	V7Album.apply_bonuses(self)
+ 	match fortune.get("id", ""):
+@@ -608,7 +611,7 @@
+ 	tc.set_param("border_top", Color("e8c9a0")).set_param("border_bottom", Color("a8697a"))
+ 	add_child(tc)
+ 	tc.add_child(Common.avatar("mc", Rect2(8, 8, 84, 84), "gold"))
+-	var nm: = UI.label(V6Txt.s("play.perk_tip") % [G.HEROES[partner].name, G.PERKS[partner]], 16, Color("b8406c"), Color.WHITE, 3, "body", 900)
++	var nm: = UI.label(V6Txt.s("play.perk_tip") % [G.HEROES[partner].name, V10W1Play.perk(partner)], 16, Color("b8406c"), Color.WHITE, 3, "body", 900)
+ 	nm.position = Vector2(102, 8)
+ 	nm.size = Vector2(W - 170, 24)
+ 	nm.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+@@ -1399,7 +1402,7 @@
+ 	skill_charge = SKILL_NEED
+ 	stage.set_charge(SKILL_NEED, SKILL_NEED)
+ 	# 0.9: «Ульта готова»: the portrait glows (stage), a chime, her line names the ult
+-	var nm: = ult.ult_name() if ult else String(G.SKILLS[partner].name)
++	var nm: = ult.ult_name() if ult else String(V10W1Play.skill(partner).name)
+ 	_bubble("Умение «%s» готово! Коснись меня." % nm)  # v10-clarity: «ульта» → «умение»
+ 	Sfx.play("reveal_sr", 1.3, -4)
+ 	V9Feel.haptic("match")
+--- a/game/scripts/v06/heroines/skills.gd
++++ b/game/scripts/v06/heroines/skills.gd
+@@ -36,7 +36,7 @@
+ 	var board: TrayBoard = play.board
+ 	var st: V6HeroStage = play.stage
+ 	var h: String = play.partner
+-	var sk: Dictionary = G.SKILLS[h]
++	var sk: Dictionary = V10W1Play.skill(h)
+ 	var targets: Array = []
+ 	var pairs: Array = []
+ 	match h:
+@@ -53,6 +53,9 @@
+ 			for t in board.tiles:
+ 				if board.on_board(t) and (t.secret or t.ice > 0) and targets.size() < 8:
+ 					targets.append(_pos(t))
++		_:
++			if V10Wave1.released():
++				pairs = _pairs(board, int(V10W1Play.SKILL_PAIRS.get(h, 0)))
+ 	for p in pairs:
+ 		targets.append(_pos(p[0]))
+ 		targets.append(_pos(p[1]))
+--- a/game/scripts/v06/heroines/heroines_data.gd
++++ b/game/scripts/v06/heroines/heroines_data.gd
+@@ -41,6 +41,17 @@
+ 		"skill_desc": "забирает две пары подряд"}, 
+ }
+ const RIVAL_SKILL_NEED: = 4
++
++# wave 1: the goddesses duel too once V10Wave1 is released (V10W1Play.RIVALS / DUEL_LINES)
++static func has_rival(h: String) -> bool:
++	return RIVALS.has(h) or (V10Wave1.released() and V10W1Play.RIVALS.has(h))
++
++static func rival_def(h: String) -> Dictionary:
++	if RIVALS.has(h):
++		return RIVALS[h]
++	if V10Wave1.released() and V10W1Play.RIVALS.has(h):
++		return V10W1Play.RIVALS[h]
++	return RIVALS.rin
+ const TELEGRAPH: = 1.3
+ 
+ 
+@@ -69,12 +80,14 @@
+ 
+ static func line(h: String, kind: String) -> String:
+ 	var d: Dictionary = DUEL_LINES.get(h, DUEL_LINES.mc)
++	if not DUEL_LINES.has(h) and V10Wave1.released() and V10W1Play.DUEL_LINES.has(h):
++		d = V10W1Play.DUEL_LINES[h]
+ 	var arr: Array = d.get(kind, [""])
+ 	return arr[randi() % arr.size()]
+ 
+ 
+ static func duel_cfg(rival: String, partner: String) -> Dictionary:
+-	var rv: Dictionary = RIVALS.get(rival, RIVALS.rin)
++	var rv: Dictionary = rival_def(rival)
+ 	var shapes: = ["rect", "heart", "diamond", "butterfly", "ring", "pyramid"]
+ 	var r: = RandomNumberGenerator.new()
+ 	r.randomize()
+@@ -101,5 +114,5 @@
+ 
+ 
+ static func rival_pace(h: String) -> float:
+-	var rv: Dictionary = RIVALS.get(h, RIVALS.rin)
++	var rv: Dictionary = rival_def(h)
+ 	return float(rv.pace) * maxf(0.7, 1.0 - 0.04 * duel_wins(h))
+--- a/game/scripts/v06/heroines/duel.gd
++++ b/game/scripts/v06/heroines/duel.gd
+@@ -43,8 +43,8 @@
+ func setup(p, rival_id: String) -> void :
+ 	play = p
+ 	board = p.board
+-	rival = rival_id if V6Heroines.RIVALS.has(rival_id) else "rin"
+-	rv = V6Heroines.RIVALS[rival]
++	rival = rival_id if V6Heroines.has_rival(rival_id) else "rin"
++	rv = V6Heroines.rival_def(rival)
+ 	pace = V6Heroines.rival_pace(rival)
+ 	p.riichi_offered = true
+ 	var W: float = p.W
+@@ -376,7 +376,7 @@
+ 		if V6Heroines.duel_wins(rival) == 0:
+ 			gems += 100
+ 		d.duel_wins[rival] = V6Heroines.duel_wins(rival) + 1
+-		if not G.hero_unlocked(rival) and String(d.duel_day.get(rival, "")) != G.today():
++		if not G.hero_unlocked(rival) and not rival in V10W1Play.HEROES and String(d.duel_day.get(rival, "")) != G.today():
+ 			d.duel_day[rival] = G.today()
+ 			G.S.shards[rival] = int(G.S.shards.get(rival, 0)) + 1
+ 			shard = true
+--- a/game/scripts/v07/passives/passives.gd
++++ b/game/scripts/v07/passives/passives.gd
+@@ -51,6 +51,8 @@
+ const HANA_COMBO: = 2
+ 
+ static func info(h: String) -> Dictionary:
++	if not DATA.has(h) and V10Wave1.released() and V10W1Play.PASSIVES.has(h):
++		return V10W1Play.PASSIVES[h]
+ 	return DATA.get(h, DATA.mc)
+ 
+ 
+@@ -61,6 +63,8 @@
+ 
+ 
+ static func fit(h: String, lv: Dictionary) -> int:
++	if not DATA.has(h) and V10Wave1.released() and V10W1Play.PASSIVES.has(h):
++		h = V10W1Play.passive_engine(h)
+ 	var layers: = int(lv.get("layers", 3))
+ 	var hidden: bool = lv.get("hidden", false)
+ 	var ice: = int(lv.get("ice", 0))
+--- a/game/scripts/v07/passives/passive_run.gd
++++ b/game/scripts/v07/passives/passive_run.gd
+@@ -7,6 +7,7 @@
+ 
+ var play
+ var h: = "mc"
++var who: = "mc"
+ var d: Dictionary
+ var col: = Color.WHITE
+ var board: TrayBoard
+@@ -43,7 +44,7 @@
+ 		var sz: = Vector2(Tile.TW, Tile.TH)
+ 		if run.h == "nova":
+ 			var a: = 0.7 + 0.3 * sin(t0 * 6.0)
+-			var cy: = Color(0.3, 0.95, 1.0)
++			var cy: Color = run.d.get("tint", Color(0.3, 0.95, 1.0))
+ 			for t in run.hacked:
+ 				if is_instance_valid(t) and b.on_board(t) and not t.pending:
+ 					var r: = Rect2(t.position - sz * 0.5 - Vector2(4, 4), sz + Vector2(8, 8))
+@@ -58,7 +59,7 @@
+ 					draw_circle(c, 11.0, cy)
+ 					draw_line(c + Vector2(-5, 4), c + Vector2(5, 4), Color(0.05, 0.2, 0.3), 3.0)
+ 					draw_arc(c + Vector2(-2, 0), 4.5, PI, TAU, 10, Color(0.05, 0.2, 0.3), 2.5)
+-		elif run.h == "yue":
++		elif run.h == "yue" and bool(run.d.get("see", true)):
+ 			var a: = 0.75 + 0.25 * sin(t0 * 3.2)
+ 			var want: = {}
+ 			for x in b.tray:
+@@ -66,7 +67,7 @@
+ 					want[x.face] = true
+ 			if want.is_empty():
+ 				return
+-			var mc: = Color(0.72, 0.84, 1.0)
++			var mc: Color = run.d.get("tint", Color(0.72, 0.84, 1.0))
+ 			for t in b.tiles:
+ 				if want.has(t.face) and b.on_board(t) and not t.pending:
+ 					var r: = Rect2(t.position - sz * 0.5 - Vector2(3, 3), sz + Vector2(6, 6))
+@@ -75,14 +76,20 @@
+ 					draw_rect(r.grow(4), Color(mc, a * 0.45), false, 4.0)
+ 					draw_rect(r, Color(0.92, 0.96, 1.0, a), false, 4.0)
+ 					var c: = r.position + Vector2(r.size.x, 0)
+-					draw_circle(c, 14.0, Color(0.14, 0.2, 0.45))
+-					draw_circle(c, 9.0, Color(1, 0.98, 0.88))
+-					draw_circle(c + Vector2(4.0, -3.0), 8.0, Color(0.14, 0.2, 0.45))
++					if run.d.has("tint"):
++						draw_circle(c, 12.0, Color(0.22, 0.07, 0.04))
++						draw_circle(c, 8.0, mc)
++					else:
++						draw_circle(c, 14.0, Color(0.14, 0.2, 0.45))
++						draw_circle(c, 9.0, Color(1, 0.98, 0.88))
++						draw_circle(c + Vector2(4.0, -3.0), 8.0, Color(0.14, 0.2, 0.45))
+ 
+ func setup(p) -> void :
+ 	play = p
+ 	h = String(p.partner)
++	who = h
+ 	d = V7Passives.info(h)
++	h = String(d.get("engine", h))
+ 	col = d.col
+ 	mouse_filter = Control.MOUSE_FILTER_IGNORE
+ 	position = Vector2.ZERO
+@@ -134,9 +141,9 @@
+ 	ring.col = col
+ 	ring.size = r.size
+ 	ring.mouse_filter = Control.MOUSE_FILTER_IGNORE
+-	ring.dots = {"rin": V7Passives.RIN_MAX}.get(h, 0)
++	ring.dots = {"rin": int(d.get("max", V7Passives.RIN_MAX))}.get(h, 0)
+ 	chip.add_child(ring)
+-	var av: = Common.avatar(h, Rect2(6, 6, r.size.x - 12, r.size.y - 12), "gold")
++	var av: = Common.avatar(who, Rect2(6, 6, r.size.x - 12, r.size.y - 12), "gold")
+ 	chip.add_child(av)
+ 	chip_val = UI.label("", 16, Color.WHITE, col.darkened(0.6), 4, "body", 900)
+ 	chip_val.position = Vector2(r.size.x - 22, -8)
+@@ -177,12 +184,15 @@
+ 			ring.glow = 0.5 + 0.4 * sin(G.time * 8.0) if on else 0.0
+ 		"rin":
+ 			ring.lit = cups
+-			ring.frac = float(pairs % V7Passives.RIN_EVERY) / V7Passives.RIN_EVERY if cups < V7Passives.RIN_MAX else 1.0
++			var ev: = int(d.get("every", V7Passives.RIN_EVERY))
++			ring.frac = float(pairs % ev) / ev if cups < int(d.get("max", V7Passives.RIN_MAX)) else 1.0
+ 			chip_val.text = str(cups)
+ 		"yue":
+-			ring.frac = float(pairs % V7Passives.YUE_EVERY) / V7Passives.YUE_EVERY
++			var ev: = int(d.get("every", V7Passives.YUE_EVERY))
++			ring.frac = float(pairs % ev) / ev
+ 		"nova":
+-			ring.frac = float(pairs % V7Passives.NOVA_EVERY) / V7Passives.NOVA_EVERY
++			var ev: = int(d.get("every", V7Passives.NOVA_EVERY))
++			ring.frac = float(pairs % ev) / ev
+ 	ring.queue_redraw()
+ 
+ func _pulse(text: String, at = null) -> void :
+@@ -232,9 +242,9 @@
+ 	# tray), not as a float over the portrait card and the tray
+ 	if play.has_method("v8_note"):
+ 		UI.punch(chip, 0.16)
+-		play.v8_note(V10Glossary.passive_note(h, d.name), col.lightened(0.55), 2.4)  # v10-clarity hook (was «Стиль: Пятый ветер»)
++		play.v8_note(V10Glossary.passive_note(who, d.name), col.lightened(0.55), 2.4)  # v10-clarity hook (was «Стиль: Пятый ветер»)
+ 	else:
+-		_pulse(V10Glossary.passive_note(h, d.name), chip.position + Vector2(chip.size.x * 0.5, 130))  # v10-clarity hook
++		_pulse(V10Glossary.passive_note(who, d.name), chip.position + Vector2(chip.size.x * 0.5, 130))  # v10-clarity hook
+ 	if h == "yue":
+ 		await get_tree().create_timer(0.5).timeout
+ 		if is_instance_valid(board):
+@@ -250,16 +260,16 @@
+ 	since_relay += 1
+ 	match h:
+ 		"rin":
+-			if pairs % V7Passives.RIN_EVERY == 0 and cups < V7Passives.RIN_MAX:
++			if pairs % int(d.get("every", V7Passives.RIN_EVERY)) == 0 and cups < int(d.get("max", V7Passives.RIN_MAX)):
+ 				cups += 1
+-				_pulse("+1 чашка")
++				_pulse(String(d.get("gain", "+1 чашка")))
+ 				Sfx.play("sparkle", 1.3, -8)
+ 				_log("cup +1 -> %d" % cups)
+ 		"yue":
+-			if pairs % V7Passives.YUE_EVERY == 0:
++			if pairs % int(d.get("every", V7Passives.YUE_EVERY)) == 0:
+ 				_yue_reveal()
+ 		"nova":
+-			if pairs % V7Passives.NOVA_EVERY == 0:
++			if pairs % int(d.get("every", V7Passives.NOVA_EVERY)) == 0:
+ 				_nova_hack()
+ 	_refresh_chip()
+ 
+@@ -284,7 +294,7 @@
+ 
+ 
+ func _hana_live() -> bool:
+-	return board != null and board.combo >= V7Passives.HANA_COMBO and board.now() - board.last_match < board.combo_window and since_relay >= 2
++	return board != null and board.combo >= int(d.get("combo", V7Passives.HANA_COMBO)) and board.now() - board.last_match < board.combo_window and since_relay >= 2
+ 
+ func _hana_relay(t: Tile) -> void :
+ 	if not _hana_live() or t.face == 300:
+@@ -301,7 +311,7 @@
+ 	var from: = _canvas_pos(best)
+ 	Fx.ring(play.fx_layer, from, col, 1.2, 0.35)
+ 	Fx.burst(play.fx_layer, from, "sparkle", 10, col.lightened(0.3), 0.8)
+-	_pulse("Эстафета!", from + Vector2(0, -30))
++	_pulse(String(d.get("pulse", "Эстафета!")), from + Vector2(0, -30))
+ 	_log("relay face=%d combo=%d" % [t.face, board.combo])
+ 
+ 	board.tap(best)
+@@ -320,7 +330,7 @@
+ 	board.tray_changed.emit()
+ 	Sfx.play("whoosh", 1.25, -4)
+ 	Fx.ring(play.fx_layer, from, col, 1.0, 0.35)
+-	_pulse("Чайная пауза", from + Vector2(0, -40))
++	_pulse(String(d.get("act", "Чайная пауза")), from + Vector2(0, -40))
+ 	_refresh_chip()
+ 	_log("return face=%d cups=%d" % [t.face, cups])
+ 
+@@ -350,7 +360,7 @@
+ 	var at: = _canvas_pos(best)
+ 	Fx.ring(play.fx_layer, at, Color(0.8, 0.88, 1.0), 1.4, 0.5)
+ 	Fx.burst(play.fx_layer, at, "sparkle", 14, Color(0.8, 0.88, 1.0), 0.9)
+-	_pulse("Лунный взгляд", at + Vector2(0, -40))
++	_pulse(String(d.get("pulse", "Лунный взгляд")), at + Vector2(0, -40))
+ 	_log("reveal face=%d step=%d" % [best.face, best.step])
+ 
+ 
+@@ -386,7 +396,7 @@
+ 	Fx.ring(play.fx_layer, at, col, 1.4, 0.45)
+ 	Fx.burst(play.fx_layer, at, "sparkle", 14, col, 0.9)
+ 	Sfx.play("select", 1.5, -4)
+-	_pulse("Доступ открыт", at + Vector2(0, -40))
++	_pulse(String(d.get("pulse", "Доступ открыт")), at + Vector2(0, -40))
+ 	_log("hack face=%d step=%d" % [best.face, best.step])
+ 
+ 
+--- a/game/scripts/v10/clarity/glossary.gd
++++ b/game/scripts/v10/clarity/glossary.gd
+@@ -415,6 +415,8 @@
+ 	"yue": "видит пары сквозь стол", "nova": "открывает фишку под завалом"}
+ 
+ static func passive_note(hero: String, fallback: String) -> String:
++	if not PASSIVE_SHORT.has(hero) and V10Wave1.released() and V10W1Play.PASSIVES.has(hero):
++		return "Свойство: %s" % String(V10W1Play.PASSIVES[hero].short)
+ 	return "Свойство: %s" % String(PASSIVE_SHORT.get(hero, fallback))
+ 
+ # why a tile on the board cannot be taken right now («» when it can): exact, never «прижимают сверху» for a side lock
+--- a/game/scripts/v06/modes/modes_data.gd
++++ b/game/scripts/v06/modes/modes_data.gd
+@@ -59,16 +59,28 @@
+ 	return {"floor": 1, "lamps": LAMPS_START, "slots": 4, "bless": {}, "hint": 2, "undo": 2, "shuffle": 1, 
+ 		"gems": 0, "partner": partner, "seed": randi() % 1000000, "chests": 0}
+ 
++# wave 1: one blessing per goddess joins the Лестница once V10Wave1 is released (V10W1Play.V6_BLESS)
++static func bless_ids() -> Array:
++	var ids: = BLESS.keys()
++	if V10Wave1.released():
++		ids.append_array(V10W1Play.V6_BLESS_ORDER)
++	return ids
++
++static func bless_def(id: String) -> Dictionary:
++	if BLESS.has(id):
++		return BLESS[id]
++	return V10W1Play.V6_BLESS.get(id, BLESS.lamp)
++
+ static func bless_plus(id: String) -> bool:
+-	return G.hero_unlocked(BLESS[id].hero)
++	return G.hero_unlocked(bless_def(id).hero)
+ 
+ static func bless_offer(run: Dictionary) -> Array:
+ 	var pool: = []
+-	for id in BLESS:
++	for id in bless_ids():
+ 		var n: = int(run.bless.get(id, 0))
+-		if id in BLESS_ONCE and n > 0:
++		if (id in BLESS_ONCE or bool(bless_def(id).get("once", false))) and n > 0:
+ 			continue
+-		if n >= int(BLESS_CAP.get(id, 3)):
++		if n >= int(BLESS_CAP.get(id, bless_def(id).get("cap", 3))):
+ 			continue
+ 		if id == "lamp" and int(run.lamps) >= LAMPS_MAX:
+ 			continue
+@@ -158,6 +170,19 @@
+ const SHIFT_TABLES: = 3
+ const GUESTS: = ["mc", "rin", "hana", "yue", "nova"]
+ 
++# wave 1: the goddesses drop in for tea too once V10Wave1 is released (V10W1Play.SHIFT_*)
++static func guests() -> Array:
++	if V10Wave1.released():
++		return GUESTS + V10W1Play.SHIFT_GUESTS
++	return GUESTS
++
++# part: "taste" | "order" | "thanks" | "leave"
++static func guest(h: String, part: String):
++	var t: Dictionary = {"taste": TASTE, "order": ORDER_LINES, "thanks": THANKS, "leave": LEAVE}[part]
++	if t.has(h):
++		return t[h]
++	return V10W1Play.shift(h, part)
++
+ const TASTE: = {
+ 	"mc": {"cats": [2, 0], "pat": 55.0, "tip": 1.0}, 
+ 	"rin": {"cats": [0, 3], "pat": 60.0, "tip": 1.1}, 
+--- a/game/scripts/v06/modes/mode_play.gd
++++ b/game/scripts/v06/modes/mode_play.gd
+@@ -220,7 +220,7 @@
+ 	ids.reverse()
+ 	for id in ids:
+ 		bx -= 52
+-		var av: = Common.avatar(V6ModesData.BLESS[id].hero, Rect2(bx, 10, 48, 48), "gold" if V6ModesData.bless_plus(id) else "plum")
++		var av: = Common.avatar(V6ModesData.bless_def(id).hero, Rect2(bx, 10, 48, 48), "gold" if V6ModesData.bless_plus(id) else "plum")
+ 		p.add_child(av)
+ 		var n: = int(run.bless[id])
+ 		if n > 1:
+@@ -344,7 +344,7 @@
+ 	UI.pop_in(quit, 0.7)
+ 
+ func _bless_card(root: Control, id: String, r: Rect2) -> Control:
+-	var b: Dictionary = V6ModesData.BLESS[id]
++	var b: Dictionary = V6ModesData.bless_def(id)
+ 	var plus: = V6ModesData.bless_plus(id)
+ 	var col: Color = G.HEROES[b.hero].color
+ 	var card: = UI.rbox("glass", r, 30, 4, 12)
+@@ -408,10 +408,13 @@
+ 		"clear":
+ 			if plus:
+ 				run.hint = int(run.hint) + 1
++		_:
++			if V10Wave1.released():
++				V10W1Play.v6_bless_pick(run, id, plus)
+ 	Sfx.play("reveal_sr", 1.2)
+-	Sfx.say(V6ModesData.BLESS[id].hero, "aff")
++	Sfx.say(V6ModesData.bless_def(id).hero, "aff")
+ 	UI.punch(card, 0.25)
+-	Fx.burst(card, card.size * 0.5, "sparkle", 40, G.HEROES[V6ModesData.BLESS[id].hero].color.lightened(0.3), 1.3)
++	Fx.burst(card, card.size * 0.5, "sparkle", 40, G.HEROES[V6ModesData.bless_def(id).hero].color.lightened(0.3), 1.3)
+ 	await get_tree().create_timer(0.55).timeout
+ 	run.floor = int(run.floor) + 1
+ 	main.go("arena", {"mode": "climb", "run": run, "partner": run.partner})
+@@ -441,7 +444,7 @@
+ 		if not int(m[0]) in s.climb_miles.map( func(x): return int(x)):
+ 			v8_res_line(ctx, "Следующая веха: этаж %d · +%s" % [int(m[0]), gems_text(int(m[1]))], 18, Color("ffd98a"))
+ 			break
+-	v8_res_avatars(ctx, run.bless.keys().map( func(id): return V6ModesData.BLESS[id].hero), 56.0)
++	v8_res_avatars(ctx, run.bless.keys().map( func(id): return V6ModesData.bless_def(id).hero), 56.0)
+ 	v8_res_rank(ctx, ra)
+ 	# 0.8: her face on the result: a new climb record amazes her, a run lost on its last lantern saddens her
+ 	ctx["emo"] = "surprised" if reached > 0 and reached >= best else (V8Art.win_emotion(partner) if by_choice else "sad")
+@@ -632,9 +635,9 @@
+ 	if avail.is_empty():
+ 		return
+ 	var taken: = seats.map( func(x): return x.hero)
+-	var pool: = V6ModesData.GUESTS.filter( func(h): return not h in taken)
++	var pool: Array = V6ModesData.guests().filter( func(h): return not h in taken)
+ 	var h: String = pool[randi() % pool.size()]
+-	var taste: Dictionary = V6ModesData.TASTE[h]
++	var taste: Dictionary = V6ModesData.guest(h, "taste")
+ 	var cat: int = avail[randi() % avail.size()]
+ 	for c in taste.cats:
+ 		if c in avail:
+@@ -660,7 +663,7 @@
+ 	card.pivot_offset = card.size * 0.5
+ 	UI.pop_in(card, 0.0, 0.7)
+ 	Sfx.play("pop", 1.1)
+-	var lines: Array = V6ModesData.ORDER_LINES[h]
++	var lines: Array = V6ModesData.guest(h, "order")
+ 	_seat_bubble(i, lines[randi() % lines.size()])
+ 
+ # 0.8: one guest bubble at a time, no wider than her seat, so two never cover each other
+@@ -715,10 +718,10 @@
+ 	var h: String = s.hero
+ 	s.busy = true
+ 	if happy:
+-		var th: Array = V6ModesData.THANKS[h]
++		var th: Array = V6ModesData.guest(h, "thanks")
+ 		_seat_bubble(i, th[randi() % th.size()])
+ 	else:
+-		_seat_bubble(i, V6ModesData.LEAVE[h])
++		_seat_bubble(i, String(V6ModesData.guest(h, "leave")))
+ 	var card: Control = s.node
+ 	var t: = card.create_tween()
+ 	t.tween_interval(0.9)
+@@ -859,7 +862,7 @@
+ 	if tips > 0:
+ 		v8_res_reward(ctx, tips, "+5 симпатии от каждой гостьи", "gem", "чаевые")
+ 	v8_res_line(ctx, "Твои героини дают чаевые ×1,5", 17, Color("cbb5dc"), 2.0)
+-	v8_res_avatars(ctx, V6ModesData.GUESTS, 56.0, func(h): return "gold" if G.hero_unlocked(String(h)) else "plum")
++	v8_res_avatars(ctx, V6ModesData.guests(), 56.0, func(h): return "gold" if G.hero_unlocked(String(h)) else "plum")
+ 	v8_res_rank(ctx, sa)
+ 	ctx["emo"] = "surprised" if record else (V8Art.win_emotion(partner) if served > missed else "pout")
+ 	v8_res_close(ctx, partner, "Новая смена", func(): main.go("arena", {"mode": "shift", "partner": partner, "retry": randi()}),
+--- a/game/scripts/v08/table/ai.gd
++++ b/game/scripts/v08/table/ai.gd
+@@ -17,10 +17,21 @@
+ 
+ static var room_skill: = 1.0
+ 
++# wave 1: the goddesses' table styles join once V10Wave1 is released (V10W1Play.AI_STYLES)
++static func has_style(h: String) -> bool:
++	return STYLES.has(h) or (V10Wave1.released() and V10W1Play.AI_STYLES.has(h))
++
++static func style_for(h: String) -> Dictionary:
++	if STYLES.has(h):
++		return STYLES[h]
++	if V10Wave1.released() and V10W1Play.AI_STYLES.has(h):
++		return V10W1Play.AI_STYLES[h]
++	return STYLES.mc
++
+ static func style_of(r, s: int) -> Dictionary:
+ 	var st: Dictionary = r.players[s].get("style", {})
+ 	if st.is_empty():
+-		st = STYLES.get(r.players[s].get("id", "mc"), STYLES.mc)
++		st = style_for(String(r.players[s].get("id", "mc")))
+ 	return st
+ 
+ 
+--- a/game/scripts/v10/mj/riichi/table_driver.gd
++++ b/game/scripts/v10/mj/riichi/table_driver.gd
+@@ -56,7 +56,7 @@
+ 	var pl: = []
+ 	for s in 4:
+ 		var h: String = hero_of[s]
+-		pl.append({"id": h if V8AI.STYLES.has(h) else "mc", "ctl": "human" if s == me else "ai", "hero": h})
++		pl.append({"id": h if V8AI.has_style(h) else "mc", "ctl": "human" if s == me else "ai", "hero": h})
+ 	var o: = {"seed": int(opts.get("seed", 1)), "length": String(opts.get("length", "east")), "players": pl}
+ 	if opts.has("dealer"):
+ 		o["dealer"] = int(opts.dealer)
+@@ -209,7 +209,7 @@
+ 	return 0.1
+ 
+ func ai_pause(s: int) -> float:
+-	var st: Dictionary = V8AI.STYLES.get(hero_of[s], V8AI.STYLES.mc)
++	var st: Dictionary = V8AI.style_for(String(hero_of[s]))
+ 	var sp: float = float(st.get("speed", 1.0))
+ 	var t: float = PAUSE_MAX - clampf((sp - 0.85) / (1.2 - 0.85), 0.0, 1.0) * (PAUSE_MAX - PAUSE_MIN)
+ 	t += rng.randf_range(-0.06, 0.06)
+--- a/game/scripts/v10/mj/sanma/landlord.gd
++++ b/game/scripts/v10/mj/sanma/landlord.gd
+@@ -37,7 +37,7 @@
+ 
+ # Объявление перед раздачей. Возвращает 2 или 3.
+ func declare() -> int:
+-	var st: Dictionary = V8AI.STYLES.get(host_id, V8AI.STYLES.mc)
++	var st: Dictionary = V8AI.style_for(String(host_id))
+ 	base = 3 if rng.randf() < p_triple(st) else 2
+ 	mult = base
+ 	doublings = 0
+--- a/game/scripts/v08/league/population.gd
++++ b/game/scripts/v08/league/population.gd
+@@ -17,6 +17,8 @@
+ #   V8Population.avatar_view(img, hero, rect, _, top) -> Control   round face crop of an outfit in the gold frame (V8Art.avatar)
+ 
+ const COUNT: = 1000
++# the 0.8 draw stays on the founders whatever G.HERO_ORDER holds (same nicks, heroes and scores on every device)
++const POP_HEROES: = ["mc", "rin", "hana", "yue", "nova"]
+ const SEED: = 80817
+ const TIER_COUNT: = [320, 270, 190, 120, 70, 30]
+ const Q_RANGE: = [[60, 350], [200, 700], [450, 1400], [900, 2800], [2000, 6000], [4500, 16000]]
+@@ -134,10 +136,10 @@
+ 		if seen.has(nk.to_lower()):
+ 			nk = "%s%d" % [nk.substr(0, 12), i]
+ 		seen[nk.to_lower()] = true
+-		var hero: String = G.HERO_ORDER[rng.randi() % G.HERO_ORDER.size()]
++		var hero: String = POP_HEROES[rng.randi() % POP_HEROES.size()]
+ 		var outs: = AVATARS.filter(func(x): return String(x).begins_with(hero + "_"))
+ 		var av: String = outs[rng.randi() % outs.size()]
+-		var fav: = hero if rng.randf() < 0.7 else String(G.HERO_ORDER[rng.randi() % G.HERO_ORDER.size()])
++		var fav: = hero if rng.randf() < 0.7 else String(POP_HEROES[rng.randi() % POP_HEROES.size()])
+ 		var skill: = rng.randf()
+ 		var qr: Array = Q_RANGE[tier]
+ 		var q: = lerpf(float(qr[0]), float(qr[1]), clampf(pow(skill, 1.5) * 0.7 + rng.randf() * 0.3, 0.0, 1.0))
+@@ -151,9 +153,12 @@
+ 		sh += rng.randf_range(-1.5, 2.5)
+ 		var a: = rng.randf_range(0.15, 0.4)
+ 		var b: = rng.randf_range(0.08, 0.25)
+-		_pop.append({"id": i, "nick": nk, "avatar": av, "hero": hero, "fav": fav, "tier": tier, "skill": skill,
++		var row: = {"id": i, "nick": nk, "avatar": av, "hero": hero, "fav": fav, "tier": tier, "skill": skill,
+ 			"q": q, "base": base, "days": rng.randi_range(2, 7), "shift": sh, "rpg": RPG[tier] + rng.randi_range(-4, 6),
+-			"wa": a, "ww": TAU / rng.randf_range(9.0, 25.0), "wp": rng.randf() * TAU, "wb": b, "wq": rng.randf() * TAU})
++			"wa": a, "ww": TAU / rng.randf_range(9.0, 25.0), "wp": rng.randf() * TAU, "wb": b, "wq": rng.randf() * TAU}
++		if V10Wave1.released():
++			V10W1Play.pop_overlay(row)
++		_pop.append(row)
+ 
+ static func _shuffle(arr: Array, rng: RandomNumberGenerator) -> void:
+ 	for i in range(arr.size() - 1, 0, -1):
+@@ -171,7 +176,7 @@
+ 	for sep in ["_", "-", ".", " "]:
+ 		core = core.get_slice(sep, 0)
+ 	core = core.rstrip("0123456789")
+-	return not core in HERO_NICKS
++	return not core in HERO_NICKS and not core in V10W1Play.POP_HERO_NICKS
+ 
+ static func _pick(arr: Array, rng: RandomNumberGenerator):
+ 	return arr[rng.randi() % arr.size()]
+@@ -499,6 +504,8 @@
+ # ---------------------------------------------------------------- avatars
+ 
+ static func face(img: String) -> Array:
++	if not FACES.has(img) and V10Wave1.released() and V10W1Play.is_outfit_img(img):
++		return V10W1Play.pop_face(img)
+ 	return FACES.get(img, [0.5, 0.18, 4.6])
+ 
+ static func my_avatar_img() -> String:
+--- a/game/scripts/v08/league/league_selftest.gd
++++ b/game/scripts/v08/league/league_selftest.gd
+@@ -83,7 +83,7 @@
+ 				lat = false
+ 		if lat:
+ 			latin += 1
+-		_check("avatar exists %s" % p.avatar, ResourceLoader.exists("res://assets/outfits/%s.webp" % p.avatar))
++		_check("avatar exists %s" % p.avatar, ResourceLoader.exists("res://assets/outfits/%s.webp" % p.avatar) or ResourceLoader.exists(V10W1Play.outfit_path(p.avatar)))
+ 	_check("nicks unique", dup == 0, "dups=%d" % dup)
+ 	_check("nick length 3..16", bad_len == 0, "bad=%d" % bad_len)
+ 	_check("nicks clean (no rank/heroine names, no bot marks)", bad_word == 0, "bad=%d" % bad_word)
+--- a/game/scripts/v10/levels/level_gen.gd
++++ b/game/scripts/v10/levels/level_gen.gd
+@@ -347,7 +347,7 @@
+ 		"v10": {}, "v10_id": i, "v10_version": VERSION, "v10_salt": salt, "assist": assist,
+ 		"code": code(i), "world": w, "num": l + 1, "chapter": c, "pos": p,
+ 		"name": str(W.name), "loc": w, "stage": l, "bg": W.bg, "fx": W.fx, "art": W.art,
+-		"hero": ready_hero(str(W.hero), w), "shard": ready_hero(str(W.shard), w), "hero_v10": W.hero, "shard_v10": W.shard,
++		"hero": ready_hero(str(W.hero), w), "shard": ready_hero(str(W.shard), w, true), "hero_v10": W.hero, "shard_v10": W.shard,
+ 		"tier": tier, "tier_name": TIER_NAMES[tier], "hard": TIER_HARD[tier],
+ 		"boss": boss, "peak": is_peak(i), "legend": legend, "boss_hero": ready_hero(boss_hero, w) if boss or legend else "",
+ 		"boss_hero_v10": boss_hero if boss or legend else "", "boss_title": title,
+@@ -399,8 +399,11 @@
+ const FALLBACK: = ["mc", "rin", "hana", "yue", "mc", "nova", "yue", "rin", "nova", "hana"]
+ 
+ 
+-static func ready_hero(id: String, w: int) -> String:
+-	return id if id in READY_HEROES else str(FALLBACK[w])
++# wave 1: a released goddess hosts her chapters; shard tiles never carry her (ROSTER §1.4, V10W1Play.SHARDS_FROM_PLAY)
++static func ready_hero(id: String, w: int, shard: = false) -> String:
++	if id in READY_HEROES or (not shard and V10Wave1.released() and id in V10W1Play.HEROES):
++		return id
++	return str(FALLBACK[w])
+ 
+ 
+ static func _base_mech(m: String) -> String:
+--- a/game/scripts/v10/path/path_rules.gd
++++ b/game/scripts/v10/path/path_rules.gd
+@@ -84,6 +84,8 @@
+ 
+ 
+ static func host_name(h: String) -> String:
++	if not HOST_NAMES.has(h) and V10Wave1.released() and V10W1Play.HOST_NAMES.has(h):
++		return String(V10W1Play.HOST_NAMES[h])
+ 	return HOST_NAMES.get(h, h.capitalize())
+ 
+ 

@@ -1,0 +1,334 @@
+{
+ "v": 1,
+ "note": "Wave 1 stickers, 8 per heroine (same shape as data/v10/chat/stickers.json). Art: res://assets/v10/wave1/stickers/<id>.webp (V10W1Social.sticker_path); img keeps the chat validator's reserved path. Until art exists the phone draws glyph + label.",
+ "tsubame": [
+  {
+   "id": "tsubame_done",
+   "label": "Доставлено.",
+   "glyph": "✓",
+   "mood": "win",
+   "level": 1,
+   "img": "res://assets/v10/stickers/tsubame_done.webp"
+  },
+  {
+   "id": "tsubame_letter",
+   "label": "Тебе письмо",
+   "glyph": "✉",
+   "mood": "warm",
+   "level": 1,
+   "img": "res://assets/v10/stickers/tsubame_letter.webp"
+  },
+  {
+   "id": "tsubame_smoke",
+   "label": "Пуф — и нет",
+   "glyph": "~",
+   "mood": "fun",
+   "level": 1,
+   "img": "res://assets/v10/stickers/tsubame_smoke.webp"
+  },
+  {
+   "id": "tsubame_kunai",
+   "label": "Кунай-ласточка",
+   "glyph": "✦",
+   "mood": "tease",
+   "level": 1,
+   "img": "res://assets/v10/stickers/tsubame_kunai.webp"
+  },
+  {
+   "id": "tsubame_again",
+   "label": "Ещё заход",
+   "glyph": "»",
+   "mood": "tease",
+   "level": 1,
+   "img": "res://assets/v10/stickers/tsubame_again.webp"
+  },
+  {
+   "id": "tsubame_salute",
+   "label": "Салют",
+   "glyph": "★",
+   "mood": "win",
+   "level": 1,
+   "img": "res://assets/v10/stickers/tsubame_salute.webp"
+  },
+  {
+   "id": "tsubame_scarf",
+   "label": "В шарф",
+   "glyph": "///",
+   "mood": "warm",
+   "level": 5,
+   "img": "res://assets/v10/stickers/tsubame_scarf.webp"
+  },
+  {
+   "id": "tsubame_swallow",
+   "label": "Ласточка с сердцем",
+   "glyph": "♥",
+   "mood": "warm",
+   "level": 5,
+   "img": "res://assets/v10/stickers/tsubame_swallow.webp"
+  }
+ ],
+ "miel": [
+  {
+   "id": "miel_try",
+   "label": "Попробуй!",
+   "glyph": "!",
+   "mood": "warm",
+   "level": 1,
+   "img": "res://assets/v10/stickers/miel_try.webp"
+  },
+  {
+   "id": "miel_macaron",
+   "label": "Макарон",
+   "glyph": "◉",
+   "mood": "fun",
+   "level": 1,
+   "img": "res://assets/v10/stickers/miel_macaron.webp"
+  },
+  {
+   "id": "miel_whisk",
+   "label": "Взбиваю",
+   "glyph": "~",
+   "mood": "fun",
+   "level": 1,
+   "img": "res://assets/v10/stickers/miel_whisk.webp"
+  },
+  {
+   "id": "miel_wink",
+   "label": "Секрет рецепта",
+   "glyph": "★",
+   "mood": "tease",
+   "level": 1,
+   "img": "res://assets/v10/stickers/miel_wink.webp"
+  },
+  {
+   "id": "miel_pout",
+   "label": "Перестаралась",
+   "glyph": "ε",
+   "mood": "tease",
+   "level": 1,
+   "img": "res://assets/v10/stickers/miel_pout.webp"
+  },
+  {
+   "id": "miel_cake",
+   "label": "Торт тебе",
+   "glyph": "✦",
+   "mood": "win",
+   "level": 1,
+   "img": "res://assets/v10/stickers/miel_cake.webp"
+  },
+  {
+   "id": "miel_blush",
+   "label": "Румянец",
+   "glyph": "///",
+   "mood": "warm",
+   "level": 5,
+   "img": "res://assets/v10/stickers/miel_blush.webp"
+  },
+  {
+   "id": "miel_box",
+   "label": "Обнимает коробку",
+   "glyph": "♥",
+   "mood": "warm",
+   "level": 5,
+   "img": "res://assets/v10/stickers/miel_box.webp"
+  }
+ ],
+ "kohaku": [
+  {
+   "id": "kohaku_luck",
+   "label": "Удача любит меня",
+   "glyph": "★",
+   "mood": "win",
+   "level": 1,
+   "img": "res://assets/v10/stickers/kohaku_luck.webp"
+  },
+  {
+   "id": "kohaku_fox",
+   "label": "Лисичка",
+   "glyph": "^^",
+   "mood": "tease",
+   "level": 1,
+   "img": "res://assets/v10/stickers/kohaku_fox.webp"
+  },
+  {
+   "id": "kohaku_fire",
+   "label": "Лисий огонёк",
+   "glyph": "✦",
+   "mood": "fun",
+   "level": 1,
+   "img": "res://assets/v10/stickers/kohaku_fire.webp"
+  },
+  {
+   "id": "kohaku_bell",
+   "label": "Динь!",
+   "glyph": "◉",
+   "mood": "fun",
+   "level": 1,
+   "img": "res://assets/v10/stickers/kohaku_bell.webp"
+  },
+  {
+   "id": "kohaku_mask",
+   "label": "Подглядывает",
+   "glyph": "◝",
+   "mood": "tease",
+   "level": 1,
+   "img": "res://assets/v10/stickers/kohaku_mask.webp"
+  },
+  {
+   "id": "kohaku_pet",
+   "label": "Не гладь!",
+   "glyph": "!!",
+   "mood": "tease",
+   "level": 1,
+   "img": "res://assets/v10/stickers/kohaku_pet.webp"
+  },
+  {
+   "id": "kohaku_tail",
+   "label": "Хвост выдаёт",
+   "glyph": "~",
+   "mood": "warm",
+   "level": 5,
+   "img": "res://assets/v10/stickers/kohaku_tail.webp"
+  },
+  {
+   "id": "kohaku_ears",
+   "label": "Ушки прижаты",
+   "glyph": "///",
+   "mood": "warm",
+   "level": 5,
+   "img": "res://assets/v10/stickers/kohaku_ears.webp"
+  }
+ ],
+ "shirin": [
+  {
+   "id": "shirin_stars",
+   "label": "Звёзды не лгут",
+   "glyph": "✦",
+   "mood": "win",
+   "level": 1,
+   "img": "res://assets/v10/stickers/shirin_stars.webp"
+  },
+  {
+   "id": "shirin_veil",
+   "label": "Из-под вуали",
+   "glyph": "◗",
+   "mood": "tease",
+   "level": 1,
+   "img": "res://assets/v10/stickers/shirin_veil.webp"
+  },
+  {
+   "id": "shirin_palm",
+   "label": "Читаю ладонь",
+   "glyph": "✋",
+   "mood": "fun",
+   "level": 1,
+   "img": "res://assets/v10/stickers/shirin_palm.webp"
+  },
+  {
+   "id": "shirin_coins",
+   "label": "Звон монет",
+   "glyph": "◉",
+   "mood": "fun",
+   "level": 1,
+   "img": "res://assets/v10/stickers/shirin_coins.webp"
+  },
+  {
+   "id": "shirin_sleepy",
+   "label": "Ещё пять минут",
+   "glyph": "☾",
+   "mood": "tired",
+   "level": 1,
+   "img": "res://assets/v10/stickers/shirin_sleepy.webp"
+  },
+  {
+   "id": "shirin_tea",
+   "label": "Чай в шатре",
+   "glyph": "茶",
+   "mood": "warm",
+   "level": 1,
+   "img": "res://assets/v10/stickers/shirin_tea.webp"
+  },
+  {
+   "id": "shirin_dance",
+   "label": "Танец для тебя",
+   "glyph": "♪",
+   "mood": "warm",
+   "level": 5,
+   "img": "res://assets/v10/stickers/shirin_dance.webp"
+  },
+  {
+   "id": "shirin_tender",
+   "label": "Нежный взгляд",
+   "glyph": "◡",
+   "mood": "warm",
+   "level": 5,
+   "img": "res://assets/v10/stickers/shirin_tender.webp"
+  }
+ ],
+ "zlata": [
+  {
+   "id": "zlata_spring",
+   "label": "Весна пришла!",
+   "glyph": "✺",
+   "mood": "win",
+   "level": 1,
+   "img": "res://assets/v10/stickers/zlata_spring.webp"
+  },
+  {
+   "id": "zlata_feather",
+   "label": "Перо тебе",
+   "glyph": "✦",
+   "mood": "warm",
+   "level": 1,
+   "img": "res://assets/v10/stickers/zlata_feather.webp"
+  },
+  {
+   "id": "zlata_pancake",
+   "label": "Блины!",
+   "glyph": "◉",
+   "mood": "fun",
+   "level": 1,
+   "img": "res://assets/v10/stickers/zlata_pancake.webp"
+  },
+  {
+   "id": "zlata_brow",
+   "label": "Царевну — по голове?",
+   "glyph": "?",
+   "mood": "tease",
+   "level": 1,
+   "img": "res://assets/v10/stickers/zlata_brow.webp"
+  },
+  {
+   "id": "zlata_heel",
+   "label": "Каблучок",
+   "glyph": "♪",
+   "mood": "fun",
+   "level": 1,
+   "img": "res://assets/v10/stickers/zlata_heel.webp"
+  },
+  {
+   "id": "zlata_ash",
+   "label": "Пепел — только начало",
+   "glyph": "…",
+   "mood": "tired",
+   "level": 1,
+   "img": "res://assets/v10/stickers/zlata_ash.webp"
+  },
+  {
+   "id": "zlata_blush",
+   "label": "Поймана с блином",
+   "glyph": "///",
+   "mood": "warm",
+   "level": 5,
+   "img": "res://assets/v10/stickers/zlata_blush.webp"
+  },
+  {
+   "id": "zlata_braid",
+   "label": "Ведёт косой",
+   "glyph": "~",
+   "mood": "tease",
+   "level": 5,
+   "img": "res://assets/v10/stickers/zlata_braid.webp"
+  }
+ ]
+}
