@@ -129,7 +129,10 @@ func _decorate_home(home: Node, animate: bool) -> void :
 		mul = Color.WHITE.lerp(mul, 0.45)
 	if mul != Color.WHITE:
 		var tint: = ColorRect.new()
-		tint.size = home.size
+		# 0.10 M0: the tint reaches the viewport edges past the content column (tablets, cut-outs), like the video
+		var tbr: = V10Layout.bleed_rect(root)
+		tint.position = tbr.position
+		tint.size = tbr.size
 		tint.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		tint.color = mul
 		var cm: = CanvasItemMaterial.new()

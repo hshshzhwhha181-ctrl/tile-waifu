@@ -77,7 +77,7 @@ static func video_wanted(h: String) -> bool:
 
 # the lobby loop over its own first frame; returns the player (null when the stream does not load)
 const VIDEO_SIZE: = Vector2(720, 1280)
-# what stays in view when the loop is cropped to cover a screen of another shape (her face and chest)
+# what stays in view when the loop is cropped to cover a screen of another shape (her face and upper body)
 const VIDEO_FOCUS: = Vector2(0.5, 0.4)
 
 

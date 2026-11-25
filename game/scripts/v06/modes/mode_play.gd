@@ -300,7 +300,10 @@ func _floor_overlay(f: int, gems: int, chest: bool, mile_gems: int, record: bool
 	root.z_index = 60
 	add_child(root)
 	var dim: = ColorRect.new()
-	dim.size = size
+	# 0.10 M0: the dim reaches the viewport edges past the content column (tablets, cut-outs)
+	var dbr: = V10Layout.bleed_rect(root)
+	dim.position = dbr.position
+	dim.size = dbr.size
 	dim.color = Color(0.08, 0.03, 0.14, 0.0)
 	dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.add_child(dim)

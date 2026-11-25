@@ -31,7 +31,7 @@ whole screen, i.e. pulled 25 % taller on 9:20 phones (she looked thin and squash
   its aim / fx layers in viewport coordinates (`_canvas_space`) and takes the board rect there (`_br()`).
 * **Tall phones** use the extra height instead of leaving dead bands: the title logo block moves down, the summon
   lantern stage moves into the middle (`summon.gd stage_dy`), the victory bust grows (`play.gd`), lists simply
-  show more rows; the lobby video is cropped («cover», focus on her face/chest) instead of stretched.
+  show more rows; the lobby video is cropped («cover», focus on her face and upper body) instead of stretched.
 
 ## Files
 

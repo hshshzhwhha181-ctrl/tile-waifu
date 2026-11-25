@@ -214,8 +214,10 @@ func _buttons(opts: Array) -> int:
 	var bh: = 96.0 if opts.size() > 2 else 104.0
 	var y: = H - _sb - 300 - 30 - opts.size() * bh
 	var btns: = []
+	# 0.10 M0: on tablets the choices keep the text box's measure (≤ 820), centred; phones: 40 px margins as before
+	var cw: = minf(W - 80.0, 820.0)
 	for k in opts.size():
-		var b: = JButton.make(opts[k][0], "gold" if k == 0 else "rose", Rect2(40, y + k * bh, W - 80, bh - 14), null, 23)
+		var b: = JButton.make(opts[k][0], "gold" if k == 0 else "rose", Rect2((W - cw) * 0.5, y + k * bh, cw, bh - 14), null, 23)
 		b.pressed.connect( func(): picked[0] = k)
 		choice_layer.add_child(b)
 		UI.slide_in(b, Vector2(40, 0), k * 0.08, 0.3)

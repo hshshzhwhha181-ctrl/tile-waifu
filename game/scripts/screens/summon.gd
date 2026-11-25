@@ -987,14 +987,18 @@ func _showcase(r: Dictionary) -> void :
 	showcase.mouse_filter = Control.MOUSE_FILTER_STOP
 	add_child(showcase)
 	var bg: = ColorRect.new()
-	bg.size = size
+	# 0.10 M0: the night and the veil reach the viewport edges past the content column (tablets, cut-outs)
+	var sbr: = V10Layout.bleed_rect(showcase)
+	bg.position = sbr.position
+	bg.size = sbr.size
 	# 0.9: opaque enough that the result grid underneath never ghosts through around the card
 	bg.color = Color(0.06, 0.02, 0.1, 0.985)
 	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	showcase.add_child(bg)
 	# 0.9: the showcase opens in the gold of the lantern: a warm veil that settles into the night backdrop
 	var veil: = ColorRect.new()
-	veil.size = size
+	veil.position = sbr.position
+	veil.size = sbr.size
 	veil.color = Color(V9Summon.COL.SSR, 0.22 if V9Feel.can_fx() else 0.0)
 	veil.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	showcase.add_child(veil)
