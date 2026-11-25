@@ -3,7 +3,7 @@ extends Control
 # Standalone runner of Лавка 2 (no main.gd, no save):
 #   xvfb-run -a /opt/tw-tools/godot --path game res://scripts/v10/shop/shop_demo.tscn --rendering-driver opengl3 \
 #     --audio-driver Dummy --resolution 720x1280 -- [--view=vitrina|outfits|topup|pass|purchases|age|age_stop|confirm|
-#     need|outfit_buy|month|retro|all] [--shots=/abs/dir] [--sizes=720x1280,720x1600,960x1280] [--level=12]
+#     need|outfit_buy|month|retro|topup_later|all] [--shots=/abs/dir] [--sizes=720x1280,720x1600,960x1280] [--level=12]
 #     [--fx=min] [--store=1]
 #   --shop_selftest=1 runs V10ShopSelftest (headless is fine for logic; layout checks use SubViewports) and quits
 #   with exit code = number of failures.
@@ -45,7 +45,7 @@ static func demo_model(opts: = {}) -> V10ShopModel:
 		# shop-priced first (crystals), then the rest (petals)
 		out.sort_custom(func(a, b): return int(a.get("shop", 0)) > int(b.get("shop", 0)))
 		return out
-	m.free_paths_fn = func(): return [{"text": "Задания дня: ещё 50 кристаллов сегодня"}]
+	m.free_paths_fn = func(): return [{"text": "Задания дня: ещё 50 кристаллов", "go": "today"}]
 	return m
 
 
@@ -88,8 +88,8 @@ func _open(view: String, host: Control, vs: Vector2) -> Control:
 	var scr: Control
 	var nav: = true
 	match view:
-		"vitrina", "outfits", "topup", "confirm", "need", "outfit_buy":
-			var tab: int = {"outfits": 1, "topup": 2, "need": 2, "outfit_buy": 0}.get(view, 0)
+		"vitrina", "outfits", "topup", "confirm", "need", "outfit_buy", "topup_later":
+			var tab: int = {"outfits": 1, "topup": 2, "need": 2, "outfit_buy": 0, "topup_later": 2}.get(view, 0)
 			scr = V10Shop2.make(m, {"tab": tab, "bottom_reserve": 120.0})
 			scr.go_screen.connect(func(id, _a): _go(id, host, vs))
 		"pass", "retro":
@@ -138,7 +138,7 @@ func _go(id: String, host: Control, vs: Vector2) -> void:
 func _shots(dir: String) -> void:
 	DirAccess.make_dir_recursive_absolute(dir)
 	var sizes: = String(args.get("sizes", "720x1280,720x1600,960x1280")).split(",")
-	var views: Array = ["vitrina", "outfits", "topup", "confirm", "need", "outfit_buy", "pass", "retro", "purchases", "age", "age_pick", "age_stop", "month"]
+	var views: Array = ["vitrina", "outfits", "topup", "topup_later", "confirm", "need", "outfit_buy", "pass", "retro", "purchases", "age", "age_pick", "age_stop", "month"]
 	if args.has("view") and String(args.view) != "all":
 		views = String(args.view).split(",")
 	for sz in sizes:
@@ -173,6 +173,12 @@ func _shot(view: String, vs: Vector2, path: String) -> void:
 	m = demo_model(opts)
 	if view == "month":
 		m.econ.shop._month_extend()
+	if view == "topup_later":       # every pack bought once: no first-purchase double, the true best gets its label
+		m.econ.spend.set_age_verified(true)
+		(m.provider() as V10StubPay).instant = true
+		for s in V10Catalog.SKUS:
+			if s.kind == "currency":
+				m.buy(String(s.id))
 	if view == "purchases":
 		var p: V10StubPay = m.provider()
 		p.instant = true
@@ -198,6 +204,7 @@ func _shot(view: String, vs: Vector2, path: String) -> void:
 					break
 		"retro":
 			m.econ.pass_.unlock(false, "demo")
+			(scr as V10PassScreen)._retro_pending = true
 			(scr as V10PassScreen).build()
 			await get_tree().process_frame
 			(scr as V10PassScreen).retro_cascade()

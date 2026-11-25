@@ -21,6 +21,7 @@ var bg: TextureRect
 var prem_tiles: = {}
 var claim_btn: V10Button
 var _top: = 0.0
+var _retro_pending: = false     # a late purchase just landed: premium tiles stay dark until the cascade lights them
 
 
 static func make(model: V10ShopModel, opts: = {}) -> V10PassScreen:
@@ -38,10 +39,7 @@ func _ready() -> void:
 
 
 func build() -> void:
-	for c in get_children():
-		if c is V10ShopSheet:
-			continue
-		c.queue_free()
+	V10ShopKit.clear(self)          # keeps an open sheet and the toast / hanko of a purchase or «Забрать всё»
 	prem_tiles = {}
 	vs = get_viewport_rect().size
 	size = vs
@@ -69,7 +67,10 @@ func build() -> void:
 	lv.name = "Level"
 	add_child(lv)
 	var into: = int(p.st.xp) - tier * V10Catalog.PASS_XP_TIER
-	var xp: = V10ShopKit.lbl("%d / %d опыта" % [into, V10Catalog.PASS_XP_TIER] if tier < V10Catalog.PASS_TIERS else "все уровни пройдены", "ui", 18, V10DS.PAPER_300)
+	# a number with its unit and meaning (UX §4.1.3): «ещё 60 опыта до 13-го», not «40 / 100»
+	var left: = V10Catalog.PASS_XP_TIER - into
+	var xp: = V10ShopKit.lbl("ещё %d опыта до %d-го" % [left, tier + 1] if tier < V10Catalog.PASS_TIERS else "все уровни пройдены", "ui", 18, V10DS.PAPER_300)
+	xp.name = "XpLeft"
 	xp.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	xp.position = Vector2(cx + cw * 0.5, y + 8)
 	xp.size = Vector2(cw * 0.5, 32)
@@ -89,7 +90,7 @@ func build() -> void:
 	y += 32
 	# ribbon
 	var p_claim: = p.claimable().size() > 0
-	var act_h: = (120.0 if p_claim else 0.0) + (40.0 if bool(p.st.prem) else (132.0 if m.cash_visible() else 0.0))
+	var act_h: = (120.0 if p_claim else 0.0) + (40.0 if bool(p.st.prem) else (156.0 if m.cash_visible() else 0.0))
 	var bottom_h: = act_h + 32.0 + float(ins.bottom)
 	var rh: = maxf(vs.y - y - bottom_h - 16.0, 420.0)
 	var band: = Control.new()
@@ -128,7 +129,7 @@ func build() -> void:
 		var i: = int(r.tier)
 		var x: = x0 + (i - 1) * COL
 		row.add_child(_tile(r.free, Rect2(x + 12, fy, COL - 24, tile_h), bool(r.reached), bool(r.free_got), true, "F%d" % i))
-		var pt: = _tile(r.prem, Rect2(x + 12, py, COL - 24, tile_h), bool(r.reached), bool(r.prem_got), bool(p.st.prem), "P%d" % i)
+		var pt: = _tile(r.prem, Rect2(x + 12, py, COL - 24, tile_h), bool(r.reached), bool(r.prem_got), bool(p.st.prem) and not _retro_pending, "P%d" % i)
 		prem_tiles[i] = pt
 		row.add_child(pt)
 		var md: = Medal.new()
@@ -169,13 +170,16 @@ func build() -> void:
 	fl.position = Vector2(24, y + fy - 28)
 	fl.size = Vector2(200, 20)
 	add_child(fl)
-	var plb: = V10ShopKit.lbl("ПРЕМИУМ", "overline", 15, V10DS.GOLD_500, true)
+	# no lock on every tile (UX §6.4): the track says once what opens it, the tiles stay dimmed
+	var plb: = V10ShopKit.lbl("ПРЕМИУМ" if bool(p.st.prem) else "ПРЕМИУМ · С ПРОПУСКОМ СЕЗОНА", "overline", 15, V10DS.GOLD_500, true)
 	plb.position = Vector2(24, y + py - 28)
-	plb.size = Vector2(200, 20)
+	plb.size = Vector2(cw, 20)
+	plb.name = "PremLabel"
 	add_child(plb)
 	# bottom actions
 	_top = maxf(y + rh + 16, vs.y - bottom_h)
 	_actions(cx, cw)
+	V10ShopKit.raise_fx(self)
 
 
 func _tile(g: Dictionary, r: Rect2, reached: bool, got: bool, open: bool, nm: String) -> Control:
@@ -229,13 +233,13 @@ func _actions(cx: float, cw: float) -> void:
 		claim_btn.pressed.connect(_claim_all)
 		add_child(claim_btn)
 		y += 120
-	if bool(p.st.prem):
+	if bool(p.st.prem) and not _retro_pending:
 		var ok: = V10ShopKit.lbl("Премиум открыт%s" % (" · Пропуск+" if bool(p.st.deluxe) else ""), "ui", 22, V10DS.JADE_300)
 		ok.position = Vector2(cx, y)
 		ok.size = Vector2(cw, 34)
 		add_child(ok)
 		return
-	if not m.cash_visible():
+	if bool(p.st.prem) or not m.cash_visible():
 		return
 	var half: = (cw - 16) * 0.5
 	var i: = 0
@@ -246,13 +250,21 @@ func _actions(cx: float, cw: float) -> void:
 		ttl.position = Vector2(x, y)
 		ttl.size = Vector2(half, 30)
 		add_child(ttl)
+		# every ₽ price carries «= N желаний» and «≈ N ₽ за желание» (UX §5.2.2, С-3)
+		var eq: = V10ShopKit.lbl(String(c.eq), "ui", 18, V10DS.PAPER_300)
+		eq.name = "Eq_" + sku
+		eq.position = Vector2(x, y + 30)
+		eq.size = Vector2(half, 26)
+		add_child(eq)
 		var pw: = V10ShopKit.lbl(String(c.per_wish), "ui", 18, V10DS.PAPER_300)
-		pw.position = Vector2(x, y + 30)
+		pw.name = "PerWish_" + sku
+		pw.position = Vector2(x, y + 54)
 		pw.size = Vector2(half, 26)
 		add_child(pw)
 		var cash: = V10ShopW.Cash.new().setup(String(c.price), "", Vector2(half, 72))
 		cash.name = "Buy_" + sku
-		cash.position = Vector2(x, y + 60)
+		cash.set_meta("rub_card", c)
+		cash.position = Vector2(x, y + 84)
 		cash.enabled = bool(c.available)
 		cash._lay()
 		var id: String = sku
@@ -269,7 +281,8 @@ func _buy(sku: String) -> void:
 		if once.done or not String(r.get("sku", "")).begins_with("pass_"):
 			return
 		once.done = true
-		get_tree().create_timer(0.9 if not V10ShopKit.mute else 0.0).timeout.connect(func(): retro_cascade(before))
+		_retro_pending = true       # the rebuild after delivery keeps the reached premium tiles dark…
+		get_tree().create_timer(0.9 if not V10ShopKit.mute else 0.0).timeout.connect(func(): retro_cascade(before))  # …the cascade lights them
 	shop.delivered.connect(on_ok, CONNECT_ONE_SHOT)
 	var sh: = V10ShopFlow.confirm(self, m, sku)
 	if sh:
@@ -302,8 +315,9 @@ func retro_cascade(_before: = 0) -> int:
 		tw.tween_interval(0.08 if V10ShopKit.fx_on() else 0.0)
 	tw.tween_interval(0.5)
 	tw.tween_callback(func():
-		V10ShopKit.toast(self, "Премиум открыт: %d %s ждут" % [lit, V10ShopTxt.plural(lit, "награда", "награды", "наград")])
-		build())
+		_retro_pending = false
+		build()
+		V10ShopKit.toast(self, "Премиум открыт: %d %s ждут" % [lit, V10ShopTxt.plural(lit, "награда", "награды", "наград")]))
 	return lit
 
 
@@ -315,11 +329,11 @@ func _claim_all() -> void:
 		for k in g:
 			if k != "items":
 				sum[k] = int(sum.get(k, 0)) + int(g[k])
-	V10ShopKit.hanko(self, size * Vector2(0.5, 0.45))
+	V10ShopKit.hanko(self, size * Vector2(0.5, 0.45))     # FX group: survives the rebuild below
 	if int(sum.get("crystal", 0)) > 0:
 		V10ShopKit.fly(self, claim_btn.position + claim_btn.size * 0.5, Vector2(size.x - 80, 60), V10ShopKit.tex("item_crystal"), 6)
-	V10ShopKit.toast(self, "Зачислено: " + V10ShopModel.grant_text(sum))
 	build()
+	V10ShopKit.toast(self, "Зачислено: " + V10ShopModel.grant_text(sum))
 
 
 func refresh() -> void:
@@ -352,8 +366,6 @@ class TierTile:
 		if got:
 			draw_circle(Vector2(size.x - 18, 18), 11, V10DS.JADE_500, true, -1.0, true)
 			draw_polyline(PackedVector2Array([Vector2(size.x - 23, 18), Vector2(size.x - 19, 22), Vector2(size.x - 12, 13)]), V10DS.NIGHT_900, 2.5, true)
-		elif locked:
-			V10Icons.draw(self, "lock_silhouette", Vector2(size.x - 20, 20), 24, V10DS.PAPER_500)
 
 
 class Medal:

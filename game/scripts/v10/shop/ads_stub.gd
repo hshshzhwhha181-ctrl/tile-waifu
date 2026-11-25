@@ -19,6 +19,7 @@ func show(_slot: String, done: Callable) -> void:
 		return
 	var ov: = Control.new()
 	ov.name = "V10AdStub"
+	ov.add_to_group(V10ShopKit.FX)     # a screen rebuild must not drop the overlay (its tween pays the reward)
 	ov.set_anchors_preset(Control.PRESET_FULL_RECT)
 	ov.mouse_filter = Control.MOUSE_FILTER_STOP
 	var bg: = ColorRect.new()

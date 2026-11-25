@@ -52,3 +52,24 @@ const POPUP_FROM_LEVEL: = 8
 
 # ---- shop opens after L8 (UX §3.5); before that no Label with «₽» (С-2)
 const SHOP_FROM_LEVEL: = 8
+
+# ---- «Словарь» articles of the shop terms (UX §4.4, checklist П-4). V10Glossary (branch v10-clarity) has no shop
+# section yet: the integrator adds ["shop", "Лавка"] to V10Glossary.CATS and appends these to V10Glossary.BASE (hook 15).
+# Same fields and limits as V10Glossary (name ≤ 26, why ≤ 74, how ≤ 92); no numbers that the catalog may change.
+const GLOSSARY: = [
+	{"id": "shop.moon", "cat": "shop", "name": "Лунный камень", "icon": "art:moon_1",
+		"why": "Те же кристаллы, только купленные за рубли. Тратится после бесплатных",
+		"how": "Лавка → Пополнить. Перед каждой тратой камня мы спросим"},
+	{"id": "shop.month", "cat": "shop", "name": "Лунный абонемент", "icon": "art:item_month",
+		"why": "30 дней: камень сразу и кристаллы каждый день в утреннем подносе",
+		"how": "Лавка → Витрина. Не подписка, сам не продлевается"},
+	{"id": "shop.pass", "cat": "shop", "name": "Пропуск сезона", "icon": "art:item_pass",
+		"why": "Награды за уровни сезона: бесплатная дорожка и премиум",
+		"how": "Опыт сезона — за победы и задания дня. Премиум — Лавка → Витрина"},
+	{"id": "shop.gift", "cat": "shop", "name": "Подарок дня", "icon": "art:item_gift",
+		"why": "Бесплатные кристаллы в Лавке раз в день",
+		"how": "Лавка → Витрина → Забрать. Завтра — новый"},
+	{"id": "shop.petal", "cat": "shop", "name": "Лепестки", "icon": "art:item_petal",
+		"why": "Приходят за повторный наряд из Желаний",
+		"how": "Тратятся в Лавке → Наряды → за лепестки"},
+]

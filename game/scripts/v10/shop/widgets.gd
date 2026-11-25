@@ -6,7 +6,8 @@ extends RefCounted
 #   Cash      «Касса» (UX §6.5): night.700, 1.5 px gold.500 border; left «что получу» (optional), right price in
 #             Numerals; states: normal / down / loading (spinner, taps ignored) / disabled. Never rose.
 #   Chip      crystal/petal price: painted icon 32 + Numerals 22 on night.700, no gold border (not money).
-#   Tap       any tappable rect (cards, rows, links); emits pressed; ux_role meta for the budget selftest
+#   Tap       any tappable rect (cards, rows, links); emits pressed; ux_role meta for the budget selftest;
+#             hit zone = visible rect grown to ≥ 80 px high (UX §6.1, HUD_V2 §2.1: visible 56–64, hit 80)
 #   Panel     a lacquer surface (V10Plate.draw_surface) of any size, optional art inset and «скос 12» corner
 #   Seg       segmented control: S plates 48 high, selected = gold.500 line under the text (2 px)
 #   Dots      carousel dots (no autoplay)
@@ -15,14 +16,27 @@ extends RefCounted
 class Tap:
 	extends Control
 	signal pressed
+	const HIT_MIN: = 80.0
 	var enabled: = true
 	var _down: = false
 	var dip: = true
 	var strong: = false
+	var hit_pad: = -1.0      # extra px above and below; -1 = auto (grow to HIT_MIN), 0 = exactly the visible rect
 
 	func _init() -> void:
 		mouse_filter = Control.MOUSE_FILTER_STOP
 		set_meta("v10_tap", true)
+
+	func pad_y() -> float:
+		return hit_pad if hit_pad >= 0.0 else maxf(0.0, (HIT_MIN - size.y) * 0.5)
+
+	# the touch rect (local): never smaller than 80 px high, the visible plate keeps its 56–64
+	func hit_rect() -> Rect2:
+		var p: = pad_y()
+		return Rect2(Vector2(0, -p), size + Vector2(0, p * 2.0))
+
+	func _has_point(pt: Vector2) -> bool:
+		return hit_rect().has_point(pt)
 
 	func _gui_input(e: InputEvent) -> void:
 		if not ((e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT) or e is InputEventScreenTouch):
@@ -40,7 +54,7 @@ class Tap:
 				var tw2: = create_tween()
 				tw2.tween_property(self, "scale", Vector2.ONE, 0.16).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 			queue_redraw()
-			if Rect2(Vector2.ZERO, size).grow(16).has_point(e.position):
+			if hit_rect().grow(16).has_point(e.position):
 				if enabled:
 					V10ShopKit.press(self, strong)
 					pressed.emit()
@@ -201,7 +215,7 @@ class Seg:
 			t.position = Vector2(i * cw, 0)
 			t.size = Vector2(cw, 80)       # hit zone 80 (visible line 56)
 			t.position.y = -12
-			t.set_meta("ux_role", "tertiary" if i != sel else "seg_on")
+			t.set_meta("ux_role", "segment")      # a segmented control is navigation (like the navbar), not an action
 			var l: = V10ShopKit.lbl(String(names[i]), "ui", 22, V10DS.PAPER_100 if i == sel else V10DS.PAPER_500)
 			l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			l.position = Vector2(0, 12)

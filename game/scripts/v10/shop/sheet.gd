@@ -27,6 +27,14 @@ var _dim: Control
 var _h: = 0.0
 var _closing: = false
 var kind: = ""
+var busy: = false:     # a payment is in flight: tap-outside / × / back wait for the answer (nothing «где-то потом»)
+	set(v):
+		busy = v
+		if v and is_inside_tree():
+			# safety: a provider that never answers must not trap the player
+			get_tree().create_timer(20.0).timeout.connect(func():
+				if is_instance_valid(self):
+					busy = false)
 
 
 static func make(host: Control, title: String, k: = "") -> V10ShopSheet:
@@ -120,6 +128,9 @@ func finish(h: float) -> void:
 
 func close(instant: = false) -> void:
 	if _closing:
+		return
+	if busy and not instant:
+		V10ShopKit.deny(_panel)
 		return
 	_closing = true
 	if current == self:

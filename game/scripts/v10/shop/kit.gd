@@ -12,8 +12,11 @@ extends RefCounted
 #   fly(host, from, to, tex, n)  reward cascade: n sprites, 80 ms step, pentatonic notes up (UX §6.7)
 #   toast(host, text)         one line plate at the bottom third, fades in 4 s
 #   inhale(nodes)             «Вдох»: ≤ 5 elements, +12 px and fade, 240 ms, step 40 ms (UX §6.7)
+#   clear(host) / raise_fx(host)  rebuild helpers: free a screen's children but keep sheets and the feedback layer
+#                             (toast, hanko, flying rewards — group FX) so «Зачислено: …» survives a rebuild (UX §5.2.8)
 
 const DIR: = "res://assets/v10/shop/"
+const FX: = "v10_shop_fx"      # toast / hanko / flying rewards: kept when a screen rebuilds itself
 static var _tex: = {}
 static var mute: = false       # selftests
 
@@ -43,11 +46,34 @@ static func fx_on() -> bool:
 	return V10Hud2Util.fx_level() != "min"
 
 
-static func press(_node: Node = null, strong: = false) -> void:
+# «Слух видит иерархию» (UX §2.9, §7.4, З-2): the main action is the loudest, secondary −5 dB, quiet −9 dB
+static func press(node: Node = null, strong: = false) -> void:
 	if mute:
 		return
+	var role: = String(node.get_meta("ux_role", "")) if node != null else ""
+	if role in ["primary", "primary_cash"]:
+		strong = true
+	var db: = 0.0 if strong else (-9.0 if role in ["tertiary", "quiet", "link", "footer", "segment"] else -5.0)
 	V9Feel.haptic("button" if not strong else "match")
-	V9Feel.sound("pop")
+	V9Feel.sound("pop", 1.0, db)
+
+
+# free a screen's own children before it rebuilds — but never an open sheet or the feedback layer (FX)
+static func clear(host: Node) -> void:
+	for c in host.get_children():
+		if c is V10ShopSheet or c.is_in_group(FX):
+			continue
+		c.queue_free()
+
+
+# after a rebuild the kept sheet / toast / hanko must stay on top of the new children
+static func raise_fx(host: Node) -> void:
+	for c in host.get_children():
+		if c.is_in_group(FX) and not c.is_queued_for_deletion():
+			host.move_child(c, -1)
+	for c in host.get_children():
+		if c is V10ShopSheet and not c.is_queued_for_deletion():
+			host.move_child(c, -1)
 
 
 static func deny(node: CanvasItem = null) -> void:
@@ -57,8 +83,20 @@ static func deny(node: CanvasItem = null) -> void:
 	V9Feel.haptic("button")
 	V10Hud2Util.sfx("wood_dull")
 	if node:
-		node.modulate = Color(1, 1, 1, 0.7)
-		node.create_tween().tween_property(node, "modulate:a", 1.0, 0.2)
+		# dip and come back to the node's OWN alpha (a dimmed «Продолжить» on the age gate stays dimmed);
+		# repeated taps restart the dip from the same base instead of ratcheting it down
+		var base: = float(node.get_meta("_deny_a", node.modulate.a))
+		var old: Variant = node.get_meta("_deny_tw", null)
+		if old is Tween and (old as Tween).is_valid():
+			(old as Tween).kill()
+		node.set_meta("_deny_a", base)
+		node.modulate.a = base * 0.7
+		var tw: = node.create_tween()
+		tw.tween_property(node, "modulate:a", base, 0.2)
+		tw.tween_callback(func():
+			node.remove_meta("_deny_a")
+			node.remove_meta("_deny_tw"))
+		node.set_meta("_deny_tw", tw)
 
 
 static func lbl(text: String, role: String, size: int, color: Color, on_art: = false) -> Label:
@@ -83,6 +121,22 @@ static func art(t: Texture2D, r: Rect2, cover: = false) -> TextureRect:
 	return x
 
 
+# a closed item (UX §6.4): the painted art as a flat paper.700 silhouette — no lock, the text says «Откроется: …»
+static var _sil_mat: ShaderMaterial = null
+
+
+static func silhouette(t: Texture2D, r: Rect2) -> TextureRect:
+	var x: = art(t, r)
+	if _sil_mat == null:
+		var sh: = Shader.new()
+		sh.code = "shader_type canvas_item;\nuniform vec4 tint : source_color;\nvoid fragment() { COLOR = vec4(tint.rgb, texture(TEXTURE, UV).a * tint.a); }\n"
+		_sil_mat = ShaderMaterial.new()
+		_sil_mat.shader = sh
+		_sil_mat.set_shader_parameter("tint", V10DS.PAPER_700)
+	x.material = _sil_mat
+	return x
+
+
 static func hanko(host: Control, center: Vector2) -> void:
 	var t: = tex("hanko")
 	if t == null or host == null:
@@ -96,6 +150,7 @@ static func hanko(host: Control, center: Vector2) -> void:
 	s.pivot_offset = s.size * 0.5
 	s.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	s.name = "Hanko"
+	s.add_to_group(FX)
 	host.add_child(s)
 	if not mute:
 		V10Hud2Util.sfx("stamp")
@@ -143,6 +198,7 @@ static func fly(host: Control, from: Vector2, to: Vector2, t: Texture2D, n: = 6)
 		var jitter: = Vector2(randf_range(-40, 40), randf_range(-30, 30)) if n > 1 else Vector2.ZERO
 		s.position = from + jitter - s.size * 0.5
 		s.modulate.a = 0.0
+		s.add_to_group(FX)
 		host.add_child(s)
 		var tw: = s.create_tween()
 		tw.tween_interval(i * 0.08)
@@ -171,6 +227,7 @@ static func toast(host: Control, text: String) -> void:
 	var w: = minf(624.0, vs.x - 48.0)
 	var p: = ToastPlate.new()
 	p.name = "V10ShopToast"
+	p.add_to_group(FX)
 	p.size = Vector2(w, 72)
 	p.position = Vector2((host.size.x - w) * 0.5, host.size.y * 0.70)
 	p.mouse_filter = Control.MOUSE_FILTER_IGNORE

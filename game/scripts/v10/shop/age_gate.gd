@@ -6,7 +6,8 @@ extends Control
 # drum with nothing pre-selected; the button reads «Мне есть 18 · войти» only when the picked year is adult.
 # Too young for this build → a calm stop screen «Эта версия игры — для 18+», no retry loop, no hint what to pick.
 #
-#   var g := V10AgeGate.make(st, now_unix); g.done.connect(func(band): …)   # band: "adult" | "teen"
+#   if V10Age.needs_gate(st, now_unix):
+#       var g := V10AgeGate.make(st, now_unix); g.done.connect(func(band): …)   # band: "adult" | "teen" | "child" (stop)
 
 signal done(band: String)
 
@@ -27,6 +28,12 @@ static func make(state: Dictionary, now: int) -> V10AgeGate:
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
+	vs = get_viewport_rect().size
+	size = vs
+	# a year below this build's age was already given: the calm stop screen again, never a fresh drum
+	if V10Age.is_set(st) and not V10Age.allowed(int(st.age.year), now_unix):
+		_stop()
+		return
 	build()
 
 
@@ -156,13 +163,17 @@ class Drum:
 
 	func _gui_input(e: InputEvent) -> void:
 		if (e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT) or e is InputEventScreenTouch:
+			# touch + emulated mouse arrive as a pair: only the first press / release count (one snap, one haptic)
 			if e.pressed:
+				if _drag:
+					accept_event()
+					return
 				_drag = true
 				_y0 = e.position.y
 				if off < 0.0:
 					off = 12.0      # first touch wakes the drum on a CHILD year: an adult year is never pre-selected (neutral gate)
 				_o0 = off
-			else:
+			elif _drag:
 				_drag = false
 				_snap()
 			accept_event()

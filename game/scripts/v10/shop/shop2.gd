@@ -62,10 +62,7 @@ func _on_model() -> void:
 
 
 func _rebuild_all() -> void:
-	for c in get_children():
-		if c is V10ShopSheet:
-			continue
-		c.queue_free()
+	V10ShopKit.clear(self)          # keeps an open sheet and the toast / hanko / ad overlay
 	vs = get_viewport_rect().size
 	size = vs
 	var ins: = V10Hud2Util.safe_insets(vs)
@@ -110,6 +107,7 @@ func _rebuild_all() -> void:
 	scroll.clip_contents = true
 	add_child(scroll)
 	_build_tab()
+	V10ShopKit.raise_fx(self)
 
 
 func _set_tab(i: int) -> void:
@@ -243,9 +241,10 @@ func _gift_plate(y: float) -> Control:
 	if t:
 		p.add_child(V10ShopKit.art(t, Rect2(12, 12, 80, 80)))
 	var ready: = m.gift_ready()
-	var tl: = V10ShopKit.lbl("Подарок дня", "display", 28, V10DS.PAPER_100 if ready else V10DS.PAPER_500)
-	tl.position = Vector2(108, 14)
-	tl.size = Vector2(260, 40)
+	# plate M title: UI 22 (HUD_V2 §2.1) — the screen stays on 4 sizes (44 · 32 · 22 · 18, UX §3.7)
+	var tl: = V10ShopKit.lbl("Подарок дня", "ui_strong", 22, V10DS.PAPER_100 if ready else V10DS.PAPER_500)
+	tl.position = Vector2(108, 18)
+	tl.size = Vector2(260, 34)
 	p.add_child(tl)
 	var amount: = V10ShopTxt.amount("crystal", int(V10ShopData.GIFT_DAILY.crystal))
 	var sub: = "+" + amount if ready else "Завтра — новый"
@@ -260,12 +259,12 @@ func _gift_plate(y: float) -> Control:
 	if not ready:
 		return p
 	var bx: = col_w - 16
-	var tw_: = 232.0 if month and bool(ad.ok) else 176.0
-	var take: = V10Button.make("play", "Забрать ×2" if month and bool(ad.ok) else "Забрать", Vector2(tw_, 64))
+	var tw_: = 272.0 if month and bool(ad.ok) else 200.0     # the label stays at Display 32 (no 28/26 step)
+	var take: = V10Button.make("play", "Забрать ×2" if month and bool(ad.ok) else "Забрать", Vector2(tw_, 80))
 	take.name = "GiftTake"
 	take.sheen = false        # the screen keeps ONE sheen (the carousel card); the pill only breathes
 	bx -= tw_
-	take.position = Vector2(bx, 20)
+	take.position = Vector2(bx, 12)
 	take.set_meta("ux_role", "primary")
 	var from_x2: = month and bool(ad.ok)
 	take.pressed.connect(func():
@@ -273,10 +272,10 @@ func _gift_plate(y: float) -> Control:
 		_claim_gift(from_x2, take))
 	p.add_child(take)
 	if bool(ad.ok) and not month:
-		var x2: = V10Button.make("secondary", "×2", Vector2(96, 64))
+		var x2: = V10Button.make("secondary", "×2", Vector2(96, 80))
 		x2.name = "GiftX2"
 		bx -= 104
-		x2.position = Vector2(bx, 20)
+		x2.position = Vector2(bx, 12)
 		x2.set_meta("ux_role", "secondary")
 		x2.pressed.connect(func():
 			V10ShopKit.press(x2)
@@ -321,9 +320,10 @@ func _offer_card(c: Dictionary) -> Control:
 	if String(c.kind) == "month":
 		var dl: = m.econ.shop.month_days_left()
 		if dl > 0:
-			lines = ["Активен ещё %d %s" % [dl, V10ShopTxt.plural(dl, "день", "дня", "дней")], "+%s — в утреннем подносе" % V10ShopTxt.amount("crystal", int(V10Catalog.MONTH_DAILY.crystal))]
-			if dl <= 3:
-				lines[0] = "Абонемент до " + V10ShopTxt.date_short(m.now() + (dl - 1) * 86400)
+			# a date, never a personal countdown (UX §4.1.7, С-6)
+			lines = ["Абонемент до " + V10ShopTxt.date_short(m.now() + (dl - 1) * 86400), "+%s — в утреннем подносе" % V10ShopTxt.amount("crystal", int(V10Catalog.MONTH_DAILY.crystal))]
+	if not bool(c.available) and String(c.reason_txt) != "":
+		lines = [lines[0] if not lines.is_empty() else "", String(c.reason_txt)]
 	var ly: = 114.0
 	for i in mini(lines.size(), 2):
 		var l: = V10ShopKit.lbl(String(lines[i]), "ui", 18, V10DS.PAPER_300)
@@ -331,14 +331,15 @@ func _offer_card(c: Dictionary) -> Control:
 		l.size = Vector2(cw, 26)
 		card.add_child(l)
 		ly += 28
-	var pw: = V10ShopKit.lbl(String(c.per_wish), "ui", 18, V10DS.PAPER_500)
+	# under every ₽ price: «= N желаний · ≈ N ₽ за желание» (UX §5.2.2, С-3)
+	var pw: = V10ShopKit.lbl(V10ShopModel.value_line(c), "ui", 18, V10DS.PAPER_300)
 	pw.name = "PerWish"
 	pw.position = Vector2(x, 176)
 	pw.size = Vector2(cw, 26)
 	card.add_child(pw)
 	if String(c.kind) == "pass":
-		var open: = V10Button.make("secondary", "Смотреть", Vector2(200, 64))
-		open.position = Vector2(w - 16 - 200, 220)
+		var open: = V10Button.make("secondary", "Смотреть", Vector2(200, 80))
+		open.position = Vector2(w - 16 - 200, 212)
 		open.set_meta("ux_role", "secondary")
 		open.pressed.connect(func():
 			V10ShopKit.press(open)
@@ -355,19 +356,25 @@ func _offer_card(c: Dictionary) -> Control:
 		var id: = String(c.id)
 		cash.pressed.connect(func(): V10ShopFlow.confirm(self, m, id))
 		card.add_child(cash)
-		if not bool(c.available):
-			pw.text = String(c.reason_txt)
-	# ladder: the next step as a silhouette (UX §6.4: closed = paper.700 + «Откроется: …»)
+	# ladder: the next step as a silhouette (UX §6.4: closed = paper.700 silhouette + «Откроется: …»); the text
+	# itself is information, so it stays at paper.500 (≥ 4.5:1, В-2)
 	if String(c.kind) == "starter":
 		var nx: Dictionary = m.ladder().next
 		if not nx.is_empty():
-			var nl: = V10ShopKit.lbl("Дальше: " + String(nx.title), "ui", 18, V10DS.PAPER_700)
-			nl.position = Vector2(16, 236)
-			nl.size = Vector2(w - 16 - 200 - 32, 26)
+			var st_: = V10ShopKit.tex(String(nx.get("art", "")))
+			var tx: = 16.0
+			if st_:
+				var sil: = V10ShopKit.silhouette(st_, Rect2(16, 234, 52, 52))
+				sil.name = "NextSilhouette"
+				card.add_child(sil)
+				tx = 80.0
+			var nl: = V10ShopKit.lbl("Дальше: " + String(nx.title), "ui", 18, V10DS.PAPER_500)
+			nl.position = Vector2(tx, 236)
+			nl.size = Vector2(w - tx - 200 - 32, 26)
 			card.add_child(nl)
-			var ul: = V10ShopKit.lbl(String(nx.unlock), "ui", 18, V10DS.PAPER_700)
-			ul.position = Vector2(16, 262)
-			ul.size = Vector2(w - 16 - 200 - 32, 26)
+			var ul: = V10ShopKit.lbl(String(nx.unlock), "ui", 18, V10DS.PAPER_500)
+			ul.position = Vector2(tx, 262)
+			ul.size = Vector2(w - tx - 200 - 32, 26)
 			card.add_child(ul)
 	return card
 
@@ -540,7 +547,7 @@ func _topup(first: Array) -> float:
 
 
 func _pack_row(c: Dictionary) -> Control:
-	var h: = 156.0 if bool(c.best) and String(c.first_txt) != "" else 128.0
+	var h: = 156.0 if bool(c.best) and (String(c.first_txt) != "" or not bool(c.available)) else 128.0
 	var p: = V10ShopW.Lac.new()
 	p.size = Vector2(col_w, h)
 	p.name = "Pack_" + String(c.id)
@@ -569,9 +576,12 @@ func _pack_row(c: Dictionary) -> Control:
 		lb.size = Vector2(tw, 26)
 		p.add_child(lb)
 		ly += 28
-	if String(c.first_txt) != "":
+	var note: = String(c.first_txt)
+	if not bool(c.available) and String(c.reason_txt) != "":
+		note = String(c.reason_txt)       # the reason goes to the note; «= N желаний · ≈ ₽» stays (С-3)
+	if note != "":
 		var l3: = V10ShopKit.lbl("", "ui", 18, V10DS.PAPER_500)
-		V10Type.fit(l3, String(c.first_txt), "caption_m", tw, 1, V10DS.PAPER_500)
+		V10Type.fit(l3, note, "caption_m", tw, 1, V10DS.PAPER_500)
 		l3.name = "Note"
 		l3.position = Vector2(x, ly)
 		l3.size = Vector2(tw, 26)
@@ -584,30 +594,36 @@ func _pack_row(c: Dictionary) -> Control:
 	var id: = String(c.id)
 	cash.pressed.connect(func(): V10ShopFlow.confirm(self, m, id))
 	p.add_child(cash)
-	if not bool(c.available) and String(c.reason_txt) != "":
-		l2.text = String(c.reason_txt)
 	return p
 
 
 # ---- footer
+# the footer row of UX §3.2 is ONE quiet component (like the lanterns of Чайная): 3 text links in one 80 px row
 func _footer(y: float) -> float:
 	var names: = ["Мои покупки", "Восстановить покупки", "Шансы и правила"]
 	var ids: = ["purchases", "restore", "odds"]
 	var w: = col_w / 3.0
+	var row: = Control.new()
+	row.name = "Footer"
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.position = Vector2(col_x, y)
+	row.size = Vector2(col_w, 80)
+	row.set_meta("ux_role", "tertiary")
+	content.add_child(row)
 	for i in 3:
 		var t: = V10ShopW.Tap.new()
 		t.dip = false
 		t.name = "Foot_" + ids[i]
-		t.position = Vector2(col_x + i * w, y)
+		t.position = Vector2(i * w, 0)
 		t.size = Vector2(w, 80)
-		t.set_meta("ux_role", "tertiary")
+		t.set_meta("ux_role", "footer")
 		var l: = V10ShopKit.lbl(names[i], "ui", 18, V10DS.PAPER_300)
 		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		l.size = t.size
 		t.add_child(l)
 		var id: String = ids[i]
 		t.pressed.connect(func(): _footer_tap(id))
-		content.add_child(t)
+		row.add_child(t)
 	return y + 80
 
 
@@ -712,12 +728,18 @@ class Carousel:
 			if _moved > 12:
 				accept_event()
 		elif (e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT) or e is InputEventScreenTouch:
+			# one finger arrives twice (touch + emulated mouse, or mouse + emulated touch: both emulations are on in
+			# project.godot) — only the first press and the first release count, else one swipe skips a card
 			if e.pressed:
+				if _drag:
+					return
 				_drag = true
 				_x0 = e.position.x
 				_tx0 = track.position.x
 				_moved = 0.0
 			else:
+				if not _drag:
+					return
 				_drag = false
 				var dx: float = e.position.x - _x0
 				if absf(dx) > 64:

@@ -72,6 +72,21 @@ static func is_set(st: Dictionary) -> bool:
 	return int(ensure(st).year) > 0
 
 
+# the gate must show on EVERY start until an allowed year is stored: a year below min_age keeps the stop screen
+# (otherwise a restart would skip it, since the year is already set)
+static func needs_gate(st: Dictionary, now_unix: int) -> bool:
+	var a: = ensure(st)
+	return int(a.year) <= 0 or not allowed(int(a.year), now_unix)
+
+
+# the band follows the calendar (a 17-year-old turns 18 next year); call with V10Meta/econ time on load
+static func refresh(st: Dictionary, now_unix: int) -> String:
+	var a: = ensure(st)
+	if int(a.year) > 0:
+		a.band = band_of(int(a.year), now_unix)
+	return String(a.band)
+
+
 static func band(st: Dictionary) -> String:
 	return String(ensure(st).band)
 

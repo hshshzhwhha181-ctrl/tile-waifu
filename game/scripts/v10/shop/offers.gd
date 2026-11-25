@@ -3,11 +3,12 @@ extends RefCounted
 
 # V10Offers — when a ladder offer may pop up (spec 0.10 Л3/Л7, UX §5.2.4, checklist О-3).
 #   At most once per calendar day, ONLY right after a win (never after a loss), from Path level 8, not in the first
-#   10 minutes after install, not in the session where the first SSR is chosen. Nothing else in the game may open an
-#   offer by itself. Before the guarantee and the Candle the banner shows counters only — no windows.
+#   10 minutes after install, not in the session where the first SSR is chosen and not for 24 h after it (UX §3.5).
+#   Nothing else in the game may open an offer by itself. Before the guarantee and the Candle the banner shows counters only — no windows.
 #
 # State (S.v10_shop.offers): {"last_day": -1, "shown": n}
-# ctx: {"now": unix, "install": unix, "level": int, "result": "win"|"lose"|"", "first_ssr_session": bool, "day": int}
+# ctx: {"now": unix, "install": unix, "level": int, "result": "win"|"lose"|"", "first_ssr_session": bool,
+#       "first_ssr_t": unix (0 = no SSR yet), "day": int}
 
 
 static func ensure(st: Dictionary) -> Dictionary:
@@ -28,6 +29,10 @@ static func can_popup(st: Dictionary, ctx: Dictionary) -> Dictionary:
 	if int(ctx.get("now", 0)) - int(ctx.get("install", 0)) < V10ShopData.POPUP_QUIET_SEC:
 		return {"ok": false, "why": "quiet"}
 	if bool(ctx.get("first_ssr_session", false)):
+		return {"ok": false, "why": "first_ssr"}
+	# UX §3.5: no offer in the first-SSR session AND for 24 h after it (first_ssr_t: unix of the first SSR, 0 = none yet)
+	var fs: = int(ctx.get("first_ssr_t", 0))
+	if fs > 0 and int(ctx.get("now", 0)) - fs < 86400:
 		return {"ok": false, "why": "first_ssr"}
 	if int(o.last_day) == int(ctx.get("day", -2)):
 		return {"ok": false, "why": "today"}
