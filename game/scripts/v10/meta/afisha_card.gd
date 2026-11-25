@@ -237,7 +237,8 @@ func _stamp_on(row: Control, animated: bool) -> void:
 		return
 	for c in row.get_children():
 		if c is CanvasItem and c.name != "Stamp" and c.name != "Hair":
-			(c as CanvasItem).modulate.a = 0.55
+			# dimmed, but its captions keep ≥ 4.5:1 on the plate (paper.500 at 0.75 ≈ 4.9:1, В-2)
+			(c as CanvasItem).modulate.a = 0.75
 	var fs: = V10MetaUI.FS_DISPLAY
 	var f: = UI.font("title", 700)
 	var txt: = "Сыграно"

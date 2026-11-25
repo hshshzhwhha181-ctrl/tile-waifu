@@ -100,7 +100,25 @@ func _shots() -> void:
 	await _notify_shot()
 	await _shop_shot()
 	print("META_SHOTS %s" % ("ok" if errors == 0 else "errors=%d" % errors))
+	await _teardown()
 	get_tree().quit(0 if errors == 0 else 1)
+
+
+# drop what static vars hold before the engine shuts down: the loaded main.tscn, lambdas bound to this runner, and the
+# 0.9 static font/material caches — fonts outliving the TextServer abort the process on exit (code 134)
+func _teardown() -> void:
+	if stage and is_instance_valid(stage):
+		stage.queue_free()
+		stage = null
+	V10WinStack.clear()
+	for k in V10Afisha.providers.keys():
+		V10Afisha.set_provider(k, Callable())
+	V10MoreLevel.label_of = Callable()
+	await get_tree().process_frame
+	await get_tree().process_frame
+	UI._fonts.clear()
+	Fx._add = null
+	JButton._desat_mat = null
 
 
 # ── victory: mock 0.9 plate + the real V10WinPanel, bottom-anchored (HUD_V2 §8.3) ─────────────────────────────
@@ -293,8 +311,9 @@ func _shop_shot() -> void:
 	G.S.profile_done = true
 	var main: Control = load("res://main.tscn").instantiate()
 	s.add_child(main)
-	await get_tree().process_frame
-	# dismiss the title splash main.gd adds after its first screen with a tap (as a player would)
+	# dismiss the title splash main.gd adds after its first screen with a tap (as a player would); the splash only
+	# listens for taps 0.8 s after it appears, and fades out in 0.45 s
+	await _wait(1.0)
 	var past: = false
 	var tap: = InputEventMouseButton.new()
 	tap.button_index = MOUSE_BUTTON_LEFT

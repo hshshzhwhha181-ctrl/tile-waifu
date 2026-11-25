@@ -119,7 +119,7 @@ func _cat_row(cat: String, r: Rect2, consent: bool) -> Control:
 	t.position = Vector2(24, 8)
 	V10MetaUI.trim(t, Vector2(tw, 32))
 	row.add_child(t)
-	var s: = V10MetaUI.text(CAT_SUB[cat], V10MetaUI.FS_CAPTION, V10MetaUI.PAPER_500 if consent else V10MetaUI.PAPER_700,
+	var s: = V10MetaUI.text(CAT_SUB[cat], V10MetaUI.FS_CAPTION, V10MetaUI.PAPER_500,
 		"body", 700)
 	s.position = Vector2(24, 42)
 	V10MetaUI.trim(s, Vector2(tw, 28))

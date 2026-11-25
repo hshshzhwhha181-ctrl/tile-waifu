@@ -415,6 +415,8 @@ static func _win() -> void:
 	check(built.size() == 2, "build_bars → 2 controls")
 	for b in built:
 		(b as Node).free()
+	V10WinStack.add_bar("salon", V10WinStack.PRIO_SALON, mk.call("salon"))
+	check(ids.call(V10WinStack.pick({"mode": "blitz"})).find("salon") < 0, "salon registered without modes stays path-only")
 	V10WinStack.add_bar("salon", V10WinStack.PRIO_SALON, func(_c, _w): return null, {"modes": ["path"]})
 	var b2: = V10WinStack.build_bars({"mode": "path"}, 600.0)
 	check(b2.size() == 2 and str(b2[0].name) == "mastery" and str(b2[1].name) == "pass", "an empty salon bar gives its place")
@@ -437,6 +439,17 @@ static func _win() -> void:
 		if c.has_meta("v10_bar_id"):
 			nbars += 1
 	check(nbars == 2, "the panel shows ≤ 2 bars with 9 registered (%d)" % nbars)
+	for i in 3:
+		V10WinStack.add_tick("wide%d" % i, func(_c): return {"icon": "gift", "text": "Очень длинная подпись тика %d" % i},
+			{"order": 5 + i})
+	var pw: = V10WinPanel.make({"mode": "path", "level": 3, "count": 10, "stars_map": {}}, 620.0)
+	var tr_end: = 0.0
+	for c in pw.tick_row.get_children():
+		tr_end = maxf(tr_end, (c as Control).position.x + (c as Control).size.x)
+	check(pw.tick_row != null and tr_end <= 620.5, "5 ticks never run past the panel edge (%d)" % int(tr_end))
+	pw.free()
+	for i in 3:
+		V10WinStack.remove("wide%d" % i)
 	check(p.more_btn != null and p.more_btn.lbl.text == "Ещё уровень · 5", "panel button «Ещё уровень · 5» (%s)" % (p.more_btn.lbl.text if p.more_btn else "-"))
 	check(p.alt_btn != null and str(p.alt_btn.lbl.text).begins_with("В чайную"), "no salon → secondary «В чайную» (UX §3.4)")
 	var rl: = V10MetaUI.roles(p)

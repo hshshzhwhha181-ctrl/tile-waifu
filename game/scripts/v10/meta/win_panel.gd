@@ -39,7 +39,7 @@ var bars: Array = []
 var tick_row: Control
 var more_btn: JButton
 var alt_btn: Control
-var end_note: Label
+var end_note: Control
 var st: Dictionary
 var _h: = 0.0
 var _going: = false
@@ -100,6 +100,9 @@ func _build_ticks(tk: Array) -> Control:
 		total += cw
 	var gap: = 8.0
 	total += gap * (chips.size() - 1)
+	# one row only: the ticks that do not fit are dropped from the end (lowest order), never drawn past the edge
+	while total > w and chips.size() > 1:
+		total -= chips.pop_back()[1] + gap
 	var x: = maxf(0.0, (w - total) * 0.5)
 	for c in chips:
 		var d: Dictionary = c[0]
@@ -140,13 +143,19 @@ func _build_buttons(y: float) -> float:
 		add_child(alt_btn)
 		return y + ALT_H
 	# the end of the path: say why, and the way home is the main action
-	end_note = V10MetaUI.text(str(st.text), V10MetaUI.FS_CAPTION, V10MetaUI.PAPER_300, "body", 800)
+	# on a night plate like the ticks: Caption 18 straight on the scene art fails the 4.5:1 contrast (В-2)
+	var nt: = str(st.text)
+	var nw: = minf(w, UI.font("body", 800).get_string_size(nt, HORIZONTAL_ALIGNMENT_LEFT, -1, V10MetaUI.FS_CAPTION).x + 32.0)
+	end_note = V10MetaUI.plate(Rect2((w - nw) * 0.5, y, nw, 36), V10MetaUI.NIGHT_800, 0.85, false)
 	end_note.name = "EndNote"
-	end_note.position = Vector2(0, y)
-	end_note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	V10MetaUI.trim(end_note, Vector2(w, 26))
+	var nl: = V10MetaUI.text(nt, V10MetaUI.FS_CAPTION, V10MetaUI.PAPER_300, "body", 800)
+	nl.position = Vector2(16, 0)
+	nl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	nl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	V10MetaUI.trim(nl, Vector2(nw - 32, 36))
+	end_note.add_child(nl)
 	add_child(end_note)
-	y += 26.0 + 12.0
+	y += 36.0 + 12.0
 	more_btn = JButton.make("В чайную", "gold", Rect2(bx, y, bw, BTN_H), null, V10MetaUI.FS_DISPLAY)
 	more_btn.name = "HomeBtn"
 	more_btn.pulse = true
