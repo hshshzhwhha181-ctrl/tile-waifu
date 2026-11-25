@@ -36,7 +36,8 @@ const MILESTONES: = {
 	14: {"tickets": 1},
 	30: {"frame": "fr_tea_1"},
 	60: {"gems": 200, "frame": "fr_tea_2"},
-	100: {"badge": "tea_bowl_master"},
+	# V10ProfileCos ids: badge «Сто чашек» and title «Год у стола» (the registry also unlocks them from streak best)
+	100: {"badge": "b_streak_100"},
 	365: {"title": "t_year"},
 }
 const PENDING_MAX: = 8

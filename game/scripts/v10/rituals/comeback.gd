@@ -74,8 +74,12 @@ static func check(key: = "") -> Dictionary:
 	var last: = str(s.last_seen_key)
 	if last == key:
 		return res
+	# a wrong clock (moved back) must not move last_seen into the past: the next good day would then look like a
+	# long absence and hand out a scene, Отдых and a ladder with 10 билетов
+	if not V10RitClock.clock_ok() or (last != "" and V10RitClock.days_between(last, key) < 0):
+		return res
 	s.last_seen_key = key
-	if last == "" or not V10RitClock.clock_ok():
+	if last == "":
 		return res
 	var gap: = V10RitClock.days_between(last, key)
 	res.gap = gap

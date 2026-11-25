@@ -274,6 +274,14 @@ static func _comeback() -> void:
 	r = V10Comeback.check("2026-03-15")
 	_t(r.tier == "waited" and r.ladder == "short" and int(s.rested) == 600, "gap 12 → waited, short ladder, Отдых (%s)" % [r])
 	_t(V10Comeback.check("2026-03-15").tier == "", "second check same day → nothing")
+	# a clock moved back never fakes an absence (no free scene, Отдых or ladder)
+	V10RitClock.force_clock = 0
+	_at("2026-02-10")
+	V10Comeback.check("2026-02-10")
+	V10RitClock.force_clock = -1
+	V10Comeback.check("2026-02-11")
+	_t(str(s.last_seen_key) == "2026-03-15", "clock moved back does not move last_seen into the past")
+	_at("2026-03-15")
 	var sc: = V10Comeback.take_scene()
 	_t(sc.tier == "waited" and V10Comeback.take_scene().is_empty(), "scene consumed once")
 	# rested: ×1 in ranked, consumed per pair
