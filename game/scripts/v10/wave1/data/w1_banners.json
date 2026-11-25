@@ -1,0 +1,34 @@
+{
+  "ver": 1,
+  "about": "Wave 1 (tsubame, miel, kohaku, shirin, zlata) in the Wishes: the 3+3 phase plan from 2027-02-15 (phase 4), same schema as v10/gacha/data/banners.json. Merged by V10W1Gacha.merge() only behind V10Wave1.released(). Even index = A «Новая луна», odd = B «Полнолуние», like the base plan, so any splice keeps A/B alternating.",
+  "anchor": "2026-11-23",
+  "phase_days": 21,
+  "from": "2027-02-15",
+  "phases": [
+    {"id": "nm_sugar_ball", "kind": "phase", "half": "A", "name": "Новая луна", "sub": "Сахарный бал", "ssr": ["me_gala"], "s_up": ["me_parlor", "ko_base", "sh_base"], "hero": "miel", "color": "e0566f", "font": "playfair", "from": "2027-02-15", "note": "Миэль, день рождения 27 февраля; первая волна S: Кохаку и Ширин"},
+    {"id": "fm_maslenitsa", "kind": "phase", "half": "B", "name": "Масленица", "sub": "Злата и Маджонг-тян", "ssr": ["zl_base", "o_dragon"], "s_up": ["ko_base", "sh_base", "tb_post"], "hero": "zlata", "color": "ff7a2a", "font": "zlata", "from": "2027-03-08", "debut": "zlata", "art": "res://assets/v10/wave1/gacha/key_maslenitsa.webp", "fest": {"name": "Масленичная неделя", "from": "2027-03-08", "to": "2027-03-15"}, "note": "Флагман 1.0: Злата «Жар-птица» — цель желания по умолчанию; день рождения Златы 18 марта"},
+    {"id": "nm_kyubi", "kind": "phase", "half": "A", "name": "Новая луна", "sub": "Девятихвостая", "ssr": ["ko_kyubi"], "s_up": ["ko_base", "me_parlor", "o_cafe"], "hero": "kohaku", "color": "e2a23d", "font": "playfair", "from": "2027-03-29"},
+    {"id": "fm_fox_sugar", "kind": "phase", "half": "B", "name": "Полнолуние", "sub": "Кохаку и Миэль", "ssr": ["ko_kyubi", "me_gala"], "s_up": ["sh_base", "tb_post", "r_after"], "hero": "kohaku", "color": "e2a23d", "font": "playfair", "from": "2027-04-19", "note": "Кохаку, день рождения 27 апреля"},
+    {"id": "nm_crimson", "kind": "phase", "half": "A", "name": "Новая луна", "sub": "Алая луна клана", "ssr": ["tb_crimson"], "s_up": ["tb_post", "sh_base", "n_base"], "hero": "tsubame", "color": "c8283c", "font": "playfair", "from": "2027-05-10", "note": "Цубамэ, день рождения 20 мая"},
+    {"id": "fm_swallow_gym", "kind": "phase", "half": "B", "name": "Полнолуние", "sub": "Цубамэ и Хана", "ssr": ["tb_crimson", "h_gym"], "s_up": ["ko_base", "h_street", "y_base"], "hero": "tsubame", "color": "c8283c", "font": "playfair", "from": "2027-05-31"},
+    {"id": "nm_kupala", "kind": "phase", "half": "A", "name": "Купальская ночь", "sub": "Царица-пламя", "ssr": ["zl_ember"], "s_up": ["sh_base", "me_parlor", "r_maid"], "hero": "zlata", "color": "ff7a2a", "font": "zlata", "from": "2027-06-21", "fest": {"name": "Купальская ночь", "from": "2027-07-05", "to": "2027-07-08"}, "note": "Второй SSR-наряд Златы на Ивана Купалу (6–7 июля)"},
+    {"id": "fm_moon_fox", "kind": "phase", "half": "B", "name": "Полнолуние", "sub": "Юэ и Кохаку", "ssr": ["y_duel", "ko_kyubi"], "s_up": ["tb_post", "ko_base", "n_base"], "hero": "yue", "color": "c8b6ff", "font": "playfair", "from": "2027-07-12"},
+    {"id": "nm_noon_sun", "kind": "phase", "half": "A", "name": "Новая луна", "sub": "Дочь полуденного солнца", "ssr": ["sh_sun"], "s_up": ["sh_base", "tb_post", "h_street"], "hero": "shirin", "color": "d9b26f", "font": "playfair", "from": "2027-08-02"},
+    {"id": "fm_sun_sugar", "kind": "phase", "half": "B", "name": "Полнолуние", "sub": "Ширин и Миэль", "ssr": ["sh_sun", "me_gala"], "s_up": ["sh_base", "ko_base", "o_cafe"], "hero": "shirin", "color": "d9b26f", "font": "playfair", "from": "2027-08-23", "note": "Ширин, день рождения 27 августа"},
+    {"id": "nm_star_tent", "kind": "phase", "half": "A", "name": "Новая луна", "sub": "Шатёр под звёздами", "ssr": ["sh_night"], "s_up": ["sh_base", "me_parlor", "y_base"], "hero": "shirin", "color": "d9b26f", "font": "playfair", "from": "2027-09-13"},
+    {"id": "fm_firebird_return", "kind": "phase", "half": "B", "name": "Полнолуние", "sub": "Жар-птица и Царица-пламя", "ssr": ["zl_base", "zl_ember"], "s_up": ["ko_base", "sh_base", "tb_post"], "hero": "zlata", "color": "ff7a2a", "font": "zlata", "from": "2027-10-04", "rerun": true, "note": "Возвращение Златы через 7 месяцев; после этой фазы оба её SSR-наряда — в «Пяти ветрах»"}
+  ],
+  "std_entry": {"zl_base": "2027-10-25", "zl_ember": "2027-10-25"},
+  "notice_days": 14,
+  "login7": [
+    {"id": "w1_letters_tsubame", "hero": "tsubame", "item": "tb_base", "name": "Семь писем Цубамэ", "unit": "Письмо", "from": "2027-04-05", "days": 21, "need": 7, "icon": "res://assets/v10/wave1/outfits/tb_base.webp"},
+    {"id": "w1_treats_miel", "hero": "miel", "item": "me_base", "name": "Семь угощений Миэль", "unit": "Угощение", "from": "2027-07-05", "days": 21, "need": 7, "icon": "res://assets/v10/wave1/outfits/me_base.webp"}
+  ],
+  "events": [
+    {"id": "bake_1", "name": "Испечь вместе", "hero": "miel", "from": "2027-05-24", "days": 14, "track_reward": "me_parlor", "how": "общая шкала с Миэль, очки из любого режима (ROADMAP 1.0); награда в конце шкалы — наряд «Салон „Мёд“»"}
+  ],
+  "econ": [
+    {"id": "lim_zlata", "kind": "limited", "name": "Масленица", "counter": "limited", "cost": 150, "featured": ["zlata"], "from": "2027-03-08", "to": "2027-03-29"},
+    {"id": "rerun_zlata", "kind": "limited", "name": "Возвращение Жар-птицы", "counter": "limited", "cost": 150, "featured": ["zlata"], "from": "2027-10-04", "to": "2027-10-25"}
+  ]
+}

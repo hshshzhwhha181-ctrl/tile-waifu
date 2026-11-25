@@ -1,0 +1,11 @@
+{
+ "v": 1,
+ "note": "Wave 1 chat meta. Birthdays per docs/0.10-spec.md §Р6 (MM-DD), equal to V10BdayData.DATES.",
+ "birthdays": {
+  "tsubame": "05-20",
+  "miel": "02-27",
+  "kohaku": "04-27",
+  "shirin": "08-27",
+  "zlata": "03-18"
+ }
+}
