@@ -4,9 +4,12 @@ extends Control
 # «Классика» mode screen (MODES §6.3: one transition from the «Столы» shelf). Magazine cover (UX §6.8): the hostess
 # stands on the right, the title on the left; one primary «Играть», the variant segment and the content of the
 # variant (form shelf / form of the day / memory sizes), mastery as one thin bar. Words ≤ 60, tappables ≤ 10.
-#   setup(main, args) — args: hero (hostess, default "mc"), fx, no_save
-#   signal play(args)  — args for V10MjClassicScreen / V10MjClassicMemory (variant, form, diff, size, hero, seed)
+#   setup(main, args) — args: hero (the card's hostess on the cover, default "mc"), partner (the heroine of a free
+#                       game, default G.S.partner), fx, no_save, variant (start on "free" | "daily" | "memory")
+#   signal play(args)  — args for V10MjClassicScreen / V10MjClassicMemory (variant, form, diff, size, hero, host)
 #   signal back
+# The cover follows the variant: «Свободная» — the card's hostess, «Раскладка дня» — the heroine of the day (she hosts
+# the match), «Память» — Юэ, the hostess of Memory (her crest on the backs).
 
 signal play(args: Dictionary)
 signal back
@@ -14,9 +17,12 @@ signal back
 const SIZES: = ["4x4", "4x5", "5x6", "6x6"]
 const DIFFS: = [["easy", "Лёгкая"], ["normal", "Обычная"], ["master", "Мастер"]]
 
+const MEMORY_HOST: = "yue"
+
 var main: Node
 var args: = {}
 var hero: = "mc"
+var partner: = "mc"
 var variant: = "free"
 var form_id: = "turtle"
 var diff: = "normal"
@@ -36,6 +42,12 @@ func setup(main_: Node, a: Dictionary) -> void:
 	main = main_
 	args = a
 	hero = String(a.get("hero", "mc"))
+	partner = String(a.get("partner", G.S.get("partner", "mc") if G.get("S") is Dictionary else "mc"))
+	if not V10MjClassicStyle.HERO_ACCENT.has(partner):
+		partner = "mc"
+	variant = String(a.get("variant", "free"))
+	if not variant in ["free", "daily", "memory"]:
+		variant = "free"
 	no_save = bool(a.get("no_save", false))
 	var d: = V10MjClassicData.st()
 	form_id = String(d.get("last_form", "turtle"))
@@ -72,9 +84,7 @@ func _build() -> void:
 	add_child(sh)
 	# the hostess, full height on the right (cut by the right edge), lit by her accent
 	hero_art = TextureRect.new()
-	var hp: = "res://assets/hero/%s.png" % hero
-	if ResourceLoader.exists(hp):
-		hero_art.texture = load(hp)
+	hero_art.texture = _art(cover_hero())
 	hero_art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	hero_art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT
 	var hh: = minf(720.0 + extra, 860.0)
@@ -86,6 +96,13 @@ func _build() -> void:
 	fade.position = Vector2(0, 40 + hh - 220)
 	fade.size = Vector2(vs.x, 240)
 	add_child(fade)
+	# below the fade the same depth goes on to the bottom edge: no seam under the hostess
+	var deep: = ColorRect.new()
+	deep.color = Color(T.night900, 0.92)
+	deep.position = Vector2(0, fade.position.y + fade.size.y - 1)
+	deep.size = Vector2(vs.x, maxf(0.0, vs.y - deep.position.y))
+	deep.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(deep)
 	var back_b: = V10MjClassicStyle.Btn.new("quiet", "", "back")
 	back_b.size = Vector2(80, 80)
 	back_b.position = Vector2(8, 20)
@@ -115,11 +132,13 @@ func _build() -> void:
 	add_child(diff_col)
 	var y0: = 40.0 + hh + maxf(0.0, (720.0 + extra) - hh) * 0.5
 	seg = _Segment.new()
-	seg.items = ["Свободная", "Раскладка дня", "Память"]
+	seg.items = V10MjClassicInfo.VARIANTS.map(func(v): return v[1])
+	seg.idx = ["free", "daily", "memory"].find(variant)
 	seg.size = Vector2(vs.x - 48, 80)
 	seg.position = Vector2(24, y0)
 	seg.changed.connect(func(i):
 		variant = ["free", "daily", "memory"][i]
+		_swap_art()
 		_fill())
 	add_child(seg)
 	content = Control.new()
@@ -137,6 +156,43 @@ func _build() -> void:
 	play_btn.pressed.connect(_go)
 	add_child(play_btn)
 	_fill()
+
+
+# the heroine on the cover for the chosen variant
+func cover_hero() -> String:
+	match variant:
+		"daily":
+			return V10MjClassicData.daily_host(V10MjClassicData.msk_date())
+		"memory":
+			return MEMORY_HOST if V10MjClassicLayouts._roster().is_empty() or V10MjClassicLayouts._roster().has(MEMORY_HOST) else hero
+	return hero
+
+
+static func _hero_name(h: String) -> String:
+	if G.get("HEROES") is Dictionary and (G.HEROES as Dictionary).has(h):
+		return String(G.HEROES[h].name)
+	return {"mc": "Маджонг-тян", "rin": "Рин", "hana": "Хана", "yue": "Юэ", "nova": "Нова"}.get(h, h)
+
+
+static func _art(h: String) -> Texture2D:
+	for k in [h, "mc"]:
+		var p: = "res://assets/hero/%s.png" % k
+		if ResourceLoader.exists(p):
+			return load(p)
+	return null
+
+
+func _swap_art() -> void:
+	var tex: = _art(cover_hero())
+	if hero_art == null or tex == hero_art.texture:
+		return
+	if String(args.get("fx", "full")) == "min":
+		hero_art.texture = tex
+		return
+	var tw: = hero_art.create_tween()
+	tw.tween_property(hero_art, "modulate:a", 0.0, 0.12)
+	tw.tween_callback(func(): hero_art.texture = tex)
+	tw.tween_property(hero_art, "modulate:a", 1.0, 0.2)
 
 
 class _Fade:
@@ -331,6 +387,10 @@ func _fill() -> void:
 			var l1: = V10MjClassicStyle.label("Одна форма для всех", 22, T.paper300, "body", 700)
 			l1.position = Vector2(278, 84)
 			content.add_child(l1)
+			var host: = V10MjClassicData.daily_host(date)
+			var hl: = V10MjClassicStyle.label("Ведёт %s" % _hero_name(host), 22, T.paper500, "body", 700)
+			hl.position = Vector2(278, 160)
+			content.add_child(hl)
 			var dd: Dictionary = d.daily
 			var t2: = "Сыграй — сравним время"
 			if dd.get("date", "") == date and dd.get("done", false):
@@ -346,7 +406,7 @@ func _fill() -> void:
 				c5.size = Vector2(w, 236)
 				c5.position = Vector2(32 + i * (w + 12), 0)
 				c5.sz = sz
-				c5.hero = hero
+				c5.hero = cover_hero()
 				c5.best = int(d.memory.get(sz, 0))
 				c5.on = sz == mem_size
 				c5.picked.connect(func(s):
@@ -370,8 +430,7 @@ class _MemCard:
 	var crest: Texture2D
 	func _ready() -> void:
 		mouse_filter = Control.MOUSE_FILTER_STOP
-		var p: = "res://assets/v10/mj/classic/crest_%s.png" % hero
-		crest = load(p) if ResourceLoader.exists(p) else null
+		crest = V10MjClassicMemory.crest_tex(hero)
 	func _gui_input(e: InputEvent) -> void:
 		if (e is InputEventScreenTouch or (e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT)) and not e.pressed:
 			picked.emit(sz)
@@ -412,7 +471,7 @@ func _draw_mastery(mastery: Control) -> void:
 
 
 func _go() -> void:
-	var a: = {"variant": variant, "hero": hero, "fx": args.get("fx", "full"), "no_save": no_save}
+	var a: = {"variant": variant, "hero": partner, "fx": args.get("fx", "full"), "no_save": no_save}
 	match variant:
 		"free":
 			a.form = form_id
@@ -422,8 +481,11 @@ func _go() -> void:
 				V10MjClassicData.save()
 		"daily":
 			a.date = V10MjClassicData.msk_date()
+			a.host = V10MjClassicData.daily_host(a.date)
+			a.erase("hero")
 		"memory":
 			a.size = mem_size
+			a.hero = cover_hero()
 	play.emit(a)
 
 

@@ -36,6 +36,12 @@ static func font(kind: = "body", weight: = 800) -> Font:
 	return UI.font(kind, weight)
 
 
+# Playfair Italic (combo «×4», the name of her Приём)
+static func italic() -> Font:
+	var p: = "res://assets/fonts/playfair-i-cyr.woff2"
+	return load(p) if ResourceLoader.exists(p) else UI.font("title", 700)
+
+
 static func label(text: String, size: int, col: Color, kind: = "body", weight: = 800) -> Label:
 	var l: = Label.new()
 	l.text = text
@@ -75,6 +81,7 @@ class Btn:
 	var _down: = false
 	var _breath: = 0.0
 	var breathe: = false
+	var backdrop: = false   # quiet: a soft dark disc under the glyph (over a busy band picture)
 
 	func _init(k: = "second", t: = "", ic: = "") -> void:
 		kind = k
@@ -139,6 +146,8 @@ class Btn:
 					V10MjClassicStyle.glyph(self, icon, Vector2(x0 + w2 + 20, size.y * 0.5), 18, T.gold500)
 			"quiet":
 				var col2: Color = T.gold300 if on else T.paper300
+				if backdrop:
+					draw_circle(Vector2(size.x * 0.5, size.y * 0.5 - (10 if text != "" else 0)), 30, Color(T.night900, 0.55))
 				V10MjClassicStyle.glyph(self, icon, Vector2(size.x * 0.5, size.y * 0.5 - (10 if text != "" else 0)), 24, col2)
 				if text != "":
 					var f3: = UI.font("body", 800)
@@ -240,6 +249,24 @@ static func glyph(ci: CanvasItem, id: String, c: Vector2, r: float, col: Color) 
 			ci.draw_arc(c + Vector2(0, -r * 0.15), r * 0.22, PI, TAU + PI * 0.4, 16, col, w, true)
 			ci.draw_line(c + Vector2(0, r * 0.08), c + Vector2(0, r * 0.2), col, w, true)
 			ci.draw_circle(c + Vector2(0, r * 0.42), w * 0.6, col)
+		"tap":  # a fingertip on a tile
+			ci.draw_rect(Rect2(c + Vector2(-r * 0.62, -r * 0.7), Vector2(r * 0.86, r * 1.06)), col, false, w)
+			ci.draw_arc(c + Vector2(r * 0.42, r * 0.3), r * 0.3, PI * 1.0, PI * 2.0, 12, col, w, true)
+			ci.draw_line(c + Vector2(r * 0.12, r * 0.3), c + Vector2(r * 0.12, r * 0.78), col, w, true)
+			ci.draw_line(c + Vector2(r * 0.72, r * 0.3), c + Vector2(r * 0.72, r * 0.78), col, w, true)
+		"flower":  # five petals around a dot
+			for k in 5:
+				var fa: = -PI / 2 + TAU * k / 5.0
+				ci.draw_arc(c + Vector2(cos(fa), sin(fa)) * r * 0.42, r * 0.26, 0, TAU, 16, col, w, true)
+			ci.draw_circle(c, r * 0.12, col)
+		"spark":  # her Приём: a four-point star
+			var sp2: = PackedVector2Array()
+			for i in 8:
+				var a3: = -PI / 2 + PI * i / 4.0
+				var rr2: = r if i % 2 == 0 else r * 0.3
+				sp2.append(c + Vector2(cos(a3), sin(a3)) * rr2)
+			sp2.append(sp2[0])
+			ci.draw_polyline(sp2, col, w, true)
 		"star", "star_on":
 			var sp: = PackedVector2Array()
 			for i in 10:
@@ -266,7 +293,6 @@ static func _curve(a: Vector2, b: Vector2) -> PackedVector2Array:
 static func sheet(parent: Control, h: float) -> Control:
 	var veil: = ColorRect.new()
 	veil.color = Color(0.04, 0.03, 0.05, 0.0)
-	veil.set_anchors_preset(Control.PRESET_FULL_RECT)
 	veil.mouse_filter = Control.MOUSE_FILTER_STOP
 	veil.z_index = 1000
 	parent.add_child(veil)

@@ -2,15 +2,21 @@ class_name V10MjClassicScreen
 extends Control
 
 # «Классика» match screen (MODES §4 frame + §4.1). Contract MODES §7.1:
-#   setup(main, args) — args: form (id), variant ("free" | "daily"), diff, seed, hero, presence, look, view, fx,
-#                       date (daily, MSK), no_save (demo / selftest)
-#   signal finished(result) — {mode, variant, form, win, score, stars, time_s, pairs, moves, hints, shuffles, hero,
-#                              seed, diff, rewards:{coins, gems, petals, aff}, rank_up, gifts, next: "again" | "exit"}
+#   setup(main, args) — args: form (id), variant ("free" | "daily"), diff ("easy" | "normal" | "master"), seed, hero,
+#                       presence (an object with on(event, data) and sacred(rect) — V10MjPresence of the stage lane;
+#                       without it the built-in V10MjClassicPresence lives in the band), look (tile look dictionary:
+#                       V10MjTileMaterial.look_dict() of the look lane or a V6TileLook dict), table (a V10MjTables
+#                       theme: her table under the stack; without it the V6BoardTable of her salon zone), view
+#                       ("3d" | "flat"), fx, date (daily, MSK), mult (Afisha «Режим дня» multiplier for the daily
+#                       coins), music (bool: start the mode loop V10MjMusic "classic"), no_save (demo / selftest),
+#                       result_sheet (false: the integrator shows its own result; finished comes after her finale)
+#   signal finished(result) — {mode, variant, form, win, score, stars, time_s, pairs, moves, hints, shuffles, ults,
+#                              hero, seed, diff, rewards:{coins, gems, petals, aff}, rank_up, gifts, faster, next}
 # Rewards are computed by V10MjClassicData.record() and returned, never credited here (the integrator does it).
 #
-# Layout (720 wide, any height): her band on top (120 px + the extra height of tall phones, capped), the table, the
-# help row (3 round buttons: Подсказка ∞ · Отмена ∞ · Перемешать ∞). Budget in play: 5 tappables (pause, 3 help,
-# her window), ≤ 8 words, 0 badges, 1 progress bar.
+# Layout (720 wide, any height): her band on top (120 px + the extra height of tall phones, capped), the goal line
+# «Осталось 72 · ходов 14», the table, the help row (Подсказка ∞ · Отмена ∞ · Перемешать ∞). Budget in play:
+# 5 tappables (pause, 3 help, her window = Приём), ≤ 8 words, 0 badges, 1 progress bar.
 
 signal finished(result: Dictionary)
 
@@ -19,6 +25,8 @@ const BAND_MAX: = 380.0
 const HELP_H: = 150.0
 const IDLE_S: = 20.0
 const COMBO_WINDOW: = 4.0
+const TABLE_VIEW: = "res://scripts/v10/mj/look/table_view.gd"
+const MUSIC: = "res://scripts/v10/mj/look/music.gd"
 
 var main: Node
 var args: = {}
@@ -29,9 +37,11 @@ var hero: = "mc"
 var seed_: = 1
 var date: = ""
 var board: V10MjClassicBoard
-var presence: Object
+var presence: Object                # what the screen talks to: args.presence, or `lite`
+var lite: V10MjClassicPresence      # the built-in heroine (only when no presence was passed)
 var field: Control
 var table: ColorRect
+var table_view: Control             # V10MjTableView when args.table is given and the look lane is in the tree
 var bg: TextureRect
 var shade: ColorRect
 var pause_btn: V10MjClassicStyle.Btn
@@ -53,6 +63,13 @@ var band_h: = BAND_MIN
 var fx: = "full"
 var result: = {}
 var no_save: = false
+var charge: = 0
+var need: = 10
+var ults: = 0
+var casting: = false
+var lines_said: Array = []          # every line she said (selftest, demo)
+var last_ult: = {}                  # what the last Приём did (selftest, demo)
+var _said_at: = {}
 var _bar_k: = 0.0
 
 
@@ -64,16 +81,22 @@ func setup(main_: Node, a: Dictionary) -> void:
 	var fid: String = String(a.get("form", ""))
 	if variant == "daily":
 		fid = V10MjClassicData.daily_form(date)
-	if fid == "" or V10MjClassicLayouts.get_form(fid).is_empty():
+	if fid == "" or not V10MjClassicLayouts.visible(V10MjClassicLayouts.get_form(fid)):
 		fid = "turtle"
 	form = V10MjClassicLayouts.get_form(fid)
 	diff = String(a.get("diff", "normal"))
+	if not diff in V10MjClassicGen.TRAPS:
+		diff = "normal"
 	if variant == "daily":
 		diff = "normal"
 	seed_ = int(a.get("seed", V10MjClassicData.date_seed(date) if variant == "daily" else randi() % 1000000 + 1))
-	hero = String(a.get("hero", _partner()))
+	# «Раскладка дня» is hosted by the heroine of the day (the same for everyone); otherwise the partner
+	hero = String(a.get("host", V10MjClassicData.daily_host(date))) if variant == "daily" else String(a.get("hero", _partner()))
+	if not V10MjClassicStyle.HERO_ACCENT.has(hero):
+		hero = "mc"
 	fx = String(a.get("fx", G.fx_level() if G.has_method("fx_level") else "full"))
 	no_save = bool(a.get("no_save", false))
+	need = int(a.get("need", _need()))
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 	if is_inside_tree() and board == null:
 		_build()
@@ -89,6 +112,14 @@ func _partner() -> String:
 	if G.get("S") is Dictionary:
 		p = String(G.S.get("partner", "mc"))
 	return p if V10MjClassicStyle.HERO_ACCENT.has(p) else "mc"
+
+
+# pairs to fill the Приём ring: V9Ults.need by sympathy, +4 (a Classic table has 36–72 pairs, the Path tray ~30)
+func _need() -> int:
+	var lvl: = 1
+	if G.get("S") is Dictionary and G.S.has("aff") and G.has_method("aff_level"):
+		lvl = int(G.aff_level(hero))
+	return V9Ults.need(lvl, false) + 4
 
 
 func _build() -> void:
@@ -119,7 +150,8 @@ func _build() -> void:
 	board = V10MjClassicBoard.new()
 	field.add_child(board)
 	var d: = V10MjClassicData.st()
-	board.setup(form, seed_, diff, {"look": args.get("look", {}), "view": String(args.get("view", d.view)),
+	var lk = args.get("look", {})
+	board.setup(form, seed_, diff, {"look": lk if lk is Dictionary else {}, "view": String(args.get("view", d.view)),
 		"light": V10MjClassicData.light_free() if not no_save else true, "accent": acc, "fx": fx})
 	board.picked.connect(_on_pick)
 	board.paired.connect(_on_pair)
@@ -129,6 +161,7 @@ func _build() -> void:
 	board.denied.connect(func(_t): idle_t = 0.0)
 	# band
 	pause_btn = V10MjClassicStyle.Btn.new("quiet", "", "pause")
+	pause_btn.backdrop = true
 	pause_btn.size = Vector2(80, 80)
 	pause_btn.pressed.connect(open_pause)
 	add_child(pause_btn)
@@ -146,17 +179,20 @@ func _build() -> void:
 		help.append(b)
 	help[0].pressed.connect(func():
 		idle_t = 0.0
-		board.hint())
+		if not board.hint():
+			V9Feel.deny(help[0]))
 	help[1].pressed.connect(func():
 		idle_t = 0.0
 		if not board.undo():
 			V9Feel.deny(help[1]))
 	help[2].pressed.connect(func():
 		idle_t = 0.0
-		if board.input_on:
-			board.shuffle(false))
+		if board.input_on and not casting:
+			board.shuffle(false)
+		else:
+			V9Feel.deny(help[2]))
 	combo_lbl = V10MjClassicStyle.label("", 52, T.gold300, "title", 700)
-	combo_lbl.label_settings.font = load("res://assets/fonts/playfair-i-cyr.woff2")
+	combo_lbl.label_settings.font = V10MjClassicStyle.italic()
 	V10MjClassicStyle.shadow(combo_lbl, 0.7)
 	combo_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	combo_lbl.modulate.a = 0.0
@@ -169,15 +205,24 @@ func _build() -> void:
 	banner.z_index = 400
 	add_child(banner)
 	_layout()
-	# her: the passed director, or the stage lane's, or the classic fallback
-	presence = args.get("presence", null)
-	if presence == null:
-		presence = V10MjClassicPresence.make(self, hero, {"avoid": [pause_btn.get_rect(), goal.get_rect()], "board": board,
-			"charge_need": 12, "z": 400, "band_rect": Rect2(0, 0, size.x, band_h), "fx": fx})
-	_sacred()
+	_build_presence()
 	get_viewport().size_changed.connect(_on_resize)
 	_refresh()
+	if bool(args.get("music", false)) and ResourceLoader.exists(MUSIC):
+		load(MUSIC).play("classic")
 	_start()
+
+
+# her: the passed director (V10MjPresence of the stage lane, or any object with on / sacred), else the built-in
+# V10MjClassicPresence. args.presence == "stage" builds the stage director here (demo, a hub that does not).
+func _build_presence() -> void:
+	var r: = V10MjClassicPresence.resolve(args.get("presence", null), self, hero, {"avoid": hud_rects(), "board": board,
+		"charge_need": need, "z": 400, "band_rect": Rect2(0, 0, get_viewport_rect().size.x, band_h), "fx": fx, "seed": seed_})
+	presence = r[0]
+	lite = r[1]
+	if presence.has_signal("portrait_tapped"):
+		presence.connect("portrait_tapped", try_ult)
+	_sacred()
 
 
 func _on_resize() -> void:
@@ -214,8 +259,8 @@ func _layout() -> void:
 	combo_lbl.size = Vector2(vs.x, 64)
 	banner.position = Vector2(0, fr.get_center().y - 40)
 	banner.size = Vector2(vs.x, 64)
-	if presence and presence.has_method("set_band"):
-		presence.set_band(Rect2(0, 0, vs.x, band_h))
+	if lite:
+		lite.set_band(Rect2(0, 0, vs.x, band_h))
 	if presence:
 		_sacred()
 
@@ -226,10 +271,7 @@ func _sacred() -> void:
 	if presence.has_method("clear_sacred"):
 		presence.clear_sacred()
 	presence.sacred(field.get_global_rect())
-	var hr: = Rect2()
-	for b in help:
-		hr = (b as Control).get_global_rect() if hr.size == Vector2.ZERO else hr.merge((b as Control).get_global_rect())
-	presence.sacred(hr)
+	presence.sacred(help_rect())
 
 
 func help_rect() -> Rect2:
@@ -239,7 +281,18 @@ func help_rect() -> Rect2:
 	return hr
 
 
+# the table under the stack: her table of the look lane (args.table) or the V6 table of her salon zone
 func _table(r: Rect2) -> void:
+	var th_arg = args.get("table", null)
+	if th_arg is Dictionary and not (th_arg as Dictionary).is_empty() and ResourceLoader.exists(TABLE_VIEW):
+		if table_view and is_instance_valid(table_view):
+			table_view.queue_free()
+		table_view = load(TABLE_VIEW).make(self, th_arg, r, field.get_global_rect(), get_viewport_rect().size)
+		move_child(table_view, shade.get_index() + 1)
+		table.visible = false
+		bg.visible = false
+		shade.color.a = 0.0
+		return
 	var th: Dictionary = V6BoardTable.theme_for(String(V10MjClassicStyle.HERO_TABLE.get(hero, "default")))
 	var margin: = 30.0
 	table.position = r.position - Vector2(margin, margin)
@@ -278,9 +331,27 @@ func _start() -> void:
 		tw.tween_property(banner, "modulate:a", 0.0, 0.2)
 	board.deal_in(fx == "min")
 	if variant == "daily":
-		get_tree().create_timer(1.0).timeout.connect(func():
-			if presence:
-				presence.on("idle", {"kind": "daily", "text": "Сегодня у всех «%s». Посмотрим, кто быстрее?" % form.name}))
+		# the hostess of the day says one line at the start (MODES §4.1)
+		var line: = "Сегодня у всех «%s»." % form.name
+		get_tree().create_timer(0.1 if fx == "min" else 1.0).timeout.connect(func(): say(line))
+
+
+# one line of hers, whichever director is on screen (the stage one writes it at her shoulder if there is room)
+func say(text: String, force: = true) -> void:
+	var now: = V10MjClassicStyle.now()
+	if now - float(_said_at.get(text, -100.0)) < 60.0:
+		return  # one and the same line at most once a minute (MODES §3.3)
+	_said_at[text] = now
+	lines_said.append(text)
+	if presence == null:
+		return
+	if presence.has_method("say"):
+		presence.say(text, force)
+	elif "barks" in presence and presence.get("barks") != null and "text_rect" in presence:
+		var place: Rect2 = presence.get("text_rect")
+		var barks = presence.get("barks")
+		if place.size.x > 0.0 and barks.has_method("show_line") and String(presence.get("mode")) == "live":
+			barks.show_line(text, place)
 
 
 func _process(dt: float) -> void:
@@ -291,19 +362,28 @@ func _process(dt: float) -> void:
 	if idle_t >= IDLE_S:
 		idle_t = 0.0
 		if presence:
-			presence.on("idle", {"kind": "wait"})
+			presence.on("idle", {})
 	if note_t > 0.0:
 		note_t -= dt
 		if note_t <= 0.0:
 			_refresh()
+	elif variant == "daily" and int(time_s - dt) != int(time_s):
+		_refresh()
 	if presence and "input_on" in presence:
-		presence.input_on = board.input_on and sheet == null
+		presence.input_on = board.input_on and sheet == null and not casting
+
+
+func goal_text() -> String:
+	if variant == "daily":
+		var t: = int(time_s)
+		return "Осталось %d · время %d:%02d" % [board.remaining(), t / 60, t % 60]
+	return "Осталось %d · ходов %d" % [board.remaining(), board.moves]
 
 
 func _refresh() -> void:
 	if note_t > 0.0:
 		return
-	goal.text = "Осталось %d · ходов %d" % [board.remaining(), board.moves]
+	goal.text = goal_text()
 	_bar_k = 1.0 - float(board.remaining()) / maxf(1.0, float(board.total()))
 	bar.queue_redraw()
 
@@ -329,26 +409,32 @@ func _on_pick(_t: Tile, pos: Vector2) -> void:
 func _on_pair(_a: Tile, _b: Tile, pos: Vector2, key: int, face: int) -> void:
 	idle_t = 0.0
 	var now: = V10MjClassicStyle.now()
+	var from_ult: = board.by_ult
 	combo = combo + 1 if now - last_pair_t < COMBO_WINDOW else 1
 	last_pair_t = now
 	V9Feel.tile_match(combo)
+	var sig: bool = int(V10MjClassicLayouts.SIGNATURE.get(hero, -1)) == face
+	if not from_ult:
+		# +1 per pair; her signature pair is +25 % of the ring (MODES §3.4)
+		charge = mini(need, charge + 1 + (maxi(1, int(round(need * 0.25))) if sig else 0))
 	if presence:
-		presence.on("pair", {"pos": pos, "charge": clampf(float(board.moves) / 12.0 - floorf(float(board.moves) / 12.0), 0.0, 1.0)})
+		presence.on("pair", {"pos": pos, "charge": float(charge) / float(need)})
 		if combo in [3, 5, 8, 12]:
 			presence.on("combo", {"n": combo})
 		if key == last_key:
 			presence.on("motif", {})
-		if V10MjClassicLayouts.SIGNATURE.get(hero, -1) == face:
+		if sig:
 			presence.on("signature", {})
 		if board.remaining() == 2:
 			presence.on("last_pair", {})
 	last_key = key
 	if combo >= 3:
-		_show_combo(combo)
+		_show_combo("×%d" % combo)
 
 
-func _show_combo(n: int) -> void:
-	combo_lbl.text = "×%d" % n
+func _show_combo(text: String, col: = Color(0, 0, 0, 0)) -> void:
+	combo_lbl.text = text
+	combo_lbl.label_settings.font_color = V10MjClassicStyle.TOK.gold300 if col.a == 0.0 else col
 	if fx == "min":
 		combo_lbl.modulate.a = 1.0
 		get_tree().create_timer(0.6).timeout.connect(func(): combo_lbl.modulate.a = 0.0)
@@ -364,23 +450,57 @@ func _show_combo(n: int) -> void:
 
 func _on_shuffle(auto: bool) -> void:
 	if auto:
+		# free, does not touch the score or the stars of a clean game
 		_note("Ходов нет — перемешала")
-		if presence:
-			presence.on("idle", {"kind": "shuffle"})
+		say("Ходов нет — перемешала")
+
+
+# ---- Приём (MODES §5.5, «Классика»): tap her window when the ring is full ------------------------------------
+func ult_ready() -> bool:
+	return charge >= need
+
+
+func try_ult() -> bool:
+	if not running or paused or sheet != null or casting or not board.input_on:
+		return false
+	if charge < need:
+		if lite:
+			lite.bounce()
+		return false
+	charge = 0
+	ults += 1
+	casting = true
+	board.input_on = false
+	presence.on("ult", {"charge": 0.0})
+	_show_combo(V10MjClassicUlts.ult_name(hero), V10MjClassicStyle.accent(hero).lightened(0.25))
+	V9Feel.sound("summon_charge", 1.2, -6.0)
+	var t: = 0.05 if fx == "min" else 0.45
+	get_tree().create_timer(t).timeout.connect(_cast)
+	return true
+
+
+func _cast() -> void:
+	var r: = V10MjClassicUlts.cast(hero, board)
+	casting = false
+	if board.remaining() > 0 and not board.pairs_now().is_empty() and not board.dealing:
+		board.input_on = true
+	_refresh()
+	if lite:
+		lite.set_charge(0.0)
+	last_ult = r
 
 
 func _on_clear() -> void:
 	running = false
-	if board.zoom > 1.01:
-		board.zoom_to(1.0, field.get_global_rect().get_center())
-	board.flash_form(form.get("color", Color("e8c47e")))
+	# the camera pulls back and the empty form flashes in her colour (MODES §4.1)
+	board.pull_back()
+	board.flash_form(V10MjClassicStyle.accent(hero))
 	if presence:
 		presence.on("win", {})
 	var stars: = V10MjClassicData.stars_of(true, board.hints, board.shuffles)
-	result = {"mode": "classic", "variant": variant, "form": form.id, "win": true, "score": board.moves * 10 + stars * 100,
-		"stars": stars, "time_s": int(round(time_s)), "pairs": board.total() / 2, "moves": board.moves, "hints": board.hints,
-		"shuffles": board.shuffles, "undos": board.undos, "hero": hero, "seed": seed_, "diff": diff,
-		"rewards": {"coins": 0, "gems": 0, "petals": 0, "aff": 0}}
+	result = _result(true)
+	result.stars = stars
+	result.score = board.moves * 10 + stars * 100
 	if variant == "daily":
 		result["faster"] = V10MjClassicData.faster_than(result.time_s, result.pairs, date)
 	if not no_save:
@@ -389,7 +509,18 @@ func _on_clear() -> void:
 		result["rank_up"] = rec.rank_up
 		result["gifts"] = rec.gifts
 		result["new_best"] = rec.new_best
+		result["first_today"] = rec.first_today
+	if not bool(args.get("result_sheet", true)):
+		get_tree().create_timer(0.3 if fx == "min" else 1.7).timeout.connect(func(): finished.emit(result))
+		return
 	get_tree().create_timer(0.3 if fx == "min" else 1.7).timeout.connect(show_result)
+
+
+func _result(win: bool) -> Dictionary:
+	return {"mode": "classic", "variant": variant, "form": form.id, "win": win, "score": 0, "stars": 0,
+		"time_s": int(round(time_s)), "pairs": board.total() / 2, "moves": board.moves, "hints": board.hints,
+		"shuffles": board.shuffles, "auto_shuffles": board.auto_shuffles, "undos": board.undos, "ults": ults, "hero": hero, "seed": seed_, "diff": diff,
+		"date": date, "mult": int(args.get("mult", 1)), "rewards": {"coins": 0, "gems": 0, "petals": 0, "aff": 0}}
 
 
 # ---- sheets -----------------------------------------------------------------------------------------------------
@@ -399,11 +530,12 @@ func open_pause() -> void:
 	paused = true
 	board.input_on = false
 	var T: = V10MjClassicStyle.TOK
-	sheet = V10MjClassicStyle.sheet(self, 520)
+	sheet = V10MjClassicStyle.sheet(self, 420)
 	var p: Control = sheet.get_meta("panel")
 	var t: = V10MjClassicStyle.label("Пауза", 32, T.paper100, "title", 600)
 	t.position = Vector2(32, 28)
 	p.add_child(t)
+	# «Плоский / Объёмный» — a quiet icon (MODES §4.1)
 	var view_btn: = V10MjClassicStyle.Btn.new("quiet", "Объёмный" if board.view == "3d" else "Плоский", "view3d" if board.view == "3d" else "viewflat")
 	view_btn.size = Vector2(120, 96)
 	view_btn.position = Vector2(p.size.x - 140, 14)
@@ -417,20 +549,21 @@ func open_pause() -> void:
 		view_btn.icon = "view3d" if v == "3d" else "viewflat"
 		view_btn.queue_redraw())
 	p.add_child(view_btn)
+	view_btn.name = "ViewToggle"
 	var play: = V10MjClassicStyle.Btn.new("play", "Продолжить")
 	play.size = Vector2(560, 104)
-	play.position = Vector2((p.size.x - 560) * 0.5, 150)
+	play.position = Vector2((p.size.x - 560) * 0.5, 140)
 	play.breathe = true
 	play.pressed.connect(close_pause)
 	p.add_child(play)
 	var again: = V10MjClassicStyle.Btn.new("second", "Заново")
 	again.size = Vector2(272, 84)
-	again.position = Vector2((p.size.x - 560) * 0.5, 290)
+	again.position = Vector2((p.size.x - 560) * 0.5, 272)
 	again.pressed.connect(func(): _leave("again", false))
 	p.add_child(again)
 	var out: = V10MjClassicStyle.Btn.new("second", "Выйти")
 	out.size = Vector2(272, 84)
-	out.position = Vector2((p.size.x - 560) * 0.5 + 288, 290)
+	out.position = Vector2((p.size.x - 560) * 0.5 + 288, 272)
 	out.pressed.connect(func(): _leave("exit", false))
 	p.add_child(out)
 
@@ -446,10 +579,7 @@ func close_pause() -> void:
 
 func _leave(next: String, win: bool) -> void:
 	if not win:
-		result = {"mode": "classic", "variant": variant, "form": form.id, "win": false, "score": 0, "stars": 0,
-			"time_s": int(round(time_s)), "pairs": board.total() / 2, "moves": board.moves, "hints": board.hints,
-			"shuffles": board.shuffles, "hero": hero, "seed": seed_, "diff": diff,
-			"rewards": {"coins": 0, "gems": 0, "petals": 0, "aff": 0}}
+		result = _result(false)
 		if not no_save:
 			V10MjClassicData.record(result)
 	result["next"] = next
@@ -462,6 +592,8 @@ func _leave(next: String, win: bool) -> void:
 func show_result() -> void:
 	if sheet != null:
 		return
+	if lite:
+		lite.hide_finale()
 	var T: = V10MjClassicStyle.TOK
 	sheet = V10MjClassicStyle.sheet(self, 640)
 	var p: Control = sheet.get_meta("panel")
@@ -479,13 +611,15 @@ func show_result() -> void:
 			V10MjClassicStyle.glyph(c, "star_on" if lit else "star", Vector2(32 + k * 64, 32), 26, T.gold300 if lit else T.paper700))
 	srow.position = Vector2(p.size.x - 32 - 3 * 64, 30)
 	srow.size = Vector2(3 * 64, 64)
-	srow.set_meta("lit", 0)
+	srow.set_meta("lit", stars if fx == "min" else 0)
+	srow.name = "Stars"
 	p.add_child(srow)
-	for k in stars:
-		get_tree().create_timer(0.35 + 0.08 * k).timeout.connect(func():
-			srow.set_meta("lit", k + 1)
-			srow.queue_redraw()
-			V9Feel.sound("star%d" % mini(k, 2), 1.0, -4.0))
+	if fx != "min":
+		for k in stars:
+			get_tree().create_timer(0.35 + 0.08 * k).timeout.connect(func():
+				srow.set_meta("lit", k + 1)
+				srow.queue_redraw()
+				V9Feel.sound("star%d" % mini(k, 2), 1.0, -4.0))
 	var lines: Array = []
 	var ts: = int(result.get("time_s", 0))
 	lines.append("Время %d:%02d · ходов %d" % [ts / 60, ts % 60, int(result.get("moves", 0))])
@@ -519,8 +653,8 @@ func show_result() -> void:
 		p.add_child(rl)
 		y += 44
 	# mastery: one bar
-	var pr: = V10MjClassicData.rank_progress() if not no_save else {"rank": 0, "have": stars, "need": 5}
-	var ml: = V10MjClassicStyle.label("%s · %d из %d ★" % [V10MjClassicData.rank_text(int(pr.rank)) if int(pr.rank) > 0 else "Знак Классики", int(pr.have), int(pr.need)], 18, T.paper500, "body", 800)
+	var pr: = V10MjClassicData.rank_progress() if not no_save else {"rank": 0, "have": stars, "need": V10MjClassicData.RANKS[0]}
+	var ml: = V10MjClassicStyle.label("%s · %d из %d ★" % [V10MjClassicData.rank_text(int(pr.rank)), int(pr.have), int(pr.need)], 18, T.paper500, "body", 800)
 	ml.position = Vector2(34, y + 6)
 	p.add_child(ml)
 	var kk: = clampf(float(pr.have) / maxf(1.0, float(pr.need)), 0.0, 1.0)
@@ -544,13 +678,35 @@ func show_result() -> void:
 	play.breathe = true
 	play.pressed.connect(func(): _leave("again", true))
 	p.add_child(play)
-	var out: = V10MjClassicStyle.Btn.new("second", "К формам", "next")
+	var out: = V10MjClassicStyle.Btn.new("second", "Выбрать форму", "next")
 	out.size = Vector2(300, 80)
 	out.position = Vector2((p.size.x - 300) * 0.5, p.size.y - 104)
 	out.pressed.connect(func(): _leave("exit", true))
 	p.add_child(out)
 
 
-# rects the UX self-check / presence audit uses
+# rects the UX self-check / presence audit uses: pause and the goal line
 func hud_rects() -> Array:
-	return [pause_btn.get_global_rect(), goal.get_global_rect()]
+	var gw: = 0.0
+	if goal and goal.label_settings and goal.label_settings.font:
+		gw = goal.label_settings.font.get_string_size("Осталось 144 · ходов 999", HORIZONTAL_ALIGNMENT_LEFT, -1, 24).x
+	return [pause_btn.get_global_rect(), Rect2(goal.global_position, Vector2(maxf(gw, 300.0), 50.0))]
+
+
+# everything the player can tap in play (UX budget: ≤ 6)
+func tappables() -> Array:
+	var out: Array = [pause_btn]
+	out.append_array(help)
+	out.append("her_window")
+	return out
+
+
+# visible words in play (UX budget: ≤ 8; numbers and separators do not count)
+func words_in_play() -> int:
+	var n: = 0
+	for w in goal_text().split(" ", false):
+		if not w.is_valid_int() and w != "·" and not ":" in w:
+			n += 1
+	for b in help:
+		n += String(b.text).split(" ", false).size()
+	return n

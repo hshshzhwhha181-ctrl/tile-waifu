@@ -4,9 +4,13 @@ extends Control
 # «Память» — a variant of «Классика» (MODES §4.1): a flat grid 4×4 … 6×6 face down; the backs carry her crest
 # (art: assets/v10/mj/classic/crest_<hero>.png on the v06 tile back). Open two: alike — they leave the table with
 # her wink; not alike — they turn back. Mistakes are free; stars by the number of moves.
-#   setup(main, args) — args: size ("4x4" | "4x5" | "5x6" | "6x6"), hero, seed, presence, fx, no_save
-#   signal finished(result) — {mode: "classic", variant: "memory", size, win, stars, moves, pairs, time_s, hero, seed,
-#                              rewards, next}
+#   setup(main, args) — args: size ("4x4" | "4x5" | "5x6" | "6x6"), hero, seed, presence (as in the Classic screen:
+#                       V10MjPresence of the stage lane, "stage", or nothing = the built-in V10MjClassicPresence), fx,
+#                       no_save, result_sheet (false: the integrator shows its own result)
+#   signal finished(result) — {mode: "classic", variant: "memory", size, win, stars, moves, pairs, time_s, ults, hero,
+#                              seed, score, rewards, next}
+# Her Приём (MODES §5.5): the ring fills with found pairs; mc / nova find 1 pair, hana 2, rin shows one pair for 1 s,
+# yue turns every card up for 1 s. Pairs found by a Приём are not moves and give no charge.
 
 signal finished(result: Dictionary)
 
@@ -39,6 +43,11 @@ var field: Rect2
 var band_h: = BAND_MIN
 var sheet: Control
 var result: = {}
+var lite: V10MjClassicPresence
+var charge: = 0
+var need: = 4
+var ults: = 0
+var peeking: = false
 var _close_timer: SceneTreeTimer
 
 
@@ -93,6 +102,7 @@ func setup(_main: Node, a: Dictionary) -> void:
 	faces = deal(size_id, seed_)
 	matched.resize(faces.size())
 	matched.fill(0)
+	need = int(a.get("need", maxi(3, faces.size() / 2 / 3)))
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 	if is_inside_tree() and layer == null:
 		_build()
@@ -134,8 +144,7 @@ func _build() -> void:
 	var cell: = minf(field.size.x / cols, field.size.y / rows)
 	var s: = minf(1.6, cell * 0.88 / Tile.TW)
 	var deep: = V10MjClassicStyle.accent(hero).darkened(0.55)
-	var crest_p: = "res://assets/v10/mj/classic/crest_%s.png" % hero
-	var crest: Texture2D = load(crest_p) if ResourceLoader.exists(crest_p) else null
+	var crest: = crest_tex(hero)
 	var grid_sz: = Vector2(cols, rows) * cell
 	var origin: = field.position + (field.size - grid_sz) * 0.5 + Vector2(cell, cell) * 0.5
 	for i in faces.size():
@@ -146,9 +155,11 @@ func _build() -> void:
 		c.base = s
 		c.scale = Vector2(s, s)
 		layer.add_child(c)
-		c.build(faces[i], deep, crest)
+		var lk = args.get("look", {})
+		c.build(faces[i], deep, crest, lk if lk is Dictionary else {})
 		cards.append(c)
 	pause_btn = V10MjClassicStyle.Btn.new("quiet", "", "pause")
+	pause_btn.backdrop = true
 	pause_btn.size = Vector2(80, 80)
 	pause_btn.position = Vector2(14, (band_h - 80) * 0.5 if band_h <= 140 else 20)
 	pause_btn.pressed.connect(_pause)
@@ -157,10 +168,13 @@ func _build() -> void:
 	V10MjClassicStyle.shadow(goal, 0.5)
 	goal.position = Vector2(104, pause_btn.position.y + 22)
 	add_child(goal)
-	presence = args.get("presence", null)
-	if presence == null:
-		presence = V10MjClassicPresence.make(self, hero, {"band_rect": Rect2(0, 0, vs.x, band_h), "z": 400, "fx": fx, "charge_need": faces.size() / 2,
-			"avoid": [pause_btn.get_rect(), goal.get_rect()]})
+	var r: = V10MjClassicPresence.resolve(args.get("presence", null), self, hero, {"band_rect": Rect2(0, 0, vs.x, band_h),
+		"z": 400, "fx": fx, "charge_need": need, "seed": seed_, "avoid": [pause_btn.get_global_rect(),
+		Rect2(goal.global_position, Vector2(320, 50))]})
+	presence = r[0]
+	lite = r[1]
+	if presence.has_signal("portrait_tapped"):
+		presence.connect("portrait_tapped", try_ult)
 	presence.sacred(field)
 	_refresh()
 	running = true
@@ -201,12 +215,16 @@ class _MemCard:
 	var tile: Tile
 	var back: Node2D
 	var _tw: Tween
-	func build(f: int, deep: Color, crest: Texture2D) -> void:
+	func build(f: int, deep: Color, crest: Texture2D, look: = {}) -> void:
 		tile = Tile.new()
 		tile.face = f
 		add_child(tile)
-		var lk: Dictionary = G.skin_look() if G.has_method("skin_look") else {"side": Color("e8789f"), "rim": Color("f6dfe6"), "tint": Color.WHITE}
+		var lk: Dictionary = look
+		if lk.is_empty():
+			lk = G.skin_look() if G.has_method("skin_look") else {"side": Color("e8789f"), "rim": Color("f6dfe6"), "tint": Color.WHITE}
 		tile.build(lk)
+		if lk.has("v10mj") and ResourceLoader.exists(V10MjClassicBoard.LOOK_LIB):
+			load(V10MjClassicBoard.LOOK_LIB).dress(tile, lk, {})
 		tile.visible = false
 		back = Node2D.new()
 		add_child(back)
@@ -253,19 +271,32 @@ class _MemCard:
 		return absf(lp.x) <= Tile.TW * 0.5 + 4 and absf(lp.y) <= Tile.TH * 0.5 + 4
 
 
+# her crest on the backs (founders have one; anyone else wears the house crest of Маджонг-тян)
+static func crest_tex(h: String) -> Texture2D:
+	for k in [h, "mc"]:
+		var p: = "res://assets/v10/mj/classic/crest_%s.png" % k
+		if ResourceLoader.exists(p):
+			return load(p)
+	return null
+
+
+func goal_text() -> String:
+	return "Пар %d из %d · ходов %d" % [found, faces.size() / 2, moves]
+
+
 func _refresh() -> void:
-	goal.text = "Пар %d из %d · ходов %d" % [found, faces.size() / 2, moves]
+	goal.text = goal_text()
 
 
 func _process(dt: float) -> void:
 	if running and sheet == null:
 		time_s += dt
 	if presence and "input_on" in presence:
-		presence.input_on = running and sheet == null
+		presence.input_on = running and sheet == null and not peeking
 
 
 func _unhandled_input(e: InputEvent) -> void:
-	if not running or sheet != null:
+	if not running or sheet != null or peeking:
 		return
 	if e is InputEventScreenTouch and e.pressed:
 		for c in cards:
@@ -277,7 +308,7 @@ func _unhandled_input(e: InputEvent) -> void:
 
 # open one card (the selftest and demo call it directly)
 func flip(i: int) -> void:
-	if not running or matched[i] or i in open:
+	if not running or peeking or matched[i] or i in open:
 		return
 	var c: _MemCard = cards[i]
 	if open.size() >= 2:
@@ -299,6 +330,7 @@ func flip(i: int) -> void:
 			matched[b] = 1
 			found += 1
 			open.clear()
+			charge = mini(need, charge + 1)
 			_take(a, b)
 		else:
 			V9Feel.sound("tap", 0.8, -6.0)
@@ -317,8 +349,8 @@ func _take(a: int, b: int) -> void:
 	var mid: = (ca.position + cb.position) * 0.5
 	V9Feel.tile_match(found)
 	if presence:
-		presence.on("pair", {"pos": layer.get_global_transform_with_canvas() * mid})
-		presence.on("motif", {})  # her wink on every match (MODES §4.1 «подмигивание при совпадении»)
+		presence.on("pair", {"pos": layer.get_global_transform_with_canvas() * mid, "charge": float(charge) / float(need)})
+		presence.on("motif", {})  # her wink on every match
 		if found == faces.size() / 2 - 1:
 			presence.on("last_pair", {})
 	for c in [ca, cb]:
@@ -340,6 +372,62 @@ func _take(a: int, b: int) -> void:
 		_win()
 
 
+# ---- Приём ---------------------------------------------------------------------------------------------------
+func try_ult() -> bool:
+	if not running or sheet != null or peeking:
+		return false
+	if charge < need:
+		if lite:
+			lite.bounce()
+		return false
+	charge = 0
+	ults += 1
+	presence.on("ult", {"charge": 0.0})
+	if lite:
+		lite.set_charge(0.0)
+	V9Feel.sound("summon_charge", 1.2, -6.0)
+	for j in open:
+		(cards[j] as _MemCard).turn(false, true)
+	open.clear()
+	var e: = V10MjClassicUlts.memory_effect(hero)
+	match String(e.kind):
+		"find":
+			for k in int(e.n):
+				var ps: = peek_pairs()
+				if ps.is_empty() or not running:
+					break
+				var pr: Array = ps[0]
+				for i in pr:
+					(cards[i] as _MemCard).turn(true, fx == "min")
+				matched[pr[0]] = 1
+				matched[pr[1]] = 1
+				found += 1
+				_take(pr[0], pr[1])
+			_refresh()
+		"peek_pair":
+			var ps2: = peek_pairs()
+			if not ps2.is_empty():
+				_peek(ps2[0], float(e.t))
+		"peek_all":
+			var all: = []
+			for pr2 in peek_pairs():
+				all.append_array(pr2)
+			_peek(all, float(e.t))
+	return true
+
+
+# turn cards face up for t seconds, then back; taps wait
+func _peek(ids: Array, t: float) -> void:
+	peeking = true
+	for i in ids:
+		(cards[i] as _MemCard).turn(true, fx == "min")
+	get_tree().create_timer(t).timeout.connect(func():
+		for i in ids:
+			if not matched[i]:
+				(cards[i] as _MemCard).turn(false, fx == "min")
+		peeking = false)
+
+
 func peek_pairs() -> Array:
 	var by: = {}
 	for i in faces.size():
@@ -350,19 +438,30 @@ func peek_pairs() -> Array:
 
 func _win() -> void:
 	var stars: = stars_for(moves, faces.size() / 2)
-	result = {"mode": "classic", "variant": "memory", "size": size_id, "win": true, "stars": stars, "moves": moves,
-		"pairs": faces.size() / 2, "time_s": int(round(time_s)), "hero": hero, "seed": seed_, "score": stars * 100,
-		"rewards": {"coins": 0, "gems": 0, "petals": 0, "aff": 0}}
+	result = _result(true)
+	result.stars = stars
+	result.score = stars * 100
 	if not no_save:
 		var rec: = V10MjClassicData.record(result)
 		result.rewards = rec.rewards
 		result["new_best"] = rec.new_best
 	if presence:
 		presence.on("win", {"text": "Все нашлись. У тебя хорошая память."})
+	if not bool(args.get("result_sheet", true)):
+		get_tree().create_timer(0.3 if fx == "min" else 1.4).timeout.connect(func(): finished.emit(result))
+		return
 	get_tree().create_timer(0.3 if fx == "min" else 1.4).timeout.connect(_result_sheet)
 
 
+func _result(win: bool) -> Dictionary:
+	return {"mode": "classic", "variant": "memory", "size": size_id, "win": win, "stars": 0, "moves": moves,
+		"pairs": faces.size() / 2, "time_s": int(round(time_s)), "ults": ults, "hero": hero, "seed": seed_, "score": 0,
+		"rewards": {"coins": 0, "gems": 0, "petals": 0, "aff": 0}}
+
+
 func _result_sheet() -> void:
+	if lite:
+		lite.hide_finale()
 	var T: = V10MjClassicStyle.TOK
 	sheet = V10MjClassicStyle.sheet(self, 520)
 	var p: Control = sheet.get_meta("panel")
@@ -376,13 +475,15 @@ func _result_sheet() -> void:
 			V10MjClassicStyle.glyph(c, "star_on" if lit else "star", Vector2(32 + k * 64, 32), 26, T.gold300 if lit else T.paper700))
 	srow.position = Vector2(32, 92)
 	srow.size = Vector2(3 * 64, 64)
-	srow.set_meta("lit", 0)
+	srow.set_meta("lit", stars if fx == "min" else 0)
+	srow.name = "Stars"
 	p.add_child(srow)
-	for k in stars:
-		get_tree().create_timer(0.3 + 0.08 * k).timeout.connect(func():
-			srow.set_meta("lit", k + 1)
-			srow.queue_redraw()
-			V9Feel.sound("star%d" % mini(k, 2), 1.0, -4.0))
+	if fx != "min":
+		for k in stars:
+			get_tree().create_timer(0.3 + 0.08 * k).timeout.connect(func():
+				srow.set_meta("lit", k + 1)
+				srow.queue_redraw()
+				V9Feel.sound("star%d" % mini(k, 2), 1.0, -4.0))
 	var best: = int(V10MjClassicData.st().memory.get(size_id, moves)) if not no_save else moves
 	var l: = V10MjClassicStyle.label("Ходов %d · лучшее %d" % [moves, best], 22, T.paper300, "body", 700)
 	l.position = Vector2(34, 172)
@@ -402,7 +503,7 @@ func _result_sheet() -> void:
 	play.breathe = true
 	play.pressed.connect(func(): _leave("again"))
 	p.add_child(play)
-	var out: = V10MjClassicStyle.Btn.new("second", "К формам", "next")
+	var out: = V10MjClassicStyle.Btn.new("second", "Выбрать размер", "next")
 	out.size = Vector2(300, 80)
 	out.position = Vector2((p.size.x - 300) * 0.5, p.size.y - 96)
 	out.pressed.connect(func(): _leave("exit"))
@@ -429,9 +530,9 @@ func _pause() -> void:
 	out.size = Vector2(272, 84)
 	out.position = Vector2((p.size.x - 272) * 0.5, 244)
 	out.pressed.connect(func():
-		result = {"mode": "classic", "variant": "memory", "size": size_id, "win": false, "stars": 0, "moves": moves,
-			"pairs": faces.size() / 2, "time_s": int(round(time_s)), "hero": hero, "seed": seed_, "score": 0,
-			"rewards": {"coins": 0, "gems": 0, "petals": 0, "aff": 0}}
+		result = _result(false)
+		if not no_save:
+			V10MjClassicData.record(result)
 		_leave("exit"))
 	p.add_child(out)
 

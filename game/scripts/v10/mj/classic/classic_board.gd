@@ -11,6 +11,13 @@ extends Node2D
 # bit (state() / the selftest). Tile nodes only show it.
 #
 # The board never talks to the heroine: it emits signals; the screen turns them into presence events.
+#
+# Tile look: opts.look is a V6TileLook dictionary (side, rim, tint). When it carries the look lane's "v10mj" block
+# (V10MjTileMaterial.look_dict) and that lane is in the tree, every tile is dressed in the material (porcelain, jade,
+# bone, ice, amber, lacquer): the shader then breathes free tiles itself and shades closed ones.
+# Приёмы (MODES §5.5, «Классика»): ult_take(n) — n pairs of the live certificate; ult_deep() — the deepest pair
+# (even a covered one) that keeps a certificate; show_path() — a pair that is still closed and what keeps it closed;
+# show_pairs(t) — every free pair for t seconds.
 
 signal picked(t: Tile, pos: Vector2)
 signal denied(t: Tile)
@@ -25,6 +32,9 @@ const DZ3: = Vector2(-6.0, -12.0)
 const DZF: = Vector2(-2.0, -3.5)
 const ZOOM_MAX: = 2.6
 const DOUBLE_T: = 0.32
+const LOOK_LIB: = "res://scripts/v10/mj/look/tile_material.gd"
+const JADE: = Color("4fe0b0")
+const GOLD: = Color("f1d9a0")
 
 var form: = {}
 var deal: = {}
@@ -40,6 +50,7 @@ var sel: = -1
 var moves: = 0
 var hints: = 0
 var shuffles: = 0
+var auto_shuffles: = 0              # «Ходов нет — перемешала»: free, never costs a star (MODES §4.1)
 var undos: = 0
 var input_on: = true
 var view: = "3d"
@@ -68,6 +79,10 @@ var _last_empty_tap: = -10.0
 var _last_empty_pos: = Vector2.ZERO
 var _zoom_tw: Tween
 var _ghost: Node2D
+var dressed: = false               # tiles wear the look lane's material (V10MjTileMaterial)
+var _tm = null                     # the V10MjTileMaterial script when dressed
+var _lights: Array = []            # tiles lit by show_path / show_pairs (cleared on the next move)
+var _light_tw: SceneTreeTimer
 
 
 func _ready() -> void:
@@ -95,6 +110,11 @@ func setup(f: Dictionary, seed_: int, diff: = "normal", opts: = {}) -> void:
 		var tree: = Engine.get_main_loop() as SceneTree
 		var g = tree.root.get_node_or_null("G") if tree else null
 		look = g.skin_look() if g else {"side": Color("e8789f"), "rim": Color("f6dfe6"), "tint": Color.WHITE}
+	dressed = false
+	_tm = null
+	if look.has("v10mj") and ResourceLoader.exists(LOOK_LIB):
+		_tm = load(LOOK_LIB)
+		dressed = _tm != null
 	view = String(opts.get("view", "3d"))
 	light = bool(opts.get("light", true))
 	accent = opts.get("accent", accent)
@@ -112,6 +132,7 @@ func setup(f: Dictionary, seed_: int, diff: = "normal", opts: = {}) -> void:
 	moves = 0
 	hints = 0
 	shuffles = 0
+	auto_shuffles = 0
 	undos = 0
 	# draw order: layer, then row, then column (upper layers last, lower rows over upper rows)
 	var idx: Array = range(geo.n)
@@ -131,6 +152,8 @@ func setup(f: Dictionary, seed_: int, diff: = "normal", opts: = {}) -> void:
 		tiles[i] = t
 		tile_layer.add_child(t)
 		t.build(look)
+		if dressed:
+			_tm.dress(t, look, _light_dict())
 		_mark(i)
 	_layout_tiles()
 	for i in geo.n:
@@ -225,6 +248,17 @@ func _relight() -> void:
 	V6TileLook.lamp = bounds.position + bounds.size * Vector2(0.3, 0.1)
 	var arr: Array = tiles.filter(func(t): return t != null)
 	V6TileLook.relight(arr)
+	if dressed:
+		var ld: = _light_dict()
+		for t in arr:
+			var m = (t as Tile).mat
+			if m is ShaderMaterial:
+				_tm.apply_light(m, ld)
+
+
+# the table lamp for the look lane's material (the same lamp V6TileLook uses)
+func _light_dict() -> Dictionary:
+	return {"lamp": V6TileLook.lamp, "lamp_col": V6TileLook.lamp_col, "gloss": V6TileLook.gloss, "ambient": V6TileLook.ambient}
 
 
 func tile_scale_px() -> float:
@@ -329,6 +363,10 @@ func _set_free(i: int, f: bool, animate: = true) -> void:
 	# closed tiles sit in shadow (the face a step darker), free ones are lit — «what can I take» at a glance
 	var tint: = Color.WHITE if f else (Color(0.74, 0.72, 0.76) if light else Color(0.88, 0.87, 0.9))
 	var from: float = t.mat.get_shader_parameter("dim") if t.mat.get_shader_parameter("dim") != null else target
+	if dressed:
+		# the material shades closed tiles itself (18 %) and breathes free ones; «light» adds the board's own dim
+		_tm.tile_state(t, f, not f, i, accent)
+		target = 0.0 if f else (0.55 if light else 0.0)
 	if not animate or fx_min:
 		t.mat.set_shader_parameter("dim", target)
 		t.face_spr.modulate = tint
@@ -373,7 +411,7 @@ func state() -> Dictionary:
 # ---- breathing of free tiles (1.00–1.01), one slow wave across the table -------------------------------------
 func _process(dt: float) -> void:
 	_t += dt
-	if fx_min or geo == null:
+	if fx_min or geo == null or dressed:
 		return
 	for i in geo.n:
 		var t: Tile = tiles[i]
@@ -607,12 +645,16 @@ func _show_blockers(i: int) -> void:
 		tw.tween_property(b.glow, "modulate:a", 0.0, 0.45)
 
 
-# take a pair (both must be free and alike); the rules state changes at once, the tiles animate after
-func take(a: int, b: int, record: = true) -> void:
+# take a pair (both must be free and alike; `force` — a Приём may lift a covered pair); the rules state changes at
+# once, the tiles animate after
+var by_ult: = false                 # the pairs being taken now come from a Приём (the screen gives no charge for them)
+
+func take(a: int, b: int, record: = true, force: = false) -> void:
 	if a == b or not alive[a] or not alive[b] or keys[a] != keys[b]:
 		return
-	if not (geo.free_in(a, alive) and geo.free_in(b, alive)):
+	if not force and not (geo.free_in(a, alive) and geo.free_in(b, alive)):
 		return
+	_clear_lights()
 	if record:
 		history.append({"kind": "pair", "a": a, "b": b, "sel": sel, "cert": PackedInt32Array(cert)})
 	if sel >= 0 and sel != a and sel != b:
@@ -693,29 +735,33 @@ func _fly_pair(a: int, b: int, mid: Vector2) -> void:
 
 
 func _repair_cert(a: int, b: int) -> void:
-	if cert.is_empty():
-		return
-	var m: = cert.size() / 2
+	cert = _repaired(cert, a, b, alive)
+
+
+# the live certificate after the pair (a, b) left: their two partners pair up at one of the two old places, if the
+# result still clears (alive_after has a and b gone). Empty when it does not (the hint then searches).
+func _repaired(cc: PackedInt32Array, a: int, b: int, alive_after: PackedByteArray) -> PackedInt32Array:
+	if cc.is_empty():
+		return cc
+	var m: = cc.size() / 2
 	var ka: = -1
 	var kb: = -1
 	for k in m:
-		if cert[2 * k] == a or cert[2 * k + 1] == a:
+		if cc[2 * k] == a or cc[2 * k + 1] == a:
 			ka = k
-		if cert[2 * k] == b or cert[2 * k + 1] == b:
+		if cc[2 * k] == b or cc[2 * k + 1] == b:
 			kb = k
 	if ka < 0 or kb < 0:
-		cert = PackedInt32Array()
-		return
+		return PackedInt32Array()
 	if ka == kb:
 		var c: = PackedInt32Array()
 		for k in m:
 			if k != ka:
-				c.append(cert[2 * k])
-				c.append(cert[2 * k + 1])
-		cert = c
-		return
-	var pa: int = cert[2 * ka + 1] if cert[2 * ka] == a else cert[2 * ka]
-	var pb: int = cert[2 * kb + 1] if cert[2 * kb] == b else cert[2 * kb]
+				c.append(cc[2 * k])
+				c.append(cc[2 * k + 1])
+		return c
+	var pa: int = cc[2 * ka + 1] if cc[2 * ka] == a else cc[2 * ka]
+	var pb: int = cc[2 * kb + 1] if cc[2 * kb] == b else cc[2 * kb]
 	for at in [ka, kb]:
 		var c2: = PackedInt32Array()
 		for k in m:
@@ -723,12 +769,11 @@ func _repair_cert(a: int, b: int) -> void:
 				c2.append(pa)
 				c2.append(pb)
 			elif k != ka and k != kb:
-				c2.append(cert[2 * k])
-				c2.append(cert[2 * k + 1])
-		if V10MjClassicGen.certify(geo, c2, keys, alive):
-			cert = c2
-			return
-	cert = PackedInt32Array()
+				c2.append(cc[2 * k])
+				c2.append(cc[2 * k + 1])
+		if V10MjClassicGen.certify(geo, c2, keys, alive_after):
+			return c2
+	return PackedInt32Array()
 
 
 func _restore_tile(i: int) -> void:
@@ -827,14 +872,17 @@ func shuffle(auto: = false) -> void:
 		_select(-1)
 	history.append(_snapshot(auto))
 	var rng: = RandomNumberGenerator.new()
-	rng.seed = int(deal.get("seed", 1)) * 7919 + moves * 131 + shuffles * 17 + 1
+	rng.seed = int(deal.get("seed", 1)) * 7919 + moves * 131 + (shuffles + auto_shuffles) * 17 + 1
 	var r: = V10MjClassicGen.reshuffle(geo, alive, faces, rng, base_order)
 	var old_alive: = PackedByteArray(alive)
 	alive = r.alive
 	faces = r.faces
 	keys = r.keys
 	cert = r.order
-	shuffles += 1
+	if auto:
+		auto_shuffles += 1
+	else:
+		shuffles += 1
 	input_on = false
 	_shuffle_show(old_alive)
 	shuffled.emit(auto)
@@ -922,6 +970,124 @@ func _clear_hint() -> void:
 			if i != sel:
 				_halo(i, false)
 	_hinted.clear()
+	_clear_lights()
+
+
+func _clear_lights() -> void:
+	for i in _lights:
+		if i < tiles.size() and tiles[i] and i != sel and not _hinted.has(i):
+			_halo(i, false)
+	_lights.clear()
+
+
+func _light(ids: Array, col: Color, pulse: bool, t: float) -> void:
+	for i in ids:
+		if alive[i]:
+			_halo(i, true, col, pulse and not fx_min)
+			_lights.append(i)
+	var my: = _lights.duplicate()
+	get_tree().create_timer(t).timeout.connect(func():
+		if _lights == my:
+			_clear_lights())
+
+
+# ---- Приёмы (MODES §5.5) ---------------------------------------------------------------------------------------
+# mc / hana: n pairs of the live certificate (the safest moves on the table). -> the pairs taken
+func ult_take(n: int) -> Array:
+	var out: = []
+	by_ult = true
+	for k in n:
+		if remaining() == 0:
+			break
+		var p: = hint_pair()
+		if p.size() < 2:
+			break
+		take(p[0], p[1])
+		out.append(p)
+	by_ult = false
+	return out
+
+
+# nova: the deepest pair on the table, even a covered one — the lowest layers first, then the most tiles lying on
+# it — as long as the table keeps a certificate without it. -> the pairs taken
+func ult_deep() -> Array:
+	var by: = {}
+	for i in geo.n:
+		if alive[i]:
+			if not by.has(keys[i]):
+				by[keys[i]] = []
+			by[keys[i]].append(i)
+	var cands: = []
+	for k in by:
+		var l: Array = by[k]
+		for x in l.size():
+			for y in range(x + 1, l.size()):
+				var a: int = l[x]
+				var b: int = l[y]
+				cands.append([float(geo.pos[a].z + geo.pos[b].z) * 10.0 - float(_on_top(a) + _on_top(b)), a, b])
+	cands.sort_custom(func(p, q): return p[0] < q[0])
+	var al: = PackedByteArray(alive)
+	for c in cands.slice(0, 60):
+		var a2: int = c[1]
+		var b2: int = c[2]
+		al[a2] = 0
+		al[b2] = 0
+		var ok: = remaining() == 2 or not _repaired(cert, a2, b2, al).is_empty()
+		al[a2] = 1
+		al[b2] = 1
+		if ok:
+			by_ult = true
+			take(a2, b2, true, true)
+			by_ult = false
+			return [[a2, b2]]
+	return ult_take(1)
+
+
+func _on_top(i: int) -> int:
+	var n: = 0
+	for j in geo.cover[i]:
+		n += alive[j]
+	return n
+
+
+# rin: a pair that is still closed (the next one of the certificate that cannot be taken yet) and the tiles that
+# keep it closed — «the pair and the way to it», lit for t seconds. -> {pair, path}
+func show_path(t: = 3.0) -> Dictionary:
+	_clear_hint()
+	var pair: Array = []
+	if not cert.is_empty() and V10MjClassicGen.certify(geo, cert, keys, alive):
+		var m: = cert.size() / 2
+		for k in range(m - 1, -1, -1):
+			var a: int = cert[2 * k]
+			var b: int = cert[2 * k + 1]
+			if not (geo.free_in(a, alive) and geo.free_in(b, alive)):
+				pair = [a, b]
+				break
+	if pair.is_empty():
+		pair = hint_pair()
+	if pair.is_empty():
+		return {}
+	var path: = {}
+	for i in pair:
+		for j in geo.blockers(i, alive):
+			path[j] = true
+	_light(pair, JADE, true, t)
+	_light(path.keys(), GOLD, false, t)
+	V9Feel.sound("sparkle", 1.1, -8.0)
+	return {"pair": pair, "path": path.keys()}
+
+
+# yue: every free pair lit for t seconds. -> the pairs
+func show_pairs(t: = 3.0) -> Array:
+	_clear_hint()
+	var ps: = pairs_now()
+	var lit: = {}
+	for p in ps:
+		for i in p:
+			lit[i] = true
+	_light(lit.keys(), JADE, false, t)
+	V9Feel.sound("sparkle", 1.3, -8.0)
+	return ps
 
 
 func set_view(v: String) -> void:
@@ -946,7 +1112,25 @@ func set_light(on: bool) -> void:
 	_update_free(true)
 
 
-# the win: the empty form flashes in its colour (MODES §4.1)
+# the win: the camera pulls back (zoom 1, then the whole form a little smaller, centred)
+func pull_back() -> void:
+	if geo == null:
+		return
+	if _zoom_tw and _zoom_tw.is_valid():
+		_zoom_tw.kill()
+	zoom = 1.0
+	var s1: = base_scale * 0.9
+	var p1: = field.get_center() - bounds.get_center() * s1
+	if fx_min:
+		scale = Vector2(s1, s1)
+		position = p1
+		return
+	_zoom_tw = create_tween().set_parallel()
+	_zoom_tw.tween_property(self, "scale", Vector2(s1, s1), 0.6).set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_OUT)
+	_zoom_tw.tween_property(self, "position", p1, 0.6).set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_OUT)
+
+
+# the win: the empty form flashes in her colour (MODES §4.1)
 func flash_form(col: Color) -> void:
 	if _ghost and is_instance_valid(_ghost):
 		_ghost.queue_free()
@@ -958,12 +1142,12 @@ func flash_form(col: Color) -> void:
 	if fx_min:
 		g.k = 0.6
 		g.queue_redraw()
-		g.create_tween().tween_property(g, "k", 0.0, 0.12).set_delay(0.6)
+		g.create_tween().tween_property(g, "k", 0.22, 0.12).set_delay(0.6)
 		return
 	var tw: = g.create_tween()
 	tw.tween_property(g, "k", 1.0, 0.35).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	tw.tween_property(g, "k", 0.55, 0.5).set_trans(Tween.TRANS_SINE)
-	tw.tween_property(g, "k", 0.0, 0.7).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+	tw.tween_property(g, "k", 0.22, 0.7).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)  # the empty form stays, faint
 
 
 class _FormGhost:

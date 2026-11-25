@@ -36,6 +36,8 @@ const GIFT_NAMES: = {"frame_classic": "Рамка «Знак Классики»"
 	"back_classic": "Рубашка «Знак Классики»"}
 const DAY_COINS: = 20
 const DAY_AFF: = 1
+# the hostess of «Раскладка дня» rotates by the MSK date over the heroines in the roster
+const HOSTS: = ["mc", "rin", "hana", "yue", "nova"]
 
 static var _mem: = {}  # used when there is no G (selftest without autoload)
 static var persist: = true  # the selftest turns disk writes off
@@ -89,6 +91,15 @@ static func daily_form(date: String) -> String:
 	return String(forms[posmod(h, forms.size())].id)
 
 
+# who hosts the layout of the day (she says one line at its start): the same for everyone on that date
+static func daily_host(date: String, roster = null) -> String:
+	var heroes: Dictionary = roster if roster is Dictionary else V10MjClassicLayouts._roster()
+	var pool: Array = HOSTS.filter(func(h): return heroes.is_empty() or heroes.has(h))
+	if pool.is_empty():
+		pool = ["mc"]
+	return String(pool[posmod(hash("classic-host-" + date), pool.size())])
+
+
 static func stars_of(win: bool, hints: int, shuffles: int) -> int:
 	if not win:
 		return 0
@@ -129,7 +140,9 @@ static func rank_progress(d: = {}) -> Dictionary:
 
 
 # Apply a finished match to the save; returns the rewards for result.rewards and what changed.
-# result: {mode, variant, form, win, stars, time_s, ...}
+# result: {mode, variant, form, win, stars, time_s, ..., mult}. mult — the Afisha's «Режим дня» multiplier for
+# «Раскладка дня» (×2 when Классика is the mode of the day; the integrator passes it in args.mult): it multiplies the
+# coins of the daily layout only. Crystals come only from the mastery milestones (5 × 30, once each).
 static func record(result: Dictionary, today: = "") -> Dictionary:
 	var d: = st()
 	var day: = today if today != "" else msk_date()
@@ -165,6 +178,8 @@ static func record(result: Dictionary, today: = "") -> Dictionary:
 		rew.coins += DAY_COINS
 		rew.aff += DAY_AFF
 		out.first_today = true
+		if variant == "daily":
+			rew.coins *= clampi(int(result.get("mult", 1)), 1, 3)
 	var r: = rank_of(star_sum(d))
 	while int(d.ranks_paid) < r:
 		d.ranks_paid += 1

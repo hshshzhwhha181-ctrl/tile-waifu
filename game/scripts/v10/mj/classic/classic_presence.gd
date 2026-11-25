@@ -1,14 +1,16 @@
 class_name V10MjClassicPresence
 extends Control
 
-# The heroine in a «Классика» match when no presence director was passed in (args.presence) and the stage lane
-# (V10MjPresence, branch v10-mj-stage) is not in the tree yet. Same contract — attach / on(event, data) / sacred /
-# input_on — and the same hard rule (MODES §3.1): nothing of her is ever drawn over the sacred zone while input is
-# on. She lives in the arch window of the top band (her painted waist-up frames, assets/v08/emotions), the Приём
-# ring around it fills with pairs, motes of a pair fly to her (≤ 8, alpha ≤ 0.6, ≤ 0.45 s), a line is written at her
-# shoulder (left of the window, inside the band), a wink on «motif», a glance on every pick.
+# The heroine in a «Классика» / «Память» match when no presence director was passed in (args.presence). Same
+# contract as V10MjPresence of the stage lane — attach / on(event, data) / sacred / input_on / portrait_tapped — and
+# the same hard rule (MODES §3.1): nothing of her is ever drawn over the sacred zone while input is on. She lives in
+# the arch window of the top band (her painted waist-up frames, assets/v08/emotions), the Приём ring around it fills
+# with pairs (data.charge), motes of a pair fly to her (≤ 6, alpha ≤ 0.6, ≤ 0.42 s), a line is written at her
+# shoulder (left of the window, inside the band), a wink on «motif», a glance on every pick; a tap on her window when
+# the ring is full casts her Приём (portrait_tapped).
 #
-# When V10MjPresence exists, V10MjClassicPresence.make() returns that instead: the classic screen does not care.
+# V10MjClassicPresence.resolve(args.presence, parent, hero, opts) picks the director: the passed object, the stage
+# director built here (args.presence == "stage"), or this one.
 
 signal reacted(event: String, info: Dictionary)
 signal finale_done
@@ -17,6 +19,7 @@ signal portrait_tapped
 const EMO: = "res://assets/v08/emotions/%s_%s.webp"
 const FRAME_OF: = {"rest": "shy", "smile": "happy", "ah": "surprised", "win": "happy", "lose": "sad", "bite": "pout", "wink": "happy"}
 const STAGE_PRESENCE: = "res://scripts/v10/mj/stage/presence.gd"
+const IDLE_LINES: = ["Не спеши. Ищи открытые края.", "Подсказка внизу, если нужна.", "Я рядом. Смотри по краям."]
 
 var hero: = "mc"
 var accent: = Color("ff8fb8")
@@ -43,18 +46,28 @@ var _moves_since_react: = 0
 var _bob: = 0.0
 var _fin: = 0.0
 var _fin_frame: = ""
+var _idle_n: = -1
 
 
-# the director to use: the stage lane's if present, else this one
-static func make(parent: Control, hero_id: String, opts: = {}) -> Object:
-	if ResourceLoader.exists(STAGE_PRESENCE):
+# the director to use: the passed one (an object with on / sacred), the stage lane's (ext == "stage", if that lane
+# is in the tree), else this built-in one. -> [director, built_in_or_null]
+static func resolve(ext, parent: Control, hero_id: String, opts: = {}) -> Array:
+	if ext is String and ext == "stage" and ResourceLoader.exists(STAGE_PRESENCE):
 		var cls = load(STAGE_PRESENCE)
 		if cls:
-			var p = cls.new()
-			if p.has_method("attach"):
-				return p.attach(parent, hero_id, opts)
-	var me: = V10MjClassicPresence.new()
-	return me.attach(parent, hero_id, opts)
+			var o: = opts.duplicate()
+			o.erase("band_rect")
+			ext = cls.new().attach(parent, hero_id, o)
+	if ext is Object and is_instance_valid(ext) and ext.has_method("on") and ext.has_method("sacred"):
+		if "avoid" in ext and opts.has("avoid"):
+			ext.set("avoid", opts.avoid)
+		return [ext, null]
+	var me: = V10MjClassicPresence.new().attach(parent, hero_id, opts)
+	return [me, me]
+
+
+static func make(parent: Control, hero_id: String, opts: = {}) -> Object:
+	return resolve(null, parent, hero_id, opts)[0]
 
 
 func attach(parent: Control, hero_id: String, opts: = {}) -> V10MjClassicPresence:
@@ -64,7 +77,7 @@ func attach(parent: Control, hero_id: String, opts: = {}) -> V10MjClassicPresenc
 	fx = String(opts.get("fx", G.fx_level() if G.has_method("fx_level") else "full"))
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	name = "V10MjClassicPresence"
-	z_index = 400
+	z_index = int(opts.get("z", 400))
 	parent.add_child(self)
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_line = V10MjClassicStyle.label("", 26, V10MjClassicStyle.TOK.paper100, "title", 600)
@@ -107,8 +120,46 @@ func apply_settings() -> void:
 	pass
 
 
-func _gui_input(_e: InputEvent) -> void:
-	pass
+# a tap on her window (the Приём). The window is in her band, never over the table: the board keeps every tap.
+func _input(e: InputEvent) -> void:
+	if not visible or win_rect.size.x <= 0.0:
+		return
+	if e is InputEventScreenTouch and e.pressed and win_rect.grow(10.0).has_point(e.position):
+		get_viewport().set_input_as_handled()
+		portrait_tapped.emit()
+
+
+func set_charge(v: float) -> void:
+	charge = clampf(v, 0.0, 1.0)
+	queue_redraw()
+
+
+func ready_glow() -> bool:
+	return charge >= 0.999
+
+
+# «not yet»: the window nods once (a tap on it before the ring is full)
+func bounce() -> void:
+	if fx == "min":
+		return
+	_bump = 1.0
+	create_tween().tween_property(self, "_bump", 0.0, 0.25)
+
+
+var _bump: = 0.0:
+	set(v):
+		_bump = v
+		queue_redraw()
+
+
+func hide_finale() -> void:
+	if _fin <= 0.0:
+		return
+	if fx == "min":
+		_fin = 0.0
+		queue_redraw()
+		return
+	create_tween().tween_property(self, "_fin", 0.0, 0.25)
 
 
 func _tex_of(frame: String) -> Texture2D:
@@ -166,7 +217,10 @@ func on(event: String, data: = {}) -> Dictionary:
 			acts.append("glance")
 		"pair":
 			_moves_since_react += 1
-			charge = minf(1.0, charge + 1.0 / float(charge_need))
+			if data.has("charge"):
+				charge = clampf(float(data.charge), 0.0, 1.0)
+			else:
+				charge = minf(1.0, charge + 1.0 / float(charge_need))
 			if data.has("pos") and fx != "min":
 				_burst(data.pos)
 				acts.append("motes")
@@ -187,7 +241,6 @@ func on(event: String, data: = {}) -> Dictionary:
 			create_tween().tween_property(self, "_wink", 0.0, 0.45)
 			acts.append("wink")
 		"signature":
-			charge = minf(1.0, charge + 0.25)
 			_react("ah", 0.6)
 			acts.append("ah")
 		"last_pair":
@@ -201,7 +254,8 @@ func on(event: String, data: = {}) -> Dictionary:
 					acts.append("line")
 			else:
 				_react("rest", 1.2)
-				if say(String(data.get("text", "Я тут. Смотри по краям."))):
+				_idle_n += 1
+				if say(String(data.get("text", IDLE_LINES[_idle_n % IDLE_LINES.size()]))):
 					acts.append("line")
 		"win":
 			input_on = false
@@ -216,7 +270,11 @@ func on(event: String, data: = {}) -> Dictionary:
 			_react("lose", 1.2)
 			acts.append("lose")
 			get_tree().create_timer(1.2).timeout.connect(func(): finale_done.emit())
-		"danger", "wave", "ult", "mech_intro":
+		"ult":
+			charge = 0.0
+			_react("ah", 0.6)
+			acts.append("pose")
+		"danger", "wave", "mech_intro":
 			pass
 	var info: = {"event": event, "acts": acts}
 	log.append([_now(), event, acts])
@@ -282,7 +340,7 @@ func sacred_hits() -> Array:
 
 func _draw() -> void:
 	var T: = V10MjClassicStyle.TOK
-	var r: = win_rect
+	var r: = win_rect.grow(-3.0 * _bump)
 	if r.size.x <= 0.0:
 		return
 	# arch window: dark lacquer, her accent light inside, the frame clipped to the arch
@@ -313,6 +371,10 @@ func _draw() -> void:
 		if k >= 1:
 			draw_polyline(ring.slice(0, k + 1), accent, 5.0, true)
 			draw_circle(ring[k], 4.5, accent.lightened(0.4))
+	if ready_glow():
+		# the ring is full: her Приём is ready — a soft halo of her colour and a spark at the top (no blinking)
+		draw_polyline(_arch_open(r.grow(9.0), 0.0), Color(accent, 0.35), 3.0, true)
+		V10MjClassicStyle.glyph(self, "spark", Vector2(r.get_center().x, r.position.y - 4.0), 9.0, accent.lightened(0.5))
 	if _fin > 0.001 and _fin_frame != "":
 		var fr: = finale_rect()
 		var ftex: = _tex_of(_fin_frame)
