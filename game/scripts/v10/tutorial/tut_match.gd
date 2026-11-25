@@ -548,7 +548,13 @@ func speaker() -> String:
 func hero_anchor() -> Rect2:
 	if _hud != null and is_instance_valid(_hud):
 		var tr: Rect2 = _hud.L.get("tray", Rect2(16, 792, 688, 104))
-		return Rect2(tr.position.x + 216.0, tr.end.y + 4.0, 288.0, 112.0)
+		# left edge: right of the help row when it is shown (L4+), the safe margin on L1–L3 (no help row, UX P0-4)
+		var x0: = tr.position.x + 8.0
+		if _hud.help_row != null and _hud.help_row.is_visible_in_tree():
+			x0 = _hud.help_row.get_global_rect().end.x + 16.0
+		var face: Rect2 = _hud.hero_face_global().grow(48.0)
+		var x1: = maxf(x0 + 288.0, face.position.x - 8.0)
+		return Rect2(x0, tr.end.y + 4.0, x1 - x0, 112.0)
 	var sr: = _screen_rect()
 	var f: = _field_rect()
 	var bottom: = sr.end.y - 8.0

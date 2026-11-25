@@ -534,14 +534,18 @@ func _place(animate: bool) -> void:
 	if anchor is Rect2 and (anchor as Rect2).has_area() and (String(spec.get("place", "auto")) == "hero" or _ctx() == "match"):
 		var a: Rect2 = anchor
 		var w0: = minf(maxw, maxf(a.size.x, 224.0))
-		var w: = w0
-		while w >= 224.0:
-			_try(best, w, por_w, head, 3, func(bs: Vector2) -> Array: return _anchor_cands(a, bs, avoid), col, hole_g, avoid)
+		# UX §4.1 п.9: ≤ 2 lines; a 3rd line only if the zone is too narrow for any clean 2-line spot
+		for max_a in [2, 3]:
 			if float(best.s) <= 0.0:
 				break
-			w -= 16.0
-	# ≤ 3 lines anywhere clean; a 4th line only as the last resort before overlapping something
-	for max_l in [3, 4]:
+			var w: = w0
+			while w >= 224.0:
+				_try(best, w, por_w, head, max_a, func(bs: Vector2) -> Array: return _anchor_cands(a, bs, avoid), col, hole_g, avoid)
+				if float(best.s) <= 0.0:
+					break
+				w -= 16.0
+	# ≤ 2 lines anywhere clean; 3–4 lines only as the last resort before overlapping something
+	for max_l in [2, 3, 4]:
 		if float(best.s) <= 0.0:
 			break
 		for w2 in [maxw, 472.0, 400.0, 344.0, 288.0, 256.0, 224.0]:

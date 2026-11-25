@@ -107,21 +107,21 @@ const INTROS: = {
 # First match (L1) and match mechanics. Placed in the heroine zone (HUD_V2 §8.1), never over the field.
 # {n} in m_tray is the tray size with the right plural (see tray_line()).
 const MATCH: = {
-	"m_a": {"target": "match.tile_a", "mode": "do", "line": "Коснись этой фишки — она прыгнет в лоток."},
-	"m_b": {"target": "match.tile_b", "mode": "do", "line": "А теперь такую же. Две одинаковые — и пара уходит."},
-	"m_left": {"target": "match.status", "mode": "tap", "line": "Здесь видно, сколько фишек ещё на столе."},
-	"m_free": {"target": "match.tile_a", "mode": "wait", "line": "Брать можно открытые фишки: сверху пусто, сбоку есть место."},
+	"m_a": {"target": "match.tile_a", "mode": "do", "line": "Коснись этой фишки — она уйдёт в лоток."},
+	"m_b": {"target": "match.tile_b", "mode": "do", "line": "Теперь такую же — и пара уйдёт."},
+	"m_left": {"target": "match.status", "mode": "tap", "line": "Здесь видно, сколько фишек осталось."},
+	"m_free": {"target": "match.tile_a", "mode": "wait", "line": "Открытая — та, что ничем не прижата."},
 	"m_tray": {"target": "match.tray", "mode": "tap", "line": "В лотке {n}. Заполнишь — партия окончена~"},
-	"m_danger": {"target": "match.tray", "mode": "wait", "line": "Осторожно! В лотке почти нет места."},
-	"m_ult": {"target": "match.hero", "mode": "do", "line": "Кольцо полное — коснись меня. Это мой Приём, особый ход."},
+	"m_danger": {"target": "match.tray", "mode": "wait", "line": "Осторожно! Лоток почти полон."},
+	"m_ult": {"target": "match.hero", "mode": "do", "line": "Мой Приём — особый ход. Коснись меня!"},
 	"m_fail": {"target": "fail.retry", "mode": "wait", "line": "Ничего~ Ещё раз — и стол наш."},
-	"v_stars": {"target": "win.stars", "mode": "wait", "line": "Стол чист! Звёзды — за партию без помощи."},
+	"v_stars": {"target": "win.stars", "mode": "wait", "line": "Стол чист! Звёзды — за игру без помощи."},
 	"v_home": {"target": "win.home", "mode": "do", "line": "Пойдём, покажу нашу чайную."},
 	# mechanics, once each, at most one per match, never on L1 except where noted
-	"match_help": {"target": "match.help", "mode": "tap", "line": "Застрянешь — выручат Отмена, Подсказка и Перемешать. Но третью звезду не дам~"},
-	"match_combo": {"target": "match.combo", "mode": "wait", "line": "Пары без пауз — и над лотком растёт ×2, ×3…"},
-	"match_fever": {"target": "", "mode": "wait", "line": "Азарт! Пока он горит, каждая пара ценнее."},
-	"match_stake": {"target": "match.stake", "mode": "tap", "line": "Ставка ×2: награда вдвое, если закончишь без помощи."},
+	"match_help": {"target": "match.help", "mode": "tap", "line": "Это помощь. Выручит, но без третьей звезды~"},
+	"match_combo": {"target": "match.combo", "mode": "wait", "line": "Пары без пауз — и растёт ×2, ×3…"},
+	"match_fever": {"target": "", "mode": "wait", "line": "Азарт! Сейчас каждая пара ценнее."},
+	"match_stake": {"target": "match.stake", "mode": "tap", "line": "Ставка ×2: награда вдвое без помощи."},
 }
 
 # Speaker for a match line = the match partner (screen.partner), Маджонг-тян on L1.
