@@ -1,0 +1,732 @@
+{
+ "mc": [
+  {
+   "slot": "greet",
+   "text": "Ну-ка, к столу! Фишки перемешаны, кости брошены — твой ход.",
+   "direction": "Бодро, с порога, хлопает в ладоши; хозяйка салона рада гостю",
+   "instr": "Cheerful energetic welcome, bright upbeat tone, medium-fast pace, warm smile in the voice"
+  },
+  {
+   "slot": "tap_head",
+   "text": "Ой! По макушке? Это к удаче — гладь, пока ветер попутный!",
+   "direction": "Сначала удивлённо, после паузы — смущённо-довольно, сдаётся",
+   "instr": "Surprised squeak, then delighted and playful, bright, medium-fast pace"
+  },
+  {
+   "slot": "tap_hair",
+   "text": "Ай, только не за хвосты! Это мой флюгер — дёрнешь, и ветер собьётся!",
+   "direction": "Шутливо ахает, прикрывает хвосты ладонями; в конце озорно-таинственно",
+   "instr": "Playful startled yelp, mock protest, lively pace, mischievous mysterious lift at the end"
+  },
+  {
+   "slot": "tap_prop",
+   "text": "Восточный ветер? Отыграй его у меня — если сможешь!",
+   "direction": "Азартный вызов, прячет фишку за спину, дразнит",
+   "instr": "Competitive teasing challenge, confident grin, energetic, slight taunt at the end"
+  },
+  {
+   "slot": "tap_acc",
+   "text": "Нефритовые узелки — на удачу. Теперь она у нас общая!",
+   "direction": "Тепло, с хитринкой: делится удачей как секретом",
+   "instr": "Warm and mischievous, light conspiratorial tone, medium pace, happy finish"
+  },
+  {
+   "slot": "tap_spam",
+   "text": "Ну хватит же! Ещё раз — и раздам тебе самые вредные фишки.",
+   "direction": "Надула губы, грозит понарошку, как обиженная хозяйка стола",
+   "instr": "Pouty mock annoyance, playful threat, slightly faster, not angry, teasing"
+  },
+  {
+   "slot": "combo5",
+   "text": "Пять! Ветер в спину!",
+   "direction": "Коротко, весело, подталкивает вперёд — первая ступень ветра",
+   "instr": "Short bright cheer, upbeat, quick, encouraging push"
+  },
+  {
+   "slot": "combo10",
+   "text": "Десять! Да это уже буря!",
+   "direction": "Ярче и громче, в азарте подпрыгивает — ветер крепчает",
+   "instr": "Excited loud cheer, rising energy, fast"
+  },
+  {
+   "slot": "combo20",
+   "text": "Двадцать! Ты — тайфун!",
+   "direction": "Пик восторга, почти визг, хвосты взлетают",
+   "instr": "Peak ecstatic shout, very excited, loud, breathless joy"
+  },
+  {
+   "slot": "priem",
+   "text": "Ха! Восточный ветер — лови сердечко!",
+   "direction": "Щелчком отправляет фишку в камеру и подмигивает; звонко, с задором",
+   "instr": "Bold playful battle cry, loud and punchy, wink in the voice on the last words"
+  },
+  {
+   "slot": "tag",
+   "text": "Партия окончена!",
+   "direction": "Фирменно, торжествующе, с победной точкой",
+   "instr": "Triumphant signature catchphrase, crisp and confident, strong final accent"
+  },
+  {
+   "slot": "win",
+   "text": "Наша взяла! Я же говорила — вдвоём нас не обыграть!",
+   "direction": "Ликует, подбрасывает фишку; «я же говорила» — с азартной самоуверенностью",
+   "instr": "Joyful victorious, cocky told-you-so lift, energetic, proud and warm, medium-fast pace"
+  },
+  {
+   "slot": "lose",
+   "text": "Ветер переменился, только и всего! Сдаю заново — без отыгрыша не усну!",
+   "direction": "Шутливо возмущается, валит всё на ветер, тут же загорается реваншем",
+   "instr": "Playful indignant protest, no real sadness, then eager challenging energy, inviting tone"
+  },
+  {
+   "slot": "summon",
+   "text": "Маджонг-тян, сердце «Пяти ветров»! Не проигрываю — и тобой не делюсь!",
+   "direction": "Эффектное появление: щелчок фишкой, подмигивание, озорная собственница",
+   "instr": "Confident flashy introduction, playful and possessive, bright, clear diction"
+  },
+  {
+   "slot": "birthday",
+   "text": "С днём рождения! В честь праздника даже поддамся… может быть. Разок!",
+   "direction": "Празднично, тепло; на «может быть» хитро колеблется",
+   "instr": "Festive warm congratulation, then teasing hesitation, playful wink at the end"
+  },
+  {
+   "slot": "comeback",
+   "text": "Ура, ты здесь! Твоё место за столом я никому не отдавала — садись!",
+   "direction": "Искренняя радость встречи без упрёка; тёплая собственница, сразу зовёт за стол",
+   "instr": "Genuine happy surprise, warm and excited, possessive warmth, no reproach, eager inviting pace"
+  },
+  {
+   "slot": "idle",
+   "text": "Ау? Ветер стих, фишки ждут… Ну же, ходи!",
+   "direction": "Мягко, с игривой ревностью; в конце бодро подталкивает к ходу",
+   "instr": "Soft teasing call, slower, then a light cheerful nudge at the end"
+  },
+  {
+   "slot": "danger",
+   "text": "Ветер крепчает — лоток почти полон! Бери только то, что сложится в пару.",
+   "direction": "Собранно и спокойно, как опытная наставница рядом за столом",
+   "instr": "Focused and alert but calm, steady medium pace, reassuring, no panic"
+  },
+  {
+   "slot": "close1",
+   "text": "Знаешь… с тобой я даже проигрывать не боюсь.",
+   "direction": "Шёпотом, тихое признание без привычного задора; пауза после «Знаешь…»",
+   "instr": "soft intimate whisper, tender confession, clear pause after the first word, slow and"
+  },
+  {
+   "slot": "close2",
+   "text": "Сыграем ещё? Не ради очков… Просто мне хорошо, когда ты рядом.",
+   "direction": "Шёпотом, наливает чай, не хочет отпускать",
+   "instr": "soft intimate whisper, warm and lingering, slow, shy pause in the middle"
+  },
+  {
+   "slot": "close3",
+   "text": "Держи мой восточный ветер… Пусть дует туда, куда идёшь ты.",
+   "direction": "Шёпотом вкладывает фишку в руку игрока; самое медленное и тихое, полное доверие",
+   "instr": "soft intimate whisper, slowest and quietest of the three, deeply tender, long"
+  },
+  {
+   "slot": "tut1",
+   "text": "Бери свободную фишку — и в лоток. Две одинаковые в лотке — пуф, и нету!",
+   "direction": "Объясняет весело и наглядно, на «пуф» показывает жестом",
+   "instr": "Friendly clear explanation, playful, moderate pace, bright pop on the sound word"
+  },
+  {
+   "slot": "tut2",
+   "text": "Не забивай лоток доверху! Нет места — нет партии, а я так не играю!",
+   "direction": "Наставительно, но с азартом; конец — шутливое упрямство",
+   "instr": "Clear instructive tone, moderate pace, then playful stubborn emphasis at the end"
+  },
+  {
+   "slot": "tut3",
+   "text": "Засияло кольцо у меня за спиной? Жми на меня — покажу свой Приём!",
+   "direction": "Сначала вопросом — ждём сияния, затем бодрое «жми»; гордится своим Приёмом",
+   "instr": "Clear instruction, questioning lift on the first phrase, then excited, proud and playful finish"
+  }
+ ],
+ "rin": [
+  {
+   "slot": "greet",
+   "text": "Ты здесь. Чай как раз настоялся. …Совпадение, не придумывай.",
+   "direction": "Ровно и сдержанно; после паузы «Совпадение…» — чуть быстрее и суше, прячет заботу.",
+   "instr": "Calm, composed, measured; after the pause, a touch quicker and drier, covering warmth."
+  },
+  {
+   "slot": "tap_head",
+   "text": "Это против всех правил церемонии… Ладно, ещё немного.",
+   "direction": "Строго и официально, пауза, затем тише и мягче — нехотя разрешает.",
+   "instr": "Starts strict and formal, short pause, then softer and quieter, reluctantly permissive."
+  },
+  {
+   "slot": "tap_hair",
+   "text": "Коса лежала идеально. Лежала.",
+   "direction": "Сухая ирония: «идеально» с достоинством, «Лежала» — после паузы, ровно и печально.",
+   "instr": "Deadpan irony, measured pace; pause before the last word, said flatly with mock sorrow."
+  },
+  {
+   "slot": "tap_prop",
+   "text": "Тише, это селадон. Чай ровно на две трети — я отмерила.",
+   "direction": "Негромко предупреждает; «я отмерила» — с тихой гордостью мастера за точность.",
+   "instr": "Calm, low, precise warning, even tone; slight quiet pride on the last phrase."
+  },
+  {
+   "slot": "tap_acc",
+   "text": "Очки не трогай. Я поправляю их сама… когда ты слишком близко.",
+   "direction": "Начинает строго, на «когда ты слишком близко» сбивается и поправляет очки.",
+   "instr": "Starts cool and firm, then falters and softens, slightly flustered, slower at the end."
+  },
+  {
+   "slot": "tap_spam",
+   "text": "Довольно. …Я не краснею. Это пар от чая.",
+   "direction": "Губы чуть надуты, но тон ровный: «Довольно» — холодно; оправдание тише и быстрее.",
+   "instr": "Cool, clipped first word; pause; then a quicker, quieter flustered denial, trying to stay"
+  },
+  {
+   "slot": "combo5",
+   "text": "Пять. Чисто.",
+   "direction": "Коротко, одобрительно, без лишних эмоций.",
+   "instr": "Brief, calm, approving, clean crisp delivery."
+  },
+  {
+   "slot": "combo10",
+   "text": "Десять. Эффективно.",
+   "direction": "Ровно, без восклицания; в «эффективно» проскальзывает тёплая улыбка — выдала себя.",
+   "instr": "Calm and approving, no exclamation; a tiny warm smile slips into the last word."
+  },
+  {
+   "slot": "combo20",
+   "text": "Двадцать?! Запишу тушью.",
+   "direction": "Сдержанность ломается на числе; затем собирается — тихо, тепло, с достоинством.",
+   "instr": "Genuine surprise breaking composure on the number; then quiet, warm, deliberate dignity."
+  },
+  {
+   "slot": "priem",
+   "text": "Позволь. Чайная пауза!",
+   "direction": "Собранно: «Позволь» — на вдохе, «Чайная пауза» — уверенный звонкий выкрик.",
+   "instr": "Focused calm first word, then a confident ringing call, medium-high volume."
+  },
+  {
+   "slot": "tag",
+   "text": "Позволь.",
+   "direction": "Спокойно, с достоинством, коротко — её фирменная подпись.",
+   "instr": "Calm, dignified, short, low and steady."
+  },
+  {
+   "slot": "win",
+   "text": "Партия за нами, как я и рассчитала. …Ещё чашку?",
+   "direction": "Довольная уверенность; «Ещё чашку?» — тихо, с тёплой надеждой.",
+   "instr": "Quietly satisfied and confident; final question soft and hopeful."
+  },
+  {
+   "slot": "lose",
+   "text": "Ошибка в расчётах — моя. …Допей чай, и сыграем ещё раз.",
+   "direction": "Без драмы, спокойно берёт вину на себя; приглашение мягкое и тёплое.",
+   "instr": "Gentle, unbothered, warm, no drama; soft inviting tone, medium-low volume."
+  },
+  {
+   "slot": "summon",
+   "text": "Рин, хозяйка Ледяного павильона. Чай наливаю не всем… тебе — налью.",
+   "direction": "Холодно-церемонно представляется; на «тебе — налью» лёд чуть тает.",
+   "instr": "Cool, ceremonial introduction, measured pace; warms slightly on the last phrase."
+  },
+  {
+   "slot": "birthday",
+   "text": "С днём рождения. Этот улун я берегла для особого случая. …Он настал.",
+   "direction": "Сдержанно-торжественно; «Он настал» — после паузы, тихо, тепло и твёрдо.",
+   "instr": "Composed yet warm and sincere, medium volume; last phrase quiet, tender and certain."
+  },
+  {
+   "slot": "comeback",
+   "text": "С возвращением. Я рада. …Это не чувства — просто факт.",
+   "direction": "Тихая радость, затем сухая «логика» как прикрытие; без упрёка, улыбка в голосе.",
+   "instr": "Quiet gladness, then a dry matter-of-fact cover; warm faint smile, no reproach."
+  },
+  {
+   "slot": "idle",
+   "text": "Пауза затянулась. Чай стынет, партия тоже. …Ход за тобой.",
+   "direction": "Терпеливо и негромко; «Ход за тобой» — мягкое приглашение, без нажима.",
+   "instr": "Dry, calm, slightly ironic, measured pace; softer on the last phrase"
+  },
+  {
+   "slot": "danger",
+   "text": "Лоток почти полон. Спокойно: ищи пару к тому, что уже внутри.",
+   "direction": "Спокойно и чётко, ровным голосом; её уверенность передаётся игроку.",
+   "instr": "Calm, clear and steady, reassuring, no panic, medium pace."
+  },
+  {
+   "slot": "close1",
+   "text": "Чай остыл, а вставать не хочется… Посиди со мной ещё.",
+   "direction": "Шёпотом, медленно; признание, которое она наконец себе позволяет.",
+   "instr": "soft intimate whisper, slow and tender, lingering pause before the request."
+  },
+  {
+   "slot": "close2",
+   "text": "Сядь ближе. Так… эффективнее.",
+   "direction": "Шёпотом; пауза перед «эффективнее», лёгкая смущённая улыбка.",
+   "instr": "soft intimate whisper, playful pause, hint of a shy smile."
+  },
+  {
+   "slot": "close3",
+   "text": "Павильон закрыт. Для всех, кроме тебя. …Насовсем.",
+   "direction": "Самый тёплый шёпот, рубленые паузы; «Насовсем» — тихо, твёрдо, окончательно.",
+   "instr": "soft intimate whisper, warmest and slowest, clipped pauses; final word tender and"
+  },
+  {
+   "slot": "tut1",
+   "text": "Нажми на открытую фишку — она уйдёт в лоток. Две одинаковые исчезнут.",
+   "direction": "Объясняет спокойно и точно, без спешки, как мастер на церемонии.",
+   "instr": "Calm, clear instructional tone, even pace, medium volume."
+  },
+  {
+   "slot": "tut2",
+   "text": "Оставляй в лотке место: полный лоток — проигрыш. Без исключений.",
+   "direction": "Деловито; «Без исключений» — сухо, с лёгкой иронией.",
+   "instr": "Matter-of-fact and clear; dry irony on the last words."
+  },
+  {
+   "slot": "tut3",
+   "text": "Когда кольцо засияет, нажми на меня. Дальше — мой Приём.",
+   "direction": "Чётко объясняет; «Дальше — мой Приём» — с тихой уверенностью.",
+   "instr": "Clear and composed; quiet confidence on the final phrase."
+  }
+ ],
+ "hana": [
+  {
+   "slot": "greet",
+   "text": "Привет-привет! Я тут уже третий круг нарезаю — погнали?",
+   "direction": "Звонко, чуть запыхавшись после пробежки, нетерпеливо и радостно",
+   "instr": "Bright, loud, energetic greeting, slightly out of breath, upbeat sporty tone, medium-fast pace"
+  },
+  {
+   "slot": "tap_head",
+   "text": "Эй-эй! По голове гладят только после финиша!",
+   "direction": "Смущена, отбивается спортивным правилом, но не сердится",
+   "instr": "Flustered playful protest, quick, slightly embarrassed laugh in voice"
+  },
+  {
+   "slot": "tap_hair",
+   "text": "Причёску не трогать! Это моя аэродинамика, между прочим!",
+   "direction": "Шутливо-строго, гордится причёской, улыбка в голосе",
+   "instr": "Mock-stern playful warning, proud and teasing, medium pace, smiling"
+  },
+  {
+   "slot": "tap_prop",
+   "text": "Капитанский фонарь — им я даю старт эстафете! Подержать? Только аккуратно!",
+   "direction": "Сначала важно, пауза на многоточии, сдаётся; «тебе можно» — тише и теплее",
+   "instr": "Proud and bright, quick, then a friendly offer with a playful warning"
+  },
+  {
+   "slot": "tap_acc",
+   "text": "Подсолнух тянется к солнцу… и к тебе. Ой! Фальстарт, не считается!",
+   "direction": "Мечтательно проговаривается, тут же спохватывается и частит по-спортивному",
+   "instr": "Dreamy soft start, then sudden flustered backpedal, faster and louder, embarrassed laugh"
+  },
+  {
+   "slot": "tap_spam",
+   "text": "Жёлтая карточка! Нарушаешь регламент — следующая будет красной!",
+   "direction": "Надутые губы, шутливый судейский окрик с нарастанием, без злости",
+   "instr": "Pouty mock-referee scolding, playful annoyance building up, firm but not angry"
+  },
+  {
+   "slot": "combo5",
+   "text": "Отличный темп! Вперёд!",
+   "direction": "Коротко, одобрительно, как тренер с бровки",
+   "instr": "Short encouraging shout, upbeat, medium volume"
+  },
+  {
+   "slot": "combo10",
+   "text": "Вот это спринт!",
+   "direction": "Ярче, азарт нарастает",
+   "instr": "Thrilled shout, fast, clear Russian pronunciation of every word"
+  },
+  {
+   "slot": "combo20",
+   "text": "Рекорд! Трибуны ревут!",
+   "direction": "Пик восторга, почти крик с трибуны",
+   "instr": "Peak euphoria, loud ecstatic shout, fast, stadium cheer"
+  },
+  {
+   "slot": "priem",
+   "text": "Рывок! Попробуй догони!",
+   "direction": "Взрывной боевой выкрик, на «догони» — дерзкий весёлый вызов",
+   "instr": "Explosive battle cry, loud and punchy, then a cocky playful challenge"
+  },
+  {
+   "slot": "tag",
+   "text": "На старт!",
+   "direction": "Фирменно, чётко, как стартовая команда",
+   "instr": "Crisp loud starting command, confident, punchy, short"
+  },
+  {
+   "slot": "win",
+   "text": "Есть финиш! Первое место — наше! Ладонь сюда — хлоп!",
+   "direction": "Ликует, тянет ладонь, на «хлоп» — звонко, как удар ладонью о ладонь",
+   "instr": "Triumphant joyful shout, loud, fast, celebratory, inviting, playful snap on the last word"
+  },
+  {
+   "slot": "lose",
+   "text": "Ничего, это была разминка! Реванш? Я уже зажгла фонарь!",
+   "direction": "Легко, чуть хорохорится, без обиды, и сразу азартно зовёт на реванш",
+   "instr": "Light cheerful brush-off with a hint of bravado, no disappointment, then quick eager invitation"
+  },
+  {
+   "slot": "summon",
+   "text": "Хана, капитан фонарной эстафеты! Обгоню всех… а от нежностей сбегу первой!",
+   "direction": "Громко и гордо, после многоточия — смущённый смешок на «сбегу первой»",
+   "instr": "Loud proud self-introduction, then a shy self-aware chuckle at the end"
+  },
+  {
+   "slot": "birthday",
+   "text": "С днём рождения! Сегодня пьедестал твой, а я громче всех болею за тебя!",
+   "direction": "Искренне, громко, как болельщица на трибуне",
+   "instr": "Joyful heartfelt cheer, loud and warm, festive, medium-fast pace"
+  },
+  {
+   "slot": "comeback",
+   "text": "Ого, какие люди! Отдых — тоже часть тренировки. Разомнёмся вместе?",
+   "direction": "Искренняя радость, по-тренерски поддерживает, ни тени упрёка",
+   "instr": "Genuinely happy surprise, warm supportive coach tone, no reproach"
+  },
+  {
+   "slot": "idle",
+   "text": "Судья давно свистнул! Твой ход — я тут прыгаю от нетерпения.",
+   "direction": "Нетерпеливо, но мягко и с улыбкой, подпрыгивает на месте",
+   "instr": "Gentle playful nudge, bouncy impatient energy, friendly, medium volume"
+  },
+  {
+   "slot": "danger",
+   "text": "Дыши ровно, без паники. Лоток почти полон — сначала ищи пару.",
+   "direction": "Собранно, спокойно, как тренер в решающий момент",
+   "instr": "Calm focused coach voice, steady slower pace, reassuring, lower volume"
+  },
+  {
+   "slot": "close1",
+   "text": "Эй… можно просто постоять рядом? Сердце стучит, как после забега.",
+   "direction": "Шёпотом, удивлена сама себе, впервые без спешки",
+   "instr": "soft intimate whisper, slow, shy and breathless, tender"
+  },
+  {
+   "slot": "close2",
+   "text": "Я опять зову тебя на реванш… Только не спрашивай зачем, ладно?",
+   "direction": "Шёпотом, смущённое признание, которое она не договаривает",
+   "instr": "soft intimate whisper, shy confession, hesitant pause, gentle plea"
+  },
+  {
+   "slot": "close3",
+   "text": "Всю жизнь бегу к финишу… а с тобой хочу, чтобы дистанция не кончалась.",
+   "direction": "Самый тёплый шёпот, медленно, без шуток и без бравады",
+   "instr": "soft intimate whisper, very slow and warm, sincere, deeply tender"
+  },
+  {
+   "slot": "tut1",
+   "text": "Передай свободную фишку в лоток, как эстафету! Две одинаковые — сняты!",
+   "direction": "Бодро, как тренер на первой тренировке, с жестом передачи",
+   "instr": "Clear upbeat explanation, friendly coach tone, moderate pace"
+  },
+  {
+   "slot": "tut2",
+   "text": "Держи в лотке свободное место — запас сил! Полный лоток — забег проигран!",
+   "direction": "Серьёзнее, по-тренерски, акцент на «полный лоток»",
+   "instr": "Serious but friendly coaching, emphasize the warning, moderate pace"
+  },
+  {
+   "slot": "tut3",
+   "text": "Вспыхнуло кольцо за спиной — это мой стартовый сигнал! Жми на меня — Приём!",
+   "direction": "Азартно, с предвкушением, зовёт нажать",
+   "instr": "Excited anticipation, energetic, inviting, medium-fast pace"
+  }
+ ],
+ "yue": [
+  {
+   "slot": "greet",
+   "text": "Луна взошла — и привела тебя ко мне. Ночь светлая, сыграем?",
+   "direction": "Неторопливо, с царственной теплотой; лёгкая улыбка, веер у губ",
+   "instr": "Regal warm welcome, unhurried pace, medium-low volume, faint amused smile"
+  },
+  {
+   "slot": "tap_head",
+   "text": "Меня не гладили по голове с самой коронации. …Продолжай.",
+   "direction": "Удивлённо, затем тихо довольна и чуть обезоружена; пауза перед «Продолжай»",
+   "instr": "Surprised, then quietly pleased and a little disarmed, slow, brief pause before the last"
+  },
+  {
+   "slot": "tap_hair",
+   "text": "Бережнее. В моих волосах до сих пор путаются звёзды.",
+   "direction": "Мягкое предостережение, переходящее в мечтательность; тише к концу",
+   "instr": "Gentle warning turning dreamy, slow, soft volume, a touch of wonder at the end"
+  },
+  {
+   "slot": "tap_prop",
+   "text": "Веер? Им я разгоняю тучи, чтобы луна могла тебя разглядеть.",
+   "direction": "Игриво, с полуулыбкой; лёгкий взмах веером, затем веер у губ",
+   "instr": "Playful, teasing, mysterious, moderate pace, light smile in the voice"
+  },
+  {
+   "slot": "tap_acc",
+   "text": "Полумесяц мне доверила сама луна. Тебе пока — лишь любоваться.",
+   "direction": "Гордо и снисходительно, тёплая насмешка сверху вниз",
+   "instr": "Proud, gently condescending, warm teasing, measured pace, medium volume"
+  },
+  {
+   "slot": "tap_spam",
+   "text": "Какая настойчивость… Всё, я обижена до рассвета. …Ладно, до полуночи.",
+   "direction": "Надутые губы, царственная обида; на «ладно» сдаётся и смягчается",
+   "instr": "Pouting regal annoyance, then softening with a small sigh, playful, medium pace"
+  },
+  {
+   "slot": "combo5",
+   "text": "Раз-два-три… изящно.",
+   "direction": "Под счёт вальса, легко и одобрительно",
+   "instr": "Light approving, lilting waltz rhythm, airy, medium volume"
+  },
+  {
+   "slot": "combo10",
+   "text": "Звёзды рукоплещут!",
+   "direction": "Ярче, с явным удовольствием, чуть громче",
+   "instr": "Bright, delighted, slightly louder, crisp and elegant"
+  },
+  {
+   "slot": "combo20",
+   "text": "Луна танцует с тобой!",
+   "direction": "Пик восторга, но благородно, без визга; звонко, на распеве",
+   "instr": "Peak delight, elegant, ringing and lilting, louder but never shrill"
+  },
+  {
+   "slot": "priem",
+   "text": "Лунный свет! Пусть серебро смоет всё лишнее.",
+   "direction": "Звонко на «Лунный свет» со взмахом веера; вторая фраза — спокойный царский указ",
+   "instr": "Ringing command on the technique name, then a calm sovereign decree; strong but never"
+  },
+  {
+   "slot": "tag",
+   "text": "Любопытно…",
+   "direction": "Задумчиво, протяжно, с интересом; веер у губ",
+   "instr": "Intrigued, slow, drawn out, low and silky, trailing off"
+  },
+  {
+   "slot": "win",
+   "text": "Очаровательно. За три века я не видела победы красивее нашей.",
+   "direction": "Снисходительное восхищение: лёгкая насмешка и тепло, без спешки",
+   "instr": "Amused regal admiration, unhurried, warm and proud"
+  },
+  {
+   "slot": "lose",
+   "text": "Пустяки. Луна тоже убывает, чтобы снова стать полной. Ещё партию?",
+   "direction": "Спокойно и утешающе, без жалости; светлое приглашение в конце",
+   "instr": "Calm, comforting, warm, unhurried; lift into an inviting tone on the final question"
+  },
+  {
+   "slot": "summon",
+   "text": "Я Юэ, правительница Лунного дворца. Куда спешить? У нас впереди вечность.",
+   "direction": "Величественно и неспешно; вторая часть — тёплое приглашение с улыбкой",
+   "instr": "Majestic and mysterious, slow and poised; warm inviting smile on the second phrase"
+  },
+  {
+   "slot": "birthday",
+   "text": "С днём рождения! Я велела звёздам этой ночью гореть для тебя.",
+   "direction": "Празднично, но по-царски; искренняя нежность во второй фразе",
+   "instr": "Festive yet regal, sincere warmth, gentle smile, moderate pace"
+  },
+  {
+   "slot": "comeback",
+   "text": "А вот и ты! Луна сегодня ярче — и я знаю почему.",
+   "direction": "Искренняя светлая радость, ни тени упрёка; тепло на «по-прежнему твоё»",
+   "instr": "Genuinely glad, bright and warm, no reproach at all, moderate pace"
+  },
+  {
+   "slot": "idle",
+   "text": "Я могу ждать столетиями, а вот фишки — едва ли. Сыграем?",
+   "direction": "Лениво, с иронией; на «Сыграем?» мягкий зов, не торопит",
+   "instr": "Languid, gently ironic, slow pace, low volume; soft inviting lift on the final question"
+  },
+  {
+   "slot": "danger",
+   "text": "Тише. Лоток почти полон — ищи пару, не торопись. Звёзды не любят суеты.",
+   "direction": "Собранно и спокойно, тихий уверенный совет, без паники",
+   "instr": "Calm, focused, reassuring, steady measured pace, low to medium volume"
+  },
+  {
+   "slot": "close1",
+   "text": "Не спеши уходить… С тобой даже долгая ночь коротка.",
+   "direction": "Шёпотом, нежно и близко; пауза на многоточии",
+   "instr": "soft intimate whisper, tender, slow, a pause at the ellipsis"
+  },
+  {
+   "slot": "close2",
+   "text": "Открою тебе секрет… иногда я проигрываю нарочно. Чтобы встретиться снова.",
+   "direction": "Шёпотом, заговорщицки, как признание; чуть смущённо в конце",
+   "instr": "soft intimate whisper, confiding a secret, slow, slightly shy at the end"
+  },
+  {
+   "slot": "close3",
+   "text": "Луна светила мне три века… а теперь ревнует меня к тебе.",
+   "direction": "Шёпотом, самая тёплая; медленно, каждое слово как подарок",
+   "instr": "soft intimate whisper, very slow, tender, a hint of amused wonder at the end"
+  },
+  {
+   "slot": "tut1",
+   "text": "Свободные фишки ложатся в лоток. Две одинаковые тают, как звёзды к утру.",
+   "direction": "Терпеливо и изящно, с лёгкой улыбкой; внятно на «две одинаковые»",
+   "instr": "Patient, clear, elegant guidance, unhurried, warm, medium volume"
+  },
+  {
+   "slot": "tut2",
+   "text": "Береги в лотке простор. Заполнишь его до края — и партия угаснет.",
+   "direction": "Спокойно и внятно; лёгкое предупреждение на «полный лоток»",
+   "instr": "Calm, clear and measured, slight warning emphasis near the end, warm tone"
+  },
+  {
+   "slot": "tut3",
+   "text": "Кольцо за спиной сияет, как полная луна? Коснись меня — и узри Приём.",
+   "direction": "Таинственно, с предвкушением; чётко на «коснись меня»",
+   "instr": "Mysterious anticipation, clear instruction, unhurried, medium volume"
+  }
+ ],
+ "nova": [
+  {
+   "slot": "greet",
+   "text": "Вход зафиксирован. Привет! Я тебя ещё на подходе вычислила.",
+   "direction": "Сухой лог, тёплое «привет», в конце — довольная ухмылка: засекла заранее",
+   "instr": "Crisp log-style first phrase, bright warm hi, then smug teasing on the last phrase"
+  },
+  {
+   "slot": "tap_head",
+   "text": "Несанкционированное поглаживание. Статус: приятно.",
+   "direction": "Ровный системный рапорт, на «приятно» — сдержанная смущённая улыбка",
+   "instr": "Mock-robotic deadpan report, short beat, then a shy amused smile on the last word"
+  },
+  {
+   "slot": "tap_hair",
+   "text": "Синяя прядь — скорость. Розовая… это засекречено.",
+   "direction": "Гордо про синюю, на розовой запинка и смущённый уход от ответа",
+   "instr": "Proud and quick on first phrase, hesitant pause, then flustered secretive tone"
+  },
+  {
+   "slot": "tap_prop",
+   "text": "Голограмма — не игрушка, а прототип. Ладно, игрушка. Но красивая.",
+   "direction": "Гордо демонстрирует, потом сама себя разоблачает с усмешкой",
+   "instr": "Proud show-off tone, short beat, then self-ironic admission with a grin, medium pace"
+  },
+  {
+   "slot": "tap_acc",
+   "text": "Ушки — рабочий интерфейс. А милота — побочный эффект.",
+   "direction": "Деловито, как по техпаспорту; на «милота» — гордая ухмылка",
+   "instr": "Mock-serious technical tone, then a proud little smirk on the last phrase, medium"
+  },
+  {
+   "slot": "tap_spam",
+   "text": "Перегрузка! Активирую защиту от спама… Шучу. Почти.",
+   "direction": "Надула губы: короткий вскрик, потом обиженно-игривое ворчание",
+   "instr": "Startled exclamation, mock-robotic warning, then a playful aside, quick"
+  },
+  {
+   "slot": "combo5",
+   "text": "Цепочка пошла!",
+   "direction": "Азартно, как старт заезда",
+   "instr": "Energetic, quick, confident, upbeat"
+  },
+  {
+   "slot": "combo10",
+   "text": "Разгон! Не тормози!",
+   "direction": "Ярче, с драйвом, подгоняет",
+   "instr": "Excited racing energy, louder, fast pace, encouraging"
+  },
+  {
+   "slot": "combo20",
+   "text": "Сверхзвук! Держись!",
+   "direction": "Пик восторга, почти крик на трассе",
+   "instr": "Peak euphoric shout, loud, fast, thrilled laughter in voice"
+  },
+  {
+   "slot": "priem",
+   "text": "Взлом! Неоновая нить — пару ко мне!",
+   "direction": "Боевой выкрик, чётко и хлёстко, название Приёма — ударно",
+   "instr": "Sharp battle cry, punchy emphasis on first word, fast and confident, loud"
+  },
+  {
+   "slot": "tag",
+   "text": "Скачано.",
+   "direction": "Коротко, довольно, с ухмылкой — как точка в логе",
+   "instr": "Short satisfied smirk, clipped, cool, each syllable clearly pronounced"
+  },
+  {
+   "slot": "win",
+   "text": "Стол чист, сбоев — ноль. Мы с тобой — отличный экипаж.",
+   "direction": "Довольный отчёт после заезда; «мы с тобой» — гордо и тепло",
+   "instr": "Satisfied report tone, proud and warm on second phrase, relaxed medium pace"
+  },
+  {
+   "slot": "lose",
+   "text": "Занесло на повороте. Трассу запомнила — давай ещё один заезд?",
+   "direction": "Спокойно, с усмешкой, без драмы; приглашение — тепло",
+   "instr": "Calm lighthearted shrug, no drama, warm inviting question at end, medium pace"
+  },
+  {
+   "slot": "summon",
+   "text": "Нова, взлом и гонки. Твоё имя на вывесках? Тест на уязвимости. Не более.",
+   "direction": "Эффектно; на вопросе самодовольно, «не более» — чуть быстрее, чем надо: выдаёт смущение",
+   "instr": "Cool confident intro, smug on the question, then a too-quick dismissive last phrase"
+  },
+  {
+   "slot": "birthday",
+   "text": "С днём рождения! Взломала все экраны города — на каждом твоё имя.",
+   "direction": "Искренне радостно, празднично; «так и быть» — щедрая гоночная ухмылка",
+   "instr": "Bright sincere joy, festive, proud hacker grin on the last phrase"
+  },
+  {
+   "slot": "comeback",
+   "text": "Сигнал восстановлен! Пинг в норме, а вот мой пульс — нет.",
+   "direction": "Радостный рапорт, потом смущённое честное признание",
+   "instr": "Happy relieved announcement, then a shy flustered admission on the last phrase"
+  },
+  {
+   "slot": "idle",
+   "text": "Ожидаю ввода. Фишки сами себя не взломают.",
+   "direction": "Мягко поддразнивает, лениво-ироничный тон",
+   "instr": "Gentle teasing, relaxed slow pace, soft ironic smile, low-medium volume"
+  },
+  {
+   "slot": "danger",
+   "text": "Тревога: лоток почти полон! Ищем пару, без резких манёвров.",
+   "direction": "Собранно и ровно, как штурман на опасном повороте",
+   "instr": "Focused calm and steady, reassuring, measured pace, no panic, medium volume"
+  },
+  {
+   "slot": "close1",
+   "text": "Поставила на тебя отдельный звук уведомлений. …Да, это уже серьёзно.",
+   "direction": "Шёпотом, доверительно; пауза после «Знаешь», «кроме твоих» — нежно",
+   "instr": "soft intimate whisper, slow, shy, then a quiet serious admission after the pause"
+  },
+  {
+   "slot": "close2",
+   "text": "Подниму визор… хочу смотреть на тебя без фильтров.",
+   "direction": "Шёпотом, медленно, будто правда поднимает визор",
+   "instr": "soft intimate whisper, slow and gentle, sincere, faint smile, close to mic"
+  },
+  {
+   "slot": "close3",
+   "text": "Вывески — не тест на уязвимости. Уязвимость… это ты.",
+   "direction": "Самый тёплый шёпот: признание, ирония растворяется",
+   "instr": "soft intimate whisper, very slow, vulnerable and tender, long pause before final"
+  },
+  {
+   "slot": "tut1",
+   "text": "Тапни свободную фишку — и она в лотке. Совпали две — обе стёрты из системы.",
+   "direction": "Просто и чётко, как брифинг перед заездом, с лёгкой гордостью",
+   "instr": "Clear friendly instruction, steady medium pace, confident, slight playful tone at"
+  },
+  {
+   "slot": "tut2",
+   "text": "Следи за загрузкой лотка! Забьёшь до упора — переполнение, партия слетит.",
+   "direction": "Серьёзно, но дружески; «переполнение» — как знакомый термин",
+   "instr": "Calm clear warning, friendly but serious, steady pace, slight emphasis on the risk"
+  },
+  {
+   "slot": "tut3",
+   "text": "Видишь кольцо за моей спиной? Засияет — жми на меня, запущу Приём.",
+   "direction": "Деловито, с азартом в конце — ей не терпится показать Приём",
+   "instr": "Clear instructive tone, then excited anticipation on last phrase, medium pace"
+  }
+ ]
+}
