@@ -23,6 +23,7 @@ const ROSE_700: = Color("#9A4F66")  # «Игра» pressed
 const JADE_300: = Color("#A9D9C4")  # progress
 const JADE_500: = Color("#5B9580")
 const EMBER: = Color("#E07A7A")  # danger: last tray slot
+const CINNABAR: = Color("#C8463C")  # only the hanko seal (UX §6.2; used by hudfx V10Hanko)
 const FELT_HI: = Color("#1C4A3B")  # table felt, centre (no frame around it, §9.2)
 const FELT_LO: = Color("#0B211B")  # table felt, edge
 const SHADOW: = Color("#121014")  # text shadow on art (α SHADOW_A)
