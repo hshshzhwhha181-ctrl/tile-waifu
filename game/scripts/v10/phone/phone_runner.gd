@@ -5,6 +5,7 @@ extends Control
 # flags:
 #   --phone_selftest=1        run V10PhoneSelftest and quit (exit code 0 = all passed)
 #   --phone_shots=<dir>       scripted tour with screenshots (run under xvfb with --resolution WxH)
+#   --fx=min                  effects «минимум» (S.fx_level): movement replaced by 120 ms fades, no particles
 #   (none)                    interactive: a seeded save, the phone opened over a home backdrop
 # The runner plays the role of `main` for the phone: W, H, overlay, show_chrome(), back(), go(), toast().
 
@@ -32,8 +33,8 @@ func _ready() -> void:
 			_selftest.call_deferred()
 			return
 	Common.backdrop(self, "menu", size, 0.0, 1.0, Color.WHITE, Vector2(0.5, 0.4))
-	button = V10PhoneButton.make(self, Rect2(W - 150, H * 0.52, 112, 128))
-	add_child(button)
+	if "--fx=min" in args:
+		G.S.fx_level = "min"
 	overlay = Control.new()
 	overlay.size = vs
 	overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -42,8 +43,11 @@ func _ready() -> void:
 	P.bond_sink = func(h, n, src):
 		gained[h] = int(gained.get(h, 0)) + n
 		return n
+	# the button reads the badge, and the first badge read starts the feed rhythm: seed the month of feed first
 	seed_save()
-	button.refresh()
+	button = V10PhoneButton.make(self, Rect2(W - 150, H * 0.52, 112, 128))
+	add_child(button)
+	move_child(button, overlay.get_index())
 	for a in args:
 		if a.begins_with("--phone_shots="):
 			_tour.call_deferred(a.substr(14))
@@ -54,7 +58,18 @@ func _ready() -> void:
 func _selftest() -> void:
 	var r: Array = await ST.run(self)
 	print("PHONE SELFTEST %d/%d" % [r[0], r[1]])
+	_teardown()
+	await _wait(0.3)
 	get_tree().quit(0 if r[0] == r[1] else 1)
+
+
+# nothing static outlives the tree at exit: phone caches, sfx pool, V9Letters' node_added hook
+func _teardown() -> void:
+	P.shutdown()
+	for n in get_tree().get_nodes_in_group("v10_phone_sfx"):
+		n.queue_free()
+	for c in get_tree().node_added.get_connections():
+		get_tree().node_added.disconnect(c.callable)
 
 
 # --- the fake main -------------------------------------------------------------------------
@@ -215,11 +230,7 @@ func _tour(dir: String) -> void:
 	print("PHONE TOUR OK gained=", gained)
 	if is_instance_valid(phone):
 		phone.queue_free()
-	for n in get_tree().get_nodes_in_group("v10_phone_sfx"):
-		n.queue_free()
-	# static callables connected to the tree (V9Letters.install) are dropped before quitting
-	for c in get_tree().node_added.get_connections():
-		get_tree().node_added.disconnect(c.callable)
+	_teardown()
 	await _wait(0.6)
 	get_tree().quit(0)
 

@@ -264,7 +264,7 @@ static func _ui(host: Node) -> void:
 			msgs.append({"who": "h" if i % 2 == 0 else "me", "k": "text", "t": "Сообщение %d-%d: чай заварен, фишки ждут, а я жду тебя за столом." % [run, i]})
 		var t0: = Time.get_ticks_usec()
 		for m in msgs:
-			box.add_child(BUB.make(m, 440.0, Color("ff8fb8")))
+			box.add_child(BUB.make(m, 440.0, PUI.HEART))
 		var dt: = (Time.get_ticks_usec() - t0) / 1000.0
 		if run > 0:
 			best = minf(best, dt)
