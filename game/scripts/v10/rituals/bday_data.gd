@@ -24,6 +24,11 @@ const SIG: = {
 	"nova": "res://assets/v10/rituals/sig_nova.webp",
 }
 const SIG_NAME: = {"mc": "сакура", "rin": "маття", "hana": "подсолнух", "yue": "луна", "nova": "бриллиант"}
+# the base tile set draws the same motifs (G.TILE_NAMES: sakura, matcha, sunflower, moon, diamond, cake). When such a
+# face is in the deal the overlay MUST take that very face, or two kinds on the board would look alike (Ханин
+# подсолнух next to the sunflower tile)
+const SIG_MOTIF: = {"mc": "sakura", "rin": "matcha", "hana": "sunflower", "yue": "moon", "nova": "diamond"}
+const CAKE_MOTIF: = "cake"
 const CAKE: = {"mc": "cake_tier", "rin": "cake_matcha", "hana": "cake_tier", "yue": "cake_matcha", "nova": "cake_tier"}
 
 const GOAL_PAIRS: = 24

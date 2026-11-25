@@ -15,7 +15,9 @@ extends RefCounted
 #   * Milestones (once per lifetime): 3 → 50 кр; 7 → 100 кр + подсказка; 14 → 1 билет; 30 → рамка «Чайный мастер I»;
 #     60 → 200 кр + рамка II; 100 → анимированная пиала (значок); 365 → титул «Год у стола»; after 30 every +30 → 50 кр.
 #     A milestone also gives +10 симпатии партнёру (hard Bond source «рубеж серии»).
-#   * Clock moved back (clock_ok false): wins wait in st.pending and are applied by the next check() with a good clock.
+#   * Clock moved back (clock_ok false): wins wait in st.pending (at most PENDING_MAX) and are applied by the next
+#     check() with a good clock — AFTER the missed days are judged, and to the day of that check (never to the stale
+#     day the wrong clock showed, so turning the clock back cannot fill a gap in the past).
 #
 # API
 #   V10Streak.check(key = today) -> Array[event]       idempotent per day; events also queue in st.events for the UI
@@ -32,14 +34,19 @@ const MILESTONES: = {
 	3: {"gems": 50},
 	7: {"gems": 100, "hints": 1},
 	14: {"tickets": 1},
-	30: {"frame": "tea_master_1"},
-	60: {"gems": 200, "frame": "tea_master_2"},
+	30: {"frame": "fr_tea_1"},
+	60: {"gems": 200, "frame": "fr_tea_2"},
 	100: {"badge": "tea_bowl_master"},
-	365: {"title": "year_at_table"},
+	365: {"title": "t_year"},
 }
+const PENDING_MAX: = 8
 const MILESTONE_AFF: = 10
 const RULE_TEXT: = "Листья: +1 каждый понедельник, максимум 2. Лист закрывает пропуск, только если листьев хватает на все пропущенные дни. Листья не продаются"
-const FRAME_NAMES: = {"tea_master_1": "Чайный мастер I", "tea_master_2": "Чайный мастер II"}
+# UX_RULES §9 P1-17: «Визиты» are gone, the Серия keeps their promise «Ничего не сгорит»
+const KEEP_TEXT: = "Ничего не сгорит: рубежи и лучшая серия остаются с тобой"
+# frame ids of the V10ProfileCos registry (§2.7: frames live there; v10-profile builds fr_tea_1/2 itself)
+const FRAME_NAMES: = {"fr_tea_1": "Чайный мастер I", "fr_tea_2": "Чайный мастер II"}
+const FRAME_DAYS: = {"fr_tea_1": 30, "fr_tea_2": 60}
 
 
 static func st() -> Dictionary:
@@ -107,11 +114,18 @@ static func check(key: = "") -> Array:
 	var out: = []
 	if not V10RitClock.clock_ok():
 		return out
-	_flush_pending()
 	weekly_leaf(key)
-	if str(s.checked_key) == key:
-		return out
-	s.checked_key = key
+	if str(s.checked_key) != key:
+		s.checked_key = key
+		_judge(key, out)
+	# wins held while the clock was wrong count for THIS day, after the missed days were judged
+	_flush_pending(key)
+	_trim(key)
+	return out
+
+
+static func _judge(key: String, out: Array) -> void:
+	var s: = st()
 	# an open repair window that ran out
 	var rp: Dictionary = s.repair
 	if not rp.is_empty() and V10RitClock.days_between(str(rp.until), key) >= 0:
@@ -120,12 +134,10 @@ static func check(key: = "") -> Array:
 		out.append(_ev("reset", {"best": int(s.best), "why": "repair_late"}))
 	var last: = str(s.last_win_key)
 	if int(s.n) <= 0 or last == "":
-		_trim(key)
-		return out
+		return
 	var missed: = V10RitClock.days_between(last, key) - 1
 	if missed <= 0:
-		_trim(key)
-		return out
+		return
 	var miss_keys: = []
 	for i in missed:
 		miss_keys.append(V10RitClock.add_days(last, i + 1))
@@ -146,8 +158,6 @@ static func check(key: = "") -> Array:
 		s.repair = {}
 		_reset(key)
 		out.append(_ev("reset", {"best": int(s.best), "why": "gap"}))
-	_trim(key)
-	return out
 
 
 static func _reset(key: String) -> void:
@@ -170,9 +180,9 @@ static func on_win(key: = "") -> Dictionary:
 	key = _today(key)
 	var s: = st()
 	if not V10RitClock.clock_ok():
-		s.pending.append({"kind": "win", "key": key})
+		if (s.pending as Array).size() < PENDING_MAX:
+			s.pending.append({"kind": "win", "key": key})
 		return {"new_day": false, "pending": true, "n": int(s.n)}
-	_flush_pending()
 	check(key)
 	return _apply_win(key)
 
@@ -221,14 +231,15 @@ static func _milestones() -> Array:
 		r["aff"] = {V10RitBridge.partner(): MILESTONE_AFF}
 		for f in ["frame"]:
 			if r.has(f):
-				V10RitBridge.register_frame(str(r[f]), FRAME_NAMES.get(str(r[f]), "Чайный мастер"), "streak")
+				V10RitBridge.register_frame(str(r[f]), FRAME_NAMES.get(str(r[f]), "Чайный мастер"),
+					{"type": "streak", "days": int(FRAME_DAYS.get(str(r[f]), m))})
 		V10RitBridge.grant(r, "streak_milestone")
 		out.append({"n": m, "rewards": r})
 		_ev("milestone", {"n": m, "rewards": r})
 	return out
 
 
-static func _flush_pending() -> void:
+static func _flush_pending(key: String) -> void:
 	var s: = st()
 	if (s.pending as Array).is_empty() or not V10RitClock.clock_ok():
 		return
@@ -236,7 +247,7 @@ static func _flush_pending() -> void:
 	s.pending = []
 	for e in p:
 		if e is Dictionary and str(e.get("kind", "")) == "win":
-			_apply_win(str(e.key))
+			_apply_win(key)
 
 
 static func _trim(key: String) -> void:

@@ -120,7 +120,7 @@ static func _streak() -> void:
 	ev = V10Streak.check("2026-03-18")
 	_t(ev.size() == 1 and ev[0].kind == "cooled" and V10Streak.state_of("2026-03-18") == "cold", "1 miss, no leaf → cooled")
 	var v: = V10Streak.view("2026-03-18")
-	_t(str(v.repair.text).find("2 победы до пт 04:00") >= 0, "repair plate text (%s)" % v.repair.get("text", ""))
+	_t(str(v.repair.text).find("2 победы до пт, 20 мар, 04:00") >= 0, "repair plate text (%s)" % v.repair.get("text", ""))
 	var n_before: = int(s.n)
 	V10Streak.on_win("2026-03-18")
 	_t(int(s.n) == n_before + 1 and not (s.repair as Dictionary).is_empty(), "normal daily win during repair")
@@ -199,6 +199,18 @@ static func _streak() -> void:
 	V10RitClock.force_clock = 1
 	V10Streak.check("2026-07-01")
 	_t(int(s.n) == 1 and s.pending.is_empty(), "pending applied when the clock is back")
+	# a win held on a wrong clock counts for the day of the good check, never for a missed day in the past
+	V10RitClock.force_clock = 0
+	V10Streak.on_win("2026-07-02")
+	V10RitClock.force_clock = 1
+	_at("2026-07-03")
+	V10Streak.check("2026-07-03")
+	_t(str(s.hist.get("2026-07-02", "")) != "win" and str(s.hist.get("2026-07-03", "")) == "win", "pending win cannot fill a past gap")
+	V10RitClock.force_clock = 0
+	for i in 20:
+		V10Streak.on_win("2026-07-04")
+	_t((s.pending as Array).size() == V10Streak.PENDING_MAX, "pending is capped")
+	V10RitClock.force_clock = -1
 	# calendar
 	var cal: = V10Streak.calendar("2026-07-01")
 	_t(cal.size() == 35 and cal.filter(func(c): return c.today).size() == 1, "calendar 5 weeks")
@@ -232,6 +244,17 @@ static func _tray() -> void:
 	V10Tray.claim_all("2026-03-16")
 	_t(str(V10Streak.st().leaf_new_key) == "", "leaf card acknowledged")
 	_t(_grants.size() == before, "leaf card grants nothing twice (the leaf was granted by the streak)")
+	# UX_RULES §9 P1-17: the 0.9 daily login reward arrives on the tray (S.login {n, last} as Daily.login kept it)
+	_fresh({"login": {"n": 2, "last": "2026-03-09"}})
+	V10Tray.install_builtins()
+	_at("2026-03-10")
+	cards = V10Tray.collect("2026-03-10")
+	_t(cards.size() == 1 and cards[0].id == "visit" and int(cards[0].rewards.get("coins", 0)) == 500, "login reward card on the tray")
+	V10Tray.claim_all("2026-03-10")
+	var lg: Dictionary = V10RitSave.root().login
+	_t(int(lg.n) == 3 and str(lg.last) == "2026-03-10" and int(_grants[-1].r.get("coins", 0)) == 500, "login reward paid once, S.login advanced")
+	_at("2026-03-11")
+	_t(V10Tray.collect("2026-03-11").filter(func(c): return c.id == "visit").size() == 1, "next day the card is back")
 
 
 # ── Р5 comeback ────────────────────────────────────────────────────────────────────────────────────────────────
@@ -275,6 +298,10 @@ static func _comeback() -> void:
 	lv = V10Comeback.ladder_view("2026-06-20")
 	_t(lv.days.size() == 7 and int(lv.days[2].rewards.get("tickets", 0)) == 10, "d3 of the long ladder = 10 билетов")
 	_t(lv.days[4].rewards.has("pick_outfit") and lv.days[6].rewards.has("frame"), "d5 outfit pick, d7 frame")
+	_t(str(lv.days[6].rewards.frame) == "fr_back_2026", "d7 frame «Снова за столом · 2026» (%s)" % lv.days[6].rewards.frame)
+	_t(V10RitBridge.bond_src("comeback_ladder") == "comeback" and V10RitBridge.bond_src("player_bday") == "bday", "ladder and birthday симпатия are hard Bond sources")
+	var fe: = V10RitBridge.frame_entry("fr_back_2026", "Снова за столом · 2026", {"type": "grant", "event": "comeback", "year": 2026})
+	_t(fe.tier in ["A", "S", "SSR"] and str(fe.look.base) == "ring" and str(fe.look.text) == "2026", "frame entry follows the V10ProfileCos schema")
 	# rested never touches pass XP: the API has no pass input at all, only mastery pairs
 	# backfill letters
 	var away: = V10Comeback.while_away(40)
@@ -320,6 +347,9 @@ static func _bday() -> void:
 	_t(hash(cfg) == h0, "overlay does not change the deal hash")
 	_t((ov.icons as Array).size() == 2 and ov.icons[0] != ov.icons[1], "the two overlaid kinds stay distinguishable")
 	_t(V10Bday.sig_overlay(cfg, "2027-07-18") == ov, "overlay deterministic")
+	_t(int(ov.faces[0]) == V10RitBridge.face_of("sunflower"), "Hana's sunflower takes the sunflower face (no look-alike kinds)")
+	var cfg2: = {"ranked": false, "faces": [1, 1, 5, 5, 16, 16, 30, 30], "seed": 2}
+	_t(int(V10Bday.sig_overlay(cfg2, "2027-07-18").faces[1]) == V10RitBridge.face_of("cake"), "the cake face takes the cake overlay")
 	cfg.ranked = true
 	_t(V10Bday.sig_overlay(cfg, "2027-07-18").is_empty(), "no overlay in ranked")
 	cfg.ranked = false
@@ -333,7 +363,7 @@ static func _bday() -> void:
 	var rows: = V10Bday.claim("2027-07-19")
 	_t(rows.size() >= 4 and int(V10Streak.st().leaves) >= 1, "reward: frame, 100 кр, +30, leaf")
 	var g: Dictionary = _grants[-1].r
-	_t(str(g.get("frame", "")) == "bday_hana_2027" and int(g.get("gems", 0)) == 100 and int(g.aff.hana) == 30, "frame «Праздник Ханы · 2027»")
+	_t(str(g.get("frame", "")) == "fr_bday_hana_2027" and int(g.get("gems", 0)) == 100 and int(g.aff.hana) == 30, "frame «Праздник Ханы · 2027»")
 	_t(V10Bday.claim("2027-07-20").is_empty(), "frame once a year")
 	for i in 24:
 		V10Bday.on_pair(int(ov.faces[0]), ov, "2028-07-18")
@@ -362,7 +392,7 @@ static func _player_bday() -> void:
 	_t(not V10PlayerBday.gift_due("2026-03-20"), "late date → no gift this year")
 	_t(V10PlayerBday.gift_due("2027-03-20"), "gift next year")
 	var rows: = V10PlayerBday.claim_gift("2027-03-20")
-	_t(rows.size() == 3 and int(_grants[-1].r.tickets) == 3 and str(_grants[-1].r.frame) == "my_bday_2027", "gift: 3 билета, frame, +50")
+	_t(rows.size() == 3 and int(_grants[-1].r.tickets) == 3 and str(_grants[-1].r.frame) == "fr_me_2027", "gift: 3 билета, frame, +50")
 	_t(int(_grants[-1].r.aff.values()[0]) == 50, "+50 симпатии партнёру")
 	_t(V10PlayerBday.claim_gift("2027-03-20").is_empty(), "gift once a year")
 	r = V10PlayerBday.set_date(6, 1, true, "2026-12-01")
