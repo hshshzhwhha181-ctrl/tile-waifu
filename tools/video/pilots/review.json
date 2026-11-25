@@ -1,0 +1,485 @@
+[
+ {
+  "model": "kling_o3_flf",
+  "lens": "body",
+  "style": 4,
+  "face": 4,
+  "anatomy": 5,
+  "motion": 3,
+  "seam": 5,
+  "defects": [
+   {
+    "frame": "s_008-s_013",
+    "what": "There is no wink. Both eyes close into happy ^^ arcs and stay shut for about 1.5 s (t=1.75-3.0, roughly 37% of the loop). Repeated every 4 s, this reads as a constant laugh rather than an idle. s_007 is the half-lidded transition into it.",
+    "severity": "major"
+   },
+   {
+    "frame": "s_011-s_014",
+    "what": "The mouth opens into a wide toothy grin: the teeth are a flat white band and the lower lip disappears. This is a big departure from the keyframe's soft closed smile. It stays on-model with no identity change, but it is not subtle. In s_014 the eyes are already open while the grin is still on.",
+    "severity": "minor"
+   },
+   {
+    "frame": "s_002-s_006",
+    "what": "Slight eye-shape drift. The upper lash line is thinner and the eyes are a little narrower than in the keyframe. Iris color (pink) and age stay consistent.",
+    "severity": "minor"
+   },
+   {
+    "frame": "s_001-s_016",
+    "what": "Line art is lighter and softer than in the keyframe PNG throughout. The dark jaw and face outline is weaker, and the glitter grain on the stockings and the fine hair texture are smoothed away. The cel-shaded style itself holds.",
+    "severity": "minor"
+   },
+   {
+    "frame": "s_004-s_016",
+    "what": "The body is almost frozen. Mean pixel change on the legs is about 1.3/255, the torso and tassels about 2-4, and the right lantern under 1. There is no visible breathing and no lantern sway. Almost all the motion is the face plus the left twin tail swaying (s_002-s_006, s_010-s_014).",
+    "severity": "minor"
+   }
+  ],
+  "shippable": true,
+  "summary_ru": "Анатомия и идентичность безупречны во всех 16 кадрах: 2 руки, на руке с тайлом 5 пальцев, у руки на столе 4 видимых пальца, тайл не меняется, 2 ноги и 2 туфли, два хвоста с украшениями, подол и кисточки стабильны. Шов лупа чистый (SSIM 0.997). Главная проблема — вместо подмигивания оба глаза закрыты около 1.5 с (s_008–s_013) плюс широкая улыбка с зубами (s_011–s_014); для idle это слишком сильная эмоция, а тело и фонари почти статичны."
+ },
+ {
+  "model": "kling_o3_flf",
+  "lens": "look",
+  "style": 4,
+  "face": 4,
+  "anatomy": 5,
+  "motion": 3,
+  "seam": 4,
+  "defects": [
+   {
+    "frame": "s_008-s_013 (video f043-f076), s_011-s_014 (f057-f082)",
+    "what": "The facial beat is far too big for an idle loop. Both eyes stay shut in a closed-eye laugh for about 1.3 s, and one eye is closed for about 1.6 s, so the eyes are shut for roughly 40% of the loop. It is not a wink, because both eyes close. On top of that, a wide open-mouth grin showing teeth runs for about 1 s (s_011-s_014). Repeated every 4 s, this reads as constant laughing, not idling.",
+    "severity": "major"
+   },
+   {
+    "frame": "all frames, including s_001 and s_016",
+    "what": "The whole clip is softer than the keyframe when both are compared at 1080 px. Fine high-frequency detail drops about 25-30% (blur-residual 3.7-3.9 vs 5.2): eye highlights and lashes, the damask jacquard, sakura outlines on the dress and the knot buttons are smeared, and line art looks thinner and lighter. The cel look is still there, with no 3D or CG gloss, but swapping the keyframe for the video in game will show a visible drop in sharpness.",
+    "severity": "minor"
+   },
+   {
+    "frame": "seam s_016 -> s_001 (f097 -> f001)",
+    "what": "The frame is not identical at the loop point. The whole frame shifts about +2/255 in red, and static areas get re-rendered (dress, floor and background residual 1.2-1.6, p99 6-7 levels, about 10x the normal static frame-to-frame step of 0.01-0.16). The clip warms and sharpens over the first ~7 frames (s_001-s_002) and never returns, so each wrap gives a faint shimmer or softening flick. SSIM is still 0.997.",
+    "severity": "minor"
+   },
+   {
+    "frame": "s_002-s_016",
+    "what": "The body looks frozen. The legs, skirt, hem and the hand on the table are pixel-static (temporal std of about 0.5, which is codec noise only), and breathing is at most 1 px (s_003-s_006). The result looks like an animated head and hair pasted on a still image.",
+    "severity": "minor"
+   },
+   {
+    "frame": "s_002-s_006, s_010-s_014",
+    "what": "The left twin tail sways strongly (temporal std up to 16), and its strands re-form rather than move rigidly (wisps split and merge between s_002 and s_006, and again in s_010-s_014): mild hair boiling. The right twin tail barely moves, so the motion is lopsided.",
+    "severity": "minor"
+   },
+   {
+    "frame": "s_014 -> s_015 (f080-f084)",
+    "what": "The mouth snaps from the toothy grin back to a closed smile in about 4 frames (0.17 s), with almost no ease-out, while the eyes reopen more slowly.",
+    "severity": "minor"
+   }
+  ],
+  "shippable": false,
+  "summary_ru": "Стиль и фон стабильны, камера неподвижна, шов почти чистый (лишь лёгкий сдвиг теплоты и резкости на стыке s_016→s_001), но всё видео заметно мягче ключевого кадра. Главная проблема — мимика: глаза закрыты ~1,3 с (s_008–s_013) плюс широкая улыбка с зубами (s_011–s_014) вместо лёгкого подмигивания; для бесконечного idle это слишком много, а тело при этом почти заморожено."
+ },
+ {
+  "model": "kling3_0",
+  "lens": "body",
+  "style": 4,
+  "face": 4,
+  "anatomy": 5,
+  "motion": 4,
+  "seam": 5,
+  "defects": [
+   {
+    "frame": "s_005-s_009 (peak s_006, s_008)",
+    "what": "The face drifts off-model. The head straightens, the keyframe's heavy-lidded almond eyes become larger and rounder with bigger irises and highlights, and the lips part. She reads younger and more innocent than the sultry smirk in the keyframe. Identity holds: eye colour stays pink and the earrings, bangs and hair ornaments are unchanged.",
+    "severity": "minor"
+   },
+   {
+    "frame": "s_010-s_013",
+    "what": "Both eyes close into an eye-smile and stay closed for about 1 s (clip frames 54-72), instead of a single-eye wink. There is no separate blink. The eyelid transition (clip f52-f56) is clean, with no morphing.",
+    "severity": "minor"
+   },
+   {
+    "frame": "s_001-s_016 (vs KEY)",
+    "what": "Line art is thinner and lower in contrast than the keyframe on every frame, including the first. The keyframe's crisp dark chin and eyelid lines, iris detail and blush hatching are softened. Shoe and stocking outlines are also softer (feet crops).",
+    "severity": "minor"
+   },
+   {
+    "frame": "s_003-s_010",
+    "what": "The upper body, head, both twin tails and the tile hand shift together as one rigid block. Mean abs diff is about 20 for the face and tile-hand regions and about 1 for the legs. The tails and the wrist and jade tassels do not sway on their own. Lanterns and table petals stay frozen.",
+    "severity": "minor"
+   },
+   {
+    "frame": "s_015-s_016 / s_001-s_002",
+    "what": "Motion is near zero for about 0.8 s around the loop point (per-frame face diff about 0.2 across clip frames 84-97 and 1-7). This gives a slight stall at the seam, although there is no visible jump.",
+    "severity": "minor"
+   }
+  ],
+  "shippable": true,
+  "summary_ru": "Анатомия стабильна на всех кадрах: две ноги и две туфли, кисть с тайлом и кисть на столе без изменений (по 4 видимых пальца, большой скрыт, как на ключе), оба хвоста, украшения и подол на месте. Лицо узнаваемо, но в s_005–s_009 глаза становятся крупнее и круглее, а рот приоткрыт; вместо подмигивания в s_010–s_013 закрыты оба глаза. Шов чистый (SSIM 0.997), линии чуть мягче, чем на ключевом кадре; клип пригоден к использованию."
+ },
+ {
+  "model": "kling3_0",
+  "lens": "look",
+  "style": 4,
+  "face": 3,
+  "anatomy": 4,
+  "motion": 3,
+  "seam": 5,
+  "defects": [
+   {
+    "frame": "s_003-s_008 (f15-f49, 0.6-2.0 s)",
+    "what": "The expression goes off the keyframe. The heavy-lidded closed-mouth smile becomes wide round eyes with bigger glossy irises and parted lips showing teeth. The head lifts about 5 px and the tilt straightens, so for about 1.4 s she reads as a different, more generic AI-anime face.",
+    "severity": "major"
+   },
+   {
+    "frame": "s_005-s_008 (f27-f45)",
+    "what": "The lips get semi-realistic gloss highlights and soft gradient shading. This is a slight 'AI sheen' compared with the flat cel lips in the keyframe.",
+    "severity": "minor"
+   },
+   {
+    "frame": "s_009 (f51), s_014 (f81)",
+    "what": "The eye in-betweens are cross-dissolved rather than drawn. Half-closed eyes show ghosted double lash lines and a mushy lid shape for 1-2 frames on the close and on the reopen.",
+    "severity": "minor"
+   },
+   {
+    "frame": "s_001-s_016 (whole clip)",
+    "what": "The torso and chest never move (measured 0 px shift, so no breathing). The twin tails sway at most about 4 px. From f57 to f97 only the eyelids move, so the idle reads as a frozen body with an animated face rather than a living loop. The lanterns are completely static.",
+    "severity": "minor"
+   },
+   {
+    "frame": "s_010-s_013 (f53-f77)",
+    "what": "Both eyes stay closed in a happy ^^ expression for about 1 s. That is a long hold for an idle blink, and it makes the 4 s loop feel front-loaded with acting rather than subtle.",
+    "severity": "minor"
+   },
+   {
+    "frame": "s_001-s_016",
+    "what": "Every frame is softer than the keyframe (Laplacian detail about 13 vs 30 at the same scale). The fine line art in the face and the dress pattern loses crispness, though line color and weight stay consistent across frames.",
+    "severity": "minor"
+   },
+   {
+    "frame": "f3, f13, f23 ... f93 (every 10 frames)",
+    "what": "A low-amplitude shimmer band (p99 about 4 levels) over y 280-780 (head, lanterns, upper torso) repeats every 10 frames. It is barely visible, but it can read as faint line boiling on large screens.",
+    "severity": "minor"
+   }
+  ],
+  "shippable": true,
+  "summary_ru": "Стиль держится (линии, плоская cel-заливка, фон и камера неподвижны), шов идеален (SSIM 0.997, движение мягко затухает к краям), руки и ноги стабильны. Главная проблема: в s_003–s_008 лицо уходит от ключевого кадра (широко раскрытые глаза, приоткрытый рот, голова приподнята), а тело не «дышит»; годится как есть, но лучше доработать выражение лица."
+ },
+ {
+  "model": "kling4_0",
+  "lens": "body",
+  "style": 4,
+  "face": 4,
+  "anatomy": 5,
+  "motion": 4,
+  "seam": 5,
+  "defects": [
+   {
+    "frame": "s_001-s_016",
+    "what": "Every frame is softer than the keyframe, including the first one. The eyes lose the large starburst catchlights, the hatched blush lines on the cheeks are gone, and the damask texture on the dress is smoothed. High-frequency energy in the face region is about 700 per frame against 2878 in the keyframe, and the dress region shows the same drop. The softness is the same across the whole clip, so the loop does not pulse, but a cut from the still keyframe to the video would show it.",
+    "severity": "minor"
+   },
+   {
+    "frame": "s_014",
+    "what": "After the wink is held from s_009 to s_013, her left eye (viewer-right) also closes, so both eyes are shut and the wink ends as a second blink. With the blink at s_008, she closes her eyes twice in 4 s. The wink itself lasts about 1.25 s, which is long for a playful wink.",
+    "severity": "minor"
+   },
+   {
+    "frame": "s_003-s_009",
+    "what": "Her mouth opens into a grin that shows the upper teeth. The keyframe has a closed-lip smile, so this is more than a slightly bigger smile. The face stays on-model and the mouth closes again by s_010.",
+    "severity": "minor"
+   },
+   {
+    "frame": "s_003",
+    "what": "In this transition frame her left eye (viewer-right) is half-lidded and narrowed, and the iris shape is briefly flattened.",
+    "severity": "minor"
+   }
+  ],
+  "shippable": true,
+  "summary_ru": "Анатомия и идентичность стабильны во всех 16 кадрах: две руки (пальцы и плитка без изменений), две скрещённые ноги на месте, подол, кисточки, брошь, серьги и оба хвоста не меняются; подмигивание правым глазом (s_009–s_013) не ломает лицо, шов практически идеален (SSIM 0.997). Минусы: все кадры мягче кейфрейма (пропали блики в глазах и штриховка румянца), в s_014 лишнее моргание обоими глазами, в s_003–s_009 улыбка шире нужного, с открытыми зубами."
+ },
+ {
+  "model": "kling4_0",
+  "lens": "look",
+  "style": 4,
+  "face": 4,
+  "anatomy": 5,
+  "motion": 4,
+  "seam": 5,
+  "defects": [
+   {
+    "frame": "s_001-s_016 (all frames, including frame 0)",
+    "what": "The whole clip is softer than the keyframe. Laplacian sharpness is about 3-4x lower (face 650-730 vs 2990). The fine blush hatching on the cheeks and the damask texture on the dress are blurred out, and the line art is a little lighter. It stays the same in every frame, so nothing boils or drifts; it is a global loss of detail against the keyframe, with no CG gloss or painterly smear.",
+    "severity": "minor"
+   },
+   {
+    "frame": "s_002-s_003 (frames 10-12) and s_009-s_010 (frames 50-56)",
+    "what": "The only drifting sakura petal appears out of the dress hem at the left instead of falling in from above. Later it fades out in mid-air over the floor before landing.",
+    "severity": "minor"
+   },
+   {
+    "frame": "s_008-s_010 (frames 44-56)",
+    "what": "The wink transition is the fastest part of the clip: face motion per frame is about 5x the rest. In about 0.5 s the head rolls, both eyes close and then one reopens, and the mouth goes from an open grin to closed. It reads as slightly abrupt for an idle.",
+    "severity": "minor"
+   },
+   {
+    "frame": "s_004-s_008 (frames 18-42)",
+    "what": "The expression goes further than a subtle idle: a wide open-mouth grin showing teeth, plus a torso dip of about 9 px that peaks at frame 40 (s_007-s_008).",
+    "severity": "minor"
+   },
+   {
+    "frame": "s_011-s_016 (frames 64-96)",
+    "what": "The motion is front-loaded. All body motion (the torso dip and breath) happens in the first 2.7 s. After that the torso is still (residual under 0.2 px) and only the face, hair, lanterns and wind chimes move, so the loop alternates between an active half and a near-frozen half.",
+    "severity": "minor"
+   }
+  ],
+  "shippable": true,
+  "summary_ru": "Стиль, лицо и руки стабильны, фон и камера неподвижны (сдвиг 0 px), движение плавное, с ease-in/out, без дрожания и «кипящих» линий; шов петли практически идеален (SSIM 0.9973, остаточный сдвиг ≤0.2 px). Мелкие минусы: весь ролик мягче ключевого кадра (штриховка румянца и текстура платья размыты), лепесток появляется из подола и растворяется в воздухе (s_002-s_003, s_009-s_010), подмигивание резковатое (s_008-s_010), а всё движение тела приходится на первые 2.7 с."
+ },
+ {
+  "model": "wan3_0_prime",
+  "lens": "body",
+  "style": 4,
+  "face": 3,
+  "anatomy": 4,
+  "motion": 3,
+  "seam": 4,
+  "defects": [
+   {
+    "frame": "s_006-s_009",
+    "what": "Her expression drifts away from the keyframe for about 1 s. The closed-lip smile is replaced by a neutral, parted-lip, slightly sultry look, the head straightens and the eyes widen, so she reads as more mature and serious. It is still the same character (pink eyes, same earrings and hair ornaments), but she does not look like the keyframe here.",
+    "severity": "major"
+   },
+   {
+    "frame": "s_009-s_010 (video frames 67->68, t~2.27; 72->73, t~2.43; 82->83, t~2.77)",
+    "what": "The head lurches sideways in single-frame steps going into and during the wink. These are the 4 auto-flagged pops (diff 2.2-2.8 against a median of 0.62), and they show as jerky motion in an idle loop.",
+    "severity": "major"
+   },
+   {
+    "frame": "s_004-s_011",
+    "what": "The whole upper body drifts left/up by about 10-15 px and comes back, while the feet and background stay put. That is too much movement for a quiet idle, and SSIM bottoms out at 0.75 around s_011.",
+    "severity": "minor"
+   },
+   {
+    "frame": "s_011-s_013",
+    "what": "The wink grin opens wide enough to show teeth, a much bigger smile than in the keyframe. The wink itself is clean, with the correct eye.",
+    "severity": "minor"
+   },
+   {
+    "frame": "s_003, s_005, s_008",
+    "what": "Textures swim. The sakura print on the stockings at the knees slides and rearranges between frames, and the curve of the front dress panel's hem plus the gold wave print near it shift in s_005.",
+    "severity": "minor"
+   },
+   {
+    "frame": "loop seam (video frames 117->119, 0->2)",
+    "what": "Detail and sharpness snap back to the keyframe in the last 2 and first 2 frames (diff 1.4-1.75 against a median of 0.62), causing a faint flicker at the loop point even though the seam SSIM is 0.997.",
+    "severity": "minor"
+   }
+  ],
+  "shippable": false,
+  "summary_ru": "Анатомия чистая: на всех кадрах две ноги и две ступни, пять пальцев на руке с плиткой, плитка, наряд, серьги и оба хвоста стабильны. Но в s_006–s_009 улыбка сменяется нейтральным лицом с приоткрытым ртом, а во время подмигивания (t≈2.27–2.77) голова дёргается, поэтому перед использованием нужен ретайм или правка."
+ },
+ {
+  "model": "wan3_0_prime",
+  "lens": "look",
+  "style": 4,
+  "face": 4,
+  "anatomy": 4,
+  "motion": 3,
+  "seam": 4,
+  "defects": [
+   {
+    "frame": "s_010-s_011 (video frames 68-70, t=2.27s)",
+    "what": "The head tilt into the wink starts abruptly with no ease-in. The head is static until frame 67, jumps about 5 px in one frame at frame 69 and moves about 11 px in 3 frames. This frame-to-frame jerk is what the metric flags as pops at 2.27, 2.40 and 2.43 s.",
+    "severity": "major"
+   },
+   {
+    "frame": "s_004-s_010",
+    "what": "The upper-body lean is too large for an idle. The tile hand drifts about 24 px left and 16 px down, and the chest and dress hem shift 4-5 px, before everything returns. It reads as a pose change, not breathing.",
+    "severity": "minor"
+   },
+   {
+    "frame": "s_016 -> s_001 (video frames 118-120 and 1-3)",
+    "what": "Brightness and detail settle at the loop point. Frames 3-118 are about 4 levels brighter in R (about 2.5 in G and B) and slightly crisper than the keyframe. Frames 119-120 ramp down to the keyframe and frames 2-3 ramp back up, so every loop gets a 4-frame dim, soft blip. Pose continuity is clean (last vs first SSIM 0.997).",
+    "severity": "minor"
+   },
+   {
+    "frame": "s_011-s_015 (video frames 76-118)",
+    "what": "The left twin-tail hair strands re-form and morph instead of swaying as consistent clumps. Strand tips change shape and count. The hair also settles with a small snap at frames 116-118 (about 5 levels mean step on the hair region) just before the seam.",
+    "severity": "minor"
+   },
+   {
+    "frame": "s_006-s_009",
+    "what": "The expression drifts mid-clip. The keyframe's half-lidded sly smile becomes rounder, wider eyes with lips parted and teeth showing, which reads like talking. The face is still recognizably the same character.",
+    "severity": "minor"
+   },
+   {
+    "frame": "s_013 (video frame 90)",
+    "what": "The winking eye reopens through a half-closed state with an odd extra lid crease before it returns to the keyframe eye.",
+    "severity": "minor"
+   },
+   {
+    "frame": "s_002-s_015",
+    "what": "A global exposure lift slightly washes the keyframe's pinks compared with s_001. Line weight, cel shading, dress pattern and background (lanterns, table and floor have 0 px shift, no camera move) all stay in style with no boiling.",
+    "severity": "minor"
+   }
+  ],
+  "shippable": true,
+  "summary_ru": "Стиль, фон и шов в целом держатся: линии и заливка не плывут, камера неподвижна, SSIM последнего кадра к первому 0.997. Главные минусы: резкий старт наклона головы перед подмигиванием (кадры 68-70, s_010-s_011) и великоватый наклон корпуса для idle. Мелочи: волосы «переплетаются», на стыке 4-кадровый провал яркости, его нужно выровнять цветокоррекцией."
+ },
+ {
+  "model": "gemini_omni_flash_1_2",
+  "lens": "body",
+  "style": 3,
+  "face": 4,
+  "anatomy": 5,
+  "motion": 3,
+  "seam": 3,
+  "defects": [
+   {
+    "frame": "s_001 (persists through s_016)",
+    "what": "The first frame already differs from the keyframe (SSIM 0.92). Pink saturation and contrast are higher, line art is crisper, the soft pink haze is gone, the stockings carry a glitter-speckle texture the keyframe lacks, and the jade earrings have turned pale sage instead of teal. Cutting from the static keyframe to the clip will visibly pop.",
+    "severity": "major"
+   },
+   {
+    "frame": "s_013-s_014 (t~3.21s, video frames 77-78)",
+    "what": "Redraw pop: face, hair strands and the tile hand are re-rendered between consecutive frames, with almost no translation (phase shift about 1px). The frame diff is 8.1 against a median of 1.0, so it reads as a boil or flicker on the face.",
+    "severity": "major"
+   },
+   {
+    "frame": "s_016 / last frame -> s_001",
+    "what": "At the end of the loop, 5-7 sakura petals are in the air and on the floor (by the rug, near the shoes, by the chair). s_001 has none, so the petals vanish at the seam. The character itself lines up within 1px.",
+    "severity": "major"
+   },
+   {
+    "frame": "s_009-s_012",
+    "what": "The expression goes well past an idle smile. s_009 has both eyes squeezed shut with an open mouth, and s_010-s_012 show a wide open-mouth laugh with upper teeth. Identity holds (same pink-red eyes, same age and face shape), but the face is far from the key's closed-lip smile for about 1 s.",
+    "severity": "minor"
+   },
+   {
+    "frame": "s_006-s_008",
+    "what": "The loose hair mass on the viewer's left spreads about 60px further out and its strands re-form rather than swing. The twin-tail count (2) and length are unchanged.",
+    "severity": "minor"
+   },
+   {
+    "frame": "s_007-s_013",
+    "what": "The head drifts about 13px left and up and tilts (drift_min 0.80 at s_009) while the body and legs stay planted. This is acceptable sway but a large part of the SSIM drift.",
+    "severity": "minor"
+   },
+   {
+    "frame": "s_016",
+    "what": "The end face is slightly more half-lidded and smirky than s_001. The difference is small but adds to the seam residual (head-region diff 9.5).",
+    "severity": "minor"
+   }
+  ],
+  "shippable": false,
+  "summary_ru": "Анатомия и идентичность стабильны во всех кадрах: две руки, две ноги, две туфли, пальцы и плитка в руке не меняются, лицо, хвосты и наряд узнаваемы. Мешают другие проблемы: стиль уже в s_001 отличается от ключевого кадра (насыщеннее, блёстки на чулках), в s_010–s_012 слишком широкий смех с зубами, около 3.2 с (s_013–s_014) лицо перерисовывается скачком, а на шве s_016→s_001 исчезают лепестки."
+ },
+ {
+  "model": "gemini_omni_flash_1_2",
+  "lens": "look",
+  "style": 2,
+  "face": 2,
+  "anatomy": 4,
+  "motion": 2,
+  "seam": 2,
+  "defects": [
+   {
+    "frame": "s_001",
+    "what": "The first video frame is a redraw of the keyframe, not the keyframe itself (whole-frame mean abs diff vs key 10.2/255). Line art is heavier and dark-brown: pixels with luma <60 are 12x more common (0.84% vs 0.07%). The soft painterly key becomes hard traced outlines. Vase blossoms, lantern paintings and shoe flowers are redrawn with new outlines, and the stockings get glitter noise. Switching from the static keyframe to the video will visibly pop.",
+    "severity": "major"
+   },
+   {
+    "frame": "s_001",
+    "what": "Face and accessories are already redesigned versus the keyframe. Eyes are smaller and differently shaped, and the glossy painted lips become a single line. The chin is sharper. Earrings change from gold flower plus jade drop with gold cap to pink flower plus pale drop with dark outline. Round jade frog buttons become flat clover knots. Identity is off-model from frame 0 onward.",
+    "severity": "major"
+   },
+   {
+    "frame": "s_014",
+    "what": "Whole-frame vertical camera judder in the last ~0.8 s (frames 76-95). The static background (chairs, table, carpet, lanterns) jumps -3.1/+2.1 px at frames 77/78, which is the reported pop at t=3.21 s. It keeps oscillating about ±1-2 px at frames 83-86 and 91-94. It reads as a shaking camera, not a locked-off shot.",
+    "severity": "blocker"
+   },
+   {
+    "frame": "s_015",
+    "what": "Continued frame-to-frame judder: the dress, stockings and shoes all shift together by 1-2 px (dress region diff 10-15 per frame against <1 mid-clip). The cause is camera wobble, not character motion.",
+    "severity": "major"
+   },
+   {
+    "frame": "s_016",
+    "what": "Loop seam: the true last frame (#95) is offset about 0.8 px vertically from frame 0 across the whole image, and the hair edges differ. About 6 sakura petals hang mid-air in the last frame (left floor, table leg, chair, near the feet). None exist in s_001, so they all vanish at once when the loop wraps.",
+    "severity": "major"
+   },
+   {
+    "frame": "s_003",
+    "what": "Falling petals spawn mid-air in the middle of the frame (first visible near the table edge around frame 8) instead of drifting in from an edge, so they pop into existence.",
+    "severity": "minor"
+   },
+   {
+    "frame": "s_009",
+    "what": "Expression overshoots an idle: both eyes shut with a wide open-mouth laugh, followed by an open-mouth grin with a wink (s_010-s_012). It reads as a laugh beat, not a subtle smile and wink.",
+    "severity": "minor"
+   },
+   {
+    "frame": "s_009",
+    "what": "The left twin-tail swings about 60 px outward (hair region diffs ~20 per frame, s_005-s_011), which looks like wind rather than a soft indoor sway. The right tail swings strongly in s_011-s_013.",
+    "severity": "minor"
+   },
+   {
+    "frame": "s_014",
+    "what": "At the pop frame (77) the green table felt and dress texture briefly turn grainy and darker (texture shimmer during the judder).",
+    "severity": "minor"
+   }
+  ],
+  "shippable": false,
+  "summary_ru": "Клип внутри себя выдержан в одном стиле, руки и ноги стабильны. Но уже s_001 перерисован относительно кейфрейма: толще и темнее контуры, другое лицо, серьги и пуговицы. В последние ~0.8 с (s_014–s_016) камера дрожит по вертикали на 1–3 px, а на шве лупа одновременно исчезают ~6 лепестков и есть сдвиг ~0.8 px, поэтому без перегенерации клип не годится."
+ },
+ {
+  "model": "seedance_2_5",
+  "lens": "body",
+  "style": 3,
+  "face": 3,
+  "anatomy": 4,
+  "motion": 4,
+  "seam": 4,
+  "defects": [
+   {
+    "frame": "s_001-s_016",
+    "what": "The eyes don't match the keyframe on any frame. They are smaller and heavier-lidded, the upper lid covers part of the iris, and the lash and catch-light detail is gone (compare the keyframe face crop with s_001 and s_016). Her look turns sultry and slightly older, and the lips are redder and glossier. Within the clip the identity holds steady and nothing morphs.",
+    "severity": "major"
+   },
+   {
+    "frame": "s_001",
+    "what": "The first frame is a re-render, not the keyframe. SSIM against the keyframe is 0.386 at t=0 and 0.37-0.39 for the whole clip. The dark cel outlines on the arms, dress silhouette and frog buttons are thinner and blurred, and the brocade and sheer-sleeve texture is mushier. Swapping the static keyframe for this clip will visibly pop.",
+    "severity": "major"
+   },
+   {
+    "frame": "s_004-s_009",
+    "what": "For about 1.5 s the mouth stays open in a wide parted smile with teeth showing (f016-f052). It reads as talking rather than a closed idle smile, and the keyframe mouth is closed.",
+    "severity": "minor"
+   },
+   {
+    "frame": "s_001-s_016",
+    "what": "The pose of the hand holding the tile differs from the keyframe. The index finger is raised higher and more splayed, and the tile sits further up between the index and middle fingertips. The pose is stable across the clip: 3 visible fingers with the thumb hidden in every frame, including the fastest motion f054-f066. No melting, and the blank tile never changes.",
+    "severity": "minor"
+   },
+   {
+    "frame": "s_016 -> s_001 (f097->f001)",
+    "what": "At the wrap there is no geometric offset (phase-correlation shift 0,0), but texture and sharpness pop. f001 is crisper. The face and hair frame difference at the wrap is 3.5-4.2, against 1.5-2.0 between neighbouring frames, so a faint tick shows on every loop.",
+    "severity": "minor"
+   },
+   {
+    "frame": "s_002-s_003, s_010-s_015",
+    "what": "The blink is slow: both eyes stay closed from about 0.25 s to 0.5 s. The wink uses the correct eye (her right) but is held about 1.25 s (s_010-s_015), then closes into a both-eyes-closed beat at f089-f091 before reopening. It is acceptable but heavy for a 4 s idle.",
+    "severity": "minor"
+   },
+   {
+    "frame": "s_001-s_016",
+    "what": "The lanterns and background are practically frozen (region difference about 1.0 over the whole clip). The legs and the hand on the table barely move (difference under 3.5), which is good. Motion is limited to the head, hair and the tile arm.",
+    "severity": "minor"
+   }
+  ],
+  "shippable": true,
+  "summary_ru": "Анатомия чистая во всех кадрах: две ноги и две ступни стоят на месте, пальцы и плитка стабильны (s_001–s_016, включая f054–f066), оба хвоста и украшения без изменений, петля почти бесшовная. Однако с самого первого кадра это перерисовка, а не ключевой кадр (SSIM ~0.38): линии мягче, глаза уже и «сонливее», губы краснее; кроме того, в s_004–s_009 рот открыт с зубами."
+ }
+]

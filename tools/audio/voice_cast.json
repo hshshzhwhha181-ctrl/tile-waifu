@@ -1,0 +1,7 @@
+{
+ "mc": {"name": "Luna", "voice_id": "375a3398-e3b4-4f91-845d-42181e352899", "voice_type": "preset", "model": "qwen_audio_tts", "base": "Bright, bouncy adult woman.", "why": "highest and widest pitch of the 6 auditioned (F0 321 Hz, 239-422), brightest timbre; the 0.9 Japanese MC was the highest voice"},
+ "rin": {"name": "Sienna", "voice_id": "41023a48-71ab-478a-bea7-c7b5a78f6b36", "voice_type": "preset", "model": "qwen_audio_tts", "base": "Calm, cool adult woman, dry irony.", "why": "lowest, darkest of the 5 (F0 171 Hz); the 0.9 Rin had the darkest timbre; least similar to Hana and Nova"},
+ "hana": {"name": "Remy", "voice_id": "b9c5c5db-4eb7-468a-a0b7-d06423af0335", "voice_type": "preset", "model": "qwen_audio_tts", "base": "Sunny, sporty, loud adult woman.", "why": "fast and clear (14.7 chars/s, F0 230 Hz), most distinct from Rin (speaker similarity 0.55)"},
+ "yue": {"name": "Naomi", "voice_id": "caeba733-3c17-43db-863e-69c7025512cd", "voice_type": "preset", "model": "qwen_audio_tts", "base": "Regal adult woman, low velvety voice.", "why": "darkest timbre of the 6 (centroid 1181 Hz), velvety; clean ASR"},
+ "nova": {"name": "Marisol", "voice_id": "75e72cd5-011b-4130-a474-e8b1ab341f04", "voice_type": "preset", "model": "qwen_audio_tts", "base": "Crisp, ironic adult woman, slightly husky.", "why": "husky mid voice (F0 191 Hz), least similar to Rin (0.54) and Yue (0.60)"}
+}
