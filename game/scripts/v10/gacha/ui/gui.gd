@@ -257,6 +257,144 @@ static func cascade(nodes: Array, delay: = 0.0) -> void:
 		t.parallel().tween_property(n, "position", p0, 0.24).set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_OUT)
 
 
+# Segmented control (UX_RULES §6.2: the chosen segment is gold.300 with a gold.500 underline, the rest paper.500).
+# Every segment is a hit zone ≥ 80 px high (§6.1); the whole row is ONE control for the screen budget.
+static func segment(labels: Array, sel: int, rect: Rect2, on_pick: Callable, fs: = 22) -> Control:
+	var root: = Control.new()
+	root.position = rect.position
+	root.size = Vector2(rect.size.x, maxf(80.0, rect.size.y))
+	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	root.set_meta("ux_role", "secondary")
+	var n: = labels.size()
+	var w: = rect.size.x / maxf(1.0, n)
+	var f: = UI.font("body", 900)
+	var line: = ColorRect.new()
+	line.color = Color(GOLD_700, 0.35)
+	line.position = Vector2(0, root.size.y - 1)
+	line.size = Vector2(rect.size.x, 1)
+	line.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	root.add_child(line)
+	for i in n:
+		var on: = i == sel
+		var b: = Control.new()
+		b.position = Vector2(i * w, 0)
+		b.size = Vector2(w, root.size.y)
+		b.pivot_offset = b.size * 0.5
+		b.mouse_filter = Control.MOUSE_FILTER_STOP
+		var l: = lbl(String(labels[i]), fs, GOLD_300 if on else PAPER_500, "body", 900 if on else 800)
+		UI.center_label(l, Rect2(0, 0, w, root.size.y - 6))
+		b.add_child(l)
+		if on:
+			var tw: = f.get_string_size(String(labels[i]), HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
+			var u: = ColorRect.new()
+			u.color = GOLD_500
+			u.size = Vector2(tw, 2)
+			u.position = Vector2((w - tw) * 0.5, root.size.y - 14)
+			u.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			b.add_child(u)
+		var idx: = i
+		b.gui_input.connect(func(e):
+			if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT and idx != sel:
+				V9Feel.press(b, "tap", "button")
+				on_pick.call(idx))
+		root.add_child(b)
+	return root
+
+
+# Quiet icon (UX_RULES §6.5 «Тихая»): a glyph in an 80 × 80 hit zone, no plate, no rim.
+static func quiet_icon(glyph: String, pos: Vector2, on_tap: Callable, role: = "tertiary") -> Control:
+	var b: = Control.new()
+	b.position = pos
+	b.size = Vector2(80, 80)
+	b.pivot_offset = b.size * 0.5
+	b.mouse_filter = Control.MOUSE_FILTER_STOP
+	b.set_meta("ux_role", role)
+	var l: = lbl(glyph, 34, PAPER_300, "body", 800)
+	UI.center_label(l, Rect2(Vector2.ZERO, b.size))
+	b.add_child(l)
+	b.gui_input.connect(func(e):
+		if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT:
+			V9Feel.press(b, "tap", "button")
+			on_tap.call())
+	return b
+
+
+# A text link in an 80 px hit zone (tertiary): «ⓘ Шансы», «Отмена» on sheets
+static func link(text: String, pos: Vector2, on_tap: Callable, col: = GOLD_500, fs: = 20, role: = "tertiary") -> Control:
+	var f: = UI.font("body", 800)
+	var b: = Control.new()
+	b.position = pos
+	b.size = Vector2(f.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x + 24.0, 80.0)
+	b.mouse_filter = Control.MOUSE_FILTER_STOP
+	b.set_meta("ux_role", role)
+	var l: = lbl(text, fs, col, "body", 800)
+	l.position = Vector2(12, (80.0 - l.get_minimum_size().y) * 0.5)
+	b.add_child(l)
+	b.gui_input.connect(func(e):
+		if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT:
+			V9Feel.press(b, "tap", "button")
+			on_tap.call())
+	return b
+
+
+# «Касса» (UX_RULES §6.5, §5.3.7): any spend of Лунный камень or ₽. night.700, a gold.500 line, what you get on
+# the left, the spend on the right (Nunito 900, gold.300), never rose.500. It is a JButton (pressed, gate, press
+# spring, deny) whose plate is drawn here. `extra` is a second, quieter spend line («+ 900 кристаллов»).
+# Narrow rects (< 360 px) stack the two sides: what you get on top, the spend under it.
+static func kassa_button(left_t: String, right_t: String, rect: Rect2, extra: = "") -> JButton:
+	var b: = JButton.make("", "graphite", rect, null, 24, 4.0, false)
+	b.box.visible = false
+	var plate: = Panel.new()
+	var sb: = StyleBoxFlat.new()
+	sb.bg_color = NIGHT_700
+	sb.border_color = GOLD_500
+	sb.set_border_width_all(2)
+	sb.set_corner_radius_all(4)
+	plate.add_theme_stylebox_override("panel", sb)
+	plate.size = rect.size
+	plate.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	plate.name = "Kassa"
+	b.add_child(plate)
+	b.move_child(plate, 0)
+	var f: = UI.font("body", 900)
+	if rect.size.x < 360.0:
+		var lt: = lbl(left_t, 24, PAPER_100, "body", 900)
+		UI.center_label(lt, Rect2(0, rect.size.y * 0.14, rect.size.x, rect.size.y * 0.4))
+		plate.add_child(lt)
+		var rt: = lbl(right_t, 18, GOLD_300, "body", 900)
+		rt.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		UI.center_label(rt, Rect2(8, rect.size.y * 0.52, rect.size.x - 16, rect.size.y * 0.4))
+		plate.add_child(rt)
+		return b
+	var l: = lbl(left_t, 24, PAPER_100, "body", 900)
+	var lw: = f.get_string_size(left_t, HORIZONTAL_ALIGNMENT_LEFT, -1, 24).x
+	l.position = Vector2(20, (rect.size.y - l.get_minimum_size().y) * 0.5)
+	plate.add_child(l)
+	var cw: = rect.size.x - 20.0 - lw - 16.0 - 20.0
+	var rs: = 24
+	while rs > 18 and f.get_string_size(right_t, HORIZONTAL_ALIGNMENT_LEFT, -1, rs).x > cw:
+		rs -= 1
+	var rl: = lbl(right_t, rs, GOLD_300, "body", 900)
+	rl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	rl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	rl.size = Vector2(cw, 10)
+	plate.add_child(rl)
+	var hh: = rl.get_minimum_size().y
+	var el: Label = null
+	if extra != "":
+		el = lbl(extra, 18, PAPER_300, "body", 800)
+		el.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		el.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		el.size = Vector2(cw, 10)
+		plate.add_child(el)
+		hh += el.get_minimum_size().y
+	var y0: = (rect.size.y - hh) * 0.5
+	rl.position = Vector2(rect.size.x - 20.0 - cw, y0)
+	if el:
+		el.position = Vector2(rect.size.x - 20.0 - cw, y0 + rl.get_minimum_size().y)
+	return b
+
+
 static func chip(text: String, tex: Texture2D, h: = 44.0, col: = PAPER_100) -> Control:
 	var f: = UI.font("body", 900)
 	var fs: = int(h * 0.46)

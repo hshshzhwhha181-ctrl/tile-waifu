@@ -371,7 +371,7 @@ func _misc() -> void:
 
 # visible strings of the lane must not use banned jargon (UX_RULES §4.3)
 func _lint() -> void:
-	var banned: = ["гарант", "50/50", "пити", "крутк", "гача", "ульт", "\\bSR\\b", "\\bR\\b", "Ранг", "−\\d+%", "успей", "последний шанс", "Звезда наряда"]
+	var banned: = ["гарант", "50/50", "пити", "крутк", "гача", "(^|[^а-яё])ульт", "\\bSR\\b", "\\bR\\b", "Ранг", "−\\d+%", "успей", "последний шанс", "Звезда наряда"]
 	var dir: = "res://scripts/v10/gacha/ui/"
 	var bad: = []
 	var re: = RegEx.create_from_string("\"([^\"\\\\]|\\\\.)*\"")

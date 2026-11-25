@@ -12,6 +12,15 @@ extends Control
 const TABS: = ["Шансы", "Правила", "История"]
 
 static var providers: = {}
+# «₽» may show only after L8 (UX_RULES §3.5, С-2). The integrator points this at the Ф7 / V10Meta check (hook H10);
+# until then: Path level 8 cleared (S.unlocked counts the open levels: ≥ 9 after L8).
+static var rub_ok_fn: Callable = Callable()
+
+
+static func rub_ok() -> bool:
+	if rub_ok_fn.is_valid():
+		return bool(rub_ok_fn.call())
+	return int(G.S.get("unlocked", 0)) >= 9
 
 var gacha: V10Gacha2
 var banner: Dictionary = {}
@@ -70,19 +79,8 @@ func _setup(a: Dictionary) -> void:
 	var t: = V10GUI.h1("Шансы и правила", 44)
 	t.position = Vector2(30, 66)
 	add_child(t)
-	var x: = JButton.make("✕", "glass", Rect2(W - 104, 40, 80, 80), null, 30)
-	x.set_meta("ux_role", "tertiary")
-	x.sound = "tap"
-	x.pressed.connect(close)
-	add_child(x)
-	# segmented tabs
-	var tw: = (W - 64) / TABS.size()
-	for i in TABS.size():
-		var b: = JButton.make(TABS[i], "graphite" if i != tab else "lav", Rect2(32 + i * tw, 150, tw - 8, 64), null, 22)
-		var idx: = i
-		b.pressed.connect(func(): _set_tab(idx))
-		add_child(b)
-		tab_nodes.append(b)
+	# a quiet ✕ (UX_RULES §6.5): no medallion, a glyph in an 80 px hit zone
+	add_child(V10GUI.quiet_icon("✕", Vector2(W - 104, 40), close))
 	_set_tab(int(a.get("tab", 0)))
 	modulate.a = 0.0
 	position.y = 24
@@ -106,8 +104,15 @@ func close() -> void:
 
 func _set_tab(i: int) -> void:
 	tab = i
-	for k in tab_nodes.size():
-		(tab_nodes[k] as JButton).set_pal("lav" if k == i else "graphite")
+	# segmented tabs: the chosen one in gold with an underline (the 0.9 art buttons drew all three alike)
+	for n in tab_nodes:
+		if is_instance_valid(n):
+			n.queue_free()
+	tab_nodes.clear()
+	if String(args.get("source", "gacha")) != "chest":
+		var seg: = V10GUI.segment(TABS, i, Rect2(24, 140, W - 48, 80), func(k): _set_tab(k))
+		add_child(seg)
+		tab_nodes.append(seg)
 	if is_instance_valid(body):
 		body.queue_free()
 	var sc: = ScrollContainer.new()
@@ -220,19 +225,22 @@ func _rules(list: Control) -> float:
 	hl.position = Vector2(18, by)
 	box.add_child(hl)
 	by += 30
-	for line in V10Rates.worst_lines():
+	var rub: = rub_ok()
+	for line in V10Rates.worst_lines(rub):
 		var l: = V10GUI.lbl(line, 21, V10GUI.GOLD_300, "body", 900)
 		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		l.size = Vector2(W - 84, 10)
 		l.position = Vector2(18, by)
 		box.add_child(l)
 		by += l.get_minimum_size().y + 8
-	var pl: = V10GUI.lbl("Расчёт: ≈ %d ₽ за желание по пакету Лунного камня за %s ₽" % [int(round(V10Rates.ref_rub_per_pull())), V10Rates.group(int(V10Rates.REF_PACK_RUB))], 17, V10GUI.PAPER_500, "body", 700)
-	pl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	pl.size = Vector2(W - 84, 10)
-	pl.position = Vector2(18, by)
-	box.add_child(pl)
-	by += pl.get_minimum_size().y + 16
+	if rub:
+		var pl: = V10GUI.lbl("Расчёт: ≈ %d ₽ за желание по пакету Лунного камня за %s ₽" % [int(round(V10Rates.ref_rub_per_pull())), V10Rates.group(int(V10Rates.REF_PACK_RUB))], 18, V10GUI.PAPER_500, "body", 700)
+		pl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		pl.size = Vector2(W - 84, 10)
+		pl.position = Vector2(18, by)
+		box.add_child(pl)
+		by += pl.get_minimum_size().y
+	by += 16
 	box.size.y = by
 	y += by + 24
 	var cl: = V10GUI.lbl("Сундуки салона, глав и лестницы возврата — без случайности: что написано, то и внутри.", 18, V10GUI.PAPER_500, "body", 700)
@@ -256,16 +264,12 @@ func _history(list: Control) -> float:
 	sub.position = Vector2(32, y)
 	list.add_child(sub)
 	y += 40
-	var fx: = 32.0
-	for f in ["", "SSR", "S", "A"]:
-		var b: = JButton.make("Все" if f == "" else f, "lav" if f == hist_filter else "graphite", Rect2(fx, y, 120, 56), null, 20)
-		var ff: String = f
-		b.pressed.connect(func():
-			hist_filter = ff
-			_set_tab(2))
-		list.add_child(b)
-		fx += 130
-	y += 76
+	var filters: = ["", "SSR", "S", "A"]
+	var seg: = V10GUI.segment(["Все", "SSR", "S", "A"], filters.find(hist_filter), Rect2(24, y - 8, 4 * 110, 80), func(k):
+		hist_filter = filters[k]
+		_set_tab(2))
+	list.add_child(seg)
+	y += 88
 	var h: = gacha.history()
 	h.reverse()
 	var shown: = 0
