@@ -227,6 +227,20 @@ static func arc_progress(w: int) -> Array:
 	return [done, mains]
 
 
+# «Чайный сад · пройдено 36/93»; the place name is left out when it repeats the arc title («Чайная во льду»)
+static func arc_subtitle(w: int) -> String:
+	var pr: = arc_progress(w)
+	var place: = str(Gen.WORLD[w].name)
+	if place == str(Rules.ARC_TITLES[w]):
+		return "пройдено %d/%d" % [pr[0], pr[1]]
+	return "%s · пройдено %d/%d" % [place, pr[0], pr[1]]
+
+
+# UX_RULES §3.5: Peaks appear on the map at L58 (the model still opens a Peak after its chapter boss)
+static func peaks_shown() -> bool:
+	return unlocked() >= Rules.PEAKS_FROM
+
+
 static func chapter_stars(gc: int) -> int:
 	var n: = 0
 	for k in Gen.CHAPTER:

@@ -37,6 +37,19 @@ static func stock(kind: String) -> int:
 	return int(st().get(kind, 0))
 
 
+# UX_RULES §3.5: Огонёк пути and the booster row appear at L10 (the card and the map hide them before that)
+static func opened() -> bool:
+	return State.unlocked() >= Rules.BOOST_FROM
+
+
+# crystals the player can spend on a booster (V10Wallet when merged, else the plain counter)
+static func gems_balance() -> int:
+	var wallet = Rules.cls("V10Wallet") if State.root_override == null else null
+	if wallet != null and wallet.has_method("balance"):
+		return int(wallet.balance("gems"))
+	return int(State.S().get("gems", 0))
+
+
 static func can_use(mode: String, tier: String, peak: = false) -> bool:
 	if mode in Rules.HONEST_MODES:
 		return false

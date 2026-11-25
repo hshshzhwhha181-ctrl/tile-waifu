@@ -13,6 +13,10 @@ const STAR_CHEST_NEED: = 25         # chapter star chest: 25★ of 30
 const SUMMIT_STEP: = 10             # every 10 summits = one step of the «Восходящая» frame (I–X)
 const BOOST_PRICE: = 60             # a booster bought for crystals when the stock is empty (with confirm)
 const BOOST_MAX: = 3                # max boosters per level
+# step-by-step opening (UX_RULES §3.5): one system per entry. Numbers are «unlocked» values (level N is open).
+const BOOST_FROM: = 10              # L10: Огонёк пути and the booster row (map pill, card row)
+const ARCS_FROM: = 49               # L49: the «Арки» list
+const PEAKS_FROM: = 58              # L58: Peaks show on the map (the fog parts); before that they are not drawn
 const ARC_TITLES: = ["Пробуждение чайной", "Чайная во льду", "Фестиваль фонарей", "Лунный дворец", "Драконье святилище",
 	"Неоновая ночь", "Храм Тысячи врат", "Жемчужный дворец", "Алая ночь", "Царство Жар-птицы"]
 
@@ -48,6 +52,33 @@ const BOOSTER_NAMES: = {"lantern": "Фонарик", "wind": "Попутный �
 const BOOSTER_HELP: = {"lantern": "На старте раскрыты тайные фишки и перевёртыши.",
 	"wind": "Две пары улетают со стола на старте (в комбо не идут).",
 	"scroll": "+3 подсказки на эту партию."}
+
+# «Тишина и лак» tokens (UX_RULES §6.2) used by the Path screens. When V10DS (v10-hud2) is merged the integrator
+# maps these names to it; the values are the DS hex values, so nothing changes on screen.
+const C: = {
+	"night900": Color("121014"), "night800": Color("1B171C"), "night700": Color("26212A"), "night600": Color("332C36"),
+	"paper100": Color("F5EAD8"), "paper300": Color("DDD2C4"), "paper500": Color("B3A89C"), "paper700": Color("7E756D"),
+	"gold300": Color("F1D9A0"), "gold500": Color("E8C47E"), "gold700": Color("A87B3A"), "gold_line": Color(0.659, 0.482, 0.227, 0.35),
+	"rose300": Color("ECC0C9"), "rose500": Color("D796A5"), "jade300": Color("A9D9C4"), "jade500": Color("5B9580"),
+	"ember": Color("E07A7A"),
+}
+
+# Path terms for the «?» sheet of the map and for V10Glossary (v10-clarity): the integrator registers these entries
+# (`for e in V10PathRules.GLOSSARY: V10Glossary._add(e)`), so every new Path word has its article (UX_RULES §4.4).
+const GLOSSARY: = [
+	{"id": "path.flame", "cat": "path", "name": "Огонёк пути", "why": "Победа на Пути зажигает чашку, провал гасит одну. 1–3 чашки — 1–3 бустера даром на старте",
+		"how": "Побеждай подряд на обычных столах Пути", "reward": "бустеры на старт"},
+	{"id": "path.boosters", "cat": "path", "name": "Бустеры", "why": "Фонарик раскрывает фишки, Попутный ветер уносит 2 пары, Свиток даёт +3 подсказки",
+		"how": "Даром от Огонька, из запаса или за 60 кристаллов на карточке уровня", "reward": ""},
+	{"id": "path.peak", "cat": "path", "name": "Пик", "why": "Самый трудный стол главы, только честная игра: бустеры здесь не продаются",
+		"how": "Открывается после босса главы", "reward": "30 кристаллов за первую победу"},
+	{"id": "path.legend", "cat": "path", "name": "Легенда арки", "why": "Последний стол арки. Победа даёт лавр «Легенда арки»",
+		"how": "После 5 попыток можно пройти дальше и без победы, но лавр — только за победу", "reward": "150 кристаллов и лавр"},
+	{"id": "path.chests", "cat": "path", "name": "Сундуки главы", "why": "Сундук главы — за босса, звёздный — за 25 ★ из 30 в главе",
+		"how": "Тапни сундук на карте, когда он светится", "reward": "кристаллы, монеты, Лепестки"},
+	{"id": "path.jam", "cat": "path", "name": "Где лоток начал копиться", "why": "После провала видно ход, с которого лоток стал расти",
+		"how": "«Показать» подсветит эту фишку на столе на 2 секунды", "reward": ""},
+]
 
 const HOST_NAMES: = {"mc": "Маджонг-тян", "rin": "Рин", "hana": "Хана", "yue": "Юэ", "nova": "Нова"}
 const ROMAN: = ["", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"]
