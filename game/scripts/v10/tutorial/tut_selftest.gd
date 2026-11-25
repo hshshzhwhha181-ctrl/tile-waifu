@@ -12,6 +12,16 @@ func _ready() -> void:
 	if "--tut_compile=1" in args:
 		_compile()
 		return
+	# orchestrator / first-match logic (tut_logic_test.gd): fake main, or the real main.tscn playing L1
+	if "--tut_logic=1" in args or "--tut_l1=1" in args:
+		var lt: RefCounted = load(DIR + "tut_logic_test.gd").new()
+		var f: int = 0
+		if "--tut_logic=1" in args:
+			f = await lt.run_logic(self)
+		else:
+			f = await lt.run_l1(self)
+		get_tree().quit(1 if f > 0 else 0)
+		return
 
 
 func _compile() -> void:
