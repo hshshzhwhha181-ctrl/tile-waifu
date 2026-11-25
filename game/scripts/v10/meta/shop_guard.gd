@@ -12,8 +12,12 @@ extends RefCounted
 #   V10ShopGuard.can_buy() -> bool               shop._buy() starts with `if not V10ShopGuard.can_buy(): return`
 #   V10ShopGuard.guard(root) -> int              walks a built screen: store → hides every ₽ button and puts a grey
 #                                                «Скоро» in its place (denies: «Покупки откроются с выходом игры в
-#                                                RuStore»), test → adds the «ТЕСТ» plaque to each.
-#                                                Returns how many ₽ buttons it touched. Idempotent.
+#                                                RuStore») and hides the 0.9 caption «Тестовая версия: покупки
+#                                                бесплатные…» (false in a store build); test → adds the «ТЕСТ» plaque
+#                                                to each. Returns how many ₽ buttons it touched. Idempotent.
+#                                                Call it on every built shop body AND on every popup that can sell
+#                                                (pass popup, the 0.9 starter offer V8Starter.popup) — see README.
+#   V10ShopGuard.test_notes(root) -> Array       visible 0.9 «test build» captions under root (selftest: 0 in store)
 #   V10ShopGuard.visible_rub(root) -> Array      visible tappable ₽ controls (selftest: 0 in store)
 #   V10ShopGuard.force(mode) / unforce()         dev / selftests
 #
@@ -125,9 +129,33 @@ static func visible_rub(root: Node) -> Array:
 	return out
 
 
+# the 0.9 captions that only make sense in a test build («Тестовая версия: покупки бесплатные, реальная оплата
+# отключена», V6Txt shop.test_note)
+static func _is_test_note(t: String) -> bool:
+	return t != "" and t == V6Txt.s("shop.test_note")
+
+
+static func test_notes(root: Node) -> Array:
+	var out: = []
+	_notes(root, out)
+	return out
+
+
+static func _notes(n: Node, out: Array) -> void:
+	if n is CanvasItem and not (n as CanvasItem).visible:
+		return
+	if n is Label and _is_test_note((n as Label).text):
+		out.append(n)
+	for c in n.get_children():
+		_notes(c, out)
+
+
 static func guard(root: Node) -> int:
 	var n: = 0
 	var store: = not rub_allowed()
+	if store:
+		for l in test_notes(root):
+			(l as CanvasItem).visible = false
 	for b in rub_buttons(root):
 		var c: Control = b
 		if c.has_meta(META_DONE):
@@ -165,10 +193,15 @@ static func _soon(btn: Control) -> void:
 
 
 static func _plaque(c: Control) -> void:
-	var fs: = 13
+	# Overline 15 (caps, UX §6.3) — the smallest size the type scale allows
+	var fs: = 15
 	var tw: = UI.font("body", 900).get_string_size(T_TEST, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x + 14.0
-	var pl: = UI.rbox("red", Rect2(-6, -10, tw, 22), 11, 2, 3)
+	var pl: = V10MetaUI.plate(Rect2(-6, -12, tw, 24), V10MetaUI.NIGHT_900, 0.95, false)
 	pl.name = "V10TestPlaque"
 	pl.rotation = deg_to_rad(-6.0)
-	pl.add_child(UI.center_label(UI.label(T_TEST, fs, Color.WHITE, Color("6a1020"), 2, "body", 900), Rect2(0, 0, tw, 22)))
+	var l: = V10MetaUI.text(T_TEST, fs, V10MetaUI.GOLD_500, "body", 900)
+	l.size = pl.size
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	pl.add_child(l)
 	c.add_child(pl)

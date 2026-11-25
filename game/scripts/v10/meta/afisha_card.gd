@@ -1,106 +1,137 @@
 class_name V10AfishaCard
 extends Control
 
-# V10AfishaCard — «Сегодня в чайной», the lacquer board on the home screen's right slot (compact, 198 px wide) and
-# at the top of «Режимы» (wide). Rows come from V10Afisha.rows(); a played row dims and gets the red «Сыграно»
-# stamp (Playfair, low-pitched pop). Every row presses through V9Feel; a closed row denies and says why.
+# V10AfishaCard — «Сегодня в чайной» (docs/0.10-spec.md M1 Ф6) laid out by UX_RULES §3.2–§3.4 and HUD_V2 §2:
+#   · the CONTENT of the Афиша bottom sheet that the «Сегодня» lantern of the Чайная opens (UX §3.2). The home
+#     screen itself gets no card (UX §3.3: 7 tappables, the old right-slot card is gone);
+#   · the «Сегодня» block of Столы: the same component with only ["daily", "mode"] and no button of its own (there
+#     «Играть · 58» is the primary and Партия дня / Режим дня are the two secondary actions, UX §3.4).
+# Rows come from V10Afisha.visible(V10Afisha.rows()): open rows + at most one closed teaser (UX §6.4: silhouette
+# and «Откроется: …», no lock icons). Each row is a HUD_V2 M plate (80 px; 128 when the daily row has the
+# «Раскладка | Чтение руки» tabs, each tab an S plate 48 with an 80 px hit zone). A played row dims and gets the
+# cinnabar «Сыграно» stamp (Playfair 32, low-pitched pop). In the sheet the first unplayed row is «selected»
+# (gold.500 hairline, gold.300 title) and the one primary button «Играть» plays it; when everything is played the
+# primary is «Понятно» (closes the sheet). Type: Display 32 · Body 22 · Caption 18 — three sizes.
 #
-#   var c: = V10AfishaCard.make(Vector2(w, h_max))   compact layout when w < 360
-#   c.refresh()                                       rebuild rows (call on V10Meta.bus().day_rolled, after a game)
-#   c.stamp(kind)                                     marks a row as played with the stamp animation
+#   var c: = V10AfishaCard.make(Vector2(w, 0), opts = {})
+#       opts.only: Array of row ids (default all) · opts.play: bool (default true: the «Играть» button)
+#       opts.header: bool (default true: «Сегодня в чайной» + the date line)
+#   c.refresh()                       rebuild rows (call on V10Meta.bus().day_rolled, after a game)
+#   c.stamp(kind)                     marks a row as played with the stamp animation, then re-picks the next row
 #   c.preferred_height() -> float
-#   signals: row_pressed(id: String, tab: String) · locked(id: String, text: String)
-#   (tab = "Раскладка" / "Чтение руки" for the daily row, "" otherwise)
+#   signals: row_pressed(id: String, tab: String) · locked(id: String, text: String) · close_pressed()
+#   (tab = "Раскладка" / "Чтение руки" for the daily row, "" otherwise; «Играть» emits row_pressed of the selected row)
 
 signal row_pressed(id: String, tab: String)
 signal locked(id: String, text: String)
+signal close_pressed
 
-const LACQ_TOP: = Color("4a141e")
-const LACQ_BOT: = Color("1e080d")
-const GOLD_HI: = Color("ffe7a6")
-const GOLD_LO: = Color("b9802a")
-const INK_RED: = Color("d8343f")
+const ROW_H: = 80.0
+const ROW_TABS_H: = 128.0
+const GAP: = 8.0
+const HEADER_H: = 96.0
+const BTN_H: = 104.0
+const BTN_W_MAX: = 560.0
+const TX: = 88.0
 
 var box_size: Vector2
-var compact: = false
+var opts: Dictionary = {}
 var rows_root: Control
 var row_nodes: = {}
+var play_btn: JButton
 var _rows: Array = []
-var header_h: = 0.0
-var row_h: = 0.0
+var _next: Dictionary = {}
 
 
-static func make(sz: Vector2) -> V10AfishaCard:
+static func make(sz: Vector2, o: Dictionary = {}) -> V10AfishaCard:
 	var c: = V10AfishaCard.new()
 	c.box_size = sz
-	c.compact = sz.x < 360.0
+	c.opts = o
 	c.size = sz
 	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	c._build()
 	return c
 
 
+func _play_on() -> bool:
+	return bool(opts.get("play", true))
+
+
+func _header_on() -> bool:
+	return bool(opts.get("header", true))
+
+
+func _row_h(r: Dictionary) -> float:
+	return ROW_TABS_H if (r.get("tabs", []) as Array).size() > 1 else ROW_H
+
+
 func preferred_height() -> float:
-	return header_h + _rows.size() * (row_h + 8.0) + (10.0 if compact else 16.0)
+	var h: = HEADER_H if _header_on() else 0.0
+	for r in _rows:
+		h += _row_h(r) + GAP
+	if _play_on():
+		h += 16.0 + BTN_H
+	else:
+		h -= GAP
+	return maxf(h, 0.0)
 
 
 func _build() -> void:
 	for ch in get_children():
+		remove_child(ch)
 		ch.queue_free()
 	row_nodes.clear()
-	_rows = V10Afisha.rows()
-	header_h = 74.0 if compact else 92.0
-	row_h = 56.0 if compact else 78.0
-	size = Vector2(box_size.x, minf(box_size.y, preferred_height())) if box_size.y > 0.0 else Vector2(box_size.x, preferred_height())
-	# the lacquer board: deep red-black lacquer, gold rim, a soft inner glow at the top
-	var board: = UI.rbox("plum", Rect2(Vector2.ZERO, size), 24.0 if compact else 30.0, 4, 12)
-	board.colors(LACQ_TOP, LACQ_BOT)
-	board.borders(GOLD_HI, GOLD_LO)
-	board.set_param("gloss", 0.12)
-	add_child(board)
-	# two cords and the hanging pin: the card reads as a board hung on the tea-house wall
-	if not compact:
-		for x in [size.x * 0.22, size.x * 0.78]:
-			var pin: = UI.rbox("gold", Rect2(x - 7, -7, 14, 14), 7, 2, 2)
-			add_child(pin)
-	var title_fs: = 22 if compact else 32
-	var title: = UI.label("Сегодня в чайной", title_fs, GOLD_HI, Color("2a0a10"), 4, "title", 800)
-	title.position = Vector2(0, 8 if compact else 12)
-	title.size = Vector2(size.x, title_fs + 12)
-	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	if compact:
-		Common.fit_line(title, size.x - 20, 16)
-	add_child(title)
-	var sub_txt: = _date_text() if compact else "%s · %s" % [_date_text(), V10Afisha.T_REFRESH]
-	var sub: = UI.label(sub_txt, 13 if compact else 16, Color(1, 0.88, 0.78, 0.7), UI.DARK, 2, "body", 800)
-	sub.position = Vector2(8, (8 if compact else 12) + title_fs + 10)
-	sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	V10MetaUI.trim(sub, Vector2(size.x - 16, 20))
-	add_child(sub)
-	# thin gold rule with a dot in the middle
-	var rule_y: = header_h - 8.0
-	for seg in [[16.0, size.x * 0.5 - 12.0], [size.x * 0.5 + 12.0, size.x - 16.0]]:
-		var ln: = ColorRect.new()
-		ln.color = Color(GOLD_HI, 0.45)
-		ln.position = Vector2(seg[0], rule_y)
-		ln.size = Vector2(seg[1] - seg[0], 2)
-		ln.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		add_child(ln)
-	var dot: = UI.rbox("gold", Rect2(size.x * 0.5 - 5, rule_y - 4, 10, 10), 5, 1, 2)
-	add_child(dot)
+	play_btn = null
+	_rows = V10Afisha.visible(V10Afisha.rows(), opts.get("only", []))
+	_next = V10Afisha.next_row(_rows) if _play_on() else {}
+	size = Vector2(box_size.x, preferred_height())
+	var w: = size.x
+	var y: = 0.0
+	if _header_on():
+		# H2 by the left margin (UX §6.3: headings are left-aligned), the date as a caption under it
+		var title: = V10MetaUI.text("Сегодня в чайной", V10MetaUI.FS_DISPLAY, V10MetaUI.PAPER_100, "title", 700)
+		title.name = "Title"
+		title.position = Vector2(0, 8)
+		title.size = Vector2(w, 44)
+		add_child(title)
+		var sub: = V10MetaUI.text("%s · %s" % [_date_text(), V10Afisha.T_REFRESH], V10MetaUI.FS_CAPTION, V10MetaUI.PAPER_500,
+			"body", 700)
+		sub.position = Vector2(0, 54)
+		V10MetaUI.trim(sub, Vector2(w, 26))
+		add_child(sub)
+		y = HEADER_H
 	rows_root = Control.new()
 	rows_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	rows_root.position = Vector2(0, header_h)
-	rows_root.size = Vector2(size.x, size.y - header_h)
+	rows_root.position = Vector2(0, y)
+	rows_root.size = Vector2(w, size.y - y)
 	add_child(rows_root)
-	var y: = 0.0
+	var ry: = 0.0
 	for r in _rows:
-		var rn: = _row(r, Rect2(10 if compact else 16, y, size.x - (20 if compact else 32), row_h))
+		var rh: = _row_h(r)
+		var rn: = _row(r, Rect2(0, ry, w, rh))
 		rows_root.add_child(rn)
 		row_nodes[r.id] = rn
 		if bool(r.done):
 			_stamp_on(rn, false)
-		y += row_h + 8.0
+		ry += rh + GAP
+	if _play_on():
+		var bw: = minf(w, BTN_W_MAX)
+		var by: = y + ry - GAP + 16.0
+		if _next.is_empty():
+			play_btn = JButton.make("Понятно", "gold", Rect2((w - bw) * 0.5, by, bw, BTN_H), null, V10MetaUI.FS_DISPLAY)
+			play_btn.name = "Close"
+			play_btn.pressed.connect(func(): close_pressed.emit())
+		else:
+			var nx: Dictionary = _next
+			play_btn = JButton.make("Играть", "gold", Rect2((w - bw) * 0.5, by, bw, BTN_H), null, V10MetaUI.FS_DISPLAY)
+			play_btn.name = "Play"
+			play_btn.pulse = true
+			play_btn.shine_every = 2.8
+			play_btn.pressed.connect(func():
+				var tabs: Array = nx.get("tabs", [])
+				row_pressed.emit(str(nx.id), str(tabs[0]) if not tabs.is_empty() else ""))
+		V10MetaUI.role(play_btn, "primary")
+		add_child(play_btn)
 
 
 func _date_text() -> String:
@@ -111,84 +142,81 @@ func _date_text() -> String:
 
 func _row(r: Dictionary, rect: Rect2) -> Control:
 	var open: = bool(r.open)
-	var row: = UI.rbox("glass", rect, 16.0 if compact else 20.0, 2, 6)
-	if open:
-		row.colors(Color(0.27, 0.13, 0.15, 0.92), Color(0.15, 0.06, 0.08, 0.94))
-		row.borders(Color(1, 0.86, 0.6, 0.45), Color(0.3, 0.1, 0.1, 0.6))
-	else:
-		row.colors(Color(0.17, 0.14, 0.15, 0.9), Color(0.1, 0.08, 0.09, 0.92))
-		row.borders(Color(1, 1, 1, 0.1), Color(0, 0, 0, 0.3))
+	var done: = bool(r.done)
+	var selected: = not _next.is_empty() and str(_next.id) == str(r.id)
+	var row: = V10MetaUI.plate(rect)
+	row.name = "Row_" + str(r.id)
+	if selected:
+		var hair: ColorRect = row.get_node("Hair")
+		hair.color = V10MetaUI.GOLD_500
 	row.mouse_filter = Control.MOUSE_FILTER_STOP
 	row.pivot_offset = rect.size * 0.5
-	var h: = rect.size.y
-	var isz: = h - (20.0 if compact else 20.0)
-	var icon_x: = 8.0 if compact else 10.0
+	if not _play_on() and open:
+		V10MetaUI.role(row, "secondary")
+	var isz: = 48.0
+	var iy: = 16.0
 	var art: Control
-	if r.id == "mode" and V10Afisha.MODE_BG.has(str(r.get("mode", ""))) and not compact:
+	if r.id == "mode" and V10Afisha.MODE_BG.has(str(r.get("mode", ""))):
 		var p: = "res://assets/bg/%s.webp" % V10Afisha.MODE_BG[r.mode]
-		art = Common.card_art(load(p), Rect2(icon_x, (h - isz) * 0.5, isz, isz), Vector2(0.5, 0.45), 1.0, 12)
+		art = Common.card_art(load(p), Rect2(24, iy, isz, isz), Vector2(0.5, 0.45), 1.0, V10MetaUI.RADIUS)
 		if not open:
 			(art.material as ShaderMaterial).set_shader_parameter("gray", 1.0)
 	else:
-		art = V8Art.rect(V8Art.icon(str(r.icon)), Rect2(icon_x, (h - isz) * 0.5, isz, isz))
-		if not open:
-			art.modulate = Color(0.6, 0.58, 0.58, 0.8)
-	row.add_child(art)
+		art = V8Art.rect(V8Art.icon(str(r.icon)), Rect2(24, iy, isz, isz))
 	if not open:
-		var lk: = V8Art.rect(V8Art.icon("lock"), Rect2(icon_x + isz - (18 if compact else 24), h - (24 if compact else 30), 20 if compact else 26, 20 if compact else 26))
-		row.add_child(lk)
-	var tx: = icon_x + isz + (8.0 if compact else 14.0)
-	var right_w: = 20.0 if compact else 92.0
-	var tw: = rect.size.x - tx - right_w
-	var tfs: = 16 if compact else 21
-	var title_txt: = str(r.title)
-	if compact and r.id == "mode":
-		title_txt = "%s ×2" % str(V10Afisha.MODE_SHORT.get(str(r.get("mode", "")), "Режим"))
-	var t: = UI.label(title_txt, tfs, UI.INK if open else Color("a39a92"), UI.DARK, 3, "body", 900)
-	t.position = Vector2(tx, 6 if compact else 10)
-	V10MetaUI.trim(t, Vector2(tw, tfs + 6))
+		# closed = a silhouette in paper.700 (UX §6.4), no lock
+		art.modulate = Color(V10MetaUI.PAPER_700, 0.7)
+	row.add_child(art)
+	var right_w: = 176.0 if done else 56.0
+	var tw: = rect.size.x - TX - 24.0 - right_w
+	var tcol: = V10MetaUI.GOLD_300 if selected else (V10MetaUI.PAPER_100 if open else V10MetaUI.PAPER_500)
+	var t: = V10MetaUI.text(str(r.title), V10MetaUI.FS_BODY, tcol, "body", 800)
+	t.name = "Title"
+	t.position = Vector2(TX, 8)
+	V10MetaUI.trim(t, Vector2(tw, 32))
 	row.add_child(t)
-	var sfs: = 12 if compact else 16
-	var s_txt: = str(r.sub)
-	if compact:
-		s_txt = _short_sub(r)
-	var s: = UI.label(s_txt, sfs, Color("e9c9a8") if open else Color("8f8580"), UI.DARK, 2, "body", 800)
-	s.position = Vector2(tx, (6 if compact else 10) + tfs + 4)
-	V10MetaUI.trim(s, Vector2(tw, sfs + 6))
+	var s_txt: = str(r.sub) if open else str(r.lock)
+	if r.has("rule"):
+		s_txt = "%s · %s" % [s_txt, r.rule]
+	var s: = V10MetaUI.text(s_txt, V10MetaUI.FS_CAPTION, V10MetaUI.PAPER_500, "body", 700)
+	s.name = "Sub"
+	s.position = Vector2(TX, 42)
+	V10MetaUI.trim(s, Vector2(tw, 28))
 	row.add_child(s)
-	if r.has("rule") and not compact:
-		s.text = "%s · %s" % [s.text, r.rule]
-	# daily tabs (wide only): «Раскладка» | «Чтение руки»
+	# daily tabs: «Раскладка» | «Чтение руки» — S plates 48 high, hit zone 80 (HUD_V2 §2.1)
 	var tabs: Array = r.get("tabs", [])
-	if not compact and tabs.size() > 1:
+	if tabs.size() > 1:
 		s.visible = false
-		var x: = tx
+		var x: = TX
 		for tb in tabs:
-			var fw: = UI.font("body", 900).get_string_size(tb, HORIZONTAL_ALIGNMENT_LEFT, -1, 15).x + 22.0
-			var pill: = UI.rbox("glass", Rect2(x, h - 32, fw, 24), 12, 2, 3)
-			pill.colors(Color(0.35, 0.16, 0.18, 0.95), Color(0.2, 0.08, 0.1, 0.95))
-			pill.borders(Color(1, 0.85, 0.6, 0.5), Color(0, 0, 0, 0.3))
-			pill.mouse_filter = Control.MOUSE_FILTER_STOP
-			pill.add_child(UI.center_label(UI.label(tb, 15, Color("ffe7c4"), UI.DARK, 2, "body", 900), Rect2(0, 0, fw, 24)))
+			var pw: = maxf(96.0, UI.font("body", 800).get_string_size(tb, HORIZONTAL_ALIGNMENT_LEFT, -1, V10MetaUI.FS_CAPTION).x + 32.0)
+			var hit: = Control.new()
+			hit.name = "Tab_" + str(tb)
+			hit.position = Vector2(x, 48)
+			hit.size = Vector2(pw, 80)
+			hit.mouse_filter = Control.MOUSE_FILTER_STOP
+			hit.pivot_offset = hit.size * 0.5
+			var pill: = V10MetaUI.plate(Rect2(0, 16, pw, 48), V10MetaUI.NIGHT_600, 1.0, false)
+			hit.add_child(pill)
+			var pl: = V10MetaUI.text(tb, V10MetaUI.FS_CAPTION, V10MetaUI.PAPER_100, "body", 800)
+			pl.size = pill.size
+			pl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			pl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+			pill.add_child(pl)
 			var tab_name: String = tb
-			pill.gui_input.connect(func(e):
+			hit.gui_input.connect(func(e):
 				if e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT and not e.pressed:
-					V9Feel.press(pill)
+					V9Feel.press(hit)
 					row_pressed.emit(str(r.id), tab_name)
-					pill.accept_event())
-			row.add_child(pill)
-			x += fw + 6.0
-	# right side: ×2 seal, «Играть» chevron or the lock text
-	if bool(r.get("x2", false)) and open and not compact:
-		var x2: = UI.rbox("red", Rect2(rect.size.x - (40 if compact else 86), (6 if compact else 10), 34 if compact else 44, 22 if compact else 26), 11, 2, 3)
-		x2.add_child(UI.center_label(UI.label("×2", 14 if compact else 17, Color.WHITE, Color("6a1020"), 2, "body", 900), Rect2(Vector2.ZERO, x2.size)))
-		row.add_child(x2)
-		if compact:
-			t.size.x -= 14.0
-	if open and not bool(r.done):
-		var ch: = UI.label("›", 30 if compact else 38, GOLD_HI, UI.DARK, 3, "body", 900)
-		ch.position = Vector2(rect.size.x - (18 if compact else 34), 0)
-		ch.size = Vector2(20 if compact else 26, h)
+					hit.accept_event())
+			row.add_child(hit)
+			x += pw + 16.0
+	# right slot: the chevron of an open row still to play
+	if open and not done:
+		var ch: = V10MetaUI.text("›", V10MetaUI.FS_DISPLAY, V10MetaUI.GOLD_300, "body", 800)
+		ch.position = Vector2(rect.size.x - 24 - 32, 0)
+		ch.size = Vector2(32, ROW_H)
+		ch.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 		ch.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		row.add_child(ch)
 	row.gui_input.connect(func(e):
@@ -202,48 +230,32 @@ func _row(r: Dictionary, rect: Rect2) -> Control:
 	return row
 
 
-# compact (198 px) captions: a few words that fit, the full text is in the toast on tap
-func _short_sub(r: Dictionary) -> String:
-	var lock: = str(r.get("lock", ""))
-	if not bool(r.open):
-		if lock.begins_with("Откроется на ранге "):
-			return "с ранга " + lock.substr(19)
-		return "скоро"
-	if bool(r.done):
-		return V10Afisha.T_PLAYED
-	match str(r.id):
-		"daily":
-			return "до 04:00"
-		"mode":
-			return "монеты и ранг"
-	return str(r.sub)
-
-
-# the «Сыграно» stamp: red ink frame, Playfair, rotated; animated = slams in with a low pop
+# the «Сыграно» stamp: cinnabar ink frame (UX §6.2: cinnabar = the hanko only), Playfair 32, rotated; animated =
+# slams in with a low pop (fx_level=min: a 120 ms fade)
 func _stamp_on(row: Control, animated: bool) -> void:
 	if row.get_node_or_null("Stamp") != null:
 		return
 	for c in row.get_children():
-		if c is CanvasItem and c.name != "Stamp":
-			(c as CanvasItem).modulate = Color(0.75, 0.7, 0.7, 0.55)
-	var fs: = 15 if compact else 22
-	var f: = UI.font("title", 900)
+		if c is CanvasItem and c.name != "Stamp" and c.name != "Hair":
+			(c as CanvasItem).modulate.a = 0.55
+	var fs: = V10MetaUI.FS_DISPLAY
+	var f: = UI.font("title", 700)
 	var txt: = "Сыграно"
-	var tw: = f.get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x * 1.15 + (14.0 if compact else 22.0)
-	var th: = fs + (10.0 if compact else 14.0)
+	var tw: = f.get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x + 28.0
+	var th: = fs + 14.0
 	var st: = Control.new()
 	st.name = "Stamp"
 	st.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	st.size = Vector2(tw, th)
-	st.position = Vector2(row.size.x - tw - (6.0 if compact else 14.0), (row.size.y - th) * 0.5)
+	st.position = Vector2(row.size.x - tw - 24.0, (minf(row.size.y, ROW_H) - th) * 0.5)
 	st.pivot_offset = st.size * 0.5
-	st.rotation = deg_to_rad(-11.0)
+	st.rotation = deg_to_rad(-9.0)
 	var frame: = Panel.new()
 	var sb: = StyleBoxFlat.new()
-	sb.bg_color = Color(INK_RED, 0.12)
-	sb.border_color = Color(INK_RED, 0.9)
-	sb.set_border_width_all(2 if compact else 3)
-	sb.set_corner_radius_all(6)
+	sb.bg_color = Color(V10MetaUI.CINNABAR, 0.1)
+	sb.border_color = Color(V10MetaUI.CINNABAR, 0.9)
+	sb.set_border_width_all(3)
+	sb.set_corner_radius_all(V10MetaUI.RADIUS)
 	frame.add_theme_stylebox_override("panel", sb)
 	frame.size = st.size
 	frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -252,7 +264,7 @@ func _stamp_on(row: Control, animated: bool) -> void:
 	var ls: = LabelSettings.new()
 	ls.font = f
 	ls.font_size = fs
-	ls.font_color = Color(INK_RED, 0.95)
+	ls.font_color = Color(V10MetaUI.CINNABAR, 0.95)
 	l.label_settings = ls
 	l.text = txt
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -261,18 +273,22 @@ func _stamp_on(row: Control, animated: bool) -> void:
 	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	st.add_child(l)
 	row.add_child(st)
-	if animated:
-		st.scale = Vector2(2.4, 2.4)
+	if not animated:
+		return
+	if not V9Feel.can_fx():
 		st.modulate.a = 0.0
-		var t: = st.create_tween().set_parallel()
-		t.tween_property(st, "scale", Vector2.ONE, 0.22).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
-		t.tween_property(st, "modulate:a", 1.0, 0.12)
-		t.chain().tween_callback(func():
-			V9Feel.sound("pop", 0.62, 2.0)
-			V9Feel.haptic("match")
-			UI.punch(row, 0.04, 0.25)
-			if V9Feel.can_fx():
-				Fx.burst(row, st.position + st.size * 0.5, "sparkle", int(8 * V9Feel.fx_scale()) + 2, Color(1, 0.55, 0.5), 0.5))
+		st.create_tween().tween_property(st, "modulate:a", 1.0, 0.12)
+		V9Feel.sound("pop", 0.62, 2.0)
+		return
+	st.scale = Vector2(2.4, 2.4)
+	st.modulate.a = 0.0
+	var t: = st.create_tween().set_parallel()
+	t.tween_property(st, "scale", Vector2.ONE, 0.14).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
+	t.tween_property(st, "modulate:a", 1.0, 0.1)
+	t.chain().tween_callback(func():
+		V9Feel.sound("pop", 0.62, 2.0)
+		V9Feel.haptic("match")
+		Fx.burst(row, st.position + st.size * 0.5, "sparkle", int(8 * V9Feel.fx_scale()) + 2, V10MetaUI.CINNABAR, 0.5))
 
 
 func _ready() -> void:
@@ -284,8 +300,13 @@ func refresh() -> void:
 	V10MetaUI.refit.call_deferred(self)
 
 
+# a row played: the stamp slams in, then the card re-picks the next row for «Играть» (0.5 s later)
 func stamp(kind: String) -> void:
 	V10Afisha.mark(kind)
 	var rn: Control = row_nodes.get(kind)
 	if rn != null and is_instance_valid(rn):
 		_stamp_on(rn, true)
+	if is_inside_tree():
+		await get_tree().create_timer(0.5).timeout
+		if is_inside_tree():
+			refresh()

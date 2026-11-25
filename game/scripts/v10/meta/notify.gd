@@ -12,7 +12,9 @@ extends RefCounted
 #         request displaces the queued one (bday 3 > comeback 2 > salon 1 > feed 0), a lower/equal one is dropped
 #       · quiet hours 22:00–10:00 phone time: moved to 10:00 + 0–40 min (jitter from the day's seed)
 #       · the text passes V10Lint (no prices, no guilt), else the request is dropped and logged
-#   V10Notify.advance(now) -> Dictionary   the queued entry whose time has come is marked sent (last_unix) and returned
+#   V10Notify.advance(now) -> Dictionary   the queued entry whose time has come is marked sent (last_unix) and returned;
+#                                          a plan whose consent or category was switched off meanwhile is dropped,
+#                                          never sent (set_consent(false) / set_cat(cat, false) drop it at once too)
 #   V10Notify.next_allowed(now) -> int, next_text(now) -> «Следующее уведомление не раньше: чт 18:30»
 #   V10Notify.set_consent(allow), can_ask(now) (re-ask after a refusal not sooner than 30 days), set_cat(cat, on)
 #   V10Notify.log_entries() -> Array       the dev log (≤200 entries)
@@ -81,7 +83,12 @@ static func request(cat: String, earliest: int, hero: = "", text_id: = "") -> Di
 static func advance(now: int) -> Dictionary:
 	var s: = _n()
 	var q: Dictionary = s.queued
-	if q.is_empty() or int(q.get("at", 0)) > now:
+	if q.is_empty():
+		return {}
+	if not bool(_c().push) or not cat_on(str(q.get("cat", ""))):
+		_drop("switched_off")
+		return {}
+	if int(q.get("at", 0)) > now:
 		return {}
 	s.last_unix = int(q.at)
 	s.queued = {}
@@ -127,6 +134,8 @@ static func set_consent(allow: bool) -> void:
 	c.asked_unix = V10Meta.now_unix()
 	c.push = allow
 	c.bday = allow
+	if not allow:
+		_drop("no_consent")
 	if allow:
 		var cats: Dictionary = _n().cats
 		for k in ["bday", "salon", "feed"]:
@@ -145,6 +154,17 @@ static func set_cat(cat: String, on: bool) -> void:
 	if PRIO.has(cat):
 		(_n().cats as Dictionary)[cat] = on
 		_write_log("cat", {"cat": cat, "on": on})
+		if not on and str((_n().queued as Dictionary).get("cat", "")) == cat:
+			_drop("cat_off")
+
+
+# forget the queued plan (consent or its category switched off): nothing is sent, the 72 h budget is not spent
+static func _drop(why: String) -> void:
+	var q: Dictionary = _n().queued
+	if q.is_empty():
+		return
+	_n().queued = {}
+	_write_log("drop", {"cat": q.get("cat", ""), "why": why})
 
 
 static func cat_on(cat: String) -> bool:
