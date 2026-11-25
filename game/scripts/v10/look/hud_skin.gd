@@ -9,14 +9,20 @@ extends RefCounted
 #   V10HudSkin.skinned() -> bool              active != five_winds (the ONE check the hot files make)
 #   V10HudSkin.tok(name) -> Color             token of the active skin + palette
 #   V10HudSkin.nine(role, size, id = active) -> Control        background of a role (vector or @2x 9-patch)
-#   V10HudSkin.button(cls, text, rect, cb) -> Control          4 classes of UX §6.5 (play / cash / secondary / quiet)
+#   V10HudSkin.button(cls, text, rect, cb, sample) -> Control  4 classes of UX §6.5 (play / cash / secondary / quiet);
+#                                                             meta ux_role (UX §3.4); sample = a still, untappable
+#                                                             specimen for previews (no ux_role, no «дыхание»)
+#   V10HudSkin.tappable(ctrl, cb, ok = true)                  chips / cards: spring from touch-down (Г-5), a drag
+#                                                             (scroll) cancels the tap, never shakes (UX §6.7)
 #   V10HudSkin.plate(cls, title, sub, rect) -> Control         plate S/M/L (HUD_V2 §2)
 #   V10HudSkin.window(parent, title, rect) -> Control          popup with the skin's opening (silk / pen)
-#   V10HudSkin.header(parent, title, w, top_inset) -> Control  one header (UX §6.1), title in the skin font
+#   V10HudSkin.header(parent, title, w, top_inset, in_match) -> Control  one header (UX §6.1), title in the skin
+#                                                             font; in_match: plain lacquer, no ornament (UX §3.7)
 #   V10HudSkin.currency(parent, icon, value, rect) -> Control
 #   V10HudSkin.tabs(parent, names, active_i, rect) -> Control  5-tab navbar
 #   V10HudSkin.menu_bg(parent, rect) / loading(parent, rect)   textured backgrounds (none for five_winds)
-#   V10HudSkin.decorate(ctrl, role) -> Control|null            hook for jbutton / rbox / popup / V8Header
+#   V10HudSkin.decorate(ctrl, role, opts) -> Control|null      hook for jbutton / rbox / popup / V8Header;
+#                                                             opts.match on the match header = plain lacquer
 #   V10HudSkin.sting(full) -> bool                             ≤ once per 600 s, ducking −8 dB (Sfx.sting when merged)
 #   V10HudSkin.role_fill(id, role) -> Color / contrast(a, b)   for the selftest (≥ 4,5:1)
 
@@ -24,6 +30,10 @@ const BASE: = "five_winds"
 const STING_GAP_MS: = 600000
 const T_SILK: = 0.22
 const T_PEN: = 0.4
+# UX §3.4: every button carries its role for the screen budget autotest (П-1). «Касса» is secondary by default;
+# a confirmation sheet sets its own «Касса» to primary.
+const UX_ROLE: = {"play": "primary", "cash": "secondary", "secondary": "secondary", "quiet": "tertiary"}
+const TAP_SLOP: = 14.0
 
 static var active: = BASE
 static var palette: = ""
@@ -109,7 +119,9 @@ static func nine(role: String, sz: Vector2, id: = "") -> Control:
 		cv.texture = t
 		cv.mode = String(d.get("mode", "fit"))
 		cv.modulate = tint
-		cv.fill = V10HudSkinData.tokens(sid, palette if sid == active else "").get(String(d.get("fill", "")), Color(0, 0, 0, 0))
+		var tk: = V10HudSkinData.tokens(sid, palette if sid == active else "")
+		cv.fill = tk.get(String(d.get("fill", "")), Color(0, 0, 0, 0))
+		cv.sheen = tk.paper_100
 		c = cv
 	c.name = "V10Skin_" + role
 	c.size = sz
@@ -204,7 +216,7 @@ static func label(text: String, size: int, col: Color, kind: = "ui", w: = 0.0) -
 
 # ------------------------------------------------------------------------------------------------- pieces
 
-static func button(cls: String, text: String, rect: Rect2, cb: = Callable()) -> Control:
+static func button(cls: String, text: String, rect: Rect2, cb: = Callable(), sample: = false) -> Control:
 	var role: String = V10HudSkinData.BUTTON_CLASSES.get(cls, "btn_secondary")
 	var b: = _Btn.new()
 	b.name = "V10Btn_" + cls
@@ -213,6 +225,9 @@ static func button(cls: String, text: String, rect: Rect2, cb: = Callable()) -> 
 	b.cb = cb
 	b.skin_id = active
 	b.cls = cls
+	b.sample = sample
+	if not sample:
+		b.set_meta("ux_role", UX_ROLE.get(cls, "secondary"))
 	var bg: = nine(role, rect.size)
 	b.add_child(bg)
 	if cls == "quiet":
@@ -280,14 +295,17 @@ static func window(parent: Control, title: String, rect: Rect2) -> Control:
 	return w
 
 
-static func header(parent: Control, title: String, w: float, top: = 0.0) -> Control:
+static func header(parent: Control, title: String, w: float, top: = 0.0, in_match: = false) -> Control:
 	var h: = Control.new()
 	h.name = "V10Header"
 	h.size = Vector2(w, 120 + top)
-	if skinned():
+	var ornament: = skinned() and not in_match
+	if ornament:
 		h.size.y = float(role_def(active, "header").get("h", 120)) + top
 		h.add_child(nine("header", h.size))
-	var dy: = 4.0 if skinned() else 26.0   # skinned: the title sits above the ornament strip
+	elif skinned():
+		h.add_child(_plain_lacquer(h.size))
+	var dy: = 4.0 if ornament else 26.0   # skinned: the title sits above the ornament strip
 	var back: = label("‹", 44, tok("paper_100"), "ui")
 	back.position = Vector2(24, top + dy - 4)
 	back.size = Vector2(48, 64)
@@ -396,18 +414,66 @@ static func _cover(parent: Control, path: String, rect: Rect2, nm: String) -> Co
 	return cv
 
 
+# In the match the skin keeps its lacquer but drops the ornament strip of the header: the budget of a match screen
+# is 0 gold ornaments except the tray frame (UX §3.7, §6.6).
+static func _plain_lacquer(sz: Vector2) -> Control:
+	var c: = _Vec.new()
+	c.def = {"fill": "night_900", "alpha": 0.92, "bottom_hair": true}
+	c.toks = V10HudSkinData.tokens(active, palette)
+	c.name = "V10Skin_header"
+	c.size = sz
+	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	c.set_meta("v10_skin", active)
+	return c
+
+
 # Hook for the hot files: one call, no-op while five_winds is active.
-static func decorate(ctrl: Control, role: String) -> Control:
+static func decorate(ctrl: Control, role: String, opts: = {}) -> Control:
 	if not skinned() or ctrl == null or not (role in V10HudSkinData.NINE_ROLES):
 		return null
 	var old: = ctrl.get_node_or_null("V10Skin_" + role)
 	if old:
 		old.free()
-	var bg: = nine(role, ctrl.size)
+	var bg: = _plain_lacquer(ctrl.size) if role == "header" and bool(opts.get("match", false)) else nine(role, ctrl.size)
 	ctrl.add_child(bg)
 	ctrl.move_child(bg, 0)
-	ctrl.resized.connect(func(): if is_instance_valid(bg): bg.size = ctrl.size)
+	# one resize link per node, however often the node is re-decorated (skin or palette change)
+	if not ctrl.has_meta("v10_skin_resize"):
+		ctrl.set_meta("v10_skin_resize", true)
+		ctrl.resized.connect(func():
+			for ch in ctrl.get_children():
+				if ch is Control and String(ch.name).begins_with("V10Skin_"):
+					(ch as Control).size = ctrl.size)
 	return bg
+
+
+# Chips and cards (pickers, kit strip): the V9Feel spring starts on touch-down (< 100 ms, UX Г-5), the action fires
+# on release inside the node. A drag farther than TAP_SLOP is a scroll, not a tap: the node passes its input on so a
+# parent ScrollContainer can scroll by touch. `ok = false` (a teaser) answers with a soft press, never a shake.
+static func tappable(c: Control, cb: Callable, ok: = true) -> void:
+	c.mouse_filter = Control.MOUSE_FILTER_PASS
+	c.gui_input.connect(func(ev: InputEvent): _tap_input(c, ev, cb, ok))
+
+
+static func _tap_input(c: Control, ev: InputEvent, cb: Callable, ok: bool) -> void:
+	if not (ev is InputEventMouseButton) or (ev as InputEventMouseButton).button_index != MOUSE_BUTTON_LEFT:
+		return
+	var mb: = ev as InputEventMouseButton
+	var feel: = c.is_inside_tree() and c.get_tree().root.get_node_or_null("G") != null
+	if mb.pressed:
+		c.set_meta("v10_tap_from", mb.global_position)
+		if feel:
+			V9Feel.press_down(c)
+		return
+	if not c.has_meta("v10_tap_from"):
+		return
+	var from: Vector2 = c.get_meta("v10_tap_from")
+	c.remove_meta("v10_tap_from")
+	var fire: = mb.global_position.distance_to(from) <= TAP_SLOP and Rect2(Vector2.ZERO, c.size).has_point(mb.position)
+	if feel:
+		V9Feel.press_up(c, fire, "pop" if ok else "deny")
+	if fire and cb.is_valid():
+		cb.call()
 
 
 static func sting(full: = false, now_ms: = -1) -> bool:
@@ -479,12 +545,16 @@ class _Vec extends Control:
 			draw_polyline_colors(pts, cols, 1.0, true)
 		# bottom tone
 		draw_line(Vector2(r, size.y - 0.5), Vector2(size.x - r, size.y - 0.5), Color(toks.get("night_900", Color.BLACK), 0.6), 1.0)
+		if def.get("bottom_hair", false):
+			# one 1 px line gold.700 at 35 % (UX §6.8: the only border a plain surface may have)
+			draw_line(Vector2(0, size.y - 1.0), Vector2(size.x, size.y - 1.0), Color(toks.get("gold_700", Color.GOLD), 0.35), 1.0)
 
 
 class _Cover extends Control:
 	var texture: Texture2D
 	var mode: = "cover"
 	var fill: = Color(0, 0, 0, 0)
+	var sheen: = Color.WHITE   # paper.100 of the skin: the lacquer gloss over the top of a strip
 
 	func _draw() -> void:
 		if texture == null:
@@ -494,7 +564,7 @@ class _Cover extends Control:
 			# lacquer band + the ornament strip on its bottom edge, full width, never cropped
 			draw_rect(Rect2(Vector2.ZERO, size), fill)
 			for i in 10:
-				draw_rect(Rect2(0, size.y * 0.05 * i, size.x, size.y * 0.05), Color(1, 0.95, 0.85, 0.035 * (1.0 - i / 10.0)))
+				draw_rect(Rect2(0, size.y * 0.05 * i, size.x, size.y * 0.05), Color(sheen, 0.035 * (1.0 - i / 10.0)))
 			var sh: = ts.y * size.x / ts.x
 			draw_texture_rect(texture, Rect2(0, size.y - sh, size.x, sh), false)
 			return
@@ -548,9 +618,17 @@ class _Btn extends Control:
 	var cb: = Callable()
 	var skin_id: = "five_winds"
 	var cls: = "secondary"
+	var sample: = false
 	var _down: = false
 
 	func _ready() -> void:
+		if sample:
+			# a specimen inside a live preview: shows the skin's class, never acts, never breathes
+			mouse_filter = Control.MOUSE_FILTER_IGNORE
+			for ch in get_children():
+				if ch is Control:
+					(ch as Control).mouse_filter = Control.MOUSE_FILTER_IGNORE
+			return
 		mouse_filter = Control.MOUSE_FILTER_STOP
 		if cls == "play" and V10HudSkin.fx_level() != "min":
 			# the one infinite UI motion: «дыхание» of the main button 0,985↔1,0 / 3,2 с

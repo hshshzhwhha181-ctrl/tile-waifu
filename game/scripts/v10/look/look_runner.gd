@@ -5,9 +5,12 @@ extends Control
 #
 #   godot --headless --path game res://scripts/v10/look/look_runner.tscn -- --look_selftest=1
 #   xvfb-run -a godot --path game --rendering-driver opengl3 --audio-driver Dummy --resolution 720x1280 \
-#       res://scripts/v10/look/look_runner.tscn -- --look_shots=/abs/dir [--views=home,match,...] [--skin=zlata]
+#       res://scripts/v10/look/look_runner.tscn -- --look_shots=/abs/dir [--views=home,match,...] [--skin=zlata] [--fx=min]
 #
 # Views: tiles, ranked, match, home, window, kit, style, picker, fonts, card, assemble, preview, loading
+# --fx=min: shots with «Эффекты: минимум» (in memory only, the save is not written): no wave, no pen, no breathing.
+# The home / match / window views are SKIN SPECIMENS laid out by UX §3.3 / §6.6 / §5.3 (the real screens are the
+# integrator's): they never show what those rules forbid (prices or currencies on Чайная, a style chip in the match).
 
 const ALL_VIEWS: = ["tiles", "ranked", "match", "home", "window", "kit", "style", "picker", "fonts", "card", "assemble", "preview", "loading"]
 
@@ -23,7 +26,10 @@ func _ready() -> void:
 		args[kv[0]] = kv[1] if kv.size() > 1 else "1"
 	if args.has("skin"):
 		V10Look.dev_reveal[String(args.skin)] = true
-	size = get_viewport_rect().size
+	if args.has("fx"):
+		G.S["fx_level"] = String(args.fx)
+		V10TileTheme.anim_on = String(args.fx) != "min"
+	# the scene's root is anchored full-rect, so it already spans the viewport (no size write: no anchor warning)
 	if args.has("look_selftest"):
 		await get_tree().process_frame
 		var fails: int = await V10LookSelftest.run(self)
@@ -157,14 +163,17 @@ func _match(theme_id: String, skin: String, hero: String, outfit: String, tag: S
 	V10HudSkin.use(skin, "")
 	var th: = V10TileTheme.theme(theme_id)
 	var tb: = String(th.get("table", ""))
-	_bg("res://assets/bg/bg_teahouse_blur.webp" if skin == "five_winds" else "res://assets/v10/look/zlata/menu_bg.webp", Color(0.55, 0.52, 0.58))
+	# the match keeps the location's background in every skin: a HUD skin changes only the header, the tray frame
+	# and the help discs (UX §6.6)
+	_bg("res://assets/bg/bg_teahouse_blur.webp", Color(0.55, 0.52, 0.58))
 	var W: = stage.size.x
 	var H: = stage.size.y
 	var top: = 0.0
-	# header: pause · «1-2 · Осталось 30» · heroine in the arch window (HUD_V2 §8.1 simplified)
-	var hd: = V10HudSkin.header(stage, "", W, top)
+	# header: pause · «1-2 · Осталось 30» · heroine in the arch window (HUD_V2 §8.1 simplified); in a skin the match
+	# header is plain lacquer — no ornament strip (UX §3.7: 0 gold ornaments in the match but the tray frame)
+	var hd: = V10HudSkin.header(stage, "", W, top, true)
 	var lv: = V10HudSkin.label("1-2 · Осталось 30", 22, V10HudSkin.tok("paper_100"))
-	lv.position = Vector2(80, top + (20 if V10HudSkin.skinned() else 40))
+	lv.position = Vector2(80, top + 40)
 	lv.size = Vector2(360, 32)
 	stage.add_child(lv)
 	var prog_bg: = ColorRect.new()
@@ -214,7 +223,6 @@ func _match(theme_id: String, skin: String, hero: String, outfit: String, tag: S
 		n.position = bx.position + Vector2(126, 30)
 		n.size = Vector2(30, 30)
 		stage.add_child(n)
-	_label(String(th.name), 15, V10HudSkin.tok("gold_500"), Vector2(24, top + 214), 400).uppercase = true
 	await _wait(0.25)
 	await _shot("match_%s" % tag, 4)
 
@@ -256,13 +264,12 @@ func _home(skin: String, pal: String, hero: String, outfit: String, tag: String)
 	shade.col = V10HudSkin.tok("night_900")
 	shade.size = stage.size
 	stage.add_child(shade)
-	# top: avatar in the kit frame, currencies
+	# status (UX §3.3, 0–88): avatar in the kit frame + nick on the left. No currencies on Чайная.
 	var cur: = V10Look.resolve(hero, outfit)
-	var fr: = V10FrameView.make(String(cur.frame), hero if V10ProfileCos.released(hero) else "mc", 96.0, {"anim": false})
-	fr.position = Vector2(24, 24)
+	var fr: = V10FrameView.make(String(cur.frame), hero if V10ProfileCos.released(hero) else "mc", 72.0, {"anim": false})
+	fr.position = Vector2(24, 12)
 	stage.add_child(fr)
-	V10HudSkin.currency(stage, load("res://assets/icons/gem.png"), "1 240", Rect2(W - 24 - 196 * 2 - 16, 40, 196, 56))
-	V10HudSkin.currency(stage, load("res://assets/icons/coin.png"), "8 600", Rect2(W - 24 - 196, 40, 196, 56))
+	_label("Лунный Лис", 22, V10HudSkin.tok("paper_100"), Vector2(108, 34), 260)
 	# spine
 	var sp: = V10HudSkin.label("ЧАЙНАЯ · ВЕЧЕР · 21:40", 15, Color(V10HudSkin.tok("paper_100"), 0.4))
 	sp.rotation = -PI * 0.5
@@ -274,13 +281,16 @@ func _home(skin: String, pal: String, hero: String, outfit: String, tag: String)
 	var t: = _label(V10ProfileCos.hero_name(hero), 64, V10HudSkin.tok("paper_100"), Vector2(40, H * 0.2 + 26), 380, "display")
 	t.size.y = 90
 	_label(String(cur.kit_name), 22, V10HudSkin.tok("paper_300"), Vector2(40, H * 0.2 + 116), 360)
-	# partner plate M + main button + secondary
-	var pm: = V10HudSkin.plate("M", "Партнёр · %s" % V10ProfileCos.hero_name(hero), "%s · набор %s" % [cur.kit_name, cur.rank], Rect2(32, H - 392, 432, 80))
+	# action (UX §3.3): partner plate 200 px on the left, ★ «Играть · 1-4» 440×104 on the right with its overline;
+	# the extra height of 9:20 goes into the scene, so the action zone is anchored to the navbar
+	var nav_h: = 112.0
+	var ay: = H - nav_h - 24.0 - 104.0
+	var pm: = V10HudSkin.plate("M", V10ProfileCos.hero_name(hero), "Партнёр", Rect2(32, ay + 12, 200, 80))
+	pm.set_meta("ux_role", "secondary")
 	stage.add_child(pm)
-	stage.add_child(V10HudSkin.button("play", "Играть · 1-4", Rect2((W - 560) * 0.5, H - 296, 560, 104)))
-	stage.add_child(V10HudSkin.button("cash", "Лавка · 449 ₽", Rect2(32, H - 176, 320, 56)))
-	stage.add_child(V10HudSkin.button("secondary", "Желания ›", Rect2(W - 32 - 272, H - 176, 272, 56)))
-	V10HudSkin.tabs(stage, ["Чайная", "Героини", "Столы", "Желания", "Лавка"], 0, Rect2(0, H - 112, W, 112))
+	_label("ПУТЬ · ЧАЙНЫЙ САД", 15, V10HudSkin.tok("gold_500"), Vector2(W - 32 - 440, ay - 26), 440).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	stage.add_child(V10HudSkin.button("play", "Играть · 1-4", Rect2(W - 32 - 440, ay, 440, 104)))
+	V10HudSkin.tabs(stage, ["Чайная", "Героини", "Столы", "Желания", "Лавка"], 0, Rect2(0, H - nav_h, W, nav_h))
 	await _wait(0.2)
 	await _shot("home_%s" % tag, 4)
 
@@ -292,29 +302,58 @@ func _view_home() -> void:
 	await _home("zlata", "dawn", "zlata", "zl_vow", "zlata_dawn")
 
 
+# the one window template every skin dresses: the confirmation sheet of UX §5.3 (Касса is its primary)
 func _view_window() -> void:
 	for skin in ["five_winds", "zlata"]:
 		_clear()
 		V10HudSkin.use(skin, "")
-		if skin == "zlata":
-			V10HudSkin.menu_bg(stage, Rect2(Vector2.ZERO, stage.size))
-		else:
-			_bg("res://assets/bg/bg_teahouse_blur.webp", Color(0.5, 0.48, 0.52))
+		_bg("res://assets/bg/bg_teahouse_blur.webp", Color(0.5, 0.48, 0.52))
 		var W: = stage.size.x
-		var w: = V10HudSkin.window(stage, "Шансы и правила", Rect2(32, 220, W - 64, 760))
-		var y: = 110.0
-		for row in [["Злата · SSR", "0,8 %"], ["Любая SSR", "3 %"], ["Гарант SSR", "на 60-м"], ["≈ 164 ₽ за желание", ""]]:
-			var p: = V10HudSkin.plate("M", row[0], "", Rect2(48, y, w.size.x - 96, 80))
+		var H: = stage.size.y
+		var wh: = 820.0
+		var w: = V10HudSkin.window(stage, "Набор первого гостя", Rect2(32, (H - wh) * 0.5, W - 64, wh))
+		var inset: = 56.0 if V10HudSkin.skinned() else 32.0
+		var iw: = w.size.x - inset * 2.0
+		var y: = inset + 70.0
+		var cap: = V10HudSkin.label("ТЫ ПОЛУЧИШЬ", 15, V10HudSkin.tok("gold_500"))
+		cap.position = Vector2(inset, y)
+		cap.size = Vector2(iw, 20)
+		w.add_child(cap)
+		y += 28.0
+		for row in [["300 Лунного камня", "= 2 желания"], ["Рамка «Первый гость»", ""]]:
+			var p: = V10HudSkin.plate("S", row[0], "", Rect2(inset, y, iw, 48))
 			w.add_child(p)
 			if row[1] != "":
-				var n: = V10HudSkin.label(row[1], 28, V10HudSkin.tok("gold_300"), "num")
-				n.position = Vector2(w.size.x - 96 - 160, 20)
-				n.size = Vector2(130, 40)
+				var n: = V10HudSkin.label(row[1], 22, V10HudSkin.tok("paper_300"))
+				n.position = Vector2(iw - 196, 6)
+				n.size = Vector2(180, 36)
 				n.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 				p.add_child(n)
-			y += 96
-		w.add_child(V10HudSkin.button("cash", "Загадать · 1 желание", Rect2(48, w.size.y - 232, w.size.x - 96, 80)))
-		w.add_child(V10HudSkin.button("play", "Понятно", Rect2((w.size.x - 440) * 0.5, w.size.y - 136, 440, 104)))
+			y += 60.0
+		y += 12.0
+		var price: = V10HudSkin.label("149 ₽", 40, V10HudSkin.tok("gold_300"), "num")
+		price.position = Vector2(inset, y)
+		price.size = Vector2(200, 48)
+		w.add_child(price)
+		var rate: = V10HudSkin.label("≈ 74 ₽ за желание", 22, V10HudSkin.tok("paper_300"))
+		rate.position = Vector2(inset + iw - 260, y + 10)
+		rate.size = Vector2(260, 32)
+		rate.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		w.add_child(rate)
+		y += 56.0
+		var spent: = V10HudSkin.label("Потрачено за 30 дней: 528 ₽ из 3 000", 18, V10HudSkin.tok("paper_500"))
+		spent.position = Vector2(inset, y)
+		spent.size = Vector2(iw, 26)
+		w.add_child(spent)
+		var pay: = V10HudSkin.button("cash", "Оплатить · 149 ₽", Rect2(inset, w.size.y - inset - 236, iw, 88))
+		pay.set_meta("ux_role", "primary")
+		w.add_child(pay)
+		w.add_child(V10HudSkin.button("secondary", "Отмена", Rect2(inset, w.size.y - inset - 136, iw, 80)))
+		var foot: = V10HudSkin.label("Оферта · Покупка окончательна после зачисления", 18, V10HudSkin.tok("paper_500"))
+		foot.position = Vector2(inset, w.size.y - inset - 44)
+		foot.size = Vector2(iw, 26)
+		foot.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		w.add_child(foot)
 		await _wait(0.2)
 		await _shot("window_%s_open" % skin, 1)
 		await _wait(0.8)
@@ -324,7 +363,7 @@ func _view_window() -> void:
 func _view_kit() -> void:
 	_clear()
 	_bg("", Color.WHITE)
-	_label("Набор богини", 44, V10HudSkin.tok("paper_100"), Vector2(24, 20), 672, "display")
+	_label("Набор героини", 44, V10HudSkin.tok("paper_100"), Vector2(24, 20), 672, "display")
 	var cases: = [["mc", "o_base"], ["mc", "o_dragon"], ["rin", "r_agent"], ["hana", "h_gym"], ["yue", "y_queen"], ["nova", "n_ssr"], ["zlata", "zl_base"]]
 	var y: = 96.0
 	for c in cases:
@@ -358,7 +397,7 @@ func _view_picker() -> void:
 func _view_fonts() -> void:
 	_clear()
 	_bg("", Color.WHITE)
-	_label("Шрифты богинь на моментах", 44, V10HudSkin.tok("paper_100"), Vector2(24, 16), 672, "display")
+	_label("Шрифты героинь на моментах", 44, V10HudSkin.tok("paper_100"), Vector2(24, 16), 672, "display")
 	var skins: = ["", "zlata", "minamo", "kira", "vesper", "sigrid"]
 	var y: = 84.0
 	for sk in skins:
@@ -371,14 +410,17 @@ func _view_fonts() -> void:
 		_font_line(V10LookFonts.fit("victory", "Победа!", 220, look), "Победа!", 40, V10HudSkin.tok("gold_300"), Vector2(470, y + 64))
 		var sign: String = "— твоя %s" % ("Маджонг-тян" if sk == "" else who)
 		_font_line(V10LookFonts.fit("letter_sign", sign, 400, look), sign, 30, V10HudSkin.tok("paper_300"), Vector2(24, y + 120))
+		# a price is always Nunito, in real units (UX §5.2 п. 2)
 		var pr: = Label.new()
-		pr.text = "449 ₽"
+		pr.text = "≈ 164 ₽ за желание"
 		var pls: = LabelSettings.new()
 		pls.font = V10LookFonts.price_font()
-		pls.font_size = 28
+		pls.font_size = 22
 		pls.font_color = V10HudSkin.tok("gold_300")
 		pr.label_settings = pls
-		pr.position = Vector2(590, y + 124)
+		pr.position = Vector2(stage.size.x - 24 - 240, y + 128)
+		pr.size = Vector2(240, 30)
+		pr.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 		stage.add_child(pr)
 		y += 196
 	await _shot("fonts_moments", 6)
@@ -444,7 +486,8 @@ func _view_assemble() -> void:
 
 func _view_preview() -> void:
 	await _home("zlata", "firebird", "zlata", "zl_base", "zlata_tryon_base")
-	V10PreviewBar.open(stage, "zlata", "zl_base", Callable(), 136)
+	# right under the status row (UX §3.3, 0–88), clear of her face
+	V10PreviewBar.open(stage, "zlata", "zl_base", Callable(), 92)
 	await _shot("preview_bar", 6)
 	V10Look.end_preview()
 

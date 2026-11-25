@@ -41,6 +41,9 @@ static func open(win: Control, skin_id: String) -> void:
 		pen.size = win.size
 		pen.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		pen.skin_id = skin_id
+		# the pen's ember glow is the goddess's accent (Злата: жар-перо), not a literal
+		var hero: = String(V10HudSkinData.skin(skin_id).get("hero", ""))
+		pen.ember = Color(String(V10KitData.kit(hero).get("accent", {}).get("col", "ff7a2a")))
 		win.add_child(pen)
 		win.modulate.a = 0.0
 		if win.is_inside_tree():
@@ -93,7 +96,7 @@ class _Pen extends Control:
 	var tip: = Color.WHITE
 	var k: = 0.0
 	var skin_id: = "zlata"
-	var ember: = Color("ff7a2a")
+	var ember: = Color.ORANGE_RED   # set from the kit accent by open()
 	var _done: = false
 
 	func _ready() -> void:

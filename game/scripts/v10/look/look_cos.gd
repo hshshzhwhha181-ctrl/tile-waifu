@@ -9,7 +9,7 @@ extends RefCounted
 #   V10LookCos.all(kind = "", include_hidden = false) -> Array   kinds: frame title badge bg tile table hud sting font
 #   V10LookCos.entry(id) -> Dictionary
 #   V10LookCos.owned(S, kind) -> Array                             ids
-#   V10LookCos.kit_line(hero, outfit) -> String                    «Набор: рамка · тема · стол · HUD · стинг · шрифт»
+#   V10LookCos.kit_line(hero, outfit) -> String                    «Набор: рамка · … · интерфейс · стинг · шрифт»
 #   V10LookCos.validate_all() -> Array                             error strings
 #
 # Entry: {id, kind, name, tier: A|S|SSR, hero, src: {type: goddess|outfit|legacy|default|…}, sim_ok, sold: false}
@@ -107,7 +107,7 @@ static func kit_line(hero: String, outfit: = "") -> String:
 	var parts: = []
 	for el in V10KitData.ELEMENTS:
 		if r.open.get(el, false):
-			parts.append(String(V10KitData.ELEMENT_NAMES[el]).to_lower() if el != "hud" else "HUD")
+			parts.append(String(V10KitData.ELEMENT_NAMES[el]).to_lower())
 	return "Набор: " + " · ".join(parts)
 
 

@@ -58,12 +58,15 @@ func _start() -> void:
 			var n: Control = ch
 			var d: = (n.position + n.size * 0.5).distance_to(c)
 			var delay: = clampf(d / maxf(home.size.length() * 0.5, 1.0), 0.0, 1.0) * dur * 0.5
+			# every block lands on ITS OWN resting state (a mirrored corner keeps scale −1, a dimmed layer its alpha)
+			var sc0: = n.scale
+			var a0: = n.modulate.a
 			n.pivot_offset = n.size * 0.5
-			n.scale = Vector2(0.94, 0.94)
+			n.scale = sc0 * 0.94
 			n.modulate.a = 0.0
 			var tw: = n.create_tween().set_parallel()
-			tw.tween_property(n, "scale", Vector2.ONE, dur * 0.5).set_delay(delay).set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_OUT)
-			tw.tween_property(n, "modulate:a", 1.0, dur * 0.5).set_delay(delay)
+			tw.tween_property(n, "scale", sc0, dur * 0.5).set_delay(delay).set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_OUT)
+			tw.tween_property(n, "modulate:a", a0, dur * 0.5).set_delay(delay)
 			tweens_made += 1
 			i += 1
 	if dur > 0.0:
@@ -96,20 +99,21 @@ func _draw() -> void:
 
 
 func _buttons() -> void:
-	# a scrim under the decision so it reads over the assembling Чайная
+	# a scrim under the decision so it reads over the assembling Чайная: fully opaque from just above the overline,
+	# so no line of the Чайная under it (partner plate, buttons) shows through the title
 	var g: = Gradient.new()
 	g.set_color(0, Color(V10HudSkin.tok("night_900", skin_id), 0.0))
-	g.set_color(1, Color(V10HudSkin.tok("night_900", skin_id), 0.94))
+	g.set_color(1, Color(V10HudSkin.tok("night_900", skin_id), 0.97))
 	var gt: = GradientTexture2D.new()
 	gt.gradient = g
 	gt.fill_from = Vector2(0, 0)
-	gt.fill_to = Vector2(0, 0.45)
+	gt.fill_to = Vector2(0, 0.36)
 	var scrim: = TextureRect.new()
 	scrim.texture = gt
 	scrim.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	scrim.stretch_mode = TextureRect.STRETCH_SCALE
-	scrim.position = Vector2(0, size.y - 520)
-	scrim.size = Vector2(size.x, 520)
+	scrim.position = Vector2(0, size.y - 620)
+	scrim.size = Vector2(size.x, 620)
 	scrim.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(scrim)
 	_corners()

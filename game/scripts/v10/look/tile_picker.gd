@@ -2,7 +2,8 @@ class_name V10TilePicker
 extends Control
 
 # V10TilePicker — Героини → «Фишки и столы» (D3): a grid of live 3×2 previews (real tiles on the theme's table).
-# Owned themes are pickable; of the locked ones only ONE teaser is shown («Откроется: …», UX §6.4).
+# Owned themes are pickable; of the locked ones only ONE teaser is shown («Откроется: …», UX §6.4). The grid scrolls
+# vertically (the 9th theme and the teaser stay reachable on 720×1280); only the picked preview's table animates.
 #
 #   V10TilePicker.make(S, size, opts) -> V10TilePicker     opts: ranked (shows the «стандартные лица» plate)
 #   signal picked(theme_id)
@@ -14,6 +15,8 @@ const GAP: = 16.0
 
 var S: Dictionary
 var ranked: = false
+var scroll: ScrollContainer
+var grid: Control
 
 
 static func make(save: Dictionary, sz: Vector2, opts: = {}) -> V10TilePicker:
@@ -51,23 +54,34 @@ func _build() -> void:
 			teaser = id
 	if teaser != "":
 		list.append(teaser)
+	scroll = ScrollContainer.new()
+	scroll.name = "Scroll"
+	scroll.position = Vector2(0, y0)
+	scroll.size = Vector2(size.x, size.y - y0)
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_SHOW_NEVER
+	add_child(scroll)
+	var rows_n: = int(ceil(list.size() / 2.0))
+	grid = Control.new()
+	grid.name = "Grid"
+	grid.custom_minimum_size = Vector2(size.x, rows_n * (CELL.y + GAP) + 24.0)
+	grid.mouse_filter = Control.MOUSE_FILTER_PASS
+	scroll.add_child(grid)
 	var x0: = (size.x - (CELL.x * 2 + GAP)) * 0.5
 	for i in list.size():
 		var id: String = list[i]
-		var pos: = Vector2(x0 + (i % 2) * (CELL.x + GAP), y0 + (i / 2) * (CELL.y + GAP))
-		if pos.y + CELL.y > size.y:
-			break
+		var pos: = Vector2(x0 + (i % 2) * (CELL.x + GAP), (i / 2) * (CELL.y + GAP))
 		_cell(id, Rect2(pos, CELL), id in own, String(cur.tile) == id)
 
 
 func _cell(id: String, r: Rect2, owned: bool, on: bool) -> void:
 	var c: = Control.new()
+	c.name = "Cell_" + id
 	c.position = r.position
 	c.size = r.size
-	c.mouse_filter = Control.MOUSE_FILTER_STOP
-	add_child(c)
+	grid.add_child(c)
 	var th: = V10TileTheme.theme(id)
-	var board: = V10LookBoard.make(id, String(th.get("table", "")), Rect2(0, 0, r.size.x, 196), {"ranked": ranked, "pad": 18.0})
+	var board: = V10LookBoard.make(id, String(th.get("table", "")), Rect2(0, 0, r.size.x, 196), {"ranked": ranked, "pad": 18.0, "still": not on})
 	c.add_child(board)
 	var nm: = V10HudSkin.label(String(th.name), 22, V10HudSkin.tok("gold_300") if on else V10HudSkin.tok("paper_100"))
 	nm.position = Vector2(4, 204)
@@ -78,17 +92,11 @@ func _cell(id: String, r: Rect2, owned: bool, on: bool) -> void:
 		sub = "Выбрано" if on else V10ProfileCos.hero_name(String(th.owner))
 	else:
 		sub = "Откроется: %s (%s)" % [V10ProfileCos.hero_name(String(th.owner)), th.tier]
-		board.modulate = Color(0.45, 0.42, 0.45, 1.0)
+		board.modulate = V10HudSkin.tok("paper_700")   # silhouette in paper.700 (UX §6.4)
 	var sl: = V10HudSkin.label(sub, 18, V10HudSkin.tok("paper_500"))
 	sl.position = Vector2(4, 236)
 	sl.size = Vector2(r.size.x - 8, 26)
 	c.add_child(sl)
-	c.gui_input.connect(func(ev: InputEvent):
-		if ev is InputEventMouseButton and ev.button_index == MOUSE_BUTTON_LEFT and not ev.pressed:
-			var g_ok: = get_tree().root.get_node_or_null("G") != null
-			if owned:
-				if g_ok:
-					V9Feel.press(c)
-				picked.emit(id)
-			elif g_ok:
-				V9Feel.deny(c))
+	c.set_meta("ux_role", "option")
+	c.set_meta("ux_group", "tile")
+	V10HudSkin.tappable(c, func(): if owned: picked.emit(id), owned)

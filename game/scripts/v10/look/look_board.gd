@@ -6,7 +6,8 @@ extends Control
 #
 #   V10LookBoard.make(theme_id, table_id, rect, opts) -> V10LookBoard
 #     opts: cols (3), rows (2), faces (Array, defaults to the theme's signature first), ranked (false), scale (auto),
-#           layers (1, a second layer offsets like a real stack), burst (false: one accent particle burst)
+#           layers (1, a second layer offsets like a real stack), burst (false: one accent particle burst),
+#           still (false: the table shader holds still — pickers animate only the picked preview, Mali budget)
 
 var theme_id: = "s_sakura"
 var table_id: = ""
@@ -32,7 +33,8 @@ func _build(opts: Dictionary) -> void:
 	var ranked: = bool(opts.get("ranked", false))
 	var pad: = float(opts.get("pad", 22.0))
 	if table_id != "":
-		table_cr = V10TileTheme.table_rect(table_id, Rect2(Vector2.ZERO, size), {"static": ranked, "frame_w": float(opts.get("frame_w", 16.0)), "radius": float(opts.get("radius", 18.0))})
+		table_cr = V10TileTheme.table_rect(table_id, Rect2(Vector2.ZERO, size), {"static": ranked or bool(opts.get("still", false)),
+			"frame_w": float(opts.get("frame_w", 16.0)), "radius": float(opts.get("radius", 18.0))})
 		add_child(table_cr)
 		var th: = V10TileTheme.table(table_id)
 		V6TileLook.lamp_col = th.lamp_col
@@ -41,7 +43,7 @@ func _build(opts: Dictionary) -> void:
 		V6TileLook.shadow_col = th.shadow
 	else:
 		var bg: = ColorRect.new()
-		bg.color = Color("1c4a3b")
+		bg.color = V10TileTheme.LOCATION_FELT
 		bg.size = size
 		bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		add_child(bg)

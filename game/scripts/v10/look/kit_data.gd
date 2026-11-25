@@ -15,7 +15,8 @@ extends RefCounted
 # 0.9 `rar` 1:1 (R→A, SR→S, SSR→SSR), exactly what ROSTER §1.1 prescribes.
 
 const ELEMENTS: = ["frame", "accent", "tile", "table", "hud", "sting", "font"]
-const ELEMENT_NAMES: = {"frame": "Рамка", "accent": "Акцент", "tile": "Тема фишек", "table": "Стол", "hud": "HUD",
+# player-facing names (UX §3.2 «Стиль: Рамка · Фишки · Стол · Интерфейс · Стинг · Шрифт»; §4.1 — no «HUD» on screen)
+const ELEMENT_NAMES: = {"frame": "Рамка", "accent": "Акцент", "tile": "Тема фишек", "table": "Стол", "hud": "Интерфейс",
 	"sting": "Стинг", "font": "Шрифт"}
 # the lowest kit rank that carries the element
 const ELEMENT_RANK: = {"frame": "A", "accent": "A", "tile": "S", "table": "S", "hud": "SSR", "sting": "SSR", "font": "SSR"}
@@ -90,7 +91,7 @@ const EXTRA_OUTFITS: = {
 	"zl_ember": ["zlata", "SSR", "Царица-пламя"], "zl_vow": ["zlata", "SSR", "Обет Жар-птицы"],
 }
 # chip captions of the kit ribbon (short)
-const ELEMENT_SHORT: = {"frame": "Рамка", "accent": "Акцент", "tile": "Фишки", "table": "Стол", "hud": "HUD",
+const ELEMENT_SHORT: = {"frame": "Рамка", "accent": "Акцент", "tile": "Фишки", "table": "Стол", "hud": "Интерфейс",
 	"sting": "Стинг", "font": "Шрифт"}
 
 # stings: short fanfare at «Сделать партнёром» (1,5 с) and the full one once a session on entering Чайная (4–6 с).
@@ -168,6 +169,31 @@ static func lock_text(element: String) -> String:
 	return "у %s" % ELEMENT_RANK.get(element, "SSR")
 
 
+# The ONE closed teaser of the kit ribbon (UX §6.4, §10 В-8): what the next kit rank adds, and how it opens.
+# {rank, elements: [..], title: «Фишки и стол», how: «Откроется: наряд «…»» | «Есть у набора S»}; {} for a full kit.
+static func next_teaser(hero: String, outfit: String) -> Dictionary:
+	var r: = kit_rank(hero, outfit)
+	var i: = rank_index(r)
+	if i >= RANKS.size() - 1:
+		return {}
+	var nxt: String = RANKS[i + 1]
+	var els: = []
+	for e in ELEMENTS:
+		if ELEMENT_RANK[e] == nxt:
+			els.append(e)
+	var names: = []
+	for e in els:
+		names.append(String(ELEMENT_SHORT[e]) if names.is_empty() else String(ELEMENT_SHORT[e]).to_lower())
+	var title: = " · ".join(names) if names.size() > 2 else " и ".join(names)
+	var how: = "Есть у набора %s" % nxt
+	if nxt == "S":
+		for o in kit(hero).get("up", {}):
+			if o != outfit:
+				how = "Откроется: наряд «%s»" % outfit_name(o)
+				break
+	return {"rank": nxt, "elements": els, "title": title, "how": how}
+
+
 static func _item(id: String) -> Dictionary:
 	var g: = _g()
 	if g == null:
@@ -181,20 +207,32 @@ static func _g() -> Node:
 	return tree.root.get_node_or_null("G") if tree else null
 
 
+# class lookups are cached: the global class list is fixed at run time, and resolve() runs per board / per kit
+static var _class_path: = {}
+
+
+static func _class(cn: String) -> String:
+	if not _class_path.has(cn):
+		_class_path[cn] = ""
+		for c in ProjectSettings.get_global_class_list():
+			if String(c.get("class", "")) == cn:
+				_class_path[cn] = String(c.path)
+				break
+	return _class_path[cn]
+
+
 static func _has_class(cn: String) -> bool:
-	for c in ProjectSettings.get_global_class_list():
-		if String(c.get("class", "")) == cn:
-			return true
-	return false
+	return _class(cn) != ""
 
 
 static func _call_static(cn: String, fn: String, args: Array):
-	for c in ProjectSettings.get_global_class_list():
-		if String(c.get("class", "")) == cn:
-			var scr: Script = load(String(c.path))
-			if scr == null:
-				return null
-			for m in scr.get_script_method_list():
-				if String(m.name) == fn:
-					return scr.callv(fn, args)
+	var path: = _class(cn)
+	if path == "":
+		return null
+	var scr: Script = load(path)
+	if scr == null:
+		return null
+	for m in scr.get_script_method_list():
+		if String(m.name) == fn:
+			return scr.callv(fn, args)
 	return null

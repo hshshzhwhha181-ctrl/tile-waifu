@@ -22,6 +22,8 @@ const TABLE_SHADER: = preload("res://scripts/v10/look/table_v10.gdshader")
 const BODY_TEX: = "res://assets/v06/board/tile_body.png"
 const IVORY: = Color("f4ecdc")
 const STANDARD_RIM: = Color("f6dfe6")
+# stand-in for «the location's own table» (no v10 table) in previews and pickers
+const LOCATION_FELT: = Color("1c4a3b")
 
 # pattern ids of tile_body_v10.gdshader
 const P_PLAIN: = 0
