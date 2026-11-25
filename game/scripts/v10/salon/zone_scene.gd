@@ -145,7 +145,7 @@ func _build_stage() -> void:
 	top_sh.texture = gt2
 	top_sh.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	top_sh.stretch_mode = TextureRect.STRETCH_SCALE
-	top_sh.size = Vector2(minf(W * 0.5, 360.0), 200)
+	top_sh.size = Vector2(minf(W * 0.55, 400.0), 250)
 	top_sh.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	top_sh.name = "TopShade"
 	add_child(top_sh)
@@ -169,11 +169,13 @@ func _build_ui() -> void:
 	back_b.icon = "back"
 	back_b.pressed.connect(_back)
 	ui.add_child(back_b)
+	# the title sits under «назад» on the left field: next to the button it ran into Rin's face (z2 still: her
+	# face is high, just right of centre; UX §10 Г-1 — no Control within face_rect + 48 px)
 	var ov: = V10SalonUI.overline(str(z.name), V10SalonUI.GOLD_500)
-	ov.position = Vector2(104, top + 18)
+	ov.position = Vector2(32, top + 98)
 	ui.add_child(ov)
 	who_lbl = V10SalonUI.label(str(z.scene), 32, V10SalonUI.PAPER_100, "italic", 600, 0.7)
-	who_lbl.position = Vector2(104, top + 38)
+	who_lbl.position = Vector2(32, top + 118)
 	ui.add_child(who_lbl)
 	# her line: Voice 30, no bubble, soft shadow, pen 0.4 s / hold 4 s / fade 0.3 s (UX §6.3)
 	line_lbl = V10SalonUI.label("", 30, V10SalonUI.PAPER_100, "italic", 500, 0.9)

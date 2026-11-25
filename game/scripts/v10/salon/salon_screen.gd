@@ -35,6 +35,7 @@ var _bottom_h: = 190.0
 var _top_pad: = 0.0
 
 const ZONE_GAP: = 28.0
+const MUSIC: = "res://assets/music/salon.ogg"  # UX §7.1 «Салон: эрху, деревянный зал, 76»; audio lane
 
 
 func build(m, args: Dictionary) -> void:
@@ -46,6 +47,10 @@ func build(m, args: Dictionary) -> void:
 	V10Salon.ensure()
 	V10Salon.reset_cache()
 	V10Salon.repair()
+	# UX §7.1: the salon's own track (эрху, 76) once the audio lane lands it; until then the current track plays on
+	var sfx_node: Node = get_tree().root.get_node_or_null("Sfx") if is_inside_tree() else null
+	if sfx_node != null and ResourceLoader.exists(MUSIC) and main != null:
+		sfx_node.call("music", "salon", 0.4)
 	var bg: = ColorRect.new()
 	bg.color = V10SalonUI.NIGHT_900
 	bg.size = size
@@ -219,14 +224,14 @@ func _arc_teaser(zw: float) -> Control:
 	c.draw.connect(func():
 		var r: = Rect2((W - zw) * 0.5 + 24, 10, zw - 48, 200)
 		c.draw_style_box(V10SalonUI.panel_box(V10SalonUI.NIGHT_800, 4.0, Color(V10SalonUI.GOLD_700, 0.35), 1), r)
-		# silhouette of a lantern yard: roof line and three lanterns
-		var base: = r.position + Vector2(r.size.x * 0.68, 150)
+		# silhouette of a lantern yard: roof line and three lanterns, in the right corner clear of the H2 text
+		var base: = Vector2(r.end.x - 106, 160)
 		var col: = Color(V10SalonUI.PAPER_700, 0.35)
-		c.draw_colored_polygon(PackedVector2Array([base + Vector2(-150, -70), base + Vector2(0, -112), base + Vector2(150, -70), base + Vector2(120, -62), base + Vector2(-120, -62)]), col)
+		c.draw_colored_polygon(PackedVector2Array([base + Vector2(-96, -62), base + Vector2(0, -96), base + Vector2(96, -62), base + Vector2(78, -56), base + Vector2(-78, -56)]), col)
 		for k in 3:
-			var lp: = base + Vector2(-80 + k * 80, -30)
-			c.draw_line(lp + Vector2(0, -32), lp + Vector2(0, -18), col, 2.0)
-			c.draw_circle(lp, 16.0, col))
+			var lp: = base + Vector2(-54 + k * 54, -24)
+			c.draw_line(lp + Vector2(0, -28), lp + Vector2(0, -14), col, 2.0)
+			c.draw_circle(lp, 13.0, col))
 	var ov: = V10SalonUI.label("Зона IV · %s" % nz.name, 18, V10SalonUI.PAPER_500, "body", 800)
 	ov.position = Vector2((W - zw) * 0.5 + 52, 40)
 	c.add_child(ov)
@@ -248,6 +253,16 @@ func _check_visible() -> void:
 		var row: Control = zn.get_parent()
 		var r: = Rect2(row.position, row.size)
 		vis[zid] = view.intersects(r)
+	# the focus zone: the one that fills most of the map between the header and the bottom — only it runs a rig
+	var map_r: = Rect2(0, scroll.scroll_vertical + _header_h, W, maxf(1.0, H - _header_h - _bottom_h))
+	var focus: = ""
+	var best: = 0.0
+	for zid in zones:
+		var row2: Control = zones[zid].get_parent()
+		var a: = map_r.intersection(Rect2(row2.position, row2.size)).get_area()
+		if a > best:
+			best = a
+			focus = zid
 	for zid in zones:
 		var on: bool = vis[zid]
 		var near: = on
@@ -256,7 +271,7 @@ func _check_visible() -> void:
 			if j >= 0 and j < ids.size() and vis.get(ids[j], false):
 				near = true
 		zones[zid].load_textures(near)
-		zones[zid].set_visible_live(on)
+		zones[zid].set_visible_live(on, zid == focus)
 
 
 func _process(dt: float) -> void:
@@ -441,6 +456,9 @@ func _hide_intro() -> void:
 func _on_task(zid: String, tid: String) -> void:
 	if busy or (sheet and is_instance_valid(sheet)):
 		return
+	# one layer at a time (П-6): a toast left from the header «?» does not hang over the sheet
+	for c in toast_box.get_children():
+		c.queue_free()
 	sheet = V10SalonSheet.open(self, zid, tid)
 	sheet.restore.connect(func(t): _do_restore(zid, t))
 	sheet.finish.connect(func(t, v): _do_finish(zid, t, v))
@@ -512,6 +530,10 @@ func _do_finale(zid: String) -> void:
 	var zn: V10SalonZone = zones[zid]
 	await zn.play_finale()
 	var rewards: = V10Salon.claim_chest(zid)
+	# the ceremony brings her own rig: the map under it holds still, back to stills (UX Г-4: one rig on screen);
+	# closing the finale rebuilds the map (_fill) and the focus zone gets its rig again
+	for k in zones:
+		zones[k].set_visible_live(false)
 	finale = V10SalonFinale.open(self, zid, rewards)
 	finale.scene.connect(func(): _open_scene(zid))
 	finale.play.connect(_play)

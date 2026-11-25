@@ -128,7 +128,7 @@ func shoot() -> String:
 	var img: = get_viewport().get_texture().get_image()
 	mark.queue_free()
 	bar.visible = true
-	V10SalonUI.sound("salon_shutter", 1.3, -2.0)
+	V10SalonUI.sound("salon_shutter", 1.3, -4.5)  # file peak −2 dBFS → ≤ −6 dBFS played (UX З-4)
 	V10SalonUI.haptic("flip")
 	_flash()
 	var path: = _save(img)

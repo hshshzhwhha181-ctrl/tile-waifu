@@ -157,7 +157,7 @@ func _build() -> void:
 		heroine.modulate.a = 1.0
 		heroine.appear()
 		V10SalonFx.zone_haptic()
-		V10SalonUI.sound("salon_zone_sting", 1.0, -1.0)
+		V10SalonUI.sound("salon_zone_sting", 1.0, -3.0)  # file peak −3.7 dBFS → ≤ −6 dBFS played (UX З-4)
 		if fx:
 			V10SalonFx.sparkle(self, Rect2(W * 0.2, H * 0.15, W * 0.6, H * 0.45), accent.lightened(0.3), 30))
 	t.tween_property(ov, "modulate:a", 1.0, 0.24)

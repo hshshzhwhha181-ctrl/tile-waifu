@@ -7,7 +7,7 @@ const BANNED: = ["скуча", "одна", "обещал", "пропал", "за
 	"последн", "только сегодня", "купи", "баннер", "акци", "цена"]
 const UI_BANNED: = ["гарант", "пити", "pity", "гача", "ролл", "крутка", "фивер", "ивент", "ульта", "донат", "шаффл"]
 
-const MIN_CHECKS: = 290
+const MIN_CHECKS: = 340
 
 var ok: = 0
 var total: = 0
@@ -481,6 +481,20 @@ func _ux() -> void:
 					if tg._hop != 0.0 or tg.rotation != 0.0 or tg._hop_t >= 0.0:
 						moving += 1
 			check(moving == 0, "В-7 tags at rest %s (%d moving)" % [nm, moving])
+			# Г-4: never two rigs on screen — z1 and z3 are both Маджонг-тян; scrolled to z2 both are in view
+			if st[0] == "all":
+				var seen_rig: = 0
+				for zf in ["z2", "z1", "z3", "z2"]:
+					await sc._scroll_to(zf, false)
+					await tree.process_frame
+					var rigs: = 0
+					for zid in sc.zones:
+						var hz: V10SalonHeroine = sc.zones[zid].heroine
+						if hz != null and is_instance_valid(hz) and not hz.is_queued_for_deletion() and hz.rig != null:
+							rigs += 1
+					check(rigs <= 1, "Г-4 ≤ 1 rig on the map at %s %s (%d)" % [zf, nm, rigs])
+					seen_rig = maxi(seen_rig, rigs)
+				check(seen_rig == 1, "her rig does run in the focus zone %s" % nm)
 			# the task sheet: one sheet, its own hierarchy, its main button fully on screen
 			if st[0] in ["fresh3", "short", "all"]:
 				var zid2: = "z1"
