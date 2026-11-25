@@ -5,9 +5,11 @@ extends Control
 # header says «Примерка · Стиль Златы» with «Вернуть» and «К баннеру». No timer, no price, never writes S.look.
 # The try-on ends with the bar: if the screen under it is torn down another way (tab switch, back gesture), the bar
 # leaving the tree still ends the preview, so the player's own kit never stays replaced by a try-on.
-# Both buttons are secondary with an 80 px hit zone (UX §6.1).
+# Both buttons are secondary with an 80 px hit zone (UX §6.1). They are two answers of ONE control (ux_group
+# "tryon", like the answer pills of §3.4): on Чайная the bar takes the lanterns' zone (88–184, UX §3.3), so the
+# screen keeps 2 secondaries — partner plate + this bar — and the bar never reaches face_rect + 48 (Г-1).
 #
-#   V10PreviewBar.open(parent, hero, outfit, on_banner, top = 120) -> V10PreviewBar
+#   V10PreviewBar.open(parent, hero, outfit, on_banner, top = 88) -> V10PreviewBar
 
 signal closed(to_banner: bool)
 
@@ -19,7 +21,7 @@ var outfit: = ""
 var _open: = false
 
 
-static func open(parent: Control, h: String, o: = "", on_banner: = Callable(), top: = 120.0) -> V10PreviewBar:
+static func open(parent: Control, h: String, o: = "", on_banner: = Callable(), top: = 88.0) -> V10PreviewBar:
 	var b: = V10PreviewBar.new()
 	b.hero = h
 	b.outfit = o
@@ -53,9 +55,11 @@ func _build() -> void:
 	var y: = (H - BTN.y) * 0.5
 	var back: = V10HudSkin.button("secondary", "Вернуть", Rect2(Vector2(size.x - BTN.x * 2 - 12, y), BTN), func(): _close(false))
 	back.name = "Back"
+	back.set_meta("ux_group", "tryon")
 	add_child(back)
 	var ban: = V10HudSkin.button("secondary", "К баннеру", Rect2(Vector2(size.x - BTN.x - 4, y), BTN), func(): _close(true))
 	ban.name = "ToBanner"
+	ban.set_meta("ux_group", "tryon")
 	add_child(ban)
 
 

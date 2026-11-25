@@ -18,6 +18,7 @@ var skin_id: = "zlata"
 var home: Control
 var level: = "full"
 var tweens_made: = 0
+var _decided: = false
 var _k: = 0.0
 
 
@@ -161,6 +162,10 @@ func _corners() -> void:
 
 
 func _close(keep: bool) -> void:
+	# one answer: a second tap during the 0,16 с fade (or on the other button) is ignored
+	if _decided:
+		return
+	_decided = true
 	decided.emit(keep)
 	if level == "min":
 		queue_free()

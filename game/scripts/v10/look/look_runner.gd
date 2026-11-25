@@ -218,6 +218,9 @@ func _match(theme_id: String, skin: String, hero: String, outfit: String, tag: S
 	var names: = ["Отмена", "Подсказка", "Перемешать"]
 	for i in 3:
 		var bx: = V10HudSkin.button("quiet", names[i], Rect2(W * 0.5 - 240 + i * 160, H - 134, 160, 116))
+		# UX §3.4: the three help discs are ONE row control of secondary rank (the skin only dresses them as quiet)
+		bx.set_meta("ux_role", "secondary")
+		bx.set_meta("ux_group", "help")
 		stage.add_child(bx)
 		var n: = V10HudSkin.label(str(3 - i), 22, V10HudSkin.tok("paper_100"), "num")
 		n.position = bx.position + Vector2(126, 30)
@@ -253,7 +256,9 @@ func _home(skin: String, pal: String, hero: String, outfit: String, tag: String)
 		tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 		var hh: = H * 0.74
 		tr.size = Vector2(hh * art.get_width() / art.get_height(), hh)
-		tr.position = Vector2(W - tr.size.x * 0.86, H * 0.08)
+		# the scene starts under the lanterns' zone (UX §3.3: 240+): her face_rect + 48 stays clear of anything that
+		# sits at 88–184 (the try-on bar)
+		tr.position = Vector2(W - tr.size.x * 0.86, maxf(H * 0.08, 192.0))
 		tr.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		var fm: = ShaderMaterial.new()
 		fm.shader = preload("res://scripts/v10/look/art_fade.gdshader")
@@ -271,7 +276,7 @@ func _home(skin: String, pal: String, hero: String, outfit: String, tag: String)
 	stage.add_child(fr)
 	_label("Лунный Лис", 22, V10HudSkin.tok("paper_100"), Vector2(108, 34), 260)
 	# spine
-	var sp: = V10HudSkin.label("ЧАЙНАЯ · ВЕЧЕР · 21:40", 15, Color(V10HudSkin.tok("paper_100"), 0.4))
+	var sp: = V10HudSkin.label("ЧАЙНАЯ · ВЕЧЕР · 21:40", 15, Color(V10HudSkin.tok("paper_100"), 0.62))   # ≥ 4,5:1 (В-2)
 	sp.rotation = -PI * 0.5
 	sp.position = Vector2(12, H * 0.62)
 	sp.size = Vector2(360, 20)
@@ -486,8 +491,8 @@ func _view_assemble() -> void:
 
 func _view_preview() -> void:
 	await _home("zlata", "firebird", "zlata", "zl_base", "zlata_tryon_base")
-	# right under the status row (UX §3.3, 0–88), clear of her face
-	V10PreviewBar.open(stage, "zlata", "zl_base", Callable(), 92)
+	# the bar takes the lanterns' zone right under the status row (UX §3.3, 88–184), clear of her face
+	V10PreviewBar.open(stage, "zlata", "zl_base")
 	await _shot("preview_bar", 6)
 	V10Look.end_preview()
 

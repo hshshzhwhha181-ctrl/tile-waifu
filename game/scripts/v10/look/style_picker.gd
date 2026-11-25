@@ -68,10 +68,12 @@ func _build() -> void:
 	_refresh()
 
 
+# the player's own kit with the picks so far: a shallow copy is enough (only «look» is replaced; no deep copy of
+# the whole save per tap), and a banner try-on running meanwhile never shows up here
 func _effective() -> Dictionary:
-	var tmp: = S.duplicate(true)
+	var tmp: = S.duplicate()
 	tmp["look"] = work.duplicate()
-	return V10Look.current(tmp)
+	return V10Look.current(tmp, {"no_preview": true})
 
 
 func _refresh() -> void:

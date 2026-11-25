@@ -498,6 +498,16 @@ static func _tap(c: Control, from: Vector2, to: Vector2) -> void:
 
 static func _ui(host: Node) -> void:
 	V10HudSkin.use("five_winds")
+	# a screen that re-titles its header label keeps ONE look link (else one change cross-fades N ghosts)
+	var hubc: = V10Look.hub().look_changed
+	var n0: = hubc.get_connections().size()
+	var tl: = Label.new()
+	host.add_child(tl)
+	V10LookFonts.title(tl, "Чайная", 600)
+	V10LookFonts.title(tl, "Героини", 600)
+	check(hubc.get_connections().size() == n0 + 1, "re-titled label: one look link (%d)" % (hubc.get_connections().size() - n0))
+	tl.free()
+	check(hubc.get_connections().size() == n0, "title label gone -> its look link is gone")
 	# player-facing names: «Интерфейс», never «HUD» (UX §3.2, §4.1); «героиня», never «богиня» (§4.2)
 	var bad_names: = []
 	for d in [V10KitData.ELEMENT_NAMES, V10KitData.ELEMENT_SHORT, V10StylePicker.SLOT_NAMES]:
@@ -623,12 +633,15 @@ static func _ui(host: Node) -> void:
 	scr.size = Vector2(720, 1280)
 	host.add_child(scr)
 	V10Look.dev_reveal["zlata"] = true
-	var bar: = V10PreviewBar.open(scr, "zlata", "zl_base", Callable(), 92)
+	var bar: = V10PreviewBar.open(scr, "zlata", "zl_base")
 	check(V10Look.previewing() and V10HudSkin.active == "zlata", "try-on bar starts the preview")
 	var hz: = true
 	for bn in ["Back", "ToBanner"]:
 		hz = hz and (bar.get_node(bn) as Control).size.y >= 80.0
 	check(hz, "try-on buttons: 80 px hit zones")
+	var grp: = String(bar.get_node("Back").get_meta("ux_group", "")) == "tryon" and String(bar.get_node("ToBanner").get_meta("ux_group", "")) == "tryon"
+	check(grp and bar.position.y >= 88.0 and bar.position.y + bar.size.y <= 240.0,
+		"try-on bar: one control (ux_group tryon) inside the lanterns' zone 88–240 (%.0f–%.0f)" % [bar.position.y, bar.position.y + bar.size.y])
 	S = _save("yue", "y_queen", ["y_queen"])
 	var p_prev: = V10LookCard.payload(S)
 	check(String(p_prev.tile) == "s_night" and String(p_prev.get("kit", "")) == "yue", "card payload ignores a running try-on")
@@ -657,6 +670,11 @@ static func _ui(host: Node) -> void:
 	check(_with_meta(a, "ux_role", "primary", []).size() == 1 and _with_meta(a, "ux_role", "secondary", []).size() == 1, "«Новый стиль стола»: Оставить primary, Вернуть secondary")
 	await host.get_tree().create_timer(0.7).timeout
 	check(mir.scale.is_equal_approx(Vector2(-1, 1)) and absf(mir.modulate.a - 0.5) < 0.01, "assembly keeps a block's own scale and alpha")
+	var answers: = [0]
+	a.decided.connect(func(_k: bool): answers[0] += 1)
+	a._close(true)
+	a._close(false)
+	check(answers[0] == 1, "«Новый стиль стола»: one answer, a second tap during the fade is ignored (%d)" % answers[0])
 	a.free()
 	root.free()
 	V10HudSkin.use("five_winds")

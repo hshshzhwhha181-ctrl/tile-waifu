@@ -38,7 +38,7 @@
 ```bash
 cd game
 flock /tmp/tw-godot.lock /opt/tw-tools/godot --headless --path . res://scripts/v10/look/look_runner.tscn -- --look_selftest=1
-# -> LOOK_SELFTEST 755/755 OK, код выхода = число провалов
+# -> LOOK_SELFTEST 759/759 OK, код выхода = число провалов
 flock /tmp/tw-godot.lock xvfb-run -a /opt/tw-tools/godot --path . --rendering-driver opengl3 --audio-driver Dummy \
   --resolution 720x1280 res://scripts/v10/look/look_runner.tscn -- --look_shots=/abs/dir [--views=home,match,...] [--fx=min]
 ```
@@ -46,7 +46,8 @@ flock /tmp/tw-godot.lock xvfb-run -a /opt/tw-tools/godot --path . --rendering-dr
 (только в памяти, сейв не пишется). `home`, `match`, `window` — образцы скина, разложенные по UX §3.3 / §6.6 / §5.3 (настоящие экраны —
 у интегратора): на Чайной нет валют и цен, в партии нет чипа стиля, окно — лист подтверждения с «Кассой».
 Самотест кроме D1–D7 проверяет UX_RULES на экранах дорожки: одна primary, кегль ≥ 18 (15 — только капс-надстрочник), нет «HUD»/«богиня»,
-≤ 1 закрытый тизер в ленте, подписи не режутся, тап ≠ перетаскивание, хит-зоны 80, примерка не утекает в карточку и не переживает экран.
+≤ 1 закрытый тизер в ленте, подписи не режутся, тап ≠ перетаскивание, хит-зоны 80, примерка не утекает в карточку и не переживает экран,
+плашка примерки — один контрол в зоне фонарей, одна связь заголовка с `look_changed`, у «Нового стиля стола» один ответ.
 После добавления файлов в свежий worktree один раз `godot --headless --path . --import` (кэш class_name).
 
 ## Хуки для интегратора (короткие вызовы в горячих файлах)
@@ -64,6 +65,8 @@ flock /tmp/tw-godot.lock xvfb-run -a /opt/tw-tools/godot --path . --rendering-dr
    вкладка «Фишки и столы» → `V10TilePicker.make(G.S, size)` (сигнал `picked(id)` → `V10Look.set_choice(G.S, "tile", id)`).
 8. **«Мой стиль»** — по UX §3.2 это сегмент **Героини → Стиль** (из Профиля переезжает): `V10StylePicker.make(G.S, size)`, `done(changed)` → `G.save()`.
 9. **Баннер (Г3/Г6)**: строка `V10LookCos.kit_line(hero, outfit)`; «Примерить стиль» → `V10PreviewBar.open(screen, hero, outfit, func(): <к баннеру>)`.
+   Плашка встаёт в зону фонарей Чайной (`top` = 88, высота 96, UX §3.3): **на время примерки фонари скрыть** (`V10Look.previewing()`),
+   тогда на Чайной 2 secondary — табличка партнёра и плашка (две её кнопки — один контрол `ux_group = "tryon"`), и плашка не задевает `face_rect` + 48.
 10. **HUD-скин (D7)** — одна проверка `if V10HudSkin.skinned(): V10HudSkin.decorate(node, role)` в: `jbutton.gd` (класс кнопки → `btn_play/btn_cash/btn_secondary/btn_quiet`),
     `rbox.gd`/`V10Plate` (`plate_s/m/l`), `Common.popup` (`window` + `V10SkinFx.open(win, V10HudSkin.active)`), `V8Header` (`header`), topbar валют (`currency`),
     navbar (`tab`), шапка партии — `decorate(node, "header", {"match": true})` (лак без орнамента: в партии 0 золотых орнаментов, кроме рамки лотка, UX §3.7),
@@ -74,6 +77,7 @@ flock /tmp/tw-godot.lock xvfb-run -a /opt/tw-tools/godot --path . --rendering-dr
     Первое получение — **через очередь входа** (UX §3.5, О-1: одна полноэкранная сцена за вход), не поверх раскрытия SSR в Желаниях.
     Полный стинг 4–6 с — один раз за сессию при входе в Чайную: `V10HudSkin.sting(true)` (лимит 600 с внутри).
 12. **Шрифты (D2)**: заголовки экранов/окон, имя Приёма в `cutin.gd`, «Победа!», подпись писем → `V10LookFonts.title(label, text, max_w, moment)`
+    (повторный вызов на той же подписи только меняет текст: связь с `look_changed` одна на подпись и снимается, когда подпись уходит из дерева)
     (moment: `screen_title / window_title / ult_name / victory / letter_sign`). Цены — только `V10LookFonts.price_font()`.
 13. **Профиль 2.0 / карточка (D5/D6)**: вместо `V10CardPayload.mine` — `V10LookCard.payload(G.S, extra)`; вместо `V10CardView.make` — `V10LookCard.view(p, rect, mode)`;
     population.gd → `V10LookCard.sim(rng, tier, nick)`; league.gd строки — `V10LookCard.view(p, rect, "row")`. Сервер (1.0) — `V10LookCard.validate(p)`.
@@ -85,6 +89,9 @@ flock /tmp/tw-godot.lock xvfb-run -a /opt/tw-tools/godot --path . --rendering-dr
 18. **v10-profile** (правка у источника): `card_view.gd` подписи «Богини» → «Героини» (строки 239, 262; здесь закрыто шимом `V10LookCard.ui_words`),
     подписи плиток 15 px → Caption 18 (UX §6.3).
 19. **V10DS** (после влития v10-hud2): `V10HudSkinData.BASE_TOKENS` заменить чтением `DS`, токены скина — поверх (`skin_data.tokens`, UX §6).
+20. **`--ux_selftest` / V10Registry**: узлы с одинаковой метой `ux_group` считаются одним контролом (как «ответ-пилюля» и «ряд из 3 кружков»
+   в §3.4): `ux_group = "tryon"` (плашка примерки), `"help"` (кружки помощи в партии), `ux_role = "option"` + `ux_group = <слот>` — варианты
+   выбора в «Стиле» и «Фишках и столах» (это выбор, а не действие: в бюджет кнопок П-1 не идут).
 
 ## Открытые вопросы
 - Злата скрыта (её нет в `G.HEROES`); весь её набор виден только с `--skin=zlata` и в примерке.
