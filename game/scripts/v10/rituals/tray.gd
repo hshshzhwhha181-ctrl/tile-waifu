@@ -73,7 +73,7 @@ static func _visit_card(_key: String) -> Dictionary:
 	var n: = int(rw[kind])
 	var unit: = V10RitLines.plural(n, "кристалл", "кристалла", "кристаллов") if kind == "gems" \
 		else V10RitLines.plural(n, "монета", "монеты", "монет")
-	return {"icon": V10RitBridge.ICONS.get(kind, V10RitBridge.ICONS.gems), "title": "Награда за вход",
+	return {"icon": V10RitBridge.ICONS.get(kind, V10RitBridge.ICONS.gems), "title": "За вход",
 		"text": "+%d %s" % [n, unit], "rewards": rw,
 		"claim": func():
 			lg.n = int(lg.get("n", 0)) + 1

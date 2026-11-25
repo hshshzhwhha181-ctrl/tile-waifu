@@ -49,7 +49,7 @@ func _build() -> void:
 	sub.position = Vector2(M, 136)
 	add_child(sub)
 	head.append(sub)
-	var close_b: = V10RitUI.button("✕", Rect2(W - M - 64, 40, 64, 64), "quiet", func():
+	var close_b: = V10RitUI.button("✕", Rect2(W - M - 80, 32, 80, 80), "quiet", func():
 		closed.emit()
 		queue_free())
 	add_child(close_b)
@@ -79,7 +79,7 @@ func _row(d: Dictionary, r: Rect2) -> Control:
 	var is_ready: = st == "ready"
 	var bg_col: = V10RitUI.NIGHT700 if st != "later" else V10RitUI.NIGHT800
 	c.add_child(V10RitUI.panel(Rect2(Vector2.ZERO, r.size), bg_col, 4, V10RitUI.GOLD500 if is_ready else Color(V10RitUI.GOLD700, 0.3), 2 if is_ready else 1))
-	var num: = V10RitUI.label(str(int(d.i) + 1), 40, V10RitUI.GOLD300 if st != "later" else V10RitUI.PAPER700, "num")
+	var num: = V10RitUI.label(str(int(d.i) + 1), 44, V10RitUI.GOLD300 if st != "later" else V10RitUI.PAPER700, "num")
 	num.position = Vector2(18, 0)
 	num.size = Vector2(56, r.size.y)
 	num.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -106,7 +106,9 @@ func _row(d: Dictionary, r: Rect2) -> Control:
 	dl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	c.add_child(dl)
 	if int(d.rewards.get("tickets", 0)) > 0:
-		var ob: = V10RitUI.button("Шансы", Rect2(r.size.x - 128, (r.size.y - 52) * 0.5, 112, 52), "secondary", func(): odds_requested.emit())
+		# hit zone 80 (UX_RULES В-6); Caption size keeps the screen at 4 type sizes
+		var ob: = V10RitUI.button("Шансы", Rect2(r.size.x - 140, (r.size.y - 80) * 0.5, 128, 80), "secondary", func(): odds_requested.emit())
+		ob.add_theme_font_size_override("font_size", 18)
 		c.add_child(ob)
 	elif st == "done":
 		var hk: = V10RitUI.hanko(c, Vector2(r.size.x - 50, r.size.y * 0.5), "受", 52)

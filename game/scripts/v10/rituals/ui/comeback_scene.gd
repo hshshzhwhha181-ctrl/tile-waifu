@@ -166,7 +166,7 @@ func _rested_chip(at: Vector2) -> void:
 	l.size = Vector2(c.size.x - 22, 60)
 	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	c.add_child(l)
-	var sub: = V10RitUI.label("мастерство нарядов", 15, V10RitUI.PAPER300)
+	var sub: = V10RitUI.label("удваивает мастерство нарядов", 18, V10RitUI.PAPER300)
 	sub.position = Vector2(0, 64)
 	c.add_child(sub)
 	_stage.add_child(c)

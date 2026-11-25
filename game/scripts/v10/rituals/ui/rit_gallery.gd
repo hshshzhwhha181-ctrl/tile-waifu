@@ -146,7 +146,8 @@ func _run(sc: String, dir: String) -> void:
 			var cards: = [
 				{"id": "seven", "icon": "res://assets/icons/ticket.png", "title": "Семь встреч", "text": "День 3", "rewards": {"tickets": 1}},
 				{"id": "streak_leaf", "icon": V10RitUI.ART + "leaf.webp", "title": "Чайный лист", "text": "Листья: 2/2", "rewards": {}},
-				{"id": "card", "icon": "res://assets/icons/gem.png", "title": "Абонемент", "text": "+30", "rewards": {"gems": 30}},
+				{"id": "visit", "icon": "res://assets/icons/coin.png", "title": "За вход", "text": "+500 монет", "rewards": {"coins": 500}},
+				{"id": "card", "icon": "res://assets/icons/gem.png", "title": "Абонемент", "text": "+30 кристаллов", "rewards": {"gems": 30}},
 			]
 			var tv: = V10TrayView.open(root, cards, {"default": ctr.gems.global_position + Vector2(30, 26), "gems": ctr.gems, "tickets": ctr.tickets})
 			tv.claim_fn = func():

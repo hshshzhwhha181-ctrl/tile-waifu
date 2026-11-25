@@ -1,7 +1,7 @@
 class_name V10StreakSheet
 extends Control
 
-# «Календарь серии» bottom sheet (Р3, UX_RULES: main action «Понятно», help «?»): 5 weeks of circles, milestones,
+# «Календарь серии» bottom sheet (Р3, UX_RULES: main action «Понятно»; the leaf rule is on the sheet itself): 5 weeks of circles, milestones,
 # the repair plate when the bowl is cold, the leaf rule. Opened by a tap on V10StreakChip / the lantern «Серия».
 #   V10StreakSheet.open(parent, key = today) -> V10StreakSheet       signal closed
 
@@ -80,7 +80,7 @@ func _ready() -> void:
 		var rp: Dictionary = v.repair
 		var plate: = V10RitUI.panel(Rect2(M, y, W - 2 * M, 84), Color(V10RitUI.FROST, 0.12), 4, Color(V10RitUI.FROST, 0.45), 1)
 		_sheet.add_child(plate)
-		var pl: = V10RitUI.label(str(rp.text), 22, V10RitUI.PAPER100)
+		var pl: = V10RitUI.label(str(rp.text), 18, V10RitUI.PAPER100, "body", 800)
 		pl.position = Vector2(20, 14)
 		plate.add_child(pl)
 		for i in int(rp.need):
@@ -131,7 +131,7 @@ func _ready() -> void:
 		if not done and not nxt:
 			ic.modulate = Color(1, 1, 1, 0.45)
 		card.add_child(ic)
-		var ln: = V10RitUI.label(str(m), 22, V10RitUI.GOLD300 if (done or nxt) else V10RitUI.PAPER500, "num")
+		var ln: = V10RitUI.label(str(m), 18, V10RitUI.GOLD300 if (done or nxt) else V10RitUI.PAPER500, "num")
 		ln.position = Vector2(0, 64)
 		ln.size = Vector2(mw, 30)
 		ln.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -140,6 +140,11 @@ func _ready() -> void:
 			var hk: = V10RitUI.hanko(card, Vector2(mw - 14, 18), "✓", 30)
 			hk.modulate.a = 1.0
 	y += 114
+	# UX_RULES §9 P1-17: the promise of the removed «Визиты» screen lives on in the Серия
+	var keep: = V10RitUI.wrap_w(V10RitUI.label(V10Streak.KEEP_TEXT + ".", 18, V10RitUI.GOLD300, "body", 800), W - 2 * M)
+	keep.position = Vector2(M, y)
+	_sheet.add_child(keep)
+	y += 34
 	var rule: = V10RitUI.wrap_w(V10RitUI.label(V10Streak.RULE_TEXT + ".", 18, V10RitUI.PAPER500, "body", 700), W - 2 * M)
 	rule.position = Vector2(M, y)
 	_sheet.add_child(rule)
@@ -151,8 +156,6 @@ func _ready() -> void:
 	var ok: = V10RitUI.button("Понятно", Rect2((W - 560) * 0.5, sh_h - 124, 560, 104), "primary", close)
 	ok.breathing = false
 	_sheet.add_child(ok)
-	var help: = V10RitUI.button("?", Rect2(W - M - 64, 28, 64, 64), "quiet", func(): pass)
-	_sheet.add_child(help)
 	V10RitUI.inhale(items, 0.2)
 	var t: = _sheet.create_tween()
 	t.tween_property(_sheet, "position:y", H - sh_h, 0.24 if V9Feel.can_fx() else 0.12).set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_OUT)
@@ -197,7 +200,7 @@ func _cell(c: Dictionary, cw: float) -> Control:
 	if stt == "leaf":
 		box.add_child(V10RitUI.tex(V10RitUI.ART + "leaf.webp", Rect2(ctr - Vector2(18, 20), Vector2(36, 40))))
 	else:
-		var d: = V10RitUI.label(str(c.day), 20, txt_col, "num")
+		var d: = V10RitUI.label(str(c.day), 18, txt_col, "num")
 		d.size = Vector2(r, r) * 2
 		d.position = ctr - Vector2(r, r)
 		d.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER

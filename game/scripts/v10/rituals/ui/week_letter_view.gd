@@ -7,8 +7,8 @@ extends Control
 
 signal closed
 
-const INK: = Color("3a2a2e")
-const INK_SOFT: = Color("6a4a52")
+const INK: = V10RitUI.INK
+const INK_SOFT: = V10RitUI.INK_SOFT
 
 var letter: = {}
 var _paper: Control
@@ -82,7 +82,7 @@ func _ready() -> void:
 		l.material = mat
 		_blocks.append(l)
 		y += lines * lh + 22
-	var sign: = V10RitUI.label("— " + str(letter.get("sign", "")), 46, Color("7a3a4a"), "hand")
+	var sign: = V10RitUI.label("— " + str(letter.get("sign", "")), 46, V10RitUI.INK_SIGN, "hand")
 	sign.label_settings.shadow_color = Color(0, 0, 0, 0)
 	sign.position = Vector2(40, minf(y + 6, ph - 90))
 	sign.size.x = _paper.size.x - 80
