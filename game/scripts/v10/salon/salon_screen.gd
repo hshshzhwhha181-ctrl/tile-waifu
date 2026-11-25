@@ -1,12 +1,14 @@
 extends Control
 
 # Screen "v10salon" — Салон Пяти ветров (docs/0.10-spec.md §Р1). Register in main.SCREENS (README, hooks).
-# One header (back · «Салон» · star bank), a vertical map of zones from the bottom up (z1 at the bottom, the
-# next one above, ONE locked teaser on top — UX §6.4), and a fixed bottom: «Играть · уровень N» and
-# «ещё 4★ до „Фонари у входа“». Tags → task sheet → restore beat (stars fly, dust, reveal, glint);
+# One header (back · «Салон» · star bank · «?»), a vertical map of zones from the bottom up (z1 at the bottom, the
+# next one above, ONE locked teaser on top — UX §6.4), and a fixed bottom with ONE main action (UX §3.4):
+# «Восстановить · 3★» (the cheapest affordable task) when the bank covers it, else «Играть · уровень N», over the
+# line «ещё 4★ до „Фонари у входа“». Tags → task sheet → restore beat (stars fly, dust, reveal, glint);
 # the last task → zone finale (wave, heroine, line, chest). Done zones: heroine lives there, «Сцена».
 # args: {zone: zid} scroll to that zone.  Works with the real main (go/back/toast/show_chrome) and the runner stub.
-# dev_act(name): "tap_first", "restore_first", "open_sheet", "finish_jade", "close_sheet", "scroll:<zid>".
+# dev_act(name): "restore_first", "open_sheet", "close_sheet", "close_finale", "help", "main", "scroll:<zid>",
+#   "sheet:<zid>/<tid>", "jade:<zid>/<tid>", "say:<zid>/<zone>".
 
 var main
 var W: = 720.0
@@ -19,6 +21,8 @@ var bank_box: Control
 var goal_lbl: Label
 var goal_box: HBoxContainer
 var play_btn: V10SalonButton
+var help_btn: V10SalonButton
+var _bottom_goal: = {}  # the goal the bottom button restores ({} = it plays)
 var sheet: V10SalonSheet
 var finale: V10SalonFinale
 var toast_box: Control
@@ -92,31 +96,37 @@ func _build_header() -> void:
 	back_b.icon = "back"
 	back_b.pressed.connect(_back)
 	add_child(back_b)
-	var ov: = V10SalonUI.overline("Пять ветров")
-	ov.position = Vector2(104, y0 + 20)
-	add_child(ov)
+	# H1 on the left field (HUD_V2 §8.6); no overline here — the map keeps to 4 type sizes (UX §3.7)
 	var h1: = V10SalonUI.label("Салон", 44, V10SalonUI.PAPER_100, "display", 700)
-	h1.position = Vector2(102, y0 + 36)
+	h1.position = Vector2(102, y0 + 22)
 	add_child(h1)
-	# star bank: «34» Numeric with a drawn star and the caption «звёзды Пути»
+	# «?» (quiet, UX §2.4): the salon's article; the bank next to it is a display (its meaning is in the article)
+	help_btn = V10SalonButton.make("quiet", "", Rect2(W - 92, y0 + 12, 80, 80))
+	help_btn.icon = "help"
+	help_btn.pressed.connect(_help)
+	add_child(help_btn)
+	# star bank: «34» with a drawn star and the caption «звёзды Пути»
 	bank_box = Control.new()
-	bank_box.mouse_filter = Control.MOUSE_FILTER_STOP
-	bank_box.size = Vector2(196, 88)
-	bank_box.position = Vector2(W - 196 - 20, y0 + 10)
+	bank_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	bank_box.size = Vector2(176, 88)
+	bank_box.position = Vector2(W - 92 - 8 - 176, y0 + 10)
 	bank_box.draw.connect(func():
 		bank_box.draw_style_box(V10SalonUI.panel_box(Color(V10SalonUI.NIGHT_700, 0.9), 4.0, Color(V10SalonUI.GOLD_700, 0.5), 1), Rect2(Vector2.ZERO, bank_box.size))
 		bank_box.draw_colored_polygon(V10SalonUI.star_points(Vector2(38, 38), 20.0), V10SalonUI.GOLD_300))
 	add_child(bank_box)
-	bank_lbl = V10SalonUI.label("0", 40, V10SalonUI.GOLD_300, "body", 900)
-	bank_lbl.position = Vector2(68, 8)
+	bank_lbl = V10SalonUI.label("0", 32, V10SalonUI.GOLD_300, "body", 900)
+	bank_lbl.position = Vector2(66, 10)
 	bank_box.add_child(bank_lbl)
 	var cap: = V10SalonUI.label("звёзды Пути", 18, V10SalonUI.PAPER_500, "body", 700)
-	cap.position = Vector2(68, 54)
+	cap.position = Vector2(66, 54)
 	bank_box.add_child(cap)
-	bank_box.gui_input.connect(func(e):
-		if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT:
-			V9Feel.press(bank_box)
-			toast("Звёзды Пути не продаются: их дают уровни, до 3 за каждый."))
+
+
+func _help() -> void:
+	if V10Salon.help_cb.is_valid():
+		V10Salon.help_cb.call("salon")
+		return
+	toast(V10SalonData.HELP)
 
 
 func bank_center() -> Vector2:
@@ -192,7 +202,7 @@ func _lock_plate(zid: String, sz: Vector2) -> Control:
 	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var ids: = V10SalonData.zone_ids()
 	var prev: Dictionary = V10SalonData.ZONES[ids.find(zid) - 1]
-	var l: = V10SalonUI.label("Откроется: после зоны «%s»" % prev.name, 22, V10SalonUI.PAPER_300, "body", 700, 0.8)
+	var l: = V10SalonUI.label("Откроется: после зоны «%s»" % prev.name, 18, V10SalonUI.PAPER_300, "body", 700, 0.8)
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	l.size = Vector2(sz.x, 32)
 	l.position = Vector2(0, sz.y * 0.5 - 4)
@@ -217,14 +227,14 @@ func _arc_teaser(zw: float) -> Control:
 			var lp: = base + Vector2(-80 + k * 80, -30)
 			c.draw_line(lp + Vector2(0, -32), lp + Vector2(0, -18), col, 2.0)
 			c.draw_circle(lp, 16.0, col))
-	var ov: = V10SalonUI.overline("Зона IV · %s" % nz.name, V10SalonUI.PAPER_500)
-	ov.position = Vector2((W - zw) * 0.5 + 52, 46)
+	var ov: = V10SalonUI.label("Зона IV · %s" % nz.name, 18, V10SalonUI.PAPER_500, "body", 800)
+	ov.position = Vector2((W - zw) * 0.5 + 52, 40)
 	c.add_child(ov)
-	var l: = V10SalonUI.label("Следующая зона откроется\nс аркой 2", 26, V10SalonUI.PAPER_300, "italic", 500)
+	var l: = V10SalonUI.label("Следующая зона откроется\nс аркой 2", 32, V10SalonUI.PAPER_300, "italic", 500)
 	l.position = Vector2((W - zw) * 0.5 + 52, 76)
 	c.add_child(l)
 	var l2: = V10SalonUI.label("Звёзды копятся — ничего не пропадёт", 18, V10SalonUI.PAPER_500, "body", 700)
-	l2.position = Vector2((W - zw) * 0.5 + 52, 160)
+	l2.position = Vector2((W - zw) * 0.5 + 52, 166)
 	c.add_child(l2)
 	return c
 
@@ -292,7 +302,7 @@ func _build_bottom() -> void:
 	add_child(band)
 	var bw: = minf(560.0, W - 64)
 	play_btn = V10SalonButton.make("game", "Играть · уровень %d" % V10Salon.next_level(), Rect2((W - bw) * 0.5, H - 32 - 104, bw, 104))
-	play_btn.pressed.connect(_play)
+	play_btn.pressed.connect(_on_main)
 	add_child(play_btn)
 	goal_box = HBoxContainer.new()
 	goal_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -308,19 +318,55 @@ func _refresh_bottom() -> void:
 		c.queue_free()
 	var g: = V10Salon.next_goal()
 	var col: = V10SalonUI.PAPER_300
+	# ONE main action (UX §3.4 «Салон»): restore the next task when the bank covers it, else play the Path
+	_bottom_goal = g if not g.is_empty() and int(g.need) == 0 else {}
+	if _bottom_goal.is_empty():
+		play_btn.text = "Играть · уровень %d" % V10Salon.next_level()
+		play_btn.stars = -1
+	else:
+		play_btn.text = "Восстановить"
+		play_btn.stars = int(g.cost)
+	play_btn.queue_redraw()
 	if g.is_empty():
-		var l: = V10SalonUI.label("Все зоны арки восстановлены" if V10Salon.all_released_done() else "", 20, V10SalonUI.JADE_300, "body", 700)
+		var l: = V10SalonUI.label("Все зоны арки восстановлены" if V10Salon.all_released_done() else "", 18, V10SalonUI.JADE_300, "body", 700)
 		goal_box.add_child(l)
 		return
 	if int(g.need) == 0:
-		var l0: = V10SalonUI.label("Можно восстановить: «%s» · %d" % [g.name, g.cost], 20, V10SalonUI.GOLD_300, "body", 800)
-		goal_box.add_child(l0)
-		goal_box.add_child(V10SalonUI.star_icon(17, V10SalonUI.GOLD_300))
+		goal_box.add_child(V10SalonUI.label("Можно восстановить: «%s»" % g.name, 18, V10SalonUI.GOLD_300, "body", 800))
 		return
-	var l1: = V10SalonUI.label("ещё %d" % g.need, 20, col, "body", 800)
+	var l1: = V10SalonUI.label("ещё %d" % g.need, 18, col, "body", 800)
 	goal_box.add_child(l1)
-	goal_box.add_child(V10SalonUI.star_icon(17, V10SalonUI.GOLD_300))
-	goal_box.add_child(V10SalonUI.label(" до «%s»" % g.name, 20, col, "body", 700))
+	goal_box.add_child(_goal_star())
+	goal_box.add_child(V10SalonUI.label(" до «%s»" % g.name, 18, col, "body", 700))
+
+
+# the drawn ★ of the goal line, centred on the text's x-height (a bare icon in an HBox sits on the top edge)
+func _goal_star() -> Control:
+	var c: = CenterContainer.new()
+	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	c.custom_minimum_size = Vector2(18, 26)
+	c.add_child(V10SalonUI.star_icon(15, V10SalonUI.GOLD_300))
+	return c
+
+
+# public: re-read the save (stars changed while the screen is open: app resumed, a debug grant)
+func refresh() -> void:
+	V10Salon.reset_cache()
+	V10Salon.repair()
+	shown_bank = V10Salon.bank()
+	bank_lbl.text = str(shown_bank)
+	for zid in zones:
+		zones[zid].refresh()
+	_refresh_bottom()
+
+
+func _on_main() -> void:
+	if busy:
+		return
+	if _bottom_goal.is_empty():
+		_play()
+	else:
+		_do_restore(str(_bottom_goal.zid), str(_bottom_goal.tid))
 
 
 func _vgrad(r: Rect2, a: Color, b: Color, mid: = 0.5) -> TextureRect:
@@ -362,8 +408,8 @@ func _show_intro() -> void:
 	intro_plate.z_index = 20
 	var sh: = _vgrad(Rect2(0, 0, W, 150), Color(V10SalonUI.NIGHT_900, 0.0), Color(V10SalonUI.NIGHT_900, 0.92), 0.45)
 	intro_plate.add_child(sh)
-	var who: = V10SalonUI.overline("Маджонг-тян", V10SalonUI.ROSE_300)
-	who.position = Vector2(32, 40)
+	var who: = V10SalonUI.label("Маджонг-тян", 18, V10SalonUI.ROSE_300, "body", 800, 0.6)
+	who.position = Vector2(32, 36)
 	intro_plate.add_child(who)
 	var l: = V10SalonUI.label(V10Salon.intro_text(), 30, V10SalonUI.PAPER_100, "italic", 500, 0.8)
 	l.position = Vector2(32, 62)
@@ -415,6 +461,8 @@ func _do_restore(zid: String, tid: String) -> void:
 	var zn: V10SalonZone = zones[zid]
 	var cost: = int(V10SalonData.task(zid, tid).cost)
 	await _scroll_to(zid, true)
+	if not is_inside_tree():
+		return
 	var to: = zn.get_global_transform() * zn.task_center(tid) - get_global_transform().origin
 	var done_flight: = [false]
 	var after: = V10Salon.bank()
@@ -423,15 +471,21 @@ func _do_restore(zid: String, tid: String) -> void:
 		bank_lbl.text = str(maxi(after, shown_bank))
 		V9Feel.press(bank_box, "", "tap"), func(): done_flight[0] = true)
 	while not done_flight[0]:
+		if not is_inside_tree():
+			return
 		await get_tree().process_frame
 	shown_bank = after
 	bank_lbl.text = str(after)
 	await zn.play_restore(tid)
+	if not is_inside_tree():
+		return
 	for k in zones:
 		zones[k].refresh()
 	_refresh_bottom()
 	if res.zone_done:
 		await get_tree().create_timer(0.35).timeout
+		if not is_inside_tree():
+			return
 		await _do_finale(zid)
 	busy = false
 
@@ -470,9 +524,10 @@ func _do_finale(zid: String) -> void:
 		main.refresh_currency()
 
 
-func _on_heroine(zid: String, _zone: String) -> void:
+func _on_heroine(zid: String, zone: String) -> void:
 	var hero: String = V10SalonData.zone(zid).hero
-	toast(V10Salon.next_line(hero))
+	# her voice in her zone, no box (UX §6.3); torso / outfit → a neutral glance only (§8.2)
+	zones[zid].say(V10Salon.tap_line(hero, zone))
 
 
 func _open_scene(zid: String) -> void:
@@ -489,6 +544,9 @@ func _back() -> void:
 	if sheet and is_instance_valid(sheet):
 		sheet.close()
 		return
+	if finale and is_instance_valid(finale):
+		finale._close(Callable())
+		return
 	if main != null and main.has_method("back"):
 		main.back()
 
@@ -496,11 +554,11 @@ func _back() -> void:
 func toast(text: String) -> void:
 	for c in toast_box.get_children():
 		c.queue_free()
-	var w: = minf(W - 64, V10SalonUI.text_w(text, 20, "body", 700) + 56)
-	var lines: = 1 if V10SalonUI.text_w(text, 20, "body", 700) + 56 <= W - 64 else 2
+	var w: = minf(W - 64, V10SalonUI.text_w(text, 18, "body", 700) + 56)
+	var lines: = 1 if V10SalonUI.text_w(text, 18, "body", 700) + 56 <= W - 64 else 2
 	var h: = 64.0 if lines == 1 else 92.0
 	var p: = V10SalonUI.panel(Rect2((W - w) * 0.5, _header_h + 12, w, h), Color(V10SalonUI.NIGHT_700, 0.97), 4.0, Color(V10SalonUI.GOLD_700, 0.5), 1)
-	var l: = V10SalonUI.label(text, 20, V10SalonUI.PAPER_100, "body", 700)
+	var l: = V10SalonUI.label(text, 18, V10SalonUI.PAPER_100, "body", 700)
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -512,14 +570,15 @@ func toast(text: String) -> void:
 	var t: = p.create_tween()
 	t.tween_property(p, "modulate:a", 1.0, 0.18)
 	t.parallel().tween_property(p, "position:y", p.position.y, 0.24).from(p.position.y - 12).set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_OUT)
-	t.tween_interval(2.6)
+	# long enough to read: ≈ 15 characters a second, 2.6…5 s
+	t.tween_interval(clampf(0.8 + text.length() / 15.0, 2.6, 5.0))
 	t.tween_property(p, "modulate:a", 0.0, 0.3)
 	t.tween_callback(p.queue_free)
 
 
 # «Вдох»: header and bottom breathe in (240 ms, +12 px, step 40 ms) — UX §6.7
 func _enter() -> void:
-	var items: = [bank_box, play_btn, goal_box]
+	var items: = [bank_box, help_btn, play_btn, goal_box]
 	var i: = 0
 	for n in items:
 		var c: Control = n
@@ -549,12 +608,19 @@ func dev_act(name: String) -> void:
 		"close_finale":
 			if finale and is_instance_valid(finale):
 				finale._close(Callable())
+		"help":
+			_help()
+		"main":
+			_on_main()
 		_:
 			if name.begins_with("scroll:"):
 				await _scroll_to(name.substr(7), true)
 			elif name.begins_with("sheet:"):
 				var p: = name.substr(6).split("/")
 				_on_task(p[0], p[1])
+			elif name.begins_with("say:"):
+				var r: = name.substr(4).split("/")
+				_on_heroine(r[0], r[1] if r.size() > 1 else "head")
 			elif name.begins_with("jade:"):
 				var q: = name.substr(5).split("/")
 				_do_finish(q[0], q[1], "jade")

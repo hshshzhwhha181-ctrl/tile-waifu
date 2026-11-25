@@ -59,15 +59,26 @@ func _build() -> void:
 	add_child(bar)
 	var cw: = 172.0
 	var x0: = (W - (cw * 3 + 24)) * 0.5
+	# the three framings are ONE segmented control (ux_role on the row); each chip has an 80 px hit zone
+	var row: = Control.new()
+	row.name = "Presets"
+	row.position = Vector2(x0, -8)
+	row.size = Vector2(cw * 3 + 24, 80)
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.set_meta("ux_role", "secondary")
+	bar.add_child(row)
 	for i in PRESETS.size():
-		var b: = V10SalonButton.make("chip", PRESETS[i].name, Rect2(x0 + i * (cw + 12), 0, cw, 64))
+		var b: = V10SalonButton.make("chip", PRESETS[i].name, Rect2(i * (cw + 12), 0, cw, 80))
 		b.selected = i == preset
 		var ii: = i
 		b.pressed.connect(func(): set_preset(ii))
-		bar.add_child(b)
+		row.add_child(b)
 		chips.append(b)
+	# the shutter is the one main action of photo mode: the round shape, rose fill
 	var shutter: = V10SalonButton.make("quiet", "", Rect2(W * 0.5 - 56, 88, 112, 112))
 	shutter.icon = "camera"
+	shutter.fill = true
+	shutter.set_meta("ux_role", "primary")
 	shutter.sound = ""
 	shutter.pressed.connect(func(): shoot())
 	shutter.name = "Shutter"
@@ -109,7 +120,7 @@ func shoot() -> String:
 		return ""
 	_busy = true
 	bar.visible = false
-	var mark: = V10SalonUI.label("Tile Waifu · ИИ-арт", 18, Color(1, 1, 1, 0.55), "body", 700, 0.5)
+	var mark: = V10SalonUI.label("Tile Waifu · ИИ-арт", 18, Color(V10SalonUI.PAPER_100, 0.6), "body", 700, 0.5)
 	mark.position = Vector2(size.x - V10SalonUI.text_w("Tile Waifu · ИИ-арт", 18) - 24, size.y - 44)
 	add_child(mark)
 	await get_tree().process_frame

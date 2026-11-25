@@ -5,8 +5,10 @@ extends Control
 #   before → after crops of the zone art, the finish row (Лак · Нефрит +N★ · Сезонная — «входит в пропуск
 #   сезона», no price, no buy button), and one main action:
 #     unrestored + enough ★  → «Восстановить · 3★» (game button)
-#     unrestored, short of ★ → «Не хватает 2★» (disabled, shakes) + «Играть · уровень 57» (second)
-#     restored               → «Готово» (second); tapping a finish switches it (Нефрит costs its ★ once)
+#     unrestored, short of ★ → «Ещё 2 звезды» (disabled second, shakes) + «Играть · 57» (game)
+#     restored               → «Готово» (game); tapping a finish switches it (Нефрит costs its ★ once)
+# The finish chips are ONE segmented control (row container `Finishes`, ux_role secondary). The sheet's height
+# follows its content, so the main button always keeps ≥ 32 px above the screen edge.
 # Emits: restore(tid), finish(tid, variant), play(), closed().
 
 signal restore(tid: String)
@@ -14,7 +16,7 @@ signal finish(tid: String, variant: String)
 signal play
 signal closed
 
-const SHEET_H: = 600.0
+const SHEET_H: = 600.0  # minimum; _build grows it to fit
 
 var zid: = ""
 var tid: = ""
@@ -24,6 +26,7 @@ var chips: = {}
 var main_btn: V10SalonButton
 var play_btn: V10SalonButton
 var _closing: = false
+var sheet_h: = SHEET_H
 
 
 static func open(parent: Control, zid_: String, tid_: String) -> V10SalonSheet:
@@ -64,7 +67,7 @@ func _build() -> void:
 	var ov: = V10SalonUI.overline(str(z.name))
 	ov.position = Vector2(x0, 34)
 	sheet.add_child(ov)
-	var h2: = V10SalonUI.label(str(t.name), 34, V10SalonUI.PAPER_100, "display", 700)
+	var h2: = V10SalonUI.label(str(t.name), 32, V10SalonUI.PAPER_100, "display", 700)
 	h2.position = Vector2(x0, 56)
 	sheet.add_child(h2)
 	var close_b: = V10SalonButton.make("quiet", "", Rect2(sw - 96, 22, 80, 80))
@@ -92,20 +95,28 @@ func _build() -> void:
 	sheet.add_child(fl)
 	var cur: = V10Salon.task_variant(zid, tid)
 	var chip_w: = (cw - 24.0) / 3.0
+	var row: = Control.new()
+	row.name = "Finishes"
+	row.position = Vector2(x0, fy)
+	row.size = Vector2(cw, 64)
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.set_meta("ux_role", "secondary")
+	sheet.add_child(row)
 	var i: = 0
 	for f in V10SalonData.FINISHES:
 		var label: String = V10SalonData.FINISH_NAMES[f]
-		var b: = V10SalonButton.make("chip", label, Rect2(x0 + i * (chip_w + 12), fy, chip_w, 64))
+		var b: = V10SalonButton.make("chip", label, Rect2(i * (chip_w + 12), -8, chip_w, 80))
 		if f == "jade" and not V10Salon.jade_paid(zid, tid):
-			b.text = "Нефрит +%d" % V10SalonData.jade_cost(int(t.cost))
-			b.stars = -1
+			# the price in the unit it is paid in: «Нефрит · 2★» (UX §4.1: a number always has its unit)
+			b.text = "Нефрит"
+			b.stars = V10SalonData.jade_cost(int(t.cost))
 		b.selected = (cur == f) or (cur == "" and f == "lacquer")
 		if f == "season" and not V10Salon.season_open():
 			b.disabled = true
 		var fv: String = f
 		b.pressed.connect(func(): _on_chip(fv))
 		b.denied.connect(func(): _hint(fv))
-		sheet.add_child(b)
+		row.add_child(b)
 		chips[f] = b
 		i += 1
 	var note: = V10SalonUI.label("", 18, V10SalonUI.PAPER_500)
@@ -117,8 +128,10 @@ func _build() -> void:
 	# action
 	var by: = fy + 124.0
 	var bank: = V10Salon.bank()
+	sheet_h = maxf(SHEET_H, by + 104.0 + 32.0)
+	sheet.size.y = sheet_h + 40.0
 	if restored:
-		main_btn = V10SalonButton.make("second", "Готово", Rect2(x0 + (cw - 440) * 0.5, by, 440, 96))
+		main_btn = V10SalonButton.make("game", "Готово", Rect2(x0 + (cw - 440) * 0.5, by, 440, 104))
 		main_btn.pressed.connect(close)
 	elif bank >= int(t.cost):
 		main_btn = V10SalonButton.make("game", "Восстановить", Rect2(x0 + (cw - 480) * 0.5, by, 480, 104), int(t.cost))
@@ -127,7 +140,7 @@ func _build() -> void:
 			close(true))
 	else:
 		var need: = int(t.cost) - bank
-		main_btn = V10SalonButton.make("second", "Ещё %s" % V10SalonUI.stars_word(need), Rect2(x0, by, cw * 0.42, 96))
+		main_btn = V10SalonButton.make("second", "Ещё %s" % V10SalonUI.stars_word(need), Rect2(x0, by + 4, cw * 0.42, 96))
 		main_btn.disabled = true
 		main_btn.stars = -1
 		main_btn.denied.connect(func(): _flash_note("Звёзды дают уровни Пути: до 3 за каждый"))
@@ -213,6 +226,7 @@ func _on_chip(f: String) -> void:
 		chips[k].selected = k == f
 	if f == "jade":
 		chips[f].text = "Нефрит"
+		chips[f].stars = -1
 	(sheet.get_node("Note") as Label).text = _note_text()
 
 
@@ -236,7 +250,7 @@ func _slide_in() -> void:
 	V10SalonUI.sound("salon_sheet", 1.1, -6.0)
 	var t: = create_tween()
 	t.tween_property(veil, "color:a", 0.55, 0.2)
-	t.parallel().tween_property(sheet, "position:y", size.y - SHEET_H, 0.28).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	t.parallel().tween_property(sheet, "position:y", size.y - sheet_h, 0.28).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 
 func close(quick: = false) -> void:

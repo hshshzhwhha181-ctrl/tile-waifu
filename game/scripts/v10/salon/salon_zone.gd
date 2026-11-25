@@ -107,7 +107,8 @@ func load_textures(on: bool) -> void:
 
 
 func _build_title() -> void:
-	# top shade + «ЗОНА II · 4/6» overline + the zone name in Playfair italic, left-aligned (editorial, UX §6.3)
+	# top shade + «Зона II · 4/6» (Caption 18, gold) + the zone name in Playfair italic, left-aligned (editorial,
+	# UX §6.3). Caption, not Overline 15: the map keeps to four type sizes — 44 · 32 · 22 · 18 (UX §3.7)
 	var shade: = TextureRect.new()
 	var g: = Gradient.new()
 	g.set_color(0, Color(V10SalonUI.NIGHT_900, 0.82))
@@ -129,10 +130,10 @@ func _build_title() -> void:
 	title_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(title_box)
 	var i: = V10SalonData.zone_ids().find(zid)
-	prog_lbl = V10SalonUI.overline("Зона %s" % ROMAN[i])
+	prog_lbl = V10SalonUI.label("Зона %s" % ROMAN[i], 18, V10SalonUI.GOLD_500, "body", 800, 0.6)
 	title_box.add_child(prog_lbl)
-	var nm: = V10SalonUI.label(str(z.name), 34, V10SalonUI.PAPER_100, "italic", 600, 0.6)
-	nm.position = Vector2(0, 20)
+	var nm: = V10SalonUI.label(str(z.name), 32, V10SalonUI.PAPER_100, "italic", 600, 0.6)
+	nm.position = Vector2(0, 22)
 	title_box.add_child(nm)
 
 
@@ -147,7 +148,7 @@ func refresh(instant: = false) -> void:
 		line += " · Нефрит"
 	elif st == "restored":
 		line += " · восстановлена"
-	prog_lbl.text = line.to_upper()
+	prog_lbl.text = line
 	prog_lbl.label_settings.font_color = V10SalonUI.JADE_300 if st in ["restored", "jade"] else V10SalonUI.GOLD_500
 	for t in z.tasks:
 		var v: = V10Salon.task_variant(zid, t.id)
@@ -246,7 +247,7 @@ func _sync_heroine() -> void:
 		move_child(heroine, tag_layer.get_index())
 		heroine.set_live(_live)
 	if done and scene_btn == null:
-		scene_btn = V10SalonButton.make("second", "Сцена", Rect2(size.x - 196, size.y - 92, 172, 68))
+		scene_btn = V10SalonButton.make("second", "Сцена", Rect2(size.x - 196, size.y - 104, 172, 80))
 		scene_btn.icon = "scene"
 		scene_btn.pressed.connect(func(): scene_tapped.emit(zid))
 		add_child(scene_btn)
@@ -255,6 +256,39 @@ func _sync_heroine() -> void:
 # where she stands in her zone (open floor of each painting)
 func _hero_x() -> float:
 	return {"z1": 0.7, "z2": 0.52, "z3": 0.36}.get(zid, 0.5) * size.x
+
+
+# Her line right in her zone, in her voice: no box (UX §6.3 — Voice 30, soft shadow, pen 0.4 s, hold 4 s, fade
+# 0.3 s), beside her at shoulder height on the open side of the painting, never over her face.
+var _say_lbl: Label
+var _say_tw: Tween
+
+func say(text: String) -> void:
+	if text == "":
+		return
+	if _say_lbl == null:
+		_say_lbl = V10SalonUI.label("", 30, V10SalonUI.PAPER_100, "italic", 500, 0.9)
+		_say_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		_say_lbl.vertical_alignment = VERTICAL_ALIGNMENT_TOP
+		_say_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		add_child(_say_lbl)
+	var hx: = _hero_x()
+	var w: = size.x * 0.44
+	var left: = hx > size.x * 0.5
+	_say_lbl.size = Vector2(w, size.y * 0.4)
+	_say_lbl.position = Vector2(24.0 if left else size.x - w - 24.0, size.y * 0.36)
+	_say_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT if left else HORIZONTAL_ALIGNMENT_RIGHT
+	_say_lbl.text = text
+	_say_lbl.visible_ratio = 0.0
+	_say_lbl.modulate.a = 1.0
+	if _say_tw and _say_tw.is_valid():
+		_say_tw.kill()
+	if heroine:
+		heroine.talk(minf(3.0, 0.6 + text.length() * 0.045))
+	_say_tw = create_tween()
+	_say_tw.tween_property(_say_lbl, "visible_ratio", 1.0, 0.4 if V10SalonUI.can_fx() else 0.12)
+	_say_tw.tween_interval(4.0)
+	_say_tw.tween_property(_say_lbl, "modulate:a", 0.0, 0.3)
 
 
 func set_visible_live(on: bool) -> void:
@@ -291,11 +325,13 @@ func _gui_input(e: InputEvent) -> void:
 	if e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT and not e.pressed:
 		if e.position.distance_to(get_meta("down_at", e.position)) > 18.0:
 			return
-		# her first: a tap on the heroine is hers
-		if heroine and heroine.react_at(get_global_transform() * e.position) != "none":
-			heroine_tapped.emit(zid, "body")
-			accept_event()
-			return
+		# her first: a tap on the heroine is hers (the zone she reports: head / hair / arm… or outfit)
+		if heroine:
+			var hz: = heroine.react_at(get_global_transform() * e.position)
+			if hz != "none":
+				heroine_tapped.emit(zid, hz)
+				accept_event()
+				return
 		var tid: = task_at(e.position / size)
 		if tid != "" and V10Salon.restored(zid, tid):
 			V9Feel.press(null, "pop", "tap")

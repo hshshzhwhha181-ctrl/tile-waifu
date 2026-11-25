@@ -5,6 +5,8 @@ extends Control
 # (V10LiveRig mc_gown: taps, gestures, lip-sync), Рин as the scene still with masked breathing until her rig
 # lands (V10SalonHeroine picks the rig automatically when RIGS has a path that exists).
 # Bottom: three 120 px buttons «Реплика» (affinity-tier lines, no repeats), «Фон лобби», «Фото» (photo mode).
+# Hierarchy (UX §3.4 «Сцена зоны»): «Реплика» is the main action (rose disc), «Фон лобби» and «Фото» secondary,
+# «назад» quiet. A tap on her head / hair / arms → a line; on her torso or outfit → a neutral glance only (§8.2).
 # First view: +20 affinity (hard source) and a letter next morning — V10Salon.mark_scene_seen.
 # dev_act: "line", "lobby", "photo", "tap_head", "back".
 
@@ -127,19 +129,23 @@ func _build_stage() -> void:
 	sh.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	sh.name = "FloorShade"
 	add_child(sh)
+	# a corner shade under the title only (radial from the top-left): it never reaches her face, which in the
+	# scene stills sits high and right of centre (face_rect + 48 is hers, UX §2.2)
 	var g2: = Gradient.new()
-	g2.set_color(0, Color(V10SalonUI.NIGHT_900, 0.78))
+	g2.set_color(0, Color(V10SalonUI.NIGHT_900, 0.82))
 	g2.set_color(1, Color(V10SalonUI.NIGHT_900, 0.0))
 	var gt2: = GradientTexture2D.new()
 	gt2.gradient = g2
-	gt2.fill_to = Vector2(0, 1)
-	gt2.width = 4
+	gt2.fill = GradientTexture2D.FILL_RADIAL
+	gt2.fill_from = Vector2(0, 0)
+	gt2.fill_to = Vector2(1, 0)
+	gt2.width = 64
 	gt2.height = 64
 	var top_sh: = TextureRect.new()
 	top_sh.texture = gt2
 	top_sh.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	top_sh.stretch_mode = TextureRect.STRETCH_SCALE
-	top_sh.size = Vector2(W, 190)
+	top_sh.size = Vector2(minf(W * 0.5, 360.0), 200)
 	top_sh.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	top_sh.name = "TopShade"
 	add_child(top_sh)
@@ -186,6 +192,8 @@ func _build_ui() -> void:
 		b.icon = defs[i][1]
 		b.pressed.connect(defs[i][2])
 		b.name = "Btn%d" % i
+		b.set_meta("ux_role", "primary" if i == 0 else "secondary")
+		b.fill = i == 0
 		ui.add_child(b)
 	if V10Salon.st().lobby_bg == zid:
 		(ui.get_node("Btn1") as V10SalonButton).selected = true
@@ -264,12 +272,16 @@ func _on_tap(zone: String) -> void:
 			_hop = -0.7
 			_hop_v = 9.0
 			V10SalonUI.haptic("pet")
-			_say(V10Salon.next_line(z.hero))
+			_say(V10Salon.tap_line(z.hero, zone))
+		"outfit":
+			# torso / outfit: only a neutral glance, no hop, no line of her tier (UX §8.2)
+			V10SalonUI.haptic("tap")
+			_say(V10Salon.tap_line(z.hero, zone))
 		_:
 			_hop = -0.35
 			_hop_v = 6.0
 			V10SalonUI.haptic("tap")
-			_say(V10Salon.next_line(z.hero))
+			_say(V10Salon.tap_line(z.hero, zone))
 
 
 func _line() -> void:
@@ -317,9 +329,10 @@ func _say_later(delay: float, text: String) -> void:
 
 
 func _toast(text: String) -> void:
-	var w: = minf(W - 64, V10SalonUI.text_w(text, 20) + 56)
-	var p: = V10SalonUI.panel(Rect2((W - w) * 0.5, 130, w, 64), Color(V10SalonUI.NIGHT_700, 0.97), 4.0, Color(V10SalonUI.GOLD_700, 0.5), 1)
-	var l: = V10SalonUI.label(text, 20, V10SalonUI.PAPER_100, "body", 700)
+	var w: = minf(W - 64, V10SalonUI.text_w(text, 18) + 56)
+	# low, over her line's band — never at the top, where her face is (UX §2.2 / Г-1: face_rect + 48 is hers)
+	var p: = V10SalonUI.panel(Rect2((W - w) * 0.5, H - 420, w, 64), Color(V10SalonUI.NIGHT_700, 0.97), 4.0, Color(V10SalonUI.GOLD_700, 0.5), 1)
+	var l: = V10SalonUI.label(text, 18, V10SalonUI.PAPER_100, "body", 700)
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	l.size = Vector2(w, 64)
@@ -337,8 +350,17 @@ func _back() -> void:
 	if photo and is_instance_valid(photo):
 		photo.close()
 		return
-	if main != null and main.has_method("go"):
-		main.go("v10salon", {"zone": zid})
+	if main == null:
+		return
+	# Came from somewhere else (not the salon map): the normal «назад».
+	var h = main.get("history")
+	if h is Array and not h.is_empty() and str(h[h.size() - 1][0]) != "v10salon" and main.has_method("back"):
+		main.back()
+		return
+	# Back to the map at this zone WITHOUT remembering the scene (remember = false): otherwise «назад» on the map
+	# pops the scene again and the player loops salon ↔ scene and never gets home.
+	if main.has_method("go"):
+		main.go("v10salon", {"zone": zid}, true, false)
 
 
 # selftest helper: live players / rigs under this screen

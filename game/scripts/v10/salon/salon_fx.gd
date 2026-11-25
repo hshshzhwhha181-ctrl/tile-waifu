@@ -3,7 +3,9 @@ extends RefCounted
 
 # Salon effects, all in code (spec §Р1 «Туман, пыль, блик, волна, бирки, полёт звёзд — кодом»), all through the
 # effect gates: «Минимум» keeps the information (numbers, reveal) and drops particles; no white flashes, the
-# light is warm amber/gold (UX §6.7).
+# light is warm amber/gold (UX §6.7). One burst never has more than MAX_PARTICLES (UX §8.5: ≤ 18 at «full»).
+
+const MAX_PARTICLES: = 18
 
 static var _soft: Texture2D
 static var _spark: Texture2D
@@ -49,7 +51,7 @@ static func dust(parent: Node, pos: Vector2, radius: float) -> void:
 	var p: = CPUParticles2D.new()
 	p.texture = soft_tex()
 	p.position = pos
-	p.amount = int(34 * V9Feel.fx_scale()) if V9Feel.fx_scale() > 0.0 else 18
+	p.amount = maxi(6, int(MAX_PARTICLES * V9Feel.fx_scale()))
 	p.one_shot = true
 	p.explosiveness = 0.92
 	p.lifetime = 1.1
@@ -85,7 +87,7 @@ static func sparkle(parent: Node, r: Rect2, col: Color = Color(1.0, 0.86, 0.55),
 	var p: = CPUParticles2D.new()
 	p.texture = spark_tex()
 	p.position = r.get_center()
-	p.amount = maxi(6, int(n * maxf(0.5, V9Feel.fx_scale())))
+	p.amount = clampi(int(n * maxf(0.5, V9Feel.fx_scale())), 6, MAX_PARTICLES)
 	p.one_shot = true
 	p.explosiveness = 0.55
 	p.lifetime = 0.9

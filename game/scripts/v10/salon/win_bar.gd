@@ -46,10 +46,10 @@ func _draw() -> void:
 	var frac: = clampf(_v / cost, 0.0, 1.0)
 	var ready: = _v >= cost
 	var label: = ("Салон: можно восстановить «%s»" % goal.name) if ready else ("Салон: «%s»" % goal.name)
-	draw_string(f, Vector2(0, 24), label, HORIZONTAL_ALIGNMENT_LEFT, size.x - 120, 20, V10SalonUI.GOLD_300 if ready else V10SalonUI.PAPER_300)
+	draw_string(f, Vector2(0, 24), label, HORIZONTAL_ALIGNMENT_LEFT, size.x - 120, 18, V10SalonUI.GOLD_300 if ready else V10SalonUI.PAPER_300)
 	var n: = "%d/%d" % [mini(int(round(_v)), int(cost)), int(cost)]
-	var nw: = f.get_string_size(n, HORIZONTAL_ALIGNMENT_LEFT, -1, 20).x
-	draw_string(f, Vector2(size.x - nw - 26, 24), n, HORIZONTAL_ALIGNMENT_LEFT, -1, 20, V10SalonUI.PAPER_100)
+	var nw: = f.get_string_size(n, HORIZONTAL_ALIGNMENT_LEFT, -1, 22).x
+	draw_string(f, Vector2(size.x - nw - 26, 24), n, HORIZONTAL_ALIGNMENT_LEFT, -1, 22, V10SalonUI.PAPER_100)
 	draw_colored_polygon(V10SalonUI.star_points(Vector2(size.x - 11, 17), 10.0), V10SalonUI.GOLD_300)
 	var r: = Rect2(0, 42, size.x, 10)
 	draw_style_box(V10SalonUI.panel_box(V10SalonUI.NIGHT_600, 5.0), r)

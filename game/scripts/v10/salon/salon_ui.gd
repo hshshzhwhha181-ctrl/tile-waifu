@@ -21,6 +21,10 @@ const ROSE_700: = Color("9a4f66")
 const JADE_300: = Color("a9d9c4")
 const JADE_500: = Color("5b9580")
 const EMBER: = Color("e07a7a")
+const CINNABAR: = Color("c8463c")
+# painted reward glyphs (items, not UI: UX §6.4 «предметы пишутся») — one place, for the DS swap
+const ITEM_COL: = {"gems": Color("9fd3ff"), "hint": GOLD_300, "shuffle": ROSE_300, "undo": Color("c9b8ff"),
+	"leaves": JADE_300, "tickets": Color("ffd08a")}
 
 static var _fonts: = {}
 static var _cleanup_armed: = false

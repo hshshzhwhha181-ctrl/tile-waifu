@@ -124,6 +124,21 @@ const LINES: = {
 # What a heroine says when the player taps an empty spot of her scene (neutral glance, no reaction animation).
 const NEUTRAL: = {"mc": "М? Что там?", "rin": "Хм?"}
 
+# The header «?» of the salon (UX_RULES §2.4, §4.4): one short article, the same text as the V10Glossary entries the
+# integrator registers (README, hooks): name · what it is · what for · how to get more.
+const HELP: = "Салон: за звёзды Пути возвращай ему свет, вещь за вещью. Звёзды дают уровни — до 3 за каждый, они не продаются."
+const GLOSSARY: = [
+	{"id": "salon.salon", "cat": "salon", "icon": "glyph:star", "name": "Салон",
+		"why": "Зоны салона, которые ты восстанавливаешь за звёзды Пути",
+		"how": "Играй уровни Пути: каждая звезда идёт в банк салона"},
+	{"id": "salon.stars", "cat": "salon", "icon": "glyph:star", "name": "Звёзды Пути",
+		"why": "До 3 за каждый уровень Пути; тратятся только в Салоне",
+		"how": "Пройди уровень лучше: банк растёт на разницу. Звёзды не продаются"},
+	{"id": "salon.finish", "cat": "salon", "icon": "glyph:star", "name": "Отделка",
+		"why": "Как выглядит восстановленная вещь: Лак, Нефрит или Сезонная",
+		"how": "Лак — сразу, Нефрит — за полцены вещи в звёздах, Сезонная — в пропуске сезона"},
+]
+
 # The salon's first-visit intro and the «уже есть звёзды» variant for 0.9 players (migration, spec §Р1 «Данные»).
 const INTRO_NEW: = "Пойдём, покажу, что осталось от салона."
 const INTRO_OLD: = "У тебя уже %d★ — давай вернём салону свет."
@@ -159,6 +174,14 @@ static func tasks_by_cost(zid: String) -> Array:
 	var ts: Array = zone(zid).get("tasks", []).duplicate()
 	ts.sort_custom(func(a, b): return a.cost < b.cost or (a.cost == b.cost and a.id < b.id))
 	return ts
+
+
+const ROMAN: = ["I", "II", "III", "IV", "V", "VI"]
+
+
+static func roman(zid: String) -> String:
+	var i: = zone_ids().find(zid)
+	return ROMAN[i] if i >= 0 and i < ROMAN.size() else ""
 
 
 static func zone_ids() -> Array:

@@ -21,6 +21,8 @@ extends RefCounted
 #   day_cb() -> String                            V10Meta.day_key() when it exists, else ""
 #   season_cb() -> bool                           season pass owned (M4). Default false
 #   level_cb() -> int                             the next Path level number for «Играть · уровень N»
+#   help_cb(topic: String)                        the header «?»: open the V10Glossary article (topic "salon").
+#                                                 Default: the screen shows V10SalonData.HELP as a toast
 
 const KEY: = "v10_salon"
 const SCENE_BOND: = 20
@@ -31,6 +33,7 @@ static var letter_cb: Callable
 static var day_cb: Callable
 static var season_cb: Callable
 static var level_cb: Callable
+static var help_cb: Callable
 
 # tests and the standalone runner point this at their own fixture; null → G.S
 static var state_override = null
@@ -264,7 +267,7 @@ static func hub_info() -> Dictionary:
 	var zid: = current_zone()
 	var p: = progress(zid)
 	var z: = V10SalonData.zone(zid)
-	var label: = "%s · %d/%d" % [zid, p.x, p.y]
+	var label: = "Зона %s · %d/%d" % [V10SalonData.roman(zid), p.x, p.y]
 	if all_released_done():
 		label = "Салон восстановлен"
 	return {"zid": zid, "name": z.name, "n": p.x, "total": p.y, "frac": float(p.x) / maxf(1.0, p.y),
@@ -360,6 +363,14 @@ static func next_line(hero: String, rng: RandomNumberGenerator = null) -> String
 	var line: String = cand[r.randi() % cand.size()]
 	last[hero] = line
 	return line
+
+
+# A tap on her (zone from the rig / the still): head, hair, arms → a line of her affinity tier; torso, outfit and
+# the empty room → only a neutral glance (UX_RULES §8.2: «Тап по торсу, бёдрам или юбке — только нейтральный взгляд»).
+static func tap_line(hero: String, zone: String) -> String:
+	if zone in ["head", "hair", "armL", "armR"]:
+		return next_line(hero)
+	return str(V10SalonData.NEUTRAL.get(hero, "М?"))
 
 
 # ── intro (first visit, spec §Р1 п.1 and migration) ──────────────────────────────────────────────────────────

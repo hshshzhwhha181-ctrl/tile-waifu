@@ -2,13 +2,16 @@ class_name V10SalonTag
 extends Control
 
 # A paper tag hanging on a thread over an unrestored task: «Вывеска · 3★» (spec §Р1 п.3).
-# Sways from the scroll (impulse()), and when the bank covers the cost it turns gold and hops once every 3 s.
-# `hint` draws the one obligatory tutorial finger (first task of the first visit).
+# Sways from the scroll (impulse()) and settles; when the bank covers the cost it turns gold with a soft halo and
+# hops ONCE (when it becomes affordable / the map opens). No endless hop, pulse or idle sway: the interface is
+# still, the only endless UI motion on the screen is the main button's breath (UX_RULES §2.10, §6.7; HUD_V2 §6).
+# `hint` draws the one obligatory tutorial finger (first task of the first visit; it lives until the first restore).
 
 signal tapped(tid: String)
 
 const H: = 50.0
 const THREAD: = 34.0
+const FS: = 18  # Caption 18 (UX §6.3)
 
 var tid: = ""
 var title: = ""
@@ -17,12 +20,15 @@ var affordable: = false:
 	set(v):
 		if v != affordable:
 			affordable = v
+			if v:
+				_hop_t = 0.0
 			queue_redraw()
 var hint: = false
 var _rot: = 0.0
 var _rv: = 0.0
 var _t: = 0.0
 var _hop: = 0.0
+var _hop_t: = -1.0  # ≥ 0 while the one-shot hop plays
 var _w: = 160.0
 var _press: = false
 var pin: = Vector2.ZERO  # local point where the thread is pinned (the object); the plaque may be pushed aside
@@ -35,7 +41,7 @@ static func make(tid_: String, title_: String, cost_: int) -> V10SalonTag:
 	t.cost = cost_
 	t.mouse_filter = Control.MOUSE_FILTER_STOP
 	var f: = V10SalonUI.font("body", 800)
-	t._w = f.get_string_size("%s · %d" % [title_, cost_], HORIZONTAL_ALIGNMENT_LEFT, -1, 19).x + 52.0
+	t._w = f.get_string_size("%s · %d" % [title_, cost_], HORIZONTAL_ALIGNMENT_LEFT, -1, FS).x + 52.0
 	# hit zone ≥ 80 px tall (UX §6.1); the plaque itself is 50
 	t.size = Vector2(maxf(t._w, 96.0), THREAD + H + 18.0)
 	t.pivot_offset = Vector2(t.size.x * 0.5, 0)
@@ -61,20 +67,26 @@ func impulse(v: float) -> void:
 
 func _process(dt: float) -> void:
 	_t += dt
-	# damped spring on the sway angle
+	# damped spring on the sway angle (scroll impulses only; at rest the tag hangs still)
 	var k: = 40.0
 	var c: = 4.2
 	_rv += (-k * _rot - c * _rv) * dt
 	_rot += _rv * dt
-	if V10SalonUI.can_fx():
-		_rot += sin(_t * 1.3) * 0.0006
+	if absf(_rot) < 0.0005 and absf(_rv) < 0.0005:
+		_rot = 0.0
+		_rv = 0.0
 	rotation = clampf(_rot, -0.35, 0.35)
-	if affordable and V10SalonUI.can_fx():
-		var ph: = fmod(_t, 3.0)
-		_hop = -10.0 * sin(clampf(ph / 0.45, 0.0, 1.0) * PI) * (1.0 if ph < 0.45 else 0.0)
-	else:
-		_hop = 0.0
-	queue_redraw()
+	var moving: = _rot != 0.0
+	# the one-shot hop (0.45 s) when the tag turns affordable
+	if _hop_t >= 0.0:
+		_hop_t += dt
+		_hop = -10.0 * sin(clampf(_hop_t / 0.45, 0.0, 1.0) * PI) if V10SalonUI.can_fx() else 0.0
+		if _hop_t >= 0.45:
+			_hop_t = -1.0
+			_hop = 0.0
+		moving = true
+	if moving or hint:
+		queue_redraw()
 
 
 func _gui_input(e: InputEvent) -> void:
@@ -101,20 +113,19 @@ func _draw() -> void:
 	draw_line(pin, Vector2(cx + 14, top + 4), line_col, 1.5, true)
 	var r: = Rect2(cx - _w * 0.5, top, _w, H)
 	if affordable:
-		# gold halo: the only animated glow on the map, only on tags you can pay for now
-		var a: = 0.18 + 0.1 * sin(_t * 3.0)
-		draw_style_box(V10SalonUI.panel_box(Color(V10SalonUI.GOLD_500, a), 10.0), r.grow(5))
-	var bg: = Color("f1e2c4") if affordable else Color("2b2530")
+		# gold halo (static) only on tags you can pay for now
+		draw_style_box(V10SalonUI.panel_box(Color(V10SalonUI.GOLD_500, 0.22), 10.0), r.grow(5))
+	var bg: = V10SalonUI.PAPER_100 if affordable else V10SalonUI.NIGHT_700
 	var ink: = V10SalonUI.NIGHT_900 if affordable else V10SalonUI.PAPER_100
 	draw_style_box(V10SalonUI.panel_box(bg, 5.0, Color(V10SalonUI.GOLD_700, 0.8), 1), r)
 	# a tiny cinnabar knot where the threads meet the paper
-	draw_circle(Vector2(cx, top + 3), 4.0, Color("c8463c"))
+	draw_circle(Vector2(cx, top + 3), 4.0, V10SalonUI.CINNABAR)
 	var f: = V10SalonUI.font("body", 800)
 	var txt: = "%s · %d" % [title, cost]
-	var tw: = f.get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, 19).x
+	var tw: = f.get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, FS).x
 	var x: = cx - (tw + 20) * 0.5
 	var y: = top + H * 0.5 + 7
-	draw_string(f, Vector2(x, y), txt, HORIZONTAL_ALIGNMENT_LEFT, -1, 19, ink)
+	draw_string(f, Vector2(x, y), txt, HORIZONTAL_ALIGNMENT_LEFT, -1, FS, ink)
 	var sc: = Vector2(x + tw + 11, y - 7)
 	draw_colored_polygon(V10SalonUI.star_points(sc, 9.0), V10SalonUI.GOLD_700 if affordable else V10SalonUI.GOLD_300)
 	if hint:

@@ -87,20 +87,21 @@ func _build() -> void:
 	var floor_r: = ColorRect.new()
 	floor_r.color = Color(V10SalonUI.NIGHT_900, 0.96)
 	floor_r.position = Vector2(0, H * FLOOR)
-	floor_r.size = Vector2(W, H * 0.34 + 2)
+	floor_r.size = Vector2(W, H * (1.0 - FLOOR) + 2)  # down to the screen edge: no strip of art under the buttons
 	floor_r.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(floor_r)
-	# title: Display line «Зона восстановлена», overline with the zone name
-	var ov: = V10SalonUI.overline(str(z.name), accent.lightened(0.2))
-	ov.position = Vector2(32, 52)
-	ov.modulate.a = 0.0
-	add_child(ov)
+	# title: H1 «Зона восстановлена» and the zone's name under it as a Caption (four sizes on the screen:
+	# 44 · 32 · 22 · 18, plus her voice — UX §3.7)
 	var title: = V10SalonUI.label("Зона восстановлена", 44, V10SalonUI.PAPER_100, "display", 700, 0.7)
-	title.position = Vector2(32, 74)
+	title.position = Vector2(32, 44)
 	title.modulate.a = 0.0
 	add_child(title)
-	# her line, written with a pen
-	line_lbl = V10SalonUI.label(str(z.finale_line), 28, V10SalonUI.PAPER_100, "italic", 500, 0.85)
+	var ov: = V10SalonUI.label(str(z.name), 18, accent.lightened(0.35), "body", 800, 0.7)
+	ov.position = Vector2(34, 104)
+	ov.modulate.a = 0.0
+	add_child(ov)
+	# her line, written with a pen (Voice 30, UX §6.3)
+	line_lbl = V10SalonUI.label(str(z.finale_line), 30, V10SalonUI.PAPER_100, "italic", 500, 0.85)
 	line_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	line_lbl.position = Vector2(32, H * FLOOR - 118)
 	line_lbl.size = Vector2(W - 64, 110)
@@ -161,7 +162,7 @@ func _build() -> void:
 			V10SalonFx.sparkle(self, Rect2(W * 0.2, H * 0.15, W * 0.6, H * 0.45), accent.lightened(0.3), 30))
 	t.tween_property(ov, "modulate:a", 1.0, 0.24)
 	t.parallel().tween_property(title, "modulate:a", 1.0, 0.24)
-	t.parallel().tween_property(title, "position:y", 66.0, 0.24).from(86.0).set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_OUT)
+	t.parallel().tween_property(title, "position:y", 44.0, 0.24).from(56.0).set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_OUT)
 	t.tween_callback(func(): heroine.talk(2.4))
 	t.tween_property(line_lbl, "visible_ratio", 1.0, 0.4 + 0.012 * line_lbl.text.length())
 	t.tween_property(rib, "modulate:a", 1.0, 0.24)
@@ -184,7 +185,7 @@ func _build() -> void:
 func _ribbon(text: String, accent: Color) -> Control:
 	var c: = Control.new()
 	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var w: = V10SalonUI.text_w(text, 24, "body", 800) + 56
+	var w: = V10SalonUI.text_w(text, 22, "body", 800) + 56
 	c.size = Vector2(w, 52)
 	c.draw.connect(func():
 		var pts: = PackedVector2Array([Vector2(0, 0), Vector2(w, 0), Vector2(w - 16, 26), Vector2(w, 52), Vector2(0, 52)])
@@ -192,8 +193,8 @@ func _ribbon(text: String, accent: Color) -> Control:
 		c.draw_line(Vector2(0, 0), Vector2(w, 0), Color(V10SalonUI.GOLD_500, 0.6), 1.0)
 		c.draw_line(Vector2(0, 52), Vector2(w, 52), Color(V10SalonUI.GOLD_500, 0.6), 1.0)
 		c.draw_circle(Vector2(18, 26), 5.0, V10SalonUI.GOLD_300))
-	var l: = V10SalonUI.label(text, 24, V10SalonUI.PAPER_100, "body", 800)
-	l.position = Vector2(34, 10)
+	var l: = V10SalonUI.label(text, 22, V10SalonUI.PAPER_100, "body", 800)
+	l.position = Vector2(34, 11)
 	c.add_child(l)
 	return c
 
@@ -203,16 +204,15 @@ func _reward_tile(k: String, n: int, sz: Vector2) -> Control:
 	var c: = Control.new()
 	c.size = sz
 	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var col: Color = {"gems": Color("9fd3ff"), "hint": V10SalonUI.GOLD_300, "shuffle": V10SalonUI.ROSE_300, "undo": Color("c9b8ff"),
-		"leaves": V10SalonUI.JADE_300, "tickets": Color("ffd08a")}.get(k, V10SalonUI.PAPER_300)
+	var col: Color = V10SalonUI.ITEM_COL.get(k, V10SalonUI.PAPER_300)
 	c.draw.connect(func():
 		var b: = 12.0
 		var pts: = PackedVector2Array([Vector2(b, 0), Vector2(sz.x - b, 0), Vector2(sz.x, b), Vector2(sz.x, sz.y - b), Vector2(sz.x - b, sz.y), Vector2(b, sz.y), Vector2(0, sz.y - b), Vector2(0, b)])
-		c.draw_colored_polygon(pts, Color("f1e6d2"))
+		c.draw_colored_polygon(pts, V10SalonUI.PAPER_100)
 		var inner: = PackedVector2Array()
 		for p in pts:
 			inner.append(sz * 0.5 + (p - sz * 0.5) * 0.9)
-		c.draw_colored_polygon(inner, Color("2a2330"))
+		c.draw_colored_polygon(inner, V10SalonUI.NIGHT_700)
 		c.draw_polyline(inner + PackedVector2Array([inner[0]]), Color(V10SalonUI.GOLD_700, 0.7), 1.0, true)
 		var ic: = Vector2(sz.x * 0.5, sz.y * 0.27)
 		match k:
@@ -232,12 +232,12 @@ func _reward_tile(k: String, n: int, sz: Vector2) -> Control:
 				c.draw_colored_polygon(PackedVector2Array([ic + Vector2(-14, 12), ic + Vector2(-4, -14), ic + Vector2(14, -16), ic + Vector2(6, 8)]), col)
 			"tickets":
 				c.draw_rect(Rect2(ic - Vector2(20, 12), Vector2(40, 24)), col)
-				c.draw_circle(ic + Vector2(-20, 0), 5, Color("2a2330"))
-				c.draw_circle(ic + Vector2(20, 0), 5, Color("2a2330"))
+				c.draw_circle(ic + Vector2(-20, 0), 5, V10SalonUI.NIGHT_700)
+				c.draw_circle(ic + Vector2(20, 0), 5, V10SalonUI.NIGHT_700)
 		var f: = V10SalonUI.font("body", 900)
 		var s: = "+%d" % n
-		var nw: = f.get_string_size(s, HORIZONTAL_ALIGNMENT_LEFT, -1, 26).x
-		c.draw_string(f, Vector2((sz.x - nw) * 0.5, sz.y * 0.64), s, HORIZONTAL_ALIGNMENT_LEFT, -1, 26, V10SalonUI.GOLD_300)
+		var nw: = f.get_string_size(s, HORIZONTAL_ALIGNMENT_LEFT, -1, 22).x
+		c.draw_string(f, Vector2((sz.x - nw) * 0.5, sz.y * 0.64), s, HORIZONTAL_ALIGNMENT_LEFT, -1, 22, V10SalonUI.GOLD_300)
 		var nm: String = SHORT.get(k, k)
 		var w2: = f.get_string_size(nm, HORIZONTAL_ALIGNMENT_LEFT, -1, 18).x
 		c.draw_string(f, Vector2((sz.x - w2) * 0.5, sz.y * 0.87), nm, HORIZONTAL_ALIGNMENT_LEFT, -1, 18, V10SalonUI.PAPER_300))
