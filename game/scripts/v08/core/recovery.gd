@@ -32,7 +32,7 @@ static var last_error: = ""
 
 static func export_code(state: = {}) -> String:
 	var s: Dictionary = state if not state.is_empty() else G.S
-	var env: = {"f": FORMAT, "v": G.version(), "sv": int(s.get("ver", G.SAVE_VER)), "t": int(Time.get_unix_time_from_system()), "s": s}
+	var env: = {"f": FORMAT, "v": G.version(), "sv": int(s.get("ver", G.SAVE_VER)), "t": V10Meta.now_unix(), "s": s}
 	var raw: = JSON.stringify(env).to_utf8_buffer()
 	var packed: = raw.compress(FileAccess.COMPRESSION_DEFLATE)
 	var body: = _b64url(packed)

@@ -11,8 +11,8 @@ extends Control
 #
 # Buttons (path mode only; other modes keep their 0.9 buttons, ctx.buttons = false hides the row):
 #   · big gold «Ещё уровень · 58» + glass «В салон» when the salon bar is registered and open (ctx.salon_open);
-#   · otherwise big «Ещё уровень · 58» + small glass «Домой»;
-#   · at the end of the path: grey «Скоро новая арка» (denies with the reason) + «Домой».
+#   · otherwise big «Ещё уровень · 58» + small glass «В чайную» (UX §3.4);
+#   · at the end of the path: grey «Скоро новая арка» (denies with the reason) + «В чайную».
 # The «Ещё уровень» tap plays the press, then V10MoreLevel.wipe() (0.4 s) and calls ctx.on_more(next) under the
 # curtain when ctx.on_more is set; the signal `more` fires either way.
 
@@ -129,7 +129,7 @@ func _build_buttons(y: float) -> void:
 		alt_btn = JButton.make("В салон", "glass", Rect2(main_w + GAP, y, alt_w, BTN_H), null, 28)
 		alt_btn.pressed.connect(func(): salon.emit())
 	else:
-		alt_btn = JButton.make("Домой", "glass", Rect2(main_w + GAP, y + 10, alt_w, BTN_H - 20), V8Art.nav("home"), 24)
+		alt_btn = JButton.make("В чайную", "glass", Rect2(main_w + GAP, y + 10, alt_w, BTN_H - 20), V8Art.nav("home"), 24)
 		alt_btn.pressed.connect(func(): home.emit())
 	alt_btn.name = "AltBtn"
 	add_child(alt_btn)

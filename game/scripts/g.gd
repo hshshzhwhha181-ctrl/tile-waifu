@@ -30,7 +30,7 @@ signal rp_changed(old_rp: int, new_rp: int)
 signal settings_changed(key: String)
 
 const SAVE_PATH: = "user://save.json"
-const SAVE_VER: = 7
+const SAVE_VER: = 8
 const FX_LEVELS: = ["full", "mid", "min"]
 const ULT_CUTINS: = ["full", "short", "off"]
 const RP_SOURCES: = ["path", "daily", "duel", "blitz", "zen", "etude", "event", "tourney", "table", "other"]
@@ -216,7 +216,7 @@ func add_rp(n: int, source: = "other") -> Array:
 		var t: = mini(k / 3, RANKS.size() - 1)
 		var s: = k - t * 3
 		var g: int = RANKS[t].gems if s == 0 else 50 * (t + 1)
-		S.gems += g
+		V10Money.grant({"gems": g}, "rank_up")
 		ups.append({"tier": t, "sub": s, "gems": g})
 	if new_rp != old_rp:
 		rp_changed.emit(old_rp, new_rp)
@@ -260,7 +260,7 @@ func version() -> String:
 
 
 func new_profile() -> Dictionary:
-	return {"nick": "", "avatar": "mc", "frame": "", "created": int(Time.get_unix_time_from_system()), "id": "%08x" % (randi() & 0xffffffff)}
+	return {"nick": "", "avatar": "mc", "frame": "", "created": V10Meta.now_unix(), "id": "%08x" % (randi() & 0xffffffff)}
 
 
 func profile() -> Dictionary:
@@ -466,6 +466,8 @@ func _ready() -> void :
 		for p in [save_path, _tmp_path(), _bak_path()]:
 			if FileAccess.file_exists(p):
 				DirAccess.remove_absolute(ProjectSettings.globalize_path(p))
+	# 0.10: every module registers its save keys / migrators before the save is read (scripts/v10/core)
+	V10Registry.load_all()
 	load_game()
 	if "--recovery_selftest=1" in args:
 		_recovery_selftest.call_deferred()
@@ -586,6 +588,17 @@ func sync_hidden_items() -> void :
 func load_game() -> void :
 	_load_game()
 	sync_hidden_items()
+	v10_attach()
+
+
+# 0.10: the save keys of the modules (V10Save + V10Registry, idempotent) and the economy wallet behind the 0.9
+# currency fields (V10Money mirrors S.gems/S.coins). Runs after every load and every accepted import.
+var econ = null
+
+func v10_attach() -> void :
+	V10Save.migrate(S)
+	V10Registry.ensure_all(S)
+	V10Money.attach(S)
 
 
 func _load_game() -> void :
@@ -646,6 +659,7 @@ func apply_state(d: Dictionary) -> bool:
 		S = prev
 		return false
 	sync_hidden_items()
+	v10_attach()
 	return true
 
 
@@ -688,6 +702,8 @@ func _migrate() -> void :
 	S.profile_done = bool(S.get("profile_done", false))
 	if not (S.get("stats") is Dictionary):
 		S.stats = {}
+	# 0.10: SAVE_VER 7 → 8, once (V10Save: v10_meta, v10_afisha, module migrators — economy, profile, meta; ver 8: ensure)
+	V10Save.migrate(S)
 
 
 func fx_level() -> String:
@@ -742,6 +758,10 @@ func _bak_path() -> String:
 func save() -> void :
 	if demo:
 		return
+	# 0.10: a leftover direct write of S.gems/S.coins becomes a wallet operation; the wallet is sealed into S.econ
+	V10Money.sync(S)
+	if econ != null and is_same(S.get("econ"), econ.st):
+		S.econ = econ.save_dict()
 	save_ok = write_atomic(save_path, JSON.stringify(S), _main_ok)
 	if save_ok:
 		_main_ok = true
@@ -788,7 +808,7 @@ const DUP_GEMS: = 25
 func give(id: String) -> bool:
 
 	if owns(id):
-		S.gems += DUP_GEMS
+		V10Money.grant({"gems": DUP_GEMS}, "dup")
 		return false
 	S.owned[id] = true
 	return true
@@ -831,11 +851,9 @@ func icon(name: String) -> Texture2D:
 func fx(name: String) -> Texture2D:
 	return load("res://assets/fx/%s.png" % name)
 
+# 0.10: one rarity palette (A / S / SSR) — V10Rank
 func rar_color(r: String) -> Color:
-	match r:
-		"SSR": return Color("ffc93c")
-		"SR": return Color("c08bff")
-	return Color("7cc6ff")
+	return V10Rank.color(r)
 
 
 func art_tex(it: Dictionary) -> Texture2D:
@@ -844,8 +862,9 @@ func art_tex(it: Dictionary) -> Texture2D:
 		return load("res://assets/outfits/%s.webp" % it.alt)
 	return item_tex(it)
 
+# 0.10 (spec §2.5): the daily day starts at 04:00 phone time and never rolls back (V10Meta, the one clock)
 func today() -> String:
-	return Time.get_date_string_from_system()
+	return V10Meta.day_key()
 
 func days_between(a: String, b: String) -> int:
 	if a == "" or b == "":

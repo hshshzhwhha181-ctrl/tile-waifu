@@ -211,7 +211,7 @@ func _build() -> void :
 		var rtag: = UI.rbox("graphite", Rect2(cw - rw - 5, inner.position.y + 2, rw, 22), 11, 2, 3)
 		rtag.borders(G.rar_color(it.rar).lerp(Color.WHITE, 0.35), G.rar_color(it.rar).darkened(0.45))
 		card.add_child(rtag)
-		rtag.add_child(UI.center_label(UI.label(it.rar, 16, G.rar_color(it.rar).lerp(Color.WHITE, 0.45), UI.DARK, 2, "body", 900), Rect2(0, -1, rw, 22)))
+		rtag.add_child(UI.center_label(UI.label(V10Rank.label(it.rar), 16, G.rar_color(it.rar).lerp(Color.WHITE, 0.45), UI.DARK, 2, "body", 900), Rect2(0, -1, rw, 22)))
 		if worn and own:
 			# 0.9: «надет» is a jade band at the bottom of the art (behind the name) plus a small jade check badge
 			# pinned on the frame's top-left corner (mirroring the rarity tag), mostly over the rim — never a pill

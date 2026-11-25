@@ -380,13 +380,14 @@ func finish() -> void :
 			d.duel_day[rival] = G.today()
 			G.S.shards[rival] = int(G.S.shards.get(rival, 0)) + 1
 			shard = true
-	G.S.gems += gems
-	G.add_aff(rival, 20 if win else (10 if draw else 5))
-	G.add_aff(play.partner, 10)
+	V10Money.grant({"gems": gems}, "duel")
+	V10Bond.gain(rival, 20 if win else (10 if draw else 5), "duel")
+	V10Bond.gain(play.partner, 10, "duel")
 	G.add_pass_xp(60)
 	award = V8PlayRules.award("duel", V8PlayRules.duel_rp(win, draw), win)
 	# 0.8: saved: leaving during the pause below goes straight out and counts no extra lost game
 	play._v8_saved = true
+	play._v10_ended(win, 0, 0, play.now() - play.start_t, false)  # 0.10 hook
 	stage.react("deny" if win else "win")
 	_end_line = V6Heroines.line(rival, "lose" if win else ("draw" if draw else "win"))
 	stage.say_text(_end_line, 3.0)

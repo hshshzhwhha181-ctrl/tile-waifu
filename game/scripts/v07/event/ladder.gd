@@ -228,7 +228,7 @@ static func _settle(r: Dictionary, t: Dictionary) -> int:
 		else:
 			G.give(prize)
 			prize_new = true
-	G.S.gems += gems + prize_gems
+	V10Money.grant({"gems": gems + prize_gems}, "ladder")
 	var z: = zone_in(place, league, String(t.week))
 	var nl: = league + (1 if z == "up" else (-1 if z == "down" else 0))
 	nl = clampi(nl, 0, LEAGUES.size() - 1)

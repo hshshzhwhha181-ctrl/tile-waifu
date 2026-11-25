@@ -213,7 +213,7 @@ const UI: = {
 	"play.rankup": "Новый ранг: %s · +%d кристаллов", 
 	"play.unlock_t": "Желания открыты!", 
 	"play.unlock_name": "Десять желаний в подарок", 
-	"play.unlock_d": "За первые три партии. Хотя бы одно SR среди них — точно.", 
+	"play.unlock_d": "За первые три партии. Хотя бы одна S среди них — точно.", 
 	"play.unlock_go": "Загадать", 
 
 
@@ -225,9 +225,9 @@ const UI: = {
 	"summon.newbie_line": "SSR-наряд среди первых 20 желаний", 
 	"summon.pity": "До гаранта SSR", 
 	"summon.pity_unit": "желаний", 
-	"summon.rules": "SR+ каждые 10 · SSR 3%, шанс растёт с 45-го", 
+	"summon.rules": "S и выше каждые 10 · SSR 3%, шанс растёт с 45-го", 
 	"summon.guar_on": "Следующая SSR — героиня баннера ✓", 
-	"summon.guar_off": "50/50: не повезёт — следующая SSR точно с баннера", 
+	"summon.guar_off": "Если SSR не с баннера — следующая SSR точно она", 
 	"summon.newbie_left": "Осталось %d из 20 · SSR среди них", 
 	"summon.exchange": "Обмен", 
 	"summon.exchange_btn": "Обменять · %d", 

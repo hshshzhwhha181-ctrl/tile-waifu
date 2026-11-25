@@ -23,8 +23,10 @@ const SOFT_CAP: = 25
 const SHOW_FROM: = 20
 const TOUCH_CAP: = 3
 
-const SOFT: = ["touch", "letter_reply", "chat_branch", "feed_like", "feed_reply", "hand", "duel_friendly", "salon_guest"]
-const HARD: = ["gift", "date", "bday", "comeback", "streak_milestone", "zone_scene_first", "level_win", "event_win"]
+const SOFT: = ["touch", "letter_reply", "chat_branch", "feed_like", "feed_reply", "hand", "duel_friendly", "salon_guest", "egg"]
+# W1 integration: the 0.9 match/mode/story sources keep their 0.9 amounts (pair, match_gift, special, story, mode_win, duel)
+const HARD: = ["gift", "date", "bday", "comeback", "streak_milestone", "zone_scene_first", "level_win", "event_win",
+	"pair", "match_gift", "special", "story", "mode_win", "duel"]
 
 const T_TODAY: = "сегодня %d/%d"
 const T_HAPPY: = "На сегодня она уже счастлива"

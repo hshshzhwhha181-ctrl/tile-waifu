@@ -270,7 +270,7 @@ func _climb_clear() -> void :
 		if f >= int(m[0]) and not int(m[0]) in s.climb_miles.map( func(x): return int(x)):
 			s.climb_miles.append(int(m[0]))
 			mile_gems += int(m[1])
-	G.S.gems += gems + mile_gems
+	V10Money.grant({"gems": gems + mile_gems}, "mode_play")
 	run.gems = int(run.gems) + gems + mile_gems + gained
 	gained = 0
 	var record: = f > int(s.climb_best)
@@ -279,7 +279,7 @@ func _climb_clear() -> void :
 	run.hint = hint_n
 	run.undo = undo_n
 	run.shuffle = shuffle_n
-	G.add_aff(partner, 4)
+	V10Bond.gain(partner, 4, "mode_win")
 	G.task_add("levels")
 	G.add_pass_xp(40)
 	var ca: = V8PlayRules.award("other", V8PlayRules.climb_rp(f), true)
@@ -431,6 +431,7 @@ func _climb_over(by_choice: bool) -> void :
 	else:
 		G.save()
 	_v8_saved = true
+	_v10_ended(true, 0, 0, now() - start_t, false)  # 0.10 hook
 	Sfx.play("win" if by_choice else "deny", 1.0 if by_choice else 0.6)
 	var ctx: = v8_res_open("Восхождение окончено", "pink", 40)
 	v8_res_big(ctx, str(maxi(0, reached)), "пройдено этажей")
@@ -511,12 +512,13 @@ func _etude_clear() -> void :
 	if stars > prev:
 		gems += (stars - prev) * 20
 		s.etude_stars[str(etude_i)] = stars
-	G.S.gems += gems
-	G.add_aff("mc", 3)
+	V10Money.grant({"gems": gems}, "mode_play")
+	V10Bond.gain("mc", 3, "mode_win")
 	G.task_add("levels")
 	G.add_pass_xp(50)
 	var ea: = V8PlayRules.award("etude", V8PlayRules.etude_rp(stars), true)
 	_v8_saved = true
+	_v10_ended(true, stars, 0, now() - start_t, false)  # 0.10 hook
 	_v8_end_overlays()
 	Sfx.play("win")
 	await get_tree().create_timer(0.3).timeout
@@ -765,7 +767,7 @@ func _shift_serve(mid: Vector2) -> void :
 	var got: = int(s.tip) + bonus
 	tips += got
 	served += 1
-	G.add_aff(s.hero, 5)
+	V10Bond.gain(s.hero, 5, "mode_win")
 	tips_lbl.text = str(tips)
 	UI.punch(tips_lbl, 0.35)
 	Fx.burst(self, target, "heart", 10)
@@ -845,11 +847,12 @@ func _shift_end() -> void :
 		s.shift_best = tips
 	s.shift_runs = int(s.shift_runs) + 1
 	s.shift_served = int(s.shift_served) + served
-	G.S.gems += tips
+	V10Money.grant({"gems": tips}, "mode_play")
 	G.task_add("levels")
-	G.add_aff(partner, 6)
+	V10Bond.gain(partner, 6, "mode_win")
 	var sa: = V8PlayRules.award("other", V8PlayRules.shift_rp(served), served > missed)
 	_v8_saved = true
+	_v10_ended(served > missed, 0, 0, now() - start_t, false, served)  # 0.10 hook
 	Sfx.play("win")
 	Sfx.say(partner, "win")
 	var ctx: = v8_res_open("Смена закрыта", "pink", 44)

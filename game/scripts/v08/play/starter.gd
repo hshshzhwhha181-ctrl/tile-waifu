@@ -34,7 +34,7 @@ static func st() -> Dictionary:
 	return d
 
 static func now() -> int:
-	return int(Time.get_unix_time_from_system())
+	return V10Meta.now_unix()
 
 # Path wins: the per-mode stats (0.8) or, for a 0.7 save without stats, the cleared Path levels.
 static func path_wins() -> int:
@@ -112,7 +112,7 @@ static func popup(main) -> RBox:
 		if owned():
 			Common.close_popup(p)
 			return
-		G.S.gems += GEMS
+		V10Money.grant({"gems": GEMS}, "starter")
 		G.give(ITEM)
 		st().bought = true
 		G.save()

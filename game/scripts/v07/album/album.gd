@@ -207,7 +207,7 @@ func claim(id: String) -> int:
 	for x in sets():
 		if x.id == id and x.ready and not x.claimed:
 			st().claimed[id] = true
-			G.S.gems += int(x.gems)
+			V10Money.grant({"gems": int(x.gems)}, "album")
 			G.save()
 			return int(x.gems)
 	return 0

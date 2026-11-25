@@ -8,7 +8,7 @@ const TABS: = [
 	{"id": "summon", "name": "Желания", "icon": "wishes"}, 
 	{"id": "shop", "name": "Лавка", "icon": "shop"}, 
 ]
-const SCREENS: = {
+var SCREENS: = {
 	"home": preload("res://scripts/screens/home.gd"), 
 	"levels": preload("res://scripts/screens/levels.gd"), 
 	"play": preload("res://scripts/screens/play.gd"), 
@@ -23,6 +23,7 @@ const SCREENS: = {
 	"v7play": preload("res://scripts/v07/event/event_play.gd"),
 	"profile": preload("res://scripts/v08/profile/profile_screen.gd"),
 	"letters": preload("res://scripts/v09/letters/letters_screen.gd"),
+	"tables": preload("res://scripts/v10/core/tables_hub.gd"),
 }
 
 var W: = 720.0
@@ -50,6 +51,8 @@ var safe_top: = 0.0
 var safe_bottom: = 0.0
 
 func _ready() -> void :
+	# 0.10: screens of the wired modules (V10Registry) join the table (a const dict cannot grow)
+	SCREENS.merge(V10Registry.screens())
 	var vs: = get_viewport_rect().size
 	W = vs.x
 	H = vs.y
@@ -413,6 +416,13 @@ func _dev_args() -> void :
 		G.S.partner = it.hero
 	if a.has("fuzz"):
 		V7Fuzz.run(self, int(a.fuzz))
+		return
+	if a.has("v10_selftest"):
+		# 0.10: every module selftest as a child process (scripts/v10/core/registry_runner.gd)
+		V10RegistryRunner.start(self, a)
+		return
+	if a.get("hud2_selftest", "") == "1":
+		get_tree().quit(await V10Hud2Selftest.run(self))
 		return
 	if a.has("layout_shots") or a.has("layout_selftest"):
 		# 0.10 M0 layout runner: every screen at this resolution (scripts/v10/responsive/README.md)
@@ -836,6 +846,7 @@ func go(id: String, args: = {}, animate: = true, remember: = true) -> void :
 	screen.set_meta("v8_args", args.duplicate())
 	screen_root.add_child(screen)
 	screen.call("build", self, args)
+	V10Hooks.emit_screen_shown(id, screen)  # 0.10 hook
 	if tab_nodes.has(id):
 		_select_tab(id)
 	refresh_currency()
@@ -933,6 +944,10 @@ func _notification(what: int) -> void :
 		get_tree().quit_on_go_back = false
 	elif what == NOTIFICATION_WM_GO_BACK_REQUEST:
 		android_back()
+	elif what == NOTIFICATION_APPLICATION_RESUMED:
+		V10Hooks.emit_app_resumed()  # 0.10 hook
+	elif what == NOTIFICATION_APPLICATION_PAUSED:
+		V10Hooks.emit_app_paused()  # 0.10 hook
 
 func _unhandled_key_input(e: InputEvent) -> void :
 	if e is InputEventKey and e.pressed and not e.echo and e.keycode == KEY_ESCAPE:

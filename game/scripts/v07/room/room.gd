@@ -267,7 +267,7 @@ func _say(text: String) -> void :
 
 func _gain(n: int, at: Vector2) -> void :
 	var old: = G.aff_level(h)
-	G.add_aff(h, n)
+	V10Bond.gain(h, n, "gift")
 	G.save()
 	Fx.float_text(root, at, "+%d ♥" % n, Color("ffd0e0"), 42)
 	Fx.burst(root, at, "heart", 14, Color(1, 0.75, 0.85))
@@ -369,7 +369,7 @@ func _gift_popup() -> void :
 func _give(gid: String) -> void :
 	var gd: = V7RoomData.gift(gid)
 	var s: = V7RoomData.st()
-	G.S.coins = int(G.S.coins) - int(gd.price)
+	V10Money.spend({"coins": int(gd.price)}, "room")
 	s.gifts[h] = int(s.gifts.get(h, 0)) + 1
 	var first: = not V7RoomData.known(h, gid)
 	V7RoomData.mark("known", h, gid)
@@ -455,7 +455,7 @@ func _date_popup() -> void :
 					Sfx.play("deny")
 					main.toast("Не хватает кристаллов.", "gem")
 					return
-				G.S.gems = int(G.S.gems) - V7RoomData.EXTRA_INVITE_GEMS
+				V10Money.spend({"gems": V7RoomData.EXTRA_INVITE_GEMS}, "room")
 				s.invites = int(s.invites) + 1
 				s.bought = int(s.bought) + 1
 				G.save()
@@ -483,7 +483,7 @@ func _go_date(pid: String) -> void :
 	var photo_new: bool = grade == 0 and not s.photos.get(h, {}).has(pid)
 	if photo_new:
 		V7RoomData.mark("photos", h, pid)
-		G.S.gems = int(G.S.gems) + V7RoomData.PHOTO_GEMS
+		V10Money.grant({"gems": V7RoomData.PHOTO_GEMS}, "room")
 	G.save()
 	main.refresh_currency(photo_new)
 	_date_result(pid, grade, aff, fav, fav_new, photo_new)
@@ -614,7 +614,7 @@ func _play_scene(id: String) -> void :
 	if first:
 		V7RoomData.st().seen[id] = true
 		var gems: int = V7RoomData.SCENE_GEMS.get(int(V7RoomScenes.SCENES[id].lv), 0)
-		G.S.gems = int(G.S.gems) + gems
+		V10Money.grant({"gems": gems}, "room")
 		G.save()
 		main.refresh_currency(true)
 		main.fly_gems(global_position + Vector2(W * 0.5, H * 0.5), 8)

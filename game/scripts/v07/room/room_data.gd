@@ -386,7 +386,7 @@ static func mail() -> Array:
 
 static func add_mail(h: String, text: String, kind: = "date", extra: = "") -> void :
 	var m: = mail()
-	m.append({"h": h, "text": text, "kind": kind, "extra": extra, "t": int(Time.get_unix_time_from_system()), "read": false})
+	m.append({"h": h, "text": text, "kind": kind, "extra": extra, "t": V10Meta.now_unix(), "read": false})
 	while m.size() > MAIL_MAX:
 		m.pop_front()
 

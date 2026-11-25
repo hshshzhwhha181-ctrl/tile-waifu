@@ -74,7 +74,7 @@ func new_session(wall_unix: int) -> void:
 
 
 func wall() -> int:
-	return _m_wall if _manual else int(Time.get_unix_time_from_system())
+	return _m_wall if _manual else V10Meta.now_unix()
 
 
 func mono_ms() -> int:

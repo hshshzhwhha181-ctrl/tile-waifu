@@ -226,7 +226,7 @@ static func _make(ev: String, vars: Dictionary, h: = "") -> Dictionary:
 		k = (k + 1) % vs.size()
 	s.lastk[key] = k
 	s.seq += 1
-	var l: = {"id": s.seq, "h": h, "ev": ev, "k": k, "t": int(Time.get_unix_time_from_system()), "day": G.today(),
+	var l: = {"id": s.seq, "h": h, "ev": ev, "k": k, "t": V10Meta.now_unix(), "day": G.today(),
 		"read": false, "reply": -1, "vars": vars.duplicate()}
 	s.list.push_front(l)
 	while s.list.size() > KEEP:
@@ -304,7 +304,7 @@ static func reply(id: int, i: int) -> String:
 	if int(l.get("reply", -1)) < 0:
 		l["reply"] = i
 		l["read"] = true
-		G.add_aff(str(l.h), REPLY_AFF)
+		V10Bond.gain(str(l.h), REPLY_AFF, "letter_reply")
 		G.save()
 	return str(v.answers[int(l.reply)])
 
@@ -316,7 +316,7 @@ static func badge_count() -> int:
 static func ago(t: int) -> String:
 	if t <= 0:
 		return ""
-	var d: = int(Time.get_unix_time_from_system()) - t
+	var d: = V10Meta.now_unix() - t
 	if d < 3600:
 		return "только что"
 	if d < 86400:

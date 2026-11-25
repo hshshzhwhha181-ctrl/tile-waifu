@@ -68,7 +68,7 @@ static func now_unix() -> float:
 			if s.length() == 10:
 				s += "T12:00:00"
 			return Time.get_unix_time_from_datetime_string(s)
-	return Time.get_unix_time_from_system() + Time.get_time_zone_from_system().get("bias", 0) * 60.0
+	return float(V10Meta.local_unix(V10Meta.now_unix()))
 
 static func day_of(unix: float) -> int:
 	return floori(unix / 86400.0)
@@ -133,7 +133,7 @@ static func st() -> Dictionary:
 static func _close_event(r: Dictionary, ev: Dictionary) -> void :
 	var left: = int(ev.get("cur", 0))
 	var gems: = int(round(left * LEFTOVER_RATE))
-	G.S.gems += gems
+	V10Money.grant({"gems": gems}, "event_data")
 	var def: Dictionary = {}
 	for e in EVENTS:
 		if e.id == ev.get("def", ""):
@@ -231,8 +231,8 @@ static func add_cur(n: int) -> Array:
 	return got
 
 static func _pay(m: Dictionary, def: Dictionary) -> void :
-	G.S.gems += int(m.get("gems", 0))
-	G.S.coins += int(m.get("coins", 0))
+	V10Money.grant({"gems": int(m.get("gems", 0))}, "event_data")
+	V10Money.grant({"coins": int(m.get("coins", 0))}, "event_data")
 	if m.has("shards"):
 		G.S.shards[def.hero] = int(G.S.shards.get(def.hero, 0)) + int(m.shards)
 
@@ -266,8 +266,8 @@ static func buy(item: Dictionary) -> String:
 		"shard":
 			G.S.shards[def.hero] = int(G.S.shards.get(def.hero, 0)) + 1
 		"gems":
-			G.S.gems += int(item.n)
+			V10Money.grant({"gems": int(item.n)}, "event_data")
 		"coins":
-			G.S.coins += int(item.n)
+			V10Money.grant({"coins": int(item.n)}, "event_data")
 	G.save()
 	return ""

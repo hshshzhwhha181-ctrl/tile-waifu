@@ -145,6 +145,7 @@ func build(m, args: Dictionary) -> void :
 	_build_hud()
 	board_rect = Rect2(10, 318, W - 20, H - 318 - 186)
 	_make_board()
+	V10Hooks.emit_game_started({"mode": _v10_mode(), "level": lvl, "hero": partner, "seed": int(cfg.get("seed", 0)), "cfg": cfg})  # 0.10 hook
 	_apply_perk()
 	fx_layer = Node2D.new()
 	add_child(fx_layer)
@@ -774,6 +775,7 @@ func _on_match(mid: Vector2, combo: int, gold: bool, shard: String) -> void :
 	var from_ult: = v9_from_ult
 	if from_ult:
 		combo = 1
+	V10Hooks.emit_pair_taken({"mid": mid, "combo": combo, "gold": gold, "shard": shard, "face": -1, "mode": _v10_mode(), "partner": partner, "ult": from_ult})  # 0.10 hook
 	var fever: = now() < fever_until
 	var mult: = 1 + (combo - 1) / 2
 	var gain: = int(round(mult * (2 if fever else 1) * (gold_mult if gold else 1) * (1.0 + gem_bonus)))
@@ -792,9 +794,9 @@ func _on_match(mid: Vector2, combo: int, gold: bool, shard: String) -> void :
 		skill_charge = V9Ults.add(skill_charge, SKILL_NEED)
 		if skill_charge >= SKILL_NEED:
 			_skill_ready()
-	G.S.gems += gain
+	V10Money.grant({"gems": gain}, "play")
 	gained += gain
-	G.add_aff(partner, 1)
+	V10Bond.gain(partner, 1, "pair")
 	G.task_add("pairs")
 	max_combo = maxi(max_combo, combo)
 	if not from_ult:
@@ -1100,6 +1102,7 @@ var _v8_loss_done: = false
 func _v8_record_loss() -> void :
 	if _v8_loss_done or _v8_over or _v8_saved:
 		return
+	_v10_ended(false, 0, 0, now() - start_t, false)  # 0.10 hook
 	var src: = _v8_source()
 	if src in ["path", "daily", "duel", "blitz"]:
 		_v8_loss_done = true
@@ -1241,7 +1244,7 @@ func _v8_can_pay(price: int) -> bool:
 	return true
 
 func _v8_spend(price: int) -> void :
-	G.S.gems = int(G.S.gems) - price
+	V10Money.spend({"gems": price}, "play")
 	G.save()
 	UI.punch(gems_lbl, 0.3)
 
@@ -1459,7 +1462,7 @@ func _open_gift(mid: Vector2) -> void :
 	match r:
 		0:
 			var g: = 40 + randi() % 41
-			G.S.gems += g
+			V10Money.grant({"gems": g}, "play")
 			gained += g
 			text = "Под фишкой подарок: " + gems_text(g)
 		1:
@@ -1469,7 +1472,7 @@ func _open_gift(mid: Vector2) -> void :
 			skill_charge = SKILL_NEED - 1
 			text = V6Txt.s("play.gift_skill")
 		3:
-			G.add_aff(partner, 15)
+			V10Bond.gain(partner, 15, "match_gift")
 			text = V6Txt.s("play.gift_note") % G.HEROES[partner].name
 	Sfx.play("reveal_ssr", 1.2, -2)
 	# 0.9: nothing bursts over the tiles — a gold glint UNDER the board where the gift tile was, and the hearts and
@@ -1493,7 +1496,8 @@ func _blitz_end() -> void :
 	if record:
 		G.S.blitz_best = blitz_score
 	var gems: = mini(150, blitz_score / 20)
-	G.S.gems += gems
+	V10Money.grant({"gems": gems}, "play")
+	_v10_ended(true, 0, gems, now() - start_t, false, blitz_score)  # 0.10 hook
 	var ba: = V8PlayRules.award("blitz", V8PlayRules.blitz_rp(blitz_score), boards_done > 0)
 	_v8_saved = true
 	_v8_end_overlays()
@@ -1516,7 +1520,7 @@ func _track_set(mid: Vector2) -> void :
 		sets_done.append(c)
 		var nm: String = V10Glossary.label("set.%d" % c)  # v10-clarity hook: «Тройка: цветы», not the bare suit name
 		_yaku_banner(nm, "3 пары подряд · +15")
-		G.S.gems += 15
+		V10Money.grant({"gems": 15}, "play")
 		gained += 15
 		Fx.float_text(fx_layer, mid + Vector2(0, -50), "+15", Color("ffd34d"), 36)
 
@@ -1666,7 +1670,7 @@ func _on_clear() -> void :
 			blitz_score += 100
 			Fx.float_text(fx_layer, Vector2(W * 0.5, 600), V6Txt.s("play.clear10"), Color("ffe7a6"), 40)
 		else:
-			G.S.gems += 30
+			V10Money.grant({"gems": 30}, "play")
 			gained += 30
 			Fx.float_text(fx_layer, Vector2(W * 0.5, 600), V6Txt.s("play.clear30"), Color("ffe7a6"), 40)
 			var za: = V8PlayRules.award("zen", V8PlayRules.zen_rp(boards_done), true)
@@ -1726,15 +1730,16 @@ func _on_clear() -> void :
 		if src == "path":
 			V8Starter.on_path_win()
 	if mode != "trial":
-		G.add_aff(partner, 10)
+		V10Bond.gain(partner, 10, "level_win")
 		G.task_add("levels")
 		G.add_pass_xp(100)
 		G.S.xp = int(G.S.xp) + 40
-	G.S.gems += reward
+	V10Money.grant({"gems": reward}, "play")
 	G.S.tut_done = true
 	G.save()
 	# 0.8: the win is saved: leaving now goes straight out, without «прогресс не сохранится» or a counted loss
 	_v8_saved = true
+	_v10_ended(true, stars, reward, secs, first)  # 0.10 hook
 	board.input_on = false
 	await get_tree().create_timer(0.4).timeout
 	if not is_inside_tree():
@@ -2187,6 +2192,7 @@ func _victory(stars: int, reward: int, secs: float, first: bool) -> void :
 		null, V8Art.nav("wishes") if summon_ok else V8Art.nav("home"))
 	victory_next_btn = btns[0]
 	victory_summon_btn = btns[1]
+	_v10_win_panel(ctx, btns, stars, first)  # 0.10 hook: V10WinStack bars + «Ещё уровень · N» / «В чайную»
 	_v8_photo_row(root, stars, secs, ctx.plate_end, ctx.by, plate.position + Vector2(V8_RES_PAD, album_y) if album_y >= 0.0 else Vector2(-1, -1), pw - V8_RES_PAD * 2.0)
 	_v8_res_settle(ctx, album_y)
 
@@ -2911,3 +2917,40 @@ func _v9_win_dev() -> void :
 		print("V9WIN shot %.2f" % t)
 	if a.get("v9_win_quit", "") == "1":
 		get_tree().quit()
+
+
+# ── 0.10 hooks (docs/INTEGRATION_0.10.md §3.8): one result per table for V10Hooks.game_ended, the win window ──
+var _v10_end_sent: = false
+
+func _v10_mode() -> String:
+	return "path" if mode == "" else mode
+
+
+func _v10_ended(win: bool, stars: int, reward: int, secs: float, first: bool, score: = 0) -> void :
+	if _v10_end_sent:
+		return
+	_v10_end_sent = true
+	V10Hooks.emit_game_ended({"mode": _v10_mode(), "win": win, "score": score, "stars": stars, "time_s": secs,
+		"pairs": int(board.tiles.size() / 2) if board else 0, "hero": partner, "seed": int(cfg.get("seed", 0)),
+		"level": lvl if mode == "" else -1, "first": first, "rewards": {"gems": reward}})
+
+
+# Path: the 0.9 two-button row gives way to V10WinPanel (≤ 2 bars of V10WinStack, «Ещё уровень · N» + «В чайную»)
+func _v10_win_panel(ctx: Dictionary, btns: Array, stars: int, first: bool) -> void :
+	var wctx: = {"mode": _v10_mode(), "level": lvl, "first": first, "stars": stars, "was_done": not first and mode == "",
+		"count": G.LEVELS.size(), "salon_open": false, "buttons": mode == "",
+		"on_more": func(n: int): main.go("play", {"level": n, "partner": partner}, false)}
+	V10Hooks.emit_win_screen(wctx)
+	if mode != "":
+		return
+	var wp: = V10WinPanel.make(wctx, W - 32.0)
+	var root: Control = ctx.root
+	root.add_child(wp)
+	wp.position = Vector2(16.0, float(ctx.by) + 96.0 - wp.height())
+	wp.home.connect(func(): main.go("home"))
+	wp.denied.connect(func(hint: String): main.toast(hint, "lock"))
+	for b in btns:
+		(b as Control).visible = false
+	victory_next_btn = wp.more_btn
+	victory_summon_btn = wp.alt_btn
+	wp.play(0.9)

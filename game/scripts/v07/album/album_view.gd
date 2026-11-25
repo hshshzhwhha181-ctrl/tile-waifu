@@ -360,7 +360,7 @@ func _fill_sets() -> float:
 			tile.build(G.SKIN_LOOK.get(it.id, {}))
 			if not own:
 				tile.modulate = Color(0.4, 0.38, 0.45)
-			var rl: = UI.label(it.rar, 18, Color.WHITE, G.rar_color(it.rar).darkened(0.5), 4, "body", 900)
+			var rl: = UI.label(V10Rank.label(it.rar), 18, Color.WHITE, G.rar_color(it.rar).darkened(0.5), 4, "body", 900)
 			rl.position = Vector2(10, 6)
 			card.add_child(rl)
 			card.add_child(UI.center_label(UI.label(it.name.replace("Фишки ", ""), 17, UI.INK if not on else Color("3a2410"), UI.DARK if not on else Color(1, 0.95, 0.8, 0.5), 3, "body", 900), Rect2(0, 182, cw, 26)))

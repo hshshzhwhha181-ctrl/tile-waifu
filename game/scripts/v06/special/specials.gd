@@ -189,7 +189,7 @@ func _fx() -> Node:
 func _gems(n: int, pos: Vector2) -> void :
 	if _mode() == "trial":
 		return
-	G.S.gems += n
+	V10Money.grant({"gems": n}, "specials")
 	if "gained" in play:
 		play.gained += n
 	if play.main and play.main.has_method("fly_gems"):
@@ -460,7 +460,7 @@ func _open_box(pos: Vector2) -> void :
 				icon = "gem"
 		"heart":
 			var h: String = play.partner if "partner" in play else "mc"
-			G.add_aff(h, 10)
+			V10Bond.gain(h, 10, "special")
 			icon = "heart"
 			txt = "+10 симпатии %s" % G.HEROES[h].name
 		"star":

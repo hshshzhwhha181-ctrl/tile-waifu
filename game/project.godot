@@ -30,6 +30,8 @@ V7DayNight="*res://scripts/v07/daynight/daynight.gd"
 V7Eggs="*res://scripts/v07/eggs/eggs.gd"
 V7Album="*res://scripts/v07/album/album.gd"
 V7Event="*res://scripts/v07/event/event.gd"
+V10MetaTick="*res://scripts/v10/meta/meta_tick.gd"
+V10Hooks="*res://scripts/v10/core/hooks.gd"
 
 [debug]
 

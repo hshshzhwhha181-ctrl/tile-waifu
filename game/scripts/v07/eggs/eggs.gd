@@ -222,7 +222,7 @@ func _on_match(b: Node, mid: Vector2, combo: int) -> void :
 func _star_caught(pos: Vector2) -> void :
 	var st: = state()
 	st["stars"] = int(st.get("stars", 0)) + 1
-	G.S.gems = int(G.S.gems) + STAR_GEMS
+	V10Money.grant({"gems": STAR_GEMS}, "eggs")
 	G.save()
 	var fx = get_node_or_null("/root/V6Fx")
 	if fx:
@@ -417,8 +417,8 @@ func _cameo(home: Node, h: String, moon: bool) -> void :
 		bt.tween_callback(bb.queue_free)
 		if not locked:
 			Sfx.voice_started.emit(h, line, minf(3.0, 0.4 + line.length() * 0.045))
-			G.add_aff(h, 3)
-		G.S.coins = int(G.S.coins) + CAMEO_COINS
+			V10Bond.gain(h, 3, "egg")
+		V10Money.grant({"coins": CAMEO_COINS}, "eggs")
 		G.save()
 		Fx.burst(home, head, "heart" if not locked else "sparkle", 12)
 		var fx = get_node_or_null("/root/V6Fx")

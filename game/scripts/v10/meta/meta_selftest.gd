@@ -398,7 +398,7 @@ static func _win() -> void:
 			nbars += 1
 	check(nbars == 2, "the panel shows ≤ 2 bars with 9 registered (%d)" % nbars)
 	check(p.more_btn != null and p.more_btn.lbl.text == "Ещё уровень · 5", "panel button «Ещё уровень · 5» (%s)" % (p.more_btn.lbl.text if p.more_btn else "-"))
-	check(p.alt_btn != null and p.alt_btn.lbl.text == "Домой", "no salon → small «Домой»")
+	check(p.alt_btn != null and p.alt_btn.lbl.text == "В чайную", "no salon → small «В чайную»")
 	p.free()
 	var p2: = V10WinPanel.make({"mode": "blitz"}, 620.0)
 	check(p2.more_btn == null, "non-path: no «Ещё уровень» row")

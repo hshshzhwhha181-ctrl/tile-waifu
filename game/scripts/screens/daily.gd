@@ -13,10 +13,10 @@ static func _reward_icon(r: Dictionary) -> Texture2D:
 
 static func _give(main, r: Dictionary, from: Vector2) -> void :
 	if r.has("gems"):
-		G.S.gems += int(r.gems)
+		V10Money.grant({"gems": int(r.gems)}, "daily")
 		main.fly_gems(from, 6)
 	if r.has("coins"):
-		G.S.coins += int(r.coins)
+		V10Money.grant({"coins": int(r.coins)}, "daily")
 	if r.has("item"):
 		G.give(r.item)
 		main.toast(V6Txt.s("daily.outfit") % G.ITEM[r.item].name, "wardrobe")
@@ -130,7 +130,7 @@ static func tasks(main, home) -> void :
 			if G.tasks().claimed[idx] or int(G.tasks()[td.key]) < td.goal:
 				return
 			G.tasks().claimed[idx] = true
-			G.S.gems += int(td.gems)
+			V10Money.grant({"gems": int(td.gems)}, "daily")
 			G.add_pass_xp(100)
 			G.save()
 			main.fly_gems(b.get_global_rect().get_center(), 5)

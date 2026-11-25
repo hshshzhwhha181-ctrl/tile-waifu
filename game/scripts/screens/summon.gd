@@ -24,6 +24,7 @@ const TOP: = TABS_Y + 60.0 + 12.0
 
 func build(m, args: Dictionary) -> void :
 	main = m
+	V10Hooks.emit_summon_built.call_deferred(self)  # 0.10 hook (after build)
 	W = size.x
 	H = size.y
 	stage_dy = maxf(0.0, H - 1280.0) * 0.45
@@ -227,7 +228,7 @@ func _pull(n: int) -> void :
 		return
 	if free:
 		G.S.free10 = false
-	G.S.gems -= cost
+	V10Money.spend({"gems": cost}, "summon")
 	main.refresh_currency(true)
 	# 0.9: the pity counter and guarantee are replayed card by card during the sequence, from their pre-pull values
 	var ctx: = {"pity": int(G.S.pity), "guar": bool(G.S.guar), "newbie_left": int(G.S.get("newbie_left", 0)),
@@ -917,7 +918,7 @@ func _card(r: Dictionary, sz: Vector2) -> Control:
 	rtag.borders(col.lerp(Color.WHITE, 0.35), col.darkened(0.45))
 	rtag.name = "Rar"
 	front.add_child(rtag)
-	rtag.add_child(UI.center_label(UI.label(r.rar, rfs, col.lerp(Color.WHITE, 0.45), UI.DARK, 3, "body", 900), Rect2(0, -1, rw, rh)))
+	rtag.add_child(UI.center_label(UI.label(V10Rank.label(r.rar), rfs, col.lerp(Color.WHITE, 0.45), UI.DARK, 3, "body", 900), Rect2(0, -1, rw, rh)))
 	var nl: = UI.label(r.name, fs, Color.WHITE, Color(0.2, 0.05, 0.2), 4, "body", 900)
 	# 0.8: the name is fitted to the card (16 px floor, lighter weight / hyphenation / «…» past that) and its box
 	# grows UP from the frame's bottom rim by the wrapped height, so a third line («Фон» / «Чайный» / «сад»») stays

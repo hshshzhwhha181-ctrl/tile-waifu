@@ -36,7 +36,7 @@ func is_available() -> bool:
 
 
 func _time() -> int:
-	return t if t > 0 else int(Time.get_unix_time_from_system())
+	return t if t > 0 else V10Meta.now_unix()
 
 
 func purchase(product_id: String, order_id: String) -> void:

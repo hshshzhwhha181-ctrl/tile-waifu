@@ -380,7 +380,7 @@ func _shop() -> void :
 	nm.position = Vector2(250, 20)
 	nm.size = Vector2(W - 32 - 270, 44)
 	big.add_child(nm)
-	var rr: = UI.label("%s · %s" % [it.rar, G.HEROES[it.hero].name], 19, G.rar_color(it.rar), UI.DARK, 3, "body", 900)
+	var rr: = UI.label("%s · %s" % [V10Rank.label(it.rar), G.HEROES[it.hero].name], 19, G.rar_color(it.rar), UI.DARK, 3, "body", 900)
 	rr.position = Vector2(252, 70)
 	big.add_child(rr)
 	var ds: = UI.label("Наряд только этого ивента. Его можно надеть в Гардеробе, и он оживает в Чайной.", 17, Color("ddd2c4"))

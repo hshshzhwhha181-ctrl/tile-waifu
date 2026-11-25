@@ -172,8 +172,6 @@ static func bond(h: String, n: int, src: String) -> void:
 	var b: = klass("V10Bond")
 	if b:
 		b.call("gain", h, n, src)
-	elif has_g():
-		G.add_aff(h, n)
 
 
 static func register_frame(id: String, name: String, src: String) -> void:

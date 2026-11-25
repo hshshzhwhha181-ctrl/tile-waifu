@@ -250,7 +250,7 @@ func _ask(e: Dictionary) -> void :
 	var o: Array = opts[picked[0]]
 	var aff: = int(o[2]) if o.size() > 2 else 0
 	if aff > 0 and G.HEROES.has(who):
-		G.add_aff(who, aff)
+		V10Bond.gain(who, aff, "story")
 		G.save()
 		var pos: = Vector2(W * 0.5, H * 0.42)
 		if heroes.has(who):

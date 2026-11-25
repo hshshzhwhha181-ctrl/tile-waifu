@@ -177,4 +177,4 @@ static func commit_aff(h: String) -> void:
 	if G.pet_left() <= 0:
 		return
 	G.S.pet.n = int(G.S.pet.n) + 1
-	G.add_aff(h, AFF)
+	V10Bond.gain(h, AFF, "touch")

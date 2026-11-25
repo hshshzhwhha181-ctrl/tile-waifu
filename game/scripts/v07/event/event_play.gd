@@ -198,9 +198,9 @@ func _event_clear() -> void :
 	if not first:
 		ev.bis = int(ev.bis) + 1
 	var miles: = V7EventData.add_cur(int(rw.total))
-	G.add_aff(partner, 10)
+	V10Bond.gain(partner, 10, "event_win")
 	if partner == def.hero:
-		G.add_aff(partner, 10)
+		V10Bond.gain(partner, 10, "event_win")
 	G.task_add("levels")
 	G.add_pass_xp(100)
 	G.S.xp = int(G.S.xp) + 40
@@ -209,6 +209,7 @@ func _event_clear() -> void :
 	rp_gain = int(ea.rp)
 	rank_ups = ea.ups
 	_v8_saved = true
+	_v10_ended(true, stars, 0, now() - start_t, first)  # 0.10 hook
 	_v8_end_overlays()
 	print("V7EVENT CLEAR node=%d stars=%d cur=+%d" % [node_i, stars, int(rw.total)])
 	Sfx.play("win")
@@ -274,12 +275,13 @@ func _tour_finish(cleared: bool) -> void :
 	var res: = V7Ladder.submit(table_k, total)
 	G.task_add("levels")
 	G.add_pass_xp(80)
-	G.add_aff(partner, 5)
+	V10Bond.gain(partner, 5, "event_win")
 	rp_before = int(G.S.rp)
 	var ta: = V8PlayRules.award("tourney", V8PlayRules.tourney_rp(cleared, total, int(res.place_before) - int(res.place_after)), cleared)
 	rp_gain = int(ta.rp)
 	rank_ups = ta.ups
 	_v8_saved = true
+	_v10_ended(cleared, 0, 0, now() - start_t, false)  # 0.10 hook
 	_v8_end_overlays()
 	print("V7TOURNEY table=%d score=%d cleared=%s place %d->%d" % [table_k, total, str(cleared), int(res.place_before), int(res.place_after)])
 	Sfx.play("win" if cleared else "deny", 1.0 if cleared else 0.7)

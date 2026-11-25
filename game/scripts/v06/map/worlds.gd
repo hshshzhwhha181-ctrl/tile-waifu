@@ -150,8 +150,8 @@ static func open_chest(w: int, kind: String) -> Dictionary:
 	var r: Dictionary = chest_reward(kind).duplicate()
 	var shard_hero: String = G.LOCS[w].shard if w < G.LOCS.size() else "rin"
 	r["hero"] = shard_hero
-	G.S.gems = int(G.S.gems) + int(r.gems)
-	G.S.coins = int(G.S.coins) + int(r.coins)
+	V10Money.grant({"gems": int(r.gems)}, "worlds")
+	V10Money.grant({"coins": int(r.coins)}, "worlds")
 	G.S.shards[shard_hero] = int(G.S.shards.get(shard_hero, 0)) + int(r.shard)
 	state().chests[chest_id(w, kind)] = true
 	G.save()

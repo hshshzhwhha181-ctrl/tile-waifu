@@ -696,7 +696,7 @@ func _milestone(n: int, at: Vector2) -> void :
 		# to it; it pays a few crystals instead
 		3:
 			if not trial:
-				G.S.gems += 5
+				V10Money.grant({"gems": 5}, "combo")
 				play.gained += 5
 			what = "+5 кристаллов"
 			icon = "gem"
@@ -722,7 +722,7 @@ func _milestone(n: int, at: Vector2) -> void :
 		_:
 			var g: = 10 + n
 			if not trial:
-				G.S.gems += g
+				V10Money.grant({"gems": g}, "combo")
 				play.gained += g
 			what = "+%d %s" % [g, V8PlayRules.plural(g, "кристалл", "кристалла", "кристаллов")]
 			icon = "gem"

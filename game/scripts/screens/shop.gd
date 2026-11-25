@@ -114,8 +114,8 @@ func _recommended() -> float:
 		mb = _price_btn("449 ₽", Rect2(228, 140, W - 36 - 250, 60), null, 28)
 		mb.shine_every = 2.4
 		mb.pressed.connect( func():
-			G.S.month_card = {"until": Time.get_date_string_from_unix_time(int(Time.get_unix_time_from_system()) + 30 * 86400), "last": G.today()}
-			G.S.gems += 300
+			G.S.month_card = {"until": Time.get_date_string_from_unix_time(V10Meta.now_unix() + 30 * 86400), "last": G.today()}
+			V10Money.grant({"gems": 300}, "shop")
 			G.save()
 			main.fly_gems(mb.get_global_rect().get_center(), 8)
 			main.toast(V6Txt.s("shop.month_on"), "calendar")
@@ -128,7 +128,7 @@ func _recommended() -> float:
 				main.toast(V6Txt.s("shop.month_got"), "calendar")
 				return
 			G.S.month_card.last = G.today()
-			G.S.gems += 90
+			V10Money.grant({"gems": 90}, "shop")
 			G.save()
 			main.fly_gems(mb.get_global_rect().get_center(), 5)
 			_build_body())
@@ -191,7 +191,7 @@ func _recommended() -> float:
 		fr.add_child(lt)
 		var b3: = _price_btn("149 ₽", Rect2(158, 82, 220, 60), null, 24)
 		b3.pressed.connect( func():
-			G.S.gems += V8Starter.GEMS
+			V10Money.grant({"gems": V8Starter.GEMS}, "shop")
 			G.give(V8Starter.ITEM)
 			V8Starter.st().bought = true
 			G.save()
@@ -317,9 +317,9 @@ func pass_popup() -> void :
 			for k in range(int(G.S.pass.claimed) + 1, n + 1):
 				var r: = _pass_reward(k)
 				if r.has("gems"):
-					G.S.gems += int(r.gems)
+					V10Money.grant({"gems": int(r.gems)}, "shop")
 				if r.has("coins"):
-					G.S.coins += int(r.coins)
+					V10Money.grant({"coins": int(r.coins)}, "shop")
 				if r.has("item"):
 					G.give(r.item)
 			if n > int(G.S.pass.claimed):
@@ -391,7 +391,7 @@ func _buy_outfit(it: Dictionary, b: JButton) -> void :
 func _buy_outfit_do(it: Dictionary, b: JButton) -> void :
 	if G.owns(it.id) or int(G.S.gems) < int(it.shop):
 		return
-	G.S.gems -= int(it.shop)
+	V10Money.spend({"gems": int(it.shop)}, "shop")
 	G.give(it.id)
 	G.save()
 	main.refresh_currency(true)
@@ -472,14 +472,14 @@ func _gems() -> void :
 			main.toast(V6Txt.s("shop.gift_got"), "gift")
 			return
 		G.S.gift_day = G.today()
-		G.S.gems += 50
+		V10Money.grant({"gems": 50}, "shop")
 		G.save()
 		main.fly_gems(cb.get_global_rect().get_center(), 5))
 	d.add_child(cb)
 	UI.slide_in(d, Vector2(0, 40), 0.4)
 
 func _buy(gems: int, from: Control) -> void :
-	G.S.gems += gems
+	V10Money.grant({"gems": gems}, "shop")
 	G.save()
 	Sfx.play("win", 1.2, -6)
 	Fx.burst(self, from.get_global_rect().get_center(), "sparkle", 30, Color(1, 0.8, 0.9), 1.2)
@@ -501,4 +501,4 @@ func _rar_tag(parent: Control, rar: String, at: Vector2) -> void :
 	var tag: = UI.rbox("graphite", Rect2(at.x - tw, at.y, tw, 30), 15, 2, 4)
 	tag.borders(G.rar_color(rar).lerp(Color.WHITE, 0.35), G.rar_color(rar).darkened(0.45))
 	parent.add_child(tag)
-	tag.add_child(UI.center_label(UI.label(rar, fs, G.rar_color(rar).lerp(Color.WHITE, 0.45), UI.DARK, 3, "body", 900), Rect2(0, -1, tw, 30)))
+	tag.add_child(UI.center_label(UI.label(V10Rank.label(rar), fs, G.rar_color(rar).lerp(Color.WHITE, 0.45), UI.DARK, 3, "body", 900), Rect2(0, -1, tw, 30)))
