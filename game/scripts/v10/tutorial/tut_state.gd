@@ -1,167 +1,178 @@
 class_name V10TutState
 extends RefCounted
-
-# V10TutState — what the player has already been shown (docs: scripts/v10/tutorial/README.md).
-# Lives in the save as S.v10_tut (one dictionary, added by ensure(); V10Save.register can call ensure too).
-#   step       id of the flow step in progress ("" = none started / between chapters)
-#   chapters   {chapter_id: true} finished chapters of the guided first run
-#   skipped    true after «Пропустить обучение» (flow off; contextual tips stay on unless tips_off)
-#   tips       {tip_id: day_key} contextual first-time tips already shown
-#   tips_off   true: no contextual tips at all (from Справка)
-#   large      bigger bubble text (accessibility; S.text_large from the look lane wins when present)
-#   gifts      {gift_id: true} one-time tutorial gifts (first free wish) — never granted twice
-#   v          format version of this block
+# Save block of the tutorial: G.S.v10_tut (v2). Keys are only added; SAVE_VER is untouched.
+# Re-read G.S on every call: a load / recovery import replaces G.S as a whole.
 
 const KEY: = "v10_tut"
-const VER: = 1
-const DEFAULTS: = {"v": VER, "step": "", "chapters": {}, "skipped": false, "tips": {}, "tips_off": false,
-	"large": false, "gifts": {}}
+const VER: = 2
+const DEFAULTS: = {
+	"v": VER, "seen": {}, "first_match": false, "skipped": false, "hints": true,
+	"first_day": 0, "t0": 0, "funnel": {}, "large": false, "legacy": false, "entries": 0, "forced": {},
+}
 
-# test hook: a dictionary that stands in for G.S (selftests run without touching the real save)
-static var override_s = null
+static var test_store = null  # Dictionary: used instead of G.S when not null (selftest)
 
 
-static func S() -> Dictionary:
-	if override_s is Dictionary:
-		return override_s
+static func _root() -> Dictionary:
+	if test_store is Dictionary:
+		return test_store
+	if G == null or not (G.S is Dictionary):
+		test_store = {}
+		return test_store
 	return G.S
 
 
-# idempotent: adds the block and any missing key, repairs wrong types, never resets progress
-static func ensure(s = null) -> Dictionary:
-	var root: Dictionary = s if s is Dictionary else S()
-	var d = root.get(KEY)
+static func st() -> Dictionary:
+	var S: = _root()
+	return ensure(S)
+
+
+# Idempotent. Migrates the old v1 block (old module) and 0.9 players.
+static func ensure(S: Dictionary) -> Dictionary:
+	var d = S.get(KEY, null)
 	var fresh: = not (d is Dictionary)
 	if fresh:
 		d = {}
-		root[KEY] = d
+		S[KEY] = d
+	var old_v: = int(d.get("v", 0))
+	if old_v == 1:
+		_from_v1(d)
 	for k in DEFAULTS:
-		var dv = DEFAULTS[k]
-		if not d.has(k) or typeof(d[k]) != typeof(dv):
-			d[k] = dv.duplicate(true) if dv is Dictionary else dv
-	# migration, once: a player who finished the 0.9 first match (S.tut_done) does not get the match chapter
-	# (a later «Обучение заново» may bring it back, so this runs only when the block is created)
-	if fresh and bool(root.get("tut_done", false)):
-		d.chapters["match1"] = true
+		if not d.has(k):
+			d[k] = DEFAULTS[k].duplicate(true) if DEFAULTS[k] is Dictionary else DEFAULTS[k]
+	# types (JSON brings ints back as floats; corrupted values become defaults)
+	for k in ["seen", "funnel", "forced"]:
+		if not (d[k] is Dictionary):
+			d[k] = {}
+	for k in ["first_match", "skipped", "hints", "large", "legacy"]:
+		d[k] = bool(d[k])
+	for k in ["first_day", "t0", "entries"]:
+		d[k] = int(d[k])
+	d.v = VER
+	if int(d.t0) <= 0:
+		d.t0 = V10Meta.now_unix()
+	if int(d.first_day) <= 0:
+		d.first_day = _today_index()
+	if fresh or old_v < 2:
+		_legacy_check(S, d)
 	return d
 
 
-static func st() -> Dictionary:
-	return ensure()
+static func _from_v1(d: Dictionary) -> void:
+	var ch = d.get("chapters", {})
+	if ch is Dictionary and bool(ch.get("match1", false)):
+		d["first_match"] = true
+	if bool(d.get("tips_off", false)):
+		d["hints"] = false
+	if bool(d.get("skipped", false)):
+		d["skipped"] = true
+		d["first_match"] = true
+	for k in ["step", "chapters", "tips", "tips_off", "gifts"]:
+		d.erase(k)
 
 
-static func save() -> void:
-	if override_s is Dictionary:
+# A 0.9 player (finished the old tutorial or has progress): the first match is done, everything already open is
+# «seen» (one welcome line about the new tabs is kept for them).
+static func _legacy_check(S: Dictionary, d: Dictionary) -> void:
+	var played: = int(S.get("unlocked", 1)) > 1 or bool(S.get("tut_done", false))
+	if not played:
 		return
-	var tree: = Engine.get_main_loop() as SceneTree
-	if tree and tree.root.get_node_or_null("G"):
-		G.save()
+	d["first_match"] = true
+	d["legacy"] = true
+	var seen: Dictionary = d.seen
+	for id in V10TutLines.INTROS:
+		if id == "v10_welcome":
+			continue
+		var gate: = String(V10TutLines.INTROS[id].get("gate", ""))
+		if gate == "" or V10Reveal.is_open_in(S, d, gate):
+			seen[id] = true
+	for id in V10TutLines.MATCH:
+		if String(id).begins_with("m_") or String(id).begins_with("v_"):
+			seen[id] = true
 
 
-static func chapter_done(id: String) -> bool:
-	return bool(st().chapters.get(id, false))
+static func _today_index() -> int:
+	return V10Meta.day_index(V10Meta.day_key())
 
 
-static func finish_chapter(id: String) -> void:
-	var d: = st()
-	d.chapters[id] = true
-	d.step = ""
-	if id == "match1":
-		S()["tut_done"] = true
+static func seen(id: String) -> bool:
+	return bool(st().seen.get(id, false))
+
+
+static func mark(id: String) -> void:
+	st().seen[id] = true
+
+
+static func unmark(id: String) -> void:
+	st().seen.erase(id)
+
+
+static func hints_on() -> bool:
+	return bool(st().hints)
+
+
+static func set_hints(on: bool) -> void:
+	st().hints = on
 	save()
 
 
-static func set_step(id: String) -> void:
-	var d: = st()
-	if d.step == id:
-		return
-	d.step = id
+static func first_match_done() -> bool:
+	return bool(st().first_match)
+
+
+static func set_first_match_done() -> void:
+	st().first_match = true
+	var S: = _root()
+	S["tut_done"] = true
 	save()
-
-
-static func step() -> String:
-	return String(st().step)
 
 
 static func skipped() -> bool:
 	return bool(st().skipped)
 
 
-static func skip_all() -> void:
+static func skip() -> void:
 	var d: = st()
 	d.skipped = true
-	d.step = ""
-	S()["tut_done"] = true
-	save()
+	d.hints = false
+	set_first_match_done()
 
 
-# «Пройти обучение заново» from Справка: the guided chapters come back (gifts stay given)
+# 1 on the first play day (04:00 day boundary of V10Meta), 2 on the next, …
+static func day_number() -> int:
+	return maxi(1, _today_index() - int(st().first_day) + 1)
+
+
+static func funnel_mark(ev: String) -> void:
+	var d: = st()
+	if d.funnel.has(ev):
+		return
+	d.funnel[ev] = V10Meta.now_unix() - int(d.t0)
+
+
 static func replay() -> void:
 	var d: = st()
 	d.skipped = false
-	d.step = ""
-	d.chapters = {}
+	d.hints = true
+	if d.get("tries", null) is Dictionary:
+		(d.tries as Dictionary).clear()
+	for k in V10TutLines.MATCH:
+		if String(k).begins_with("m_") or String(k).begins_with("v_"):
+			d.seen.erase(String(k))
 	save()
 
 
-static func tip_seen(id: String) -> bool:
-	return st().tips.has(id)
+static func funnel(ev: String) -> int:
+	return int(st().funnel.get(ev, -1))
 
 
-static func mark_tip(id: String) -> void:
-	st().tips[id] = _day()
-	save()
-
-
-static func reset_tips() -> void:
-	var d: = st()
-	d.tips = {}
-	d.tips_off = false
-	save()
-
-
-static func tips_off() -> bool:
-	return bool(st().tips_off)
-
-
-static func set_tips_off(v: bool) -> void:
-	st().tips_off = v
-	save()
-
-
-static func gift_given(id: String) -> bool:
-	return bool(st().gifts.get(id, false))
-
-
-static func mark_gift(id: String) -> void:
-	st().gifts[id] = true
-	save()
-
-
+# compatibility: clarity_state.gd asks for the old «Крупный текст» flag (now the global text scale owns it)
 static func large() -> bool:
-	var s: = S()
-	if s.has("text_large"):
-		return bool(s.text_large) or bool(st().large)
-	return bool(st().large)
+	return bool(st().get("large", false))
 
 
-static func set_large(v: bool) -> void:
-	st().large = v
-	save()
-
-
-# text scale for every tutorial caption: 1.0, or 1.22 with «Крупный текст»
-static func text_scale() -> float:
-	var s: = S()
-	if s.has("text_scale"):
-		return clampf(float(s.text_scale), 1.0, 1.5) if not bool(st().large) else maxf(1.22, float(s.text_scale))
-	return 1.22 if large() else 1.0
-
-
-static func _day() -> String:
-	# only a marker that the tip was seen (its value is informational); G.today() is the game's day source.
-	# No direct Time.* call here: spec §2.5 keeps those in v10/meta/meta.gd only.
-	var tree: = Engine.get_main_loop() as SceneTree
-	if tree and tree.root.get_node_or_null("G"):
-		return str(G.today())
-	return "-"
+static func save() -> void:
+	if test_store is Dictionary:
+		return
+	if G != null and G.has_method("save"):
+		G.save()

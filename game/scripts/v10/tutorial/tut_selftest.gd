@@ -1,398 +1,458 @@
 class_name V10TutSelftest
-extends RefCounted
+extends Node
+# Full tutorial selftest (README §5).
+#   -- --tut_selftest=1          all suites: code/hygiene, lint/lines, state/gates, HUD v2 geometry, «?»/«Как играть»
+#                                sheets, orchestrator logic, AND live main.tscn L1 -> Victory -> Чайная -> Столы ->
+#                                Героини -> Settings «Как играть» (unless --tut_static=1 is passed)
+#   -- --tut_static=1            fast headless static + HUD v2 host geometry + sheets + orchestrator logic
+#   -- --tut_shots=<abs_dir>     capture PNGs of coach modes & sheets (under OpenGL)
+#   -- --tut_compile=1 | --tut_logic=1 | --tut_l1=1 | --tut_bot=1
 
-# V10TutSelftest — data and state checks of the tutorial (headless). The scene test/tut_test.tscn runs these and
-# then the whole first run on the real screens with real touch events (README «Самотест»).
-#   static checks: every step / chapter / tip is well formed, every predicate and dynamic target exists, every
-#   forced step has an exit (done predicate + timeout), no line is too long, art and portraits exist, the shop
-#   tip does not come from a heroine (spec §1.2), no banned words in her lines (spec §2.7);
-#   references: every prop the data reads exists on the real screen script (play.gd, home.gd, summon.gd,
-#   collection.gd, main.gd), every target resolves on a mock screen set that carries the declared hooks;
-#   state: ensure() idempotent, 0.9 tut_done migration, skip / replay / tips / one-time gift.
+const DIR: = "res://scripts/v10/tutorial/"
+const BANNED_09: = [
+	"левая колонка", "сесть за стол", "гардероб", "ульта", "умение", "лихорадка",
+	"полнолуние", "ва-банк", "богиня", "поручения", "визиты", "ивент", "перк",
+]
+const REQUIRED_IDS: = [
+	"nav.teahouse", "nav.heroines", "nav.tables", "nav.wishes", "nav.shop",
+	"home.hero", "home.play", "home.phone", "home.partner",
+	"lantern.today", "lantern.salon", "lantern.streak",
+	"tables.play", "tables.tourney", "tables.mode.triples", "tables.mode.riichi",
+	"tables.mode.koikoi", "tables.mode.duels", "tables.mode.journey", "tables.mode.pagoda",
+	"match.tray", "match.hero", "match.board", "match.hint", "match.pause",
+	"match.status", "match.stake", "match.combo", "match.tile_a", "match.tile_b",
+	"win.stars", "win.rewards", "win.next", "win.home",
+]
 
-const MODES: = ["tap", "do", "wait"]
-const EMOS: = ["happy", "shy", "surprised", "pout", "sad"]
-const SCREEN_SCRIPTS: = {
-	"play": "res://scripts/screens/play.gd", "home": "res://scripts/screens/home.gd",
-	"summon": "res://scripts/screens/summon.gd", "collection": "res://scripts/screens/collection.gd",
-}
-const MAIN_SCRIPT: = "res://scripts/main.gd"
-const BANNED: = ["₽", "%", "купи", "скидк", "успей", "только сегодня", "акци", "скуча", "почему ты", "бросил", "вернись", "забыл?"]
-
-var ok: = 0
-var total: = 0
-var fails: = []
+var checks: = 0
+var fails: = 0
+var mods: = {}
+var _mod: = "init"
+var _shot_dir: = ""
 
 
-func check(name: String, cond: bool, info: = "") -> void:
-	total += 1
+func ok(cond: bool, what: String) -> void:
+	checks += 1
+	if not mods.has(_mod):
+		mods[_mod] = [0, 0]
+	mods[_mod][1] += 1
 	if cond:
-		ok += 1
+		mods[_mod][0] += 1
 	else:
-		fails.append(name + (" — " + info if info != "" else ""))
-		printerr("V10TUT FAIL ", name, " ", info)
+		fails += 1
+		printerr("TUT_FAIL [%s] %s" % [_mod, what])
 
 
-func run_all(tree: SceneTree) -> Dictionary:
-	V10Tutorial.register_dyn_all()
-	data_checks()
-	reference_checks()
-	await mock_checks(tree)
-	state_checks()
-	return {"ok": ok, "total": total, "fails": fails}
+func _apply_resolution_arg() -> void:
+	for a in OS.get_cmdline_user_args():
+		if a.begins_with("--tut_res="):
+			var parts: PackedStringArray = a.substr(10).split("x")
+			if parts.size() >= 2:
+				var w: = int(parts[0])
+				var h: = int(parts[1])
+				if w > 0 and h > 0:
+					get_tree().root.size = Vector2i(w, h)
+					DisplayServer.window_set_size(Vector2i(w, h))
 
 
-# ── data ─────────────────────────────────────────────────────────────────────────────────────────────────────
-
-func _preds_of(d: Dictionary) -> Array:
-	var out: = []
-	for k in ["done", "when", "skip_if", "need"]:
-		var v: = String(d.get(k, ""))
-		if v != "":
-			out.append(v)
-	return out
-
-
-func _pred_known(p: String) -> bool:
-	return p in V10Tutorial.PREDICATES or p.begins_with("screen:")
-
-
-func data_checks() -> void:
-	var ids: = {}
-	for c in V10TutSteps.CHAPTERS:
-		check("chapter %s has steps" % c.id, (c.steps as Array).size() > 0)
-		check("chapter %s has a screen" % c.id, String(c.get("screen", "")) != "")
-		for p in _preds_of(c):
-			check("chapter %s predicate %s known" % [c.id, p], _pred_known(p))
-		var vis: = 0
-		var cids: = {}
-		for s in c.steps:
-			cids[s.id] = true
-		for e in c.get("entry", []) + c.steps:
-			var sid: = String(e.get("id", ""))
-			check("step id present", sid != "")
-			check("step id %s unique" % sid, not ids.has(sid))
-			ids[sid] = true
-			var m: = String(e.get("mode", "tap"))
-			check("%s mode valid" % sid, m in MODES, m)
-			for p in _preds_of(e):
-				check("%s predicate %s known" % [sid, p], _pred_known(p))
-			if m == "wait":
-				check("%s wait has done (exit)" % sid, String(e.get("done", "")) != "")
-				continue
-			vis += 1
-			var txt: = String(e.get("text", ""))
-			var lines: = txt.split("\n")
-			check("%s text 1–3 lines" % sid, txt != "" and lines.size() <= 3, str(lines.size()))
-			for ln in lines:
-				check("%s line short" % sid, ln.length() <= 72, "%d: %s" % [ln.length(), ln])
-			for w in BANNED:
-				check("%s no «%s»" % [sid, w], not (w in txt.to_lower()))
-			check("%s emo valid" % sid, String(e.get("emo", "happy")) in EMOS)
-			check("%s portrait exists" % sid, ResourceLoader.exists("res://assets/v08/emotions/mc_%s.webp" % String(e.get("emo", "happy"))))
-			if m == "do":
-				check("%s forced step has done" % sid, String(e.get("done", "")) != "")
-				var entry: = (c.get("entry", []) as Array).has(e)
-				check("%s forced step has timeout or is a screen bridge" % sid, float(e.get("timeout", 0.0)) > 0.0 or entry)
-				check("%s forced step has a target" % sid, e.get("target", []) is Array and (e.target as Array).size() > 0)
-			var r: = String(e.get("resume", ""))
-			if r != "":
-				check("%s resume %s in chapter" % [sid, r], cids.has(r))
-			for spec in e.get("target", []):
-				_spec_check(sid, spec)
-		check("chapter %s has a visible step" % c.id, vis > 0)
-	# tips
-	var tids: = {}
-	var cats: = {}
-	for c in V10TutTips.CATS:
-		cats[c[0]] = true
-	for tp in V10TutTips.TOPICS:
-		var id: = String(tp.id)
-		check("tip %s unique" % id, not tids.has(id))
-		tids[id] = true
-		check("tip %s title" % id, String(tp.get("title", "")) != "")
-		check("tip %s help" % id, String(tp.get("help", "")).length() > 40)
-		check("tip %s cat" % id, cats.has(String(tp.get("cat", ""))))
-		check("tip %s art" % id, ResourceLoader.exists(V10TutTips.icon_path(tp)), V10TutTips.icon_path(tp))
-		var tip: = String(tp.get("tip", ""))
-		if tip != "":
-			check("tip %s 1–3 lines" % id, tip.split("\n").size() <= 3)
-			for ln in tip.split("\n"):
-				check("tip %s line short" % id, ln.length() <= 72, ln)
-			check("tip %s has a trigger" % id, (tp.get("screens", []) as Array).size() > 0 or (tp.get("events", []) as Array).size() > 0)
-			if String(tp.get("speaker", "mc")) == "mc":
-				for w in BANNED:
-					check("tip %s no «%s»" % [id, w], not (w in tip.to_lower()))
-		var rp: = String(tp.get("replay", ""))
-		if rp != "":
-			check("tip %s replay chapter %s" % [id, rp], not V10TutSteps.chapter(rp).is_empty())
-		for spec in tp.get("target", []):
-			_spec_check("tip " + id, spec)
-	# the shop is never presented by a heroine (spec §1.2: she never talks about purchases)
-	check("shop tip speaker is the neutral guide", String(V10TutTips.topic("shop").get("speaker", "mc")) == "guide")
-	# every feature the owner listed has a topic
-	for need in ["path", "salon", "phone", "gacha", "shop", "profile", "tile_themes", "pagoda", "journey", "palm", "duels",
-			"modes", "rituals", "leagues", "events", "room", "settings", "basics", "tray", "combo", "helpers", "victory", "home", "wardrobe",
-			"today", "flame", "challenge", "constellation"]:
-		check("topic %s exists" % need, tids.has(need))
-
-
-func _spec_check(owner: String, spec) -> void:
-	if spec is Dictionary and spec.has("union"):
-		for s in spec.union:
-			_spec_check(owner, s)
+func _ready() -> void:
+	_apply_resolution_arg()
+	await get_tree().process_frame
+	var args: = OS.get_cmdline_user_args()
+	for a in args:
+		if a.begins_with("--tut_shots="):
+			_shot_dir = a.substr(12)
+			DirAccess.make_dir_recursive_absolute(_shot_dir)
+		elif a.begins_with("--insets="):
+			var p: PackedStringArray = a.substr(9).split(",")
+			if p.size() >= 2:
+				V10Hud2Util.sim_insets = {"top": float(p[0]), "bottom": float(p[1])}
+	if "--tut_compile=1" in args:
+		_suite_code_hygiene()
+		await _clean_quit(1 if fails > 0 else 0)
 		return
-	check("%s target is a dictionary" % owner, spec is Dictionary)
-	if not (spec is Dictionary):
+	if "--tut_logic=1" in args:
+		var lt0: RefCounted = load(DIR + "tut_logic_test.gd").new()
+		var f0: int = await lt0.run_logic(self)
+		await _clean_quit(1 if f0 > 0 else 0)
 		return
-	var kinds: = ["meta", "prop", "path", "text", "tex", "dyn", "rect", "px"].filter(func(k): return spec.has(k))
-	check("%s target has one kind" % owner, kinds.size() == 1, str(spec))
-	if spec.has("dyn"):
-		check("%s dyn %s registered" % [owner, spec.dyn], V10TutTarget.DYN.has(String(spec.dyn)))
-	if spec.has("rect"):
-		var a: Array = spec.rect
-		check("%s rect within the screen" % owner, a.size() == 4 and float(a[0]) >= 0 and float(a[1]) >= 0 and float(a[0]) + float(a[2]) <= 1.001 and float(a[1]) + float(a[3]) <= 1.001)
+	if "--tut_l1=1" in args or "--tut_bot=1" in args:
+		var lt1: RefCounted = load(DIR + "tut_logic_test.gd").new()
+		var f1: int = await lt1.run_l1(self)
+		await _clean_quit(1 if f1 > 0 else 0)
+		return
+	var static_only: = "--tut_static=1" in args
+	await _run_all(static_only)
+	await _clean_quit(1 if fails > 0 else 0)
 
 
-# ── references against the real scripts ─────────────────────────────────────────────────────────────────────
-
-static func _props_of(path: String) -> Dictionary:
-	var out: = {}
-	var s: Script = load(path)
-	while s:
-		for p in s.get_script_property_list():
-			out[String(p.name)] = true
-		s = s.get_base_script()
-	return out
-
-
-func reference_checks() -> void:
-	var main_props: = _props_of(MAIN_SCRIPT)
-	var per: = {}
-	for k in SCREEN_SCRIPTS:
-		per[k] = _props_of(SCREEN_SCRIPTS[k])
-	for c in V10TutSteps.CHAPTERS:
-		for e in c.get("entry", []) + c.steps:
-			var scr: = String(e.get("screen", c.screen))
-			for spec in _flat(e.get("target", [])):
-				if spec.has("prop"):
-					var root: = String(spec.prop).split(".")[0]
-					if spec.get("from", "") == "main":
-						check("%s main.%s exists" % [e.id, root], main_props.has(root))
-					elif per.has(scr):
-						check("%s %s.%s exists" % [e.id, scr, root], per[scr].has(root))
-	# the props the predicates / dyn resolvers read
-	for p in ["board", "board_rect", "victory_next_btn", "skill_ready", "ult", "stage", "lvl", "mode", "tray_box", "btn_hint", "btn_undo", "btn_shuffle"]:
-		check("play.%s exists" % p, per.play.has(p))
-	for p in ["seq", "showcase", "flipping", "pull1_btn", "pull10_btn", "pity_lbl"]:
-		check("summon.%s exists" % p, per.summon.has(p))
-	for p in ["play_btn", "modes_btn", "side_btns"]:
-		check("home.%s exists" % p, per.home.has(p))
-	for p in ["screen", "screen_id", "overlay", "busy", "tab_nodes", "navbar", "prof_root"]:
-		check("main.%s exists" % p, main_props.has(p))
-	check("TrayBoard API", ClassDB.class_exists("Node2D") and TrayBoard.new().has_method("free_tiles"))
+func _run_all(static_only: bool) -> void:
+	_suite_code_hygiene()
+	_suite_lines_and_lint()
+	_suite_state_and_gates()
+	await _suite_coach_and_geometry()
+	await _suite_help_and_sheets()
+	_mod = "logic"
+	var lt: RefCounted = load(DIR + "tut_logic_test.gd").new()
+	var lf: int = await lt.run_logic(self)
+	checks += int(lt.n)
+	fails += lf
+	mods["logic"] = [int(lt.n) - lf, int(lt.n)]
+	if not static_only:
+		_mod = "live"
+		var lt2: RefCounted = load(DIR + "tut_logic_test.gd").new()
+		var lf2: int = await lt2.run_l1(self)
+		checks += int(lt2.n)
+		fails += lf2
+		mods["live"] = [int(lt2.n) - lf2, int(lt2.n)]
+	var parts: = []
+	for k in mods:
+		parts.append("%s %d/%d" % [k, mods[k][0], mods[k][1]])
+	var passed: = checks - fails
+	print("V10TUT %d/%d (%s)" % [passed, checks, ", ".join(parts)])
+	print("TUT_SELFTEST %d/%d %s" % [passed, checks, "OK" if fails == 0 else "FAIL"])
 
 
-func _flat(specs) -> Array:
-	var out: = []
-	if specs is Dictionary:
-		specs = [specs]
-	for s in specs:
-		if s is Dictionary and s.has("union"):
-			out.append_array(_flat(s.union))
-		elif s is Dictionary:
-			out.append(s)
-	return out
+func _suite_code_hygiene() -> void:
+	_mod = "code"
+	var files: = []
+	_collect_gd(DIR, files)
+	ok(files.size() >= 11, "tutorial scripts count >= 11 (%d)" % files.size())
+	var hex_re: = RegEx.create_from_string("Color\\s*\\(\\s*\"#?[0-9a-fA-F]{6,8}\"")
+	var flt_re: = RegEx.create_from_string("Color\\s*\\(\\s*0\\.[0-9]")
+	for p in files:
+		var s = load(p)
+		ok(s is GDScript and (s as GDScript).can_instantiate(), "compile %s" % p.get_file())
+		var txt: = FileAccess.get_file_as_string(p)
+		ok(hex_re.search(txt) == null and flt_re.search(txt) == null, "В-1 no color literals in %s" % p.get_file())
+		var ts_fn: = "Time.get_unix_time" + "_from_system"
+		var td_fn: = "Time.get_date_string" + "_from_system"
+		var aff_fn: = "G.add" + "_aff("
+		var rub_ch: = char(0x20BD)
+		ok(txt.count(ts_fn) == 0 and txt.count(td_fn) == 0, "no raw system clock in %s" % p.get_file())
+		ok(txt.count(aff_fn) == 0, "no G.add_aff in %s" % p.get_file())
+		ok(txt.find(rub_ch) < 0, "С-2/С-9 no ruble sign in %s" % p.get_file())
 
 
-# ── mock screen set: every target resolves when its declared hook is on screen ───────────────────────────────
-
-class MockScreen extends Control:
-	var props: = {}
-	func _get(p: StringName):
-		return props.get(String(p))
-
-
-class MockMain extends Control:
-	var screen: Control
-	var screen_id: = ""
-	var overlay: Control
-	var busy: = false
-	var tab_nodes: = {}
-	var navbar: Control
-	var prof_root: Control
+func _collect_gd(dir_path: String, out: Array) -> void:
+	for f in DirAccess.get_files_at(dir_path):
+		if f.ends_with(".gd"):
+			out.append(dir_path.path_join(f))
+	for d in DirAccess.get_directories_at(dir_path):
+		if not d.begins_with("."):
+			_collect_gd(dir_path.path_join(d), out)
 
 
-func _box(parent: Control, r: Rect2) -> Control:
-	var c: = Control.new()
-	c.position = r.position
-	c.size = r.size
-	parent.add_child(c)
-	return c
-
-
-func mock_checks(tree: SceneTree) -> void:
-	var root: = tree.root
-	var m: = MockMain.new()
-	m.size = Vector2(720, 1280)
-	root.add_child(m)
-	m.overlay = _box(m, Rect2(0, 0, 720, 1280))
-	m.navbar = _box(m, Rect2(0, 1160, 720, 120))
-	m.prof_root = _box(m, Rect2(8, 20, 360, 90))
-	for k in ["home", "collection", "levels", "summon", "shop"]:
-		m.tab_nodes[k] = _box(m.navbar, Rect2(144 * ["home", "collection", "levels", "summon", "shop"].find(k), 0, 144, 120))
-	var ctx_of: = func(s): return {"main": m, "screen": s}
-	var n: = 0
-	# every step: build the hooks its specs declare on a fresh mock of its screen; the FIRST entry must resolve
-	# (that is the hook a lane is expected to provide) and the whole list must resolve
-	var entries: = []
-	for c in V10TutSteps.CHAPTERS:
-		for e in c.get("entry", []) + c.steps:
-			if String(e.get("mode", "tap")) != "wait" and (e.get("target", []) as Array).size() > 0:
-				entries.append(["step " + String(e.id), e.target])
-	for tp in V10TutTips.TOPICS:
-		if (tp.get("target", []) as Array).size() > 0:
-			entries.append(["tip " + String(tp.id), tp.target])
-	for en in entries:
-		var s: = MockScreen.new()
-		s.size = Vector2(720, 1280)
-		m.add_child(s)
-		m.screen = s
-		var first_dyn: = false
-		for spec in _flat(en[1]):
-			_provide(s, m, spec)
-		var first = en[1][0]
-		if first is Dictionary and first.has("dyn"):
-			first_dyn = true
-		await tree.process_frame
-		if _flat(en[1]).all(func(x): return x.has("dyn")):
-			# board tiles / victory parts: only the real run (test/tut_test.gd) has them
-			s.queue_free()
-			continue
-		var r: = V10TutTarget.resolve(en[1], ctx_of.call(s))
-		check("%s resolves on the mock" % en[0], r.ok)
-		if not first_dyn:
-			var r0: = V10TutTarget.resolve([first], ctx_of.call(s))
-			check("%s first hook resolves" % en[0], r0.ok, str(first))
-		check("%s rect on screen" % en[0], Rect2(-40, -40, 800, 1360).encloses(r.rect), str(r.rect))
-		s.queue_free()
-		n += 1
-	# fallbacks: with NO hooks at all, a target list that ends in rect / px still resolves (never an empty hole)
-	var bare: = MockScreen.new()
-	bare.size = Vector2(720, 1280)
-	m.add_child(bare)
-	m.screen = bare
-	for en in entries:
-		var last = (en[1] as Array).back()
-		if last is Dictionary and (last.has("rect") or last.has("px")):
-			check("%s fallback resolves bare" % en[0], V10TutTarget.resolve(en[1], ctx_of.call(bare)).ok)
-	# re-resolve on resize: a px from the bottom follows the new height
-	var r1: = V10TutTarget.resolve({"px": [0, -120, 720, 120], "pad": 0}, {"vp": Vector2(720, 1280)})
-	var r2: = V10TutTarget.resolve({"px": [0, -120, 720, 120], "pad": 0}, {"vp": Vector2(720, 1600)})
-	check("px from bottom follows the aspect", r1.rect.position.y == 1160.0 and r2.rect.position.y == 1480.0, "%s %s" % [r1.rect, r2.rect])
-	# a hidden node is never a target
-	var hid: = _box(bare, Rect2(10, 10, 50, 50))
-	hid.set_meta("tut_id", "x.hidden")
-	hid.visible = false
-	await tree.process_frame
-	check("hidden node not targeted", not V10TutTarget.resolve({"meta": "x.hidden"}, ctx_of.call(bare)).ok)
-	m.queue_free()
-	await tree.process_frame
-
-
-func _provide(s: MockScreen, m: MockMain, spec: Dictionary) -> void:
-	if spec.has("meta"):
-		var c: = _box(s, Rect2(100, 300, 200, 90))
-		c.set_meta("tut_id", String(spec.meta))
-	elif spec.has("prop") and spec.get("from", "") != "main":
-		var parts: = String(spec.prop).split(".")
-		if parts.size() == 1:
-			if parts[0] == "board_rect":
-				s.props[parts[0]] = Rect2(10, 318, 700, 700)
+func _suite_lines_and_lint() -> void:
+	_mod = "lint"
+	var hlines: = V10TutLines.all_heroine_lines()
+	var uistrs: = V10TutLines.all_ui_strings()
+	ok(hlines.size() >= 38, "heroine lines >= 38 (%d)" % hlines.size())
+	ok(V10Lint.scan(hlines).is_empty(), "С-9 heroine lines pass V10Lint.check: %s" % str(V10Lint.scan(hlines)))
+	ok(V10Lint.ui_scan(hlines).is_empty(), "С-1 heroine lines pass V10Lint.ui_check: %s" % str(V10Lint.ui_scan(hlines)))
+	ok(V10Lint.ui_scan(uistrs).is_empty(), "С-1 UI strings pass V10Lint.ui_check: %s" % str(V10Lint.ui_scan(uistrs)))
+	for s in hlines + uistrs:
+		var low: = String(s).to_lower()
+		for bw in BANNED_09:
+			if bw == "режимы":
+				ok(String(s).strip_edges() != "Режимы", "no 0.9 tab Режимы in «%s»" % s)
 			else:
-				s.props[parts[0]] = _box(s, Rect2(200, 600, 160, 110))
-		else:
-			var d: Dictionary = s.props.get(parts[0], {})
-			d[parts[1]] = _box(s, Rect2(16, 140 + 124 * d.size(), 84, 84))
-			s.props[parts[0]] = d
-	elif spec.has("text"):
-		var l: = UI.label(String(spec.text), 22)
-		l.position = Vector2(80, 900)
-		l.size = Vector2(300, 40)
-		s.add_child(l)
-	elif spec.has("tex"):
-		var tr: = TextureRect.new()
-		tr.texture = V8Art.star(false)
-		tr.position = Vector2(200, 400)
-		tr.size = Vector2(100, 100)
-		s.add_child(tr)
+				ok(low.find(bw) < 0, "no 0.9 word «%s» in «%s»" % [bw, s])
+	for k in V10TutLines.INTROS:
+		var ln: = V10TutLines.intro_line(String(k))
+		ok(V10Type.lines_needed(ln, "hand", 30, 488.0) <= 2, "intro %s <= 2 Caveat lines at 488 px" % k)
+	for k in V10TutLines.MATCH:
+		var mln: = V10TutLines.match_line(String(k), {"n": 7})
+		ok(V10Type.lines_needed(mln, "hand", 30, 456.0) <= 2, "match %s <= 2 Caveat lines at 456 px" % k)
+	for bk in ["understood", "more", "show_in_game", "replay_first", "skip", "skip_sure", "glossary", "how_to"]:
+		var bt: = V10TutLines.ui(bk)
+		ok(bt.length() <= 18, "button «%s» <= 18 chars (%d)" % [bt, bt.length()])
+	var all_joined: = " ".join(hlines + uistrs)
+	for req in ["Чайная", "Героини", "Столы", "Желания", "Лавка", "Приём", "Азарт", "Ставка ×2", "Дар", "Играть"]:
+		ok(all_joined.find(req) >= 0, "canonical 0.10 term «%s» present" % req)
+	V10Type.overflow.clear()
+	for tk in V10TutLines.HELP:
+		var rows: Array = V10TutLines.HELP[tk].rows
+		ok(rows.size() >= 1 and rows.size() <= 3, "HELP[%s] has 1..3 rows (%d)" % [tk, rows.size()])
+		for r in rows:
+			var lbl: = Label.new()
+			V10Type.fit(lbl, String(r[1]), "text_l", 544.0, 2, V10DS.PAPER_100)
+			lbl.free()
+	ok(V10Type.overflow.is_empty(), "HELP rows fit <= 2 lines without ellipsis (%s)" % str(V10Type.overflow))
 
 
-# ── state ────────────────────────────────────────────────────────────────────────────────────────────────────
-
-func state_checks() -> void:
-	var s: = {"gems": 100, "tut_done": false}
-	V10TutState.override_s = s
-	var d: = V10TutState.ensure(s)
-	check("ensure adds the block", s.has(V10TutState.KEY) and d.has("chapters") and d.has("tips"))
-	d.chapters["home1"] = true
-	d.tips["salon"] = "x"
-	var before: = str(s)
-	V10TutState.ensure(s)
-	V10TutState.ensure(s)
-	check("ensure idempotent", str(s) == before)
-	s[V10TutState.KEY].tips = "broken"
-	V10TutState.ensure(s)
-	check("ensure repairs a wrong type", s[V10TutState.KEY].tips is Dictionary)
-	V10TutState.mark_tip("salon")
-	var old: = {"tut_done": true}
-	V10TutState.ensure(old)
-	check("0.9 player (tut_done) skips the first match", bool(old[V10TutState.KEY].chapters.get("match1", false)))
-	V10TutState.set_step("m_twin")
-	check("step saved", V10TutState.step() == "m_twin")
-	V10TutState.finish_chapter("match1")
-	check("finish chapter clears step and sets tut_done", V10TutState.step() == "" and bool(s.tut_done) and V10TutState.chapter_done("match1"))
-	V10TutState.skip_all()
-	check("skip all", V10TutState.skipped())
-	V10TutState.replay()
-	check("replay brings chapters back", not V10TutState.skipped() and not V10TutState.chapter_done("home1"))
-	check("tips survive replay", V10TutState.tip_seen("salon"))
-	V10TutState.reset_tips()
-	check("reset tips", not V10TutState.tip_seen("salon"))
-	var g0: = int(s.gems)
-	var a: = V10Tutorial.grant("first_wish")
-	var b: = V10Tutorial.grant("first_wish")
-	check("first wish granted once", a and not b and int(s.gems) == g0 + int(G.PULL_COST), "%d→%d" % [g0, int(s.gems)])
-	var s2: = {"tickets": 0}
-	V10TutState.override_s = s2
-	V10Tutorial.grant("first_wish")
-	check("first wish is a ticket in the 0.10 wallet", int(s2.tickets) == 1 and not s2.has("gems"))
-	V10TutState.set_large(true)
-	check("large text scales", V10TutState.text_scale() > 1.1)
-	s2["text_large"] = false
-	V10TutState.set_large(false)
-	check("text_large off → 1.0", is_equal_approx(V10TutState.text_scale(), 1.0))
-	check("{slots} plural", V10Tutorial.fill("всего {slots} места") == "всего 4 места")
-	check("{tabs} without a navbar", V10Tutorial.fill("Внизу: {tabs}.") == "Внизу: Чайная, Героини, Столы, Желания и Лавка.")
-	check("{tab:id} without a navbar", V10Tutorial.fill("«{tab:collection}»") == "«Героини»")
-	# UX_RULES §4.2/§4.3: no banned / renamed words in any visible tutorial line
-	for e in V10TutSteps.all_steps():
-		_ux_words("step " + String(e.step.id), String(e.step.get("text", "")))
-	for c in V10TutSteps.CHAPTERS:
-		_ux_words("chapter " + String(c.id), String(c.get("title", "")))
-	for tp in V10TutTips.TOPICS:
-		_ux_words("tip " + String(tp.id), String(tp.get("tip", "")) + " " + String(tp.get("help", "")) + " " + String(tp.get("title", "")))
-	for c in V10TutTips.CATS:
-		_ux_words("cat " + String(c[0]), String(c[1]))
-	V10TutState.override_s = null
-
-
-# UX_RULES §4.2 «было» and §4.3 jargon (lower-case word stems; a tutorial line must use the 0.10 names)
-const UX_BANNED: = ["ульт", "гардероб", "сесть за стол", "следующая партия", "поручени", "визит", "ивент", "богин",
-	"квартал", "фивер", "лихорадк", "перк", "гарант", "крутк", "гача", "донат", "успей", "последний шанс", "ранг наряд"]
+func _suite_state_and_gates() -> void:
+	_mod = "gates"
+	# 1. v1 migration -> v2
+	var sv1: = {"unlocked": 1, "v10_tut": {"v": 1, "chapters": {"match1": true}, "tips_off": true, "large": true, "step": "old"}}
+	var d1: = V10TutState.ensure(sv1)
+	ok(int(d1.v) == 2 and bool(d1.first_match) and not bool(d1.hints) and bool(d1.large) and not d1.has("chapters"), "v1 -> v2 migration")
+	# 2. 0.9 tut_done migration + JSON round-trip idempotency
+	var s09: = {"unlocked": 5, "tut_done": true}
+	V10TutState.ensure(s09)
+	var snap_tut: = JSON.stringify(s09.v10_tut)
+	var back: Dictionary = JSON.parse_string(JSON.stringify(s09))
+	V10TutState.ensure(back)
+	ok(JSON.stringify(back.v10_tut) == snap_tut and bool(back.v10_tut.legacy) and bool(back.v10_tut.first_match), "0.9 migration + JSON idempotency")
+	ok(not bool(back.v10_tut.seen.get("v10_welcome", false)) and bool(back.v10_tut.seen.get("lantern_salon", false)), "0.9 welcome kept, open gates marked seen")
+	# 3. UX §3.5 staged gates + day rollover + rank gates
+	V10Meta.bind({})
+	var base_u: = 1795687200
+	V10Meta.set_now(base_u)
+	V10TutState.test_store = {"unlocked": 1, "rp": 0}
+	V10TutState.st()
+	ok(V10Reveal.is_open("tab.teahouse") and not V10Reveal.is_open("tab.tables"), "L0: only teahouse open")
+	var expected_lvls: = [
+		[2, "tab.tables"], [3, "lantern.salon"], [4, "tab.wishes"], [4, "match.help"],
+		[6, "phone"], [7, "lantern.today"], [9, "tab.shop"], [11, "path.boosters"], [11, "path.ogonyok"],
+		[15, "mode.triples"], [17, "tables.tourney"], [35, "mode.riichi"], [46, "mode.koikoi"],
+	]
+	for pair in expected_lvls:
+		V10TutState.test_store["unlocked"] = int(pair[0]) - 1
+		ok(not V10Reveal.is_open(String(pair[1])), "%s closed before unlocked=%d" % [pair[1], pair[0]])
+		V10TutState.test_store["unlocked"] = int(pair[0])
+		ok(V10Reveal.is_open(String(pair[1])), "%s open at unlocked=%d" % [pair[1], pair[0]])
+	# Heroines right after first SSR pick on L3
+	V10TutState.test_store = {"unlocked": 4, "first_pick": ""}
+	V10TutState.st()
+	ok(not V10Reveal.is_open("tab.heroines"), "heroines waits at L3 before first_pick")
+	V10TutState.test_store["first_pick"] = "rin"
+	ok(V10Reveal.is_open("tab.heroines"), "heroines opens at L3 right after first_pick")
+	# Shop opens quietly at L8: zero shop intro
+	V10TutState.test_store = {"unlocked": 9}
+	V10TutState.st()
+	ok(V10Reveal.is_open("tab.shop") and not V10Reveal.due_intros("shop").has("shop_first"), "shop opens quietly at L8")
+	# Day 2 & Day 3 via V10Meta clock
+	V10Meta.set_now(base_u + 86400)
+	ok(V10TutState.day_number() == 2 and V10Reveal.is_open("lantern.streak") and not V10Reveal.is_open("phone.feed"), "Day 2 opens streak")
+	V10Meta.set_now(base_u + 2 * 86400)
+	ok(V10TutState.day_number() == 3 and V10Reveal.is_open("phone.feed"), "Day 3 opens feed")
+	# Rank gates (Нефрит I = 3, Нефрит III = 5, Золото I = 9) + force_open
+	V10TutState.test_store["rank_index"] = 3
+	ok(V10Reveal.is_open("mode.journey") and V10Reveal.is_open("mode.garden") and not V10Reveal.is_open("mode.duels"), "Нефрит I opens journey & garden")
+	V10TutState.test_store["rank_index"] = 5
+	ok(V10Reveal.is_open("mode.duels") and not V10Reveal.is_open("mode.pagoda"), "Нефрит III opens duels")
+	V10Reveal.force_open("mode.pagoda")
+	ok(V10Reveal.is_open("mode.pagoda"), "force_open opens pagoda")
+	ok(V10Reveal.screen_matches("tables", "tables") and V10Reveal.screen_matches("tables", "levels") and V10Reveal.screen_matches("tables", "v10path"), "tables screen group")
+	V10Meta.clear_now()
+	V10Meta.unbind()
+	V10TutState.test_store = null
 
 
-func _ux_words(owner: String, txt: String) -> void:
-	var low: = txt.to_lower()
-	for w in UX_BANNED:
-		check("%s UX_RULES no «%s»" % [owner, w], not (w in low), txt.substr(0, 60))
+func _suite_coach_and_geometry() -> void:
+	_mod = "geom"
+	V10TutState.test_store = {"unlocked": 7, "partner": "mc"}
+	V10TutState.st()
+	var holder: = Control.new()
+	holder.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	add_child(holder)
+	var coach: = V10Coach.new()
+	V10Coach.layer(self).add_child(coach)
+	await get_tree().process_frame
+
+	# Verify EVERY required tut_id resolves via meta "tut_id" on HUD v2 demo hosts
+	var h_home: = V10TutDemo.make_home(holder)
+	await get_tree().process_frame
+	for tid in ["nav.teahouse", "nav.heroines", "nav.tables", "nav.wishes", "nav.shop", "home.hero", "home.play",
+			"home.phone", "home.partner", "lantern.today", "lantern.salon", "lantern.streak"]:
+		ok(V10TutTarget.find(h_home, tid).ok, "tut_id %s resolves on V10HudHome" % tid)
+	# Tea House coach checks (lantern.salon do + home.play tap) across normal & notched insets
+	for ins in [{"top": 0.0, "bottom": 0.0}, {"top": 48.0, "bottom": 24.0}]:
+		V10Hud2Util.sim_insets = ins
+		h_home.layout_now()
+		var face_h: Rect2 = (h_home.L.hero_face as Rect2).grow(48.0)
+		for pair in [["lantern_salon", "lantern.salon", "do"], ["home_first", "home.play", "tap"], ["wishes_first", "nav.wishes", "do"]]:
+			coach.show_step({"line": V10TutLines.intro_line(pair[0]), "speaker": "mc", "target": pair[1],
+				"mode": pair[2], "dim": 0.72, "avoid": [face_h], "root": h_home, "timeout": 0, "instant": true})
+			await get_tree().process_frame
+			var ds: = coach.debug_state()
+			ok(bool(ds.revealed) and (ds.hole as Rect2).has_area(), "home %s revealed" % pair[0])
+			ok(int(ds.lines) <= 2, "home %s <= 2 lines (%d)" % [pair[0], int(ds.lines)])
+			ok(not (ds.text_rect as Rect2).intersects(face_h), "Г-1 home %s clears face_rect+48" % pair[0])
+			ok(int(ds.animated) <= 1, "В-7 home %s <= 1 animation" % pair[0])
+		if _shot_dir != "" and float(ins.top) == 0.0:
+			await get_tree().create_timer(0.55).timeout
+			await _save_shot("01_home_coach")
+	coach.complete("tap")
+	h_home.queue_free()
+	V10TutTarget.clear_cache()
+	await get_tree().process_frame
+
+	# Tables demo host
+	V10Hud2Util.sim_insets = {}
+	var h_tab: = V10TutDemo.make_tables(holder)
+	await get_tree().process_frame
+	for tid2 in ["tables.play", "tables.tourney", "tables.mode.triples", "tables.mode.riichi", "tables.mode.koikoi",
+			"tables.mode.duels", "tables.mode.journey", "tables.mode.pagoda"]:
+		ok(V10TutTarget.find(h_tab, tid2).ok, "tut_id %s resolves on Tables" % tid2)
+	coach.show_step({"line": V10TutLines.intro_line("tables_first"), "speaker": "mc", "portrait": true,
+		"target": "tables.play", "mode": "tap", "dim": 0.72, "root": h_tab, "timeout": 0})
+	await get_tree().process_frame
+	ok(int(coach.debug_state().lines) <= 2, "tables_first <= 2 lines with portrait")
+	coach.complete("tap")
+	h_tab.queue_free()
+	V10TutTarget.clear_cache()
+	await get_tree().process_frame
+
+	# Match HUD v2 host (L1 without help discs + L4+ with help discs) + two-tap skip + fx_level=min
+	for show_h in [false, true]:
+		var h_m: = V10TutDemo.make_match(holder, {"show_help": show_h, "stake_offer": true})
+		h_m.combo_l.visible = true
+		await get_tree().process_frame
+		for tid3 in ["match.tray", "match.hero", "match.board", "match.hint", "match.pause", "match.status",
+				"match.stake", "match.combo", "match.tile_a", "match.tile_b"]:
+			if tid3 == "match.hint" and not show_h:
+				continue
+			ok(V10TutTarget.find(h_m, tid3).ok, "tut_id %s resolves on V10HudMatch (help=%s)" % [tid3, show_h])
+		var face_m: = h_m.hero_face_global().grow(48.0)
+		var board_r: = h_m.board_rect()
+		var tr_r: Rect2 = h_m.L.get("tray", Rect2(16, 792, 688, 104))
+		var vs_m: = get_viewport().get_visible_rect().size
+		var x0: = tr_r.position.x + (148.0 if show_h and not bool(h_m.L.get("wide", false)) else 8.0)
+		var anc: = Rect2(x0, tr_r.end.y + 8.0, maxf(240.0, tr_r.end.x - 8.0 - x0), maxf(112.0, vs_m.y - tr_r.end.y - 24.0))
+		var avoid_m: = [face_m, board_r]
+		if show_h:
+			for dk in h_m.discs:
+				avoid_m.append(Rect2((h_m.discs[dk] as Control).get_global_rect().position, Vector2(128, 80)))
+		for mk in ["m_a", "m_tray", "m_ult", "match_help", "match_stake"]:
+			if mk == "match_help" and not show_h:
+				continue
+			var m_e: Dictionary = V10TutLines.MATCH[mk]
+			var tg_m: = "match.hint" if mk == "match_help" else String(m_e.target)
+			coach.show_step({"line": V10TutLines.match_line(mk, {"n": 7}), "speaker": "mc", "target": tg_m,
+				"mode": String(m_e.mode), "dim": 0.45 if mk == "m_a" else 0.0, "place": "hero", "ctx": "match",
+				"anchor": anc, "avoid": avoid_m, "skippable": mk == "m_a", "root": h_m, "timeout": 0, "instant": true})
+			await get_tree().process_frame
+			var dsm: = coach.debug_state()
+			ok(int(dsm.lines) <= 2, "match %s <= 2 lines (help=%s, got %d)" % [mk, show_h, int(dsm.lines)])
+			ok(not (dsm.text_rect as Rect2).intersects(face_m), "Г-1 match %s clears face_rect+48" % mk)
+			ok(not (dsm.text_rect as Rect2).intersects(board_r), "match %s clears sacred board_rect (help=%s tr=%s br=%s anc=%s)" % [mk, show_h, dsm.text_rect, board_r, anc])
+			if mk == "m_a":
+				var skr: Rect2 = dsm.skip_rect
+				ok(bool(dsm.skippable) and skr.size.x >= 80.0 and skr.size.y >= 80.0, "В-6 skip hit >= 80 (%s)" % str(skr.size))
+				if _shot_dir != "" and not show_h:
+					await get_tree().create_timer(0.55).timeout
+					await _save_shot("02_match_l1")
+		V10Hud2Util.fx_override = "min"
+		coach.show_step({"line": V10TutLines.match_line("m_a"), "speaker": "mc", "target": "match.tile_a",
+			"mode": "do", "dim": 0.45, "place": "hero", "anchor": anc, "avoid": avoid_m, "root": h_m, "timeout": 0, "instant": true})
+		await get_tree().process_frame
+		ok(int(coach.debug_state().animated) == 0, "В-7 fx_level=min -> 0 animated rings")
+		V10Hud2Util.fx_override = ""
+		coach.complete("tap")
+		h_m.queue_free()
+		V10TutTarget.clear_cache()
+		await get_tree().process_frame
+
+	# Victory HUD v2 host (wait for «Вдох» 0.3s + 0.16s stagger so modulate.a > 0.05)
+	var h_vic: = V10TutDemo.make_victory(holder)
+	await get_tree().create_timer(0.55).timeout
+	for tid4 in ["win.stars", "win.rewards", "win.next", "win.home"]:
+		ok(V10TutTarget.find(h_vic, tid4).ok, "tut_id %s resolves on V10HudVictory" % tid4)
+	coach.show_step({"line": V10TutLines.match_line("v_home"), "speaker": "mc", "target": "win.home",
+		"mode": "do", "dim": 0.72, "ctx": "work", "root": h_vic, "timeout": 0, "instant": true})
+	await get_tree().process_frame
+	ok(int(coach.debug_state().lines) <= 2, "victory v_home <= 2 lines")
+	if _shot_dir != "":
+		await get_tree().create_timer(0.55).timeout
+		await _save_shot("03_victory_coach")
+	coach.complete("tap")
+	h_vic.queue_free()
+	coach.queue_free()
+	holder.queue_free()
+	V10TutTarget.clear_cache()
+	V10TutState.test_store = null
+	await get_tree().process_frame
+
+
+func _suite_help_and_sheets() -> void:
+	_mod = "help"
+	V10TutState.test_store = {"unlocked": 4, "partner": "mc"}
+	V10TutState.st()
+	V10TutState.mark("home_first")
+	var stage: = Control.new()
+	stage.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	add_child(stage)
+	var hb: = V10Help.help_button(stage, Rect2(632, 4, 80, 80), stage, "teahouse")
+	ok(hb.size == Vector2(80, 80) and String(hb.get_meta("ux_role", "")) == "tertiary", "help_button 80x80 tertiary")
+
+	# Check every contextual «?» topic sheet (UX §4.1.9: ≤3 rows, «Понятно» primary, «Подробнее» secondary, hit >= 80)
+	for tp in V10TutLines.HELP:
+		var sh: = V10Help.open(stage, String(tp))
+		await get_tree().process_frame
+		ok(sh != null and V10TutHelp.current() == sh, "open help topic %s" % tp)
+		if sh != null:
+			var page: Control = sh.get("page")
+			var rl: = V10MetaUI.roles(page)
+			ok(int(rl.primary) == 1 and int(rl.secondary) <= 2 and int(rl.tertiary) <= 2,
+				"П-1 help %s roles %s" % [tp, str(rl)])
+			ok(V10MetaUI.small_hits(page).is_empty(), "В-6 help %s hits >= 80: %s" % [tp, str(V10MetaUI.small_hits(page))])
+			ok(V10TutTarget.find(page, "help.more").ok, "UX §4.1.9 help %s has «Подробнее»" % tp)
+	if _shot_dir != "":
+		V10Help.open(stage, "teahouse")
+		await get_tree().create_timer(0.3).timeout
+		await _save_shot("04_help_teahouse")
+
+	# Tapping «Подробнее» swaps the SAME sheet to «Как играть» (П-6: never two sheets)
+	var sh0: = V10Help.open(stage, "tables")
+	await get_tree().process_frame
+	var more_b: = V10TutTarget.find(sh0, "help.more").node as V10Button
+	ok(more_b != null, "tables sheet has help.more button")
+	if more_b != null:
+		more_b.pressed.emit()
+		await get_tree().process_frame
+		ok(V10TutHelp.current() == sh0 and String(sh0.get("page_kind")) == "list", "Подробнее swaps same sheet to list")
+		var list_ctrl: Control = sh0.get("_list")
+		var teasers: = 0
+		if list_ctrl != null:
+			for ch in list_ctrl.get_children():
+				if ch.has_meta("tut_id") and String(ch.get_meta("tut_id")) == "help.teaser":
+					teasers += 1
+		ok(teasers == 1, "В-8 how_to shows exactly 1 closed teaser (%d)" % teasers)
+		if _shot_dir != "":
+			await get_tree().create_timer(0.3).timeout
+			await _save_shot("05_how_to")
+	V10Help.locked_toast(stage, Rect2(576, 1144, 144, 136), V10Reveal.locked_text("tab.shop"))
+	await get_tree().process_frame
+	var sl: = V10TutHelp.layer(stage)
+	ok(sl != null and sl.get_node_or_null("V10TutToast") != null, "locked_toast spawns S plate")
+	V10Help.close_all(stage)
+	stage.queue_free()
+	V10TutTarget.clear_cache()
+	V10TutState.test_store = null
+	await get_tree().create_timer(0.25).timeout
+
+
+func _save_shot(name_s: String) -> void:
+	await RenderingServer.frame_post_draw
+	var img: = get_viewport().get_texture().get_image()
+	var vs: = get_viewport().get_visible_rect().size
+	img.save_png("%s/%s_%dx%d.png" % [_shot_dir, name_s, int(vs.x), int(vs.y)])
+
+
+# Drop static Callable / FontVariation caches before SceneTree quits so Godot 4.5.1 exits cleanly with code 0.
+func _clean_quit(code: int) -> void:
+	V10Help.close_all(self)
+	if V10Tutorial.inst != null and is_instance_valid(V10Tutorial.inst):
+		V10Tutorial.inst.queue_free()
+		V10Tutorial.inst = null
+	for lname in ["V10TutLayer", "V10TutSheetLayer"]:
+		var l: = get_tree().root.get_node_or_null(lname)
+		if l != null:
+			l.queue_free()
+	await get_tree().process_frame
+	await get_tree().process_frame
+	V10TutTarget.clear_all()
+	V10Type._fonts.clear()
+	V10Type._ls.clear()
+	V10Fonts._cache.clear()
+	V10Fonts._files.clear()
+	V10Lint._re_cache.clear()
+	V10Hud2Util._classes.clear()
+	V10Registry._mods.clear()
+	V10Save._migrators.clear()
+	V10GClock.now_fn = Callable()
+	V10Bond.sink = Callable()
+	V10EntryQueue.new_launch()
+	get_tree().quit(code)
