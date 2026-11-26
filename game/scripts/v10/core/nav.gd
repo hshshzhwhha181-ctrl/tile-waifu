@@ -15,9 +15,11 @@ extends RefCounted
 #                                      Событие (+ «Забрать всё»), one sheet, never over another sheet (П-6)
 #   V10Nav.install()                   V10Afisha providers (week = турнир недели, extra rows = tasks, event)
 
+const SALON_AT: = 3  # after L2 (UX §3.5)
 const SUMMON_AT: = 4  # G.S.unlocked: open after the 3rd Path win (G.summon_open)
-const SHOP_AT: = 9  # after L8, the boss of chapter 1 (UX §3.5, С-2)
+const PHONE_AT: = 6  # Телефон after L5 (UX §3.5)
 const TODAY_AT: = 7  # after L6
+const SHOP_AT: = 9  # after L8, the boss of chapter 1 (UX §3.5, С-2)
 const WEEK_AT: = 17  # Турнир недели after L16 (UX §3.5)
 const T_LOCK: = "Откроется после партии %d"
 
@@ -63,21 +65,42 @@ static func dot() -> Control:
 	return d
 
 
+static func salon_open() -> bool:
+	return int(G.S.get("unlocked", 1)) >= SALON_AT
+
+
+static func salon_lit() -> bool:
+	return salon_open() and V10Salon.can_restore_any()
+
+
+static func streak_shown() -> bool:
+	var meta = G.S.get("v10_meta", {})
+	var days: = int(meta.get("days_seen", 0)) if meta is Dictionary else 0
+	return days >= 2 or int(V10Streak.st().get("n", 0)) > 0
+
+
+static func streak_lit() -> bool:
+	if not streak_shown():
+		return false
+	var v: = V10Streak.view()
+	return str(v.get("state", "")) in ["cold", "today"] or not (v.get("repair", {}) as Dictionary).is_empty()
+
+
+static func phone_open() -> bool:
+	return int(G.S.get("unlocked", 1)) >= PHONE_AT
+
+
 static func path_info() -> Dictionary:
-	var n: int = G.LEVELS.size()
-	var lvl: = clampi(int(G.S.get("unlocked", 1)), 1, n) - 1
-	var L: Dictionary = G.LEVELS[lvl]
-	var loc: = ""
-	var li = L.get("loc", 0)
-	if int(li) >= 0 and int(li) < G.LOCS.size():
-		loc = str(G.LOCS[int(li)].name)
-	return {"lvl": lvl, "code": str(L.get("code", str(lvl + 1))), "loc": loc, "total": n}
+	var cur: = V10PathState.current()
+	var nd: = V10PathState.node(cur)
+	var loc: = G.loc_name(int(nd.world))
+	return {"lvl": cur, "code": str(nd.code), "loc": loc, "total": V10PathState.released_total()}
 
 
 static func play_path(main) -> void:
-	var pi: = path_info()
+	var cur: = V10PathState.current()
 	var hero: String = G.S.level_partner if G.hero_unlocked(G.S.level_partner) else "mc"
-	main.go("play", {"level": int(pi.lvl), "partner": hero})
+	main.go("play", {"level": cur, "partner": hero, "v10_cfg": V10PathState.play_cfg(cur)})
 
 
 # ── «Сегодня» (Afisha) ─────────────────────────────────────────────────────────────────────────────────────────
@@ -247,6 +270,39 @@ static func settings_notify(main, p: Control) -> void:
 		var np: = V10NotifyPanel.make(656.0)
 		sh.add_body(np, 0.0)
 		sh.finish(np.preferred_height()))
+	p.add_child(b)
+
+
+# Настройки → «Мой день рождения» (rituals Р7, 152-ФЗ): set with explicit consent or delete in one tap
+static func settings_bday(main, p: Control) -> void:
+	var extra: = 84.0
+	var y0: = 900.0 + V10Clarity.SETTINGS_EXTRA + 84.0
+	for c in p.get_children():
+		if c is Control and (c as Control).position.y >= y0 - 2.0 and c.name != "PanelArt":
+			(c as Control).position.y += extra
+	p.size.y += extra
+	var root = p.get_meta("root") if p.has_meta("root") else null
+	if root is Control and p.position.y + p.size.y > (root as Control).size.y - 10.0:
+		p.position.y = maxf(20.0, (root as Control).size.y - 10.0 - p.size.y)
+	var l: = UI.label("Мой день рождения", 26, UI.INK, Color.WHITE, 3, "body", 900)
+	l.position = Vector2(34, y0 + 2)
+	p.add_child(l)
+	var d: = UI.label(V10PlayerBday.settings_text(), 17, Color("8a5a7a"))
+	d.position = Vector2(34, y0 + 42)
+	p.add_child(d)
+	var has_bday: = V10PlayerBday.has_date()
+	var b: = JButton.make("Удалить" if has_bday else "Указать", "glass" if has_bday else "lav", Rect2(470, y0 + 8, 158, 64), null, 22)
+	b.name = "PlayerBday"
+	b.pressed.connect(func() -> void:
+		if V10PlayerBday.has_date():
+			V10PlayerBday.delete()
+			G.save()
+			d.text = V10PlayerBday.settings_text()
+			b.lbl.text = "Указать"
+			b.set_pal("lav")
+			return
+		Common.close_popup(p)
+		V10PlayerBdayScreen.open(main.overlay, "consent"))
 	p.add_child(b)
 
 

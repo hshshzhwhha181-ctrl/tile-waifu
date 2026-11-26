@@ -38,6 +38,7 @@ func _ready() -> void:
 		tag += "_min"
 	if "--meta_selftest=1" in args:
 		var f: = V10MetaSelftest.run("--meta_grep_strict=1" in args)
+		await _teardown()
 		get_tree().quit(1 if f > 0 else 0)
 		return
 	if shots == "":

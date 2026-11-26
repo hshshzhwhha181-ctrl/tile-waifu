@@ -29,7 +29,9 @@ var own_figure: = false  # the screen already shows her (rig / video): do not ad
 var own_backdrop: = false
 var own_nav: = false
 var shown: = [true, true, true]
+var phone_shown: = true
 var phone_dot: = true
+var phone_count: = 0
 var L: = {}
 
 var backdrop: TextureRect
@@ -93,7 +95,9 @@ func configure(cfg: Dictionary) -> void:
 	own_backdrop = bool(cfg.get("own_backdrop", false))
 	own_nav = bool(cfg.get("own_nav", false))
 	shown = cfg.get("shown", shown)
-	phone_dot = bool(cfg.get("phone_dot", true))
+	phone_shown = bool(cfg.get("phone_shown", phone_shown))
+	phone_dot = bool(cfg.get("phone_dot", phone_dot))
+	phone_count = int(cfg.get("phone_count", phone_count))
 
 
 func _ready() -> void:
@@ -192,6 +196,7 @@ func layout_now() -> void:
 	deco.size = vs
 	nick_l.position = (L.nick as Rect2).position
 	nick_l.size = (L.nick as Rect2).size
+	phone_b.visible = phone_shown
 	phone_b.position = (L.phone as Rect2).position
 	var sp: Rect2 = L.spine
 	spine_l.size = Vector2(sp.size.y, sp.size.x)
@@ -248,8 +253,20 @@ class _Deco:
 		draw_arc(c, 28, 0, TAU, 64, V10DS.GOLD_700, 1.0, true)
 		V10Icons.draw(self, "avatar_ring", c, 40, V10DS.PAPER_500)
 		# «new» dot on the phone (12 px rose.300, no rim)
+		# «new» badge on the phone (UX §3.6: Телефон is the ONLY number badge on Tea House; 9+ cap)
 		var pr: Rect2 = L.phone
-		if h.phone_dot:
+		if h.phone_shown and h.phone_count > 0:
+			var bt: = "9+" if h.phone_count > 9 else str(h.phone_count)
+			var bc: = pr.get_center() + Vector2(16, -16)
+			var bw: = 32.0 if bt.length() > 1 else 26.0
+			var box: = StyleBoxFlat.new()
+			box.bg_color = V10DS.ROSE_500
+			box.set_corner_radius_all(13)
+			draw_style_box(box, Rect2(bc - Vector2(bw * 0.5, 13), Vector2(bw, 26)))
+			var bf: = V10Type.font("ui")
+			var ts: = bf.get_string_size(bt, HORIZONTAL_ALIGNMENT_CENTER, -1, 16)
+			draw_string(bf, Vector2(bc.x - ts.x * 0.5, bc.y + ts.y * 0.28), bt, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, V10DS.NIGHT_900)
+		elif h.phone_shown and h.phone_dot:
 			draw_circle(pr.get_center() + Vector2(14, -18), 6, V10DS.ROSE_300, true, -1.0, true)
 		# threads of the three lanterns (the lanterns themselves are painted TextureRects)
 		for i in 3:

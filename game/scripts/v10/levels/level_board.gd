@@ -8,9 +8,11 @@ extends V6SpecialBoard
 
 var v10: = {}
 var v10_used: = false
+var takes: = PackedInt32Array()
 
 
 func _assign(cfg: Dictionary) -> void :
+	takes = PackedInt32Array()
 	v10 = cfg.get("v10", {})
 	v10_used = false
 	if v10.is_empty() or int(v10.get("n", -1)) != tiles.size() or not _same_layout(v10.get("pos", PackedInt32Array())):
@@ -78,7 +80,11 @@ func apply_specials(p: Dictionary) -> void :
 # last free takeable one and every other free tile is locked/chained, the player had no move and no fail. Open them
 # here too (the sim mirrors this rule). A full tray is the fail path and is left alone.
 func tap(t: Tile) -> void :
+	var will_take: = is_instance_valid(t) and on_board(t) and not t.pending and is_free(t) and takeable(t) and t.ice <= 0
+	var idx: = tiles.find(t) if will_take else -1
 	super.tap(t)
+	if idx >= 0:
+		takes.append(idx)
 	if v10_used and is_instance_valid(t) and tray.has(t) and not t.pending and tray.size() < slots:
 		unstick()
 

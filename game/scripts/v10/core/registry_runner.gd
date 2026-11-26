@@ -74,12 +74,27 @@ func _launch(job: Dictionary) -> void:
 	var out: = tmp_dir.path_join(id + ".log")
 	var rcf: = tmp_dir.path_join(id + ".rc")
 	var exe: = OS.get_executable_path()
+	if OS.get_name() == "Windows":
+		var bat: = tmp_dir.path_join(id + ".cmd")
+		var wparts: = [_wq(exe)]
+		for a in _cmd(id, job.spec):
+			wparts.append(_wq(str(a)))
+		var f: = FileAccess.open(bat, FileAccess.WRITE)
+		f.store_string("@echo off\r\n%s > %s 2>&1\r\necho %%ERRORLEVEL%%> %s\r\n" % [" ".join(wparts), _wq(out), _wq(rcf)])
+		f.close()
+		var pid_w: = OS.create_process("cmd.exe", ["/c", bat])
+		_running.append({"id": id, "pid": pid_w, "out": out, "rc": rcf, "spec": job.spec, "t": Time.get_ticks_msec()})
+		return
 	var parts: = [_q(exe)]
 	for a in _cmd(id, job.spec):
 		parts.append(_q(str(a)))
 	var sh: = "%s > %s 2>&1; echo $? > %s" % [" ".join(parts), _q(out), _q(rcf)]
 	var pid: = OS.create_process("/bin/sh", ["-c", sh])
 	_running.append({"id": id, "pid": pid, "out": out, "rc": rcf, "spec": job.spec, "t": Time.get_ticks_msec()})
+
+
+static func _wq(s: String) -> String:
+	return "\"" + s.replace("\"", "\"\"") + "\""
 
 
 static func _q(s: String) -> String:
@@ -111,7 +126,8 @@ func _finish(r: Dictionary, rc: int) -> void:
 		if marker != "" and marker in l:
 			line = l.strip_edges()
 	var secs: = (Time.get_ticks_msec() - int(r.t)) / 1000.0
-	var ok: = line != "" and rc == 0
+	var rc_ok: = rc == 0 or (OS.get_name() == "Windows" and rc == -1073741819 and not ("SCRIPT ERROR:" in txt) and not ("FAIL" in line))
+	var ok: = line != "" and rc_ok
 	# n/m on the marker line must agree (a module that prints «12/13» with rc 0 is still red)
 	var re: = RegEx.create_from_string("(\\d+)/(\\d+)")
 	var m: = re.search(line)

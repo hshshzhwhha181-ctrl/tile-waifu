@@ -20,7 +20,7 @@ extends RefCounted
 
 # the integration step this build is at: modules of later steps keep their selftests in --v10_selftest but do not
 # put keys into the save or screens into the navigation yet
-const STEP: = 1
+const STEP: = 2
 
 static var _mods: = {}
 static var _order: Array = []
@@ -111,7 +111,7 @@ const CORE_NAV: = {
 	"v7event": ["tables"],          # «Сегодня»/Афиша → Событие
 	"v7tourney": ["tables", "profile"],
 	"v7play": ["v7event"],
-	"play": ["home", "tables", "levels"],
+	"play": ["home", "tables", "levels", "v10path", "v10salon"],
 }
 
 

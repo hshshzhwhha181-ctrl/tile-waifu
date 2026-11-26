@@ -169,6 +169,19 @@ func open_letter(id: int) -> void:
 	var first: = not bool(l.get("read", false))
 	V9Letters.mark_read(id)
 	G.save()
+	if str(l.get("ev", "")) == "week" and l.get("custom") is Dictionary and (l.custom as Dictionary).has("week_doc"):
+		var wv: = V10WeekLetterView.open(self, l.custom.week_doc)
+		wv.closed.connect(func():
+			if int(l.get("reply", -1)) < 0:
+				V9Letters.reply(id, 0)
+			refresh())
+		return
+	if str(l.get("ev", "")) == "ask_bday" and int(l.get("reply", -1)) < 0:
+		var bs: = V10PlayerBdayScreen.open(self, "ask")
+		bs.closed.connect(func(_res: Dictionary):
+			V9Letters.reply(id, 0 if V10PlayerBday.has_date() else 1)
+			refresh())
+		return
 	var v: = V9Letters.view(l)
 	var h: = str(l.h)
 	var hc: = P.hero_color(h)

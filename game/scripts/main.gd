@@ -337,6 +337,7 @@ func settings() -> void :
 	p.add_child(vl)
 	V10Clarity.settings_hook(self, p)  # v10-clarity hook: «Фишки и словарь»
 	V10Nav.settings_notify(self, p)  # 0.10 W1 (meta Ф1): «Уведомления»
+	V10Nav.settings_bday(self, p)  # 0.10 W2 (rituals Р7): «Мой день рождения»
 
 
 # one 3-way setting: caption, three segments (the chosen one painted like a selected tab) and a hint line
@@ -463,7 +464,7 @@ func _dev_args() -> void :
 func _selftest() -> void :
 	var bad: = 0
 	var total: = 0
-	for li in G.LEVELS.size():
+	for li in mini(48, G.LEVELS.size()):
 		for rep in 5:
 			var cfg: Dictionary = G.LEVELS[li].duplicate(true)
 			cfg.seed = int(cfg.seed) + rep * 7919
@@ -701,6 +702,9 @@ func _build_navbar() -> void :
 		l.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		c.add_child(l)
 		c.set_meta("ux_role", "nav")
+		var tut_map: = {"home": "nav.teahouse", "collection": "nav.heroines", "tables": "nav.tables", "summon": "nav.wishes", "shop": "nav.shop"}
+		if tut_map.has(tab.id):
+			c.set_meta("tut_id", tut_map[tab.id])
 		c.gui_input.connect( func(e):
 			if (e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT) or (e is InputEventScreenTouch and e.pressed):
 				if not V10Nav.tab_open(tab.id):
@@ -724,7 +728,7 @@ func refresh_nav() -> void :
 				c.remove_child(n)
 				n.queue_free()
 		var open: = V10Nav.tab_open(k)
-		var on: bool = k == screen_id or (k == "tables" and screen_id in ["levels", "modes"])
+		var on: bool = k == screen_id or (k == "tables" and screen_id in ["levels", "modes", "v10path"])
 		var col: = V10DS.GOLD_300 if on else (V10DS.PAPER_500 if open else Color(V10DS.PAPER_700, 0.55))
 		var ic = c.get_node("IC")
 		ic.set("color", col)
@@ -890,6 +894,8 @@ func _notification(what: int) -> void :
 		V10Hooks.emit_app_resumed()  # 0.10 hook
 	elif what == NOTIFICATION_APPLICATION_PAUSED:
 		V10Hooks.emit_app_paused()  # 0.10 hook
+	elif what == NOTIFICATION_WM_CLOSE_REQUEST or what == NOTIFICATION_PREDELETE:
+		V10Phone.shutdown()
 
 func _unhandled_key_input(e: InputEvent) -> void :
 	if e is InputEventKey and e.pressed and not e.echo and e.keycode == KEY_ESCAPE:

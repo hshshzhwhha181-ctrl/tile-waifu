@@ -559,6 +559,10 @@ func _open_scene(zid: String) -> void:
 
 func _play() -> void:
 	if main != null and main.has_method("go"):
+		var nav: = V10Salon.global_class("V10Nav")
+		if nav != null and nav.has_method("play_path") and "screen_id" in main:
+			nav.call("play_path", main)
+			return
 		main.go("levels")
 
 

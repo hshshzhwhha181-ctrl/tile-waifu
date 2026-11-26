@@ -54,7 +54,7 @@ func build(m, args: Dictionary) -> void :
 	scroll_plate.set_meta("ux_role", "secondary")
 	scroll_plate.right_slot = _Nodes.new(int(pi.lvl))
 	scroll_plate.position = Vector2(cx + X0, y)
-	scroll_plate.pressed.connect(func() -> void: main.go("levels", {"select": int(pi.lvl)}))
+	scroll_plate.pressed.connect(func() -> void: main.go("v10path", {"select": int(pi.lvl)}))
 	add_child(scroll_plate)
 	y += 160.0 + 48.0
 	# 2. ★ «Играть · N»
@@ -191,13 +191,21 @@ class _Nodes:
 		mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 	func _draw() -> void:
-		var n: = 5
+		var nodes: Array[int] = []
+		var k0: = maxi(0, cur - 2)
+		while nodes.size() < 5 and k0 < V10LevelGen.TOTAL:
+			if not V10LevelGen.is_peak(k0):
+				nodes.append(k0)
+			k0 += 1
+		var n: = nodes.size()
+		if n < 2:
+			return
 		var x0: = 12.0
 		var step: = (size.x - 24.0) / (n - 1)
 		var yc: = size.y * 0.5
 		draw_line(Vector2(x0, yc), Vector2(x0 + step * (n - 1), yc), Color(V10DS.PAPER_700, 0.6), 1.0, true)
-		var first: = maxi(0, cur - 2)
 		for i in n:
-			var k: = first + i
-			var c: = V10DS.GOLD_300 if k < cur else (V10DS.ROSE_500 if k == cur else V10DS.PAPER_700)
+			var k: int = nodes[i]
+			var done: = V10PathState.stars(k) > 0 or V10PathState.bypassed(k)
+			var c: = V10DS.ROSE_500 if k == cur else (V10DS.GOLD_300 if done else V10DS.PAPER_700)
 			draw_circle(Vector2(x0 + step * i, yc), 9.0 if k == cur else 6.0, c, true, -1.0, true)

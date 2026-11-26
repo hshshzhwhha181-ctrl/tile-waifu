@@ -124,9 +124,16 @@ static func _count(sel: Dictionary) -> int:
 	return n
 
 
-# buy one booster for crystals (the card asks first). Wallet when merged, else plain counter.
+# buy one booster for crystals (the card asks first). V10Money when merged, else plain counter.
 static func buy(kind: String) -> bool:
 	var s: = State.S()
+	var mon = Rules.cls("V10Money") if State.root_override == null else null
+	if mon != null and mon.has_method("spend"):
+		if not bool(mon.call("spend", {"gems": Rules.BOOST_PRICE}, "path_booster_" + kind)):
+			return false
+		st()[kind] = stock(kind) + 1
+		State.save()
+		return true
 	var wallet = Rules.cls("V10Wallet") if State.root_override == null else null
 	if wallet != null and wallet.has_method("spend"):
 		if not wallet.spend("gems", Rules.BOOST_PRICE, "path_booster_" + kind):

@@ -65,7 +65,7 @@ static func now_unix() -> int:
 	var m: = _meta()
 	if m:
 		return int(m.call("now_unix"))
-	var u: = int(Time.get_unix_time_from_system()) + _arg_shift()
+	var u: = V10Meta.now_unix() + _arg_shift()
 	_max_seen = maxi(_max_seen, u)
 	return u
 

@@ -83,13 +83,48 @@ func emit_screen_shown(id: String, screen: Node) -> void:
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	# economy: the clock skips the sleep, then the day's grants and store receipts are caught up; pause = save now
-	app_resumed.connect(func() -> void: V10Money.on_resumed())
+	app_resumed.connect(func() -> void:
+		V10Money.on_resumed()
+		if V10Registry.wired("phone"):
+			V10Phone.tick())
 	app_paused.connect(func() -> void:
 		var g = get_node_or_null("/root/G")
 		if g and g.has_method("save"):
 			g.save())
-	game_ended.connect(func(r: Dictionary) -> void: V10Afisha.on_game_ended(r))
+	game_ended.connect(func(r: Dictionary) -> void:
+		V10Afisha.on_game_ended(r)
+		if V10Registry.wired("salon") and int(r.get("stars_delta", 0)) > 0:
+			V10Salon.notify_stars(int(r.stars_delta))
+		if V10Registry.wired("phone") and bool(r.get("win", false)):
+			if bool(r.get("first_win_day", false)):
+				V10Phone.event({"kind": "first_win"})
+			if bool(r.get("combo_rec", false)):
+				V10Phone.event({"kind": "combo_record", "combo": int(r.get("max_combo", 0))})
+			if bool(r.get("rank_up", false)):
+				V10Phone.event({"kind": "rank_up", "rank": str(r.get("rank_title", ""))})
+	)
+	V10Meta.bus().day_rolled.connect(func(_old: String, _new: String) -> void:
+		if V10Registry.wired("phone"):
+			V10Phone.tick())
 	# meta: at most one full-screen entry scene per launch, offered by the modules, run when the tea house is up
 	home_built.connect(func(_h: Node) -> void: V10EntryQueue.run())
-	# the W1 shell: Afisha providers (Неделя = турнир недели, партия дня from the 0.9 calendar)
+	# the W1+W2 shell: Afisha providers, MoreLevel codes, WinStack salon bar + streak/flame/daily ticks
 	V10Nav.install()
+	if V10Registry.wired("salon"):
+		V10WinStack.add_bar("salon", V10WinStack.PRIO_SALON, V10SalonWinBar.build, {
+			"modes": ["path"],
+			"when": func(_c: Dictionary) -> bool: return V10Nav.salon_open() and not V10Salon.next_goal().is_empty(),
+		})
+	if V10Registry.wired("rituals"):
+		V10WinStack.add_tick("streak", func(_c: Dictionary) -> Dictionary:
+			var n: = int(V10Streak.st().get("n", 0))
+			return {"icon": "visits", "text": "Серия · %d" % n} if n > 0 else {}, {"order": 0})
+	if V10Registry.wired("path"):
+		V10WinStack.add_tick("flame", func(_c: Dictionary) -> Dictionary:
+			var fl: = V10PathBoosters.flame()
+			return {"icon": "star", "text": "Огонёк · %d" % fl} if fl > 0 and int(G.S.get("unlocked", 1)) >= V10PathRules.BOOST_FROM else {},
+			{"order": 1, "modes": ["path"]})
+		V10WinStack.add_tick("path15", func(_c: Dictionary) -> Dictionary:
+			var d: = V10PathState.daily()
+			return {"icon": "gem", "text": "Награда · %d/%d" % [int(d.n), V10PathRules.DAILY_FULL]} if bool(d.show) else {},
+			{"order": 2, "modes": ["path"]})

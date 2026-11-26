@@ -117,34 +117,124 @@ const LOCS: = [
 const SHAPE_NAMES: = {"rect": "Плато", "heart": "Сердце", "diamond": "Ромб", "butterfly": "Бабочка", "cross": "Крест", "ring": "Кольцо", "pyramid": "Пагода", "towers": "Две башни"}
 const HARD_NAMES: = ["", "Сложный", "Очень сложный"]
 var LEVELS: = []
+var _arcs_built: = {}
 
+# 0.10 W2: 1000-level Path via V10LevelGen, materialized lazily by 100-level arc (Arc 0 built at startup in ~65 ms;
+# Arcs 1..9 hold light stubs until ensure_arc/level_at touches them).
 func _build_levels() -> void :
 	LEVELS.clear()
-	for li in LOCS.size():
-		var L: Dictionary = LOCS[li]
-		var stl: Array = V6Worlds.stages(li, L)
-		for si in stl.size():
-			var st: Array = stl[si]
-			var mech: String = st[6]
-			var n: = LEVELS.size()
-			var lv: = {
-				"name": L.name, "loc": li, "stage": si, "code": "%d-%d" % [li + 1, si + 1], 
-				"bg": L.bg, "fx": L.fx, "tint": L.tint, "hero": L.hero, "shard": L.shard, 
-				"shape": st[0], "cols": st[1], "rows": st[2], "layers": st[3], "fill": st[4], "faces": st[5], 
-				"mech": mech, "hard": st[7], "seed": 11 + n * 11, 
-				"gold": (4 + 2 * (li / 2)) if "gold" in mech else 0, 
-				"ice": (3 + li) if "ice" in mech else 0, 
-				"hidden": "hidden" in mech, 
-				"reward": {"gems": 100 + n * 10 + st[7] * 60}, 
-				"goal": "Очисти стол и найди частичку героини: %s" % HEROES[L.shard].name, 
-				"intro": L.intro, 
-			}
-			V6Worlds.decorate(lv, st, li, si)
-			if si == stl.size() - 1:
-				lv.reward["item"] = L.item
-			if n == 0:
-				lv.reward["item"] = "s_lemon"
-			LEVELS.append(lv)
+	_arcs_built.clear()
+	for i in V10LevelGen.TOTAL:
+		var w: = i / V10LevelGen.PER_WORLD
+		var Wd: Dictionary = V10LevelGen.WORLD[w]
+		var tier: = V10LevelGen.tier_of(i)
+		LEVELS.append({
+			"v10_id": i, "code": V10LevelGen.code(i), "world": w, "num": i % V10LevelGen.PER_WORLD + 1,
+			"name": str(Wd.name), "loc": mini(w, LOCS.size() - 1), "world_loc": w, "stage": i % V10LevelGen.PER_WORLD,
+			"bg": str(Wd.bg), "fx": str(Wd.fx), "tint": LOCS[mini(w, LOCS.size() - 1)].tint,
+			"hero": V10LevelGen.ready_hero(str(Wd.hero), w), "shard": V10LevelGen.ready_hero(str(Wd.shard), w),
+			"tier": tier, "tier_name": str(V10LevelGen.TIER_NAMES.get(tier, "")), "hard": int(V10LevelGen.TIER_HARD.get(tier, 0)),
+			"boss": V10LevelGen.is_boss(i), "peak": V10LevelGen.is_peak(i), "legend": tier == "legendary",
+			"shape": "rect", "cols": 6, "rows": 8, "layers": 3, "fill": 0.7, "faces": 12, "seed": 11 + i * 11,
+			"mech": "", "gold": 0, "ice": 0, "hidden": false, "reward": {"gems": 2, "per_star": 2, "first_only": true},
+			"goal": "Очисти стол", "intro": str(LOCS[mini(w, LOCS.size() - 1)].intro), "_lazy": true,
+		})
+	ensure_arc(0)
+
+
+func ensure_arc(w: int) -> void :
+	w = clampi(w, 0, V10LevelGen.WORLDS - 1)
+	if _arcs_built.has(w):
+		return
+	_arcs_built[w] = true
+	var base: = w * V10LevelGen.PER_WORLD
+	for k in V10LevelGen.PER_WORLD:
+		var i: = base + k
+		var lv: Dictionary = V10PathState._lv_cache.get(i, V10LevelGen.level(i))
+		V10PathState._lv_cache[i] = lv
+		var copy: = lv.duplicate(true)
+		copy["world_loc"] = int(lv.get("loc", w))
+		copy["loc"] = mini(int(lv.get("loc", w)), LOCS.size() - 1)
+		copy["tint"] = LOCS[int(copy.loc)].tint
+		if not copy.has("goal"):
+			copy["goal"] = "Очисти стол"
+		if not copy.has("intro") or str(copy.intro).length() < 12:
+			var il: = str(copy.get("intro_line", ""))
+			copy["intro"] = il if il != "" else str(LOCS[int(copy.loc)].intro)
+		LEVELS[i] = copy
+
+
+func level_at(i: int) -> Dictionary:
+	i = clampi(i, 0, V10LevelGen.TOTAL - 1)
+	ensure_arc(i / V10LevelGen.PER_WORLD)
+	return LEVELS[i]
+
+
+func loc_name(w: int) -> String:
+	if w >= 0 and w < V10LevelGen.WORLDS:
+		return str(V10LevelGen.WORLD[w].name)
+	return str(LOCS[clampi(w, 0, LOCS.size() - 1)].name)
+
+
+# 0.10 W2 (levels/README.md, INTEGRATION_0.10.md §4 W2): one-time 48 → 1000 migration for legacy saves.
+#   passed = clamp(old_unlocked - 1, 0, 48), raised to k + 1 if stars[k] > 0 (48 passed when index 47 has stars).
+#   new_unlocked = 1 if passed == 0 else clamp(round(passed * 100 / 48) + 1, 1, released_total).
+#   Each old star at 0..47 moves to the nearest unused non-Peak main-path level around round(old_i * 99 / 47) in Arc 1,
+#   preserving 100 % of earned stars (Salon bank == sum of legacy stars).
+static func migrate_48_to_1000(st_dict: Dictionary) -> void :
+	if not (st_dict.get("v10_levels") is Dictionary):
+		st_dict["v10_levels"] = {}
+	var lv10: Dictionary = st_dict["v10_levels"]
+	if bool(lv10.get("mig48", false)):
+		return
+	var old_stars: Dictionary = st_dict.get("stars", {}) if st_dict.get("stars") is Dictionary else {}
+	var old_unl: = maxi(1, int(st_dict.get("unlocked", 1)))
+	var has_hi: = old_unl > 48
+	for k in old_stars:
+		if int(k) >= 48:
+			has_hi = true
+			break
+	if has_hi:
+		lv10["mig48"] = true
+		return
+	var passed: = clampi(old_unl - 1, 0, 48)
+	var max_idx: = -1
+	for k in old_stars:
+		var idx: = int(k)
+		if idx >= 0 and idx < 48 and int(old_stars[k]) > 0:
+			passed = maxi(passed, idx + 1)
+			max_idx = maxi(max_idx, idx)
+	if old_unl <= 6 and max_idx < 6:
+		lv10["mig48"] = true
+		return
+	var new_stars: = {}
+	var used: = {}
+	var keys: = old_stars.keys()
+	keys.sort_custom(func(a, b): return int(a) < int(b))
+	for k in keys:
+		var sv: = clampi(int(old_stars[k]), 0, 3)
+		if sv <= 0:
+			continue
+		var oi: = clampi(int(k), 0, 47)
+		var target: = clampi(int(round(oi * 99.0 / 47.0)), 0, 99)
+		var pick: = -1
+		for d in 100:
+			for cand in ([target] if d == 0 else [target - d, target + d]):
+				if cand >= 0 and cand < 100 and not V10LevelGen.is_peak(cand) and not used.has(cand):
+					pick = cand
+					break
+			if pick >= 0:
+				break
+		if pick < 0:
+			pick = target
+		used[pick] = true
+		new_stars[str(pick)] = sv
+	st_dict["stars"] = new_stars
+	if passed <= 0:
+		st_dict["unlocked"] = 1
+	else:
+		st_dict["unlocked"] = clampi(int(round(passed * 100.0 / 48.0)) + 1, 1, V10PathState.released_total())
+	lv10["mig48"] = true
 
 
 func level_feature(lv: Dictionary) -> String:
@@ -599,6 +689,10 @@ func v10_attach() -> void :
 	V10Save.migrate(S)
 	V10Registry.ensure_all(S)
 	V10Money.attach(S)
+	if V10Registry.wired("salon"):
+		V10Salon.notify_stars(0)
+	if V10Registry.wired("phone"):
+		V10Phone.reset()
 
 
 func _load_game() -> void :

@@ -395,12 +395,14 @@ func _cameo(home: Node, h: String, moon: bool) -> void :
 	var t: = hero.create_tween()
 	t.tween_property(hero, "position:x", shown_x, 0.6).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	var done: = [false]
+	var hero_iid: int = hero.get_instance_id()
 	var leave: = func():
-		if not is_instance_valid(hero):
+		var hn = instance_from_id(hero_iid)
+		if hn == null or not is_instance_valid(hn):
 			return
-		var t2: = hero.create_tween()
-		t2.tween_property(hero, "position:x", W + 300, 0.45).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-		t2.tween_callback(hero.queue_free)
+		var t2: = (hn as Node).create_tween()
+		t2.tween_property(hn, "position:x", W + 300, 0.45).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+		t2.tween_callback((hn as Node).queue_free)
 	hero.tapped.connect( func():
 		if done[0]:
 			return

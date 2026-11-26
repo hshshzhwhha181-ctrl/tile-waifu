@@ -34,8 +34,8 @@ var boosters_used: = 0
 var fails: = 0
 var gained: = 0
 var shards_found: = 0
-var victory_summon_btn: JButton
-var victory_next_btn: JButton
+var victory_summon_btn: Control
+var victory_next_btn: Control
 var fail_retry_btn: JButton
 var board_rect: = Rect2()
 var talk_cd: = 0.0
@@ -126,7 +126,17 @@ func build(m, args: Dictionary) -> void :
 		cfg.intro = V6Txt.s("play.trial_intro")
 	else:
 		G.current_level = lvl
-		cfg = G.LEVELS[lvl]
+		if args.get("v10_cfg") is Dictionary:
+			cfg = (args.v10_cfg as Dictionary).duplicate(true)
+		else:
+			cfg = V10PathState.play_cfg(lvl)
+		if not cfg.has("tint"):
+			cfg["tint"] = G.LOCS[clampi(int(cfg.get("loc", 0)), 0, G.LOCS.size() - 1)].tint
+		if not cfg.has("goal"):
+			cfg["goal"] = V6Txt.s("play.goal_clear")
+		if not cfg.has("intro") or str(cfg.intro).length() < 12:
+			var il: = str(cfg.get("intro_line", ""))
+			cfg["intro"] = il if il != "" else str(G.LOCS[clampi(int(cfg.get("loc", 0)), 0, G.LOCS.size() - 1)].intro)
 	if not G.hero_unlocked(partner) and mode != "trial":
 		partner = "mc"
 	for a in OS.get_cmdline_user_args():
@@ -135,7 +145,7 @@ func build(m, args: Dictionary) -> void :
 	tut = lvl == 0 and mode == "" and not G.S.tut_done
 	if mode == "" and not tut:
 		fortune = G.draw_fortune(cfg)
-		if fortune.get("gold", 0) > 0:
+		if fortune.get("gold", 0) > 0 and not cfg.has("v10_id"):
 			cfg = cfg.duplicate(true)
 			cfg.gold = int(cfg.get("gold", 0)) + int(fortune.gold)
 	Sfx.music("play" if mode != "zen" else "menu")
@@ -223,10 +233,16 @@ func _v9_under_board_fx() -> Node2D:
 		move_child(n, board.get_index())
 	return n
 
+var _v10_sig_ov: = {}
+var _v10_rested_bar: V10RestedBar
+var _v10_stars_before: = 0
+var _v10_path_res: = {}
+
 func _make_board() -> void :
 	if board:
 		board.queue_free()
-	board = V6SpecialBoard.new()
+	board = V10LevelBoard.new() if cfg.has("v10_id") else V6SpecialBoard.new()
+	board.set_meta("tut_id", "match.board")
 	board.look = G.skin_look()
 	board.slots = _slot_count()
 	add_child(board)
@@ -247,7 +263,7 @@ func _make_board() -> void :
 	board.cleared.connect(_on_clear)
 	board.failed.connect(_on_fail)
 	board.tray_changed.connect(_refresh)
-	if mode == "" and mode != "trial":
+	if mode == "" and mode != "trial" and not cfg.has("v10_id"):
 		_place_gift()
 	if fortune.get("reveal", false):
 		for t in board.tiles:
@@ -258,6 +274,18 @@ func _make_board() -> void :
 					t.back_spr = null
 				t.face_spr.visible = true
 	V6Specials.hook(self)
+	var is_ranked: = mode in ["duel", "v7tourney", "duel_ranked"]
+	var used_faces: = []
+	for t in board.tiles:
+		if t.face >= 0 and t.face < 36 and not (t.face in used_faces):
+			used_faces.append(t.face)
+	_v10_sig_ov = V10Rituals.deal_overlay({"ranked": is_ranked, "faces": used_faces, "seed": int(cfg.get("seed", 0))})
+	if not _v10_sig_ov.is_empty():
+		var frect: = Rect2(-Tile.TW * 0.36, -Tile.TH * 0.38, Tile.TW * 0.72, Tile.TH * 0.68)
+		for t in board.tiles:
+			var ip: = V10BdaySigDecor.icon_for(_v10_sig_ov, t.face)
+			if ip != "" and t.face_spr:
+				V10BdaySigDecor.apply(t.face_spr, ip, frect)
 
 
 func _mode_cfg(n: int) -> Dictionary:
@@ -305,11 +333,13 @@ func _apply_perk() -> void :
 		"tea": board.combo_window += 1.5
 		"tray": free_rescue_left = 1
 		"small": hint_n += 1
+	hint_n += int(cfg.get("extra_hints", 0))
 	V7Passives.attach(self)
 
 
 func _build_hud() -> void :
-	_v8_round_btn(V8Art.nav("home"), Rect2(12, 22, 70, 70), 0.62, func(): main.leave_match())
+	var home_b: = _v8_round_btn(V8Art.nav("home"), Rect2(12, 22, 70, 70), 0.62, func(): main.leave_match())
+	home_b.set_meta("tut_id", "match.pause")
 
 	var gp: = UI.rbox("cream", Rect2(92, 16, W - 92 - 258, 104), 26, 4, 12)
 	add_child(gp)
@@ -383,6 +413,12 @@ func _build_hud() -> void :
 			V9Feel.press(stage, "pop", "tap")
 			_speak("aff", true))
 	portrait = stage
+	stage.set_meta("tut_id", "match.hero")
+	if not (mode in ["duel", "v7tourney", "duel_ranked"]) and V10Comeback.rested() > 0:
+		_v10_rested_bar = V10RestedBar.new()
+		_v10_rested_bar.position = Vector2(maxf(14.0, stage.position.x - 120.0), stage.position.y + stage.size.y + 2.0)
+		add_child(_v10_rested_bar)
+		_v10_rested_bar.set_value(V10Comeback.rested())
 
 
 	var gem: = UI.rbox("plum", Rect2(14, 132, 112, 44), 22, 2, 8)
@@ -403,6 +439,7 @@ func _build_hud() -> void :
 	var tw: = ns * sw + (ns - 1) * gap + 28
 	tray_box = UI.rbox("plum", Rect2(12 + (tray_room - tw) * 0.5, 172, tw, 128), 28, 4, 12)
 	tray_box.set_param("border_top", Color("ffe7a6")).set_param("border_bottom", Color("c58a2c"))
+	tray_box.set_meta("tut_id", "match.tray")
 	V6HudStyle.tray(tray_box, V7Album.table_for(cfg.get("bg", "")))
 	add_child(tray_box)
 	slot_rects.clear()
@@ -441,6 +478,7 @@ func _build_bottom() -> void :
 	btn_undo = _action("undo", V6Txt.s("play.undo"), xs[0], "rose")
 	btn_undo.pressed.connect(_undo)
 	btn_hint = _action("hint", V6Txt.s("play.hint"), xs[1], "gold")
+	btn_hint.set_meta("tut_id", "match.hint")
 	btn_hint.pressed.connect(_hint)
 	btn_shuffle = _action("shuffle", V6Txt.s("play.shuffle"), xs[2], "mint")
 	btn_shuffle.pressed.connect(_shuffle)
@@ -576,6 +614,9 @@ func _intro() -> void :
 		_v8_quick_deal()
 	else:
 		board.deal()
+	if cfg.has("v10_boost"):
+		V10PathBoosters.apply_board(board, cfg)
+		_refresh()
 	await get_tree().create_timer(0.6).timeout
 	if not is_inside_tree():
 		return
@@ -778,7 +819,14 @@ func _on_match(mid: Vector2, combo: int, gold: bool, shard: String) -> void :
 	var from_ult: = v9_from_ult
 	if from_ult:
 		combo = 1
-	V10Hooks.emit_pair_taken({"mid": mid, "combo": combo, "gold": gold, "shard": shard, "face": -1, "mode": _v10_mode(), "partner": partner, "ult": from_ult})  # 0.10 hook
+	var pair_face: = int(board.last_face) if board else -1
+	V10Hooks.emit_pair_taken({"mid": mid, "combo": combo, "gold": gold, "shard": shard, "face": pair_face, "mode": _v10_mode(), "partner": partner, "ult": from_ult})  # 0.10 hook
+	if not _v10_sig_ov.is_empty() and pair_face >= 0:
+		V10Rituals.on_pair(pair_face, _v10_sig_ov)
+	if _v10_rested_bar and is_instance_valid(_v10_rested_bar) and _v10_rested_bar.visible and not from_ult:
+		var sp: = V10Rituals.mastery_pairs(1, mode in ["duel", "v7tourney", "duel_ranked"])
+		if sp > 1:
+			_v10_rested_bar.set_value(V10Comeback.rested())
 	var fever: = now() < fever_until
 	var mult: = 1 + (combo - 1) / 2
 	var gain: = int(round(mult * (2 if fever else 1) * (gold_mult if gold else 1) * (1.0 + gem_bonus)))
@@ -1049,6 +1097,37 @@ func _on_fail() -> void :
 	if not is_inside_tree():
 		return
 	_v8_modal_open()
+	if mode == "" and cfg.has("v10_id"):
+		var fr: = V10PathState.on_fail(lvl)
+		V10PathBoosters.on_fail(str(cfg.get("mode", "")), str(cfg.get("tier", "normal")), bool(cfg.get("peak", false)))
+		var jam: = V10PathJam.find(cfg, (board as V10LevelBoard).takes) if board is V10LevelBoard else {}
+		if bool(cfg.get("no_paid_help", false)) or bool(fr.get("offer_assist", false)) or not jam.is_empty():
+			var do_retry: = func():
+				_v8_record_loss()
+				var a2: = args0.duplicate()
+				a2["v10_cfg"] = V10PathState.play_cfg(lvl)
+				a2["retry"] = randi()
+				main.go("play", a2)
+			var do_map: = func():
+				_v8_record_loss()
+				main.go("v10path", {"select": lvl})
+			var do_jam: = func(j: Dictionary):
+				_v8_modal_close()
+				V10PathDialogs.show_jam_on_board(board, j, self)
+				var jt: = create_tween()
+				jt.tween_interval(2.0)
+				jt.tween_callback(func():
+					if is_inside_tree():
+						_v8_modal_open()
+						var fw2: = V10PathDialogs.fail_window(main, lvl, fr, {}, do_retry, do_map)
+						var rb2 = fw2.find_child("Retry", true, false)
+						if rb2 is JButton:
+							fail_retry_btn = rb2)
+			var fw: = V10PathDialogs.fail_window(main, lvl, fr, jam, do_retry, do_map, do_jam)
+			var rbtn = fw.find_child("Retry", true, false)
+			if rbtn is JButton:
+				fail_retry_btn = rbtn
+			return
 	var p: = Common.popup(main, V6Txt.s("play.full_t"), 440, "cream", 660.0, false)
 	# 0.8: her sad face (emotion art; the base portrait when the file is missing), settling in with a soft pop
 	var fav: = V8Art.emotion_avatar(partner, "sad", Rect2(30, 60, 120, 120), "pink")
@@ -1089,6 +1168,8 @@ func _on_fail() -> void :
 		Common.close_popup(p)
 		_v8_record_loss()
 		var a: = args0.duplicate()
+		if mode == "" and cfg.has("v10_id"):
+			a["v10_cfg"] = V10PathState.play_cfg(lvl)
 		a["retry"] = randi()
 		main.go("play", a))
 	p.add_child(fail_retry_btn)
@@ -1701,11 +1782,22 @@ func _on_clear() -> void :
 	yaku_list = _collect_yaku(secs)
 	var first: = false
 	var reward: = 0
+	var path_paid: = false
+	_v10_stars_before = V10Salon.stars_total()
+	_v10_path_res = {}
+	var wins_before_win: = V9Letters.total_wins()
+	var combo_prev_best: = int(V9Letters.st().get("best_combo", 0))
 	if mode == "":
 		first = G.level_stars(lvl) == 0
-		G.S.stars[str(lvl)] = max(G.level_stars(lvl), stars)
-		G.S.unlocked = max(int(G.S.unlocked), min(lvl + 2, G.LEVELS.size()))
-		reward = cfg.reward.gems + stars * 20
+		if cfg.has("v10_id"):
+			_v10_path_res = V10PathState.on_win(lvl, stars, int(secs * 1000.0))
+			V10PathBoosters.on_win(str(cfg.get("mode", "")), str(cfg.get("tier", "normal")), bool(cfg.get("peak", false)))
+			reward = int(_v10_path_res.get("gems", 0))
+			path_paid = true
+		else:
+			G.S.stars[str(lvl)] = max(G.level_stars(lvl), stars)
+			G.S.unlocked = max(int(G.S.unlocked), min(lvl + 2, G.LEVELS.size()))
+			reward = cfg.reward.gems + stars * 20
 		if first and cfg.reward.has("item"):
 			G.give(cfg.reward.item)
 		if first and lvl == 2:
@@ -1717,7 +1809,9 @@ func _on_clear() -> void :
 		var d: = int(G.today().substr(8, 2))
 		if not d in dm.done.map( func(x): return int(x)):
 			dm.done.append(d)
+	var riichi_extra: = 0
 	if riichi:
+		riichi_extra = reward + gained
 		reward = reward * 2 + gained
 	rp_before = int(G.S.rp)
 	if mode != "trial":
@@ -1737,12 +1831,25 @@ func _on_clear() -> void :
 		G.task_add("levels")
 		G.add_pass_xp(100)
 		G.S.xp = int(G.S.xp) + 40
-	V10Money.grant({"gems": reward}, "play")
+	if path_paid:
+		if riichi_extra > 0:
+			V10Money.grant({"gems": riichi_extra}, "play")
+	else:
+		V10Money.grant({"gems": reward}, "play")
 	G.S.tut_done = true
 	G.save()
 	# 0.8: the win is saved: leaving now goes straight out, without «прогресс не сохранится» or a counted loss
 	_v8_saved = true
-	_v10_ended(true, stars, reward, secs, first)  # 0.10 hook
+	var first_win_day: = wins_before_win == int(V9Letters.st().get("wins0", 0))
+	var combo_rec: = max_combo >= V9Letters.COMBO_MIN and max_combo > combo_prev_best
+	_v10_ended(true, stars, reward, secs, first, 0, {
+		"stars_delta": maxi(0, V10Salon.stars_total() - _v10_stars_before),
+		"first_win_day": first_win_day,
+		"combo_rec": combo_rec,
+		"max_combo": max_combo,
+		"rank_up": not rank_ups.is_empty(),
+		"rank_title": str(G.rank_of(int(G.S.rp)).title) if not rank_ups.is_empty() else "",
+	})  # 0.10 hook
 	board.input_on = false
 	await get_tree().create_timer(0.4).timeout
 	if not is_inside_tree():
@@ -2139,8 +2246,12 @@ func _victory(stars: int, reward: int, secs: float, first: bool) -> void :
 	Fx.burst(wparts, Vector2(W * 0.8, H * 0.14), "petal", 30, Color(1, 0.8, 0.88), 1.5)
 	Fx.burst(wparts, Vector2(W * 0.5, H * 0.12), "sparkle", 40, Color(1, 0.86, 0.5), 1.4)
 	var star_nodes: = v8_res_stars(ctx, V10Glossary.star_rule())  # v10-clarity hook (was V8PlayRules.T.star_rule)
+	if star_nodes.size() >= 2 and star_nodes[1] is Node:
+		(star_nodes[1] as Node).set_meta("tut_id", "win.stars")
 	v8_res_line(ctx, V10Glossary.stats_line(secs, boosters_used, fails), 19, UI.INK, 4.0)  # v10-clarity hook (was T.stats)
 	var rw: = v8_res_reward(ctx, 0, "+10 симпатии" if mode != "trial" else "")
+	if rw.row is Node:
+		(rw.row as Node).set_meta("tut_id", "win.rewards")
 	V10Breakdown.tap_reward(self, rw.row, stars, reward)  # v10-clarity hook: tap the crystals → «из чего сумма»
 	var rr: Control = rw.row
 	var gl: Label = rw.lbl
@@ -2195,9 +2306,9 @@ func _victory(stars: int, reward: int, secs: float, first: bool) -> void :
 		null, V8Art.nav("wishes") if summon_ok else V8Art.nav("home"))
 	victory_next_btn = btns[0]
 	victory_summon_btn = btns[1]
-	_v10_win_panel(ctx, btns, stars, first)  # 0.10 hook: V10WinStack bars + «Ещё уровень · N» / «В чайную»
 	_v8_photo_row(root, stars, secs, ctx.plate_end, ctx.by, plate.position + Vector2(V8_RES_PAD, album_y) if album_y >= 0.0 else Vector2(-1, -1), pw - V8_RES_PAD * 2.0)
 	_v8_res_settle(ctx, album_y)
+	_v10_win_panel(ctx, btns, stars, first)  # 0.10 hook: V10WinStack bars + «Ещё уровень · N» / «В чайную»
 
 	await v8_res_light_stars(ctx, star_nodes, stars)
 	if not is_inside_tree():
@@ -2929,20 +3040,24 @@ func _v10_mode() -> String:
 	return "path" if mode == "" else mode
 
 
-func _v10_ended(win: bool, stars: int, reward: int, secs: float, first: bool, score: = 0) -> void :
+func _v10_ended(win: bool, stars: int, reward: int, secs: float, first: bool, score: = 0, extra: = {}) -> void :
 	if _v10_end_sent:
 		return
 	_v10_end_sent = true
-	V10Hooks.emit_game_ended({"mode": _v10_mode(), "win": win, "score": score, "stars": stars, "time_s": secs,
+	var pl: = {"mode": _v10_mode(), "win": win, "score": score, "stars": stars, "time_s": secs,
 		"pairs": int(board.tiles.size() / 2) if board else 0, "hero": partner, "seed": int(cfg.get("seed", 0)),
-		"level": lvl if mode == "" else -1, "first": first, "rewards": {"gems": reward}})
+		"level": lvl if mode == "" else -1, "first": first, "rewards": {"gems": reward}}
+	pl.merge(extra, true)
+	V10Hooks.emit_game_ended(pl)
 
 
-# Path: the 0.9 two-button row gives way to V10WinPanel (≤ 2 bars of V10WinStack, «Ещё уровень · N» + «В чайную»)
+# Path: the 0.9 two-button row gives way to V10WinPanel (≤ 2 bars of V10WinStack, «Ещё уровень · N» + «В салон» / «В чайную»)
 func _v10_win_panel(ctx: Dictionary, btns: Array, stars: int, first: bool) -> void :
+	var want_sal: = mode == "" and V10Nav.salon_open() and V10SalonWinBar.want_salon_button()
 	var wctx: = {"mode": _v10_mode(), "level": lvl, "first": first, "stars": stars, "was_done": not first and mode == "",
-		"count": G.LEVELS.size(), "salon_open": false, "buttons": mode == "",
-		"on_more": func(n: int): main.go("play", {"level": n, "partner": partner}, false)}
+		"stars_before": _v10_stars_before, "stars_after": V10Salon.stars_total(),
+		"count": V10PathState.released_total(), "salon_open": want_sal, "buttons": mode == "",
+		"on_more": func(n: int): main.go("play", {"level": n, "partner": partner, "v10_cfg": V10PathState.play_cfg(n)}, false)}
 	V10Hooks.emit_win_screen(wctx)
 	if mode != "":
 		return
@@ -2950,10 +3065,27 @@ func _v10_win_panel(ctx: Dictionary, btns: Array, stars: int, first: bool) -> vo
 	var root: Control = ctx.root
 	root.add_child(wp)
 	wp.position = Vector2(16.0, float(ctx.by) + 96.0 - wp.height())
+	var wpr: = Rect2(wp.position, wp.size)
+	for c in root.get_children():
+		if c != wp and c is JButton and not (c in btns) and (c as Control).visible:
+			var jb: Control = c
+			if Rect2(jb.position, jb.size).intersects(wpr):
+				var ny: = wp.position.y - jb.size.y - 8.0
+				if ny > float(ctx.plate_end) + 4.0:
+					jb.position.y = ny
+				else:
+					jb.visible = false
 	wp.home.connect(func(): main.go("home"))
+	wp.salon.connect(func(): main.go("v10salon"))
 	wp.denied.connect(func(hint: String): main.toast(hint, "lock"))
 	for b in btns:
 		(b as Control).visible = false
-	victory_next_btn = wp.more_btn
+	if wp.more_btn:
+		wp.more_btn.set_meta("tut_id", "win.next")
+	elif wp.alt_btn:
+		wp.alt_btn.set_meta("tut_id", "win.next")
+	victory_next_btn = wp.more_btn if wp.more_btn else wp.alt_btn
 	victory_summon_btn = wp.alt_btn
 	wp.play(0.9)
+	if bool(_v10_path_res.get("summit", false)) and main != null:
+		V10PathDialogs.win_peak(main, _v10_path_res)

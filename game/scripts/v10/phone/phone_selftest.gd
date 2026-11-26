@@ -223,7 +223,7 @@ static func _grep() -> void:
 	var hits: = []
 	for f in _src_files():
 		var s: = FileAccess.get_file_as_string(f)
-		for bad in ["G.add_aff", "Time.get_unix_time_from_system", "Time.get_date_string_from_system", "S.gems +="]:
+		for bad in ["G." + "add_aff", "Time." + "get_unix_time_from_system", "Time." + "get_date_string_from_system", "S.gems +="]:
 			if s.contains(bad):
 				hits.append("%s: %s" % [f.get_file(), bad])
 	check(hits.is_empty(), "no direct affection / clock / currency calls in v10/phone (%s)" % str(hits))
