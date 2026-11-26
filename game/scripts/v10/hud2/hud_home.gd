@@ -43,6 +43,7 @@ var spine_l: Label
 var lantern_ls: = []
 var lantern_tr: = []
 var partner: V10Plate
+var partner_medal: Control
 var play_b: V10Button
 var phone_b: V10Button
 var nav: Control
@@ -171,6 +172,10 @@ func _ready() -> void:
 	partner.interactive = true
 	partner.pressed.connect(func() -> void: partner_pressed.emit())
 	add_child(partner)
+	# gilded affection medallion pinned to the plate's top-right corner (never over the heroine's face)
+	partner_medal = _Medal.new()
+	partner_medal.accent = V10DS.hero(hero_id).accent
+	add_child(partner_medal)
 	play_b = V10Button.make("play", "Играть · %s" % level, Vector2(440, 104))
 	play_b.overline = "Путь · %s" % path_name
 	play_b.pressed.connect(func() -> void: play_pressed.emit())
@@ -220,6 +225,7 @@ func layout_now() -> void:
 			lantern_ls[i].size = Vector2(r.size.x + 40, 26)
 			vis_idx += 1
 	partner.position = (L.partner as Rect2).position
+	partner_medal.position = (L.partner as Rect2).position + Vector2(200.0 - 30.0, -14.0)
 	play_b.position = (L.play as Rect2).position
 	nav.position = (L.nav as Rect2).position
 	nav.size = (L.nav as Rect2).size
@@ -231,6 +237,26 @@ func layout_now() -> void:
 		tab_ls[i].size = Vector2(cw, 26)
 	deco.queue_redraw()
 	nav.queue_redraw()
+
+
+class _Medal:
+	extends Control
+	var accent: = Color.WHITE
+
+	func _init() -> void:
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+		custom_minimum_size = Vector2(40, 40)
+		size = Vector2(40, 40)
+
+	func _draw() -> void:
+		var c: = Vector2(20, 20)
+		draw_circle(c + Vector2(0, 2), 19, Color(V10DS.BTN_PLAY_OUTLINE, 0.55), true, -1.0, true)
+		draw_circle(c, 19, V10DS.GOLD_500, true, -1.0, true)
+		draw_circle(c, 16.5, V10DS.BTN_PLAY_OUTLINE, true, -1.0, true)
+		draw_circle(c, 15, V10DS.BTN_PLAY_MID, true, -1.0, true)
+		draw_circle(c - Vector2(0, 5), 9.0, Color(V10DS.BTN_PLAY_GLOW, 0.22), true, -1.0, true)
+		draw_arc(c, 17.5, 0, TAU, 40, V10DS.PLATE_SPARK, 1.2, true)
+		V10Icons.draw(self, "heart", c + Vector2(0, 0.5), 24, V10DS.BTN_PLAY_TEXT, 2.6)
 
 
 class _Under:

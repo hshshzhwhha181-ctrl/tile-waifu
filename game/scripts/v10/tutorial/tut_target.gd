@@ -88,6 +88,8 @@ static func _visible(n: Node) -> bool:
 static func _unlocked_plate(n: Node) -> bool:
 	if n is V10Plate and (n as V10Plate).disabled:
 		return false
+	if n is Control and (n as Control).get_script() != null and bool((n as Control).get("disabled")):
+		return false
 	return true
 
 

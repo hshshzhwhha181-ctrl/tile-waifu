@@ -16,17 +16,17 @@ extends RefCounted
 
 # fit() steps per plate role (§2.3 table)
 const STEPS: = {
-	"title_sm": {"role": "ui", "sizes": [22, 20, 18]},
-	"caption_m": {"role": "ui", "sizes": [18]},
+	"title_sm": {"role": "ui", "sizes": [24, 22, 20, 18]},
+	"caption_m": {"role": "ui", "sizes": [20, 18]},
 	"title_l": {"role": "display", "sizes": [32, 28, 26]},
 	"text_l": {"role": "ui", "sizes": [22, 20, 18]},
 	"value": {"role": "num", "sizes": [40, 32, 28]},
 	"value_s": {"role": "num", "sizes": [22]},
-	"button_play": {"role": "display", "sizes": [32, 28, 26]},
-	"button_ui": {"role": "ui", "sizes": [22, 20, 18]},
+	"button_play": {"role": "display", "sizes": [38, 34, 30, 26]},
+	"button_ui": {"role": "ui", "sizes": [26, 24, 22, 20, 18]},
 }
 # line heights (§3 «Межстрочие»)
-const LINE: = {64: 72, 44: 52, 40: 44, 32: 40, 28: 36, 26: 34, 22: 32, 20: 28, 18: 26, 15: 20, 30: 36}
+const LINE: = {64: 72, 44: 52, 40: 44, 38: 46, 34: 42, 32: 40, 30: 36, 28: 36, 26: 34, 24: 32, 22: 32, 20: 28, 18: 26, 15: 20}
 
 static var overflow: Array = []
 static var _fonts: = {}

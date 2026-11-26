@@ -31,10 +31,32 @@ const TINT_SCENE: = Color("#8C8594")  # backdrop dimming in the match scene
 const TINT_HOME: = Color("#9E94A3")  # backdrop dimming at home
 const TINT_VICTORY: = Color("#807887")  # backdrop dimming on the victory beat
 
-const HAIR_A: = 0.35  # hairline gold.700 alpha
-const LACQUER_A: = 0.05  # paper.100 lacquer gradient alpha (top 40 %)
-const BOTTOM_TONE_A: = 0.6  # 1 px night.900 inside the bottom edge
-const ON_ART_A: = 0.92  # plate fill alpha over art
+# --- AAA lacquer & luxury button tokens (Wave 2) ---
+const BTN_PLAY_TOP: = Color("#DF4F74")       # crimson-sakura lacquer top
+const BTN_PLAY_MID: = Color("#AE284B")       # imperial crimson mid
+const BTN_PLAY_BOT: = Color("#6D142E")       # velvet burgundy bottom
+const BTN_PLAY_DOWN_TOP: = Color("#A32A4B")  # pressed top
+const BTN_PLAY_DOWN_BOT: = Color("#4B0C20")  # pressed bottom
+const BTN_PLAY_GLOW: = Color("#FFA4BE")      # warm sakura specular sheen
+const BTN_PLAY_TEXT: = Color("#FFF8EC")      # luminous ivory text
+const BTN_PLAY_OUTLINE: = Color("#340818")   # deep wine crisp outline/drop shadow
+const BTN_SEC_TOP: = Color("#362642")        # deep plum lacquer top
+const BTN_SEC_BOT: = Color("#1E1527")        # obsidian plum bottom
+const BTN_SEC_DOWN_TOP: = Color("#473256")   # pressed plum top
+const BTN_SEC_DOWN_BOT: = Color("#281C33")   # pressed plum bottom
+const BTN_CASH_TOP: = Color("#2F2438")       # royal obsidian top
+const BTN_CASH_BOT: = Color("#1A1320")       # royal obsidian bottom
+const PLATE_TOP: = Color("#281F2F")          # lacquer plate warm top
+const PLATE_BOT: = Color("#16111C")          # lacquer plate deep bottom
+const PLATE_SEL_TOP: = Color("#3D2A3C")      # selected plate top
+const PLATE_SEL_BOT: = Color("#211624")      # selected plate bottom
+const PLATE_RIM: = Color("#C99E54")          # warm antique gold border
+const PLATE_SPARK: = Color("#F8E4B4")        # champagne gold corner ornament
+
+const HAIR_A: = 0.45  # hairline gold alpha
+const LACQUER_A: = 0.08  # paper.100 lacquer gradient alpha (top 40 %)
+const BOTTOM_TONE_A: = 0.7  # 1 px night.900 inside the bottom edge
+const ON_ART_A: = 0.94  # plate fill alpha over art
 const SHADOW_A: = 0.55
 
 # --- metrics (base 720 px) ---
