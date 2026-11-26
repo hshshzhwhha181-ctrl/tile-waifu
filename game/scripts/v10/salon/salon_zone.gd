@@ -4,7 +4,8 @@ extends Control
 # One zone on the salon map: the painted room (ruined art with restored parts revealed by salon_zone.gdshader),
 # mist over what is still broken, hanging tags over unrestored tasks, a title plate, and — once the zone is
 # finished — her heroine living in it plus a «Сцена» button (spec §Р1 п.3, §Р2 п.1).
-# The screen calls set_visible_live(on) from its scroll check: textures, rig and mist only run while visible.
+# The screen calls set_visible_live(on, focus) from its scroll check: textures and mist only run while visible,
+# and only the ONE focus zone (most of the map area) gets her live rig — never two rigs on screen (UX §10 Г-4).
 
 signal task_tapped(zid: String, tid: String)
 signal scene_tapped(zid: String)
@@ -35,6 +36,7 @@ var _glint: = PackedFloat32Array()
 var _finale: = 0.0
 var _t: = 0.0
 var _live: = false
+var _rig_on: = false  # this zone is the screen's focus: her rig may run here
 var _loaded: = false
 
 
@@ -107,7 +109,8 @@ func load_textures(on: bool) -> void:
 
 
 func _build_title() -> void:
-	# top shade + «ЗОНА II · 4/6» overline + the zone name in Playfair italic, left-aligned (editorial, UX §6.3)
+	# top shade + «Зона II · 4/6» (Caption 18, gold) + the zone name in Playfair italic, left-aligned (editorial,
+	# UX §6.3). Caption, not Overline 15: the map keeps to four type sizes — 44 · 32 · 22 · 18 (UX §3.7)
 	var shade: = TextureRect.new()
 	var g: = Gradient.new()
 	g.set_color(0, Color(V10SalonUI.NIGHT_900, 0.82))
@@ -129,10 +132,10 @@ func _build_title() -> void:
 	title_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(title_box)
 	var i: = V10SalonData.zone_ids().find(zid)
-	prog_lbl = V10SalonUI.overline("Зона %s" % ROMAN[i])
+	prog_lbl = V10SalonUI.label("Зона %s" % ROMAN[i], 18, V10SalonUI.GOLD_500, "body", 800, 0.6)
 	title_box.add_child(prog_lbl)
-	var nm: = V10SalonUI.label(str(z.name), 34, V10SalonUI.PAPER_100, "italic", 600, 0.6)
-	nm.position = Vector2(0, 20)
+	var nm: = V10SalonUI.label(str(z.name), 32, V10SalonUI.PAPER_100, "italic", 600, 0.6)
+	nm.position = Vector2(0, 22)
 	title_box.add_child(nm)
 
 
@@ -147,7 +150,7 @@ func refresh(instant: = false) -> void:
 		line += " · Нефрит"
 	elif st == "restored":
 		line += " · восстановлена"
-	prog_lbl.text = line.to_upper()
+	prog_lbl.text = line
 	prog_lbl.label_settings.font_color = V10SalonUI.JADE_300 if st in ["restored", "jade"] else V10SalonUI.GOLD_500
 	for t in z.tasks:
 		var v: = V10Salon.task_variant(zid, t.id)
@@ -237,8 +240,8 @@ func _layout_tags() -> void:
 func _sync_heroine() -> void:
 	var done: = bool(V10Salon.zone_rec(zid).done)
 	if done and heroine == null:
-		var h: = size.y * 0.92
-		heroine = V10SalonHeroine.make(str(z.hero), Vector2(size.y * 0.75, h), _live)
+		var h: = size.y * _hero_h()
+		heroine = V10SalonHeroine.make(str(z.hero), Vector2(size.y * 0.75, h), _rig_on)
 		heroine.position = Vector2(_hero_x() - heroine.size.x * 0.5, size.y - h)
 		heroine.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		# under the title shade but over the art and mist
@@ -246,7 +249,7 @@ func _sync_heroine() -> void:
 		move_child(heroine, tag_layer.get_index())
 		heroine.set_live(_live)
 	if done and scene_btn == null:
-		scene_btn = V10SalonButton.make("second", "Сцена", Rect2(size.x - 196, size.y - 92, 172, 68))
+		scene_btn = V10SalonButton.make("second", "Сцена", Rect2(size.x - 196, size.y - 104, 172, 80))
 		scene_btn.icon = "scene"
 		scene_btn.pressed.connect(func(): scene_tapped.emit(zid))
 		add_child(scene_btn)
@@ -257,15 +260,62 @@ func _hero_x() -> float:
 	return {"z1": 0.7, "z2": 0.52, "z3": 0.36}.get(zid, 0.5) * size.x
 
 
-func set_visible_live(on: bool) -> void:
+# her height in the zone: in z3 she stands on the left, under the zone title — a smaller figure keeps her face
+# (face_rect + 48 px) clear of the title (UX §10 Г-1)
+func _hero_h() -> float:
+	return {"z3": 0.78}.get(zid, 0.92)
+
+
+# Her line right in her zone, in her voice: no box (UX §6.3 — Voice 30, soft shadow, pen 0.4 s, hold 4 s, fade
+# 0.3 s), beside her at shoulder height on the open side of the painting, never over her face.
+var _say_lbl: Label
+var _say_tw: Tween
+
+func say(text: String) -> void:
+	if text == "":
+		return
+	if _say_lbl == null:
+		_say_lbl = V10SalonUI.label("", 30, V10SalonUI.PAPER_100, "italic", 500, 0.9)
+		_say_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		_say_lbl.vertical_alignment = VERTICAL_ALIGNMENT_TOP
+		_say_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		add_child(_say_lbl)
+	var hx: = _hero_x()
+	var w: = size.x * 0.44
+	var left: = hx > size.x * 0.5
+	_say_lbl.size = Vector2(w, size.y * 0.4)
+	if not left:
+		# on her right: keep clear of her face (Г-1)
+		var x0: = maxf(size.x - w - 24.0, hx + 130.0)
+		w = size.x - 24.0 - x0
+		_say_lbl.size.x = w
+	_say_lbl.position = Vector2(24.0 if left else size.x - w - 24.0, size.y * 0.36)
+	_say_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT if left else HORIZONTAL_ALIGNMENT_RIGHT
+	_say_lbl.text = text
+	_say_lbl.visible_ratio = 0.0
+	_say_lbl.modulate.a = 1.0
+	if _say_tw and _say_tw.is_valid():
+		_say_tw.kill()
+	if heroine:
+		heroine.talk(minf(3.0, 0.6 + text.length() * 0.045))
+	_say_tw = create_tween()
+	_say_tw.tween_property(_say_lbl, "visible_ratio", 1.0, 0.4 if V10SalonUI.can_fx() else 0.12)
+	_say_tw.tween_interval(4.0)
+	_say_tw.tween_property(_say_lbl, "modulate:a", 0.0, 0.3)
+
+
+func set_visible_live(on: bool, focus: = on) -> void:
 	load_textures(on or _loaded)
-	if on == _live:
+	var rig_on: = on and focus
+	if on == _live and rig_on == _rig_on:
 		return
 	_live = on
+	_rig_on = rig_on
 	set_process(on)
 	if heroine:
-		# a rig is only built for the visible zone (spec: «живой риг только у видимой»)
-		if on and heroine.rig == null and V10SalonHeroine.has_rig(str(z.hero)) != "":
+		# her rig only in the focus zone (spec: «живой риг только у видимой»; UX Г-4: ≤ 1 rig on screen); a zone
+		# that loses the focus goes back to her breathing still, so a frozen rig never stays on screen next to it
+		if (heroine.rig != null) != (rig_on and V10SalonHeroine.has_rig(str(z.hero)) != ""):
 			heroine.queue_free()
 			heroine = null
 			_sync_heroine()
@@ -291,11 +341,13 @@ func _gui_input(e: InputEvent) -> void:
 	if e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT and not e.pressed:
 		if e.position.distance_to(get_meta("down_at", e.position)) > 18.0:
 			return
-		# her first: a tap on the heroine is hers
-		if heroine and heroine.react_at(get_global_transform() * e.position) != "none":
-			heroine_tapped.emit(zid, "body")
-			accept_event()
-			return
+		# her first: a tap on the heroine is hers (the zone she reports: head / hair / arm… or outfit)
+		if heroine:
+			var hz: = heroine.react_at(get_global_transform() * e.position)
+			if hz != "none":
+				heroine_tapped.emit(zid, hz)
+				accept_event()
+				return
 		var tid: = task_at(e.position / size)
 		if tid != "" and V10Salon.restored(zid, tid):
 			V9Feel.press(null, "pop", "tap")
@@ -348,7 +400,7 @@ func play_restore(tid: String) -> void:
 		tt.tween_callback(tag.queue_free)
 	var rr: = task_rect(tid)
 	V10SalonFx.dust(self, rr.get_center(), maxf(rr.size.x, rr.size.y) * 0.5)
-	V10SalonUI.sound("salon_thud", 1.0, -2.0)
+	V10SalonUI.sound("salon_thud", 1.0, -4.5)  # file peak −2 dBFS → ≤ −6 dBFS played (UX З-4)
 	V10SalonUI.haptic("match")
 	var drop: = 40.0 / size.y
 	var dur: = 0.55 if fx else 0.12

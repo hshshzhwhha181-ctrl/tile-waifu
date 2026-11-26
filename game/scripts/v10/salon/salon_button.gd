@@ -5,9 +5,13 @@ extends Control
 #   "game"   rose.500 pill, night.900 Playfair 32 — the one main action of a screen; breathes 0.985↔1.0 / 3.2 s
 #            and gets one soft glint every 2.8 s while `alive` (an available action)
 #   "second" night.700 glass with a gold 1 px line at 35 %, paper text
-#   "quiet"  icon-sized glass circle (hit zone ≥ 80 px), for back / close / photo presets
+#   "quiet"  icon-sized glass circle (hit zone ≥ 80 px), for back / close / photo presets; `fill` paints the disc
+#            rose.500 (the scene's main action «Реплика» keeps the round shape but reads as THE button)
 #   "chip"   selectable pill (finish choice); `selected` draws gold
 # A disabled button still takes taps: it shakes «no» (V9Feel.deny) and emits `denied`, never silently ignores.
+# Every button carries meta `ux_role` (UX_RULES §3.4, checked by --ux_selftest): "game" → primary, "second" →
+# secondary, "quiet" → tertiary; "chip" → "segment": a row of chips is ONE control, its row container carries the
+# role. A screen overrides the role with set_meta("ux_role", …) where class and role differ (the scene's «Реплика»).
 
 signal pressed
 signal denied
@@ -16,7 +20,7 @@ var kind: = "game"
 var text: = ""
 var sub: = ""
 var stars: = -1  # draws «text · N★» with a drawn star when ≥ 0
-var icon: = ""  # "back" | "close" | "camera" | "chat" | "home" | "play" | "scene" | ""
+var icon: = ""  # "back" | "close" | "camera" | "chat" | "home" | "play" | "scene" | "help" | ""
 var disabled: = false:
 	set(v):
 		disabled = v
@@ -26,11 +30,14 @@ var selected: = false:
 		selected = v
 		queue_redraw()
 var alive: = false
+var fill: = false  # quiet only: rose disc + night icon (a primary action in the round shape)
 var accent: = V10SalonUI.ROSE_500
 var sound: = "pop"
 var _t: = 0.0
 var _down: = false
 var _glint: = -1.0
+
+const ROLE: = {"game": "primary", "second": "secondary", "chip": "segment", "quiet": "tertiary"}
 
 
 static func make(kind_: String, text_: String, rect: Rect2, stars_: = -1) -> V10SalonButton:
@@ -45,6 +52,7 @@ static func make(kind_: String, text_: String, rect: Rect2, stars_: = -1) -> V10
 	b.mouse_filter = Control.MOUSE_FILTER_STOP
 	b.focus_mode = Control.FOCUS_NONE
 	b.alive = kind_ == "game"
+	b.set_meta("ux_role", ROLE.get(kind_, "tertiary"))
 	return b
 
 
@@ -112,24 +120,31 @@ func _draw() -> void:
 				for p in pts:
 					clip.append(Vector2(clampf(p.x, size.y * 0.35, size.x - size.y * 0.35), p.y))
 				draw_colored_polygon(PackedVector2Array(clip), Color(1, 1, 1, a))
-			_draw_label(V10SalonUI.NIGHT_900 if not disabled else V10SalonUI.PAPER_500, 30, "display", 700)
+			_draw_label(V10SalonUI.NIGHT_900 if not disabled else V10SalonUI.PAPER_500, 32, "display", 700)
 		"second":
 			draw_style_box(V10SalonUI.panel_box(Color(V10SalonUI.NIGHT_700, 0.92), 4.0, Color(V10SalonUI.GOLD_700, 0.6), 1), r)
-			_draw_label(V10SalonUI.PAPER_100 if not disabled else V10SalonUI.PAPER_700, 24, "body", 800)
+			# disabled still carries information («Ещё 4 звезды»): paper.500 keeps ≥ 4.5:1 on night.700
+			_draw_label(V10SalonUI.PAPER_100 if not disabled else V10SalonUI.PAPER_500, 22, "body", 800)
 		"chip":
+			# the pill is at most 64 tall; a taller control is the 80 px hit zone around it (UX §6.1)
+			r = Rect2(0, maxf(0.0, (size.y - 64.0) * 0.5), size.x, minf(size.y, 64.0))
 			var bg: = Color(V10SalonUI.NIGHT_700, 0.96)
 			var line: = Color(V10SalonUI.GOLD_700, 0.5)
 			if selected:
-				bg = Color("3a2f2a")
+				bg = V10SalonUI.NIGHT_600.lerp(V10SalonUI.GOLD_700, 0.18)
 				line = V10SalonUI.GOLD_500
 			draw_style_box(V10SalonUI.panel_box(bg, size.y * 0.5, line, 2 if selected else 1), r)
-			_draw_label(V10SalonUI.GOLD_300 if selected else (V10SalonUI.PAPER_300 if not disabled else V10SalonUI.PAPER_700), 21, "body", 800)
+			_draw_label(V10SalonUI.GOLD_300 if selected else (V10SalonUI.PAPER_300 if not disabled else V10SalonUI.PAPER_500), 22, "body", 800)
 		"quiet":
 			var c: = size * 0.5
 			var rad: = minf(size.x, size.y) * 0.5 - 6.0
-			draw_circle(c, rad, Color(V10SalonUI.NIGHT_800, 0.62))
-			draw_arc(c, rad, 0, TAU, 48, Color(V10SalonUI.GOLD_700, 0.55), 1.0, true)
-			_draw_icon(c, rad * 0.5, V10SalonUI.PAPER_100)
+			if fill:
+				draw_circle(c, rad, accent)
+				_draw_icon(c, rad * 0.5, V10SalonUI.NIGHT_900)
+			else:
+				draw_circle(c, rad, Color(V10SalonUI.NIGHT_800, 0.62))
+				draw_arc(c, rad, 0, TAU, 48, V10SalonUI.GOLD_500 if selected else Color(V10SalonUI.GOLD_700, 0.55), 2.0 if selected else 1.0, true)
+				_draw_icon(c, rad * 0.5, V10SalonUI.GOLD_300 if selected else V10SalonUI.PAPER_100)
 			if text != "":
 				var f: = V10SalonUI.font("body", 800)
 				var tw: = f.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, 18).x
@@ -197,6 +212,11 @@ func _draw_icon(c: Vector2, s: float, col: Color) -> void:
 		"scene":
 			draw_rect(Rect2(c + Vector2(-s, -s * 0.7), Vector2(s * 2, s * 1.4)), col, false, w)
 			draw_colored_polygon(PackedVector2Array([c + Vector2(-s * 0.3, -s * 0.4), c + Vector2(s * 0.45, 0), c + Vector2(-s * 0.3, s * 0.4)]), col)
+		"help":
+			# «?» monoline: an open hook and a dot
+			draw_arc(c + Vector2(0, -s * 0.35), s * 0.5, PI * 1.05, PI * 2.35, 20, col, w, true)
+			draw_line(c + Vector2(s * 0.12, s * 0.02), c + Vector2(0, s * 0.3), col, w, true)
+			draw_circle(c + Vector2(0, s * 0.72), w * 0.75, col)
 		"frame":
 			for k in 4:
 				var sx: = -1.0 if k % 2 == 0 else 1.0

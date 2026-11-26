@@ -18,6 +18,7 @@ var screen_id: = ""
 var args: = {}
 var history: = []
 var fixture: = {}
+var went_home: = false
 
 
 func _ready() -> void:
@@ -46,11 +47,11 @@ func _ready() -> void:
 		return
 	var sc: String = str(args.get("screen", "salon"))
 	if sc.begins_with("scene:"):
-		go("v10scene", {"zone": sc.substr(6)}, false)
+		go("v10scene", {"zone": sc.substr(6)}, false, false)
 	elif sc == "hub":
 		_hub_demo()
 	else:
-		go("v10salon", {}, false)
+		go("v10salon", {}, false, false)
 	if args.has("quit"):
 		await get_tree().create_timer(float(args.quit)).timeout
 		if args.has("shots"):
@@ -112,12 +113,13 @@ const SCREENS: = {
 }
 
 
-func go(id: String, a: = {}, remember: = true) -> void:
+# same signature and history rules as main.go / main.back (so screens can pass animate / remember)
+func go(id: String, a: = {}, _animate: = true, remember: = true) -> void:
 	if not SCREENS.has(id):
 		# the Path, home… are outside this lane: show where the button leads and come back
 		toast("→ " + id)
 		return
-	if screen and remember:
+	if screen and remember and screen_id != id:
 		history.append([screen_id, screen.get_meta("v8_args", {})])
 	if screen:
 		screen.queue_free()
@@ -132,11 +134,14 @@ func go(id: String, a: = {}, remember: = true) -> void:
 
 
 func back() -> void:
-	if history.is_empty():
-		toast("→ home")
+	while not history.is_empty():
+		var e: Array = history.pop_back()
+		if e[0] == screen_id:
+			continue
+		go(e[0], e[1], false, false)
 		return
-	var e: Array = history.pop_back()
-	go(e[0], e[1], false)
+	went_home = true
+	toast("→ home")
 
 
 func show_chrome(_top: bool, _nav: bool) -> void:
@@ -196,9 +201,12 @@ func wait(s: float) -> void:
 
 func _playtest() -> void:
 	var fails: = []
-	go("v10salon", {}, false)
+	go("v10salon", {}, false, false)
 	await wait(1.4)
 	await shot("01_fresh_intro")
+	screen.dev_act("help")
+	await wait(0.5)
+	await shot("01b_help")
 	# sheet of the hinted task
 	screen.dev_act("open_sheet")
 	await wait(0.6)
@@ -230,11 +238,11 @@ func _playtest() -> void:
 	for i in 30:
 		fixture.stars[str(100 + i)] = 3
 	V10Salon.notify_stars(90)
-	screen._refresh_bottom()
-	for zid in screen.zones:
-		screen.zones[zid].refresh()
-	await wait(0.3)
+	screen.refresh()
+	await wait(0.6)
 	await shot("07_affordable_tags")
+	if screen.play_btn.text != "Восстановить":
+		fails.append("main button restores when the bank covers the next task")
 	while true:
 		var gg: = V10Salon.next_goal()
 		if gg.is_empty() or gg.zid != "z1":
@@ -248,7 +256,7 @@ func _playtest() -> void:
 			await wait(0.1)
 			if screen.finale and is_instance_valid(screen.finale):
 				break
-	await wait(2.6)
+	await wait(3.8)
 	await shot("09_finale_ceremony")
 	if not bool(V10Salon.zone_rec("z1").chest):
 		fails.append("chest not claimed")
@@ -257,6 +265,8 @@ func _playtest() -> void:
 	await shot("10_map_z2_open")
 	await screen._scroll_to("z1", false)
 	await wait(1.2)
+	screen.dev_act("say:z1/head")
+	await wait(1.0)
 	await shot("11_z1_done_heroine")
 	# jade finish on the sign
 	screen._on_task("z1", "t1")
@@ -288,12 +298,17 @@ func _playtest() -> void:
 		fails.append("photo not saved")
 	screen.photo.close()
 	await wait(0.4)
-	# finish z2 for Rin
+	# «назад» from the scene returns to the map (and must not remember the scene: no salon ↔ scene loop)
+	screen.dev_act("back")
+	await wait(0.6)
+	if screen_id != "v10salon":
+		fails.append("scene back → salon")
+	# finish z2 for Rin, open her scene from the map
 	var s: Dictionary = fixture[V10Salon.KEY]
 	for t in V10SalonData.zone("z2").tasks:
 		s.zones.z2.t[t.id] = "lacquer"
 	s.zones.z2.done = true
-	go("v10scene", {"zone": "z2"})
+	screen._open_scene("z2")
 	await wait(1.4)
 	await shot("18_scene_z2_rin")
 	screen.dev_act("tap_head")
@@ -304,9 +319,13 @@ func _playtest() -> void:
 	await shot("20_lobby_toast")
 	if V10Salon.lobby_texture() == "":
 		fails.append("lobby not set")
-	go("v10salon", {"zone": "z2"})
+	screen.dev_act("back")
 	await wait(1.4)
 	await shot("21_map_z2_done")
+	# the map's «назад» now leaves the salon (home), never back into a scene
+	screen.call("_back")
+	if not went_home or screen_id != "v10salon":
+		fails.append("salon back → home (history %s)" % [history])
 	screen.queue_free()
 	screen = null
 	_hub_demo()

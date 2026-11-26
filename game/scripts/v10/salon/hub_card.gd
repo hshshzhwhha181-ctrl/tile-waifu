@@ -3,8 +3,8 @@ extends Control
 
 # Home hub card «Салон» (spec §Р1 п.2, decision §11 п.8: a card on the home screen instead of a sixth tab).
 # Left: a live miniature of the current zone (the same reveal shader, so the card shows exactly what is restored),
-# right: overline «САЛОН», the zone name, the progress ring «z2 · 4/6» and the next goal; a gold dot when
-# something can be restored now. Tap → on_tap (integrator: main.go("v10salon")).
+# right: overline «САЛОН», the zone name, the progress ring «II · 4/6» and the next goal; one dot when something
+# can be restored now (UX §3.6: 12 px rose.300, static — badges never pulse). Tap → on_tap (main.go("v10salon")).
 #   var card: = V10SalonHub.make(Rect2(32, 900, 656, 168), func(): main.go("v10salon"))
 #   home.add_child(card)   # or V10Registry.home_slot("salon", builder, priority)
 # card.refresh() after stars change (V10Hooks.app_resumed / win screen).
@@ -15,7 +15,6 @@ var mini_mat: ShaderMaterial
 var name_lbl: Label
 var goal_lbl: Label
 var info: = {}
-var _t: = 0.0
 var _press: = false
 
 
@@ -26,6 +25,7 @@ static func make(r: Rect2, cb: Callable) -> V10SalonHub:
 	c.on_tap = cb
 	c.mouse_filter = Control.MOUSE_FILTER_STOP
 	c.pivot_offset = r.size * 0.5
+	c.set_meta("ux_role", "secondary")
 	c._build()
 	return c
 
@@ -101,12 +101,6 @@ func refresh() -> void:
 	queue_redraw()
 
 
-func _process(dt: float) -> void:
-	_t += dt
-	if bool(info.get("dot", false)):
-		queue_redraw()
-
-
 func _draw() -> void:
 	draw_style_box(V10SalonUI.panel_box(V10SalonUI.NIGHT_800, 4.0, Color(V10SalonUI.GOLD_700, 0.4), 1), Rect2(Vector2.ZERO, size))
 	draw_rect(Rect2(mini.position - Vector2(1, 1), mini.size + Vector2(2, 2)), Color(V10SalonUI.GOLD_700, 0.45), false, 1.0)
@@ -126,10 +120,8 @@ func _draw() -> void:
 	var w2: = f.get_string_size(zl, HORIZONTAL_ALIGNMENT_LEFT, -1, 18).x
 	draw_string(f, Vector2(c.x - w2 * 0.5, c.y - 14), zl, HORIZONTAL_ALIGNMENT_LEFT, -1, 18, V10SalonUI.PAPER_500)
 	if bool(info.get("dot", false)):
-		# the gold «можно восстановить» dot breathes on the ring
-		var a: = 0.75 + 0.25 * sin(_t * 3.0)
-		draw_circle(c + Vector2(r * 0.72, -r * 0.72), 11.0, Color(V10SalonUI.GOLD_300, a))
-		draw_circle(c + Vector2(r * 0.72, -r * 0.72), 6.0, V10SalonUI.GOLD_500)
+		# «можно восстановить»: one still dot, 12 px rose.300, no rim, no pulse (UX §3.6, HUD_V2 §4)
+		draw_circle(c + Vector2(r * 0.72, -r * 0.72), 6.0, V10SalonUI.ROSE_300)
 
 
 func _gui_input(e: InputEvent) -> void:
