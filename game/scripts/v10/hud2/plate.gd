@@ -205,11 +205,11 @@ func _relayout() -> void:
 			V10Type.fit(_title_l, title, "title_sm", tw, 1, tcol)
 			if subtitle != "":
 				V10Type.fit(_sub_l, subtitle, "caption_m", tw, 1, Color(V10DS.PAPER_300, a))
-				var top: = (h - 32.0 - 26.0) * 0.5
+				var top: = (h - 32.0 - 28.0) * 0.5
 				_title_l.position = Vector2(x, top)
 				_title_l.size = Vector2(tw, 32)
 				_sub_l.position = Vector2(x, top + 32.0)
-				_sub_l.size = Vector2(tw, 26)
+				_sub_l.size = Vector2(tw, 28)
 			else:
 				_title_l.position = Vector2(x, 0)
 				_title_l.size = Vector2(tw, h)
@@ -245,29 +245,41 @@ func _draw() -> void:
 
 
 static func draw_surface(ci: CanvasItem, r: Rect2, over_art: = true, down: = false, sel: = false, dis: = false, foc: = false, flash: = -1.0, fill_override: = Color.TRANSPARENT) -> void:
-	# §2.2 — shared by the plate, the tray and sheets
-	var sb: = StyleBoxFlat.new()
-	var fill: = V10DS.NIGHT_600 if down else V10DS.NIGHT_800
+	# §2.2 (Wave 2 «дорогой лак») — shared by the plate, the tray and sheets:
+	# warm lacquer gradient, thin antique-gold rim with a bright inner highlight, champagne corner studs.
+	var rad: = 10.0
+	var a_fill: = V10DS.ON_ART_A if over_art else 1.0
+	var top_c: Color = V10DS.PLATE_SEL_TOP if sel else V10DS.PLATE_TOP
+	var bot_c: Color = V10DS.PLATE_SEL_BOT if sel else V10DS.PLATE_BOT
+	if down:
+		top_c = V10DS.NIGHT_600
+		bot_c = V10DS.NIGHT_700
 	if fill_override.a > 0.0:
-		fill = fill_override
-	sb.bg_color = Color(fill, V10DS.ON_ART_A if over_art else 1.0)
-	sb.set_corner_radius_all(V10DS.RADIUS)
-	sb.anti_aliasing = true
-	sb.border_width_left = 0
-	sb.border_width_top = 0
-	sb.border_width_right = 0
-	sb.border_width_bottom = 0
-	ci.draw_style_box(sb, r)
-	# lacquer: paper.100 α 0.05 → 0 over the top 40 % (a tone, not a gloss stripe)
-	var lh: = r.size.y * 0.4
+		top_c = fill_override
+		bot_c = fill_override.darkened(0.25)
+	var op: = V10Button.rr_pts(r, rad, 8)
+	var rim_a: = 0.2 if dis else (1.0 if (sel or foc) else (0.9 if down else 0.6))
+	ci.draw_polygon(op, V10Button.grad_cols(op, r.position.y, r.end.y, [[0.0, Color(V10DS.PLATE_SPARK, rim_a)], [0.5, Color(V10DS.PLATE_RIM, rim_a)], [1.0, Color(V10DS.GOLD_700, rim_a)]]))
+	var r2: = r.grow(-1.5)
+	var ip: = V10Button.rr_pts(r2, rad - 1.5, 8)
+	ci.draw_polygon(ip, V10Button.grad_cols(ip, r2.position.y, r2.end.y, [[0.0, Color(top_c, a_fill)], [1.0, Color(bot_c, a_fill)]]))
+	# lacquer: warm sheen on the top 45 %
+	var lh: = r.size.y * 0.45
 	var lac: = Color(V10DS.PAPER_100, V10DS.LACQUER_A)
 	var clear: = Color(V10DS.PAPER_100, 0.0)
-	ci.draw_polygon(PackedVector2Array([r.position + Vector2(2, 1), r.position + Vector2(r.size.x - 2, 1),
-			r.position + Vector2(r.size.x - 2, lh), r.position + Vector2(2, lh)]),
+	ci.draw_polygon(PackedVector2Array([r.position + Vector2(rad * 0.6, 2.5), r.position + Vector2(r.size.x - rad * 0.6, 2.5),
+			r.position + Vector2(r.size.x - 3, lh), r.position + Vector2(3, lh)]),
 			PackedColorArray([lac, lac, clear, clear]))
-	# bottom tone: 1 px night.900 α 0.6 inside the bottom edge
-	ci.draw_line(r.position + Vector2(V10DS.RADIUS, r.size.y - 0.5), r.position + Vector2(r.size.x - V10DS.RADIUS, r.size.y - 0.5),
-			Color(V10DS.NIGHT_900, V10DS.BOTTOM_TONE_A), 1.0)
+	# inner gold highlight line 4 px inside the rim
+	var hp: = V10Button.rr_pts(r.grow(-4.0), rad - 4.0, 8)
+	hp.append(hp[0])
+	ci.draw_polyline(hp, Color(V10DS.GOLD_500, 0.10 if dis else 0.26), 1.0, true)
+	ci.draw_line(r.position + Vector2(rad, r.size.y - 2.5), r.position + Vector2(r.size.x - rad, r.size.y - 2.5),
+			Color(V10DS.NIGHT_900, V10DS.BOTTOM_TONE_A), 1.5)
+	# champagne corner studs
+	if not dis:
+		for cxy in [Vector2(r.position.x + 7, r.position.y + 7), Vector2(r.end.x - 7, r.position.y + 7), Vector2(r.position.x + 7, r.end.y - 7), Vector2(r.end.x - 7, r.end.y - 7)]:
+			ci.draw_colored_polygon(PackedVector2Array([cxy + Vector2(0, -2.6), cxy + Vector2(2.6, 0), cxy + Vector2(0, 2.6), cxy + Vector2(-2.6, 0)]), Color(V10DS.PLATE_SPARK, 0.8))
 	# THE hairline (top only)
 	var la: = V10DS.HAIR_A
 	var lc: = V10DS.GOLD_700
