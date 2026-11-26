@@ -11,16 +11,24 @@ extends RefCounted
 const INFO: = {
 	"id": "cube",
 	"name": "Куб",
+	"title": "Куб",
 	"shelf": "solitaire",
 	"line": "Вращай куб и снимай пары",
 	"host": "nova",
 	"gate": {"level": 40},
 	"pt": "res://scripts/v10/mj/cube/cube_demo.tscn",
 	"screen": "res://scripts/v10/mj/cube/cube_screen.gd",
+	"save": "v10_mj_cube",
+	"selftest": "res://scripts/v10/mj/cube/cube_selftest.tscn",
 	"music": "cube",
 	"music_desc": {"instruments": ["синт-пэд", "кото", "гранулы"], "bpm": 80},
 	"icon": "res://assets/v10/mj/cube/cube_icon.png",
 	"levels": 40,
+	"HOW": [
+		["rotate", "Веди пальцем по пустому месту — куб повернётся"],
+		["pair", "Тапни две одинаковые свободные фишки"],
+		["relic", "Внутри спрятана реликвия героини"],
+	],
 }
 
 # «Как играть»: три строки с иконками (UX_RULES §4.1 п.9)

@@ -8,11 +8,11 @@ extends Control
 #   pair — два одинаковых кубика; cube — изометрический кубик 3×3 (знак режима); relic — искра в сердцевине
 
 var kind: = "hint"
-var color: = Color("F1D9A0")
+var color: = V10DS.GOLD_300
 var stroke: = 2.5
 
 
-func _init(k: = "hint", c: = Color("F1D9A0")) -> void:
+func _init(k: = "hint", c: = V10DS.GOLD_300) -> void:
 	kind = k
 	color = c
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -58,6 +58,13 @@ func _draw() -> void:
 		"pause":
 			draw_line(P.call(18, 13), P.call(18, 35), color, w * 1.2, true)
 			draw_line(P.call(30, 13), P.call(30, 35), color, w * 1.2, true)
+		"help":
+			draw_arc(P.call(24, 24), 15.0 * s, 0, TAU, 32, color, w, true)
+			draw_arc(P.call(24, 20), 4.6 * s, PI, TAU + PI * 0.42, 16, color, w, true)
+			draw_line(P.call(24, 24.5), P.call(24, 28), color, w, true)
+			draw_circle(P.call(24, 33.5), w * 0.65, color)
+		"back":
+			draw_polyline(PackedVector2Array([P.call(29, 12), P.call(17, 24), P.call(29, 36)]), color, w, true)
 		"star":
 			var pts: = PackedVector2Array()
 			for k in 11:

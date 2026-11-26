@@ -288,91 +288,100 @@ static func _targets(cols: int, rows: int, variant: String, dens: float, shape: 
 	return {"kind": "cells", "cells": cells}
 
 
-# ── reverse construction ────────────────────────────────────────────────────────────────────────────────
+# ── forward peeling construction (100% deadlock-free on static / rain / shift) ─────────────────────────
 static func _construct(cols: int, rows: int, variant: String, tgt: Dictionary, rng: RandomNumberGenerator, p_long: float) -> Dictionary:
-	var pw: = cols + 2
-	var ph: = rows + 2
-	var stacks: Array
-	var counts: Array
-	var depth: Array = []
+	var pos0: Array = []
 	if tgt.kind == "cells":
-		stacks = []
-		counts = []
 		for c in tgt.cells:
-			stacks.append([c])
-			counts.append(1)
-			depth.append(mini(mini(c.x, cols + 1 - c.x), mini(c.y, rows + 1 - c.y)))
+			pos0.append(c as Vector2i)
 	else:
-		stacks = V10MjConnectBoard.make_stacks(cols, rows, variant)
-		counts = tgt.counts
-		for s in stacks:
-			depth.append(1)
-	var total: = 0
-	for c in counts:
-		total += int(c)
-	var content: Array = []
-	for s in stacks:
-		content.append([])
-	var occ: = PackedInt32Array()
-	occ.resize(pw * ph)
-	occ.fill(-1)
-	var pos: Array = []
-	pos.resize(total)
-	var pairs: Array = []
-	var nlong: = 0
-	var static_mode: bool = tgt.kind == "cells"
-	var P: = total / 2
-	for k in P:
-		var ida: = k * 2
-		var idb: = k * 2 + 1
-		var placed: = false
-		var open: Array = []
-		var wsum: = 0.0
+		var stacks: Array = V10MjConnectBoard.make_stacks(cols, rows, variant)
+		var counts: Array = tgt.counts
 		for si in stacks.size():
-			if content[si].size() < int(counts[si]):
-				open.append(si)
-				wsum += 1.0 + float(depth[si] * depth[si]) * (2.0 if static_mode else 0.0)
-		for try_a in 18:
-			var sa: = _pick_weighted(open, depth, wsum, static_mode, rng)
-			var ia: = rng.randi_range(0, content[sa].size())
-			_ins(stacks, content, occ, pos, pw, sa, ia, ida)
-			var cands: Array = []
-			for si in stacks.size():
-				var room: = int(counts[si]) - content[si].size()
-				if room <= 0:
-					continue
-				for j in range(content[si].size() + 1):
-					cands.append(Vector2i(si, j))
-			_shuffle(cands, rng)
-			var want_long: = rng.randf() < p_long
-			var best: = Vector2i(-1, -1)
-			var best_t: = -1
-			var tried: = 0
-			for cnd in cands:
-				if tried >= 48:
-					break
-				tried += 1
-				_ins(stacks, content, occ, pos, pw, cnd.x, cnd.y, idb)
-				var t: = V10MjConnectPath.turns(occ, pw, ph, pos[ida], pos[idb])
-				_del(stacks, content, occ, pos, pw, cnd.x, idb)
+			var s_cells: Array = stacks[si]
+			var lim: int = mini(int(counts[si]), s_cells.size())
+			for j in lim:
+				pos0.append(s_cells[j] as Vector2i)
+	var total: int = pos0.size()
+	if total < 2 or total % 2 == 1:
+		return {}
+	var flat0: Array = []
+	for c in pos0:
+		var cv: Vector2i = c
+		flat0.append(cv.x)
+		flat0.append(cv.y)
+	var zero: Array = []
+	zero.resize(total)
+	zero.fill(0)
+	var sim: V10MjConnectBoard = V10MjConnectBoard.new().load_payload({
+		"cols": cols, "rows": rows, "variant": variant, "n": total, "face": zero, "pos": flat0,
+	})
+	var cert: Array = []
+	var nlong: int = 0
+	var P: int = total / 2
+	for _k in P:
+		var alive_ids: Array = []
+		for t in total:
+			if sim.alive[t] == 1:
+				alive_ids.append(t)
+		_shuffle(alive_ids, rng)
+		var want_long: bool = rng.randf() < p_long
+		var best_a: int = -1
+		var best_b: int = -1
+		var best_t: int = -1
+		var m_a: int = mini(alive_ids.size(), 14)
+		for ia in m_a:
+			var a: int = int(alive_ids[ia])
+			var pa: Vector2i = sim.pos[a]
+			var m_b: int = mini(alive_ids.size(), ia + 11)
+			for ib in range(ia + 1, m_b):
+				var b: int = int(alive_ids[ib])
+				var t: int = V10MjConnectPath.turns(sim.occ, sim.pw, sim.ph, pa, sim.pos[b] as Vector2i)
 				if t < 0:
 					continue
 				if best_t < 0 or (want_long and t > best_t) or (not want_long and t < best_t):
-					best = cnd
+					best_a = a
+					best_b = b
 					best_t = t
-				if (want_long and t == 2) or (not want_long and t == 0):
+				if (want_long and t == 2) or (not want_long and t <= 1):
 					break
-			if best_t >= 0:
-				_ins(stacks, content, occ, pos, pw, best.x, best.y, idb)
-				pairs.append([ida, idb])
-				if best_t == 2:
-					nlong += 1
-				placed = true
+			if (want_long and best_t == 2) or (not want_long and best_t >= 0 and best_t <= 1):
 				break
-			_del(stacks, content, occ, pos, pw, sa, ida)
-		if not placed:
+		if best_t < 0:
+			var rim: Array = []
+			for id_v in alive_ids:
+				var tid: int = int(id_v)
+				var pc: Vector2i = sim.pos[tid]
+				for d in V10MjConnectPath.DIRS:
+					if sim.at(pc + d) < 0:
+						rim.append(tid)
+						break
+			for ia in rim.size():
+				var a2: int = int(rim[ia])
+				var pa2: Vector2i = sim.pos[a2]
+				for ib in range(ia + 1, rim.size()):
+					var b2: int = int(rim[ib])
+					var t2: int = V10MjConnectPath.turns(sim.occ, sim.pw, sim.ph, pa2, sim.pos[b2] as Vector2i)
+					if t2 < 0:
+						continue
+					if best_t < 0 or (want_long and t2 > best_t) or (not want_long and t2 < best_t):
+						best_a = a2
+						best_b = b2
+						best_t = t2
+					if (want_long and t2 == 2) or (not want_long and t2 <= 1):
+						break
+				if (want_long and best_t == 2) or (not want_long and best_t >= 0 and best_t <= 1):
+					break
+		if best_t < 0:
 			return {}
-	return {"n": total, "pos": pos, "pairs": pairs, "long": nlong}
+		var path: Array = V10MjConnectPath.find(sim.occ, sim.pw, sim.ph, sim.pos[best_a] as Vector2i, sim.pos[best_b] as Vector2i)
+		sim.remove(best_a, best_b, path)
+		cert.append([best_a, best_b])
+		if best_t == 2:
+			nlong += 1
+	var pairs: Array = cert.duplicate()
+	pairs.reverse()
+	return {"n": total, "pos": pos0, "pairs": pairs, "long": nlong}
 
 
 static func _pick_weighted(open: Array, depth: Array, wsum: float, static_mode: bool, rng: RandomNumberGenerator) -> int:

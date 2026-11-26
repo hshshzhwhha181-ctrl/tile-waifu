@@ -38,6 +38,10 @@ static func st(S = null) -> Dictionary:
 	return d
 
 
+static func ensure(S = null) -> Dictionary:
+	return st(S)
+
+
 static func help_for(level: int) -> Dictionary:
 	return (HELP_BOSS if V10MjCubeShapes.is_boss(level) else HELP_N).duplicate()
 

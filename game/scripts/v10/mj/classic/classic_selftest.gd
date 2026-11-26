@@ -831,7 +831,7 @@ func _flow() -> void:
 	check(res is Dictionary and "win" in m.kinds(), "win sent, finished(result) emitted")
 	if res is Dictionary:
 		var keys_ok: = true
-		for k in ["mode", "win", "score", "stars", "time_s", "pairs", "hero", "seed", "rewards"]:
+		for k in ["mode", "win", "score", "stars", "time_s", "pairs", "hero", "seed", "level", "rewards"]:
 			if not res.has(k):
 				keys_ok = false
 		var rw: Dictionary = res.get("rewards", {})
@@ -979,6 +979,16 @@ func _words() -> void:
 		check(true, "V10Lint absent: §4.3 list only")
 	# simple words: no «ульта», the Приём is «Приём»
 	check(not V10MjClassicInfo.INFO.line.to_lower().contains("ульт") and V10MjClassicInfo.HOW.size() == 3, "«Как играть»: 3 lines")
+	check(V10MjClassicStyle.TOK.night900 == V10DS.NIGHT_900 and V10MjClassicStyle.TOK.rose500 == V10DS.ROSE_500, "tokens aliased to V10DS")
+	var sv_box: = {}
+	var sv_d: = V10MjClassicSave.st(sv_box)
+	check(sv_box.has(V10MjClassicSave.KEY) and sv_d is Dictionary, "V10MjClassicSave.st(S) idempotent")
+	var raw_time: = 0
+	for f2 in DirAccess.get_files_at(dir):
+		if f2.ends_with(".gd") and f2 != "classic_selftest.gd":
+			var tx2: = FileAccess.get_file_as_string(dir + f2)
+			raw_time += tx2.count("Time.get_unix_time_from_system") + tx2.count("Time.get_date_string_from_system")
+	check(raw_time == 0, "zero raw Time.*_from_system calls (%d)" % raw_time)
 
 
 # ---- snapshots of the demo (only with --mj_classic_shots=<dir>) -----------------------------------------------------

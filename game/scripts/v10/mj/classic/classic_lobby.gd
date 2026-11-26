@@ -38,6 +38,10 @@ var how_sheet: Control
 var cards: Array = []
 
 
+func build(main_: Node, a: Dictionary = {}) -> void:
+	setup(main_, a)
+
+
 func setup(main_: Node, a: Dictionary) -> void:
 	main = main_
 	args = a
@@ -287,7 +291,7 @@ class _Card:
 				_down = e.position
 			elif _down.x >= 0.0 and e.position.distance_to(_down) < 16.0:
 				_down = Vector2(-1, -1)
-				if Rect2(size.x - 56, 0, 56, 56).has_point(e.position):
+				if Rect2(size.x - 80, 0, 80, 80).has_point(e.position):
 					heart = V10MjClassicData.toggle_heart(form.id)
 					V9Feel.press(self, "pop", "select")
 					queue_redraw()
@@ -487,6 +491,8 @@ func _go() -> void:
 			a.size = mem_size
 			a.hero = cover_hero()
 	play.emit(a)
+	if play.get_connections().is_empty() and main != null and main.has_method("go"):
+		main.go("mj_classic_memory" if variant == "memory" else "mj_classic_play", a)
 
 
 func _how() -> void:

@@ -75,7 +75,11 @@ var _busy: = false
 var _auto_shuffles: = 0
 
 
-func setup(m, a: Dictionary) -> void:
+func build(m, a: Dictionary = {}) -> void:
+	setup(m, a)
+
+
+func setup(m, a: Dictionary = {}) -> void:
 	main = m
 	args = a
 	demo = bool(a.get("demo", false))
@@ -90,7 +94,8 @@ func setup(m, a: Dictionary) -> void:
 		relic_hero = V10MjCubeShapes.host_of(level)
 	fx_min = bool(a.get("fx_min", false)) or V9Feel.level() == "min"
 	rng.seed = int(a.get("seed_shuffle", level * 977 + 5))
-	if is_inside_tree():
+	set_anchors_preset(Control.PRESET_FULL_RECT)
+	if is_inside_tree() and view == null:
 		_build()
 
 
@@ -105,7 +110,10 @@ func _ready() -> void:
 
 func _build() -> void:
 	vw = get_viewport_rect().size
-	size = vw
+	if vw.x <= 0.0:
+		vw = Vector2(720, 1280)
+	if anchor_right == 0.0:
+		size = vw
 	var extra: = maxf(0.0, vw.y - 1280.0)
 	band_h = 120.0 + minf(extra, 330.0)
 	var spare: = extra - minf(extra, 330.0)
@@ -318,6 +326,7 @@ func _icon_button(kind: String, pos: Vector2) -> Button:
 	b.position = pos
 	b.size = Vector2(80, 80)
 	b.custom_minimum_size = Vector2(80, 80)
+	b.set_meta("ux_role", "tertiary")
 	var ic: = V10MjCubeIcon.new(kind, T.paper300)
 	ic.position = Vector2(16, 16)
 	ic.size = Vector2(48, 48)
@@ -345,6 +354,8 @@ func _build_help() -> void:
 		b.focus_mode = Control.FOCUS_NONE
 		b.position = Vector2(12, 0)
 		b.size = Vector2(96, 96)
+		b.custom_minimum_size = Vector2(96, 96)
+		b.set_meta("ux_role", "tertiary")
 		b.draw.connect(func():
 			var c: = Vector2(48, 48)
 			var on: bool = int(help_left.get(key, 0)) > 0
@@ -414,7 +425,7 @@ func _start() -> void:
 
 # an event goes to the presence (ext or lite); the lite stub always hears it too (tilt, motes, audit)
 func _emit(ev: String, data: Dictionary) -> void:
-	if presence != lite and presence.has_method("on"):
+	if presence != lite and presence.has_method("on") and ev != "start":
 		presence.on(ev, data)
 	lite.on(ev, data)
 
@@ -766,8 +777,8 @@ func _on_win() -> void:
 	view.relic_leave()
 	await _relic_flight(from, to)
 	_emit("win", {"relic": relic_hero})
-		if not presence.has_signal("finale_done"):
-			get_tree().create_timer(2.4).timeout.connect(_after_finale)
+	if not presence.has_signal("finale_done"):
+		get_tree().create_timer(2.4).timeout.connect(_after_finale)
 
 
 func _relic_flight(from: Vector2, to: Vector2) -> void:
@@ -878,8 +889,9 @@ func _primary(text: String, w: = 560.0) -> Button:
 	b.name = "Primary"
 	b.text = text
 	b.focus_mode = Control.FOCUS_NONE
-	b.size = Vector2(w, 104)
+	b.size = Vector2(maxf(440.0, w), 104)
 	b.custom_minimum_size = b.size
+	b.set_meta("ux_role", "primary")
 	for st in ["normal", "hover", "pressed", "focus"]:
 		var sb: = StyleBoxFlat.new()
 		sb.bg_color = T.rose700 if st == "pressed" else T.rose500
@@ -906,6 +918,8 @@ func _secondary(text: String) -> Button:
 	b.flat = true
 	b.focus_mode = Control.FOCUS_NONE
 	b.size = Vector2(320, 80)
+	b.custom_minimum_size = Vector2(320, 80)
+	b.set_meta("ux_role", "secondary")
 	b.add_theme_font_override("font", V10MjCubeStyle.font("body", 800))
 	b.add_theme_font_size_override("font_size", 22)
 	for cn in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color"]:
@@ -950,8 +964,12 @@ func _start_sheet() -> void:
 	dn.position = Vector2(34, 120)
 	p.add_child(dn)
 	var sr: = _stars_row(V10MjCubeSave.stars_of(save_d, level), 3, 34.0)
-	sr.position = Vector2(vw.x - 32.0 - sr.size.x, 72)
+	sr.position = Vector2(vw.x - 116.0 - sr.size.x, 72)
 	p.add_child(sr)
+	var help_b: = _icon_button("help", Vector2(vw.x - 96.0, 20.0))
+	help_b.name = "HelpBtn"
+	help_b.pressed.connect(func(): _help_sheet(true))
+	p.add_child(help_b)
 	var row: = Control.new()
 	row.position = Vector2(24, 168)
 	row.size = Vector2(vw.x - 48.0, 88)
@@ -989,6 +1007,10 @@ func _pause_sheet() -> void:
 	var h: = V10MjCubeStyle.label("Пауза", 32, T.paper100, "title", 600)
 	h.position = Vector2(32, 32)
 	p.add_child(h)
+	var help_b: = _icon_button("help", Vector2(vw.x - 96.0, 18.0))
+	help_b.name = "HelpBtn"
+	help_b.pressed.connect(func(): _help_sheet(false, was))
+	p.add_child(help_b)
 	for k in V10MjCubeInfo.HOW.size():
 		var row: Array = V10MjCubeInfo.HOW[k]
 		var ic: = V10MjCubeIcon.new(row[0], T.gold300)
@@ -1014,6 +1036,78 @@ func _pause_sheet() -> void:
 		result["action"] = "exit"
 		finished.emit(result))
 	p.add_child(quit)
+
+
+func open_help() -> void:
+	_help_sheet(false, input_on)
+
+
+func _help_sheet(from_start: bool, prev_input: bool = true) -> void:
+	input_on = false
+	var p: = _sheet(620.0)
+	var h: = V10MjCubeStyle.label("Как играть", 36, T.paper100, "title", 700)
+	h.position = Vector2(32, 28)
+	p.add_child(h)
+	for k in V10MjCubeInfo.HOW.size():
+		var row: Array = V10MjCubeInfo.HOW[k]
+		var ic: = V10MjCubeIcon.new(String(row[0]), T.gold300)
+		ic.position = Vector2(32, 92 + k * 60)
+		ic.size = Vector2(44, 44)
+		p.add_child(ic)
+		var l: = V10MjCubeStyle.label(String(row[1]), 20, T.paper300, "body", 700)
+		l.position = Vector2(92, 100 + k * 60)
+		l.size = Vector2(vw.x - 120.0, 40)
+		p.add_child(l)
+	var rule_l: = V10MjCubeStyle.label(V10MjCubeInfo.RULE, 18, T.paper500, "body", 600)
+	rule_l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	rule_l.position = Vector2(32, 286)
+	rule_l.size = Vector2(vw.x - 64.0, 56)
+	p.add_child(rule_l)
+	for s_i in V10MjCubeInfo.STARS_HOW.size():
+		var sl: = V10MjCubeStyle.label(String(V10MjCubeInfo.STARS_HOW[s_i]), 18, T.gold300, "body", 700)
+		sl.position = Vector2(32, 352 + s_i * 32)
+		p.add_child(sl)
+	var ok_b: = _primary("Понятно")
+	ok_b.name = "OkBtn"
+	ok_b.position = Vector2(vw.x * 0.5 - 280.0, 476)
+	ok_b.pressed.connect(func():
+		_close_sheet()
+		if from_start:
+			_start_sheet()
+		else:
+			input_on = prev_input)
+	p.add_child(ok_b)
+
+
+# ── бюджеты партии (для самотеста UX_RULES §6.6) ─────────────────────────────
+
+func tappables() -> Array:
+	var out: Array = []
+	var pause_n: Node = get_node_or_null("Pause")
+	if pause_n:
+		out.append(pause_n)
+	if lite and lite._win and lite.visible:
+		out.append(lite._win)
+	elif presence != lite and presence != null:
+		out.append(presence)
+	for k in help_btns:
+		out.append(help_btns[k])
+	return out
+
+
+func words_in_play() -> int:
+	var txt: = (left_lbl.text if left_lbl else "") + " " + " ".join(V10MjCubeSave.NAMES.values())
+	var n: = 0
+	for tok in txt.split(" ", false):
+		var has_letter: = false
+		for i in tok.length():
+			var u: = tok.unicode_at(i)
+			if (u >= 0x0400 and u <= 0x04FF) or (u >= 65 and u <= 122):
+				has_letter = true
+				break
+		if has_letter:
+			n += 1
+	return n
 
 
 func _win_sheet() -> void:

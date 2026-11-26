@@ -1,6 +1,0 @@
-[gd_scene load_steps=2 format=3]
-
-[ext_resource type="Script" path="res://scripts/v10/mj/cube/_vtest.gd" id="1"]
-
-[node name="VTest" type="Node"]
-script = ExtResource("1")

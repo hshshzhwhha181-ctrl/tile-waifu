@@ -73,6 +73,10 @@ var _said_at: = {}
 var _bar_k: = 0.0
 
 
+func build(main_: Node, a: Dictionary = {}) -> void:
+	setup(main_, a)
+
+
 func setup(main_: Node, a: Dictionary) -> void:
 	main = main_
 	args = a
@@ -517,24 +521,65 @@ func _on_clear() -> void:
 
 
 func _result(win: bool) -> Dictionary:
-	return {"mode": "classic", "variant": variant, "form": form.id, "win": win, "score": 0, "stars": 0,
+	var forms: Array = V10MjClassicLayouts.all()
+	var lvl: = 1
+	for idx in forms.size():
+		if String(forms[idx].id) == String(form.id):
+			lvl = idx + 1
+			break
+	return {"mode": "classic", "variant": variant, "form": form.id, "level": lvl, "win": win, "score": 0, "stars": 0,
 		"time_s": int(round(time_s)), "pairs": board.total() / 2, "moves": board.moves, "hints": board.hints,
 		"shuffles": board.shuffles, "auto_shuffles": board.auto_shuffles, "undos": board.undos, "ults": ults, "hero": hero, "seed": seed_, "diff": diff,
 		"date": date, "mult": int(args.get("mult", 1)), "rewards": {"coins": 0, "gems": 0, "petals": 0, "aff": 0}}
 
 
 # ---- sheets -----------------------------------------------------------------------------------------------------
+func open_help() -> void:
+	if sheet != null or not running:
+		return
+	paused = true
+	board.input_on = false
+	var T: = V10MjClassicStyle.TOK
+	sheet = V10MjClassicStyle.sheet(self, 440)
+	var p: Control = sheet.get_meta("panel")
+	var t: = V10MjClassicStyle.label("Как играть", 32, T.paper100, "title", 600)
+	t.position = Vector2(32, 26)
+	p.add_child(t)
+	var how: Array = V10MjClassicInfo.HOW
+	for i in how.size():
+		var gid: String = how[i][0]
+		var ic: = V10MjClassicStyle.Paint.new(func(c: Control): V10MjClassicStyle.glyph(c, gid, Vector2(22, 22), 18, T.gold300))
+		ic.position = Vector2(32, 90 + i * 76)
+		ic.size = Vector2(44, 44)
+		p.add_child(ic)
+		var l: = V10MjClassicStyle.label(how[i][1], 20, T.paper300, "body", 700)
+		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		l.position = Vector2(92, 88 + i * 76)
+		l.size = Vector2(p.size.x - 124, 66)
+		p.add_child(l)
+	var ok_b: = V10MjClassicStyle.Btn.new("play", "Понятно")
+	ok_b.size = Vector2(560, 104)
+	ok_b.position = Vector2((p.size.x - 560) * 0.5, 320)
+	ok_b.pressed.connect(close_pause)
+	p.add_child(ok_b)
+
+
 func open_pause() -> void:
 	if sheet != null or not running:
 		return
 	paused = true
 	board.input_on = false
 	var T: = V10MjClassicStyle.TOK
-	sheet = V10MjClassicStyle.sheet(self, 420)
+	sheet = V10MjClassicStyle.sheet(self, 580)
 	var p: Control = sheet.get_meta("panel")
 	var t: = V10MjClassicStyle.label("Пауза", 32, T.paper100, "title", 600)
 	t.position = Vector2(32, 28)
 	p.add_child(t)
+	var help_b: = V10MjClassicStyle.Btn.new("quiet", "", "help")
+	help_b.size = Vector2(80, 80)
+	help_b.position = Vector2(p.size.x - 224, 14)
+	help_b.name = "HelpBtn"
+	p.add_child(help_b)
 	# «Плоский / Объёмный» — a quiet icon (MODES §4.1)
 	var view_btn: = V10MjClassicStyle.Btn.new("quiet", "Объёмный" if board.view == "3d" else "Плоский", "view3d" if board.view == "3d" else "viewflat")
 	view_btn.size = Vector2(120, 96)
@@ -550,20 +595,39 @@ func open_pause() -> void:
 		view_btn.queue_redraw())
 	p.add_child(view_btn)
 	view_btn.name = "ViewToggle"
+	var how_box: = Control.new()
+	how_box.position = Vector2(0, 96)
+	how_box.size = Vector2(p.size.x, 196)
+	how_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	p.add_child(how_box)
+	for i in V10MjClassicInfo.HOW.size():
+		var row: Array = V10MjClassicInfo.HOW[i]
+		var gid: String = row[0]
+		var ic: = V10MjClassicStyle.Paint.new(func(c: Control): V10MjClassicStyle.glyph(c, gid, Vector2(20, 20), 16, T.gold300))
+		ic.position = Vector2(32, i * 62)
+		ic.size = Vector2(40, 40)
+		how_box.add_child(ic)
+		var l: = V10MjClassicStyle.label(row[1], 18, T.paper300, "body", 700)
+		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		l.position = Vector2(88, i * 62 - 2)
+		l.size = Vector2(p.size.x - 120, 56)
+		how_box.add_child(l)
+	help_b.pressed.connect(func():
+		how_box.modulate = Color(1, 1, 1, 1.0))
 	var play: = V10MjClassicStyle.Btn.new("play", "Продолжить")
 	play.size = Vector2(560, 104)
-	play.position = Vector2((p.size.x - 560) * 0.5, 140)
+	play.position = Vector2((p.size.x - 560) * 0.5, 320)
 	play.breathe = true
 	play.pressed.connect(close_pause)
 	p.add_child(play)
 	var again: = V10MjClassicStyle.Btn.new("second", "Заново")
 	again.size = Vector2(272, 84)
-	again.position = Vector2((p.size.x - 560) * 0.5, 272)
+	again.position = Vector2((p.size.x - 560) * 0.5, 448)
 	again.pressed.connect(func(): _leave("again", false))
 	p.add_child(again)
 	var out: = V10MjClassicStyle.Btn.new("second", "Выйти")
 	out.size = Vector2(272, 84)
-	out.position = Vector2((p.size.x - 560) * 0.5 + 288, 272)
+	out.position = Vector2((p.size.x - 560) * 0.5 + 288, 448)
 	out.pressed.connect(func(): _leave("exit", false))
 	p.add_child(out)
 

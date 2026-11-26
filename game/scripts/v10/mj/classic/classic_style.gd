@@ -6,11 +6,11 @@ extends RefCounted
 # hit, plus the round help buttons of the match). Every press goes through V9Feel.
 
 const TOK: = {
-	"night900": Color("121014"), "night800": Color("1b171c"), "night700": Color("26212a"), "night600": Color("332c36"),
-	"paper100": Color("f5ead8"), "paper300": Color("ddd2c4"), "paper500": Color("b3a89c"), "paper700": Color("7e756d"),
-	"gold300": Color("f1d9a0"), "gold500": Color("e8c47e"), "gold700": Color("a87b3a"),
-	"rose300": Color("ecc0c9"), "rose500": Color("d796a5"), "rose700": Color("9a4f66"),
-	"jade300": Color("a9d9c4"), "jade500": Color("5b9580"), "cinnabar": Color("c8463c"), "ember": Color("e07a7a"),
+	"night900": V10DS.NIGHT_900, "night800": V10DS.NIGHT_800, "night700": V10DS.NIGHT_700, "night600": V10DS.NIGHT_600,
+	"paper100": V10DS.PAPER_100, "paper300": V10DS.PAPER_300, "paper500": V10DS.PAPER_500, "paper700": V10DS.PAPER_700,
+	"gold300": V10DS.GOLD_300, "gold500": V10DS.GOLD_500, "gold700": V10DS.GOLD_700,
+	"rose300": V10DS.ROSE_300, "rose500": V10DS.ROSE_500, "rose700": V10DS.ROSE_700,
+	"jade300": V10DS.JADE_300, "jade500": V10DS.JADE_500, "cinnabar": Color("c8463c"), "ember": V10DS.EMBER,
 }
 
 const HERO_ACCENT: = {"mc": "ff8fb8", "rin": "4fbf9f", "hana": "ffb35c", "yue": "c8b6ff", "nova": "4fe3ff",
@@ -29,6 +29,8 @@ static func accent(hero: String) -> Color:
 	var g = tree.root.get_node_or_null("G") if tree else null
 	if g and g.get("HEROES") is Dictionary and (g.HEROES as Dictionary).has(hero):
 		return g.HEROES[hero].color
+	if V10DS.HEROES.has(hero):
+		return V10DS.HEROES[hero].accent
 	return Color(String(HERO_ACCENT.get(hero, "ff8fb8")))
 
 
@@ -75,7 +77,7 @@ class Btn:
 	var text: = ""
 	var icon: = ""          # drawn glyph id: hint, undo, shuffle, pause, view3d, viewflat, heart, back, close, play
 	var count: = ""
-	var accent: = Color("d796a5")
+	var accent: = V10DS.ROSE_500
 	var enabled: = true
 	var on: = false
 	var _down: = false
@@ -89,6 +91,8 @@ class Btn:
 		icon = ic
 		mouse_filter = Control.MOUSE_FILTER_STOP
 		focus_mode = Control.FOCUS_NONE
+		custom_minimum_size = Vector2(V10DS.HIT_MIN, V10DS.HIT_MIN)
+		set_meta("ux_role", "primary" if k == "play" else ("secondary" if k == "second" else "tertiary"))
 
 	func _ready() -> void:
 		pivot_offset = size * 0.5
@@ -292,7 +296,7 @@ static func _curve(a: Vector2, b: Vector2) -> PackedVector2Array:
 # the bottom sheet (UX §3.7: one sheet, never over another): night.700, 4 px radius, «Шёлк» in 220 ms
 static func sheet(parent: Control, h: float) -> Control:
 	var veil: = ColorRect.new()
-	veil.color = Color(0.04, 0.03, 0.05, 0.0)
+	veil.color = Color(TOK.night900, 0.0)
 	veil.mouse_filter = Control.MOUSE_FILTER_STOP
 	veil.z_index = 1000
 	parent.add_child(veil)

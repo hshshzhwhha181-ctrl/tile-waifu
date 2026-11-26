@@ -49,10 +49,10 @@ static func _g():
 	return tree.root.get_node_or_null("G") if tree else null
 
 
-static func st() -> Dictionary:
+static func st(S_in = null) -> Dictionary:
 	var g = _g()
-	var S: Dictionary = g.S if g and g.get("S") is Dictionary else _mem
-	if sandbox is Dictionary:
+	var S: Dictionary = S_in if S_in is Dictionary else (g.S if g and g.get("S") is Dictionary else _mem)
+	if S_in == null and sandbox is Dictionary:
 		S = sandbox
 	if not S.get(KEY) is Dictionary:
 		S[KEY] = DEFAULTS.duplicate(true)
@@ -75,9 +75,15 @@ static func save() -> void:
 		g.save()
 
 
+static func _now_unix() -> int:
+	if ClassDB.class_exists("V10Meta") or ResourceLoader.exists("res://scripts/v10/meta/meta.gd"):
+		return V10Meta.now_unix()
+	return 1798761600
+
+
 # Moscow date (UTC+3, no DST) — «Раскладка дня» is the same for everyone
 static func msk_date(unix: = -1.0) -> String:
-	var t: float = Time.get_unix_time_from_system() if unix < 0.0 else unix
+	var t: float = float(_now_unix()) if unix < 0.0 else unix
 	return Time.get_date_string_from_unix_time(int(t) + 3 * 3600)
 
 

@@ -89,6 +89,10 @@ static func stars_for(moves_: int, pairs: int) -> int:
 
 
 # ---- screen -----------------------------------------------------------------------------------------------------
+func build(main_: Node, a: Dictionary = {}) -> void:
+	setup(main_, a)
+
+
 func setup(_main: Node, a: Dictionary) -> void:
 	args = a
 	size_id = String(a.get("size", "4x4"))
@@ -454,7 +458,8 @@ func _win() -> void:
 
 
 func _result(win: bool) -> Dictionary:
-	return {"mode": "classic", "variant": "memory", "size": size_id, "win": win, "stars": 0, "moves": moves,
+	var lvl: = maxi(1, ["4x4", "4x5", "5x6", "6x6"].find(size_id) + 1)
+	return {"mode": "classic", "variant": "memory", "size": size_id, "level": lvl, "win": win, "stars": 0, "moves": moves,
 		"pairs": faces.size() / 2, "time_s": int(round(time_s)), "ults": ults, "hero": hero, "seed": seed_, "score": 0,
 		"rewards": {"coins": 0, "gems": 0, "petals": 0, "aff": 0}}
 
@@ -514,21 +519,32 @@ func _pause() -> void:
 	if sheet != null:
 		return
 	var T: = V10MjClassicStyle.TOK
-	sheet = V10MjClassicStyle.sheet(self, 380)
+	sheet = V10MjClassicStyle.sheet(self, 520)
 	var p: Control = sheet.get_meta("panel")
 	var t: = V10MjClassicStyle.label("Пауза", 32, T.paper100, "title", 600)
 	t.position = Vector2(32, 28)
 	p.add_child(t)
+	for i in V10MjClassicInfo.HOW_MEMORY.size():
+		var row: Array = V10MjClassicInfo.HOW_MEMORY[i]
+		var gid: String = row[0]
+		var ic: = V10MjClassicStyle.Paint.new(func(c: Control): V10MjClassicStyle.glyph(c, gid, Vector2(20, 20), 16, T.gold300))
+		ic.position = Vector2(32, 88 + i * 58)
+		ic.size = Vector2(40, 40)
+		p.add_child(ic)
+		var l: = V10MjClassicStyle.label(row[1], 18, T.paper300, "body", 700)
+		l.position = Vector2(88, 94 + i * 58)
+		l.size = Vector2(p.size.x - 120, 36)
+		p.add_child(l)
 	var play: = V10MjClassicStyle.Btn.new("play", "Продолжить")
 	play.size = Vector2(560, 104)
-	play.position = Vector2((p.size.x - 560) * 0.5, 110)
+	play.position = Vector2((p.size.x - 560) * 0.5, 280)
 	play.pressed.connect(func():
 		V10MjClassicStyle.close_sheet(sheet)
 		sheet = null)
 	p.add_child(play)
 	var out: = V10MjClassicStyle.Btn.new("second", "Выйти")
 	out.size = Vector2(272, 84)
-	out.position = Vector2((p.size.x - 272) * 0.5, 244)
+	out.position = Vector2((p.size.x - 272) * 0.5, 404)
 	out.pressed.connect(func():
 		result = _result(false)
 		if not no_save:
