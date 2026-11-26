@@ -46,7 +46,7 @@ static func num(n: int) -> String:
 
 
 static func rub(n: float) -> String:
-	return num(int(round(n))) + "\u00a0₽"
+	return V10Sku.rub(n)
 
 
 # one decimal with a comma, trimmed («1,2», «6»)
@@ -71,7 +71,7 @@ static func eq_wishes(v: float) -> String:
 
 
 static func per_wish(rub_per: float) -> String:
-	return "≈ %s за желание" % rub(rub_per)
+	return V10Sku.per_wish(rub_per)
 
 
 # «450 Лунного камня», «2 билета», «2 000 монет», «120 заварки», «1 рамка»

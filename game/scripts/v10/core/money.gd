@@ -143,6 +143,19 @@ static func attach(S: Dictionary) -> void:
 		e = cur as V10Econ
 	else:
 		e = V10Econ.load_dict(ed)
+		e.season_outfit = "y_ball"
+		e.item_granted.connect(func(id: String, _src: String) -> void:
+			var gg = _g()
+			if gg == null:
+				return
+			if gg.ITEM.has(id):
+				gg.give_new(id)
+			else:
+				V10ProfileCos.grant(gg.S, id))
+		e.changed.connect(func() -> void:
+			if not _attaching:
+				_write_mirrors())
+	e.shop.set_provider(V10ShopPay.make_provider())
 	e.owns = func(id: String) -> bool: return g.owns(id)
 	S["econ"] = e.st
 	g.set("econ", e)

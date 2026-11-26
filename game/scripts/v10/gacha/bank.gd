@@ -8,6 +8,7 @@ extends RefCounted
 
 var S: Dictionary
 var give_fn: Callable = Callable()        # optional: G.give(id) -> bool (true when new); default writes S.owned
+var live_money: = false
 
 
 func _init(state: Dictionary = {}) -> void:
@@ -15,16 +16,23 @@ func _init(state: Dictionary = {}) -> void:
 
 
 func balance(cur: String) -> int:
+	if live_money:
+		return V10Money.bal(cur)
 	return int(S.get(cur, 0))
 
 
 func add(cur: String, n: int) -> void:
+	if live_money:
+		V10Money.grant({cur: n}, "gacha")
+		return
 	S[cur] = int(S.get(cur, 0)) + n
 
 
 func spend(cur: String, n: int) -> bool:
 	if n <= 0:
 		return true
+	if live_money:
+		return V10Money.spend({cur: n}, "gacha")
 	if balance(cur) < n:
 		return false
 	S[cur] = balance(cur) - n

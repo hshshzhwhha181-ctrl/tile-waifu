@@ -99,46 +99,17 @@ static func value_line(c: Dictionary) -> String:
 	return " · ".join(parts)
 
 
-# wishes a SKU is worth: catalog value + boosters at their crystal value (spec Л3: booster = 60 кр-экв.)
+# wishes a SKU is worth: unified in V10Sku / V10Catalog (boosters included at their crystal value, spec Л3)
 func pull_value(s: Dictionary, first: bool) -> float:
-	var v: = V10Catalog.pull_value(s, first)
-	var bv: = int(s.get("boost_value", 0))
-	if bv > 0:
-		var n: = 0
-		for i in s.get("grant", {}).get("items", []):
-			if String(i).begins_with("boost_"):
-				n += 1
-		v += float(n * bv) / float(V10Catalog.PULL_COST)
-	return v
+	return V10Sku.pull_value(s, first)
 
 
 func ratio(s: Dictionary, first: = false) -> float:
-	var v: = pull_value(s, first)
-	if v <= 0.0:
-		return 0.0
-	return V10Catalog.base_rub_per_pull() / (float(s.rub) / v)
-
-
-const REASON_TXT: = {
-	"server": "Откроется вместе с облачным сохранением",
-	"no_provider": "Покупки недоступны в этой сборке",
-	"age_limit": "Лимит 3 000 ₽ за 30 дней, пока возраст не подтверждён",
-	"own_limit": "Твой лимит трат на 30 дней",
-	"paused": "Покупки на паузе",
-	"cooldown": "Покупки на паузе до завтра",
-	"in_progress": "Ждём подтверждения банка",
-	"owned": "Уже твоё",
-	"month_max": "Абонемент уже продлён на 180 дней",
-	"no_season": "Сезон ещё не начался",
-	"teen_one": "До 18 лет — не дороже 499 ₽ за покупку",
-	"teen_month": "До 18 лет — не больше 1 500 ₽ за 30 дней",
-	"age_unset": "Сначала укажи год рождения",
-	"age_child": "Покупки недоступны",
-}
+	return V10Sku.ratio(s, first)
 
 
 func reason_txt(r: String) -> String:
-	return String(REASON_TXT.get(r, ""))
+	return V10Sku.reason_txt(r)
 
 
 # ================================================================ cards

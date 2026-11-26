@@ -55,7 +55,13 @@ static func font(kind: = "body", weight: = 800) -> FontVariation:
 	var fb: = FontVariation.new()
 	fb.base_font = load("res://assets/fonts/%s.woff2" % files[1])
 	fb.variation_opentype = {ts.name_to_tag("wght"): weight}
-	fv.fallbacks = [fb]
+	var sym_chain: = [fb]
+	if ResourceLoader.exists("res://assets/v10/fonts/nunito_sym/nunito-sym.woff2"):
+		var sfb: = FontVariation.new()
+		sfb.base_font = load("res://assets/v10/fonts/nunito_sym/nunito-sym.woff2")
+		sfb.variation_opentype = {ts.name_to_tag("wght"): 800}
+		sym_chain.append(sfb)
+	fv.fallbacks = sym_chain
 	_fonts[key] = fv
 	return fv
 

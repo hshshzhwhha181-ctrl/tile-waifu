@@ -225,7 +225,7 @@ const SETTINGS_EXTRA: = 84.0
 
 # one line at the end of main.settings(): grows the popup and adds the «Фишки и словарь» row above the footer lines
 static func settings_hook(main, p: Control) -> void:
-	var y0: = 900.0
+	var y0: = p.size.y - 90.0
 	for c in p.get_children():
 		if c is Control and (c as Control).position.y >= y0 - 2.0 and c.name != "PanelArt":
 			(c as Control).position.y += SETTINGS_EXTRA

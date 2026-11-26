@@ -106,11 +106,17 @@ func build(lk = {}) -> void :
 	if gold:
 		mat.set_shader_parameter("gold", 1.0)
 	V6TileLook.dress(self)
+	_dress_v10()
 	_update_ice()
 	if secret:
 		_make_back()
 
 
+
+func _dress_v10() -> void :
+	var v10_tt = load("res://scripts/v10/look/tile_themes.gd")
+	if v10_tt:
+		v10_tt.dress(self)
 
 const V6Back: = preload("res://scripts/v06/flip/tile_back.gd")
 var flipping: = false

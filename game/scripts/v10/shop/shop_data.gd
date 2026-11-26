@@ -16,11 +16,7 @@ const LADDER: = [
 ]
 # «Набор путника» (spec Л3) is not in V10Catalog yet: added through V10Shop.extra_skus (the integrator hook that
 # already exists) with the same fields as catalog starters. Boosters are items ids of the 0.10 boosters lane.
-const EXTRA_SKUS: = [
-	{"id": "traveler_199", "kind": "starter", "name": "Набор путника", "rub": 199,
-		"grant": {"moon": 150, "items": ["boost_lantern", "boost_lantern", "boost_wind", "boost_wind", "boost_scroll", "boost_scroll"]},
-		"once": true, "requires_server": true, "boost_value": 60},
-]
+const EXTRA_SKUS: = []
 
 # ---- Лавка · Витрина «Подарок дня» (Л6) and rewarded ads (Л8)
 const GIFT_DAILY: = {"crystal": 50}

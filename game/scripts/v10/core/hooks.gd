@@ -24,6 +24,7 @@ signal screen_shown(id: String, screen: Node)
 # counters (selftests and the playtest read them; never saved)
 var counts: = {}
 var last: = {}
+var mastery: = V10Mastery.new()
 
 
 func _bump(sig: String, payload = null) -> void:
@@ -91,10 +92,60 @@ func _ready() -> void:
 		var g = get_node_or_null("/root/G")
 		if g and g.has_method("save"):
 			g.save())
+	pair_taken.connect(func(info: Dictionary) -> void:
+		if not V10Registry.wired("gacha") or str(info.get("mode", "")) == "trial":
+			return
+		var pt: = str(info.get("partner", G.S.get("partner", "mc")))
+		var oid: = str(G.S.get("outfit", {}).get(pt, ""))
+		if oid != "" and oid != "o_base":
+			mastery.on_pair(oid, V10Comeback.rested() > 0, 1))
 	game_ended.connect(func(r: Dictionary) -> void:
 		V10Afisha.on_game_ended(r)
 		if V10Registry.wired("salon") and int(r.get("stars_delta", 0)) > 0:
 			V10Salon.notify_stars(int(r.stars_delta))
+		if V10Registry.wired("gacha"):
+			var ups: = mastery.flush(G.S, func(o: String) -> String: return V10Gacha2.rar10(str(G.ITEM.get(o, {}).get("rar", "R"))))
+			if not ups.is_empty():
+				G.save()
+				var og = load("res://scripts/v10/gacha/ui/outfit_growth.gd")
+				var main = get_tree().current_scene
+				for u in ups:
+					if main == null or og == null:
+						break
+					var to_lv: = int(u.get("to", 1))
+					var oid2: = str(u.get("outfit", ""))
+					if to_lv <= 1:
+						if main.has_method("toast"):
+							main.toast(og.toast_text(oid2, 1), "star")
+					elif main.get("overlay") != null:
+						og.mastery_up(main.overlay, oid2, to_lv, func():
+							if is_instance_valid(main) and main.has_method("go"):
+								main.go("collection", {"item": oid2}))
+		if V10Registry.wired("profile"):
+			var feats_sc = load("res://scripts/v10/profile/feats.gd")
+			var pcos_sc = load("res://scripts/v10/profile/cosmetics.gd")
+			if feats_sc:
+				feats_sc.best(G.S, "best_combo", int(r.get("max_combo", 0)))
+				if bool(r.get("win", false)):
+					if bool(r.get("clean", false)):
+						feats_sc.bump(G.S, "clean", 1)
+					if int(r.get("dragons", 0)) > 0:
+						feats_sc.bump(G.S, "dragons", int(r.dragons))
+					if str(r.get("mode", "")) == "daily":
+						feats_sc.bump(G.S, "daily_done", 1)
+					if str(r.get("mode", "")) in ["duel", "duel_ranked"]:
+						feats_sc.bump(G.S, "duel_wins", 1)
+			if pcos_sc:
+				var pctx: Dictionary = pcos_sc.ctx_from_save(G.S)
+				var new_ids: Array = pcos_sc.unseen(G.S, pctx)
+				var main_sc = get_tree().current_scene
+				for cid in new_ids:
+					var ce: Dictionary = pcos_sc.entry(str(cid))
+					if str(ce.get("kind", "")) == "title":
+						pcos_sc.mark_seen(G.S, str(cid))
+						if main_sc and main_sc.has_method("toast"):
+							main_sc.toast("Новый титул: «%s»" % str(ce.get("name", "")), "star")
+							break
 		if V10Registry.wired("phone") and bool(r.get("win", false)):
 			if bool(r.get("first_win_day", false)):
 				V10Phone.event({"kind": "first_win"})
@@ -128,3 +179,28 @@ func _ready() -> void:
 			var d: = V10PathState.daily()
 			return {"icon": "gem", "text": "Награда · %d/%d" % [int(d.n), V10PathRules.DAILY_FULL]} if bool(d.show) else {},
 			{"order": 2, "modes": ["path"]})
+	if V10Registry.wired("gacha"):
+		V10WinStack.add_bar("mastery", V10WinStack.PRIO_MASTERY, func(_c: Dictionary, w: float):
+			var pt: = str(G.S.get("level_partner", G.S.get("partner", "mc")))
+			var oid: = str(G.S.get("outfit", {}).get(pt, ""))
+			if oid == "" or oid == "o_base" or not G.ITEM.has(oid):
+				return null
+			var it: Dictionary = G.ITEM[oid]
+			var pts: = V10Mastery.points(G.S, oid)
+			if pts <= 0:
+				return null
+			var pr: = V10Mastery.progress(pts, V10Gacha2.rar10(str(it.get("rar", "R"))))
+			if int(pr.lv) >= V10Mastery.max_level(V10Gacha2.rar10(str(it.get("rar", "R")))):
+				return null
+			return V10WinBar.make(w, {"icon": "wardrobe", "title": "Мастерство · %s" % str(it.name),
+				"have": int(pr.cur), "need": int(pr.need), "gain": 0, "kind": "fill", "pal": "lav"}))
+	if V10Registry.wired("shop"):
+		V10WinStack.add_bar("pass", V10WinStack.PRIO_PASS, func(_c: Dictionary, w: float):
+			if int(G.S.get("unlocked", 1)) < 21 or G.econ == null:
+				return null
+			var ps: V10Pass = (G.econ as V10Econ).pass_
+			if ps.tier() >= V10Catalog.PASS_TIERS:
+				return null
+			return V10WinBar.make(w, {"icon": "star", "title": "Сезон · ступень %d" % ps.tier(),
+				"have": int(ps.st.get("xp", 0)) % V10Catalog.PASS_XP_TIER, "need": V10Catalog.PASS_XP_TIER,
+				"gain": 0, "kind": "fill", "pal": "gold"}))

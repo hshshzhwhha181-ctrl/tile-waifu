@@ -129,6 +129,17 @@ func setup(board: Node2D, r: Rect2, bg: String) -> void :
 	var tiles = board.get("tiles")
 	if tiles is Array:
 		V6TileLook.relight(tiles)
+	var v10_look = load("res://scripts/v10/look/look.gd")
+	var v10_tt = load("res://scripts/v10/look/tile_themes.gd")
+	if v10_look != null and v10_tt != null:
+		var b_lk = board.get("look")
+		var is_ranked: = bool(b_lk.get("ranked", false)) if b_lk is Dictionary else false
+		var cur_lk: Dictionary = v10_look.current(null, {"ranked": is_ranked})
+		var v10_tb: = String(cur_lk.get("table", ""))
+		if v10_tb != "" and v10_tt.has_table(v10_tb):
+			v10_tt.apply_table(self, v10_tb, {"static": is_ranked})
+		else:
+			v10_tt.relight()
 
 	var fl = board.get("floor_layer")
 	if fl is Node2D:

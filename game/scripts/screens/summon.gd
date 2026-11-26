@@ -128,26 +128,13 @@ func _build_banner() -> void :
 	pn.position = Vector2(20 + pity_lbl.get_minimum_size().x + 6, 52)
 	ip.add_child(pn)
 	Common.progress_bar(ip, Rect2(18, 96, 300, 18), float(G.S.pity) / 60.0, "gold")
-	var rules: = V6Txt.s("summon.rules")
+	var rules: = V6Txt.s("summon.rules") % V10Rates.pct(float(V10Rates.SSR_BASE[2]))
 	var g_text: = V6Txt.s("summon.guar_on") if G.S.guar else V6Txt.s("summon.guar_off")
 	if newbie:
 		g_text = V6Txt.s("summon.newbie_left") % int(G.S.newbie_left)
 	var rl: = UI.label(rules + "\n" + g_text, 16, Color("f4e6ff"), Color(0.2, 0.05, 0.2), 2)
 	rl.position = Vector2(18, 124)
 	ip.add_child(rl)
-	if not newbie:
-		var ex: = int(G.S.ex)
-		var el: = UI.label(V6Txt.s("summon.exchange"), 17, Color("ffe7a6"), Color(0.2, 0.05, 0.2), 3, "body", 900)
-		el.position = Vector2(pw - 250, 10)
-		ip.add_child(el)
-		var ev: = UI.label("%d / %d" % [mini(ex, G.EXCHANGE_COST), G.EXCHANGE_COST], 24, Color.WHITE, Color(0.2, 0.05, 0.2), 4, "body", 900)
-		ev.position = Vector2(pw - 250, 32)
-		ip.add_child(ev)
-		var xb: = JButton.make(V6Txt.s("summon.exchange_btn") % G.EXCHANGE_COST, "gold" if ex >= G.EXCHANGE_COST else "glass", Rect2(pw - 250, 72, 232, 50), null, 19)
-		xb.pressed.connect( func(): _exchange(xb))
-		# 0.9: a refused exchange answers with the deny alone (JButton gate), then _exchange says why
-		xb.set_gate( func(): return int(G.S.ex) >= G.EXCHANGE_COST and not G.owns(b.item), func(): _exchange(xb))
-		ip.add_child(xb)
 	UI.pop_in(frame, 0.0, 0.92)
 	UI.pop_in(art, 0.0, 0.92)
 
@@ -179,31 +166,6 @@ func _build_banner() -> void :
 		sale.add_child(UI.center_label(UI.label("−20%", 19, Color.WHITE, Color("6a1020"), 4), Rect2(0, 0, 100, 34)))
 	UI.slide_in(pull10_btn, Vector2(0, 60), 0.15)
 
-
-func _exchange(btn: CanvasItem = null) -> void :
-	var b: Dictionary = G.BANNERS[banner_i]
-	# 0.9: a refusal denies (shake, deny sound and haptic) before the toast, never the success press alone
-	if int(G.S.ex) < G.EXCHANGE_COST:
-		V9Feel.deny(btn)
-		main.toast(V6Txt.s("summon.ex_toast") % [int(G.S.ex), G.EXCHANGE_COST], "ticket")
-		return
-	if G.owns(b.item):
-		V9Feel.deny(btn)
-		main.toast(V6Txt.s("summon.have") % G.ITEM[b.item].name, "wardrobe")
-		return
-	# 0.8: no currency is spent without a question (spec «Общие правила кода»)
-	Common.confirm(main, V6Txt.s("summon.exchange"), "Обменять %d звёзд обмена на «%s»?" % [G.EXCHANGE_COST, G.ITEM[b.item].name], "ticket", G.EXCHANGE_COST, func(): _exchange_do(b), {"balance_check": false, "yes_text": "Обменять"})
-
-func _exchange_do(b: Dictionary) -> void :
-	if int(G.S.ex) < G.EXCHANGE_COST or G.owns(b.item):
-		return
-	G.S.ex = int(G.S.ex) - G.EXCHANGE_COST
-	G.give(b.item)
-	G.save()
-	var r: Dictionary = G.ITEM[b.item].duplicate()
-	r["new"] = true
-	await _showcase(r)
-	_build_banner()
 
 func _pull_cost(n: int) -> int:
 	var b: Dictionary = G.BANNERS[banner_i]

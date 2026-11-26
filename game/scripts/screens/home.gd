@@ -37,6 +37,8 @@ func build(m, _args: Dictionary) -> void :
 		# dev: preview home at another effects level (--fx=full|mid|min)
 		if a.begins_with("--fx=") and a.substr(5) in G.FX_LEVELS:
 			G.S.fx_level = a.substr(5)
+	V10HudSkin.sync(V10Look.current())
+	V10Voice.visit()
 	V9Letters.install()
 	V10Phone.ensure()
 	var rit_day: = V10Rituals.day_start()
@@ -47,7 +49,11 @@ func build(m, _args: Dictionary) -> void :
 	if cb_gap >= 2:
 		V10Phone.event({"kind": "comeback", "days": cb_gap})
 	V10Phone.tick()
+	if int(G.S.get("unlocked", 1)) >= 4:
+		V10Seven.visit(G.S, V10Meta.day_key())
 	_offer_ritual_scenes(rit_day)
+	_offer_gacha_scenes()
+	_offer_look_scenes()
 	var new_letters: = V9Letters.tick()
 	var salon_bg: = V10Salon.lobby_texture()
 	if salon_bg != "" and ResourceLoader.exists(salon_bg):
@@ -62,11 +68,14 @@ func build(m, _args: Dictionary) -> void :
 		add_child(sbg)
 	else:
 		Common.backdrop(self, "menu", size, 0.0, 1.0, Color.WHITE, Vector2(0.5, 0.5))
-	# 0.9 video pilot: Маджонг-тян's lobby loop (her room and her in one clip) instead of the room art + rig
+	# 0.10 W3: Маджонг-тян's living illustration rig (rig10, ≤ 1 rig and ≤ 1 video per screen, UX_RULES Г-4)
 	var bday_partner: = V10Bday.today_hero() == str(G.S.partner)
-	if not bday_partner and salon_bg == "" and V9HomeLive.video_wanted(str(G.S.partner)):
+	var rig10: V10LiveRig = null
+	if not bday_partner and V9HomeLive.rig10_wanted(str(G.S.partner)):
+		rig10 = V9HomeLive.build_rig10(self, size, salon_bg == "")
+	elif not bday_partner and salon_bg == "" and V9HomeLive.video_wanted(str(G.S.partner)):
 		video = V9HomeLive.build_video(self, size)
-	if video == null:
+	if video == null and rig10 == null:
 		Common.rays(self, Vector2(W * 0.52, H * 0.34), 1000, Color(1, 0.93, 0.8, 0.45), 10, 0.03, 0.35)
 	Fx.ambient(self, "petals", size)
 
@@ -77,7 +86,7 @@ func build(m, _args: Dictionary) -> void :
 	ped.position = Vector2(W * 0.52, floor_y - 10)
 	ped.scale = Vector2(6.0, 1.1)
 	ped.modulate = Color(1, 0.85, 0.9, 0.5)
-	ped.visible = video == null
+	ped.visible = video == null and rig10 == null
 	add_child(ped)
 	hero = Hero.new().setup(G.S.partner, H * 0.64)
 	hero.position = Vector2(W * 0.52, floor_y)
@@ -85,12 +94,14 @@ func build(m, _args: Dictionary) -> void :
 	# 0.9: every tap on her (and on the room) goes through V9HomeLive, not the rig's own tap
 	hero.interactive = false
 	UI.slide_in(hero, Vector2(0, 60), 0.05, 0.6)
-	# 0.8: her legs fade out under the button cluster (no shoes peeking between the plate and the CTA). 0.9: the fade
-	# starts at the top of the cluster (Режимы, y ≈ 900), not right under the hem — her legs stay skin and colour
 	var oid: = G.equipped(G.S.partner)
 	var live_opts: = {"hero": hero}
 	var live_mode: = "rig"
-	if video != null:
+	if rig10 != null:
+		hero.visible = false
+		live_mode = "rig10"
+		live_opts["rig10"] = rig10
+	elif video != null:
 		hero.visible = false
 		live_mode = "video"
 		live_opts["video"] = video
@@ -573,6 +584,59 @@ func _offer_ritual_scenes(rit_day: Dictionary) -> void :
 					refresh_badges()))
 
 
+func _offer_gacha_scenes() -> void :
+	if not V10Registry.wired("gacha"):
+		return
+	var g2: = V10WishScreen.make_gacha()
+	var gs: = V10Banners.state(G.S)
+	if bool(gs.get("fp_letter", false)):
+		gs["fp_letter"] = false
+		V9Letters.push_ritual({"id": "fp_comp", "hero": "mc", "subject": "Все три SSR уже твои",
+			"body": "В твоём гардеробе уже все три первых SSR-наряда чайной! Держи 10 билетов желания в благодарность.",
+			"rewards": {}})
+		G.save()
+	if G.summon_open() and g2.first_needed():
+		V10EntryQueue.offer("banner_phase", "first_ssr", func() -> void:
+			if main == null or not is_inside_tree():
+				return
+			V10EntryQueue.done("banner_phase", "first_ssr")
+			main.go("summon"))
+	if int(G.S.get("rates_ver", 2)) == 1:
+		V10EntryQueue.offer("rules_note", "v2_rates", func() -> void:
+			V10EntryQueue.done("rules_note", "v2_rates")
+			var sl: = V10Rates.summary_lines()
+			var body_t: = "В Желаниях обновились правила: %s (%s итоговый с гарантом на 60-м), Свеча желаний не сгорает." % [
+				str(sl[0].rar) + " " + V10Rates.pct(float(sl[0].base)), V10Rates.pct(float(sl[0].total))]
+			V9Letters.push_ritual({"id": "v2_rates_note", "hero": "mc", "subject": "Новые правила желаний",
+				"body": body_t, "rewards": {}})
+			G.save()
+			if is_inside_tree():
+				refresh_badges())
+
+
+func _offer_look_scenes() -> void :
+	if not V10HudSkin.skinned() or V10Look.previewing():
+		return
+	if not (G.S.get("v10_skins_seen") is Dictionary):
+		G.S["v10_skins_seen"] = {}
+	var seen_sk: Dictionary = G.S.v10_skins_seen
+	var sid: = V10HudSkin.active
+	if bool(seen_sk.get(sid, false)):
+		return
+	V10EntryQueue.offer("table_style", sid, func() -> void:
+		if main == null or main.overlay == null or not is_inside_tree():
+			return
+		seen_sk[sid] = true
+		G.save()
+		V10SkinAssemble.play(main.overlay, self, sid,
+			func(): V10EntryQueue.done("table_style", sid),
+			func():
+				V10Look.set_choice(G.S, "hud", V10Look.BASE)
+				V10HudSkin.sync(V10Look.current())
+				G.save()
+				V10EntryQueue.done("table_style", sid)))
+
+
 # ── 0.10 W1+W2: V10HudHome over the living heroine (scripts/v10/hud2/hud_home.gd, HUD_V2 §8.2) ─────────────────────
 var home2: V10HudHome
 var avatar_hit: Control
@@ -670,6 +734,20 @@ func _build_v10(mail_new: bool) -> void :
 			V9Feel.press(av)
 			main.go("profile", {"from": "home"}))
 	home2.add_child(avatar_hit)
+	var sm_disc: = V10ShopHub.model()
+	if sm_disc != null and sm_disc.econ.shop.month_days_left() > 0:
+		var md: = V10MonthDisc.make(sm_disc, false)
+		md.position = Vector2(W - 144.0, (L.avatar as Rect2).end.y + 18.0)
+		home2.add_child(md)
+	if V10Look.previewing():
+		home2.shown = [false, false, false]
+		home2.layout_now()
+		var pv_h: = str(V10Look._preview.get("hero", "mc"))
+		var pv_o: = str(V10Look._preview.get("outfit", ""))
+		var pb_bar: = V10PreviewBar.open(home2, pv_h, pv_o, func(): main.go("summon"), 88.0)
+		pb_bar.closed.connect(func(to_b: bool):
+			if not to_b and is_inside_tree():
+				refresh_badges())
 
 
 # V9HomeLive calls this after a touch added affection: the partner plate shows the new number

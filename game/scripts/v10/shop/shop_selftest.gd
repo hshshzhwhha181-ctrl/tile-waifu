@@ -229,7 +229,7 @@ static func _logic() -> void:
 	var mh: = _model()
 	(mh.provider() as V10StubPay).next_status = "paid"
 	mh.buy("moon_900")
-	check(mh.receipt_title(mh.receipts()[0]) == V10ShopTxt.amount("moon", 1720), "history: first purchase shows 1 720, not today's 900")
+	check(mh.receipt_title(mh.receipts()[0]) == V10ShopTxt.amount("moon", 600), "history: first purchase shows 600, not repeat 330")
 	# pass retro-grant
 	var mp: = _model({"pass_xp": 1240})
 	var tier: = mp.econ.pass_.tier()
@@ -269,7 +269,7 @@ static func _purchase_flow(host: Node) -> void:
 	var moon0: = m.bal("moon")
 	p.next_status = "paid"
 	var r: = m.buy("moon_900")
-	check(bool(r.ok) and m.bal("moon") - moon0 == 1720, "paid: first purchase doubles base (860+860)")
+	check(bool(r.ok) and m.bal("moon") - moon0 == 600, "paid: first purchase doubles base (300+300)")
 	p.next_status = "cancelled"
 	var m1: = m.bal("moon")
 	m.buy("moon_180")
@@ -281,12 +281,12 @@ static func _purchase_flow(host: Node) -> void:
 	var rp: = m.buy("moon_180")
 	check(m.pending_orders().size() == 1, "pending: order waits")
 	p.complete(String(rp.oid), "paid")
-	check(m.bal("moon") == m1 + 360 and m.pending_orders().is_empty(), "pending → paid later delivers once")
+	check(m.bal("moon") == m1 + 120 and m.pending_orders().is_empty(), "pending → paid later delivers once")
 	p.next_status = "paid"
 	p.duplicate = true
 	var m2: = m.bal("moon")
 	m.buy("moon_180")
-	check(m.bal("moon") == m2 + 180, "duplicate callback delivers once")
+	check(m.bal("moon") == m2 + 60, "duplicate callback delivers once")
 	p.duplicate = false
 	check(m.econ.shop.audit().is_empty() and m.econ.audit().is_empty(), "economy audit clean")
 	# teen layer blocks before the provider
@@ -323,7 +323,7 @@ static func _purchase_flow(host: Node) -> void:
 	pay.fire()
 	await host.get_tree().process_frame
 	await host.get_tree().process_frame
-	check(mc.bal("moon") == mm + 360, "confirm: paid once (double tap ignored)")
+	check(mc.bal("moon") == mm + 120, "confirm: paid once (double tap ignored)")
 	await host.get_tree().create_timer(0.3).timeout
 	check(_find_text(scr, "Зачислено:"), "confirm: toast «Зачислено: …»")
 	check(scr.find_child("Hanko", true, false) != null, "confirm: hanko seal")

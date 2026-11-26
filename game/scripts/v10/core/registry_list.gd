@@ -23,7 +23,8 @@ static func register_all() -> void:
 		"migrator": func(S: Dictionary, _now: int) -> void: S["streak"] = 0})
 	R.module("hud2", {"step": 1, "selftest": {"scene": "res://scripts/v10/hud2/hud2_demo.tscn", "args": ["--hud2_selftest=1"], "marker": "HUD2 SELFTEST"},
 		"save": {"hero_combo": "full"}})
-	R.module("fonts", {"step": 1, "selftest": {"scene": "res://scripts/v10/fonts/fonts_runner.tscn", "args": ["--fonts_selftest=1"], "marker": "FONTS SELFTEST"}})
+	R.module("fonts", {"step": 1, "selftest": {"scene": "res://scripts/v10/fonts/fonts_runner.tscn", "args": ["--fonts_selftest=1"], "marker": "FONTS SELFTEST"},
+		"save": {"deco_fonts": true}})
 	R.module("profile", {"step": 1, "selftest": {"scene": "res://scripts/v10/profile/profile2_selftest.tscn", "args": ["--profile2_selftest=1"],
 		"marker": "PROFILE2_SELFTEST"},
 		"save": {"v10_cos_owned": {}, "v10_feats": {"stats": {}, "done": {}}},
@@ -35,6 +36,7 @@ static func register_all() -> void:
 	R.module("look", {"step": 1, "selftest": {"scene": "res://scripts/v10/look/look_runner.tscn", "args": ["--look_selftest=1"], "marker": "LOOK_SELFTEST"},
 		"ensure": func(S: Dictionary) -> void: V10Look.migrate(S)})
 	R.module("shop", {"step": 1, "selftest": {"scene": "res://scripts/v10/shop/shop_demo.tscn", "args": ["--shop_selftest=1"], "marker": "SHOP_SELFTEST"},
+		"screens": {"shop": "res://scripts/v10/shop/shop2_screen.gd"},
 		"save": {"v10_shop": V10ShopModel.defaults()}})
 	R.module("auth", {"step": 1, "selftest": {"scene": "res://scripts/v10/auth/auth_dev.tscn",
 		"args": ["--auth_selftest=1", "--save=user://auth_selftest_save.json", "--save_wipe=1"], "marker": "AUTH_SELFTEST"},
@@ -122,8 +124,69 @@ static func register_all() -> void:
 				V10Clarity.open_glossary(main, topic)
 	# ── W3 ──────────────────────────────────────────────────────────────────────────────────────────────────────
 	R.module("gacha", {"step": 3, "selftest": {"scene": "res://scripts/v10/gacha/gacha_demo.tscn", "args": ["--gacha_selftest=1"],
-		"fast_args": ["--gacha_selftest=1", "--mc=0.1"], "marker": "GACHA_SELFTEST"}})
-	R.module("rig", {"step": 3, "selftest": {}})  # demo scene only (scenes/v10/rig_demo.tscn); W3 adds a smoke test
+		"fast_args": ["--gacha_selftest=1", "--mc=0.1"], "marker": "GACHA_SELFTEST"},
+		"screens": {"summon": "res://scripts/v10/gacha/ui/wish_screen.gd", "odds": "res://scripts/v10/gacha/ui/odds_screen.gd"},
+		"nav": {"odds": ["summon", "shop"]},
+		"save": {"tickets": 0, "petals": 0, "candles": 0, "pity_std": 0, "s_pity_std": 0, "rates_ver": 2,
+			"ostars": {}, "targets": {}, "mastery": {}, "first_pick": "", "first_pick_t": 0,
+			"seven": {"days": [], "claimed": [false, false, false, false, false, false, false]}, "v10_gacha": {}},
+		"migrator": func(S: Dictionary, _now: int) -> void:
+			if int(S.get("ex", 0)) > 0:
+				S["petals"] = int(S.get("petals", 0)) + int(S.ex)
+				S["ex"] = 0
+			if bool(S.get("free10", false)):
+				S["tickets"] = int(S.get("tickets", 0)) + 10
+				S["free10"] = false,
+		"ensure": func(S: Dictionary) -> void:
+			var bk: = V10GachaBank.new(S)
+			if is_same(S, G.S):
+				bk.live_money = true
+				bk.give_fn = func(id: String) -> bool: return G.give_new(id)
+			V10Gacha2.new(S, G.ITEMS, bk).ensure()})
+	R.module("rig", {"step": 3, "selftest": {"scene": "res://scripts/v10/rig/rig_selftest.tscn", "args": [], "marker": "RIG_SELFTEST"}})
+	R.module("voice", {"step": 3, "selftest": {"scene": "res://scripts/v10/voice/v10_voice_selftest.tscn", "args": [], "marker": "V10VOICE OK"}})
+	if R.STEP >= 3:
+		V10Salon.season_cb = func() -> bool:
+			return G.econ != null and bool(G.econ.pass_.st.get("prem", false))
+		var odds_sc = load("res://scripts/v10/gacha/ui/odds_screen.gd")
+		if odds_sc:
+			odds_sc.rub_ok_fn = func() -> bool:
+				return maxi(0, int(G.S.get("unlocked", 1)) - 1) >= V10ShopData.SHOP_FROM_LEVEL and G.econ != null and V10ShopPay.cash_visible((G.econ as V10Econ).shop.provider)
+			odds_sc.register("chest", func(_a: Dictionary) -> Array:
+				return [
+					{"name": "Сундук главы Пути", "text": "фиксированные кристаллы и монеты"},
+					{"name": "Звёздный сундук главы", "text": "фиксированные кристаллы и Лепестки"},
+					{"name": "Сундук зоны Салона", "text": "фиксированные награды зоны"},
+					{"name": "Лестница возврата", "text": "фиксированные подарки по дням"},
+				])
+		var seven_fn: = func(_key: String) -> Array:
+			if int(G.S.get("unlocked", 1)) < 4 and V10Seven.claimable(G.S).is_empty():
+				return []
+			var give_fn: = func(rw: Dictionary) -> void:
+				var kd: = String(rw.get("kind", ""))
+				if kd in ["tickets", "gems", "coins"]:
+					V10Money.grant({kd: int(rw.get("n", 0))}, "seven")
+				elif kd == "item":
+					G.give_new(String(rw.get("id", "")))
+				elif kd == "cos":
+					V10ProfileCos.grant(G.S, String(rw.get("id", "")))
+			var rows: = V10Seven.tray_items(G.S, give_fn)
+			for c in rows:
+				var ic: = String(c.get("icon", "ticket"))
+				c["icon"] = V8Art.cur(ic) if ic in ["ticket", "gem", "coin"] else V8Art.icon("gift")
+				c["rewards"] = {}
+			return rows
+		V10Tray.register("seven", seven_fn, 70)
+		var month_fn: = func(_key: String) -> Dictionary:
+			if G.econ == null or not G.econ.shop.month_can_claim():
+				return {}
+			var n: = int(V10Catalog.MONTH_DAILY.crystal)
+			return {"icon": "res://assets/v10/shop/item_month.png", "title": "Лунный абонемент",
+				"text": "+%d кристаллов" % n, "rewards": {},
+				"claim": func() -> void:
+					G.econ.shop.month_claim()
+					V10Money.sync(G.S)}
+		V10Tray.register("month_card", month_fn, 75)
 	# ── W4 ──────────────────────────────────────────────────────────────────────────────────────────────────────
 	R.module("audio", {"step": 4, "selftest": {"scene": "res://scripts/v10/audio/v10_audio_selftest.tscn", "args": [], "marker": "V10AUDIO"}})
 	R.module("tower", {"step": 4, "selftest": {"scene": "res://scripts/v10/tower/tower_selftest.tscn", "args": ["--tower_selftest=1"], "marker": "TOWER_SELFTEST"}})

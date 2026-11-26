@@ -151,7 +151,15 @@ static func item_odds(banner: Dictionary, pool: Dictionary, ver: int = VER_NOW) 
 
 
 static func ref_rub_per_pull() -> float:
-	return REF_PACK_RUB / REF_PACK_MOON * float(PULL_COST)
+	return V10Sku.ref_rub_per_pull()
+
+
+static func featured_line() -> String:
+	return "SSR — героиня баннера: шанс %d %%" % int(round(FEATURED_SHARE * 100.0))
+
+
+static func soft_rule_line() -> String:
+	return "С %d-го желания без SSR шанс растёт на %d %% за каждое. Счётчик общий для всех фаз Луны и переходит из фазы в фазу; у «Пяти ветров» и «Первого гостя» свой." % [SOFT_FROM, int(round(SOFT_STEP * 100.0))]
 
 
 static func rub_text(rub: float) -> String:

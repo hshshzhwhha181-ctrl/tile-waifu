@@ -35,14 +35,16 @@ var confirm: V10PullConfirm        # the open purchase confirmation (UX_RULES §
 var left_steps: Array = []         # «Ещё N желаний до SSR» after each card of the running pull
 
 
+static func make_gacha_for(state: Dictionary) -> V10Gacha2:
+	var bk: = V10GachaBank.new(state)
+	if is_same(state, G.S):
+		bk.live_money = true
+		bk.give_fn = func(id: String) -> bool: return G.give_new(id)
+	return V10Gacha2.new(state, G.ITEMS, bk)
+
+
 static func make_gacha() -> V10Gacha2:
-	var bk: = V10GachaBank.new(G.S)
-	bk.give_fn = func(id: String) -> bool: return G.give(id)
-	var g: = V10Gacha2.new(G.S, G.ITEMS, bk)
-	g.after_pull = func(n: int) -> void:
-		if G.has_method("add_pass_xp"):
-			G.add_pass_xp(10 * n)
-	return g
+	return make_gacha_for(G.S)
 
 
 func build(m, args: Dictionary) -> void:
@@ -360,7 +362,7 @@ func _sheet() -> void:
 	var l2t: = ""
 	match k:
 		"phase":
-			l2t = "Следующая SSR — героиня баннера ✓" if gacha.guar(cur_b) else "SSR — героиня баннера: шанс 50 %"
+			l2t = "Следующая SSR — героиня баннера ✓" if gacha.guar(cur_b) else V10Rates.featured_line()
 		"newbie":
 			l2t = "Осталось %d из 50 по 120 кристаллов" % gacha.newbie_left()
 		_:
@@ -472,7 +474,18 @@ func _pull(n: int) -> void:
 		return
 	if not gacha.can_pull(cur_b, n):
 		V9Feel.deny(pull1_btn if n == 1 and is_instance_valid(pull1_btn) else pull10_btn)
-		main.toast("Не хватает кристаллов: задания дня и Путь дают ещё", "gem")
+		var sm: = V10ShopHub.model()
+		if sm != null and main != null:
+			var sp0: = gacha.split(cur_b, n)
+			var defc: = maxi(1, (n - int(sp0.tickets)) * gacha.unit_cost(cur_b) - int(sp0.gems) - int(sp0.moon))
+			var top_cb: = func() -> void:
+				if V10Nav.tab_open("shop"):
+					main.go("shop", {"tab": 2})
+				else:
+					main.toast(V10Nav.tab_lock_text("shop"), "lock")
+			V10ShopFlow.need(self, sm, defc, top_cb, V10ShopHub.go_free_cb(main))
+		elif main != null:
+			main.toast("Не хватает кристаллов: задания дня и Путь дают ещё", "gem")
 		return
 	var sp: = gacha.split(cur_b, n)
 	if V10PullConfirm.needed(sp, G.S):
@@ -586,7 +599,7 @@ func _left_text(left: int) -> String:
 func _set_guar(g: bool) -> void:
 	if guar_lbl == null or not is_instance_valid(guar_lbl) or _kind() != "phase":
 		return
-	guar_lbl.text = "Следующая SSR — героиня баннера ✓" if g else "SSR — героиня баннера: шанс 50 %"
+	guar_lbl.text = "Следующая SSR — героиня баннера ✓" if g else V10Rates.featured_line()
 	guar_lbl.label_settings.font_color = V10GUI.GOLD_300 if g else V10GUI.PAPER_300
 
 
@@ -897,6 +910,7 @@ func _ceremony(r09: Dictionary) -> void:
 
 func _open_first_pick() -> void:
 	first_view = V10FirstPickView.open(_overlay(), gacha, func(r: Dictionary):
+		G.set_meta("first_ssr_session", true)
 		G.save()
 		await _ceremony(to09(r))
 		_ask_partner(r))
@@ -908,14 +922,21 @@ func _ask_partner(r: Dictionary) -> void:
 		return
 	var hero: = String(it.hero)
 	var nm: = String(G.HEROES[hero].name)
+	var yes_cb: = func() -> void:
+		G.S["partner"] = hero
+		G.S["level_partner"] = hero
+		if not (G.S.get("outfit") is Dictionary):
+			G.S["outfit"] = {}
+		G.S.outfit[hero] = String(it.id)
+		V10Look.notify()
+		V10HudSkin.sync(V10Look.current())
+		G.save()
+		if main and main.has_method("toast"):
+			main.toast("%s — твой партнёр" % nm, "heart")
+		if main and main.has_method("go"):
+			main.go("collection", {"hero": hero})
 	V10AskSheet.open(_overlay(), "Сделать партнёром?", "%s в наряде «%s» будет встречать тебя в Чайной и выходить с тобой за стол." % [nm, it.name],
-		"Сделать партнёром", "Позже", func():
-			G.S["partner"] = hero
-			if not (G.S.get("outfit") is Dictionary):
-				G.S["outfit"] = {}
-			G.S.outfit[hero] = String(it.id)
-			G.save()
-			main.toast("%s — твой партнёр" % nm, "heart"), Callable(), G.art_tex(it))
+		"Сделать партнёром", "Позже", yes_cb, Callable(), G.art_tex(it))
 
 
 # ---------------------------------------------------------------- dev / playtest

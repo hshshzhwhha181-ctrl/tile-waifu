@@ -27,7 +27,7 @@ static func now() -> int:
 		return fixed
 	if now_fn.is_valid():
 		return int(now_fn.call())
-	return int(Time.get_unix_time_from_system())
+	return V10Meta.now_unix()
 
 
 static func msk_day(t: int) -> int:

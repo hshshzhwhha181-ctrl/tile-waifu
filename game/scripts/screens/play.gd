@@ -243,7 +243,8 @@ func _make_board() -> void :
 		board.queue_free()
 	board = V10LevelBoard.new() if cfg.has("v10_id") else V6SpecialBoard.new()
 	board.set_meta("tut_id", "match.board")
-	board.look = G.skin_look()
+	var is_ranked_board: = mode in ["duel", "v7tourney", "duel_ranked"]
+	board.look = G.skin_look(is_ranked_board)
 	board.slots = _slot_count()
 	add_child(board)
 	if fx_layer:
@@ -865,6 +866,10 @@ func _on_match(mid: Vector2, combo: int, gold: bool, shard: String) -> void :
 	# sparkles; petals only from ×3 (the combo pill and the tier stamps carry the rest)
 	if V9Feel.can_fx():
 		Fx.flash_glow(fx_layer, mid, Color(V9Cutin.flash_color(G.HEROES[partner].color), 0.8), 1.4, 0.3)
+	if board != null:
+		V10PairFx.burst(fx_layer if fx_layer != null else self, mid, board.look)
+	if not from_ult and combo in [5, 10, 20] and V10Voice.has(partner, "combo%d" % combo):
+		V10Voice.combo(partner, combo)
 	Fx.ring(fx_layer, mid, Color(1, 0.85, 0.5, 0.7), 1.0)
 	Fx.burst(fx_layer, mid, "sparkle", 8 + mini(combo, 8) * 2, Color(1, 0.9, 0.55) if not gold else Color(1, 0.8, 0.2), 1.0 + mini(combo, 8) * 0.05)
 	if combo >= 3:
@@ -1323,7 +1328,16 @@ func _v8_pay(kind: String, title: String, text: String, price: int, on_yes: Call
 
 func _v8_can_pay(price: int) -> bool:
 	if int(G.S.gems) < price:
-		main.toast(V6Txt.s("play.need60") if price >= 60 else V6Txt.s("play.need30"), "gem")
+		var sm: = V10ShopHub.model()
+		if sm != null and main != null:
+			var top_cb: = func() -> void:
+				if V10Nav.tab_open("shop"):
+					main.go("shop", {"tab": 2})
+				else:
+					main.toast(V10Nav.tab_lock_text("shop"), "lock")
+			V10ShopFlow.need(self, sm, maxi(1, price - int(G.S.gems)), top_cb, V10ShopHub.go_free_cb(main))
+		else:
+			main.toast(V6Txt.s("play.need60") if price >= 60 else V6Txt.s("play.need30"), "gem")
 		return false
 	return true
 
@@ -1802,7 +1816,7 @@ func _on_clear() -> void :
 			G.give(cfg.reward.item)
 		if first and lvl == 2:
 			first_unlock_summon = true
-			G.S.free10 = true
+			V10Money.grant({"tickets": 10}, "unlock_summon")
 	elif mode == "daily":
 		reward = cfg.reward.gems + stars * 20
 		var dm: = G.dailymap()
@@ -2326,6 +2340,10 @@ func _victory(stars: int, reward: int, secs: float, first: bool) -> void :
 		await get_tree().create_timer(1.6).timeout
 		if is_inside_tree():
 			_summon_unlocked()
+	elif mode == "" and main != null and main.has_method("maybe_offer") and V10Nav.tab_open("shop"):
+		await get_tree().create_timer(1.2).timeout
+		if is_inside_tree() and _v8_over:
+			main.maybe_offer()
 
 # 0.8: with no heroine bust in the band under a short panel (no room for her face), the ribbon and the panel
 # move down so the panel ends 24 px above the «Повтор» / «Фото» row instead of leaving the board showing through
@@ -3046,7 +3064,9 @@ func _v10_ended(win: bool, stars: int, reward: int, secs: float, first: bool, sc
 	_v10_end_sent = true
 	var pl: = {"mode": _v10_mode(), "win": win, "score": score, "stars": stars, "time_s": secs,
 		"pairs": int(board.tiles.size() / 2) if board else 0, "hero": partner, "seed": int(cfg.get("seed", 0)),
-		"level": lvl if mode == "" else -1, "first": first, "rewards": {"gems": reward}}
+		"level": lvl if mode == "" else -1, "first": first, "rewards": {"gems": reward},
+		"max_combo": max_combo, "clean": win and boosters_used == 0 and fails == 0,
+		"dragons": 1 if win and max_combo >= 7 else 0}
 	pl.merge(extra, true)
 	V10Hooks.emit_game_ended(pl)
 

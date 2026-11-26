@@ -181,6 +181,13 @@ func _greet_returning() -> bool:
 	return bool(_greet_ok)
 
 func say(hero: String, kind: String) -> String:
+	var v10_map: = {"greet": "greet", "win": "win", "lose": "lose", "gacha": "summon", "ssr": "summon"}
+	if v10_map.has(kind):
+		var v10_voice = load("res://scripts/v10/voice/v10_voice.gd")
+		if v10_voice and v10_voice.has(hero, v10_map[kind]):
+			var vt: String = v10_voice.play(hero, v10_map[kind])
+			if vt != "":
+				return vt
 
 	var src: Dictionary = V6Txt.LINES
 	if not src.has(hero) or not src[hero].has(kind):

@@ -783,7 +783,14 @@ static func confirm(main, title: String, text: String, price_icon: String, price
 		# 0.9: can't afford → a real disabled button (dimmed, desaturated) whose tap is the deny + «Не хватает…»
 		yes.disabled = true
 		yes.denied.connect( func():
-			if not done[0] and main.has_method("toast"):
+			if done[0]:
+				return
+			if price_icon == "gem" and main != null and main.has_method("need_gems"):
+				done[0] = true
+				close_popup(p)
+				main.need_gems(maxi(1, price - balance))
+				return
+			if main != null and main.has_method("toast"):
 				main.toast("Не хватает %s" % ("кристаллов" if price_icon == "gem" else "монет"), price_icon))
 	else:
 		yes.shine_every = 2.6

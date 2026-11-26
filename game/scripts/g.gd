@@ -64,13 +64,13 @@ var ITEMS: = [
 	{"id": "r_idol", "cat": "outfit", "hero": "rin", "rar": "SSR", "name": "Звёздная айдол", "img": "rin_idol"}, 
 	{"id": "h_base", "cat": "outfit", "hero": "hana", "rar": "R", "name": "Спортивный стиль", "img": "hana_base"}, 
 	{"id": "h_street", "cat": "outfit", "hero": "hana", "rar": "SR", "name": "Уличный раннер", "img": "hana_street"}, 
-	{"id": "h_beach", "cat": "outfit", "hero": "hana", "rar": "SR", "name": "Летний пляж", "img": "hana_beach", "bold": true, "alt": "hana_winter"}, 
-	{"id": "h_gym", "cat": "outfit", "hero": "hana", "rar": "SSR", "name": "Чемпионка зала", "img": "hana_gym", "bold": true, "alt": "hana_winter"}, 
+	{"id": "h_beach", "cat": "outfit", "hero": "hana", "rar": "SR", "name": "Летний пляж", "img": "hana_beach", "bold": true, "sfw": false, "alt": "hana_winter"}, 
+	{"id": "h_gym", "cat": "outfit", "hero": "hana", "rar": "SSR", "name": "Чемпионка зала", "img": "hana_gym", "bold": true, "sfw": false, "alt": "hana_winter"}, 
 	{"id": "y_base", "cat": "outfit", "hero": "yue", "rar": "SR", "name": "Лунная принцесса", "img": "yue_base"}, 
-	{"id": "y_duel", "cat": "outfit", "hero": "yue", "rar": "SSR", "name": "Драконья дуэлянтка", "img": "yue_duel", "bold": true, "alt": "yue_base"}, 
+	{"id": "y_duel", "cat": "outfit", "hero": "yue", "rar": "SSR", "name": "Драконья дуэлянтка", "img": "yue_duel", "bold": true, "sfw": false, "alt": "yue_base"}, 
 	{"id": "y_queen", "cat": "outfit", "hero": "yue", "rar": "SSR", "name": "Королева лунной ночи", "img": "yue_queen"}, 
 	{"id": "n_base", "cat": "outfit", "hero": "nova", "rar": "SR", "name": "Нетраннер", "img": "nova_base"}, 
-	{"id": "n_ssr", "cat": "outfit", "hero": "nova", "rar": "SSR", "name": "Неоновый форсаж", "img": "nova_ssr", "bold": true, "alt": "nova_base"}, 
+	{"id": "n_ssr", "cat": "outfit", "hero": "nova", "rar": "SSR", "name": "Неоновый форсаж", "img": "nova_ssr", "bold": true, "sfw": false, "alt": "nova_base"}, 
 
 	{"id": "o_cozy", "cat": "outfit", "hero": "mc", "rar": "SR", "name": "Уютный вечер", "img": "mc_cozy", "shop": 680, "nogacha": true}, 
 	{"id": "r_yukata", "cat": "outfit", "hero": "rin", "rar": "SR", "name": "Летняя юката", "img": "rin_yukata", "shop": 680, "nogacha": true}, 
@@ -458,7 +458,11 @@ func skin_source(id: String) -> String:
 			return "награда за партию %s" % lv.code
 	return "в Желаниях"
 
-func skin_look() -> Dictionary:
+func skin_look(ranked: bool = false) -> Dictionary:
+	var lsc = load("res://scripts/v10/look/look.gd")
+	if lsc != null:
+		var big: = bool(S.get("v10_clarity", {}).get("big", false)) if S.get("v10_clarity") is Dictionary else false
+		return lsc.tile_look(S, {"ranked": ranked, "big_symbols": big})
 	return SKIN_LOOK.get(S.get("skin", "s_sakura"), SKIN_LOOK.s_sakura)
 
 const SHARDS_NEED: = 5
@@ -513,10 +517,9 @@ func draw_fortune(lv: = {}) -> Dictionary:
 
 const PULL_COST: = 150
 const NEWBIE_COST: = 1200
-const EXCHANGE_COST: = 120
 
 const BANNERS: = [
-	{"id": "newbie", "name": "Первый гость", "sub": "20 желаний со скидкой 20%, SSR среди них", "hero": "mc", "item": "o_dragon", "img": "mc_dragon", "color": Color("ff8fb8"), "newbie": true}, 
+	{"id": "newbie", "name": "Первый гость", "sub": "50 желаний по 120 кристаллов, SSR среди них", "hero": "mc", "item": "o_dragon", "img": "mc_dragon", "color": Color("ff8fb8"), "newbie": true}, 
 	{"id": "moon", "name": "Лунная ночь", "sub": "Шанс SSR повышен", "hero": "yue", "item": "y_queen", "img": "yue_queen", "color": Color("8f7cff")}, 
 	{"id": "neon", "name": "Неоновый форсаж", "sub": "Только на время события", "hero": "nova", "item": "n_ssr", "img": "nova_ssr", "color": Color("38d9ff")}, 
 ]
@@ -689,6 +692,14 @@ func v10_attach() -> void :
 	V10Save.migrate(S)
 	V10Registry.ensure_all(S)
 	V10Money.attach(S)
+	V10Fonts.deco = bool(S.get("deco_fonts", true))
+	var tt_sc = load("res://scripts/v10/look/tile_themes.gd")
+	if tt_sc != null:
+		tt_sc.anim_on = fx_level() != "min"
+	var hs_sc = load("res://scripts/v10/look/hud_skin.gd")
+	var lk_sc = load("res://scripts/v10/look/look.gd")
+	if hs_sc != null and lk_sc != null:
+		hs_sc.sync(lk_sc.current(S))
 	if V10Registry.wired("salon"):
 		V10Salon.notify_stars(0)
 	if V10Registry.wired("phone"):
@@ -811,6 +822,9 @@ func set_fx_level(l: String) -> void :
 		return
 	S.fx_level = l
 	_sync_v6_fx()
+	var tt_sc = load("res://scripts/v10/look/tile_themes.gd")
+	if tt_sc != null:
+		tt_sc.anim_on = l != "min"
 	settings_changed.emit("fx_level")
 
 
@@ -896,16 +910,18 @@ func level_stars(i: int) -> int:
 func owns(id: String) -> bool:
 	return S.owned.has(id)
 
-# a duplicate pull turns into this many crystals (summon shows it on the card)
+# 0.10 (M4): duplicates in gacha go to V10Stars (✦ / Лепестки), never DUP_GEMS; DUP_GEMS stays only for 0.9 UI fallback
 const DUP_GEMS: = 25
 
 func give(id: String) -> bool:
-
-	if owns(id):
-		V10Money.grant({"gems": DUP_GEMS}, "dup")
+	if id == "" or owns(id):
 		return false
 	S.owned[id] = true
 	return true
+
+
+func give_new(id: String) -> bool:
+	return give(id)
 
 func add_aff(hero: String, n: int) -> void :
 	S.aff[hero] = int(S.aff.get(hero, 0)) + n
@@ -952,7 +968,7 @@ func rar_color(r: String) -> Color:
 
 func art_tex(it: Dictionary) -> Texture2D:
 
-	if S.get("modest", false) and it.get("bold", false) and it.has("alt"):
+	if S.get("modest", false) and (it.get("bold", false) or not bool(it.get("sfw", true))) and it.has("alt"):
 		return load("res://assets/outfits/%s.webp" % it.alt)
 	return item_tex(it)
 
@@ -1025,8 +1041,12 @@ func pass_tier() -> int:
 
 func add_pass_xp(n: int) -> void :
 	S.pass.xp = int(S.pass.xp) + n
+	if econ != null:
+		econ.pass_.add_xp(n)
 
 func month_card_days() -> int:
+	if econ != null and econ.shop.month_days_left() > 0:
+		return econ.shop.month_days_left()
 	var u: String = S.month_card.get("until", "")
 	if u == "":
 		return 0
@@ -1035,84 +1055,42 @@ func month_card_days() -> int:
 
 
 
-func roll() -> String:
-	S.pity = int(S.pity) + 1
-	S.sr_pity = int(S.sr_pity) + 1
-	var rate: = 0.03
-	if S.pity >= 60:
-		rate = 1.0
-	elif S.pity > 45:
-		rate = 0.03 + (S.pity - 45) * 0.06
-	var r: = rng.randf()
-	if r < rate:
-		S.pity = 0
-		S.sr_pity = 0
-		return "SSR"
-	if S.sr_pity >= 10 or r < rate + 0.15:
-		S.sr_pity = 0
-		return "SR"
-	return "R"
+func _make_gacha() -> V10Gacha2:
+	var bk: = V10GachaBank.new(S)
+	bk.live_money = true
+	bk.give_fn = func(id: String) -> bool: return give_new(id)
+	return V10Gacha2.new(S, ITEMS, bk)
 
-# one item from pool that this pull has not drawn yet (unowned ones first when prefer_new); once every item in it
-# has come up the pool starts a new pass (so 8 R cards from 5 R items are 5 + 3 different ones, never 4× one item)
-func _draw_fresh(pool: Array, drawn: Dictionary, prefer_new: bool) -> Dictionary:
-	var left: = pool.filter( func(x): return not drawn.has(x.id))
-	if left.is_empty():
-		# every item of this pool came up once: start a fresh pass, again without replacement, and not with the
-		# item that closed the last pass (no two of the same card side by side)
-		for x in pool:
-			drawn.erase(x.id)
-		var last: = String(drawn.get("_last", ""))
-		left = pool.filter( func(x): return x.id != last) if pool.size() > 1 else pool
-	if prefer_new:
-		var fresh: = left.filter( func(x): return not owns(x.id))
-		if not fresh.is_empty():
-			left = fresh
-	var it: Dictionary = left[rng.randi() % left.size()]
-	drawn["_last"] = it.id
-	return it
+
+func roll() -> String:
+	var g2: = _make_gacha()
+	var b: Dictionary = g2.banners()[0]
+	if not g2.can_pull(b, 1):
+		V10Money.grant({"tickets": 1}, "roll_proxy")
+	var r: Array = g2.pull(b, 1)
+	if r.is_empty():
+		return "R"
+	return V10Gacha2.rar09(String(r[0].rar))
+
 
 func pull(n: int, banner: Dictionary, gifted: bool = false) -> Array:
-	var res: = []
-	var newbie: bool = banner.get("newbie", false)
-	# 0.8: inside one pull R and SR items are drawn without replacement (the pool refills only when it runs dry),
-	# and the player's first 10-pull prefers pieces they do not own yet, so a gifted 10-pull is not three of the
-	# same background
-	var first: bool = n == 10 and (gifted or newbie or int(S.pulls) == 0)
-	var drawn: = {}
-	for i in n:
-		var rar: = roll()
-		if demo_force_ssr and n == 10 and i == 6:
-			rar = "SSR"
-			S.pity = 0
-		if newbie:
-			S.newbie_left = int(S.newbie_left) - 1
-			if rar == "SSR":
-				S.newbie_ssr = true
-			elif int(S.newbie_left) <= 0 and not S.newbie_ssr:
-				rar = "SSR"
-				S.pity = 0
-				S.newbie_ssr = true
-		var pool: = ITEMS.filter( func(x): return x.rar == rar and not x.get("start", false) and not x.get("nogacha", false) and not x.get("hidden", false))
-		var it: Dictionary = _draw_fresh(pool, drawn, first)
-		if rar == "SSR":
-			if newbie:
-				pool = pool.filter( func(x): return x.cat == "outfit")
-				it = pool[rng.randi() % pool.size()]
-			elif S.guar or rng.randf() < 0.5 or (demo_force_ssr and i == 6):
-				it = ITEM[banner.item]
-				S.guar = false
-			else:
-				var off: = pool.filter( func(x): return x.id != banner.item)
-				it = off[rng.randi() % off.size()]
-				S.guar = true
-		drawn[it.id] = true
-		var is_new: = give(it.id)
-		var r: = it.duplicate()
-		r["new"] = is_new
-		res.append(r)
-	S.pulls = int(S.pulls) + n
-	S.ex = int(S.ex) + n
-	add_pass_xp(10 * n)
+	var g2: = _make_gacha()
+	var bl: = g2.banners()
+	var b: Dictionary = bl[0]
+	for cand in bl:
+		if (banner.get("newbie", false) and String(cand.get("kind", "")) == "newbie") or String(cand.get("hero", "")) == String(banner.get("hero", "")):
+			b = cand
+			break
+	if gifted or not g2.can_pull(b, n):
+		V10Money.grant({"tickets": n}, "pull_proxy")
+	var raw: = g2.pull(b, n)
 	save()
-	return res
+	var out: = []
+	for r in raw:
+		var it: Dictionary = r.get("item", ITEM.get(String(r.get("id", "")), {}))
+		var o: Dictionary = it.duplicate()
+		o["rar"] = V10Gacha2.rar09(String(r.rar))
+		o["new"] = bool(r.get("new", false))
+		o["v10"] = r
+		out.append(o)
+	return out

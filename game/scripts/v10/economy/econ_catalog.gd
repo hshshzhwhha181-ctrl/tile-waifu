@@ -38,8 +38,8 @@ const TEA_AD_REFILLS_DAY: = 1
 # ---------------------------------------------------------------- gacha (ROSTER_20 §1.4, g.gd roll())
 const RARS: = ["A", "S", "SSR"]
 const PULL_COST: = 150                        # crystals/moonstone per pull
-const SSR_BASE: = 0.03
-const S_BASE: = 0.15
+const SSR_BASE: = 0.016
+const S_BASE: = 0.13
 const SOFT_FROM: = 46                         # pull #46 since the last SSR is the first with a raised rate
 const SOFT_STEP: = 0.06                       # +6 % per pull from #46: 9 %, 15 %, 21 % …
 const SSR_HARD: = 60                          # pull #60 is always SSR
@@ -103,39 +103,42 @@ const BANNERS: = [
 # Base pack = BASE_SKU without bonus. Month card ≈ 3×, pass ≈ 2×, first-purchase double ≤ 2×.
 const LADDER_MAX: = 3.0
 const KIT_MAX_RUB: = 4990                     # no SKU above 4990 ₽
-const BASE_SKU: = "moon_180"
-const NEWBIE_WINDOW_DAYS: = 14                # beginner sets stay in the shop 14 days from install, no countdown popup
+const BASE_SKU: = "moon_3000"                 # spec §2.2 reference pack: 1 190 ₽ = 1 090 moon (≈ 164 ₽ per wish)
+const NEWBIE_WINDOW_DAYS: = 14                # legacy window constant; starter ladder is gated by Path level (spec Л3)
 const ORDER_STALE_SEC: = 1800                 # an order with no answer for 30 min no longer blocks buying the SKU again
 const MONTH_DAYS: = 30
 const MONTH_STACK_MAX: = 180
 const MONTH_NOW: = {"moon": 300}
-const MONTH_DAILY: = {"crystal": 90}
+const MONTH_DAILY: = {"crystal": 30}
 
 # kind: currency | starter | month | pass | outfit
 #   base/bonus — currency packs: bonus normally, first purchase gives base again instead (double)
-#   grant      — fixed contents; «value» for the ladder counts crystal/moon/150 + wish
-#   once       — buyable once per account; window_days — days from install it is listed
+#   grant      — fixed contents; «value» for the ladder counts crystal/moon/150 + wish + boost_value
+#   once       — buyable once per account; gated by Path level in V10ShopData.LADDER (no calendar expiry)
 #   requires_server — consumables are sold only with the server wallet (CEO_PLAN §4)
 #   restorable — comes back through getPurchases on a new install
 const SKUS: = [
-	{"id": "moon_180", "kind": "currency", "rub": 79, "base": {"moon": 180}, "bonus": {}, "requires_server": true},
-	{"id": "moon_900", "kind": "currency", "rub": 379, "base": {"moon": 860}, "bonus": {"moon": 40}, "requires_server": true},
-	{"id": "moon_3000", "kind": "currency", "rub": 1190, "base": {"moon": 2710}, "bonus": {"moon": 290}, "requires_server": true},
-	{"id": "moon_6000", "kind": "currency", "rub": 2290, "base": {"moon": 5220}, "bonus": {"moon": 780}, "requires_server": true},
-	{"id": "moon_10200", "kind": "currency", "rub": 3790, "base": {"moon": 8640}, "bonus": {"moon": 1560}, "requires_server": true},
-	{"id": "moon_14000", "kind": "currency", "rub": 4990, "base": {"moon": 11370}, "bonus": {"moon": 2630}, "requires_server": true},
-	{"id": "first_79", "kind": "starter", "name": "Первая покупка", "rub": 79, "grant": {"moon": 450, "coin": 2000},
+	{"id": "moon_180", "kind": "currency", "rub": 79, "base": {"moon": 60}, "bonus": {}, "requires_server": true},
+	{"id": "moon_900", "kind": "currency", "rub": 379, "base": {"moon": 300}, "bonus": {"moon": 30}, "requires_server": true},
+	{"id": "moon_3000", "kind": "currency", "rub": 1190, "base": {"moon": 980}, "bonus": {"moon": 110}, "requires_server": true},
+	{"id": "moon_6000", "kind": "currency", "rub": 2290, "base": {"moon": 1980}, "bonus": {"moon": 260}, "requires_server": true},
+	{"id": "moon_10200", "kind": "currency", "rub": 3790, "base": {"moon": 3300}, "bonus": {"moon": 580}, "requires_server": true},
+	{"id": "moon_14000", "kind": "currency", "rub": 4990, "base": {"moon": 4500}, "bonus": {"moon": 980}, "requires_server": true},
+	{"id": "first_79", "kind": "starter", "name": "Первая чашка", "rub": 79, "grant": {"moon": 150, "coin": 2000},
 		"once": true, "requires_server": true},
 	{"id": "guest_149", "kind": "starter", "name": "Набор первого гостя", "rub": 149,
-		"grant": {"moon": 600, "wish": 2, "tea": 120}, "once": true, "window_days": NEWBIE_WINDOW_DAYS, "requires_server": true},
+		"grant": {"moon": 300, "tea": 120}, "once": true, "requires_server": true},
 	{"id": "newbie_499", "kind": "starter", "name": "Набор новичка", "rub": 499,
-		"grant": {"moon": 1800, "wish": 8}, "once": true, "window_days": NEWBIE_WINDOW_DAYS, "requires_server": true},
+		"grant": {"moon": 650, "wish": 3}, "once": true, "requires_server": true},
+	{"id": "traveler_199", "kind": "starter", "name": "Набор путника", "rub": 199,
+		"grant": {"moon": 150, "items": ["boost_lantern", "boost_lantern", "boost_wind", "boost_wind", "boost_scroll", "boost_scroll"]},
+		"once": true, "requires_server": true, "boost_value": 60},
 	{"id": "growth_1490", "kind": "starter", "name": "Набор роста", "rub": 1490,
-		"grant": {"moon": 3600, "wish": 20, "coin": 20000}, "once": true, "requires_server": true},
+		"grant": {"moon": 2600, "wish": 3, "coin": 20000}, "once": true, "requires_server": true},
 	{"id": "month_449", "kind": "month", "name": "Лунный абонемент", "rub": 449, "restorable": true},
 	{"id": "pass_899", "kind": "pass", "name": "Пропуск сезона", "rub": 899, "restorable": true},
 	{"id": "pass_1490", "kind": "pass", "name": "Пропуск сезона+", "rub": 1490, "deluxe": true,
-		"grant": {"moon": 1500}, "skip_tiers": 10, "restorable": true},
+		"grant": {"moon": 300}, "skip_tiers": 10, "restorable": true},
 ]
 
 # Outfits sold directly for rubles (restorable, no randomness). Integrator adds SKUs with outfit_sku().
@@ -157,12 +160,10 @@ static func pass_free(tier: int) -> Dictionary:     # tier 1..30
 
 static func pass_prem(tier: int) -> Dictionary:
 	if tier == PASS_TIERS:
-		return {"crystal": 300, "wish": 3, "items": ["@season_outfit"]}
-	if tier % 5 == 0:
-		return {"wish": 1, "crystal": 60}       # tiers 5,10,15,20,25 → 5 wishes (+3 on 30, +1 on 3 below = 9)
-	if tier == 3:
-		return {"wish": 1, "crystal": 60}
-	return {"crystal": 100}
+		return {"crystal": 100, "wish": 1, "items": ["@season_outfit"]}
+	if tier in [5, 10, 15, 25]:
+		return {"wish": 1, "crystal": 25}       # 4 wishes + 1 on 30 = 5 wishes; 100 + 4*25 + 25*32 = 1 000 crystals (spec Л5)
+	return {"crystal": 32}
 
 
 static func pass_track_total(prem: bool) -> Dictionary:
@@ -240,7 +241,7 @@ static func _add_into(into: Dictionary, g: Dictionary) -> void:
 			into[k] = int(into.get(k, 0)) + int(g[k])
 
 
-# pulls a SKU is worth (premium currency / PULL_COST + wishes), for the ladder rule and «≈ N ₽ за крутку»
+# wishes a SKU is worth (premium currency / PULL_COST + wishes + booster crystal value), for the 3× rule and «≈ N ₽ за желание»
 static func pull_value(s: Dictionary, first: bool = false) -> float:
 	var g: = sku_grant(s, first)
 	var kind: = String(s.get("kind", ""))
@@ -249,8 +250,15 @@ static func pull_value(s: Dictionary, first: bool = false) -> float:
 	elif kind == "pass":
 		# tier skips only move you along the same track: no extra value
 		_add_into(g, pass_track_total(true))
-	var v: = float(int(g.get("crystal", 0)) + int(g.get("moon", 0))) / float(PULL_COST)
-	return v + float(int(g.get("wish", 0)))
+	var v: = float(int(g.get("crystal", 0)) + int(g.get("moon", 0))) / float(PULL_COST) + float(int(g.get("wish", 0)))
+	var bv: = int(s.get("boost_value", 0))
+	if bv > 0:
+		var nb: = 0
+		for i in s.get("grant", {}).get("items", []):
+			if String(i).begins_with("boost_"):
+				nb += 1
+		v += float(nb * bv) / float(PULL_COST)
+	return v
 
 
 static func rub_per_pull(s: Dictionary, first: bool = false) -> float:

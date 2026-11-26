@@ -14,9 +14,9 @@ var SCREENS: = {
 	"home": preload("res://scripts/screens/home.gd"), 
 	"levels": preload("res://scripts/screens/levels.gd"), 
 	"play": preload("res://scripts/screens/play.gd"), 
-	"summon": preload("res://scripts/screens/summon.gd"), 
+	"summon": preload("res://scripts/v10/gacha/ui/wish_screen.gd"), 
 	"collection": preload("res://scripts/screens/collection.gd"), 
-	"shop": preload("res://scripts/screens/shop.gd"), 
+	"shop": preload("res://scripts/v10/shop/shop2_screen.gd"), 
 	"modes": preload("res://scripts/screens/modes.gd"), 
 	"arena": preload("res://scripts/v06/modes/mode_play.gd"), 
 	"room": preload("res://scripts/v07/room/room.gd"), 
@@ -72,6 +72,7 @@ func _ready() -> void :
 	overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	overlay.size = vs
 	add_child(overlay)
+	V10ShopSheet.layer = overlay
 	trans = ColorRect.new()
 	trans.size = vs
 	trans.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -178,12 +179,23 @@ func _splash() -> void :
 	hero.react("big")
 	var need_card: = not has_profile
 	var need_intro: bool = not G.S.get("intro_done", false)
-	if need_card or need_intro:
+	if not (G.S.get("v10_shop") is Dictionary):
+		G.S["v10_shop"] = V10ShopModel.defaults()
+	var need_age: = V10Age.needs_gate(G.S.v10_shop, V10Meta.now_unix()) and not ("--meta_shots=" in args)
+	if need_age or need_card or need_intro:
 		pt.kill()
 		var t0: = create_tween().set_parallel()
 		for n in fades:
 			t0.tween_property(n, "modulate:a", 0.0, 0.3)
 		await t0.finished
+	if need_age:
+		var gate: = V10AgeGate.make(G.S.v10_shop, V10Meta.now_unix())
+		sp.add_child(gate)
+		var band: String = await gate.done
+		G.save()
+		if band == "child":
+			return
+		gate.queue_free()
 	var imported: = false
 	if need_card:
 		var card: = V8ProfileCard.make(self, sp)
@@ -268,7 +280,7 @@ const SETTINGS_SEG: = [
 ]
 
 func settings() -> void :
-	var p: = Common.popup(self, V6Txt.s("settings.title"), 990)
+	var p: = Common.popup(self, V6Txt.s("settings.title"), 1068)
 	var y: = 50.0
 	for seg in SETTINGS_SEG:
 		_settings_seg(p, seg, y)
@@ -276,6 +288,7 @@ func settings() -> void :
 	var rows: = [
 		["cutins", V6Txt.s("settings.cutins"), V6Txt.s("settings.cutins_d")], 
 		["modest", V6Txt.s("settings.modest"), V6Txt.s("settings.modest_d")], 
+		["deco_fonts", "Декоративные шрифты", "Особые шрифты заголовков героинь"], 
 		["v7_haptics.on", "Вибрация", "Отклик на касания, пары и серии"], 
 		["v6_story.on", V6Txt.s("settings.story"), V6Txt.s("settings.story_d")], 
 		["sound", V6Txt.s("settings.sound"), ""], 
@@ -300,10 +313,12 @@ func settings() -> void :
 			G.save()
 			b.lbl.text = V6Txt.s("common.on") if v else V6Txt.s("common.off")
 			b.set_pal("mint" if v else "glass")
+			if key == "deco_fonts":
+				V10Fonts.deco = v
 			if key == "music":
 				Sfx.cur_music = ""
 				Sfx.music("menu" if v else "")
-			if key == "modest" and screen_id in ["home", "collection", "shop", "summon"]:
+			if key in ["modest", "deco_fonts"] and screen_id in ["home", "collection", "shop", "summon"]:
 				p.get_meta("root").set_meta("on_close", func():
 					var sid: = screen_id
 					screen_id = ""
@@ -312,10 +327,10 @@ func settings() -> void :
 		y += rh
 
 	var sl: = UI.label(V6Txt.s("settings.side"), 26, UI.INK, Color.WHITE, 3, "body", 900)
-	sl.position = Vector2(34, 848)
+	sl.position = Vector2(34, 926)
 	p.add_child(sl)
-	var fb: = JButton.make(V6Txt.s("settings.side_f"), "pink" if G.S.side == "f" else "glass", Rect2(220, 836, 196, 64), null, 22, -1.0, false)
-	var mb: = JButton.make(V6Txt.s("settings.side_m"), "glass", Rect2(428, 836, 200, 64), null, 20, -1.0, false)
+	var fb: = JButton.make(V6Txt.s("settings.side_f"), "pink" if G.S.side == "f" else "glass", Rect2(220, 914, 196, 64), null, 22, -1.0, false)
+	var mb: = JButton.make(V6Txt.s("settings.side_m"), "glass", Rect2(428, 914, 200, 64), null, 20, -1.0, false)
 	Common.tab_paint(fb, G.S.side == "f")
 	Common.tab_paint(mb, false)
 	fb.pressed.connect( func():
@@ -328,16 +343,17 @@ func settings() -> void :
 	p.add_child(fb)
 	p.add_child(mb)
 	var eg: = UI.label("Тайники найдены: %d из %d" % [V7Eggs.found_count(), V7Eggs.total()], 18, Color("d9c4e6"))
-	eg.position = Vector2(34, 916)
+	eg.position = Vector2(34, 994)
 	p.add_child(eg)
 	var vl: = UI.label(V6Txt.s("title.version") % G.version(), 16, Color(1, 1, 1, 0.45))
-	vl.position = Vector2(34, 946)
+	vl.position = Vector2(34, 1024)
 	vl.size = Vector2(592, 24)
 	vl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	p.add_child(vl)
 	V10Clarity.settings_hook(self, p)  # v10-clarity hook: «Фишки и словарь»
 	V10Nav.settings_notify(self, p)  # 0.10 W1 (meta Ф1): «Уведомления»
 	V10Nav.settings_bday(self, p)  # 0.10 W2 (rituals Р7): «Мой день рождения»
+	V10Nav.settings_fonts(self, p)  # 0.10 W3 (fonts D2): «Шрифты и лицензии»
 
 
 # one 3-way setting: caption, three segments (the chosen one painted like a selected tab) and a hint line
@@ -391,9 +407,44 @@ func rank_ladder() -> void :
 	go("profile", {"from": screen_id if screen_id != "" else "home"})
 
 
+func need_gems(deficit: int) -> void :
+	var sm: = V10ShopHub.model()
+	if sm != null:
+		var top_cb: = func() -> void:
+			if V10Nav.tab_open("shop"):
+				go("shop", {"tab": 2})
+			else:
+				toast(V10Nav.tab_lock_text("shop"), "lock")
+		V10ShopFlow.need(screen if screen != null else self, sm, maxi(1, deficit), top_cb, V10ShopHub.go_free_cb(self))
+	else:
+		toast("Не хватает кристаллов", "gem")
+
+
 func maybe_offer() -> void :
-	# 0.8 (Stream E): «Набор первого гостя» — once, after the 3rd Path win, valid 72 h (scripts/v08/play/starter.gd).
-	V8Starter.maybe_show(self)
+	if "--v8_offer=1" in OS.get_cmdline_user_args():
+		V8Starter.maybe_show(self)
+		return
+	var sm: = V10ShopHub.model()
+	if sm == null or not sm.cash_visible():
+		return
+	var cur: Dictionary = sm.ladder().get("current", {})
+	if cur.is_empty():
+		return
+	var now_u: = V10Meta.now_unix()
+	var day_i: int = sm.econ.clock.today()
+	var octx: = {
+		"now": now_u,
+		"install": int(sm.econ.shop.st.get("install", now_u)),
+		"level": sm.level(),
+		"result": "win",
+		"first_ssr_session": bool(G.has_meta("first_ssr_session") and G.get_meta("first_ssr_session")),
+		"first_ssr_t": int(G.S.get("first_pick_t", 0)),
+		"day": day_i,
+	}
+	if V10Offers.can_popup(G.S.v10_shop, octx).get("ok", false):
+		V10Offers.mark_shown(G.S.v10_shop, day_i)
+		G.save()
+		V10ShopFlow.confirm(screen if screen != null else self, sm, String(cur.id))
 
 func _dev_args() -> void :
 
@@ -413,6 +464,8 @@ func _dev_args() -> void :
 		# dev: preview the top bar / screens at another rank (not saved unless the screen saves)
 		G.S.rp = int(a.rp)
 		_refresh_profile_chip()
+	if a.has("skin"):
+		V10Look.dev_reveal[String(a.skin)] = true
 	if a.has("outfit"):
 		var it: Dictionary = G.ITEM[a.outfit]
 		G.S.owned[a.outfit] = true
@@ -420,6 +473,10 @@ func _dev_args() -> void :
 		G.S.partner = it.hero
 	if a.has("fuzz"):
 		V7Fuzz.run(self, int(a.fuzz))
+		return
+	if a.get("contract_selftest", "") == "1":
+		await get_tree().process_frame
+		get_tree().quit(1 if V10ContractSelftest.run() > 0 else 0)
 		return
 	if a.has("v10_selftest"):
 		# 0.10: every module selftest as a child process (scripts/v10/core/registry_runner.gd)
