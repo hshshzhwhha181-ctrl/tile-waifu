@@ -283,6 +283,7 @@ static func register_all() -> void:
 		"ensure": func(_S: Dictionary) -> void: V10ChallengeState.st()})
 	R.module("wave1", {"step": 4, "selftest": {"scene": "res://scripts/v10/wave1/wave1_selftest.tscn",
 		"args": ["--wave1_selftest=1"], "marker": "WAVE1_SELFTEST"}})
+	V10AdventureReg.register()
 	if R.STEP >= 4:
 		V10Afisha.set_provider("hand", func() -> bool: return bool(V10PalmInfo.afisha_entry().done))
 		for cdef in V10Pagoda.cos_defs():

@@ -949,7 +949,7 @@ func go(id: String, args: = {}, animate: = true, remember: = true) -> void :
 	screen.size = CR.size
 	screen.set_meta("v8_args", args.duplicate())
 	screen_root.add_child(screen)
-	if id in ["pagoda", "journey", "tower_play", "duels", "duel2", "challenge", "challenge_play", "hand"] or id.begins_with("mj_"):
+	if id in ["pagoda", "journey", "tower_play", "duels", "duel2", "challenge", "challenge_play", "hand", "adventure"] or id.begins_with("mj_"):
 		show_chrome(false, false)
 	if screen.has_method("build"):
 		screen.call("build", self, args)

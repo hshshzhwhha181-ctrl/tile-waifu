@@ -6,6 +6,9 @@ extends "res://scripts/screens/modes.gd"
 # Пасьянсы · За столом · Испытания и соперницы. A shelf shows open modes plus at most ONE teaser (P0-8).
 
 const SHELVES: = [
+	["Приключение · Битвы с монстрами", [
+		["adventure", "Битва с монстрами"],
+	]],
 	["Пасьянсы", [
 		["classic", "Классика"],
 		["triples", "Тройки"],
@@ -37,28 +40,30 @@ const CARD_GAP: = 16.0
 const BANNER_H: = 248.0
 const BG: = "res://assets/bg/"
 const OUT: = "res://assets/outfits/"
+const HF: = "res://assets/v10/hf_ui/"
 # [artwork, focus (0..1 of the image), zoom, badge glyph ("nav:<n>" = tab art, else V8Art.icon)]
 const ART: = {
-	"daily": [BG + "bg_festival.webp", Vector2(0.5, 0.5), 1.0, "calendar"],
-	"mode": [BG + "bg_neon.webp", Vector2(0.5, 0.5), 1.1, "shuffle"],
-	"bridge_daily": [BG + "bg_shrine.webp", Vector2(0.5, 0.55), 1.1, "hint"],
+	"daily": [HF + "banner_mc_tea.png", Vector2(0.5, 0.35), 1.0, "calendar"],
+	"mode": [HF + "banner_nova.png", Vector2(0.5, 0.35), 1.0, "shuffle"],
+	"bridge_daily": [HF + "banner_kohaku.png", Vector2(0.5, 0.32), 1.0, "hint"],
 	"hand": [OUT + "yue_queen.webp", Vector2(0.5, 0.2), 1.0, "visits"],
-	"classic": [BG + "bg_teahouse.webp", Vector2(0.5, 0.5), 1.0, "nav:play"],
-	"triples": [BG + "bg_street.webp", Vector2(0.5, 0.55), 1.0, "tasks"],
-	"connect": [BG + "bg_rooftop.webp", Vector2(0.5, 0.5), 1.0, "shuffle"],
+	"classic": [HF + "banner_path.png", Vector2(0.5, 0.35), 1.0, "nav:play"],
+	"triples": [HF + "banner_rin.png", Vector2(0.5, 0.32), 1.0, "tasks"],
+	"connect": [HF + "banner_tsubame.png", Vector2(0.5, 0.32), 1.0, "shuffle"],
 	"garden": [BG + "bg_shrine.webp", Vector2(0.4, 0.7), 1.3, "heart"],
-	"cube": [BG + "bg_neon.webp", Vector2(0.3, 0.6), 1.3, "rating"],
+	"cube": [HF + "banner_nova.png", Vector2(0.5, 0.4), 1.05, "rating"],
 	"bridge_hand": [OUT + "mc_dragon.webp", Vector2(0.5, 0.2), 1.0, "hint"],
-	"riichi": [BG + "bg_palace.webp", Vector2(0.5, 0.5), 1.0, "trophy"],
+	"riichi": [HF + "banner_shirin.png", Vector2(0.5, 0.32), 1.0, "trophy"],
 	"sanma": [OUT + "hana_street.webp", Vector2(0.5, 0.2), 1.0, "tasks"],
-	"koikoi": [BG + "bg_festival.webp", Vector2(0.25, 0.6), 1.4, "heart"],
+	"koikoi": [HF + "banner_story.png", Vector2(0.5, 0.35), 1.0, "heart"],
 	"pagoda": ["res://assets/v10/tower/pagoda_far.webp", Vector2(0.5, 0.5), 1.0, "trophy"],
 	"journey": ["res://assets/v10/tower/journey_far.webp", Vector2(0.5, 0.5), 1.0, "visits"],
 	"duels": [OUT + "nova_ssr.webp", Vector2(0.5, 0.2), 1.0, "trophy"],
-	"challenge": [BG + "bg_street.webp", Vector2(0.6, 0.35), 1.4, "letters"],
-	"blitz": [BG + "bg_rooftop.webp", Vector2(0.6, 0.65), 1.3, "hint"],
+	"challenge": [HF + "banner_tsubame.png", Vector2(0.5, 0.35), 1.0, "letters"],
+	"blitz": [HF + "banner_shirin.png", Vector2(0.5, 0.35), 1.0, "hint"],
 	"tourney": ["res://assets/v08/ui/bg/tourney.webp", Vector2(0.5, 0.5), 1.0, "trophy"],
-	"default": [BG + "bg_teahouse.webp", Vector2(0.5, 0.5), 1.0, "nav:play"],
+	"adventure": ["res://assets/v10/adventure/paper_oni.png", Vector2(0.5, 0.32), 1.0, "trophy"],
+	"default": [HF + "banner_path.png", Vector2(0.5, 0.35), 1.0, "nav:play"],
 }
 
 var play_btn: V10Button
@@ -307,6 +312,8 @@ func _caption(text: String, y: float, accent: Color) -> float:
 func _mode_is_open(id: String) -> bool:
 	var u: = int(G.S.get("unlocked", 1))
 	match id:
+		"adventure":
+			return true
 		"classic":
 			return u >= 10
 		"triples":
@@ -345,6 +352,8 @@ func _mode_is_open(id: String) -> bool:
 
 func _lock_v10(id: String) -> String:
 	match id:
+		"adventure":
+			return ""
 		"classic":
 			return "Откроется на уровне 10"
 		"triples":
@@ -380,6 +389,9 @@ func _lock_v10(id: String) -> String:
 
 func _status_v10(id: String) -> String:
 	match id:
+		"adventure":
+			var ai: Dictionary = V10AdventureData.hub_card_info()
+			return String(ai.get("subtitle", "Сразись с ёкай-боссами"))
 		"classic":
 			return "Свободная · День · Память"
 		"triples":
@@ -431,6 +443,9 @@ func _open_v10(id: String) -> void:
 		return
 	var hero: String = G.S.partner if G.hero_unlocked(G.S.partner) else "mc"
 	match id:
+		"adventure":
+			var ai2: Dictionary = V10AdventureData.hub_card_info()
+			main.go("adventure", {"stage": int(ai2.get("stage", 0)), "hero": hero})
 		"classic":
 			main.go("mj_classic_lobby", {"hero": "mc", "partner": hero})
 		"triples":
