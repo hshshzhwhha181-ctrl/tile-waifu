@@ -642,7 +642,7 @@ func _build_cta() -> void:
 		else:
 			open_card(cur))
 	add_child(cta)
-	cta.pulse = true
+	cta.pulse = false
 	_build_jump(r)
 	# Огонёк пути: three cups over the CTA, from L10 (UX_RULES §3.5)
 	if not Boost.opened():

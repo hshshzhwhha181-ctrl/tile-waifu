@@ -420,11 +420,8 @@ func _react(d: Dictionary, p: Vector2) -> void:
 	if zone != "bg" or not entry.is_empty():
 		show_emotion(emo)
 	if d.line:
-		var rz_voice: String = _last_rig_zone if mode == "rig10" else String({"head": "head", "hand": "armR", "outfit": "outfit"}.get(zone, zone))
-		var vt: = V10Voice.tap(hid, rz_voice, {"aff": G.aff_level(hid)})
-		if vt != "":
-			say(vt, emo, "", false)
-		elif not entry.is_empty():
+		# JP-only voice-over (res://assets/voice/*.mp3) + Russian subtitles — never Russian TTS .ogg
+		if not entry.is_empty():
 			say(entry.text, emo, entry.voice)
 	if d.aff:
 		_gain(p)
@@ -706,16 +703,12 @@ func _process(dt: float) -> void:
 		idle_lines += 1
 		idle_t = 0.0
 		next_micro = randf_range(IDLE_MICRO.x, IDLE_MICRO.y)
-		var iv: = V10Voice.play(hid, "idle")
-		if iv != "":
-			show_emotion("happy")
-			say(iv, "happy", "", false)
-		else:
-			var n: = V9TouchLines.pool(hid, "idle").size()
-			if n > 0:
-				var e: = V9TouchLines.entry(hid, "idle", randi() % n)
-				show_emotion(e.emo)
-				say(e.text, e.emo, e.voice)
+		# JP-only voice-over (res://assets/voice/*.mp3) + Russian subtitles — never Russian TTS .ogg
+		var n: = V9TouchLines.pool(hid, "idle").size()
+		if n > 0:
+			var e: = V9TouchLines.entry(hid, "idle", randi() % n)
+			show_emotion(e.emo)
+			say(e.text, e.emo, e.voice)
 	if fps_lbl and is_instance_valid(fps_lbl) and Engine.get_process_frames() % 15 == 0:
 		_update_fps()
 	if zones_dbg:

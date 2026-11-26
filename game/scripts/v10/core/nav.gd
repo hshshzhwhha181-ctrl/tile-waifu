@@ -463,9 +463,9 @@ class _Band:
 		mouse_filter = Control.MOUSE_FILTER_STOP  # the band eats taps between the tabs
 
 	func _draw() -> void:
-		# AAA lacquer dock: deep burgundy-night vertical gradient + double gold filigree border
-		var top_col: = Color(0.14, 0.08, 0.19, 0.97)
-		var bot_col: = Color(0.06, 0.03, 0.10, 0.99)
+		# AAA lacquer dock: deep burgundy-night vertical gradient + double gold filigree border (100% opaque)
+		var top_col: = Color(0.14, 0.08, 0.19, 1.0)
+		var bot_col: = Color(0.06, 0.03, 0.10, 1.0)
 		draw_polygon(
 			PackedVector2Array([Vector2.ZERO, Vector2(size.x, 0), Vector2(size.x, size.y), Vector2(0, size.y)]),
 			PackedColorArray([top_col, top_col, bot_col, bot_col])

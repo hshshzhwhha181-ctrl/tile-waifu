@@ -28,8 +28,8 @@ var icon: = "":
 		queue_redraw()
 var icon_px: = 48
 var icon_color: = V10DS.PAPER_500
-var breathing: = true
-var sheen: = true
+var breathing: = false
+var sheen: = false
 var btn_size: = Vector2(560, 104):
 	set(v):
 		btn_size = v
@@ -121,14 +121,16 @@ func _relayout() -> void:
 func _process(delta: float) -> void:
 	if kind != "play":
 		return
-	_t += delta
+	# No continuous idle scale breathing (caused subpixel text/edge jitter on mobile);
+	# crisp tap feedback lives in _gui_input().
 	var fx: = V10Hud2Util.fx_level() != "min"
-	if breathing and fx and not _down:
-		var k: = 0.9925 + 0.0075 * cos(_t * TAU / 3.2)
-		scale = Vector2.ONE * k
 	if sheen and fx:
+		_t += delta
 		var ph: = fmod(_t, 2.8)
 		_sheen_x = ph / 0.36 if ph < 0.36 else -1.0
+		queue_redraw()
+	elif _sheen_x >= 0.0:
+		_sheen_x = -1.0
 		queue_redraw()
 
 

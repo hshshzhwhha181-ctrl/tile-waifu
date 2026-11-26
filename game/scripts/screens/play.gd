@@ -802,6 +802,13 @@ func now() -> float:
 	return G.time
 
 func _process(dt: float) -> void :
+	var ult_freeze: = (ult != null and ult.busy) or V9Cutin.any_playing()
+	if ult_freeze:
+		# Pause combo expiry and fever timers frame-by-frame while an Ultimate or Cutin is playing
+		if board and board.combo > 0:
+			board.last_match += dt
+		if now() < fever_until:
+			fever_until += dt
 	talk_cd -= dt
 	if _fortune_close.is_valid() and board and (board.tray.size() > 0 or board.combo > 0):
 		_v8_fold_fortune()
@@ -823,10 +830,11 @@ func _process(dt: float) -> void :
 			if V10Registry.wired("audio"):
 				V10Music.fever(false)
 				V10SfxBank.play("fever_end")
-		charge = max(0.0, charge - dt * 0.05)
+		if not ult_freeze:
+			charge = max(0.0, charge - dt * 0.05)
 	meter.size.x = max(12.0, meter_w * clamp(charge, 0.0, 1.0))
 	meter.set_param("glow", 1.0 if fever else 0.0)
-	if now() - board.last_match > board.combo_window and board.combo > 0:
+	if not ult_freeze and board and now() - board.last_match > board.combo_window and board.combo > 0:
 		combo_lbl.text = ""
 
 func _on_match(mid: Vector2, combo: int, gold: bool, shard: String) -> void :

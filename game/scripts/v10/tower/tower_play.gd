@@ -105,8 +105,12 @@ func _v6_setup(args: Dictionary) -> bool:
 			elif not sj.is_empty() and not is_same(sj, run) and int(sj.get("week", -1)) == int(run.get("week", -2)) \
 					and int(sj.get("attempt", -1)) == int(run.get("attempt", -2)):
 				run = sj
+			if not run.is_empty() and int(run.get("hearts", J.HEARTS)) <= 0:
+				J.finish(run)
+				_save()
+				run = {}
 			if run.is_empty():
-				# nothing to continue (the week rolled over): a practice table, never a free attempt
+				# nothing to continue (the week rolled over or 0-heart run cleaned): a practice table, never a free attempt
 				tmode = "practice"
 				mode = "practice"
 				run = J.start(partner, true)
@@ -623,13 +627,28 @@ func _life_event(r: Dictionary, why: String) -> void:
 		Sfx.say(partner, "lose")
 		if tmode != "practice":
 			V8PlayRules.award("other", 0, false)
+		# Finalize and clear the dead 0-heart / 0-lantern run IMMEDIATELY before the 0.8 s beat so quitting
+		# or backing out during the animation can never leave a dead 0-heart run in the save.
+		var end_payload: Dictionary = {}
+		if pag:
+			var end_res: Dictionary = P.end_run(run)
+			_save()
+			_emit_tower_ended(false, int(end_res.get("score", 0)), {})
+			_emit("end", end_res)
+			end_payload = {"to": "pagoda", "args": {"result": end_res, "new_cos": (run.get("new_cos", []) as Array).duplicate()}}
+		else:
+			var fin: Dictionary = J.finish(run)
+			if tmode != "practice":
+				UIT.grant(fin.get("reward", {}), "journey")
+				_save()
+				_emit_tower_ended(int(fin.get("boards", 0)) >= J.BOARDS, int(fin.get("score", 0)), fin.get("reward", {}))
+			fin["granted"] = true
+			_emit("finish", fin)
+			end_payload = {"to": "journey", "args": {"result": fin}}
 		await get_tree().create_timer(0.8).timeout
 		if not is_inside_tree():
 			return
-		if pag:
-			_pagoda_over()
-		else:
-			_journey_finish()
+		_go(String(end_payload.to), end_payload.args)
 		return
 	if pag:
 		_band_plate("Фонарь погас · осталось %d" % left, 1.4)

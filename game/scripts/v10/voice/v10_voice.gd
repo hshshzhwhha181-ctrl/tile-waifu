@@ -44,6 +44,8 @@ const COOLDOWN_SLOTS: = ["tap_head", "tap_hair", "tap_prop", "tap_acc", "tap_spa
 
 static var _inst: V10Voice = null
 static var _data: = {}
+# Russian TTS .ogg playback is disabled in-game (Japanese res://assets/voice/*.mp3 + RU subtitles only).
+static var ru_audio_enabled: = false
 
 var _player: AudioStreamPlayer
 var _cache: = {}
@@ -220,15 +222,16 @@ func _start(hero: String, slot: String, txt: String) -> void:
 	_cur_hero = hero
 	_cur_lip = String(_line(hero, slot).get("lip", ""))
 	if _g_flag("sound") and _g_flag("voice") and ResourceLoader.exists(p):
-		if not _cache.has(p):
-			_cache[p] = load(p)
-		var st: AudioStream = _cache[p]
-		if st != null:
-			_player.stream = st
-			_player.play()
-			dur = st.get_length()
-			if sfx != null and sfx.has_method("duck"):
-				sfx.duck(DUCK_DB, dur + 0.3)
+		if ru_audio_enabled:
+			if not _cache.has(p):
+				_cache[p] = load(p)
+			var st: AudioStream = _cache[p]
+			if st != null:
+				_player.stream = st
+				_player.play()
+				dur = st.get_length()
+		if sfx != null and sfx.has_method("duck"):
+			sfx.duck(DUCK_DB, dur + 0.3)
 	if sfx != null and sfx.has_signal("voice_started"):
 		sfx.voice_started.emit(hero, txt, maxf(dur, 1.0))
 

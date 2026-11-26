@@ -195,6 +195,13 @@ static func covers(p: Vector2) -> bool:
 	return false
 
 
+static func any_playing() -> bool:
+	for c in _live:
+		if is_instance_valid(c) and not c._done:
+			return true
+	return false
+
+
 static func next_mirror() -> bool:
 	_mirror_flip = not _mirror_flip
 	return _mirror_flip

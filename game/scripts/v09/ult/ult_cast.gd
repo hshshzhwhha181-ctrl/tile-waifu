@@ -292,8 +292,6 @@ func begin(auto: = false) -> void :
 	play.set_meta("v6_casting", true)
 	var was_on: = bd.input_on
 	bd.input_on = false
-	var t0: = float(play.now())
-	var fever_on: = t0 < float(play.fever_until)
 	play._refresh()
 	V9Feel.press(play.stage, "pop", "button")
 	# a happy beat on the card, not the «big» bounce: that one lifts her out of the frame while the strip plays
@@ -335,12 +333,7 @@ func begin(auto: = false) -> void :
 		await get_tree().process_frame
 	if not _alive():
 		return
-	var paused: = float(play.now()) - t0
-	if bd == _board():
-		if bd.combo > 0:
-			bd.last_match += paused
-		if fever_on:
-			play.fever_until = float(play.fever_until) + paused
+	# Combo and fever timers are paused frame-by-frame in play._process() while ult.busy / V9Cutin.any_playing()
 	play.set_meta("v6_casting", false)
 	busy = false
 	bd = _board()

@@ -172,7 +172,13 @@ static func start(partner: String, practice: = false) -> Dictionary:
 	return run
 
 static func current_run() -> Dictionary:
-	return st().run
+	var d: = st()
+	var r: Dictionary = d.run
+	if not r.is_empty() and (int(r.get("hearts", 0)) <= 0 or int(r.get("board", 0)) >= BOARDS):
+		# Auto-finalize any dead (0-heart) or already-completed run so it can never be re-entered
+		finish(r)
+		return {}
+	return r
 
 static func board_rules(run: Dictionary) -> Dictionary:
 	var r: = M.resolve(run)
@@ -235,7 +241,7 @@ static func boss_tricks(run: Dictionary, pairs: int, total: int) -> Array:
 static func on_overflow(run: Dictionary, fl: Dictionary) -> Dictionary:
 	var res: = M.on_overflow(board_rules(run), fl)
 	if res.lose_life:
-		run.hearts = int(run.hearts) - 1
+		run.hearts = maxi(0, int(run.hearts) - 1)
 		run.tricks_done = 0
 	res["restart"] = bool(res.lose_life) and int(run.hearts) > 0
 	res["run_over"] = int(run.hearts) <= 0
@@ -243,7 +249,7 @@ static func on_overflow(run: Dictionary, fl: Dictionary) -> Dictionary:
 	return res
 
 static func on_timeout(run: Dictionary) -> Dictionary:
-	run.hearts = int(run.hearts) - 1
+	run.hearts = maxi(0, int(run.hearts) - 1)
 	run.tricks_done = 0
 	return {"lose_life": true, "restart": int(run.hearts) > 0, "run_over": int(run.hearts) <= 0, "hearts": int(run.hearts)}
 

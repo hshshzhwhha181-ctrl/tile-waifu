@@ -573,7 +573,7 @@ func _t_journey() -> void:
 	_check(String(snap.title) == "Стол 1 из 5" and int(snap.lit) == 3 and String(snap.heat) == "", "hud: «Стол 1 из 5», 3 hearts")
 	_check(_find_text(j1, TPS.NORMAL_TEXT), "the plaque «Честный зачёт: наряды не дают силы»")
 	_check(j1.ult == null or (bool(j1.ult.ranked) and j1.SKILL_NEED == j1.ult.need()), "Приём at base strength")
-	_check(j1.board.slots == int(j1.tr.rules.slots), "journey: the run's own tray size (no outfit passives)")
+	_check(j1.board.slots == j1.tr.slot_count(V7Passives.slots(j1.partner, 4)) and j1.slot_rects.size() == j1.board.slots, "journey: tray size matches slot_count and slot_rects")
 	var vz: = (j1.tr.veils as Dictionary).values().filter(func(v): return is_instance_valid(v) and (v as CanvasItem).z_index != 0)
 	_check(vz.is_empty(), "veils stay in their tile's place in the stack (%d veils)" % (j1.tr.veils as Dictionary).size())
 	var g0: = int(G.S.gems)

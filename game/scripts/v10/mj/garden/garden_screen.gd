@@ -29,6 +29,8 @@ var ended: = false
 var input_on: = false
 
 var vw: = Vector2(720, 1280)
+var safe_top: = 0.0
+var safe_bottom: = 0.0
 var band_h: = 120.0
 var tray_rect: = Rect2()
 var board_rect: = Rect2()
@@ -75,13 +77,13 @@ func setup(m, a: Dictionary = {}) -> void:
 	day_str = String(a.get("day", V10MjGardenSave.day_key()))
 	rec_bar = V10MjGardenSave.record_bar(save_d, day_str)
 	run_seed = int(a.get("seed", int(V10Meta.now_unix()) % 900000 + 101))
-	set_anchors_preset(Control.PRESET_FULL_RECT)
+	set_anchors_preset(Control.PRESET_TOP_LEFT)
 	if is_inside_tree() and board == null:
 		_build()
 
 
 func _ready() -> void:
-	set_anchors_preset(Control.PRESET_FULL_RECT)
+	set_anchors_preset(Control.PRESET_TOP_LEFT)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	if not args.is_empty() and board == null:
 		_build()
@@ -91,14 +93,18 @@ func _build() -> void:
 	vw = get_viewport_rect().size
 	if vw.x <= 0.0:
 		vw = Vector2(720, 1280)
-	if anchor_right == 0.0:
-		size = vw
-	var extra: = maxf(0.0, vw.y - 1280.0 * vw.x / 720.0)
-	band_h = 120.0 + minf(extra, 300.0)
+	position = Vector2.ZERO
+	size = vw
+	var ins: = V10Layout.safe_insets(vw)
+	safe_top = maxf(float(ins.get("top", 0.0)), float(main.safe_top) if main and main.get("safe_top") != null else 0.0)
+	safe_bottom = maxf(float(ins.get("bottom", 0.0)), float(main.safe_bottom) if main and main.get("safe_bottom") != null else 0.0)
+	var usable_h: = maxf(960.0, vw.y - safe_top - safe_bottom)
+	var extra: = maxf(0.0, usable_h - 1280.0 * vw.x / 720.0)
+	band_h = safe_top + 120.0 + minf(extra, 300.0)
 	var spare: = maxf(0.0, extra - minf(extra, 300.0))
 	var tray_w: = minf(vw.x - 48.0, 648.0)
 	tray_rect = Rect2((vw.x - tray_w) * 0.5, band_h + 18.0, tray_w, 108.0)
-	help_rect = Rect2(0.0, vw.y - HELP_ZONE, vw.x, HELP_ZONE - 32.0)
+	help_rect = Rect2(0.0, vw.y - safe_bottom - HELP_ZONE, vw.x, HELP_ZONE - 32.0)
 	var b_top: = tray_rect.end.y + 18.0 + spare * 0.35
 	var b_bot: = help_rect.position.y - 18.0 - spare * 0.65
 	board_rect = Rect2(36.0, b_top, vw.x - 72.0, maxf(360.0, b_bot - b_top))
@@ -179,29 +185,30 @@ func _init_rules(th: Dictionary) -> void:
 
 
 func _window_rect() -> Rect2:
-	var h: = band_h - 14.0
+	var bh: = band_h - safe_top
+	var h: = bh - 14.0
 	var w: = clampf(h * 0.72, 96.0, 280.0)
-	if band_h <= 140.0:
+	if bh <= 140.0:
 		w = 104.0
-		h = band_h - 8.0
+		h = bh - 8.0
 	return Rect2(vw.x - w - 18.0, band_h - h - 2.0, w, h)
 
 
 func _build_band() -> void:
-	pause_btn = _icon_btn("pause", Vector2(12, 18))
+	pause_btn = _icon_btn("pause", Vector2(12, safe_top + 18.0))
 	pause_btn.name = "Pause"
 	pause_btn.pressed.connect(_pause_sheet)
 	add_child(pause_btn)
 
 	hud_lbl = V10MjGardenLook.label("", 22, T.paper100, "body", 800)
 	hud_lbl.name = "HudLbl"
-	hud_lbl.position = Vector2(104, 28)
+	hud_lbl.position = Vector2(104, safe_top + 28.0)
 	hud_lbl.size = Vector2(320, 32)
 	add_child(hud_lbl)
 
 	wave_bar = Control.new()
 	wave_bar.name = "WaveBar"
-	wave_bar.position = Vector2(104, 70)
+	wave_bar.position = Vector2(104, safe_top + 70.0)
 	wave_bar.size = Vector2(minf(280.0, vw.x - 290.0), 4)
 	wave_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	wave_bar.draw.connect(func():
@@ -213,7 +220,7 @@ func _build_band() -> void:
 
 
 func _build_help() -> void:
-	var y: = vw.y - HELP_ZONE + 24.0
+	var y: = vw.y - safe_bottom - HELP_ZONE + 24.0
 	hint_btn = _pill_btn("hint", "Подсказка", Vector2(vw.x * 0.5 - 248.0, y), 232.0)
 	hint_btn.name = "HintBtn"
 	hint_btn.pressed.connect(use_hint)
@@ -455,8 +462,9 @@ func _sheet(h: float) -> Control:
 	sb.border_color = V10DS.hair()
 	sb.border_width_top = 1
 	p.add_theme_stylebox_override("panel", sb)
-	p.size = Vector2(vw.x, h)
-	p.position = Vector2(0.0, vw.y - h)
+	var total_h: = h + safe_bottom
+	p.size = Vector2(vw.x, total_h + 120.0)
+	p.position = Vector2(0.0, vw.y - total_h)
 	sheet_layer.add_child(p)
 	return p
 
@@ -472,7 +480,7 @@ func _pause_sheet() -> void:
 		return
 	input_on = false
 	board.input_on = false
-	var p: = _sheet(620.0)
+	var p: = _sheet(640.0)
 	var h: = V10MjGardenLook.label("Сад", 36, T.paper100, "title", 700)
 	h.position = Vector2(32, 24)
 	p.add_child(h)
@@ -489,15 +497,19 @@ func _pause_sheet() -> void:
 		var l: = V10MjGardenLook.label(String(row[1]), 20, T.paper300, "body", 700)
 		l.position = Vector2(92, 94 + k * 56)
 		p.add_child(l)
-	for i in V10MjGardenSave.AMBIENTS.size():
+	var amb_n: = V10MjGardenSave.AMBIENTS.size()
+	var amb_w: = 180.0
+	var amb_gap: = 32.0
+	var amb_x0: = (vw.x - (amb_w * amb_n + amb_gap * maxf(0.0, amb_n - 1))) * 0.5
+	for i in amb_n:
 		var ak: String = V10MjGardenSave.AMBIENTS[i]
 		var ab: = Button.new()
 		ab.name = "Amb_" + ak
 		ab.flat = true
 		ab.focus_mode = Control.FOCUS_NONE
-		ab.size = Vector2(180, 80)
-		ab.custom_minimum_size = Vector2(180, 80)
-		ab.position = Vector2(32 + i * 212, 266)
+		ab.size = Vector2(amb_w, 80)
+		ab.custom_minimum_size = Vector2(amb_w, 80)
+		ab.position = Vector2(amb_x0 + i * (amb_w + amb_gap), 266)
 		ab.set_meta("ux_role", "tertiary")
 		ab.text = V10MjGardenSave.AMB_NAMES[ak]
 		ab.add_theme_font_override("font", V10MjGardenLook.font("body", 700))
@@ -510,7 +522,7 @@ func _pause_sheet() -> void:
 			_pause_sheet())
 		p.add_child(ab)
 	var go: = _primary("Продолжить")
-	go.position = Vector2(vw.x * 0.5 - 260.0, 372)
+	go.position = Vector2(vw.x * 0.5 - 260.0, 368)
 	go.pressed.connect(func():
 		_close_sheet()
 		input_on = true
@@ -518,7 +530,7 @@ func _pause_sheet() -> void:
 	p.add_child(go)
 	var ex: = _secondary("Выйти")
 	ex.name = "ExitBtn"
-	ex.position = Vector2(vw.x * 0.5 - 160.0, 496)
+	ex.position = Vector2(vw.x * 0.5 - 160.0, 492)
 	ex.pressed.connect(func():
 		_close_sheet()
 		exit_garden("exit"))
@@ -529,10 +541,17 @@ func open_help() -> void:
 	_help_sheet(false)
 
 
+func dev_act(a: String) -> void:
+	if a == "pause":
+		_pause_sheet()
+	elif a == "help":
+		_help_sheet(false)
+
+
 func _help_sheet(from_pause: bool) -> void:
 	input_on = false
 	board.input_on = false
-	var p: = _sheet(620.0)
+	var p: = _sheet(640.0)
 	var h: = V10MjGardenLook.label("Как играть", 36, T.paper100, "title", 700)
 	h.position = Vector2(32, 24)
 	p.add_child(h)

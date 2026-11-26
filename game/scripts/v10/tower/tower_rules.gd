@@ -45,10 +45,8 @@ func hook_cfg() -> Dictionary:
 	cfg = P.floor_cfg(run) if mode == "pagoda" else J.board_cfg(run)
 	return cfg
 
-# tray size: the run's own number (Journey is normalized: no outfit passives)
+# tray size: base + heroine passive (e.g. MC's 5-slot «Пятый ветер») + run blessings/curses
 func slot_count(base_with_passives: int) -> int:
-	if is_journey():
-		return int(rules.slots)
 	return clampi(int(rules.slots) + (base_with_passives - M.BASE_SLOTS), 3, 6)
 
 # ---- R0 hook 2: after the deal (board.setup) and before input

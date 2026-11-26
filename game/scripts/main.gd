@@ -770,9 +770,9 @@ func _build_navbar() -> void :
 	navbar = Control.new()
 	navbar.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	navbar.position = Vector2(0, H - 132 - safe_bottom)
-	navbar.size = Vector2(W, 132 + safe_bottom)
+	navbar.size = Vector2(W, 132 + safe_bottom + 120.0)
 	add_child(navbar)
-	navbar.add_child(V10Nav.band(Vector2(W, 132 + safe_bottom)))
+	navbar.add_child(V10Nav.band(Vector2(W, 132 + safe_bottom + 120.0)))
 	var tabs_w: = minf(W, 720.0)
 	var tw: = tabs_w / TABS.size()
 	var tx0: = (W - tabs_w) * 0.5
