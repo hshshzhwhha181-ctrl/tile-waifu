@@ -128,7 +128,7 @@ func set_lit(n: int, rec: int, animate: = true) -> void:
 	_lit_from = lit_to
 	lit_to = n
 	record_floor = rec
-	if animate and V10TowerUI.fx() != "min" and is_inside_tree() and _lit_from != n:
+	if animate and not V10TowerUI.calm() and is_inside_tree() and _lit_from != n:
 		_lit_k = 0.0
 		var tw: = create_tween()
 		tw.tween_method(func(v: float) -> void:
@@ -196,7 +196,7 @@ func scroll_to_floor(f: float, animate: = true, secs: = 0.6) -> void:
 	if _glide and _glide.is_valid():
 		_glide.kill()
 	_vel = 0.0
-	if not animate or V10TowerUI.fx() == "min" or not is_inside_tree():
+	if not animate or V10TowerUI.calm() or not is_inside_tree():
 		scroll = target
 		_changed()
 		return
@@ -210,7 +210,7 @@ func scroll_to_floor(f: float, animate: = true, secs: = 0.6) -> void:
 func intro() -> void:
 	var f: = focus_floor()
 	var target: = scroll_for(f)
-	if V10TowerUI.fx() == "min" or locked:
+	if V10TowerUI.calm() or locked:
 		scroll = target
 		_changed()
 		return
@@ -628,7 +628,7 @@ func _tower(W: float, H: float, cx: float) -> void:
 		var wy1: = ye + TIER - 10.0
 		if locked:
 			draw_rect(Rect2(tx - BODY, wy0, BODY * 2.0, wy1 - wy0), sil)
-			_roof(Vector2(tx, ye), e, 34.0, sil, Color(0, 0, 0, 0))
+			_roof(Vector2(tx, ye), e, 34.0, sil, Color.TRANSPARENT)
 			continue
 		draw_rect(Rect2(tx - BODY, wy0, BODY * 2.0, wy1 - wy0), Color(wall, fade))
 		# windows: three lattice panels, warm when the floor is lit
@@ -704,7 +704,7 @@ class _Fx extends Control:
 		size = get_parent().size
 
 	func ember_count() -> int:
-		if v.locked or v.heat < V10PagodaView.EMBER_HEAT:
+		if v.locked or v.heat < V10PagodaView.EMBER_HEAT or V10TowerUI.calm():
 			return 0
 		match V10TowerUI.fx():
 			"min":
@@ -714,7 +714,7 @@ class _Fx extends Control:
 		return 24
 
 	func animating() -> bool:
-		return V10TowerUI.fx() != "min" and not v.locked and (ember_count() > 0 or not v._art)
+		return not V10TowerUI.calm() and not v.locked and (ember_count() > 0 or not v._art)
 
 	func _process(delta: float) -> void:
 		size = v.size
@@ -743,7 +743,7 @@ class _Fx extends Control:
 
 	func _draw() -> void:
 		var t: = v._t
-		var calm: = V10TowerUI.fx() == "min"
+		var calm: = V10TowerUI.calm()
 		# procedural tower: a paper lantern on the left eave of every floor, a slow sway
 		if not v.locked and not v._art:
 			var g: = v.ground_y0() + v.scroll

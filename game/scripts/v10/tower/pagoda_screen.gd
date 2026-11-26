@@ -240,7 +240,7 @@ func _set_quiet(on: bool, animate: = true) -> void:
 func _roll_chip(h: int, animate: bool) -> void:
 	var from: = _shown_heat
 	_shown_heat = h
-	if from == h or not animate or V10TowerUI.fx() == "min":
+	if from == h or not animate or V10TowerUI.calm():
 		chip.title = V10Pagoda.heat_text(h)
 		chip_fx.queue_redraw()
 		_redraw_chip_icon()
@@ -294,7 +294,7 @@ func _breathe_in() -> void:
 		var c: = n as Control
 		c.modulate.a = 0.0
 		var tw: = c.create_tween()
-		if V10TowerUI.fx() == "min":
+		if V10TowerUI.calm():
 			tw.tween_property(c, "modulate:a", 1.0, 0.12)
 		else:
 			var y: = c.position.y
@@ -752,7 +752,7 @@ class _Sheet extends Control:
 		add_child(panel)
 
 	func open() -> void:
-		if V10TowerUI.fx() == "min":
+		if V10TowerUI.calm():
 			modulate.a = 0.0
 			create_tween().tween_property(self, "modulate:a", 1.0, 0.12)
 			return
@@ -766,7 +766,7 @@ class _Sheet extends Control:
 		if _closing:
 			return
 		_closing = true
-		if instant or V10TowerUI.fx() == "min" or not is_inside_tree():
+		if instant or V10TowerUI.calm() or not is_inside_tree():
 			closed.emit()
 			queue_free()
 			return

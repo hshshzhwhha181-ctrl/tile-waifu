@@ -24,6 +24,7 @@ const STATES: = ["fresh", "rec_h0", "rec_h8", "rec_h16", "heat12", "heat18", "ru
 	"records_week", "records_heroines", "result", "partner", "rules", "end_confirm"]
 
 var args: = {}
+var embedded: = false
 var stub: StubMain
 var screen: Control
 var host: Node
@@ -53,6 +54,16 @@ class StubMain extends RefCounted:
 
 
 func _ready() -> void:
+	for r in BANNED_RE:
+		var re: = RegEx.new()
+		re.compile(r)
+		_bans.append(re)
+	if embedded:
+		set_anchors_preset(Control.PRESET_FULL_RECT)
+		G.demo = true
+		V10TowerUtil.fake_now = FAKE_NOW
+		V10TowerBoard._test_profile_id = "demo-player"
+		return
 	for a in OS.get_cmdline_user_args():
 		var kv: = a.trim_prefix("--").split("=", true, 1)
 		args[kv[0]] = kv[1] if kv.size() > 1 else "1"
@@ -62,10 +73,6 @@ func _ready() -> void:
 	V10TowerBoard._test_profile_id = "demo-player"
 	if args.has("fx"):
 		V10Hud2Util.fx_override = str(args.fx)
-	for r in BANNED_RE:
-		var re: = RegEx.new()
-		re.compile(r)
-		_bans.append(re)
 	get_tree().create_timer(float(args.get("watchdog", "300"))).timeout.connect(func() -> void:
 		print("PAGODA_UI_SELFTEST watchdog: no result (runtime error above?)")
 		get_tree().quit(4))
@@ -237,7 +244,17 @@ func _selftest() -> void:
 	print("PAGODA_UI_SELFTEST %d/%d" % [_ok, _total])
 	for f in _fails:
 		print("  failed: ", f)
-	get_tree().quit(0 if _ok == _total else 1)
+	if not embedded:
+		get_tree().quit(0 if _ok == _total else 1)
+
+
+func run_embedded() -> Dictionary:
+	await _selftest()
+	V10Hud2Util.sim_insets = {}
+	V10Hud2Util.fx_override = ""
+	V10Pagoda._test_S = null
+	V10TowerUtil.fake_now = 0
+	return {"ok": _ok, "total": _total, "fails": _fails.duplicate()}
 
 
 func _open_sheets(root: Node) -> Array:

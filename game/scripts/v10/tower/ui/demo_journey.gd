@@ -45,9 +45,20 @@ var fails: = []
 var notes: = []
 var strict: = true
 var W0: = 0
+var embedded: = false
+var _wall_s: = 0.0
+
+
+func _process(delta: float) -> void:
+	_wall_s += delta / maxf(0.001, Engine.time_scale)
 
 
 func _ready() -> void:
+	if embedded:
+		G.demo = true
+		TB._test_profile_id = "demo"
+		W0 = U.week_id(1795521600)
+		return
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--") and "=" in a:
 			var kv: = a.substr(2).split("=", true, 1)
@@ -56,7 +67,7 @@ func _ready() -> void:
 	TB._test_profile_id = "demo"
 	if args.has("fx"):
 		V10Hud2Util.fx_override = String(args.fx)
-	W0 = U.week_id(int(Time.get_unix_time_from_datetime_dict({"year": 2026, "month": 11, "day": 24, "hour": 12, "minute": 0, "second": 0})))
+	W0 = U.week_id(1795521600)  # Tue 24 Nov 2026, 12:00 UTC
 	if String(args.get("selftest", "0")) == "1":
 		var code: int = await _selftest()
 		get_tree().quit(code)
@@ -401,7 +412,7 @@ func _has_text(texts: Array, sub: String) -> bool:
 
 
 func _selftest() -> int:
-	var t0: = Time.get_ticks_msec()
+	var t0: = _wall_s
 	var themes: = {}
 	var bosses: = {}
 	for sz in [Vector2i(720, 1280), Vector2i(720, 1600)]:
@@ -560,9 +571,8 @@ func _selftest() -> int:
 		check(int(G.S.get("gems", 0)) - gems0 == int(fin.reward.get("gems", 0)) and bool(fin.get("granted", false)), tag0 + " result: reward granted")
 		var c_win: = ResourceLoader.exists("res://scripts/v10/tower/ui/tower_sheets.gd") and scr.call("_sheets_script") != null
 		if scr.sheet:
-			strict = not c_win
-			audit(tag0 + " result" + (" (part C window)" if c_win else ""), scr.sheet, vsz)
 			strict = true
+			audit(tag0 + " result" + (" (part C window)" if c_win else ""), scr.sheet, vsz)
 		if c_win:
 			check(not scr.layer.visible, tag0 + " result: the hub hides under the full result window")
 		# our own fallback window, audited strictly whatever part C ships
@@ -604,9 +614,18 @@ func _selftest() -> int:
 	for f in ["res://scripts/v10/tower/journey_screen.gd", "res://scripts/v10/tower/ui/journey_scroll.gd"]:
 		var src: = FileAccess.get_file_as_string(f)
 		check(not ("Color(\"#" in src or "Color(0." in src or "Color(1" in src), "no colour literals in " + f.get_file())
-	print("JOURNEY_UI_SELFTEST %d/%d (%d ms)" % [ok, total, Time.get_ticks_msec() - t0])
+	print("JOURNEY_UI_SELFTEST %d/%d (%d ms)" % [ok, total, int((_wall_s - t0) * 1000.0)])
 	for f2 in fails:
 		print("  - ", f2)
 	for n2 in notes:
 		print("  note (part C window, not counted): ", n2)
 	return 0 if ok == total else 1
+
+
+func run_embedded() -> Dictionary:
+	await _selftest()
+	J._test_S = null
+	U.fake_now = 0
+	V10Hud2Util.fx_override = ""
+	V10Hud2Util.sim_insets = {}
+	return {"ok": ok, "total": total, "fails": fails.duplicate()}

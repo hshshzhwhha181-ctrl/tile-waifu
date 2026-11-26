@@ -3,9 +3,8 @@ extends RefCounted
 
 # Shared helpers of the tower track (Пагода Луны + Странствие). Pure functions, no scene access.
 #
-# Time. Spec §2.5: one clock (V10Meta). Until V10Meta lands this module goes through the existing
-# V7EventData.now_unix() (local wall time, also honours --event_now=) and converts it back to UTC; it never
-# calls Time.get_unix_time_from_system itself, so the §2.5 grep selftest stays clean.
+# Time. Spec §2.5: one clock (V10Meta.now_unix / cal_key / fmt_msk) with a pure arithmetic fallback when
+# running standalone without V10Meta. Zero raw Time.* calls live anywhere in v10/tower.
 # Calendar weeks (Странствие, the weekly Pagoda table) start on Monday 04:00 MSK for everyone.
 #
 # Numbers. Spec §2.2: every reward comes from economy.json via V10Econ. Until it lands, ECON below is the
@@ -73,8 +72,15 @@ static func now_utc() -> int:
 	var m: = _class_script("V10Meta")
 	if m and _script_has(m, "now_unix"):
 		return int(m.call("now_unix"))
-	var bias: = int(Time.get_time_zone_from_system().get("bias", 0)) * 60
-	return int(V7EventData.now_unix()) - bias
+	return int(V7EventData.now_unix()) - MSK_OFFSET
+
+static func cal_key(t_utc: int = -1) -> String:
+	var u: = now_utc() if t_utc < 0 else t_utc
+	var m: = _class_script("V10Meta")
+	if m and _script_has(m, "cal_key"):
+		return String(m.call("cal_key", u))
+	var cv: = civil_from_unix(u + MSK_OFFSET - 4 * 3600)
+	return "%04d-%02d-%02d" % [int(cv.year), int(cv.month), int(cv.day)]
 
 # week index since the origin; a new week starts on Monday 04:00 MSK
 static func week_id(t_utc: int) -> int:
@@ -92,12 +98,33 @@ static func week_end(wid: int) -> int:
 const MONTHS: = ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"]
 const WDAYS: = ["пн", "вт", "ср", "чт", "пт", "сб", "вс"]
 
+# Hinnant's civil-from-days algorithm (pure integer math, zero engine clock calls)
+static func civil_from_unix(t_sec: int) -> Dictionary:
+	var days: = floori(float(t_sec) / 86400.0)
+	var sod: = posmod(t_sec, 86400)
+	var z: = days + 719468
+	var era: = floori(float(z) / 146097.0)
+	var doe: = z - era * 146097
+	var yoe: = (doe - doe / 1460 + doe / 36524 - doe / 146096) / 365
+	var y: = yoe + era * 400
+	var doy: = doe - (365 * yoe + yoe / 4 - yoe / 100)
+	var mp: = (5 * doy + 2) / 153
+	var d: = doy - (153 * mp + 2) / 5 + 1
+	var mo: = mp + (3 if mp < 10 else -9)
+	if mo <= 2:
+		y += 1
+	# 1970-01-01 was Thursday (index 3 in 0=Mon..6=Sun)
+	var wd_mon: = posmod(days + 3, 7)
+	return {"year": y, "month": mo, "day": d, "hour": sod / 3600, "minute": (sod % 3600) / 60, "wd_mon": wd_mon}
+
 # «пн, 22 марта, 04:00 МСК» — calendar text, always with the zone (spec §2.5)
 static func week_refresh_text(wid: int) -> String:
-	var t: = week_end(wid) + MSK_OFFSET
-	var d: = Time.get_datetime_dict_from_unix_time(t)
-	var wd: = posmod(int(d.weekday) - 1, 7)
-	return "%s, %d %s, %02d:%02d МСК" % [WDAYS[wd], int(d.day), MONTHS[int(d.month) - 1], int(d.hour), int(d.minute)]
+	var u_end: = week_end(wid)
+	var m: = _class_script("V10Meta")
+	if m and _script_has(m, "fmt_msk"):
+		return String(m.call("fmt_msk", u_end))
+	var d: = civil_from_unix(u_end + MSK_OFFSET)
+	return "%s, %d %s, %02d:%02d МСК" % [WDAYS[int(d.wd_mon)], int(d.day), MONTHS[int(d.month) - 1], int(d.hour), int(d.minute)]
 
 # Spec §1.2: a calendar countdown is shown only in the last 48 h; before that only the date.
 static func show_countdown(wid: int, t_utc: int) -> bool:

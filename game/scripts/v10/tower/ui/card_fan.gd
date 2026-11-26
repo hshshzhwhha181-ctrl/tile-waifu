@@ -227,7 +227,9 @@ func _enter() -> void:
 		tw.tween_property(s, "position", end_pos, 0.36).set_delay(d).set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_OUT)
 		tw.tween_property(s, "rotation", float(st.rot), 0.36).set_delay(d).set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_OUT)
 		tw.tween_property(s, "modulate:a", 1.0, 0.16).set_delay(d)
-		get_tree().create_timer(d, false).timeout.connect(func() -> void: V9Feel.sound("flip", 0.92 + 0.06 * i, -8.0))
+		var tw_s: = s.create_tween()
+		tw_s.tween_interval(d)
+		tw_s.tween_callback(func() -> void: V9Feel.sound("flip", 0.92 + 0.06 * i, -8.0))
 	# the one primary is on its place from the first beat of the sheet (grey until a card is lifted)
 	_fade_in(take_b, minf(_d0 + 0.24, 0.3) - _d0, 0.0, _take_a)
 	if skip_b:

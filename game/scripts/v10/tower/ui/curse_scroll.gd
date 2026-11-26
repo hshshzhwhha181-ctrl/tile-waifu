@@ -184,7 +184,7 @@ func _set_rod(y: float) -> void:
 
 func _unroll() -> void:
 	V10TowerUI.sfx("feather", "pop")
-	if V10TowerUI.fx() == "min":
+	if V10TowerUI.calm():
 		_set_rod(_y0)
 		modulate.a = 0.0
 		create_tween().tween_property(self, "modulate:a", 1.0, 0.12)
@@ -204,7 +204,7 @@ func close(apply: = true) -> void:
 			on_close.call(curses.duplicate())
 		closed.emit()
 		queue_free()
-	if V10TowerUI.fx() == "min" or not is_inside_tree():
+	if V10TowerUI.calm() or not is_inside_tree():
 		done.call()
 		return
 	var tw: = create_tween()
@@ -287,7 +287,7 @@ func _roll_to(h: int, animate: bool) -> void:
 	var from: = _shown_heat
 	_shown_heat = h
 	var k1: = float(h) / float(V10ModsData.HEAT_MAX)
-	if not animate or V10TowerUI.fx() == "min":
+	if not animate or V10TowerUI.calm():
 		_heat_l.text = V10Pagoda.heat_text(h)
 		_line_k = k1
 		_content.queue_redraw()
@@ -460,7 +460,7 @@ class _Row extends Control:
 		if absf(want - _h) > 0.5:
 			if _tw and _tw.is_valid():
 				_tw.kill()
-			if animate and V10TowerUI.fx() != "min":
+			if animate and not V10TowerUI.calm():
 				_tw = create_tween()
 				_tw.tween_method(_set_h, _h, want, 0.2).set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_OUT)
 			else:

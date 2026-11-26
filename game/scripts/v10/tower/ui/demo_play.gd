@@ -30,6 +30,8 @@ const TPS: = preload("res://scripts/v10/tower/tower_play.gd")
 const BANNED: = ["₽", "кр.", "Ставка", "Лунн", "Купить", "купить", "Ульта", "ульта"]
 
 var dargs: = {}
+var embedded: = false
+var _wall_s: = 0.0
 var quick: = false
 var last_go: = {}
 var go_log: Array = []
@@ -69,7 +71,19 @@ class HubStub extends Control:
 
 # ---------------------------------------------------------------- main, taken over where it must be
 
+func _process(delta: float) -> void:
+	_wall_s += delta / maxf(0.001, Engine.time_scale)
+
+
 func _ready() -> void:
+	if embedded:
+		dargs = {"embedded": "1"}
+		quick = true
+		V10TowerUtil.fake_now = FAKE_NOW
+		_fresh_save()
+		UIT.grant_hook = _grant_hook
+		super._ready()
+		return
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--"):
 			var kv: = a.substr(2).split("=", true, 1)
@@ -146,6 +160,10 @@ func toast(text: String, icon: = "") -> void:
 func go(id: String, args: = {}, animate: = true, remember: = true) -> void:
 	# shallow copies: a hub erases args.result once it has shown it
 	go_log.append({"id": id, "args": args.duplicate()})
+	if quick and id == "home":
+		screen_id = "home"
+		busy = false
+		return
 	if not id in OWN:
 		await super.go(id, args, animate, remember)
 		return
@@ -200,6 +218,8 @@ func go(id: String, args: = {}, animate: = true, remember: = true) -> void:
 func _dev_args() -> void:
 	await get_tree().process_frame
 	busy = false
+	if embedded:
+		return
 	if dargs.has("selftest"):
 		await _tower_selftest()
 		return
@@ -251,9 +271,9 @@ func _tp():
 
 
 func _wait_until(cond: Callable, real_secs: = 20.0) -> bool:
-	var t0: = Time.get_ticks_msec()
+	var t0: = _wall_s
 	while not bool(cond.call()):
-		if Time.get_ticks_msec() - t0 > int(real_secs * 1000.0):
+		if _wall_s - t0 > real_secs:
 			return false
 		await get_tree().process_frame
 	return true
@@ -302,24 +322,14 @@ func _count(s, kind: String) -> int:
 	return _ev(s, kind).size() if s != null and is_instance_valid(s) else 0
 
 
-# the solver of the 0.9 selftest with the obvious pair first: a tray twin, a free pair, then the step order
+# exact peel-order solver: TrayBoard.solver_move() follows the generated step pairs (and reassign_faces after boss
+# gusts). If the next step tile is mid-flip (reveal_free on secret/shroud tiles), wait for its 0.18 s flip rather
+# than taking an out-of-order tile that would clog a 3- or 4-slot tray on Board 4+.
 func _pick(b) -> Tile:
-	var fr: Array = b.free_tiles().filter(func(t): return not t.pending and not t.flipping)
-	if fr.is_empty():
+	var t: Tile = b.solver_move()
+	if t == null or t.pending or t.flipping:
 		return null
-	for x in b.tray:
-		for t in fr:
-			if t.face == x.face and t.ice <= 0:
-				return t
-	if b.tray.size() < b.slots - 1:
-		var by: = {}
-		for t in fr:
-			if t.ice > 0:
-				continue
-			if by.has(t.face):
-				return by[t.face]
-			by[t.face] = t
-	return b.solver_move()
+	return t
 
 
 func _autoplay(s, max_taps: = 900, step: = 0.1) -> int:
@@ -409,18 +419,35 @@ func _close_popups() -> void:
 # ---------------------------------------------------------------- the selftest
 
 func _tower_selftest() -> void:
-	Engine.time_scale = float(dargs.get("speed", "3"))
-	var t_start: = Time.get_ticks_msec()
+	Engine.time_scale = float(dargs.get("speed", "6"))
+	var t_start: = _wall_s
 	await _t_static()
 	await _t_pagoda()
 	await _t_journey()
 	await _t_practice()
 	await _t_helps()
+	await _t_e2e()
 	Engine.time_scale = 1.0
 	for f in _fails:
 		print("  fail: ", f)
-	print("TOWER_PLAY_SELFTEST %d/%d (%.1f s)" % [_ok, _total, (Time.get_ticks_msec() - t_start) / 1000.0])
-	get_tree().quit(0 if _ok == _total and _total > 0 else 1)
+	print("TOWER_PLAY_SELFTEST %d/%d (%.1f s)" % [_ok, _total, _wall_s - t_start])
+	if not embedded:
+		get_tree().quit(0 if _ok == _total and _total > 0 else 1)
+
+
+func run_embedded() -> Dictionary:
+	var prev_path: String = G.save_path
+	var prev_s: Dictionary = G.S.duplicate(true)
+	_fresh_save()
+	UIT.grant_hook = _grant_hook
+	await _tower_selftest()
+	UIT.grant_hook = Callable()
+	V10TowerUtil.fake_now = 0
+	Engine.time_scale = 1.0
+	G.save_path = prev_path
+	G.S = prev_s
+	V10Money.attach(G.S)
+	return {"ok": _ok, "total": _total, "fails": _fails.duplicate()}
 
 
 func _t_static() -> void:
@@ -699,6 +726,120 @@ func _t_helps() -> void:
 	var bad2: = _banned_in(h2)
 	_check(bad2.is_empty(), "no «кр.» badge on an empty help %s" % [bad2])
 	h2.pay_calls = 0
+
+
+func _t_e2e() -> void:
+	# ---- Full E2E with the real V10Money / V10Bond / V10Hooks / V10Afisha pipeline (grant_hook unset)
+	_fresh_save()
+	V10Money.attach(G.S)
+	UIT.grant_hook = Callable()
+	var hook_events: Array = []
+	var on_ended: = func(r: Dictionary) -> void: hook_events.append(r)
+	V10Hooks.game_ended.connect(on_ended)
+	# 1. Pagoda E2E: hub -> curse scroll -> «Подняться» -> floor 1 -> card_fan pick -> «Выше» -> floor 2 -> pagoda_end -> reward
+	var aff0: = int((G.S.get("aff", {}) as Dictionary).get("mc", 0))
+	await go("pagoda", {}, false)
+	await _secs(0.35)
+	_check(screen_id == "pagoda" and V10TowerUI.roles_of(screen).primary == 1, "e2e pagoda: hub opens with 1 primary")
+	screen.call("_open_scroll")
+	await _secs(0.3)
+	var cscr = screen.get("sheet")
+	_check(cscr is V10CurseScroll, "e2e pagoda: curse scroll opens")
+	if cscr is V10CurseScroll:
+		(cscr as V10CurseScroll).set_level("shroud", 1)
+		(cscr as V10CurseScroll).close(true)
+	await _wait_until(func() -> bool: return screen.get("sheet") == null, 4.0)
+	_check(int((screen.get("curses") as Dictionary).get("shroud", 0)) == 1, "e2e pagoda: curse applied on hub (Жар 1)")
+	(screen.get("play") as V10Button).pressed.emit()
+	var ps1 = await _wait_match(null)
+	_check(ps1 != null and int(ps1.run.get("curses", {}).get("shroud", 0)) == 1, "e2e pagoda: «Подняться» starts floor 1 with shroud:1")
+	if ps1 != null:
+		await _autoplay(ps1, 900, 0.05)
+		_check(_has(ps1, "clear"), "e2e pagoda: floor 1 cleared")
+		await _wait_until(func() -> bool: return ps1.sheet != null and ps1.sheet.get_child_count() > 0, 6.0)
+		var sh1: Control = ps1.sheet.get_child(0)
+		await _wait_until(func() -> bool: return sh1.get("fan") != null and not (sh1.get("fan").slots as Array).is_empty() and ((sh1.get("fan").slots as Array)[0] as Control).modulate.a > 0.5, 6.0)
+		var f1: V10TowerFan = sh1.get("fan")
+		var bid: = f1.card_id(0)
+		f1.select(0)
+		f1.take_b.pressed.emit()
+		await _wait_until(func() -> bool: return (sh1.get("prim") as V10Button).visible, 6.0)
+		_check(int((ps1.run.get("bless", {}) as Dictionary).get(bid, 0)) >= 1, "e2e pagoda: blessing picked via V10TowerFan")
+		(sh1.get("prim") as V10Button).pressed.emit()
+		var ps2 = await _wait_match(ps1)
+		_check(ps2 != null and int(ps2.run.get("floor", 0)) == 2, "e2e pagoda: «Выше» opens floor 2")
+		if ps2 != null:
+			for k in 3:
+				var l0: = _count(ps2, "life_lost")
+				await _force_overflow(ps2)
+				await _wait_until(func() -> bool: return _count(ps2, "life_lost") > l0, 6.0)
+				if k < 2:
+					await _wait_until(func() -> bool: return _playable(ps2), 6.0)
+			await _wait_until(func() -> bool: return screen_id == "pagoda" and screen.get("sheet") != null, 8.0)
+			_check(screen_id == "pagoda" and screen.get("sheet") != null, "e2e pagoda: pagoda_end sheet opens on hub")
+			var pend: Control = screen.get("sheet")
+			if pend and pend.get("sec") is V10Button:
+				(pend.get("sec") as V10Button).pressed.emit()
+			await _wait_until(func() -> bool: return screen.get("sheet") == null, 4.0)
+	_check(int((G.S.get("aff", {}) as Dictionary).get("mc", 0)) > aff0, "e2e pagoda: V10Bond granted heroine affection")
+
+	# 2. Journey E2E: hub -> «Начать забег» -> ALL 5 BOARDS (1, 2, 3, 4, 5 Boss) -> blessing + curse fans -> journey_end -> V10Money rewards
+	var gems0: = V10Money.bal("gems")
+	var tix0: = V10Money.bal("tickets")
+	var pet0: = V10Money.bal("petals")
+	await go("journey", {}, false)
+	await _secs(0.35)
+	_check(screen_id == "journey" and screen.get("primary") is V10Button and (screen.get("primary") as V10Button).text == "Начать забег", "e2e journey: hub opens with «Начать забег»")
+	(screen.get("primary") as V10Button).pressed.emit()
+	var cur_m: Node = null
+	for b_idx in 5:
+		var jm = await _wait_match(cur_m)
+		_check(jm != null and int(jm.run.get("board", -1)) == b_idx, "e2e journey: board %d/5 opens" % (b_idx + 1))
+		if jm == null:
+			break
+		cur_m = jm
+		await _autoplay(jm, 1400, 0.04)
+		_check(is_instance_valid(jm) and _has(jm, "clear"), "e2e journey: board %d/5 cleared cleanly (including board 4)" % (b_idx + 1))
+		if not is_instance_valid(jm):
+			break
+		await _wait_until(func() -> bool: return is_instance_valid(jm) and jm.sheet != null and jm.sheet.get_child_count() > 0, 6.0)
+		var jsh: Control = jm.sheet.get_child(0)
+		if b_idx < 4:
+			await _wait_until(func() -> bool: return jsh.get("fan") != null and not (jsh.get("fan").slots as Array).is_empty() and ((jsh.get("fan").slots as Array)[0] as Control).modulate.a > 0.5, 6.0)
+			var jf1: V10TowerFan = jsh.get("fan")
+			jf1.select(0)
+			jf1.take_b.pressed.emit()
+			await _wait_until(func() -> bool:
+				var cur_f = jsh.get("fan")
+				return (jsh.get("prim") as V10Button).visible or (cur_f != null and cur_f != jf1 and not (cur_f.slots as Array).is_empty() and ((cur_f.slots as Array)[0] as Control).modulate.a > 0.5), 6.0)
+			var jf2 = jsh.get("fan")
+			if jf2 != null and jf2 != jf1 and not bool(jf2.done):
+				if b_idx == 0:
+					var ci: = 0 if jf2.card_id(0) != "hourglass" else (1 if jf2.cards.size() > 1 and jf2.card_id(1) != "hourglass" else -1)
+					if ci >= 0:
+						jf2.select(ci)
+						jf2.take_b.pressed.emit()
+					else:
+						jf2.skip_b.pressed.emit()
+				else:
+					jf2.skip_b.pressed.emit()
+			await _wait_until(func() -> bool: return (jsh.get("prim") as V10Button).visible, 6.0)
+			(jsh.get("prim") as V10Button).pressed.emit()
+		else:
+			await _wait_until(func() -> bool: return (jsh.get("prim") as V10Button).visible, 6.0)
+			(jsh.get("prim") as V10Button).pressed.emit()
+	await _wait_until(func() -> bool: return screen_id == "journey" and screen.get("sheet") != null, 8.0)
+	_check(screen_id == "journey" and screen.get("sheet") != null and String(screen.get("sheet_kind")) == "result", "e2e journey: 5/5 returns to hub with journey_end sheet")
+	_check(V10Money.bal("gems") > gems0 and V10Money.bal("tickets") == tix0 + 1 and V10Money.bal("petals") == pet0 + 15,
+		"e2e journey: V10Money credited gems + 1 ticket + 15 petals (%d/%d/%d)" % [V10Money.bal("gems") - gems0, V10Money.bal("tickets") - tix0, V10Money.bal("petals") - pet0])
+	if screen.get("sheet") and screen.get("sheet").get("prim") is V10Button:
+		(screen.get("sheet").get("prim") as V10Button).pressed.emit()
+	await _wait_until(func() -> bool: return screen.get("sheet") == null, 4.0)
+	_check(int((J.week_info().get("best", {}) as Dictionary).get("boards", 0)) == 5, "e2e journey: week_info records 5/5 boards")
+	_check(not hook_events.is_empty(), "e2e: V10Hooks.game_ended emitted (%d events)" % hook_events.size())
+	if V10Hooks.game_ended.is_connected(on_ended):
+		V10Hooks.game_ended.disconnect(on_ended)
+	UIT.grant_hook = _grant_hook
 
 
 # ---------------------------------------------------------------- shots

@@ -15,22 +15,21 @@ extends RefCounted
 
 const ART: = preload("res://scripts/v10/tower/ui/tower_art.gd")
 
-# ---- tower colours (derived from the DS palette; the only hex literals of the tower UI live here)
-const LACQUER: = Color("#1E1418")       # curse card: dark lacquer
-const LACQUER_HI: = Color("#2C1C22")
-const SEAL: = Color("#C8463C")          # cinnabar seal (UX §6.2 «cinnabar», only stamps / curse seals)
-const SEAL_DEEP: = Color("#7E231D")
-const EMBER_LO: = Color("#7A2E1E")      # heat embers along the screen edge
-const EMBER_HI: = Color("#F0A35A")
-const LANTERN_LIT: = Color("#F6C26B")   # a lit lantern
-const LANTERN_GLOW: = Color("#FFB45A")
-const LANTERN_OUT: = Color("#4A3B3F")   # a lantern that went out
-const HEART_FULL: = Color("#E58C9E")
-const HEART_EMPTY: = Color("#3D3038")
-const MOON: = Color("#F3E6C4")
-const PAPER_INK: = Color("#2A2024")     # ink on washi paper (Journey scroll)
-const PAPER_BG: = Color("#E9DCC4")      # washi paper fallback colour
-
+# ---- tower colours: aliased / derived from V10DS tokens (zero hex literals in the tower UI)
+const LACQUER: = V10DS.NIGHT_800                        # curse card: dark lacquer
+const LACQUER_HI: = V10DS.NIGHT_700
+const SEAL: = V10DS.EMBER * 0.84 + V10DS.GOLD_700 * 0.16  # cinnabar seal (UX §6.2, only stamps / curse seals)
+const SEAL_DEEP: = V10DS.EMBER * 0.48 + V10DS.NIGHT_900 * 0.52
+const EMBER_LO: = V10DS.GOLD_700 * 0.55 + V10DS.NIGHT_900 * 0.45  # heat embers along the screen edge
+const EMBER_HI: = V10DS.GOLD_500 * 0.65 + V10DS.EMBER * 0.35
+const LANTERN_LIT: = V10DS.GOLD_500                     # a lit lantern
+const LANTERN_GLOW: = V10DS.GOLD_300 * 0.65 + V10DS.EMBER * 0.35
+const LANTERN_OUT: = V10DS.NIGHT_600                    # a lantern that went out
+const HEART_FULL: = V10DS.ROSE_500
+const HEART_EMPTY: = V10DS.NIGHT_600
+const MOON: = V10DS.PAPER_100 * 0.6 + V10DS.GOLD_300 * 0.4
+const PAPER_INK: = V10DS.NIGHT_800                      # ink on washi paper (Journey scroll)
+const PAPER_BG: = V10DS.PAPER_100 * 0.5 + V10DS.PAPER_300 * 0.5  # washi paper fallback colour
 # ---------------------------------------------------------------- ux roles, taps, sounds
 
 static func role(n: Node, r: String) -> Node:
@@ -55,9 +54,20 @@ static func sfx(key: String, fallback: = "pop", pitch: = 1.0, db: = 0.0) -> void
 		p.pitch_scale = pitch
 		p.volume_db = db
 		p.bus = "Master"
-		(ml as SceneTree).root.add_child(p)
-		p.play()
-		p.finished.connect(p.queue_free)
+		var root: = (ml as SceneTree).root
+		if not bool(G.S.get("sound", true)):
+			p.free()
+			return
+		if root.is_node_ready():
+			root.add_child(p)
+			p.play()
+			p.finished.connect(p.queue_free)
+		else:
+			# the very first frames: the root is still adding its children
+			(func() -> void:
+				root.add_child(p)
+				p.play()
+				p.finished.connect(p.queue_free)).call_deferred()
 		return
 	V10Hud2Util.sfx(fallback)
 
@@ -66,13 +76,19 @@ static func haptic(kind: = "button") -> void:
 
 # screen music: «Пагода» (эрху, дрон, 60) / «Странствие» (сякухати, ветер, 84) through V10Music when merged
 static func music(track: String) -> void:
-	V10Hud2Util.music("play", [track])
+	# V10Music has «pagoda» only; Странствие uses it until its own track lands (INTEGRATION §3.5), fade 0.4 s
+	var m = V10Hud2Util.opt_class("V10Music")
+	if m == null:
+		return
+	var id: = track if (m.get("TRACKS") as Dictionary).has(track) else "pagoda"
+	V10Hud2Util.music("play_track", [id, 0.4])
 
 static func fx() -> String:
 	return V10Hud2Util.fx_level()
 
+# «минимум» of the fx level OR the accessibility switch «спокойный режим»: motion becomes a 120 ms fade, no shake
 static func calm() -> bool:
-	return fx() == "min"
+	return fx() == "min" or V10Juice.calm()
 
 static func insets(vs: Vector2) -> Dictionary:
 	return V10Hud2Util.safe_insets(vs)
@@ -90,10 +106,12 @@ static func grant(reward: Dictionary, src: String) -> void:
 	if grant_hook.is_valid():
 		grant_hook.call(reward, src)
 		return
-	var S: Dictionary = G.S
+	var money: = {}
 	for k in ["gems", "coins", "petals", "tickets"]:
 		if int(reward.get(k, 0)) > 0:
-			S[k] = int(S.get(k, 0)) + int(reward[k])
+			money[k] = int(reward[k])
+	if not money.is_empty():
+		V10Money.grant(money, src)
 	if int(reward.get("pass_xp", 0)) > 0 and G.has_method("add_pass_xp"):
 		G.add_pass_xp(int(reward.pass_xp))
 

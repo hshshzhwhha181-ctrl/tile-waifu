@@ -19,6 +19,7 @@ const BANNED_WORD: = ["пити", "ролл", "яку", "хит", "best", "new",
 
 var shot_dir: = ""
 var selftest: = false
+var embedded: = false
 var ok: = 0
 var total: = 0
 var fails: = []
@@ -27,6 +28,12 @@ var _done: = {}
 
 
 func _ready() -> void:
+	if embedded:
+		V10TowerUtil.fake_now = V10TowerUtil.week_start(2900) + 3600 * 50
+		V10TowerSheets.autosave = false
+		_fake_saves()
+		set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		return
 	var args: = {}
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--") and a.contains("="):
@@ -323,7 +330,18 @@ func _selftest() -> void:
 	print("FAN_UI_SELFTEST %d/%d" % [ok, total])
 	if not fails.is_empty():
 		print("FAILED: ", fails)
-	get_tree().quit(0 if ok == total else 1)
+	if not embedded:
+		get_tree().quit(0 if ok == total else 1)
+
+
+func run_embedded() -> Dictionary:
+	await _selftest()
+	V10TowerSheets.autosave = true
+	V10Pagoda._test_S = null
+	V10Journey._test_S = null
+	V10TowerUtil.fake_now = 0
+	Engine.time_scale = 1.0
+	return {"ok": ok, "total": total, "fails": fails.duplicate()}
 
 
 func _wait(t: float) -> void:
@@ -496,7 +514,7 @@ func _audit(name: String, root: Control, vs: Vector2, mark: int) -> void:
 	var words: = 0
 	for l in shown:
 		words += (l as Label).text.split(" ", false).size()
-	check(words <= 70, "%s: words on the sheet %d" % [name, words])
+	check(words <= 60, "%s: words on the sheet %d (≤ 60)" % [name, words])
 
 
 # signals, on_done and the logic calls (720×1280)

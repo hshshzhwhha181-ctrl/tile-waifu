@@ -208,9 +208,10 @@ class Sheet:
 		content.add_child(g)
 		_beat1.append(g)
 		if gained > 0 and not V10TowerUI.calm():
-			get_tree().create_timer(0.9, false).timeout.connect(func() -> void:
-				if is_instance_valid(g):
-					V10Juice.glow(content, g.position + Vector2(g.size.x - 24.0, 32.0), V10TowerUI.LANTERN_GLOW, 1.1, 0.5, 0.45))
+			var tw_g: = g.create_tween()
+			tw_g.tween_interval(0.9)
+			tw_g.tween_callback(func() -> void:
+				V10Juice.glow(content, g.position + Vector2(g.size.x - 24.0, 32.0), V10TowerUI.LANTERN_GLOW, 1.1, 0.5, 0.45))
 
 	# reward tokens («карточки-фишки» 3:4): [[key, amount, caption]] or cosmetics [["cos", id, ""]], at most 3
 	func add_tokens(list: Array, big: bool) -> float:
@@ -321,9 +322,9 @@ class Sheet:
 			var c: Control = tokens[k]
 			var d: = t0 + k * 0.08
 			_vdokh(c, d, calm)
-			get_tree().create_timer(d, false).timeout.connect(func() -> void:
-				if not is_instance_valid(c):
-					return
+			var tw_t: = c.create_tween()
+			tw_t.tween_interval(d)
+			tw_t.tween_callback(func() -> void:
 				V10Juice.sound("gem_tick", V10TowerSheets.PENTA[k % V10TowerSheets.PENTA.size()], -6.0)
 				if not calm:
 					V10Juice.burst(content, c.position + c.size * Vector2(0.5, 0.34), "star4", 6, V10Juice.GOLD, 0.5))
@@ -347,6 +348,20 @@ class Sheet:
 	func open_fan(cards: Array, o: Dictionary) -> V10TowerFan:
 		o = o.duplicate()
 		o["embedded"] = true
+		var d_fan: = float(o.get("delay", 0.0))
+		if not plates.is_empty():
+			var hide_plates: = func() -> void:
+				for p in plates:
+					if is_instance_valid(p):
+						(p as CanvasItem).visible = false
+			if d_fan <= 0.05:
+				hide_plates.call()
+			else:
+				var tw_h: = create_tween()
+				tw_h.tween_interval(d_fan)
+				tw_h.tween_callback(func() -> void:
+					if not closing and fan != null:
+						hide_plates.call())
 		fan = V10TowerFan.open(self, cards, o)
 		fan.peek_changed.connect(func(k: float) -> void:
 			content.modulate.a = 1.0 - 0.9 * k
@@ -356,6 +371,11 @@ class Sheet:
 		return fan
 
 	func _show_prim() -> void:
+		fan = null
+		for p in plates:
+			if is_instance_valid(p):
+				(p as CanvasItem).visible = true
+				_fade(p as CanvasItem, 0.0)
 		prim.visible = true
 		_fade(prim, 0.0)
 
@@ -397,8 +417,10 @@ class Sheet:
 		var t_fan: = 0.62 + tokens.size() * 0.08 + plates.size() * 0.04
 		if not fcard.is_empty():
 			var t_flare: = t_fan
-			get_tree().create_timer(t_flare, false).timeout.connect(func() -> void:
-				if is_instance_valid(self) and not closing:
+			var tw_f: = create_tween()
+			tw_f.tween_interval(t_flare)
+			tw_f.tween_callback(func() -> void:
+				if not closing:
 					V10TowerSheets.heat_flare(self, fcard))
 			t_fan += V10TowerSheets.Flare.DURATION
 		if offer.is_empty():
@@ -468,7 +490,9 @@ class Sheet:
 				run["curse_offer"] = []
 				_show_prim())
 		if offer.is_empty():
-			get_tree().create_timer(t_fan, false).timeout.connect(open_curses)
+			var tw_c: = create_tween()
+			tw_c.tween_interval(t_fan)
+			tw_c.tween_callback(open_curses)
 			return
 		var cards: = []
 		for id in offer:
@@ -484,9 +508,10 @@ class Sheet:
 
 	func _roll(l: Label, from: int, to: int, delay: float, fmt: String) -> void:
 		l.text = fmt % V10TowerSheets.num(from)
-		get_tree().create_timer(delay, false).timeout.connect(func() -> void:
-			if is_instance_valid(l):
-				V10Juice.roll(l, from, to, 0.9 if not V10TowerUI.calm() else 0.3, func(v: int) -> String: return fmt % V10TowerSheets.num(v)))
+		var tw_r: = l.create_tween()
+		tw_r.tween_interval(delay)
+		tw_r.tween_callback(func() -> void:
+			V10Juice.roll(l, from, to, 0.9 if not V10TowerUI.calm() else 0.3, func(v: int) -> String: return fmt % V10TowerSheets.num(v)))
 
 	# ------------------------------------------------------------ Пагода: the climb is over
 

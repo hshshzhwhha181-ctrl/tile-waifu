@@ -355,7 +355,9 @@ func _start_practice() -> void:
 func _hold() -> void:
 	_busy = true
 	if is_inside_tree():
-		get_tree().create_timer(1.5).timeout.connect(_release)
+		var tw: = create_tween()
+		tw.tween_interval(1.5)
+		tw.tween_callback(_release)
 
 
 func _release() -> void:

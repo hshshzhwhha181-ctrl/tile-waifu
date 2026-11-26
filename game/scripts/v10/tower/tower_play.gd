@@ -30,7 +30,7 @@ extends "res://scripts/screens/play.gd"
 #                 Journey — the attempt is already spent, the run goes on from the same board; practice — nothing kept
 #
 # Rank points and tasks (like climb in mode_play): every cleared floor / board is a won game,
-# V8PlayRules.award("other", rp, true) + G.task_add("levels") + G.add_aff(partner, 4); a run lost on its last
+# V8PlayRules.award("other", rp, true) + G.task_add("levels") + V10Bond.gain(partner, 4, "mode_win"); a run lost on its last
 # lantern / heart counts one lost game. Pagoda rp = V8PlayRules.climb_rp(floor); Journey rp = 6 + 2 × board index.
 # Practice gives nothing (no rank, no tasks, no rewards, no save).
 
@@ -200,9 +200,9 @@ func _make_board() -> void:
 	board.fit_into(board_rect)
 	board.slot_pos.clear()
 	for r in slot_rects:
-		board.slot_pos.append((r as Rect2).get_center())
+		board.slot_pos.append(get_global_transform() * (r as Rect2).get_center())
 	board.slot_size = (slot_rects[0] as Rect2).size.x * 0.92
-	board.matched.connect(_on_match)
+	board.matched.connect(func(mid: Vector2, combo: int, gold: bool, shard: String): _on_match(V10Layout.local_of(self, mid), combo, gold, shard))
 	board.denied.connect(_on_deny)
 	board.cleared.connect(_on_clear)
 	board.failed.connect(_on_fail)
@@ -293,20 +293,26 @@ func _process(dt: float) -> void:
 	_fix_stage_text()
 
 
+func _v10_mode() -> String:
+	if not is_tower():
+		return super._v10_mode()
+	return "journey" if tmode == "practice" else tmode
+
+
 func _on_match(mid: Vector2, combo: int, gold: bool, shard: String) -> void:
 	if not is_tower():
 		super._on_match(mid, combo, gold, shard)
 		return
-	var g0: = int(G.S.gems)
 	var gained0: = gained
 	var before: = {}
 	if fx_layer:
 		for c in fx_layer.get_children():
 			before[c] = true
+	# mode == "trial" suppresses per-pair crystal grants inside super._on_match while _v10_mode() still reports pagoda/journey
+	var m0: = mode
+	mode = "trial"
 	super._on_match(mid, combo, gold, shard)
-	# crystals never tick in a tower match (pairs, gold, sets, combo milestones): the window's rewards are the
-	# only income. The «+N» floats of the 0.9 code go with them.
-	G.S.gems = g0
+	mode = m0
 	gained = gained0
 	if fx_layer:
 		for c in fx_layer.get_children():
@@ -606,7 +612,7 @@ func _life_event(r: Dictionary, why: String) -> void:
 	if thud:
 		thud.call("lose_life", left)
 	UIT.sfx("lantern_out" if pag else "heart_break", "deny")
-	if tray_box:
+	if tray_box and not UIT.calm():
 		Fx.shake(tray_box, 8, 0.35)
 	# README §8: the lantern / heart is gone for good the moment it goes out
 	_save()
@@ -646,6 +652,7 @@ func _life_event(r: Dictionary, why: String) -> void:
 func _pagoda_over() -> void:
 	var end_res: Dictionary = P.end_run(run)
 	_save()
+	_emit_tower_ended(false, int(end_res.get("score", 0)), {})
 	_emit("end", end_res)
 	_go("pagoda", {"result": end_res, "new_cos": (run.get("new_cos", []) as Array).duplicate()})
 
@@ -655,6 +662,7 @@ func _journey_finish() -> void:
 	if tmode != "practice":
 		UIT.grant(fin.get("reward", {}), "journey")
 		_save()
+		_emit_tower_ended(int(fin.get("boards", 0)) >= J.BOARDS, int(fin.get("score", 0)), fin.get("reward", {}))
 	# the reward is credited here (practice has none): the Journey hub credits it only when this flag is missing
 	fin["granted"] = true
 	_emit("finish", fin)
@@ -696,8 +704,10 @@ func _on_clear() -> void:
 			run["new_cos"] = (run.get("new_cos", []) as Array) + cos
 		UIT.grant(res.get("reward", {}), "pagoda")
 		_award_win(V8PlayRules.climb_rp(int(res.get("floor", 1))))
+		_emit_tower_ended(true, int(res.get("floor", 1)), res.get("reward", {}), secs)
 	elif tmode == "journey":
 		_award_win(clampi(6 + 2 * (int(run.get("board", 1)) - 1), 5, 15))
+		_emit_tower_ended(true, int(res.get("score", 0)), {}, secs)
 	_save()
 	_v8_saved = true
 	_emit("clear", res)
@@ -712,9 +722,19 @@ func _on_clear() -> void:
 func _award_win(rp: int) -> void:
 	if tmode == "practice":
 		return
-	G.add_aff(partner, 4)
+	V10Bond.gain(partner, 4, "mode_win")
 	G.task_add("levels")
 	last_award = V8PlayRules.award("other", rp, true)
+
+
+func _emit_tower_ended(win: bool, score: int, rw: Dictionary, secs: = 0.0) -> void:
+	if tmode == "practice" or _v10_end_sent:
+		return
+	_v10_end_sent = true
+	V10Hooks.emit_game_ended({"mode": tmode, "win": win, "score": score, "stars": 3 if win else 0,
+		"time_s": secs if secs > 0.0 else maxf(0.0, now() - start_t),
+		"pairs": int(tr.pairs) if tr else 0, "hero": partner, "seed": int(cfg.get("seed", 0)),
+		"level": -1, "first": false, "rewards": rw})
 
 
 static func sheets_script() -> Script:
