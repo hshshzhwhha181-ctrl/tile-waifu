@@ -1,0 +1,106 @@
+{
+ "clip": "clips/wan3_0_prime.mp4",
+ "probe": {
+  "w": 720,
+  "h": 1280,
+  "fps": 30.0,
+  "frames": 120,
+  "codec": "h264",
+  "dur": 4.0
+ },
+ "sampled_frames": 16,
+ "drift_vs_key": [
+  [
+   0.0,
+   0.9614
+  ],
+  [
+   0.27,
+   0.9596
+  ],
+  [
+   0.53,
+   0.9051
+  ],
+  [
+   0.8,
+   0.8309
+  ],
+  [
+   1.07,
+   0.8189
+  ],
+  [
+   1.33,
+   0.8019
+  ],
+  [
+   1.6,
+   0.8266
+  ],
+  [
+   1.87,
+   0.8471
+  ],
+  [
+   2.13,
+   0.8497
+  ],
+  [
+   2.4,
+   0.7854
+  ],
+  [
+   2.67,
+   0.7531
+  ],
+  [
+   2.93,
+   0.8524
+  ],
+  [
+   3.2,
+   0.9241
+  ],
+  [
+   3.47,
+   0.9476
+  ],
+  [
+   3.73,
+   0.9514
+  ]
+ ],
+ "drift_min": 0.7531,
+ "frame_diff_median": 0.621,
+ "frame_diff_max": 3.305,
+ "pops": [
+  {
+   "t": 2.267,
+   "diff": 3.3
+  },
+  {
+   "t": 2.4,
+   "diff": 2.61
+  },
+  {
+   "t": 2.433,
+   "diff": 2.88
+  },
+  {
+   "t": 2.767,
+   "diff": 2.74
+  }
+ ],
+ "seam_ssim_last_vs_first": 0.9974,
+ "seam_ssim_last_vs_key": 0.9609,
+ "seam_meanabs_last_vs_first": 0.47,
+ "flash_jumps": 0,
+ "flash_max_per_s": 0,
+ "white_frames": [],
+ "luma_peak": 0.541,
+ "luma_base": 0.526,
+ "auto_flags": [
+  "pops: 4 abrupt frame changes"
+ ]
+}

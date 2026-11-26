@@ -1,0 +1,97 @@
+{
+ "clip": "video/clips/seedance_2_5.mp4",
+ "probe": {
+  "w": 720,
+  "h": 1280,
+  "fps": 24.0,
+  "frames": 97,
+  "codec": "h264",
+  "dur": 4.041667
+ },
+ "sampled_frames": 16,
+ "drift_vs_key": [
+  [
+   0.0,
+   0.3864
+  ],
+  [
+   0.25,
+   0.3826
+  ],
+  [
+   0.5,
+   0.3871
+  ],
+  [
+   0.75,
+   0.3814
+  ],
+  [
+   1.0,
+   0.3756
+  ],
+  [
+   1.25,
+   0.3727
+  ],
+  [
+   1.5,
+   0.3727
+  ],
+  [
+   1.75,
+   0.3758
+  ],
+  [
+   2.0,
+   0.3792
+  ],
+  [
+   2.25,
+   0.3846
+  ],
+  [
+   2.5,
+   0.3885
+  ],
+  [
+   2.75,
+   0.3859
+  ],
+  [
+   3.0,
+   0.3809
+  ],
+  [
+   3.25,
+   0.3771
+  ],
+  [
+   3.5,
+   0.3754
+  ],
+  [
+   3.75,
+   0.3761
+  ],
+  [
+   4.0,
+   0.3775
+  ]
+ ],
+ "drift_min": 0.3727,
+ "frame_diff_median": 0.343,
+ "frame_diff_max": 0.844,
+ "pops": [],
+ "seam_ssim_last_vs_first": 0.9906,
+ "seam_ssim_last_vs_key": 0.3775,
+ "seam_meanabs_last_vs_first": 1.24,
+ "flash_jumps": 0,
+ "flash_max_per_s": 0,
+ "white_frames": [],
+ "luma_peak": 0.51,
+ "luma_base": 0.508,
+ "auto_flags": [
+  "drift: frame far from keyframe (identity/outfit/camera moved)"
+ ]
+}
