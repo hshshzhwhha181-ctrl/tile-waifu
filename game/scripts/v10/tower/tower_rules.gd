@@ -257,7 +257,7 @@ func help_ok(kind: String) -> bool:
 	return true
 
 func help_off_text(kind: String) -> String:
-	var names: = {"hint": "Без подсказок", "undo": "Без отмен", "shuffle": "Без смешиваний", "ult": "Без ульты"}
+	var names: = {"hint": "Без подсказок", "undo": "Без отмен", "shuffle": "Без смешиваний", "ult": "Без приёма"}
 	return "Проклятие «%s»" % String(names.get(kind, kind))
 
 func paid_help() -> bool:

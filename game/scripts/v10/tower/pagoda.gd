@@ -150,7 +150,7 @@ static func floor_cfg(run: Dictionary) -> Dictionary:
 	elif f % D.FORCED_EVERY == 0:
 		c.intro = "Этаж %d. Пагода разгорается: ещё одно проклятие до конца восхождения." % f
 	else:
-		c.intro = "Этаж %d. Благословения богинь действуют до конца восхождения." % f
+		c.intro = "Этаж %d. Благословения героинь действуют до конца восхождения." % f
 	c.reward = {"gems": 0}
 	c["mode"] = "pagoda"
 	c["seed_locked"] = true

@@ -56,12 +56,12 @@ const BLESS: = {
 		"eff": {"no_hidden": true, "no_ice": true}, "eff_plus": {"no_hidden": true, "no_ice": true, "hint": 1}, "once": true},
 	"backdoor": {"hero": "nova", "name": "Бэкдор", "desc": "+1 смешивание на каждом этаже", "plus": "+2 смешивания на каждом этаже",
 		"eff": {"shuffle": 1}, "eff_plus": {"shuffle": 2}},
-	"overclock": {"hero": "nova", "name": "Разгон", "desc": "Ульта героини заряжена наполовину в начале этажа", "plus": "Ульта героини готова в начале этажа",
+	"overclock": {"hero": "nova", "name": "Разгон", "desc": "Приём героини заряжен наполовину в начале этажа", "plus": "Приём героини готов в начале этажа",
 		"eff": {"ult_start": 0.5}, "eff_plus": {"ult_start": 1.0}},
 	# ---- one per new goddess (docs/ROSTER_20.md); hidden until she is in G.HEROES
 	"smoke": {"hero": "tsubame", "name": "Дымовая завеса", "desc": "Первый переполненный лоток на этаже прощён", "plus": "Первый перебор прощён, +1 отмена",
 		"eff": {"shield": 1}, "eff_plus": {"shield": 1, "undo": 1}, "cap": 2},
-	"sugar": {"hero": "miel", "name": "Сахарная пудра", "desc": "Каждая 4-я пара даёт заряд ульты", "plus": "Каждая 3-я пара даёт заряд ульты",
+	"sugar": {"hero": "miel", "name": "Сахарная пудра", "desc": "Каждая 4-я пара даёт заряд приёма", "plus": "Каждая 3-я пара даёт заряд приёма",
 		"eff": {"ult_every": 4}, "eff_plus": {"ult_every": 3}, "once": true},
 	"river": {"hero": "lian", "name": "Течение реки", "desc": "+20 с к часам, комбо держится на 1 с дольше", "plus": "+30 с к часам, комбо +1,5 с",
 		"eff": {"time_bonus": 20, "combo_window": 1.0}, "eff_plus": {"time_bonus": 30, "combo_window": 1.5}},
@@ -83,7 +83,7 @@ const BLESS: = {
 		"eff": {"lamps": 1, "lamp_cap": 1}, "eff_plus": {"lamps": 2, "lamp_cap": 1}, "once": true},
 	"pearl": {"hero": "minamo", "name": "Жемчужина", "desc": "Льда нет, +1 отмена", "plus": "Льда нет, +2 отмены",
 		"eff": {"no_ice": true, "undo": 1}, "eff_plus": {"no_ice": true, "undo": 2}, "once": true},
-	"boost": {"hero": "kira", "name": "Форсаж", "desc": "Ульте нужно на четверть меньше зарядов", "plus": "Ульте нужно на две пятых меньше зарядов",
+	"boost": {"hero": "kira", "name": "Форсаж", "desc": "Приёму нужно на четверть меньше зарядов", "plus": "Приёму нужно на две пятых меньше зарядов",
 		"eff": {"ult_need_mult": 0.75}, "eff_plus": {"ult_need_mult": 0.6}, "once": true},
 	"pact": {"hero": "vesper", "name": "Гранатовый договор", "desc": "+1 место в лотке, но фишки под другими рубашкой вверх", "plus": "+1 место в лотке без условий",
 		"eff": {"slots": 1, "shroud": 1}, "eff_plus": {"slots": 1}, "once": true},
@@ -116,8 +116,8 @@ const CURSES: = {
 		{"heat": 3, "desc": "В лотке на одно место меньше", "eff": {"slots": -1}}]},
 	"one_lamp": {"name": "Один фонарь", "levels": [
 		{"heat": 4, "desc": "На весь забег один фонарь, благословения его не добавят", "eff": {"lamp_one": true}}]},
-	"no_ult": {"name": "Без ульты", "levels": [
-		{"heat": 2, "desc": "Ульта героини молчит", "eff": {"ult_off": true}}]},
+	"no_ult": {"name": "Без приёма", "levels": [
+		{"heat": 2, "desc": "Приём героини молчит", "eff": {"ult_off": true}}]},
 	"no_undo": {"name": "Без отмен", "levels": [
 		{"heat": 1, "desc": "Отмены не работают", "eff": {"undo_off": true}}]},
 	"no_hint": {"name": "Без подсказок", "levels": [
