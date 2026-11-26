@@ -17,6 +17,7 @@ var body: Control
 var title_l: Label
 var close_b: V10Button
 var _closing: = false
+var _opened_ms: = 0
 
 
 static func open(m, title: String) -> V10BottomSheet:
@@ -38,6 +39,7 @@ static func open(m, title: String) -> V10BottomSheet:
 
 
 func _build(vs: Vector2, title: String) -> void:
+	_opened_ms = Time.get_ticks_msec()
 	var dim: = ColorRect.new()
 	dim.size = vs
 	dim.color = Color(V10DS.NIGHT_900, 0.0)
@@ -84,8 +86,11 @@ func finish(body_h: float) -> void:
 
 
 func _gui_input(e: InputEvent) -> void:
-	# a tap on the dim above the sheet closes it
+	# a tap on the dim above the sheet closes it (ignore touch+emulated mouse right after open)
 	if (e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT) or (e is InputEventScreenTouch and e.pressed):
+		if Time.get_ticks_msec() - _opened_ms < 280:
+			accept_event()
+			return
 		if panel and e.position.y < panel.position.y:
 			close()
 			accept_event()

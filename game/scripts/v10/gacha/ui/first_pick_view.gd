@@ -51,13 +51,14 @@ func _build() -> void:
 	add_child(V10GUI.shade(Rect2(0, 0, W, 420), Color(V10GUI.NIGHT_900, 0.92), Color(V10GUI.NIGHT_900, 0.0), true))
 	add_child(V10GUI.shade(Rect2(0, H - 360, W, 360), Color(V10GUI.NIGHT_900, 0.0), Color(V10GUI.NIGHT_900, 0.95), true))
 	Fx.ambient(self, "stars", Vector2(W, H * 0.4))
-	title_l = V10GUI.h1("Кто будет хозяйкой\nтвоего стола?", 44)
+	var ins_top: = float(V10Hud2Util.safe_insets(size).get("top", 0.0))
+	title_l = V10GUI.h1("Кто будет хозяйкой\nтвоего стола?", 42)
 	title_l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	UI.center_label(title_l, Rect2(0, 92, W, 120))
+	UI.center_label(title_l, Rect2(0, ins_top + 48.0, W, 114))
 	title_l.modulate.a = 0.0
 	add_child(title_l)
 	sub_l = V10GUI.lbl("Выбор бесплатный. Остальные будут ждать тебя в Желаниях.", 20, V10GUI.PAPER_300, "body", 700)
-	UI.center_label(sub_l, Rect2(40, 214, W - 80, 30))
+	UI.center_label(sub_l, Rect2(32, ins_top + 166.0, W - 64, 32))
 	sub_l.modulate.a = 0.0
 	add_child(sub_l)
 	opts = gacha.first_options()
@@ -70,10 +71,12 @@ func _build() -> void:
 
 
 func _slot(i: int, n: int) -> Rect2:
-	var cw: = minf(208.0, (W - 64 - (n - 1) * 16) / n)
-	var ch: = cw * 1.5
-	var x0: = (W - (n * cw + (n - 1) * 16)) * 0.5
-	return Rect2(x0 + i * (cw + 16), 262.0 + maxf(0.0, H - 1280.0) * 0.3, cw, ch)
+	var ins_top: = float(V10Hud2Util.safe_insets(size).get("top", 0.0))
+	var cw: = minf(216.0, (W - 48.0 - (n - 1) * 14.0) / n)
+	var ch: = cw * 1.54
+	var x0: = (W - (n * cw + (n - 1) * 14.0)) * 0.5
+	var y0: = ins_top + 224.0 + maxf(0.0, H - 1280.0 - ins_top) * 0.14
+	return Rect2(x0 + i * (cw + 14.0), y0, cw, ch)
 
 
 func _tile_pos(i: int) -> Vector2:
@@ -98,27 +101,27 @@ func _tiles_and_cards() -> void:
 		tile.modulate = Color(1.0, 0.82, 0.5, 0.0)
 		add_child(tile)
 		tiles.append(tile)
-		var d: = 0.9 + i * 0.35
+		var d: = 0.12 + i * 0.14
 		var t: = tile.create_tween()
 		t.tween_interval(d)
-		t.tween_property(tile, "modulate:a", 0.9, 0.25).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		t.tween_property(tile, "modulate:a", 0.9, 0.2).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 		t.tween_callback(func():
 			Sfx.play("clack%d" % (i % 3), 0.9 + i * 0.05, -4.0)
 			V9Feel.haptic("tap"))
-		t.tween_property(tile, "modulate:a", 0.45, 0.6)
+		t.tween_property(tile, "modulate:a", 0.45, 0.45)
 		var card: = _card(opts[i], r)
 		card.modulate.a = 0.0
-		card.position.y = tp.y - r.size.y * 0.5
-		card.scale = Vector2(0.4, 0.4)
+		card.position.y = tp.y - r.size.y * 0.35
+		card.scale = Vector2(0.55, 0.55)
 		var ct: = card.create_tween()
-		ct.tween_interval(d + 0.55)
+		ct.tween_interval(d + 0.16)
 		ct.tween_callback(func():
 			Sfx.play("reveal_ssr", 0.9 + i * 0.06, -10.0)
 			if V9Feel.can_fx():
 				Fx.burst(self, tp, "sparkle", 26, V9Summon.COL.SSR, 1.1))
-		ct.tween_property(card, "modulate:a", 1.0, 0.3)
-		ct.parallel().tween_property(card, "position:y", r.position.y, 0.7).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_OUT)
-		ct.parallel().tween_property(card, "scale", Vector2.ONE, 0.7).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		ct.tween_property(card, "modulate:a", 1.0, 0.22)
+		ct.parallel().tween_property(card, "position:y", r.position.y, 0.42).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_OUT)
+		ct.parallel().tween_property(card, "scale", Vector2.ONE, 0.42).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 		ct.tween_callback(func(): _breathe(card, i))
 		cards.append(card)
 
@@ -159,14 +162,47 @@ func _card(it: Dictionary, r: Rect2) -> Control:
 	glow.scale = Vector2(r.size.x / 50.0, r.size.y / 56.0)
 	glow.modulate = Color(V9Summon.COL.SSR, 0.45)
 	c.add_child(glow)
-	var art: = Common.card_art(G.art_tex(it), Rect2(Vector2.ZERO, r.size), Vector2(0.5, 0.3), 1.0, Common.card_radius("SSR", r.size))
-	(art.material as ShaderMaterial).set_shader_parameter("holo", 0.35)
-	(art.material as ShaderMaterial).set_shader_parameter("bottom_shade", 0.7)
-	c.add_child(art)
-	Common.card_frame(c, "SSR", Rect2(Vector2.ZERO, r.size))
-	var nm: = V10GUI.lbl(String(G.HEROES[it.hero].name), 20, V10GUI.PAPER_100, "body", 900, Color(0.1, 0.05, 0.1, 0.9), 4)
-	nm.position = Vector2(0, r.size.y - 52)
-	nm.size = Vector2(r.size.x, 10)
+	# Crisp aspect-preserving portrait clipped cleanly inside a gold lacquer frame (zero stretching/bleed/alpha-clip issues)
+	var clip: = Control.new()
+	clip.position = Vector2(4, 4)
+	clip.size = r.size - Vector2(8, 8)
+	clip.clip_contents = true
+	clip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	c.add_child(clip)
+	var bg_fill: = ColorRect.new()
+	bg_fill.color = V10DS.NIGHT_800
+	bg_fill.position = Vector2.ZERO
+	bg_fill.size = clip.size
+	bg_fill.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	clip.add_child(bg_fill)
+	var tr: = TextureRect.new()
+	tr.texture = G.art_tex(it)
+	tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	tr.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	tr.position = Vector2.ZERO
+	tr.size = clip.size
+	tr.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	clip.add_child(tr)
+	var shade: = V10GUI.shade(Rect2(0, clip.size.y - 84, clip.size.x, 84), Color(V10DS.NIGHT_900, 0.0), Color(V10DS.NIGHT_900, 0.92), true)
+	clip.add_child(shade)
+	var rim: = Panel.new()
+	rim.position = Vector2.ZERO
+	rim.size = r.size
+	rim.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var sb_rim: = StyleBoxFlat.new()
+	sb_rim.bg_color = Color(0, 0, 0, 0)
+	sb_rim.border_color = V10DS.GOLD_300
+	sb_rim.set_border_width_all(3)
+	sb_rim.set_corner_radius_all(12)
+	rim.add_theme_stylebox_override("panel", sb_rim)
+	c.add_child(rim)
+	var tag: = V10GUI.lbl("SSR", 15, V10DS.GOLD_300, "body", 900, Color(0.08, 0.04, 0.1, 0.92), 3)
+	tag.position = Vector2(12, 10)
+	c.add_child(tag)
+	var nm: = V10GUI.lbl(String(G.HEROES[it.hero].name), 20, V10GUI.PAPER_100, "body", 900, Color(0.08, 0.04, 0.1, 0.95), 4)
+	nm.position = Vector2(6, r.size.y - 44)
+	nm.size = Vector2(r.size.x - 12, 32)
 	nm.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	c.add_child(nm)
 	var idx: = cards.size()

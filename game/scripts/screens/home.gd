@@ -55,7 +55,8 @@ func build(m, _args: Dictionary) -> void :
 	_offer_gacha_scenes()
 	_offer_look_scenes()
 	var new_letters: = V9Letters.tick()
-	var salon_bg: = V10Salon.lobby_texture()
+	# Salon ruins removed from lobby backdrop per tester feedback: always show warm teahouse / heroine art
+	var salon_bg: = ""
 	if salon_bg != "" and ResourceLoader.exists(salon_bg):
 		var sbg: = TextureRect.new()
 		sbg.texture = load(salon_bg)
@@ -550,7 +551,7 @@ func _tray_allowed() -> bool:
 
 
 func _open_morning_tray() -> void :
-	if not is_inside_tree() or main == null or main.overlay == null:
+	if not is_inside_tree() or main == null or main.overlay == null or main.screen_id != "home":
 		return
 	var tv: = V10TrayView.open(main.overlay)
 	if tv:
@@ -669,8 +670,8 @@ func _build_v10(mail_new: bool) -> void :
 	scrim.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	scrim.name = "StatusScrim"
 	add_child(scrim)
-	var sh_arr: = [V10Nav.today_lit(), V10Nav.salon_open(), V10Nav.streak_shown()]
-	var lit_arr: = [V10Nav.today_open(), V10Nav.salon_lit(), V10Nav.streak_lit()]
+	var sh_arr: = [V10Nav.today_lit(), false, V10Nav.streak_shown()]
+	var lit_arr: = [V10Nav.today_open(), false, V10Nav.streak_lit()]
 	home2 = V10HudHome.new()
 	home2.configure({"hero": str(G.S.partner), "nick": G.nick(), "level": pi.code, "path": pi.loc,
 		"affinity": G.aff_level(str(G.S.partner)),
@@ -743,6 +744,38 @@ func _build_v10(mail_new: bool) -> void :
 			V9Feel.press(av)
 			main.go("profile", {"from": "home"}))
 	home2.add_child(avatar_hit)
+	# 1-tap Master Mute toggle in the Tea House top-right (left of Phone)
+	var mute_btn: = Panel.new()
+	mute_btn.name = "MuteBtn"
+	var msb: = StyleBoxFlat.new()
+	msb.bg_color = Color(0.11, 0.06, 0.16, 0.82)
+	msb.border_color = Color(0.92, 0.78, 0.48, 0.72)
+	msb.set_border_width_all(2)
+	msb.set_corner_radius_all(30)
+	mute_btn.add_theme_stylebox_override("panel", msb)
+	var ph_r: Rect2 = L.phone
+	var mx: = ph_r.position.x - 74.0 if home2.phone_shown else ph_r.position.x + 10.0
+	mute_btn.position = Vector2(mx, ph_r.position.y + 10.0)
+	mute_btn.size = Vector2(60, 60)
+	mute_btn.mouse_filter = Control.MOUSE_FILTER_STOP
+	mute_btn.set_meta("ux_role", "tertiary")
+	var mic: = V8Art.rect(V8Art.icon("sound" if main.is_audio_on() else "sound_off"), Rect2(12, 12, 36, 36))
+	mic.name = "Icon"
+	mic.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	mute_btn.add_child(mic)
+	var last_mute_ms: = [0]
+	mute_btn.gui_input.connect(func(e: InputEvent) -> void:
+		if (e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT) or (e is InputEventScreenTouch and e.pressed):
+			mute_btn.accept_event()
+			var now_ms: = Time.get_ticks_msec()
+			if now_ms - last_mute_ms[0] < 260:
+				return
+			last_mute_ms[0] = now_ms
+			var on: bool = main.toggle_master_mute()
+			mic.texture = V8Art.icon("sound" if on else "sound_off")
+			V9Feel.press(mute_btn, "tap")
+			main.toast("Звук включён" if on else "Звук выключен", "sound" if on else "sound_off"))
+	home2.add_child(mute_btn)
 	var sm_disc: = V10ShopHub.model()
 	if sm_disc != null and sm_disc.econ.shop.month_days_left() > 0:
 		var md: = V10MonthDisc.make(sm_disc, false)

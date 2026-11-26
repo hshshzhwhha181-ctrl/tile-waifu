@@ -29,6 +29,7 @@ static func open(parent: Control, cards_in: = [], targets_in: = {}) -> V10TrayVi
 	v.targets = targets_in
 	v.size = parent.size
 	v.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	v.set_meta("popup", true)
 	parent.add_child(v)
 	return v
 
@@ -76,24 +77,28 @@ func _ready() -> void:
 func _card(c: Dictionary, w: float, h: float) -> Control:
 	var box: = Control.new()
 	box.size = Vector2(w, h)
+	box.clip_contents = true
 	box.pivot_offset = box.size * 0.5
 	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	box.add_child(V10RitUI.panel(Rect2(Vector2.ZERO, box.size), Color(V10RitUI.NIGHT800, 0.94), 12, Color(V10RitUI.GOLD700, 0.6), 1))
+	box.add_child(V10RitUI.panel(Rect2(Vector2.ZERO, box.size), Color(V10RitUI.NIGHT800, 0.94), 12, Color(V10RitUI.GOLD700, 0.7), 2))
 	var icon = c.get("icon", "")
+	var ic_sz: = minf(w * 0.50, 74.0)
 	var ic: TextureRect
 	if icon is Texture2D:
-		ic = V10RitUI.tex("", Rect2(w * 0.2, 12, w * 0.6, w * 0.6))
+		ic = V10RitUI.tex("", Rect2((w - ic_sz) * 0.5, 10, ic_sz, ic_sz))
 		ic.texture = icon
 	else:
-		ic = V10RitUI.tex(str(icon), Rect2(w * 0.2, 12, w * 0.6, w * 0.6))
+		ic = V10RitUI.tex(str(icon), Rect2((w - ic_sz) * 0.5, 10, ic_sz, ic_sz))
 	box.add_child(ic)
-	var tl: = V10RitUI.wrap_w(V10RitUI.label(str(c.get("title", "")), 18, V10RitUI.PAPER100, "body", 800), w - 12)
+	var tl: = V10RitUI.wrap_w(V10RitUI.label(str(c.get("title", "")), 16, V10RitUI.PAPER100, "body", 800), w - 12)
 	tl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	tl.position = Vector2(6, 16 + w * 0.6)
+	tl.position = Vector2(6, 12 + ic_sz)
 	box.add_child(tl)
-	var tx: = V10RitUI.wrap_w(V10RitUI.label(str(c.get("text", "")), 18, V10RitUI.GOLD300, "body", 700), w - 12)
+	var tx: = V10RitUI.wrap_w(V10RitUI.label(str(c.get("text", "")), 16, V10RitUI.GOLD300, "body", 800), w - 12)
 	tx.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	tx.position = Vector2(6, h - 34)
+	tx.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
+	tx.size = Vector2(w - 12, 46)
+	tx.position = Vector2(6, h - 52)
 	box.add_child(tx)
 	return box
 

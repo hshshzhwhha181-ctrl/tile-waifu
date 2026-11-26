@@ -168,11 +168,7 @@ func _ready() -> void:
 	home_built.connect(func(_h: Node) -> void: V10EntryQueue.run())
 	# the W1+W2 shell: Afisha providers, MoreLevel codes, WinStack salon bar + streak/flame/daily ticks
 	V10Nav.install()
-	if V10Registry.wired("salon"):
-		V10WinStack.add_bar("salon", V10WinStack.PRIO_SALON, V10SalonWinBar.build, {
-			"modes": ["path"],
-			"when": func(_c: Dictionary) -> bool: return V10Nav.salon_open() and not V10Salon.next_goal().is_empty(),
-		})
+	# Salon win bar intentionally disabled from Victory overlay to keep post-match screen clean
 	if V10Registry.wired("rituals"):
 		V10WinStack.add_tick("streak", func(_c: Dictionary) -> Dictionary:
 			var n: = int(V10Streak.st().get("n", 0))

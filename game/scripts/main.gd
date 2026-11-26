@@ -86,6 +86,7 @@ func _ready() -> void :
 	finger.visible = false
 	finger.z_index = 50
 	add_child(finger)
+	AudioServer.set_bus_mute(0, not (bool(G.S.get("sound", true)) or bool(G.S.get("music", true)) or bool(G.S.get("voice", true))))
 	go("home", {}, false)
 	_splash()
 	if G.demo:
@@ -739,9 +740,32 @@ func refresh_currency(punch: = false) -> void :
 func gem_target() -> Vector2:
 	return Vector2(W - 320, 58 + safe_top)
 
-# 0.10 W1 (HUD_V2 §8.2, §9.4): the v2 navbar — a night.900 band of 132 + B across the screen, one gold hairline,
-# five equal tabs (monoline icon 48 + Caption 18) centred in ≤ 720; the active tab is gold.300, the others paper.500.
-# A tab that is not open yet (UX §3.5) is dimmed, without caption or lock; a tap says when it opens (V10Nav).
+func is_audio_on() -> bool:
+	return not AudioServer.is_bus_mute(0) and (bool(G.S.get("sound", true)) or bool(G.S.get("music", true)) or bool(G.S.get("voice", true)))
+
+
+func toggle_master_mute() -> bool:
+	var on: = not is_audio_on()
+	G.S.sound = on
+	G.S.music = on
+	G.S.voice = on
+	AudioServer.set_bus_mute(0, not on)
+	G.save()
+	if on:
+		Sfx.cur_music = ""
+		if V10Registry.wired("audio"):
+			V10Music.play_screen(screen_id)
+		else:
+			Sfx.music("play" if screen_id == "play" else "menu")
+	else:
+		Sfx.music("")
+		if V10Registry.wired("audio"):
+			V10Music.stop(0.15)
+	return on
+
+
+const NAV_ART: = {"home": "home", "collection": "wardrobe", "tables": "play", "summon": "wishes", "shop": "shop"}
+
 func _build_navbar() -> void :
 	navbar = Control.new()
 	navbar.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -754,29 +778,77 @@ func _build_navbar() -> void :
 	var tx0: = (W - tabs_w) * 0.5
 	for i in TABS.size():
 		var tab: Dictionary = TABS[i]
+		var is_center: bool = (tab.id == "tables")
 		var c: = Control.new()
 		c.position = Vector2(tx0 + i * tw, 0)
 		c.size = Vector2(tw, 132)
 		c.mouse_filter = Control.MOUSE_FILTER_STOP
 		c.pivot_offset = Vector2(tw * 0.5, 66)
-		var ic: = V10Icons.icon(tab.icon, 48, V10DS.PAPER_500)
+		# Active golden aura behind icon
+		var aura: = Panel.new()
+		aura.name = "Aura"
+		var asb: = StyleBoxFlat.new()
+		asb.bg_color = Color(0.95, 0.72, 0.32, 0.24)
+		asb.border_color = Color(0.98, 0.84, 0.52, 0.72)
+		asb.set_border_width_all(2)
+		asb.set_corner_radius_all(34 if is_center else 22)
+		aura.add_theme_stylebox_override("panel", asb)
+		aura.position = Vector2(tw * 0.5 - 38, -14) if is_center else Vector2(tw * 0.5 - 40, 12)
+		aura.size = Vector2(76, 76) if is_center else Vector2(80, 68)
+		aura.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		aura.visible = false
+		c.add_child(aura)
+		# Center elevated medallion plate for "Столы"
+		if is_center:
+			var med: = Panel.new()
+			med.name = "Medallion"
+			var msb: = StyleBoxFlat.new()
+			msb.bg_color = Color(0.32, 0.11, 0.22, 0.98)
+			msb.border_color = Color(0.96, 0.80, 0.45, 0.95)
+			msb.set_border_width_all(3)
+			msb.set_corner_radius_all(38)
+			msb.shadow_color = Color(0.0, 0.0, 0.0, 0.55)
+			msb.shadow_size = 8
+			med.add_theme_stylebox_override("panel", msb)
+			med.position = Vector2(tw * 0.5 - 38, -14)
+			med.size = Vector2(76, 76)
+			med.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			c.add_child(med)
+		var ic_sz: = 56.0 if is_center else 54.0
+		var ic_y: = -4.0 if is_center else 16.0
+		var ic_tex: = V8Art.nav(String(NAV_ART.get(tab.id, "home")))
+		var ic: = V8Art.rect(ic_tex, Rect2(tw * 0.5 - ic_sz * 0.5, ic_y, ic_sz, ic_sz))
 		ic.name = "IC"
-		ic.position = Vector2(tw * 0.5 - 24, 22)
 		ic.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		c.add_child(ic)
-		var l: = V10Type.label(tab.name, "ui", 18, V10DS.PAPER_500)
+		var lck: = V8Art.rect(V8Art.icon("lock"), Rect2(tw * 0.5 + 10, 44, 24, 24))
+		lck.name = "Lock"
+		lck.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		lck.visible = false
+		c.add_child(lck)
+		var l: = UI.label(tab.name, 20, Color("f6e7d2"), Color(0.08, 0.03, 0.12, 0.95), 4, "body", 900)
 		l.name = "L"
-		l.position = Vector2(0, 78)
-		l.size = Vector2(tw, 26)
+		l.position = Vector2(0, 76)
+		l.size = Vector2(tw, 30)
 		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		l.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		c.add_child(l)
+		var bar: = ColorRect.new()
+		bar.name = "Bar"
+		bar.color = Color("f6d483")
+		bar.position = Vector2(tw * 0.5 - 22, 110)
+		bar.size = Vector2(44, 4)
+		bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		bar.visible = false
+		c.add_child(bar)
 		c.set_meta("ux_role", "nav")
 		var tut_map: = {"home": "nav.teahouse", "collection": "nav.heroines", "tables": "nav.tables", "summon": "nav.wishes", "shop": "nav.shop"}
 		if tut_map.has(tab.id):
 			c.set_meta("tut_id", tut_map[tab.id])
 		c.gui_input.connect( func(e):
 			if (e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT) or (e is InputEventScreenTouch and e.pressed):
+				c.accept_event()
 				if not V10Nav.tab_open(tab.id):
 					V9Feel.deny(c)
 					toast(V10Nav.tab_lock_text(tab.id), "lock")
@@ -788,8 +860,6 @@ func _build_navbar() -> void :
 	refresh_nav()
 
 
-# colours of the tabs: active gold.300, open paper.500, closed paper.700 dimmed without caption; one dot at most
-# (UX §3.6: «есть что забрать», never «можно купить»; the shop gets none)
 func refresh_nav() -> void :
 	for k in tab_nodes:
 		var c: Control = tab_nodes[k]
@@ -799,16 +869,27 @@ func refresh_nav() -> void :
 				n.queue_free()
 		var open: = V10Nav.tab_open(k)
 		var on: bool = k == screen_id or (k == "tables" and (screen_id in ["levels", "modes", "v10path", "pagoda", "journey", "duels", "challenge", "hand", "v7tourney"] or screen_id.begins_with("mj_")))
-		var col: = V10DS.GOLD_300 if on else (V10DS.PAPER_500 if open else Color(V10DS.PAPER_700, 0.55))
-		var ic = c.get_node("IC")
-		ic.set("color", col)
-		(ic as CanvasItem).queue_redraw()
+		var is_center: bool = (k == "tables")
+		var ic: Control = c.get_node("IC")
+		ic.modulate = Color.WHITE if on else (Color(0.90, 0.86, 0.94, 0.92) if open else Color(0.45, 0.42, 0.48, 0.55))
+		ic.position.y = (-7.0 if on else -4.0) if is_center else (12.0 if on else 16.0)
+		var aura: Control = c.get_node_or_null("Aura")
+		if aura:
+			aura.visible = on
+		var lck: Control = c.get_node_or_null("Lock")
+		if lck:
+			lck.visible = not open
+		var bar: Control = c.get_node_or_null("Bar")
+		if bar:
+			bar.visible = on
 		var l: Label = c.get_node("L")
-		l.visible = open
-		l.label_settings = V10Type.settings("ui", 18, V10DS.GOLD_300 if on else V10DS.PAPER_500)
+		l.visible = true
+		if l.label_settings:
+			l.label_settings = l.label_settings.duplicate()
+			l.label_settings.font_color = Color("ffe6a3") if on else (Color("e8d9c8") if open else Color(0.58, 0.54, 0.62, 0.65))
 		if open and not on and V10Nav.tab_dot(k):
 			var d: = V10Nav.dot()
-			d.position = Vector2(c.size.x * 0.5 + 18, 20)
+			d.position = Vector2(c.size.x * 0.5 + 22, 14)
 			d.set_meta("navmark", true)
 			c.add_child(d)
 

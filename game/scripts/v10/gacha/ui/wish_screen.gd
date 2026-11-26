@@ -89,7 +89,8 @@ func _build_banner() -> void:
 	_art_layer()
 	# one entry to the odds: «ⓘ Шансы» next to the wish buttons (С-5); the header keeps only «‹» until the
 	# HUD v2 header puts «ⓘ Шансы» in its right slot (README, hook H1)
-	V8Header.make(banner_root, main, "Желания", main.back)
+	var hdr: = V8Header.make(banner_root, main, "Желания", main.back)
+	hdr.show_money(["tickets", "gems"])
 	set_meta("v8_back", main.back)
 	_title_block()
 	_sheet()

@@ -64,12 +64,15 @@ func _path() -> bool:
 
 func _build() -> void:
 	var y: = 0.0
-	for b in V10WinStack.build_bars(ctx, w):
-		var c: Control = b
-		c.position = Vector2(0, y)
-		add_child(c)
-		bars.append(c)
-		y += c.size.y + GAP
+	var max_bars: = int(ctx.get("max_bars", 2))
+	if max_bars > 0:
+		var built_bars: = V10WinStack.build_bars(ctx, w)
+		for bi in mini(max_bars, built_bars.size()):
+			var c: Control = built_bars[bi]
+			c.position = Vector2(0, y)
+			add_child(c)
+			bars.append(c)
+			y += c.size.y + GAP
 	var tk: = V10WinStack.ticks(ctx)
 	if not tk.is_empty():
 		tick_row = _build_ticks(tk)

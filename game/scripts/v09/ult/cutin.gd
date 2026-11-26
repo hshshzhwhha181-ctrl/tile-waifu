@@ -34,22 +34,21 @@ signal strong
 signal finished
 
 const K: = 0.13
-const BAND_H: = 300.0
-const EYE_H: = 150.0
+const BAND_H: = 520.0
+const EYE_H: = 220.0
 const PANEL_GAP: = 150.0
 const GOLD: = Color("ffe7a6")
 const GOLD_DEEP: = Color("c58a2c")
 const NAME_COL: = Color("fff2d2")
 # above V6Fx's particle layer (60) and the easter-egg layer (55): nothing drawn by the board lands on the strip
 const STRIP_LAYER: = 61
-# the paintings in the strips: near-neutral light pixels (cream / paper backdrops) take the palette hue, and every
-# value is eased under vmax with a soft knee (dark and mid tones untouched), so a strip never reads as a white bar
+# the paintings in the strips: bright, vivid AAA art with subtle warm palette integration
 const TONE: = """
 shader_type canvas_item;
 uniform vec4 tint : source_color = vec4(1.0);
-uniform float vmax = 0.7;
-uniform float knee = 0.48;
-uniform float wash = 0.6;
+uniform float vmax = 0.94;
+uniform float knee = 0.72;
+uniform float wash = 0.22;
 void fragment() {
 	vec4 c = COLOR;
 	float v = max(c.r, max(c.g, c.b));

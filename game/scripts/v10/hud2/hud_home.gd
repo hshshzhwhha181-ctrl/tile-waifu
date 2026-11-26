@@ -48,6 +48,7 @@ var phone_b: V10Button
 var nav: Control
 var tab_ls: = []
 var glow: GradientTexture2D
+var _last_lantern_ms: = 0
 
 
 static func compute(vs: Vector2, ins: Dictionary) -> Dictionary:
@@ -151,7 +152,12 @@ func _ready() -> void:
 		lt.modulate = Color.WHITE if lit[i] else V10DS.PAPER_700.darkened(0.35)
 		lt.mouse_filter = Control.MOUSE_FILTER_STOP
 		lt.gui_input.connect(func(e: InputEvent) -> void:
-			if (e is InputEventMouseButton and e.pressed) or (e is InputEventScreenTouch and e.pressed):
+			if (e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT) or (e is InputEventScreenTouch and e.pressed):
+				lt.accept_event()
+				var now_ms: = Time.get_ticks_msec()
+				if now_ms - _last_lantern_ms < 260:
+					return
+				_last_lantern_ms = now_ms
 				lantern_pressed.emit(i))
 		add_child(lt)
 		lantern_tr.append(lt)
@@ -201,14 +207,18 @@ func layout_now() -> void:
 	var sp: Rect2 = L.spine
 	spine_l.size = Vector2(sp.size.y, sp.size.x)
 	spine_l.position = Vector2(sp.position.x, sp.end.y)
+	var vis_idx: = 0
 	for i in 3:
-		var r: Rect2 = L.lanterns[i]
-		lantern_tr[i].visible = bool(shown[i])
-		lantern_ls[i].visible = bool(shown[i])
-		lantern_tr[i].position = r.position
-		lantern_tr[i].size = r.size
-		lantern_ls[i].position = Vector2(r.position.x - 20, r.end.y + 8)
-		lantern_ls[i].size = Vector2(r.size.x + 40, 26)
+		var is_vis: = bool(shown[i])
+		lantern_tr[i].visible = is_vis
+		lantern_ls[i].visible = is_vis
+		if is_vis:
+			var r: Rect2 = L.lanterns[mini(vis_idx, L.lanterns.size() - 1)]
+			lantern_tr[i].position = r.position
+			lantern_tr[i].size = r.size
+			lantern_ls[i].position = Vector2(r.position.x - 20, r.end.y + 8)
+			lantern_ls[i].size = Vector2(r.size.x + 40, 26)
+			vis_idx += 1
 	partner.position = (L.partner as Rect2).position
 	play_b.position = (L.play as Rect2).position
 	nav.position = (L.nav as Rect2).position
@@ -268,11 +278,12 @@ class _Deco:
 			draw_string(bf, Vector2(bc.x - ts.x * 0.5, bc.y + ts.y * 0.28), bt, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, V10DS.NIGHT_900)
 		elif h.phone_shown and h.phone_dot:
 			draw_circle(pr.get_center() + Vector2(14, -18), 6, V10DS.ROSE_300, true, -1.0, true)
-		# threads of the three lanterns (the lanterns themselves are painted TextureRects)
+		# threads of the three lanterns (follow actual compacted lantern_tr positions)
 		for i in 3:
-			if not bool(h.shown[i]):
+			if not bool(h.shown[i]) or i >= h.lantern_tr.size():
 				continue
-			var r: Rect2 = L.lanterns[i]
+			var lt: Control = h.lantern_tr[i]
+			var r: = Rect2(lt.position, lt.size)
 			var x: = r.get_center().x
 			# the thread fades in under the header row: it never crosses the avatar ring or the nick
 			var y0: = (L.avatar as Rect2).end.y + 8.0

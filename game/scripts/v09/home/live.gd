@@ -92,15 +92,28 @@ static func build_rig10(parent: Control, sz: Vector2, show_bg: bool = true, h: S
 		if packed is PackedScene:
 			var rig: V10LiveRig = (packed as PackedScene).instantiate() as V10LiveRig
 			if rig != null:
+				# Draw teahouse background full-bleed behind the rig so 20:9 screens never show a black top band
+				if show_bg and ResourceLoader.exists("res://assets/v10/rig/mc_gown/bg.png"):
+					var bg_tr: = TextureRect.new()
+					bg_tr.name = "Rig10Backdrop"
+					bg_tr.texture = load("res://assets/v10/rig/mc_gown/bg.png")
+					bg_tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+					bg_tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+					var br: = V10Layout.bleed_rect(parent)
+					bg_tr.position = br.position
+					bg_tr.size = br.size
+					bg_tr.mouse_filter = Control.MOUSE_FILTER_IGNORE
+					parent.add_child(bg_tr)
 				rig.name = "V10LiveRig"
-				rig.show_background = show_bg
+				rig.show_background = false
 				rig.handle_input = false
 				rig.motion = 1.0 if fxl == "full" else (0.75 if fxl == "mid" else 0.5)
 				rig.auto_gestures = fxl != "min"
-				var ky: = sz.y / 1280.0
-				var k: = 0.645 * ky
+				var k_fit: = minf(sz.x / 720.0, sz.y / 1280.0)
+				var k: = 0.65 * k_fit
 				rig.scale = Vector2.ONE * k
-				rig.position = Vector2(sz.x * 0.5 - 581.0 * k, sz.y + 12.0 * ky - 1400.0 * k)
+				var tall_lift: = maxf(0.0, sz.y - 1280.0) * 0.24
+				rig.position = Vector2(sz.x * 0.5 - 581.0 * k, sz.y - tall_lift + 18.0 * k_fit - 1400.0 * k)
 				parent.add_child(rig)
 				var mc_e: = V10RigCatalog.get_rig("mc_gown")
 				var sh_cfg: Dictionary = (mc_e.get("shaders", {}) as Dictionary).get("sheen", {})

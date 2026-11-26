@@ -521,18 +521,28 @@ func _v8_round_btn(t: Texture2D, r: Rect2, k: float, cb: Callable) -> JButton:
 var btn_sound: JButton
 
 func _v8_sound_on() -> bool:
-	return bool(G.S.get("sound", true)) or bool(G.S.get("music", true))
+	if main != null and main.has_method("is_audio_on"):
+		return main.is_audio_on()
+	return not AudioServer.is_bus_mute(0) and (bool(G.S.get("sound", true)) or bool(G.S.get("music", true)))
 
 func _v8_toggle_sound() -> void :
-	var on: = not _v8_sound_on()
-	G.S.sound = on
-	G.S.music = on
-	G.save()
-	if on:
-		Sfx.cur_music = ""
-		Sfx.music("play" if mode != "zen" else "menu")
+	var on: bool
+	if main != null and main.has_method("toggle_master_mute"):
+		on = main.toggle_master_mute()
 	else:
-		Sfx.music("")
+		on = not _v8_sound_on()
+		G.S.sound = on
+		G.S.music = on
+		G.S.voice = on
+		AudioServer.set_bus_mute(0, not on)
+		G.save()
+		if on:
+			Sfx.cur_music = ""
+			Sfx.music("play" if mode != "zen" else "menu")
+		else:
+			Sfx.music("")
+			if V10Registry.wired("audio"):
+				V10Music.stop(0.15)
 	if btn_sound and is_instance_valid(btn_sound):
 		(btn_sound.get_node("Icon") as TextureRect).texture = V8Art.icon("sound" if on else "sound_off")
 
@@ -875,8 +885,8 @@ func _on_match(mid: Vector2, combo: int, gold: bool, shard: String) -> void :
 		Fx.flash_glow(fx_layer, mid, Color(V9Cutin.flash_color(G.HEROES[partner].color), 0.8), 1.4, 0.3)
 	if board != null:
 		V10PairFx.burst(fx_layer if fx_layer != null else self, mid, board.look)
-	if not from_ult and combo in [5, 10, 20] and V10Voice.has(partner, "combo%d" % combo):
-		V10Voice.combo(partner, combo)
+	if not from_ult and combo in [5, 10, 20]:
+		Sfx.say(partner, "combo")
 	Fx.ring(fx_layer, mid, Color(1, 0.85, 0.5, 0.7), 1.0)
 	if V10Registry.wired("juice"):
 		V10Juice.tile_match(mid, pair_face, combo, gold)
@@ -3106,12 +3116,12 @@ func _v10_ended(win: bool, stars: int, reward: int, secs: float, first: bool, sc
 	V10Hooks.emit_game_ended(pl)
 
 
-# Path: the 0.9 two-button row gives way to V10WinPanel (≤ 2 bars of V10WinStack, «Ещё уровень · N» + «В салон» / «В чайную»)
+# Path: clean AAA Victory bottom action panel — strictly below plate, never overlaps bonuses or screen edges
 func _v10_win_panel(ctx: Dictionary, btns: Array, stars: int, first: bool) -> void :
-	var want_sal: = mode == "" and V10Nav.salon_open() and V10SalonWinBar.want_salon_button()
 	var wctx: = {"mode": _v10_mode(), "level": lvl, "first": first, "stars": stars, "was_done": not first and mode == "",
 		"stars_before": _v10_stars_before, "stars_after": V10Salon.stars_total(),
-		"count": V10PathState.released_total(), "salon_open": want_sal, "buttons": mode == "",
+		"count": V10PathState.released_total(), "salon_open": false, "buttons": mode == "",
+		"max_bars": 0,
 		"on_more": func(n: int): main.go("play", {"level": n, "partner": partner, "v10_cfg": V10PathState.play_cfg(n)}, false)}
 	V10Hooks.emit_win_screen(wctx)
 	if mode != "":
@@ -3119,19 +3129,28 @@ func _v10_win_panel(ctx: Dictionary, btns: Array, stars: int, first: bool) -> vo
 	var wp: = V10WinPanel.make(wctx, W - 32.0)
 	var root: Control = ctx.root
 	root.add_child(wp)
-	wp.position = Vector2(16.0, float(ctx.by) + 96.0 - wp.height())
+	var wp_y: = minf(H - wp.height() - 22.0, float(ctx.by) + 96.0 - wp.height())
+	wp.position = Vector2(16.0, wp_y)
+	# Guarantee the upper result plate NEVER overlaps the bottom V10WinPanel buttons/bars
+	var plate: Control = ctx.get("plate")
+	if plate != null and is_instance_valid(plate):
+		var max_ph: = wp.position.y - plate.position.y - 16.0
+		if plate.size.y > max_ph and max_ph > 260.0:
+			plate.size.y = max_ph
+			plate.clip_contents = true
+			ctx["plate_end"] = plate.position.y + plate.size.y
 	var wpr: = Rect2(wp.position, wp.size)
-	if ctx.has("hero") and is_instance_valid(ctx.hero) and wp.position.y < float(ctx.by) - 4.0:
+	if ctx.has("hero") and is_instance_valid(ctx.hero):
 		(ctx.hero as CanvasItem).visible = false
 	for c in root.get_children():
-		if c != wp and c is JButton and not (c in btns) and (c as Control).visible:
+		if c != wp and c != plate and c is JButton and not (c in btns) and (c as Control).visible:
 			var jb: Control = c
 			if Rect2(jb.position, jb.size).intersects(wpr):
-				var ny: = wp.position.y - jb.size.y - 8.0
-				if ny > float(ctx.plate_end) + 4.0:
-					jb.position.y = ny
-				else:
-					jb.visible = false
+				jb.visible = false
+		elif c != wp and c != plate and c is RBox and (c as Control).visible:
+			var rb: Control = c
+			if Rect2(rb.position, rb.size).intersects(wpr):
+				rb.visible = false
 	wp.home.connect(func(): main.go("home"))
 	wp.salon.connect(func(): main.go("v10salon"))
 	wp.denied.connect(func(hint: String): main.toast(hint, "lock"))

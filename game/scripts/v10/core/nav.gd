@@ -463,8 +463,23 @@ class _Band:
 		mouse_filter = Control.MOUSE_FILTER_STOP  # the band eats taps between the tabs
 
 	func _draw() -> void:
-		draw_rect(Rect2(Vector2.ZERO, size), Color(V10DS.NIGHT_900, 0.94))
-		V10Plate.hairline(self, 24.0, size.x - 24.0, 0.5, Color(V10DS.GOLD_700, V10DS.HAIR_A))
+		# AAA lacquer dock: deep burgundy-night vertical gradient + double gold filigree border
+		var top_col: = Color(0.14, 0.08, 0.19, 0.97)
+		var bot_col: = Color(0.06, 0.03, 0.10, 0.99)
+		draw_polygon(
+			PackedVector2Array([Vector2.ZERO, Vector2(size.x, 0), Vector2(size.x, size.y), Vector2(0, size.y)]),
+			PackedColorArray([top_col, top_col, bot_col, bot_col])
+		)
+		# subtle warm sheen near the top edge
+		var sheen0: = Color(0.95, 0.78, 0.45, 0.12)
+		var sheen1: = Color(0.95, 0.78, 0.45, 0.0)
+		draw_polygon(
+			PackedVector2Array([Vector2(0, 2), Vector2(size.x, 2), Vector2(size.x, 22), Vector2(0, 22)]),
+			PackedColorArray([sheen0, sheen0, sheen1, sheen1])
+		)
+		# bright primary gold rim + fine inner gold hairline
+		draw_line(Vector2(0, 1.5), Vector2(size.x, 1.5), Color(0.95, 0.80, 0.48, 0.88), 2.5, true)
+		V10Plate.hairline(self, 18.0, size.x - 18.0, 5.5, Color(V10DS.GOLD_500, 0.35))
 
 
 class _Dot:

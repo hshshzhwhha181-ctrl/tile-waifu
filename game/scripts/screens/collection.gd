@@ -7,7 +7,7 @@ var H: = 1280.0
 var cur: = "mc"
 var stage: Control
 
-const ROW_Y: = V8Header.CONTENT_Y + 6.0
+const ROW_Y: = 96.0
 const AV: = 104.0
 # outfit strip cards: the name's side padding (frame rim + gap: NAME_PAD on a six-card strip's ~108 px card, growing
 # by NAME_PAD_K per px of a wider card, as the rim art and its corner flowers do) and its bottom margin above the
@@ -93,9 +93,41 @@ func _build() -> void :
 	stage.add_child(hero)
 	var oid: = G.equipped(cur)
 	if oid != "" and _unlocked(cur):
-		var fr: = UI.rbox("gold", Rect2(14, BODY_Y, W - 334, floor_y - BODY_Y - 14), 24, 4, 10)
-		stage.add_child(fr)
-		Common.living_art(fr, G.art_tex(G.ITEM[oid]), Rect2(6, 6, fr.size.x - 12, fr.size.y - 12), Vector2(0.5, 0.3))
+		var fr_w: = W - 322.0
+		var fr_h: = minf(floor_y - BODY_Y - 12.0, 740.0)
+		var fr_wrap: = Control.new()
+		fr_wrap.position = Vector2(14, BODY_Y)
+		fr_wrap.size = Vector2(fr_w, fr_h)
+		fr_wrap.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		stage.add_child(fr_wrap)
+		var fr_clip: = Control.new()
+		fr_clip.position = Vector2(4, 4)
+		fr_clip.size = Vector2(fr_w - 8.0, fr_h - 8.0)
+		fr_clip.clip_contents = true
+		fr_clip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		fr_wrap.add_child(fr_clip)
+		var atr: = TextureRect.new()
+		atr.texture = G.art_tex(G.ITEM[oid])
+		atr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		atr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+		atr.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+		atr.position = Vector2.ZERO
+		atr.size = fr_clip.size
+		atr.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		fr_clip.add_child(atr)
+		var fr_rim: = Panel.new()
+		fr_rim.position = Vector2.ZERO
+		fr_rim.size = fr_wrap.size
+		fr_rim.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var fsb: = StyleBoxFlat.new()
+		fsb.bg_color = Color(0, 0, 0, 0)
+		fsb.border_color = Color("f6d483")
+		fsb.set_border_width_all(4)
+		fsb.set_corner_radius_all(14)
+		fsb.shadow_color = Color(0.0, 0.0, 0.0, 0.42)
+		fsb.shadow_size = 10
+		fr_rim.add_theme_stylebox_override("panel", fsb)
+		fr_wrap.add_child(fr_rim)
 		hero.visible = false
 	if not unl:
 		hero.mat.set_shader_parameter("silhouette", 0.92)
@@ -190,6 +222,7 @@ func _build() -> void :
 		var card: = Control.new()
 		card.position = Vector2(cx, 44)
 		card.size = csz
+		card.clip_contents = true
 		card.pivot_offset = csz * 0.5
 		strip.add_child(card)
 		if worn and own:

@@ -112,7 +112,7 @@ func set_title(text: String) -> void :
 
 # 0.10 W1 (HUD_V2 §8.6): the currency being spent on this screen, as S-plates on the right of the bar (Numerals +
 # painted icon 24); only Желания and Лавка call it. main.refresh_currency() refreshes them (group "v10_money").
-const MONEY_ICON: = {"gems": "gem", "coins": "coin"}
+const MONEY_ICON: = {"gems": "gem", "coins": "coin", "tickets": "ticket", "moon": "moon"}
 var money_plates: = {}
 var _money_x: = 0.0
 
