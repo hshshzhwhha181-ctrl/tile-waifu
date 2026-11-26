@@ -366,6 +366,9 @@ func _build_section(c: int) -> void:
 	for k in Gen.CHAPTER:
 		var i: = gc * Gen.CHAPTER + k
 		var info: = State.node(i)
+		if info.peak and not State.peaks_shown():
+			# UX_RULES §3.5: Peaks come at L58 («туман на карте расходится»); before that the rock is not drawn
+			continue
 		var st: = State.state_of(i, cur)
 		if st == "current" and i != cur:
 			st = "open"
@@ -389,20 +392,21 @@ func _chapter_plate(sec: Control, gc: int) -> void:
 	var w: = minf(CW - 80.0, 520.0)
 	var x: = X0 + (CW - w) * 0.5
 	var plate: = UI.rbox("graphite", Rect2(x, y, w, 62), 31, 2, 10)
-	plate.borders(Color("ffe7a6"), Color("a8742a"))
+	plate.colors(Rules.C.night800, Rules.C.night800)
+	plate.borders(Rules.C.gold_line, Rules.C.gold_line)
 	sec.add_child(plate)
 	var host: = State.host_of_chapter(gc)
 	plate.add_child(Common.avatar(host, Rect2(-10, -10, 82, 82), "gold"))
-	var t1: = UI.label("Глава %d" % (c + 1), 26, Color("fff3d6"), Color(0.12, 0.05, 0.08), 4, "title", 900)
+	var t1: = UI.label("Глава %d" % (c + 1), UI.T_H3, Color("fff3d6"), Color(0.12, 0.05, 0.08), 4, "title", 900)
 	t1.position = Vector2(84, 4)
 	t1.size = Vector2(w - 220, 32)
 	plate.add_child(t1)
-	var t2: = UI.label("хозяйка: %s" % Rules.host_name(host), 17, Color("e9d9c8"))
+	var t2: = UI.label("хозяйка: %s" % Rules.host_name(host), UI.T_SMALL, Color("e9d9c8"))
 	t2.position = Vector2(86, 34)
 	t2.size = Vector2(w - 220, 24)
 	plate.add_child(t2)
 	var cs: = State.chapter_stars(gc)
-	var st: = UI.label("★ %d/%d" % [cs, State.chapter_max(gc)], 22, Color("ffd75e"), Color(0.15, 0.08, 0.02), 4, "body", 900)
+	var st: = UI.label("★ %d/%d" % [cs, State.chapter_max(gc)], UI.T_BODY, Color("ffd75e"), Color(0.15, 0.08, 0.02), 4, "body", 900)
 	st.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	st.position = Vector2(w - 150, 14)
 	st.size = Vector2(130, 34)
@@ -467,13 +471,13 @@ func _build_chest(sec: Control, gc: int, kind: String) -> void:
 		tex = Rules.icon("star_chest")
 	else:
 		tex = V8Art.misc("chest_open" if st == "claimed" else "chest_closed")
-	if st == "ready" and V9Feel.can_fx():
+	if st == "ready":
+		# a still warm glow says «ready» (UX_RULES §6.7: the screen's one breathing element is «Играть»);
+		# the caption «Открыть» carries the same news at fx_level=min
 		var glow: = UI.tex(G.fx("glow") if G.has_method("fx") else null, Rect2(-40, -40, sz.x + 80, sz.y + 80))
-		glow.modulate = Color(1.0, 0.85, 0.5, 0.65)
+		glow.modulate = Color(1.0, 0.85, 0.5, 0.5)
+		glow.name = "Glow"
 		box.add_child(glow)
-		var tw: = glow.create_tween().set_loops()
-		tw.tween_property(glow, "modulate:a", 0.25, 0.8).set_trans(Tween.TRANS_SINE)
-		tw.tween_property(glow, "modulate:a", 0.65, 0.8).set_trans(Tween.TRANS_SINE)
 	var art: = UI.tex(tex, Rect2(Vector2.ZERO, sz))
 	art.name = "Art"
 	if st == "locked":
@@ -481,19 +485,18 @@ func _build_chest(sec: Control, gc: int, kind: String) -> void:
 	elif st == "claimed":
 		art.modulate = Color(0.75, 0.72, 0.78, 0.85)
 	box.add_child(art)
-	if st == "ready":
-		var bob: = art.create_tween().set_loops()
-		bob.tween_property(art, "position:y", -8.0, 0.45).set_trans(Tween.TRANS_SINE)
-		bob.tween_property(art, "position:y", 0.0, 0.45).set_trans(Tween.TRANS_SINE)
 	var cap: = ""
 	if kind == "star":
 		cap = "★ %d/%d" % [mini(State.chapter_stars(gc), Rules.STAR_CHEST_NEED), Rules.STAR_CHEST_NEED]
 	else:
 		cap = "Сундук главы"
-	if st == "claimed":
+	if st == "ready":
+		cap = "Открыть"
+	elif st == "claimed":
 		cap = "Открыт"
-	var l: = UI.center_label(UI.label(cap, 17, Color("ffe7c4") if st != "locked" else Color("cfc6d6"), Color(0.1, 0.05, 0.08), 4, "body", 900),
+	var l: = UI.center_label(UI.label(cap, UI.T_SMALL, Color("ffe7c4") if st != "locked" else Color("cfc6d6"), Color(0.1, 0.05, 0.08), 4, "body", 900),
 		Rect2(-20, sz.y - 6, sz.x + 40, 26))
+	l.name = "Caption"
 	box.add_child(l)
 	chests["%d:%s" % [gc, kind]] = box
 
@@ -512,7 +515,7 @@ func _build_gate() -> void:
 	g.name = "ArcGate"
 	map_root.add_child(g)
 	if nxt >= Gen.WORLDS:
-		g.add_child(UI.center_label(UI.title("Конец Пути", 40, Color("fff3d6"), Color(0.2, 0.08, 0.1)), Rect2(0, 100, w, 80)))
+		g.add_child(UI.center_label(UI.title("Конец Пути", UI.T_H3, Color("fff3d6"), Color(0.2, 0.08, 0.1)), Rect2(0, 100, w, 80)))
 		return
 	var cov: = Rules.cover(nxt)
 	var rel: = State.arc_released(nxt)
@@ -528,19 +531,16 @@ func _build_gate() -> void:
 	fr.borders(Color("ffe7a6"), Color("a8742a"))
 	g.add_child(fr)
 	Common.floor_fade(g, 120, 260, Color(0.06, 0.03, 0.07), 0.92).size.x = w
-	var t1: = UI.center_label(UI.title("Арка %d · %s" % [nxt + 1, Rules.ARC_TITLES[nxt]], 30, Color("fff3d6"), Color(0.15, 0.05, 0.08)), Rect2(10, 150, w - 20, 50))
+	var t1: = UI.center_label(UI.title("Арка %d · %s" % [nxt + 1, Rules.ARC_TITLES[nxt]], UI.T_H3, Color("fff3d6"), Color(0.15, 0.05, 0.08)), Rect2(10, 150, w - 20, 50))
 	g.add_child(t1)
-	var sub: = "Откроется после Легенды арки %d" % (arc + 1) if rel else "Арка выходит с обновлением"
-	g.add_child(UI.center_label(UI.label(sub, 20, Color("e9dccb"), Color(0.08, 0.04, 0.06), 4), Rect2(10, 200, w - 20, 34)))
-	if not rel:
-		var lk: = V8Art.icon("lock")
-		if lk:
-			g.add_child(UI.tex(lk, Rect2(w * 0.5 - 34, 50, 68, 68)))
+	# closed = silhouette + «Откроется: …» (UX_RULES §6.4), no lock, no timer
+	var sub: = "Откроется после Легенды арки %d" % (arc + 1) if rel else "Откроется: с обновлением игры"
+	g.add_child(UI.center_label(UI.label(sub, UI.T_SMALL, Color("e9dccb"), Color(0.08, 0.04, 0.06), 4), Rect2(10, 200, w - 20, 34)))
 
 
 func _build_start() -> void:
 	var y: = gate_h + 10.0 * CH + 20.0
-	var l: = UI.center_label(UI.label("Начало арки · %s" % str(Gen.WORLD[arc].name), 20, Color("e9dccb"), Color(0.08, 0.04, 0.06), 4), Rect2(X0, y, CW, 34))
+	var l: = UI.center_label(UI.label("Начало арки · %s" % str(Gen.WORLD[arc].name), UI.T_SMALL, Color("e9dccb"), Color(0.08, 0.04, 0.06), 4), Rect2(X0, y, CW, 34))
 	map_root.add_child(l)
 
 
@@ -566,24 +566,37 @@ func _build_header() -> void:
 	fr.borders(Color("ffe7a6"), Color("a8742a"))
 	hdr.add_child(fr)
 	var pr: = State.arc_progress(arc)
-	var t1: = UI.title("Арка %d · %s" % [arc + 1, Rules.ARC_TITLES[arc]], 30, Color("fff6e4"), Color(0.16, 0.05, 0.08))
-	t1.position = Vector2(20, HDR_H - 96)
-	t1.size = Vector2(w - 170, 44)
-	Common.fit_line(t1, w - 170, 22)
+	var arcs_on: = State.unlocked() >= Rules.ARCS_FROM
+	var tw_: = w - (186.0 if arcs_on else 40.0)
+	var t1: = UI.title("Арка %d · %s" % [arc + 1, Rules.ARC_TITLES[arc]], UI.T_H3, Color("fff6e4"), Color(0.16, 0.05, 0.08))
+	t1.position = Vector2(20, HDR_H - 100)
+	t1.size = Vector2(tw_, 40)
+	Common.fit_line(t1, tw_, UI.T_BODY)
 	hdr.add_child(t1)
-	var sub: = UI.label("%s · пройдено %d/%d" % [str(Gen.WORLD[arc].name), pr[0], pr[1]], 19, Color("f0e2cf"), Color(0.06, 0.03, 0.05), 4)
-	sub.position = Vector2(22, HDR_H - 54)
-	sub.size = Vector2(w - 170, 26)
-	hdr.add_child(sub)
-	Common.progress_bar(hdr, Rect2(22, HDR_H - 24, w - 44, 12), float(pr[0]) / maxf(1.0, float(pr[1])), "gold")
-	var b: = JButton.make("Арки", "graphite", Rect2(w - 140, HDR_H - 98, 124, 60), null, 24)
-	b.name = "ArcsBtn"
-	b.pressed.connect(func(): Dlg.arcs_sheet(main, self))
-	hdr.add_child(b)
-	# summits chip when the player has any (the «Восходящая» frame climbs every 10)
+	# one subtitle line: the place, the progress and (from the first summit) the summits
+	var line: = State.arc_subtitle(arc)
 	if State.summits() > 0:
-		var ch: = Common.chip(hdr, Rules.icon("peak"), "Вершин: %d" % State.summits(), Rect2(w - 196, 14, 180, 40), "plum", 18)
-		ch.name = "SummitsChip"
+		line += " · вершин: %d" % State.summits()
+	var sub: = UI.label(line, UI.T_SMALL, Color("f0e2cf"), Color(0.06, 0.03, 0.05), 4)
+	sub.position = Vector2(22, HDR_H - 58)
+	sub.size = Vector2(tw_, 26)
+	sub.name = "ArcSub"
+	Common.fit_line(sub, tw_, UI.T_SMALL)
+	hdr.add_child(sub)
+	Common.progress_bar(hdr, Rect2(22, HDR_H - 24, tw_ - 4.0, 12), float(pr[0]) / maxf(1.0, float(pr[1])), "gold")
+	# «Арки» from L49 (UX_RULES §3.5): one secondary action, hit zone 80 px
+	if arcs_on:
+		var b: = JButton.make("Арки", "graphite", Rect2(w - 156, HDR_H - 90, 140, 80), null, UI.T_BODY)
+		b.name = "ArcsBtn"
+		b.set_meta("ux_role", "secondary")
+		b.pressed.connect(func(): Dlg.arcs_sheet(main, self))
+		hdr.add_child(b)
+	# «?» — the quiet help of this screen (UX_RULES §2.4, §3.4): what the Path words mean
+	var hb: = JButton.make("?", "glass", Rect2(w - 84, 2, 80, 80), null, UI.T_BODY, 40.0, false)
+	hb.name = "HelpBtn"
+	hb.set_meta("ux_role", "tertiary")
+	hb.pressed.connect(func(): Dlg.help_sheet(main, self))
+	hdr.add_child(hb)
 
 
 func _build_marker() -> void:
@@ -601,11 +614,8 @@ func _build_marker() -> void:
 	if not (who in Gen.READY_HEROES):
 		who = "mc"
 	marker.add_child(Common.avatar(who, Rect2(0, 0, 84, 84), "gold"))
+	# still: the screen's one endless motion is the breathing «Играть» (UX_RULES §6.7)
 	_place_marker(cur)
-	if V9Feel.can_fx():
-		var tw: = marker.create_tween().set_loops()
-		tw.tween_property(marker, "scale", Vector2(1.04, 0.97), 0.55).set_trans(Tween.TRANS_SINE)
-		tw.tween_property(marker, "scale", Vector2.ONE, 0.55).set_trans(Tween.TRANS_SINE)
 
 
 func _place_marker(i: int) -> void:
@@ -617,12 +627,15 @@ func _place_marker(i: int) -> void:
 
 func _build_cta() -> void:
 	var lv: = cur
-	var txt: = "Играть  %s" % Gen.code(lv)
+	var txt: = "Играть · %s" % Gen.code(lv)
 	if State.arc_of(cur) != arc:
 		txt = "К текущему уровню"
-	var r: = Rect2(X0 + 70, H - NAV_INSET - 116, CW - 140, 98)
-	cta = JButton.make(txt, "pink" if not State.is_legend(lv) else "gold", r, null, 34)
+	# the main button: ≥ 440×104, bottom third (UX_RULES §6.1); a night fade under it keeps the map nodes quiet
+	var r: = Rect2(X0 + 70, H - NAV_INSET - 122, CW - 140, 104)
+	Common.edge_shade(self, Rect2(0, r.position.y - 110, W, H - r.position.y + 110), -1, Rules.C.night900, 0.88).name = "CtaShade"
+	cta = JButton.make(txt, "pink" if not State.is_legend(lv) else "gold", r, null, UI.T_H2)
 	cta.name = "PlayCTA"
+	cta.set_meta("ux_role", "primary")
 	cta.pressed.connect(func():
 		if State.arc_of(cur) != arc:
 			switch_arc(State.arc_of(cur))
@@ -630,7 +643,10 @@ func _build_cta() -> void:
 			open_card(cur))
 	add_child(cta)
 	cta.pulse = true
-	# Огонёк пути: three cups over the CTA
+	_build_jump(r)
+	# Огонёк пути: three cups over the CTA, from L10 (UX_RULES §3.5)
+	if not Boost.opened():
+		return
 	var fl: = Boost.flame()
 	var row: = Control.new()
 	row.size = Vector2(240, 44)
@@ -639,9 +655,10 @@ func _build_cta() -> void:
 	row.name = "FlameRow"
 	add_child(row)
 	var pill: = UI.rbox("graphite", Rect2(0, 2, 240, 40), 20, 2, 8)
-	pill.borders(Color("ffe7a6"), Color("a8742a"))
+	pill.colors(Rules.C.night800, Rules.C.night800)
+	pill.borders(Rules.C.gold_line, Rules.C.gold_line)
 	row.add_child(pill)
-	var l: = UI.label("Огонёк пути", 17, Color("ffe7c4"), Color(0.1, 0.05, 0.05), 3, "body", 900)
+	var l: = UI.label("Огонёк пути", UI.T_SMALL, Color("ffe7c4"), Color(0.1, 0.05, 0.05), 3, "body", 900)
 	l.position = Vector2(14, 2)
 	l.size = Vector2(110, 40)
 	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -652,9 +669,14 @@ func _build_cta() -> void:
 		if k >= fl:
 			cup.modulate = Color(0.35, 0.32, 0.4, 0.75)
 		row.add_child(cup)
-	jump_btn = JButton.make("", "graphite", Rect2(X0 + CW - 86, r.position.y - 80, 68, 68), null, 30, 34.0)
+
+
+# «к текущему»: a quiet round button (hit 80 px), shown only while the current node is off screen
+func _build_jump(r: Rect2) -> void:
+	jump_btn = JButton.make("", "graphite", Rect2(X0 + CW - 92, r.position.y - 90, 80, 80), null, UI.T_BODY, 40.0)
 	jump_btn.name = "JumpBtn"
-	var arr: = UI.center_label(UI.label("▲", 28, Color("ffe7c4"), Color(0.1, 0.05, 0.05), 3), Rect2(0, 0, 68, 68))
+	jump_btn.set_meta("ux_role", "tertiary")
+	var arr: = UI.center_label(UI.label("▲", UI.T_BODY, Color("ffe7c4"), Color(0.1, 0.05, 0.05), 3), Rect2(0, 0, 80, 80))
 	arr.name = "Arrow"
 	jump_btn.add_child(arr)
 	jump_btn.pressed.connect(func(): scroll_to_level(cur, true))
@@ -798,7 +820,11 @@ func _tap(target) -> void:
 			if n.kind == "peak":
 				_toast("Пик откроется после босса главы")
 			else:
-				_toast("Откроется после уровня %s" % Gen.code(maxi(n.i - 1, 0)))
+				# the level before it on the main path (a Peak in between is a side rock, not «the level before»)
+				var j: = maxi(n.i - 1, 0)
+				while j > 0 and Gen.is_peak(j):
+					j -= 1
+				_toast("Откроется после уровня %s" % Gen.code(j))
 			return
 		V9Feel.sound("pop")
 		open_card(n.i)

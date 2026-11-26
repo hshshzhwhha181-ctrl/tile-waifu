@@ -552,7 +552,7 @@ func _ui() -> void:
 	await get_tree().process_frame
 	check(d10.find_child("DailyFull", true, false) != null, "10 wins: «Полная награда сегодня: 10/15»")
 	d10.queue_free()
-	# arcs sheet: 10 covers, unreleased = silhouette, no timers
+	# arcs sheet: the released arcs + ONE closed teaser (UX_RULES §6.4), silhouette «Откроется: …», no timers
 	var ar: Control = Dlg.arcs_sheet(m, map)
 	await get_tree().process_frame
 	var cards: = 0
@@ -560,8 +560,9 @@ func _ui() -> void:
 	for k in Gen.WORLDS:
 		if ar.find_child("Arc%d" % (k + 1), true, false):
 			cards += 1
-	check(cards == 10, "arcs sheet: 10 arcs")
-	check(txt.count("Арка выходит с обновлением") == Gen.WORLDS - Rules.ARCS_RELEASED, "unreleased arcs say «выходит с обновлением»")
+	check(cards == mini(Rules.ARCS_RELEASED + 1, Gen.WORLDS), "arcs sheet: released arcs + one teaser (%d)" % cards)
+	check(txt.count("Откроется: с обновлением игры") == (1 if Gen.WORLDS > Rules.ARCS_RELEASED else 0), "one closed arc says «Откроется: с обновлением игры»")
+	check(_roles_ok(ar, "arcs sheet"), "arcs sheet: one primary, ≤2 secondary, ≤2 tertiary")
 	var timer_re: = RegEx.create_from_string("\\d+\\s*(ч|мин|сек|дн)|\\d+:\\d\\d")
 	check(timer_re.search(txt) == null, "no countdown in the arcs sheet")
 	ar.queue_free()
@@ -571,7 +572,218 @@ func _ui() -> void:
 	await get_tree().process_frame
 	check(asd.find_child("HostBust", true, false) != null and asd.find_child("Yes", true, false) != null and asd.find_child("No", true, false) != null, "assist: bust, «Да, давай», «Нет, сам(а)»")
 	check("переложу стол" in _labels(asd), "assist line")
+	check(_roles_ok(asd, "assist"), "assist: «Да, давай» primary, «Нет, сам(а)» secondary")
 	asd.queue_free()
 	map.queue_free()
 	m.queue_free()
+	await get_tree().process_frame
+	await _ux()
+
+
+# ------------------------------------------------------------------ UX_RULES §10 checks on the Path screens
+
+func _all_of(root: Node) -> Array:
+	var all: = []
+	_walk(root, all)
+	return all
+
+
+func _shown(x: Node) -> bool:
+	return x is CanvasItem and (x as CanvasItem).is_visible_in_tree()
+
+
+# П-1: exactly one primary, ≤2 secondary, ≤2 tertiary (visible nodes with meta ux_role)
+func _roles_ok(root: Node, what: String) -> bool:
+	var n: = {"primary": 0, "secondary": 0, "tertiary": 0}
+	for x in _all_of(root):
+		if _shown(x) and x.has_meta("ux_role"):
+			var r: = str(x.get_meta("ux_role"))
+			if n.has(r):
+				n[r] += 1
+	var ok_: bool = n.primary == 1 and n.secondary <= 2 and n.tertiary <= 2
+	if not ok_:
+		print("  roles of %s: %s" % [what, str(n)])
+	return ok_
+
+
+# visible labels inside the viewport rect
+func _labels_on(root: Node, vs: Vector2) -> Array:
+	var out: = []
+	var view: = Rect2(Vector2.ZERO, vs)
+	for x in _all_of(root):
+		if x is Label and _shown(x) and (x as Label).text.strip_edges() != "":
+			if view.intersects((x as Label).get_global_rect()):
+				out.append(x)
+	return out
+
+
+func _sizes(labels: Array) -> Array:
+	var out: = []
+	for l in labels:
+		var ls: LabelSettings = (l as Label).label_settings
+		var fs: = ls.font_size if ls else 16
+		if not (fs in out):
+			out.append(fs)
+	out.sort()
+	return out
+
+
+func _words(labels: Array) -> int:
+	var n: = 0
+	for l in labels:
+		for w in (l as Label).text.replace("\n", " ").split(" ", false):
+			if RegEx.create_from_string("[\\p{L}\\d]").search(w) != null:
+				n += 1
+	return n
+
+
+func _main_btn_ok(b: Control, vs: Vector2) -> bool:
+	return b != null and b.size.x >= 440.0 and b.size.y >= 104.0 and b.get_global_rect().position.y >= vs.y * 2.0 / 3.0 - 1.0
+
+
+func _ux() -> void:
+	_sec = "ux"
+	var sz: = Vector2(720, 1280)
+	var m: = StubMain.new(sz)
+	add_child(m)
+	var lock_tex: = V8Art.icon("lock")
+	# fresh player: one system at a time (UX_RULES §3.5) — no Огонёк, no «Арки», no Peaks yet
+	fresh()
+	var map0 = Control.new()
+	map0.set_script(PathMap)
+	map0.size = sz
+	m.add_child(map0)
+	m.move_child(m.overlay, -1)
+	map0.build(m, {})
+	await get_tree().process_frame
+	check(map0.find_child("FlameRow", true, false) == null and map0.find_child("ArcsBtn", true, false) == null, "L1: no Огонёк pill, no «Арки» yet")
+	var c0: Control = Card.open(m, map0, 0)
+	await get_tree().process_frame
+	check(c0.find_child("Boosters", true, false) == null, "L1 card: no booster row before L10")
+	c0.free()
+	map0.free()
+	# mid player (≈L77): everything open
+	fresh()
+	for i in 76:
+		if not Gen.is_peak(i):
+			State.on_win(i, 1 + i % 3)
+	Boost.st().flame = 1
+	var map = Control.new()
+	map.set_script(PathMap)
+	map.size = sz
+	m.add_child(map)
+	m.move_child(m.overlay, -1)
+	map.build(m, {})
+	await get_tree().process_frame
+	check(map.find_child("FlameRow", true, false) != null and map.find_child("ArcsBtn", true, false) != null and map.find_child("HelpBtn", true, false) != null, "L77: Огонёк, «Арки» and «?» on the map")
+	var peaks_built: = 0
+	for i in map.nodes:
+		if Gen.is_peak(i):
+			peaks_built += 1
+	check(peaks_built > 0, "L77: Peaks on the map")
+	check(_roles_ok(map, "map"), "map: one primary («Играть»), ≤2 secondary, ≤2 tertiary")
+	check(_main_btn_ok(map.cta, sz), "map: «Играть» ≥ 440×104 in the bottom third")
+	var ml: = _labels_on(map, sz)
+	var msz: = _sizes(ml)
+	check(msz.size() <= 4 and msz[0] >= 18, "map: ≤4 type sizes, none under 18 px %s" % str(msz))
+	check(_words(ml) <= 60, "map: ≤60 words (%d)" % _words(ml))
+	var still: = true
+	var locks: = 0
+	for i in map.nodes:
+		var nd: Control = map.nodes[i]
+		if nd.is_processing():
+			still = false
+		for x in _all_of(nd):
+			if x is TextureRect and lock_tex != null and (x as TextureRect).texture == lock_tex:
+				locks += 1
+	check(still, "map nodes do not animate by themselves")
+	check(locks == 0, "closed nodes are silhouettes without locks (%d)" % locks)
+	var hit_ok: = true
+	for x in _all_of(map):
+		if x is JButton and _shown(x) and ((x as Control).size.x < 80.0 or (x as Control).size.y < 80.0):
+			hit_ok = false
+			print("  small button: ", x.name, " ", (x as Control).size)
+	check(hit_ok, "map buttons: hit zone ≥ 80 px")
+	# card: roles, main button, sizes; buying a booster asks INSIDE the card (no window over the sheet)
+	var cur: = State.current()
+	var c: Control = Card.open(m, map, cur)
+	await get_tree().process_frame
+	check(_roles_ok(c, "card"), "card: «Играть» primary, boosters + ≤1 secondary, «×» tertiary")
+	check(_main_btn_ok(c.find_child("PlayBtn", true, false), sz), "card: «Играть» ≥ 440×104 in the bottom third")
+	var cl: = _labels_on(c, sz)
+	var csz: = _sizes(cl)
+	check(csz.size() <= 4 and csz[0] >= 18, "card: ≤4 type sizes, none under 18 px %s" % str(csz))
+	check(_words(cl) <= 60, "card: ≤60 words (%d)" % _words(cl))
+	check(not ("Новое" in _labels(c)), "card: no «Новое!» sticker")
+	var kids0: = m.overlay.get_child_count()
+	var sel: Dictionary = c.get_meta("sel")
+	var buy_kind: = ""
+	for k in ["scroll", "wind", "lantern"]:
+		if not sel.has(k) and Boost.stock(k) == 0:
+			buy_kind = k
+			break
+	check(buy_kind != "", "fixture: an empty-stock booster to buy")
+	if buy_kind != "":
+		State.S().gems = 100
+		var slot: Control = c.find_child("Boost_" + buy_kind, true, false)
+		var ev: = InputEventMouseButton.new()
+		ev.button_index = MOUSE_BUTTON_LEFT
+		ev.pressed = false
+		Card._slot_input(ev, m, slot, buy_kind, sel, false, cur, "")
+		await get_tree().process_frame
+		var ask: Control = c.find_child("BuyAsk", true, false)
+		check(ask != null and m.overlay.get_child_count() == kids0, "booster purchase asks inside the card, no second window")
+		check(ask != null and ask.find_child("BuyYes", true, false) != null and "60" in _labels(ask), "the question names the price in crystals")
+		var yes: JButton = ask.find_child("BuyYes", true, false) if ask else null
+		if yes:
+			yes.pressed.emit()
+			await get_tree().process_frame
+		check(int(State.S().gems) == 40 and str(sel.get(buy_kind, "")) == "stock", "«Купить за 60»: −60 crystals, the booster is on")
+		State.S().gems = 10
+		sel.erase(buy_kind)
+		Boost.st()[buy_kind] = 0
+		Card._slot_input(ev, m, slot, buy_kind, sel, false, cur, "")
+		await get_tree().process_frame
+		var ask2: Control = c.find_child("BuyAsk", true, false)
+		check(ask2 != null and ask2.find_child("BuyYes", true, false) == null and int(State.S().gems) == 10, "not enough crystals: no buy button, nothing spent")
+	c.free()
+	# fail windows: Legendary with the jam spot and the way on = the busiest one
+	var L: = 99
+	for i in range(76, 99):
+		if not Gen.is_peak(i):
+			State.on_win(i, 2)
+	for k in 5:
+		State.on_fail(L)
+	var cfg: = State.play_cfg(L)
+	var res: = State.on_fail(L)
+	var jam: = Jam.find(cfg, Jam.demo_fail_log(cfg, 4))
+	var fw: Control = Dlg.fail_window(m, L, res, jam, Callable(), Callable())
+	await get_tree().process_frame
+	check(res.bypass and fw.find_child("BypassBtn", true, false) != null, "Legend fail: «Пройти дальше» offered")
+	check(_roles_ok(fw, "legend fail"), "Legend fail window: one primary, ≤2 secondary, ≤2 tertiary")
+	check(_main_btn_ok(fw.find_child("Retry", true, false), sz), "fail: «Ещё раз» ≥ 440×104 in the bottom third")
+	var fsz: = _sizes(_labels_on(fw, sz))
+	check(fsz.size() <= 4 and fsz[0] >= 18, "fail window: ≤4 type sizes, none under 18 px %s" % str(fsz))
+	fw.free()
+	# Legendary card with the way on: the main button keeps its full size
+	var lc: Control = Card.open(m, map, L)
+	await get_tree().process_frame
+	check(_roles_ok(lc, "legend card") and _main_btn_ok(lc.find_child("PlayBtn", true, false), sz), "Legend card: «Играть» full size, «Пройти дальше» secondary")
+	lc.free()
+	# «?» help: the Path words, ≤4 rows, ≤60 words, each in the glossary for V10Glossary
+	var hs: Control = Dlg.help_sheet(m, map)
+	await get_tree().process_frame
+	var rows: = 0
+	for x in _all_of(hs):
+		if str(x.name).begins_with("Help_"):
+			rows += 1
+	check(rows >= 2 and rows <= 4 and _words(_labels_on(hs, sz)) <= 60, "«?» sheet: %d rows, %d words" % [rows, _words(_labels_on(hs, sz))])
+	var gl_ok: = true
+	for e in Rules.GLOSSARY:
+		if str(e.get("name", "")) == "" or str(e.get("why", "")) == "" or not str(e.get("id", "")).begins_with("path."):
+			gl_ok = false
+	check(gl_ok, "glossary entries complete (id, name, why)")
+	hs.free()
+	map.free()
+	m.free()
 	await get_tree().process_frame

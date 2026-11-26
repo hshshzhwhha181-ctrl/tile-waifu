@@ -69,7 +69,8 @@ static func find(cfg: Dictionary, takes: PackedInt32Array) -> Dictionary:
 	var ref_max: = 0
 	for k in range(j, mini(end + 1, r.size())):
 		ref_max = maxi(ref_max, int(r[k]))
-	var text: = "Здесь лоток начал копиться: эталон держал в нём не больше %d, а у тебя дошло до %d." % [maxi(ref_max, 1), int(p[end])]
+	# plain words (UX_RULES §4.1): «эталон» is the solver's word, the player sees «при лучшем порядке»
+	var text: = "С этой фишки лоток начал копиться: при лучшем порядке в нём не больше %d, а у тебя дошло до %d." % [maxi(ref_max, 1), int(p[end])]
 	return {"step": j, "tile": int(takes[j]), "better": better, "player_tray": int(p[end]), "ref_tray": ref_max, "text": text}
 
 

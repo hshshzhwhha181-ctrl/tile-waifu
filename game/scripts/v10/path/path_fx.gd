@@ -1,8 +1,9 @@
 class_name V10PathFx
 extends RefCounted
 
-# 0.10 Path effects. All gated by V9Feel (S.fx_level): «минимум» keeps the press/stamp motion, drops particles,
-# fog drift and shakes.
+# 0.10 Path effects. All gated by V9Feel (S.fx_level): «минимум» keeps the press/stamp motion, drops particles
+# and fog drift. The interface never shakes (UX_RULES §6.7): the Peak drum and the summit stamp land with sound and
+# haptics only; no white flashes (the chest glow is warm gold).
 #   fog(parent, rect, density)              drifting fog layer (Peak card, locked Peak art)
 #   peak_enter(parent, size, on_done)       0.8 s fog parts, low drum on the strong beat, heavy haptic, stone rim
 #   summit_stamp(parent, size, summits, step)   «Вершин: 15» stamp slams in (+ «Восходящая» step every 10)
@@ -13,7 +14,8 @@ const Rules = preload("res://scripts/v10/path/path_rules.gd")
 const FOG = preload("res://scripts/v10/path/path_fog.gdshader")
 
 
-static func fog(parent: Control, r: Rect2, density: = 0.85, tint: = Color(0.86, 0.88, 0.96, 1.0)) -> ColorRect:
+# drift = false: a still fog (on a card / window the one endless motion of the screen is «Играть»)
+static func fog(parent: Control, r: Rect2, density: = 0.85, tint: = Color(0.86, 0.88, 0.96, 1.0), drift: = true) -> ColorRect:
 	var f: = ColorRect.new()
 	f.position = r.position
 	f.size = r.size
@@ -22,7 +24,7 @@ static func fog(parent: Control, r: Rect2, density: = 0.85, tint: = Color(0.86, 
 	m.shader = FOG
 	m.set_shader_parameter("density", density)
 	m.set_shader_parameter("tint", tint)
-	m.set_shader_parameter("speed", 0.05 if V9Feel.can_fx() else 0.0)
+	m.set_shader_parameter("speed", 0.05 if (drift and V9Feel.can_fx()) else 0.0)
 	f.material = m
 	f.name = "PathFog"
 	parent.add_child(f)
@@ -60,24 +62,31 @@ static func peak_enter(parent: Control, size: Vector2, on_done: = Callable()) ->
 		ic.scale = Vector2(1.6, 1.6)
 		ic.modulate.a = 0.0
 		root.add_child(ic)
-	var cap: = UI.center_label(UI.title("Пик", 54, Color("f2f4ff"), Color("2a2f48")), Rect2(0, size.y * 0.5 + 80, size.x, 70))
+	# a night band under the words keeps them readable over the parting fog (UX_RULES §6.2 contrast)
+	var band: = ColorRect.new()
+	band.color = Color(Rules.C.night900, 0.72)
+	band.position = Vector2(0, size.y * 0.5 + 74)
+	band.size = Vector2(size.x, 120)
+	band.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	band.modulate.a = 0.0
+	root.add_child(band)
+	var cap: = UI.center_label(UI.title("Пик", 64, Color("f2f4ff"), Color("2a2f48")), Rect2(0, size.y * 0.5 + 76, size.x, 76))
 	cap.modulate.a = 0.0
 	root.add_child(cap)
-	var sub: = UI.center_label(UI.label("Только честная игра", 22, Color("dfe4f5"), Color(0.08, 0.08, 0.14), 4), Rect2(0, size.y * 0.5 + 146, size.x, 34))
+	var sub: = UI.center_label(UI.label("Только честная игра", UI.T_BODY, Rules.C.paper100, Color(0.08, 0.08, 0.14), 4), Rect2(0, size.y * 0.5 + 152, size.x, 34))
 	sub.modulate.a = 0.0
 	root.add_child(sub)
 	var t: = root.create_tween()
 	t.tween_interval(0.12)
 	t.tween_callback(func():
 		V9Feel.sound("summon_boom", 0.55, -2.0)
-		V9Feel.haptic("clear")
-		if V9Feel.can_shake():
-			Fx.shake(parent, 9.0, 0.28))
+		V9Feel.haptic("clear"))
 	t.tween_method(func(v): m.set_shader_parameter("open", v), 0.0, 1.0, 0.8).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	t.parallel().tween_property(rim, "modulate:a", 1.0, 0.18)
 	if ic:
 		t.parallel().tween_property(ic, "modulate:a", 1.0, 0.25)
 		t.parallel().tween_property(ic, "scale", Vector2.ONE, 0.45).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	t.parallel().tween_property(band, "modulate:a", 1.0, 0.2).set_delay(0.15)
 	t.parallel().tween_property(cap, "modulate:a", 1.0, 0.3).set_delay(0.2)
 	t.parallel().tween_property(sub, "modulate:a", 1.0, 0.3).set_delay(0.35)
 	t.tween_interval(0.35)
@@ -117,7 +126,7 @@ static func summit_stamp(parent: Control, size: Vector2, summits: int, step: int
 	var ic: = Rules.icon("peak")
 	if ic:
 		disc.add_child(UI.tex(ic, Rect2(40, 26, 220, 220)))
-	var lbl: = UI.center_label(UI.label("Вершин: %d" % summits, 30, Color("fff3d6"), Color(0.14, 0.08, 0.05), 6, "title", 900), Rect2(0, 228, 300, 50))
+	var lbl: = UI.center_label(UI.label("Вершин: %d" % summits, UI.T_H2, Color("fff3d6"), Color(0.14, 0.08, 0.05), 6, "title", 900), Rect2(0, 228, 300, 50))
 	disc.add_child(lbl)
 	disc.scale = Vector2(2.4, 2.4)
 	disc.rotation = -0.35
@@ -129,13 +138,11 @@ static func summit_stamp(parent: Control, size: Vector2, summits: int, step: int
 	t.tween_callback(func():
 		V9Feel.sound("summon_boom", 0.8, -3.0)
 		V9Feel.haptic("clear")
-		if V9Feel.can_shake():
-			Fx.shake(parent, 12.0, 0.25)
 		Fx.burst(root, c, "sparkle", 30, Color(1.0, 0.92, 0.7), 1.2)
 		Fx.ring(root, c, Color(1.0, 0.9, 0.6), 2.4, 0.5))
 	t.tween_property(disc, "scale", Vector2.ONE, 0.3).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	if step > 0:
-		var cap: = UI.center_label(UI.label("Рамка «Восходящая» %s" % Rules.roman(step), 26, Color("ffe7a6"), Color(0.12, 0.06, 0.04), 5, "title", 900),
+		var cap: = UI.center_label(UI.label("Рамка «Восходящая» %s" % Rules.roman(step), UI.T_H3, Color("ffe7a6"), Color(0.12, 0.06, 0.04), 5, "title", 900),
 			Rect2(0, c.y + 170, size.x, 44))
 		cap.modulate.a = 0.0
 		root.add_child(cap)
@@ -156,12 +163,12 @@ static func chest_open(chest: Control, reward: Dictionary, fx_parent: Control) -
 		V9Feel.big(null, "reveal_sr")
 		Fx.burst(fx_parent, c, "petal", 26, Color.WHITE, 1.1)
 		Fx.burst(fx_parent, c, "sparkle", 22, Color(1.0, 0.9, 0.6), 1.0)
-		Fx.flash_glow(fx_parent, c, Color(1, 0.95, 0.8), 2.2, 0.4)
+		Fx.flash_glow(fx_parent, c, Color(1.0, 0.76, 0.42), 2.2, 0.4)
 		var k: = 0
 		for key in reward:
 			var txt: = "+%d %s" % [int(reward[key]), {"gems": "кристаллов", "coins": "монет", "petals": "Лепестков", "tickets": "билет"}.get(key, key)]
 			var tx: = clampf(c.x, 190.0, fx_parent.size.x - 190.0)
-			Fx.float_text(fx_parent, Vector2(tx, c.y - 60 - 46 * k), txt, Color("fff3d6"), 30, Color(0.25, 0.1, 0.05))
+			Fx.float_text(fx_parent, Vector2(tx, c.y - 60 - 46 * k), txt, Color("fff3d6"), UI.T_H3, Color(0.25, 0.1, 0.05))
 			k += 1)
 	t.tween_property(chest, "scale", Vector2.ONE, 0.35).set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
 

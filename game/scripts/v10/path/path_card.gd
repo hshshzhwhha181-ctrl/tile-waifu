@@ -13,6 +13,10 @@ const Boost = preload("res://scripts/v10/path/path_boosters.gd")
 const PFx = preload("res://scripts/v10/path/path_fx.gd")
 const Dlg = preload("res://scripts/v10/path/path_dialogs.gd")
 
+const TOP: = 92.0          # first content row under the title
+const PLAY_H: = 104.0      # the main button (UX_RULES §6.1)
+const BOOST_H: = 184.0     # «Огонёк пути» line + the three circles (+ the inline buy question in their place)
+
 
 static func title_of(i: int) -> String:
 	var n: = State.node(i)
@@ -43,7 +47,10 @@ static func open(main, map, i: int) -> Control:
 	var lvd: = State.level(i)
 	var mode: = "peak" if n.peak else ("legend" if n.legend else "")
 	var honest: = not Boost.can_use(mode, str(n.tier), bool(n.peak))
-	var sel: = Boost.initial_selection(i, mode)
+	# UX_RULES §3.5: Огонёк пути and the boosters come at L10; Peaks / Legends keep their grey «честная игра» row
+	var show_boost: = Boost.opened() or honest
+	var sel: = Boost.initial_selection(i, mode) if Boost.opened() else {}
+	var bypass_ready: = State.legend_bypass_ready(i)
 
 	var root: = Control.new()
 	root.size = vs
@@ -61,8 +68,9 @@ static func open(main, map, i: int) -> Control:
 	var pw: = minf(vs.x - 24.0, 700.0)
 	var intro_on: bool = str(n.intro) != ""
 	var show_daily: bool = bool(State.daily().show) and not (n.peak or n.legend)
-	var ph: = 170.0 + (170.0 if intro_on else 0.0) + (120.0 if n.peak or n.legend else 0.0) + 50.0 + (26.0 if show_daily else 0.0) \
-		+ (26.0 if State.assisted(i) else 0.0) + 8.0 + 172.0 + 128.0
+	var ph: = TOP + 62.0 + 54.0 + (170.0 if intro_on else 0.0) + (120.0 if n.peak or n.legend else 0.0) + 50.0 \
+		+ (26.0 if show_daily else 0.0) + (26.0 if State.assisted(i) else 0.0) + 8.0 + (BOOST_H + 12.0 if show_boost else 0.0) \
+		+ (92.0 if bypass_ready else 0.0) + PLAY_H + 30.0
 	ph = minf(ph, vs.y - 150.0)
 	var px: = (vs.x - pw) * 0.5
 	var py: = vs.y - ph - 18.0
@@ -72,10 +80,13 @@ static func open(main, map, i: int) -> Control:
 	p.mouse_filter = Control.MOUSE_FILTER_STOP
 	p.name = "Sheet"
 	root.add_child(p)
-	var art: = V8Art.nine("panel", Rect2(Vector2.ZERO, p.size))
+	# the sheet: one flat lacquer surface (night 700) with a 1 px gold line — no carved corners (UX_RULES §6.1, §6.8)
+	var art: = UI.rbox("graphite", Rect2(Vector2.ZERO, p.size), 12, 2, 8)
+	art.colors(Rules.C.night700, Rules.C.night800)
+	art.borders(Rules.C.gold_line, Rules.C.gold_line)
 	p.add_child(art)
 	if n.peak:
-		PFx.fog(p, Rect2(14, 14, pw - 28, ph * 0.55), 0.5, Color(0.82, 0.86, 0.98, 0.9))
+		PFx.fog(p, Rect2(8, 8, pw - 16, ph * 0.55), 0.5, Color(0.82, 0.86, 0.98, 0.9), false)
 	var close: = func():
 		if root.has_meta("closing"):
 			return
@@ -89,42 +100,43 @@ static func open(main, map, i: int) -> Control:
 		if e is InputEventMouseButton and e.pressed:
 			close.call())
 
-	# title ribbon
-	var tt: = title_of(i)
-	var rw: = clampf(Common.ribbon_w(tt, 72, 30), 360.0, pw - 110.0)
-	var rib: = Common.ribbon(p, tt, Rect2((pw - rw) * 0.5, -36, rw, 72), "gold" if n.legend else ("lav" if n.peak else "pink"), 30)
-	rib.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var xb: = JButton.make("", "graphite", Rect2(pw - 58, -18, 64, 64), null, 30)
-	if xb.box:
-		xb.box.borders(Color("ffe7a6"), Color("a8742a"))
-	xb.add_child(V8Art.rect(V8Art.icon("close"), Rect2(15, 15, 34, 34)))
-	xb.pressed.connect(close)
-	xb.name = "Close"
-	p.add_child(xb)
-
-	var y: = 54.0
 	var L: = 34.0
 	var cw: = pw - 2.0 * L
+	# title on the left field (UX_RULES §6.3), the quiet «×» on the right (hit 80 px)
+	var tt: = UI.title(title_of(i), UI.T_H2, Color("fff3e6"), Color(0.14, 0.05, 0.08))
+	tt.position = Vector2(L, 22)
+	tt.size = Vector2(cw - 90, 48)
+	tt.name = "Title"
+	Common.fit_line(tt, cw - 90, UI.T_BODY)
+	p.add_child(tt)
+	var xb: = JButton.make("", "glass", Rect2(pw - 92, 8, 80, 80), null, UI.T_BODY, 40.0, false)
+	xb.add_child(V8Art.rect(V8Art.icon("close"), Rect2(23, 23, 34, 34)))
+	xb.pressed.connect(close)
+	xb.name = "Close"
+	xb.set_meta("ux_role", "tertiary")
+	p.add_child(xb)
+
+	var y: = TOP
 	# tier pill with flames + pass rate
 	var look: = Rules.tier_look(str(n.tier))
-	var tier_name: String = "Передышка" if str(n.tier) == "easy" else str(Gen.TIER_NAMES[n.tier])
+	var tier_name: String = str(Gen.TIER_NAMES.get(str(n.tier), look.name))
 	var tp: = UI.rbox("graphite", Rect2(L, y, 250, 46), 23, 2, 8)
 	tp.colors(Color(look.bot).darkened(0.1), Color(look.bot).darkened(0.45))
 	tp.borders(Color(look.rim), Color(look.bot).darkened(0.3))
 	p.add_child(tp)
-	var tl: = UI.label(tier_name, 22, Color.WHITE, Color(0.12, 0.04, 0.08), 4, "body", 900)
+	var tl: = UI.label(tier_name, UI.T_BODY, Color.WHITE, Color(0.12, 0.04, 0.08), 4, "body", 900)
 	tl.position = Vector2(18, 0)
 	tl.size = Vector2(220, 46)
 	tl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	tp.add_child(tl)
-	tp.size.x = minf(300.0, UI.font("body", 900).get_string_size(tier_name, HORIZONTAL_ALIGNMENT_LEFT, -1, 22).x + 44.0 + 30.0 * mini(int(look.flames), 2))
+	tp.size.x = minf(300.0, UI.font("body", 900).get_string_size(tier_name, HORIZONTAL_ALIGNMENT_LEFT, -1, UI.T_BODY).x + 44.0 + 30.0 * mini(int(look.flames), 2))
 	for f in int(look.flames):
 		if f >= 2:
 			break
 		var fi: = UI.tex(Rules.icon("flame"), Rect2(tp.size.x - 40 - f * 28, 5, 34, 34))
 		tp.add_child(fi)
 	if Gen.TIERS.find(str(n.tier)) >= Gen.TIERS.find("hard"):
-		var pr: = UI.label("проходят ≈%d%%" % pass_rate(i), 21, Color("f0e2cf"), Color(0.06, 0.03, 0.05), 3)
+		var pr: = UI.label("проходят ≈%d%%" % pass_rate(i), UI.T_BODY, Color("f0e2cf"), Color(0.06, 0.03, 0.05), 3)
 		pr.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 		pr.position = Vector2(pw - L - 260, y)
 		pr.size = Vector2(260, 46)
@@ -137,19 +149,21 @@ static func open(main, map, i: int) -> Control:
 	var mechs: Array = lvd.get("mechs", [])
 	var mx: = L
 	if mechs.is_empty():
-		var l0: = UI.label("Обычный стол — только пары", 20, Color("d9cbbb"))
+		var l0: = UI.label("Обычный стол — только пары", UI.T_SMALL, Color("d9cbbb"))
 		l0.position = Vector2(L, y)
 		l0.size = Vector2(cw, 40)
+		l0.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		p.add_child(l0)
 	for m in mechs:
 		var name: String = Rules.MECH_NAMES.get(str(m), str(m))
-		var w: = UI.font("body", 900).get_string_size(name, HORIZONTAL_ALIGNMENT_LEFT, -1, 19).x + 34.0
+		var w: = UI.font("body", 900).get_string_size(name, HORIZONTAL_ALIGNMENT_LEFT, -1, UI.T_SMALL).x + 34.0
 		if mx + w > pw - L:
 			break
 		var chp: = UI.rbox("graphite", Rect2(mx, y, w, 40), 20, 2, 8)
-		chp.borders(Color("d9b98a"), Color("7a5a2a"))
+		chp.colors(Rules.C.night600, Rules.C.night800)
+		chp.borders(Rules.C.gold_line, Rules.C.gold_line)
 		p.add_child(chp)
-		var cl: = UI.center_label(UI.label(name, 19, Color("ffe9cf"), Color(0.1, 0.04, 0.05), 3, "body", 900), Rect2(0, 0, w, 40))
+		var cl: = UI.center_label(UI.label(name, UI.T_SMALL, Color("ffe9cf"), Color(0.1, 0.04, 0.05), 3, "body", 900), Rect2(0, 0, w, 40))
 		chp.add_child(cl)
 		mx += w + 10.0
 	y += 54.0
@@ -169,22 +183,26 @@ static func open(main, map, i: int) -> Control:
 		var L2: = State.legend_rec(State.arc_of(i))
 		var txt2: = "Самый трудный стол арки. Победа даёт лавр «Легенда арки %d»." % (State.arc_of(i) + 1)
 		if bool(L2.bypass):
-			txt2 = "Ты прошла дальше обходной тропой. Корона ждёт: лавр — только за победу здесь."
+			txt2 = "Путь дальше уже открыт. Лавр «Легенда арки %d» — только за победу здесь." % (State.arc_of(i) + 1)
 		_info_block(p, Rules.icon("crown"), txt2, "Попыток: %d" % int(L2.tries), Rect2(L, y, cw, 108))
 		y += 120.0
 
-	# reward
+	# reward: every number with its unit (UX_RULES §4.1.3)
 	var rw2: Dictionary = lvd.get("reward", {})
 	var st: = State.stars(i)
 	var rtxt: = ""
 	if n.peak:
-		rtxt = "За первую победу: %d" % int(Rules.reward("peak_first").get("gems", 30)) if st == 0 else "Пик покорён ★%d" % st
+		var g1: = int(Rules.reward("peak_first").get("gems", 30))
+		rtxt = "За первую победу: %d %s" % [g1, _gems_word(g1)] if st == 0 else "Пик покорён ★%d" % st
 	elif n.legend:
-		rtxt = "За первую победу: %d + лавр" % int(Rules.reward("legend_first").get("gems", 150)) if st == 0 else "Легенда пройдена ★%d" % st
+		var g2: = int(Rules.reward("legend_first").get("gems", 150))
+		rtxt = "За первую победу: %d %s и лавр" % [g2, _gems_word(g2)] if st == 0 else "Легенда пройдена ★%d" % st
 	elif st == 0:
-		rtxt = "За первое прохождение: %d + %d за каждую ★" % [int(rw2.get("gems", 2)), int(rw2.get("per_star", 2))]
+		var g3: = int(rw2.get("gems", 2))
+		rtxt = "За первое прохождение: %d %s + %d за каждую ★" % [g3, _gems_word(g3), int(rw2.get("per_star", 2))]
 	elif st < 3:
-		rtxt = "Пройдено ★%d · за новую звезду +%d" % [st, int(rw2.get("per_star", 2))]
+		var g4: = int(rw2.get("per_star", 2))
+		rtxt = "Пройдено ★%d · за новую звезду +%d %s" % [st, g4, _gems_word(g4)]
 	else:
 		rtxt = "Пройдено на ★3 · переигровка за монеты"
 	var rr: = Control.new()
@@ -193,54 +211,54 @@ static func open(main, map, i: int) -> Control:
 	rr.name = "Reward"
 	p.add_child(rr)
 	rr.add_child(UI.tex(V8Art.cur("gem"), Rect2(0, 0, 44, 44)))
-	var rl: = UI.label(rtxt, 21, Color("fff1dc"), Color(0.08, 0.04, 0.05), 3, "body", 900)
+	var rl: = UI.label(rtxt, UI.T_BODY, Color("fff1dc"), Color(0.08, 0.04, 0.05), 3, "body", 900)
 	rl.position = Vector2(52, 0)
 	rl.size = Vector2(cw - 52, 44)
 	rl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	Common.fit_line(rl, cw - 52, 16)
+	Common.fit_line(rl, cw - 52, UI.T_SMALL)
 	rr.add_child(rl)
 	y += 50.0
 	var d: = State.daily()
 	if bool(d.show) and not (n.peak or n.legend):
-		var dl: = UI.label("Полная награда сегодня: %d/%d" % [int(d.n), int(d.max)] if bool(d.full) else "Полная награда за сегодня собрана — дальше звёзды и монеты", 18, Color("e7d6c2"))
+		var dl: = UI.label("Полная награда сегодня: %d/%d" % [int(d.n), int(d.max)] if bool(d.full) else "Полная награда за сегодня собрана — дальше звёзды и монеты", UI.T_SMALL, Color("e7d6c2"))
 		dl.position = Vector2(L + 52, y - 6)
 		dl.size = Vector2(cw - 52, 26)
 		dl.name = "DailyFull"
 		p.add_child(dl)
 		y += 26.0
 	if State.assisted(i):
-		var al: = UI.label("Стол переложен удобнее · звёзды сохраняются", 18, Color("b9f0d6"))
+		var al: = UI.label("Стол переложен удобнее · звёзды сохраняются", UI.T_SMALL, Color("b9f0d6"))
 		al.position = Vector2(L + 52, y - 4)
 		al.size = Vector2(cw - 52, 26)
 		p.add_child(al)
 		y += 26.0
 	y += 8.0
 
-	# boosters: Огонёк пути + three circles
-	var bh: = 172.0
-	var by: = ph - 118.0 - bh
-	if by < y:
-		by = y
-	_boosters(main, p, i, mode, sel, honest, Rect2(L, by, cw, bh))
+	# boosters: Огонёк пути + three circles (one control, UX_RULES §3.4)
+	var play_y: = ph - PLAY_H - 30.0
+	if show_boost:
+		var by: = maxf(y, play_y - (92.0 if bypass_ready else 0.0) - 12.0 - BOOST_H)
+		_boosters(main, p, i, mode, sel, honest, Rect2(L, by, cw, BOOST_H))
 
-	# «Играть» under the thumb
-	var play_txt: = "Играть" if not n.peak else "Подняться"
-	if n.legend:
-		play_txt = "Бросить вызов"
-	var pb: = JButton.make(play_txt, "gold" if (n.legend or n.peak) else "pink", Rect2(L + 20, ph - 112, cw - 40 - (0.0 if not State.legend_bypass_ready(i) else 230.0), 92), null, 34)
+	# «Пройти дальше» after 5 Legendary fails: a quiet secondary over «Играть» (the main button keeps its full width)
+	if bypass_ready:
+		var bb: = JButton.make("Пройти дальше без лавра", "glass", Rect2(L, play_y - 92.0, cw, 80), null, UI.T_BODY, -1.0, false)
+		bb.name = "BypassBtn"
+		bb.set_meta("ux_role", "secondary")
+		bb.pressed.connect(func():
+			close.call()
+			Dlg.bypass(main, map, i))
+		p.add_child(bb)
+
+	# «Играть» under the thumb: one word for starting a level everywhere (UX_RULES §2.5), ≥ 440×104
+	var pb: = JButton.make("Играть", "gold" if (n.legend or n.peak) else "pink", Rect2(L, play_y, cw, PLAY_H), null, UI.T_H2)
 	pb.name = "PlayBtn"
+	pb.set_meta("ux_role", "primary")
 	pb.pulse = true
 	pb.pressed.connect(func():
 		close.call()
 		map.play(i, sel))
 	p.add_child(pb)
-	if State.legend_bypass_ready(i):
-		var bb: = JButton.make("Обходная тропа", "graphite", Rect2(pw - L - 230, ph - 104, 220, 76), null, 22)
-		bb.name = "BypassBtn"
-		bb.pressed.connect(func():
-			close.call()
-			Dlg.bypass(main, map, i))
-		p.add_child(bb)
 
 	# slide up with a spring
 	p.position.y = vs.y + 10.0
@@ -251,6 +269,10 @@ static func open(main, map, i: int) -> Control:
 	return root
 
 
+static func _gems_word(n: int) -> String:
+	return Rules.plural(n, "кристалл", "кристалла", "кристаллов")
+
+
 static func _info_block(p: Control, icon: Texture2D, text: String, sub: String, r: Rect2) -> void:
 	var b: = UI.rbox("graphite", r, 22, 2, 10)
 	b.colors(Color(0.12, 0.12, 0.17, 0.82), Color(0.06, 0.06, 0.09, 0.88))
@@ -258,13 +280,13 @@ static func _info_block(p: Control, icon: Texture2D, text: String, sub: String, 
 	p.add_child(b)
 	if icon:
 		b.add_child(UI.tex(icon, Rect2(10, 10, 88, 88)))
-	var l: = UI.label(text, 19, Color("eef1ff"), Color(0.04, 0.04, 0.08), 3)
+	var l: = UI.label(text, UI.T_SMALL, Color("eef1ff"), Color(0.04, 0.04, 0.08), 3)
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	l.position = Vector2(108, 8)
 	l.size = Vector2(r.size.x - 120, 64)
 	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	b.add_child(l)
-	var s: = UI.label(sub, 17, Color("b9c0dc"))
+	var s: = UI.label(sub, UI.T_SMALL, Color("b9c0dc"))
 	s.position = Vector2(108, 72)
 	s.size = Vector2(r.size.x - 120, 28)
 	b.add_child(s)
@@ -280,15 +302,19 @@ static func _intro_block(p: Control, i: int, r: Rect2) -> void:
 	p.add_child(box)
 	var av: = V8Art.emotion_avatar(host, "happy", Rect2(12, 14, 96, 96), "gold")
 	box.add_child(av)
-	var tag: = UI.center_label(UI.label("Новое!", 16, Color.WHITE, Color(0.5, 0.05, 0.2), 3, "body", 900), Rect2(14, 112, 92, 26))
-	box.add_child(tag)
 	var line: = str(Gen.INTRO_LINES.get(str(Gen.INTRO.get(i, "")), ""))
 	var mname: String = Rules.MECH_NAMES.get(str(Gen.INTRO.get(i, "")), "")
-	var l: = UI.label("%s: %s" % [Rules.host_name(host), line], 18, Color("fff1f4"), Color(0.1, 0.03, 0.06), 3)
+	# what is new — a plain caption, not a «Новое!» sticker (UX_RULES §3.6) — then her one line
+	var cap: = UI.label("%s · %s" % [Rules.host_name(host), mname] if mname != "" else Rules.host_name(host), UI.T_SMALL, Rules.C.gold300, Color(0.1, 0.03, 0.06), 3, "body", 900)
+	cap.position = Vector2(120, 10)
+	cap.size = Vector2(r.size.x - 132 - 170, 26)
+	cap.name = "MechName"
+	box.add_child(cap)
+	var l: = UI.label(line, UI.T_SMALL, Color("fff1f4"), Color(0.1, 0.03, 0.06), 3)
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	l.position = Vector2(120, 8)
-	l.size = Vector2(r.size.x - 132 - 170, r.size.y - 16)
-	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	l.position = Vector2(120, 38)
+	l.size = Vector2(r.size.x - 132 - 170, r.size.y - 46)
+	l.vertical_alignment = VERTICAL_ALIGNMENT_TOP
 	box.add_child(l)
 	# three tiles: two fly together and pop (a pair), the third shows the mechanic's twist (flip / glow / lock)
 	var stage: = Control.new()
@@ -306,7 +332,8 @@ static func _intro_block(p: Control, i: int, r: Rect2) -> void:
 	var m: = str(Gen.INTRO.get(i, ""))
 	if not V9Feel.can_fx():
 		return
-	var tw: = stage.create_tween().set_loops()
+	# shown twice, then the tiles rest (UX_RULES §6.7: one endless motion per screen — «Играть»)
+	var tw: = stage.create_tween().set_loops(2)
 	tw.tween_interval(0.5)
 	# the twist on the third tile
 	match m:
@@ -342,7 +369,8 @@ static func _boosters(main, p: Control, i: int, mode: String, sel: Dictionary, h
 	box.size = r.size
 	box.name = "Boosters"
 	p.add_child(box)
-	var head: = UI.label("Огонёк пути", 22, Color("ffe7c4"), Color(0.1, 0.05, 0.05), 3, "body", 900)
+	box.set_meta("ux_role", "secondary")
+	var head: = UI.label("Огонёк пути", UI.T_BODY, Color("ffe7c4"), Color(0.1, 0.05, 0.05), 3, "body", 900)
 	head.position = Vector2(0, 0)
 	head.size = Vector2(200, 40)
 	head.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -353,7 +381,7 @@ static func _boosters(main, p: Control, i: int, mode: String, sel: Dictionary, h
 		if k >= fl or honest:
 			cup.modulate = Color(0.35, 0.32, 0.4, 0.75)
 		box.add_child(cup)
-	var hint: = UI.label("Здесь только честная игра" if honest else ("Победа +1 чашка, провал −1" if fl < 3 else "Огонёк горит в полную силу"), 17, Color("d7c8b8"))
+	var hint: = UI.label("Здесь только честная игра" if honest else ("Победа +1 чашка, провал −1" if fl < 3 else "Огонёк горит в полную силу"), UI.T_SMALL, Color("d7c8b8"))
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	hint.position = Vector2(290, 0)
@@ -388,13 +416,75 @@ static func _slot_input(e: InputEvent, main, slot: Control, kind: String, sel: D
 		return
 	if res == "buy":
 		V9Feel.press(slot)
-		Common.confirm(main, Rules.BOOSTER_NAMES[kind], Rules.BOOSTER_HELP[kind], "gem", Rules.BOOST_PRICE,
-			func(): _buy_done(main, slot, kind, sel, honest, i, mode))
+		# the question opens IN the booster row (a sheet never opens over a sheet, UX_RULES §3.7, П-6)
+		ask_buy(main, slot, kind, sel, honest, i, mode)
 		return
 	V9Feel.press(slot, "pop" if res != "" else "tap")
 	_paint_slot(slot, kind, sel, honest)
 	if res != "" and V9Feel.can_fx():
 		Fx.burst(slot, slot.size * Vector2(0.5, 0.36), "sparkle", 10, Color(1, 0.9, 0.6), 0.5)
+
+
+# Inline question in place of the three circles: what the booster does, the price in crystals, the balance,
+# «Купить за 60» / «Отмена». Not enough crystals: the same strip says how many are missing and where they come from.
+static func ask_buy(main, slot: Control, kind: String, sel: Dictionary, honest: bool, i: int, mode: String) -> Control:
+	var box: Control = slot.get_parent()
+	var old: = box.get_node_or_null("BuyAsk")
+	if old:
+		old.free()
+	var w: = box.size.x
+	var q: = Control.new()
+	q.name = "BuyAsk"
+	q.position = Vector2(0, 44)
+	q.size = Vector2(w, box.size.y - 44)
+	q.mouse_filter = Control.MOUSE_FILTER_STOP
+	box.add_child(q)
+	var bg: = UI.rbox("graphite", Rect2(Vector2.ZERO, q.size), 12, 2, 8)
+	bg.colors(Rules.C.night800, Rules.C.night800)
+	bg.borders(Rules.C.gold_line, Rules.C.gold_line)
+	q.add_child(bg)
+	q.add_child(UI.tex(Rules.icon(kind), Rect2(10, 6, 44, 44)))
+	var have: = Boost.gems_balance()
+	var enough: = have >= Rules.BOOST_PRICE
+	var txt: = "%s: %s" % [Rules.BOOSTER_NAMES[kind], Rules.BOOSTER_HELP[kind].trim_suffix(".")]
+	var t1: = UI.label(txt, UI.T_SMALL, Rules.C.paper100, Color(0.06, 0.03, 0.05), 3, "body", 900)
+	t1.position = Vector2(62, 4)
+	t1.size = Vector2(w - 74, 26)
+	Common.fit_line(t1, w - 74, UI.T_SMALL)
+	q.add_child(t1)
+	var t2: = UI.label("У тебя %d %s" % [have, _gems_word(have)] if enough else
+		"Нужно %d %s, у тебя %d. Кристаллы дают победы на Пути и задания дня" % [Rules.BOOST_PRICE, _gems_word(Rules.BOOST_PRICE), have],
+		UI.T_SMALL, Rules.C.paper300)
+	t2.position = Vector2(62, 30)
+	t2.size = Vector2(w - 74, 26)
+	t2.name = "Balance"
+	Common.fit_line(t2, w - 74, UI.T_SMALL)
+	q.add_child(t2)
+	var by: = q.size.y - 86.0
+	var gone: = func():
+		if is_instance_valid(q):
+			q.queue_free()
+	if enough:
+		var bw: = (w - 36.0) * 0.6
+		var yes: = JButton.make("Купить за %d" % Rules.BOOST_PRICE, "graphite", Rect2(10, by, bw, 80), V8Art.cur("gem"), UI.T_BODY)
+		yes.name = "BuyYes"
+		yes.set_meta("ux_role", "secondary")
+		yes.pressed.connect(func():
+			gone.call()
+			_buy_done(main, slot, kind, sel, honest, i, mode))
+		q.add_child(yes)
+		var no: = JButton.make("Отмена", "glass", Rect2(26 + bw, by, w - 36.0 - bw, 80), null, UI.T_BODY, -1.0, false)
+		no.name = "BuyNo"
+		no.set_meta("ux_role", "tertiary")
+		no.pressed.connect(gone)
+		q.add_child(no)
+	else:
+		var ok: = JButton.make("Понятно", "glass", Rect2(10, by, w - 20, 80), null, UI.T_BODY, -1.0, false)
+		ok.name = "BuyNo"
+		ok.set_meta("ux_role", "secondary")
+		ok.pressed.connect(gone)
+		q.add_child(ok)
+	return q
 
 
 static func _buy_done(main, slot: Control, kind: String, sel: Dictionary, honest: bool, i: int, mode: String) -> void:
@@ -434,7 +524,7 @@ static func _paint_slot(slot: Control, kind: String, sel: Dictionary, honest: bo
 	if on and not honest:
 		var chk: = UI.rbox("mint", Rect2(cs - 30, -4, 34, 34), 17, 2, 6)
 		slot.add_child(chk)
-		chk.add_child(UI.center_label(UI.label("✓", 20, Color.WHITE, Color(0.05, 0.2, 0.1), 3, "body", 900), Rect2(0, 0, 34, 34)))
+		chk.add_child(UI.center_label(UI.label("✓", UI.T_SMALL, Color.WHITE, Color(0.05, 0.2, 0.1), 3, "body", 900), Rect2(0, 0, 34, 34)))
 	var cap: = ""
 	var col: = Color("e9dccb")
 	if honest:
@@ -446,7 +536,7 @@ static func _paint_slot(slot: Control, kind: String, sel: Dictionary, honest: bo
 		cap = "%s ×%d" % ["в запасе" if not on else "взят", Boost.stock(kind)]
 	else:
 		cap = "%d" % Rules.BOOST_PRICE
-	var l: = UI.center_label(UI.label(cap, 18, col, Color(0.08, 0.04, 0.05), 3, "body", 900), Rect2(-20, cs + 2, cs + 40, 28))
+	var l: = UI.center_label(UI.label(cap, UI.T_SMALL, col, Color(0.08, 0.04, 0.05), 3, "body", 900), Rect2(-20, cs + 2, cs + 40, 28))
 	slot.add_child(l)
 	if cap == "%d" % Rules.BOOST_PRICE and not honest:
 		l.position.x += 12

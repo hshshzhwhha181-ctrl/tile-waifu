@@ -26,5 +26,7 @@ void fragment() {
 	float d = abs(uv.x - 0.5) * 2.0;
 	float hole = smoothstep(open * 1.25 - 0.25, open * 1.25 + 0.05, d);
 	float a = clamp((n - 0.18) * 1.6, 0.0, 1.0) * density * mix(1.0, hole, step(0.001, open));
+	// soft edges: a fog patch on a card / window fades out instead of ending in a hard line
+	a *= smoothstep(0.0, 0.12, uv.y) * smoothstep(1.0, 0.7, uv.y) * smoothstep(0.0, 0.06, uv.x) * smoothstep(1.0, 0.94, uv.x);
 	COLOR = vec4(tint.rgb * (0.85 + 0.25 * n), a * tint.a);
 }
