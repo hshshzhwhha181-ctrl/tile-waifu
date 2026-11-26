@@ -70,8 +70,17 @@ func build(m, _args: Dictionary) -> void :
 		Common.backdrop(self, "menu", size, 0.0, 1.0, Color.WHITE, Vector2(0.5, 0.5))
 	# 0.10 W3: Маджонг-тян's living illustration rig (rig10, ≤ 1 rig and ≤ 1 video per screen, UX_RULES Г-4)
 	var bday_partner: = V10Bday.today_hero() == str(G.S.partner)
+	var want_rig10: = not bday_partner and V9HomeLive.rig10_wanted(str(G.S.partner))
+	if want_rig10 and salon_bg == "":
+		var rbg: = ColorRect.new()
+		rbg.color = V10DS.NIGHT_900
+		var rbr: = V10Layout.bleed_rect(self)
+		rbg.position = rbr.position
+		rbg.size = rbr.size
+		rbg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		add_child(rbg)
 	var rig10: V10LiveRig = null
-	if not bday_partner and V9HomeLive.rig10_wanted(str(G.S.partner)):
+	if want_rig10:
 		rig10 = V9HomeLive.build_rig10(self, size, salon_bg == "")
 	elif not bday_partner and salon_bg == "" and V9HomeLive.video_wanted(str(G.S.partner)):
 		video = V9HomeLive.build_video(self, size)

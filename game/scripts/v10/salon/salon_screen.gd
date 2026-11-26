@@ -53,7 +53,9 @@ func build(m, args: Dictionary) -> void:
 		sfx_node.call("music", "salon", 0.4)
 	var bg: = ColorRect.new()
 	bg.color = V10SalonUI.NIGHT_900
-	bg.size = size
+	var br: = V10Layout.bleed_rect(self)
+	bg.position = br.position
+	bg.size = br.size
 	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(bg)
 	_top_pad = _safe_top()
@@ -89,12 +91,14 @@ func _safe_top() -> float:
 
 func _build_header() -> void:
 	# one header band: solid night, then a 40 px fade over the map (tags and art never show through the title)
+	var br_h: = V10Layout.bleed_rect(self)
 	var band: = ColorRect.new()
 	band.color = V10SalonUI.NIGHT_900
-	band.size = Vector2(W, _header_h)
+	band.position = Vector2(br_h.position.x, br_h.position.y)
+	band.size = Vector2(br_h.size.x, _header_h - br_h.position.y)
 	band.mouse_filter = Control.MOUSE_FILTER_STOP
 	add_child(band)
-	var shade: = _vgrad(Rect2(0, _header_h, W, 40), Color(V10SalonUI.NIGHT_900, 1.0), Color(V10SalonUI.NIGHT_900, 0.0), 0.5)
+	var shade: = _vgrad(Rect2(br_h.position.x, _header_h, br_h.size.x, 40), Color(V10SalonUI.NIGHT_900, 1.0), Color(V10SalonUI.NIGHT_900, 0.0), 0.5)
 	add_child(shade)
 	var y0: = _top_pad
 	var back_b: = V10SalonButton.make("quiet", "", Rect2(12, y0 + 12, 80, 80))
@@ -113,8 +117,8 @@ func _build_header() -> void:
 	# star bank: «34» with a drawn star and the caption «звёзды Пути»
 	bank_box = Control.new()
 	bank_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	bank_box.size = Vector2(176, 88)
-	bank_box.position = Vector2(W - 92 - 8 - 176, y0 + 10)
+	bank_box.size = Vector2(204, 88)
+	bank_box.position = Vector2(W - 92 - 8 - 204, y0 + 10)
 	bank_box.draw.connect(func():
 		bank_box.draw_style_box(V10SalonUI.panel_box(Color(V10SalonUI.NIGHT_700, 0.9), 4.0, Color(V10SalonUI.GOLD_700, 0.5), 1), Rect2(Vector2.ZERO, bank_box.size))
 		bank_box.draw_colored_polygon(V10SalonUI.star_points(Vector2(38, 38), 20.0), V10SalonUI.GOLD_300))

@@ -3121,6 +3121,8 @@ func _v10_win_panel(ctx: Dictionary, btns: Array, stars: int, first: bool) -> vo
 	root.add_child(wp)
 	wp.position = Vector2(16.0, float(ctx.by) + 96.0 - wp.height())
 	var wpr: = Rect2(wp.position, wp.size)
+	if ctx.has("hero") and is_instance_valid(ctx.hero) and wp.position.y < float(ctx.by) - 4.0:
+		(ctx.hero as CanvasItem).visible = false
 	for c in root.get_children():
 		if c != wp and c is JButton and not (c in btns) and (c as Control).visible:
 			var jb: Control = c

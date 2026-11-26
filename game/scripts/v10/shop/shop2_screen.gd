@@ -8,6 +8,9 @@ var main
 
 func build(m, args: Dictionary) -> void:
 	main = m
+	position = Vector2.ZERO
+	if m is Control:
+		size = (m as Control).get_viewport_rect().size
 	if main.has_method("show_chrome"):
 		main.show_chrome(false, not (String(args.get("v10", "")) in ["pass", "purchases"]))
 	var model: = V10ShopHub.model()

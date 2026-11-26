@@ -113,7 +113,8 @@ func _art_layer() -> void:
 	var focus: = Vector2(0.6, 0.35) if k == "newbie" else Vector2(0.5, 0.4)
 	# the heroine's face never sits under the bar and the header (UX_RULES §2.2): her key art starts below them
 	var top: = 0.0 if k == "phase" else (SPINE_Y - 40.0 if k == "newbie" else 0.0)
-	var bg: = V10GUI.cover(V10GUI.tex_or_null(bg_path), Rect2(Vector2(0, top), Vector2(W, H - top)), focus)
+	var br: = V10Layout.bleed_rect(self)
+	var bg: = V10GUI.cover(V10GUI.tex_or_null(bg_path), Rect2(Vector2(br.position.x, top), Vector2(br.size.x, br.end.y - top)), focus)
 	banner_root.add_child(bg)
 	if k == "phase":
 		_phase_cards()
