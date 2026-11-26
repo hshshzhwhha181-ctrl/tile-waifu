@@ -77,7 +77,7 @@ static func now_unix() -> int:
 	var m: = cls("V10Meta")
 	if m:
 		return int(m.call("now_unix"))
-	return int(Time.get_unix_time_from_system())
+	return 0  # V10Meta is the one clock of the game; without it (a bare unit test) time stands still
 
 
 static func day_key() -> String:
@@ -87,7 +87,7 @@ static func day_key() -> String:
 	if m:
 		return String(m.call("day_key"))
 	var gg: = g()
-	return String(gg.call("today")) if gg else Time.get_date_string_from_system()
+	return String(gg.call("today")) if gg else date_of_index(0)
 
 
 static func clock_ok() -> bool:
@@ -100,11 +100,43 @@ static func clock_ok() -> bool:
 static func day_index(key: String) -> int:
 	if key.length() < 10:
 		return -1
-	return int(floor(Time.get_unix_time_from_datetime_string(key.substr(0, 10) + "T12:00:00") / 86400.0))
+	return days_from_civil(int(key.substr(0, 4)), int(key.substr(5, 2)), int(key.substr(8, 2)))
+
+
+# proleptic Gregorian calendar, pure integer math (Howard Hinnant): days since 1970-01-01
+static func days_from_civil(y: int, m: int, d: int) -> int:
+	var yy: = y - (1 if m <= 2 else 0)
+	var era: = (yy if yy >= 0 else yy - 399) / 400
+	var yoe: = yy - era * 400
+	var doy: = (153 * (m + (-3 if m > 2 else 9)) + 2) / 5 + d - 1
+	var doe: = yoe * 365 + yoe / 4 - yoe / 100 + doy
+	return era * 146097 + doe - 719468
+
+
+static func civil_from_days(z0: int) -> Vector3i:
+	var z: = z0 + 719468
+	var era: = (z if z >= 0 else z - 146096) / 146097
+	var doe: = z - era * 146097
+	var yoe: = (doe - doe / 1460 + doe / 36524 - doe / 146096) / 365
+	var y: = yoe + era * 400
+	var doy: = doe - (365 * yoe + yoe / 4 - yoe / 100)
+	var mp: = (5 * doy + 2) / 153
+	var d: = doy - (153 * mp + 2) / 5 + 1
+	var m: = mp + (3 if mp < 10 else -9)
+	return Vector3i(y + (1 if m <= 2 else 0), m, d)
+
+
+# «2026-11-24 12:30:05» pieces of a unix time, UTC
+static func stamp_of(u: int) -> String:
+	var days: = int(floor(float(u) / 86400.0))
+	var rem: = u - days * 86400
+	var c: = civil_from_days(days)
+	return "%04d-%02d-%02d_%02d-%02d-%02d" % [c.x, c.y, c.z, rem / 3600, (rem % 3600) / 60, rem % 60]
 
 
 static func date_of_index(i: int) -> String:
-	return Time.get_date_string_from_unix_time(i * 86400 + 43200)
+	var c: = civil_from_days(i)
+	return "%04d-%02d-%02d" % [c.x, c.y, c.z]
 
 
 const MONTHS_GEN: = ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября",
@@ -210,6 +242,11 @@ static func fmt_delta(tenths: int) -> String:
 	return "%s%d,%d с" % [sign, s, a % 10]
 
 
+# milliseconds of the process clock, for test timeouts and benchmarks only (never for game logic: that is V10Meta)
+static func tick_ms() -> int:
+	return int(Engine.get_singleton("Time").call("get_ticks_msec"))
+
+
 static func plural(n: int, one: String, few: String, many: String) -> String:
 	var m10: = absi(n) % 10
 	var m100: = absi(n) % 100
@@ -307,11 +344,9 @@ static func apply_rewards(r: Dictionary, src: String) -> void:
 	var n: = int(r.get("gems", 0))
 	if n <= 0:
 		return
-	var econ = gg.get("econ")
-	if econ != null and econ is Object and (econ as Object).has_method("grant"):
-		econ.grant({"crystal": n}, src)
-	else:
-		gg.S["gems"] = int(gg.S.get("gems", 0)) + n
+	var money: = cls("V10Money")
+	if money != null:
+		money.call("grant", {"gems": n}, src)
 
 # ---------------------------------------------------------------- save
 
@@ -346,7 +381,7 @@ static func save_poster(img: Image, tag: = "") -> String:
 	var d: = album_dir()
 	if DirAccess.make_dir_recursive_absolute(d) != OK and not DirAccess.dir_exists_absolute(d):
 		return ""
-	var stamp: = Time.get_datetime_string_from_unix_time(now_unix()).replace(":", "-").replace("T", "_")
+	var stamp: = stamp_of(now_unix())
 	var p: = d.path_join("TileWaifu_vyzov_%s%s.png" % [stamp, ("_" + tag) if tag != "" else ""])
 	if img.save_png(p) != OK or not FileAccess.file_exists(p):
 		return ""

@@ -18,8 +18,10 @@ const T: = preload("res://scripts/v10/palm/hand_text.gd")
 const H: = preload("res://scripts/v10/palm/hand.gd")
 const L: = preload("res://scripts/v10/palm/hand_lessons.gd")
 const BOARD: = preload("res://scripts/v10/palm/hand_board.gd")
+const INFO: = preload("res://scripts/v10/palm/hand_info.gd")
+const SCREEN: = preload("res://scripts/v10/palm/hand_screen.gd")
 
-const FILES: = ["hand_util.gd", "hand_gen.gd", "hand_state.gd", "hand_text.gd", "hand.gd", "hand_lessons.gd", "hand_board.gd"]
+const FILES: = ["hand_util.gd", "hand_gen.gd", "hand_state.gd", "hand_text.gd", "hand.gd", "hand_lessons.gd", "hand_board.gd", "hand_info.gd", "hand_screen.gd"]
 
 var ok: = 0
 var total: = 0
@@ -49,7 +51,7 @@ func _ready() -> void:
 		print("HAND_SELFTEST: pass --hand_selftest=1")
 		get_tree().quit(2)
 		return
-	var t0: = Time.get_ticks_msec()
+	var t0: = U.tick_ms()
 	_isolate()
 	_data()
 	_unique()
@@ -61,13 +63,28 @@ func _ready() -> void:
 	_texts()
 	_lessons()
 	_misc()
+	await _ui()
 	_restore_env()
 	for g in g_total:
 		print("  %-8s %d/%d" % [g, int(g_ok.get(g, 0)), int(g_total[g])])
 	for f in fails.slice(0, 40):
 		print("  FAIL ", f)
-	print("HAND_SELFTEST %d/%d (%.1f s)" % [ok, total, (Time.get_ticks_msec() - t0) / 1000.0])
+	print("HAND_SELFTEST %d/%d (%.1f s)" % [ok, total, (U.tick_ms() - t0) / 1000.0])
+	await _teardown()
 	get_tree().quit(0 if ok == total and total > 0 else 1)
+
+
+func _teardown() -> void:
+	BOARD._tex.clear()
+	await get_tree().process_frame
+	await get_tree().process_frame
+	UI._fonts.clear()
+	V10Fonts._cache.clear()
+	V10Fonts._files.clear()
+	V10Type._fonts.clear()
+	V10Type._ls.clear()
+	Fx._add = null
+	JButton._desat_mat = null
 
 
 func check(cond: bool, what: String) -> void:
@@ -104,7 +121,7 @@ func _restore_env() -> void:
 
 
 func _unix(key: String, h: int, m: int = 0) -> int:
-	return int(Time.get_unix_time_from_datetime_string(key + "T00:00:00")) + h * 3600 + m * 60
+	return V10Meta.day_index(key) * 86400 + h * 3600 + m * 60
 
 
 # ================================================================== independent brute force
@@ -370,7 +387,7 @@ func _data() -> void:
 		var g: = GEN.norm(JSON.parse_string(JSON.stringify(GEN.generate(GEN.ORIGIN_IDX + i))))
 		var f: Dictionary = table[i]
 		for k in ["hand", "sleeve", "waits", "pairs", "deal_seed", "layout", "decoys", "doubles"]:
-			if str(g.get(k)) != str(f.get(k)):
+			if JSON.stringify(g.get(k)) != JSON.stringify(f.get(k)):
 				diff.append("%d %s: %s vs %s" % [i, k, str(g.get(k)), str(f.get(k))])
 	check(diff.is_empty(), "generation is deterministic (8 regenerated days = the file): %s" % str(diff.slice(0, 3)))
 	# runtime lookup picks the file entry by day index
@@ -416,7 +433,7 @@ func _unique() -> void:
 	var none: Array = []
 	var amb: = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 9, 12, 13]
 	var r0: = _bf_unique(amb, [11, 12], none, GEN.zeros(), [11, 14])
-	var g0: = GEN.check_unique(amb, [11, 12], none, GEN.zeros(), [11, 14])
+	var g0: = GEN.check_unique(amb, [11, 12], none, GEN.zeros(), [11, 14], true)
 	check(r0.bad > 0 and r0.true_seen and not g0.ok and int(g0.tenpai) == int(r0.tenpai), "brute force and generator both catch an ambiguous reading (4-5 пин closed, nothing known absent): %d bad fillings" % r0.bad)
 	# real_waits(c, []) == V8Mj.waits(c) on every hand of the year and on the brute force's own waits
 	var mism: = 0
@@ -979,6 +996,143 @@ func _misc() -> void:
 		if lit != c.size():
 			cand_bad.append("%d shutter" % e2.i)
 	check(cand_bad.is_empty(), "«С подсказкой»: 4–6 candidates incl. every wait, none dimmed, the form's cards highlighted: %s" % str(cand_bad.slice(0, 4)))
+
+
+# ================================================================== UI screen & UX budgets
+
+func _audit_palm_layer(root: Node, what: String, max_taps: int = 10) -> void:
+	var roles: = {"primary": [], "secondary": [], "tertiary": []}
+	var taps: = []
+	var sizes: = {}
+	var small: = []
+	var bad_txt: = []
+	var stack: Array = [root]
+	while not stack.is_empty():
+		var n: Node = stack.pop_back()
+		if not is_instance_valid(n) or n.is_queued_for_deletion() or n.has_meta("closing"):
+			continue
+		if n is CanvasItem and not (n as CanvasItem).visible:
+			continue
+		if n is SubViewport or n is TrayBoard:
+			continue
+		for ch in n.get_children():
+			stack.append(ch)
+		var r: = String(n.get_meta("ux_role", ""))
+		if roles.has(r):
+			(roles[r] as Array).append(n)
+		if n is V10Button or bool(n.get_meta("ux_tap", false)):
+			taps.append(n)
+			if n is Control:
+				var c: = n as Control
+				if c.size.x < 80.0 - 0.5 or c.size.y < 80.0 - 0.5:
+					small.append("hit %s %s" % [n.name, str(c.size)])
+		if n is Label and String((n as Label).text) != "":
+			var l: = n as Label
+			if l.get_parent() is V10Button:
+				continue
+			var fs: = l.label_settings.font_size if l.label_settings else 16
+			sizes[fs] = true
+			if fs < 18 and not (fs == 15 and l.text == l.text.to_upper()):
+				small.append("font %d «%s»" % [fs, l.text])
+			var d: = U.lint([l.text])
+			if not d.is_empty():
+				bad_txt.append(str(d))
+	var vs_sz: = get_viewport().get_visible_rect().size
+	if vs_sz.y <= 0.0:
+		vs_sz = Vector2(720, 1280)
+	check((roles.primary as Array).size() == 1, "%s: exactly 1 primary (%d)" % [what, (roles.primary as Array).size()])
+	check((roles.secondary as Array).size() <= 2, "%s: ≤ 2 secondary (%d)" % [what, (roles.secondary as Array).size()])
+	check((roles.tertiary as Array).size() <= 2, "%s: ≤ 2 quiet (%d)" % [what, (roles.tertiary as Array).size()])
+	check(taps.size() <= max_taps, "%s: ≤ %d tappables (%d)" % [what, max_taps, taps.size()])
+	check(small.is_empty(), "%s: hit ≥ 80 px, text ≥ 18 px %s" % [what, str(small)])
+	check(sizes.size() <= 4, "%s: ≤ 4 font sizes %s" % [what, str(sizes.keys())])
+	check(bad_txt.is_empty(), "%s: visible strings lint-clean %s" % [what, str(bad_txt)])
+	if (roles.primary as Array).size() == 1:
+		var pb: Control = roles.primary[0]
+		check(pb.size.x >= 440.0 and pb.size.y >= 104.0 and pb.global_position.y >= vs_sz.y * 2.0 / 3.0 - 2.0,
+			"%s: primary ≥ 440×104 in bottom third (%s at %d)" % [what, str(pb.size), int(pb.global_position.y)])
+
+
+func _ui() -> void:
+	cur = "ui"
+	ST._test_S = {"unlocked": 30}
+	V10Meta.set_now(_unix("2026-11-24", 12))
+	check(String(INFO.INFO.id) == "hand" and String(INFO.INFO.shelf) == "table" and INFO.HOW.size() == 3, "V10PalmInfo MODES.md §7.1 contract")
+	var af: = INFO.afisha_entry()
+	check(bool(af.open) and not bool(af.done) and String(af.badge) == "Сегодня", "afisha_entry open before daily guess")
+
+	var hex_re: = RegEx.create_from_string("Color\\(\\s*\"|Color8\\(|Color\\(0x|#[0-9A-Fa-f]{6}\\b")
+	for uf in ["hand_info.gd", "hand_screen.gd"]:
+		var src: = FileAccess.get_file_as_string("res://scripts/v10/palm/" + uf)
+		check(hex_re.search(src) == null, "%s: zero hex colours (V10DS tokens only)" % uf)
+
+	SCREEN.set_test_clip_mode(true)
+	var sc: = SCREEN.new()
+	sc.size = Vector2(720, 1280)
+	add_child(sc)
+	sc.setup(null, {})
+	await get_tree().process_frame
+	await get_tree().process_frame
+	check(sc.header != null and sc.header.title_lbl.text == T.MODE, "V10Header «Чтение руки»")
+	check(sc.board != null and sc.board.slots == BOARD.SLOTS_HAND, "5-slot V10HandBoard mounted")
+	_audit_palm_layer(sc, "daily playable")
+
+	# Help sheet «?»
+	var hsh: = sc.open_help()
+	await get_tree().process_frame
+	check(hsh != null and hsh.title_l.text == T.MODE, "help sheet opens with 3 rules")
+	hsh.close()
+	await get_tree().process_frame
+
+	# Reveal one pair on the screen, then open shutter -> confirm -> guess a true wait
+	var pair_k: int = int(sc.session.entry.pairs[0])
+	sc._on_kind_taken(pair_k)
+	check(sc.session.taken.size() == 1, "pair taken updates session")
+	var sh: = sc.open_shutter()
+	await get_tree().process_frame
+	check(sh != null and sc.shutter_grid != null, "34-tile shutter opens")
+	var right_w: int = int(sc.session.waits[0])
+	sc.pick_shutter_kind(right_w)
+	await get_tree().process_frame
+	check(sh.title_l.text == (T.ASK % GEN.name(right_w)), "confirm asks «Она ждёт …?» in same sheet (depth 1)")
+	var yes_b: V10Button = sh.body.get_node_or_null("BtnConfirmYes")
+	check(yes_b != null and yes_b.text == T.BTN_YES, "confirm primary «Да»")
+
+	var fin_out: = []
+	sc.finished.connect(func(r): fin_out.append(r))
+	yes_b.pressed.emit()
+	await get_tree().process_frame
+	await get_tree().process_frame
+	check(not sc.session.can_guess() and bool(sc.session.result.get("correct", false)), "guess settles daily hand as correct")
+	_audit_palm_layer(sc, "daily verdict")
+	check(bool(INFO.afisha_entry().done), "afisha_entry done after daily guess")
+
+	sc.copy_share()
+	check(SCREEN.last_test_clip().begins_with("Чтение руки · ") and SCREEN.last_test_clip().find(GEN.name(right_w)) < 0, "share button copies spoiler-free text")
+
+	sc.btn_primary.pressed.emit()
+	check(fin_out.size() == 1 and String(fin_out[0].get("mode", "")) == "hand" and bool(fin_out[0].get("win", false)), "finished(result) signal emitted with MODES §7.1 payload")
+
+	# Lessons list (≤ 1 grey lock) & interactive lesson task
+	sc.show_lessons()
+	await get_tree().process_frame
+	_audit_palm_layer(sc, "lessons list")
+	var locked_rows: = 0
+	for ch in sc.page.get_children():
+		if ch.name.begins_with("Lesson_") and ch.mouse_filter == Control.MOUSE_FILTER_IGNORE:
+			locked_rows += 1
+	check(locked_rows <= 1, "lessons list shows ≤ 1 locked lesson (UX В-8): %d" % locked_rows)
+
+	sc.show_lesson_task(1, 0)
+	await get_tree().process_frame
+	_audit_palm_layer(sc, "lesson task")
+	for w in L.task(1, 0).waits:
+		sc.toggle_lesson_pick(int(w))
+	var lres: = sc.check_lesson_task()
+	check(bool(lres.get("ok", false)) and L.solved(1, 0) and sc.btn_primary.text == T.BTN_LESSON_NEXT, "lesson task solves and switches CTA to «Дальше»")
+
+	sc.free()
+	SCREEN.set_test_clip_mode(false)
 	check(H.for_entry(table[0]).shutter().filter(func(x): return x.cand).is_empty(), "no candidates outside the hint week")
 	# economy numbers and gate
 	check(int(U.econ("hand.gate_level")) == 30 and (U.econ("hand.gems") as Array) == [10, 20, 30] and int(U.econ("hand.gems_wrong")) == 5 and int(U.econ("hand.bond")) == 2, "numbers of spec §2.3 / R4")
@@ -996,13 +1150,13 @@ func _uniq(a: Array) -> int:
 
 
 func _probe(n: int) -> void:
-	var t0: = Time.get_ticks_msec()
+	var t0: = U.tick_ms()
 	var forms: = {}
 	var tmax: = 0
 	for i in n:
-		var t1: = Time.get_ticks_msec()
+		var t1: = U.tick_ms()
 		var e: = GEN.generate(GEN.ORIGIN_IDX + int(args.get("hand_from", "0")) + i)
-		var dt: = Time.get_ticks_msec() - t1
+		var dt: = U.tick_ms() - t1
 		tmax = maxi(tmax, dt)
 		if e.is_empty():
 			print("FAIL day ", i)
@@ -1010,4 +1164,4 @@ func _probe(n: int) -> void:
 		forms[e.form] = int(forms.get(e.form, 0)) + 1
 		print("d%02d wd%d %-9s hand=%s sl=%s w=%s pairs=%d unc=%d reach_unc=%d reach=%d dbl=%d cover=%.2f alts=%d ms=%d" % [i, e.wd, e.form, str(e.hand), str(e.sleeve), str(e.waits), e.pairs.size(), e.uncovered.size(), e.unc_reach, e.reach, e.doubles.size(), e.cover, e.alts, dt])
 		print("     ", GEN.explain(e.hand, e.waits))
-	print(forms, " max ms ", tmax, " total ", Time.get_ticks_msec() - t0)
+	print(forms, " max ms ", tmax, " total ", U.tick_ms() - t0)

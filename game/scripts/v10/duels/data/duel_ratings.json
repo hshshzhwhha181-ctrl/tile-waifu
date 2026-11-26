@@ -1,375 +1,375 @@
 {
 	"ver": 1,
-	"generated": "2026-11-24",
+	"generated": "2026-11-26",
 	"games_per_cell": 32,
 	"anchor": {
 		"bot": "casual",
 		"rating": 1000
 	},
 	"bots": {
-		"novice": 755,
+		"novice": 753,
 		"casual": 1000,
-		"regular": 1212,
-		"steady": 1438,
+		"regular": 1206,
+		"steady": 1424,
 		"keen": 1642,
-		"skilled": 1892,
-		"expert": 2256,
-		"master": 2531
+		"skilled": 1884,
+		"expert": 2253,
+		"master": 2536
 	},
 	"ratings": {
 		"mc": [
-			715,
-			1068,
-			1419,
-			1719,
-			1985
+			494,
+			909,
+			1271,
+			1599,
+			1967
 		],
 		"rin": [
-			743,
-			1071,
-			1340,
-			1645,
-			1914
+			690,
+			1034,
+			1319,
+			1621,
+			1820
 		],
 		"hana": [
-			673,
-			1064,
-			1506,
-			1949,
-			2340
+			455,
+			965,
+			1343,
+			1931,
+			2319
 		],
 		"yue": [
-			609,
-			996,
-			1412,
-			1731,
-			2107
+			773,
+			1164,
+			1489,
+			1749,
+			2123
 		],
 		"nova": [
-			727,
-			1045,
-			1409,
-			1838,
-			2078
+			773,
+			1082,
+			1457,
+			1870,
+			2163
 		],
 		"tsubame": [
-			639,
-			969,
-			1360,
-			1731,
-			2069
+			637,
+			965,
+			1354,
+			1725,
+			2065
 		],
 		"miel": [
-			749,
-			1086,
-			1378,
-			1697,
-			1914
+			747,
+			1082,
+			1371,
+			1691,
+			1909
 		],
 		"lian": [
-			732,
-			1064,
-			1464,
-			1750,
-			2017
+			730,
+			1060,
+			1457,
+			1745,
+			2013
 		],
 		"jess": [
-			666,
-			1019,
-			1419,
-			1770,
-			2088
+			664,
+			1015,
+			1412,
+			1764,
+			2084
 		],
 		"tsuru": [
-			624,
-			1075,
-			1499,
-			2017,
-			2335
+			623,
+			1071,
+			1492,
+			2013,
+			2334
 		],
 		"kohaku": [
-			673,
-			1082,
-			1412,
-			1689,
-			2045
+			671,
+			1078,
+			1405,
+			1684,
+			2041
 		],
 		"shirin": [
-			539,
-			996,
-			1357,
-			1727,
-			2074
+			537,
+			992,
+			1350,
+			1722,
+			2070
 		],
 		"mari": [
-			576,
-			1000,
-			1450,
-			2017,
+			575,
+			996,
+			1443,
+			2013,
 			2371
 		],
 		"hibana": [
-			704,
-			965,
-			1326,
-			1641,
-			1909
+			702,
+			961,
+			1319,
+			1635,
+			1904
 		],
 		"nemi": [
-			679,
-			1122,
-			1409,
-			1884,
-			2122
+			677,
+			1118,
+			1402,
+			1879,
+			2118
 		],
 		"zlata": [
-			666,
-			1064,
-			1398,
-			1789,
-			2093
+			664,
+			1060,
+			1392,
+			1784,
+			2089
 		],
 		"minamo": [
-			624,
-			1108,
-			1447,
-			1766,
-			2045
+			623,
+			1103,
+			1440,
+			1760,
+			2041
 		],
 		"kira": [
-			704,
-			1079,
-			1391,
-			1781,
-			2102
+			702,
+			1074,
+			1385,
+			1776,
+			2099
 		],
 		"vesper": [
-			721,
-			1115,
-			1467,
-			1884,
-			2151
+			719,
+			1111,
+			1461,
+			1879,
+			2148
 		],
 		"sigrid": [
-			738,
-			1060,
-			1447,
-			1612,
-			1863
+			736,
+			1056,
+			1440,
+			1606,
+			1858
 		]
 	},
 	"raw": {
 		"mc": [
-			715,
-			1068,
-			1419,
-			1719,
-			1985
+			494,
+			909,
+			1271,
+			1599,
+			1967
 		],
 		"rin": [
-			743,
-			1071,
-			1340,
-			1645,
-			1914
+			690,
+			1034,
+			1319,
+			1621,
+			1820
 		],
 		"hana": [
-			673,
-			1064,
-			1506,
-			1949,
-			2340
+			455,
+			965,
+			1343,
+			1931,
+			2319
 		],
 		"yue": [
-			609,
-			996,
-			1412,
-			1731,
-			2107
+			773,
+			1164,
+			1489,
+			1749,
+			2123
 		],
 		"nova": [
-			727,
-			1045,
-			1409,
-			1838,
-			2078
+			773,
+			1082,
+			1457,
+			1870,
+			2163
 		],
 		"tsubame": [
-			639,
-			969,
-			1360,
-			1731,
-			2069
+			637,
+			965,
+			1354,
+			1725,
+			2065
 		],
 		"miel": [
-			749,
-			1086,
-			1378,
-			1697,
-			1914
+			747,
+			1082,
+			1371,
+			1691,
+			1909
 		],
 		"lian": [
-			732,
-			1064,
-			1464,
-			1750,
-			2017
+			730,
+			1060,
+			1457,
+			1745,
+			2013
 		],
 		"jess": [
-			666,
-			1019,
-			1419,
-			1770,
-			2088
+			664,
+			1015,
+			1412,
+			1764,
+			2084
 		],
 		"tsuru": [
-			624,
-			1075,
-			1499,
-			2017,
-			2335
+			623,
+			1071,
+			1492,
+			2013,
+			2334
 		],
 		"kohaku": [
-			673,
-			1082,
-			1412,
-			1689,
-			2045
+			671,
+			1078,
+			1405,
+			1684,
+			2041
 		],
 		"shirin": [
-			539,
-			996,
-			1357,
-			1727,
-			2074
+			537,
+			992,
+			1350,
+			1722,
+			2070
 		],
 		"mari": [
-			576,
-			1000,
-			1450,
-			2017,
+			575,
+			996,
+			1443,
+			2013,
 			2371
 		],
 		"hibana": [
-			704,
-			965,
-			1326,
-			1641,
-			1909
+			702,
+			961,
+			1319,
+			1635,
+			1904
 		],
 		"nemi": [
-			679,
-			1122,
-			1409,
-			1884,
-			2122
+			677,
+			1118,
+			1402,
+			1879,
+			2118
 		],
 		"zlata": [
-			666,
-			1064,
-			1398,
-			1789,
-			2093
+			664,
+			1060,
+			1392,
+			1784,
+			2089
 		],
 		"minamo": [
-			624,
-			1108,
-			1447,
-			1766,
-			2045
+			623,
+			1103,
+			1440,
+			1760,
+			2041
 		],
 		"kira": [
-			704,
-			1079,
-			1391,
-			1781,
-			2102
+			702,
+			1074,
+			1385,
+			1776,
+			2099
 		],
 		"vesper": [
-			721,
-			1115,
-			1467,
-			1884,
-			2151
+			719,
+			1111,
+			1461,
+			1879,
+			2148
 		],
 		"sigrid": [
-			738,
-			1060,
-			1447,
-			1612,
-			1863
+			736,
+			1056,
+			1440,
+			1606,
+			1858
 		]
 	},
 	"monotone_fixed": 0,
 	"her_score_x100": {
 		"mc": [
 			{
-				"novice": 53,
-				"casual": 5,
+				"novice": 3,
+				"casual": 3,
 				"regular": 0,
-				"steady": 0,
+				"steady": 8,
 				"keen": 0,
 				"skilled": 0,
 				"expert": 0,
 				"master": 0
 			},
 			{
-				"novice": 91,
-				"casual": 69,
-				"regular": 22,
+				"novice": 73,
+				"casual": 36,
+				"regular": 3,
 				"steady": 3,
 				"keen": 0,
 				"skilled": 0,
-				"expert": 0,
-				"master": 0
-			},
-			{
-				"novice": 100,
-				"casual": 97,
-				"regular": 83,
-				"steady": 50,
-				"keen": 5,
-				"skilled": 6,
-				"expert": 0,
-				"master": 0
-			},
-			{
-				"novice": 100,
-				"casual": 100,
-				"regular": 98,
-				"steady": 89,
-				"keen": 75,
-				"skilled": 9,
-				"expert": 0,
-				"master": 0
-			},
-			{
-				"novice": 100,
-				"casual": 100,
-				"regular": 100,
-				"steady": 95,
-				"keen": 98,
-				"skilled": 72,
 				"expert": 6,
+				"master": 0
+			},
+			{
+				"novice": 100,
+				"casual": 84,
+				"regular": 67,
+				"steady": 22,
+				"keen": 0,
+				"skilled": 0,
+				"expert": 0,
+				"master": 3
+			},
+			{
+				"novice": 100,
+				"casual": 100,
+				"regular": 89,
+				"steady": 97,
+				"keen": 38,
+				"skilled": 0,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 100,
+				"casual": 98,
+				"regular": 97,
+				"steady": 100,
+				"keen": 95,
+				"skilled": 73,
+				"expert": 3,
 				"master": 0
 			}
 		],
 		"rin": [
 			{
-				"novice": 50,
-				"casual": 14,
-				"regular": 2,
+				"novice": 41,
+				"casual": 8,
+				"regular": 0,
 				"steady": 0,
 				"keen": 0,
 				"skilled": 0,
 				"expert": 0,
-				"master": 0
+				"master": 3
 			},
 			{
-				"novice": 91,
-				"casual": 63,
-				"regular": 27,
-				"steady": 0,
+				"novice": 88,
+				"casual": 53,
+				"regular": 22,
+				"steady": 3,
 				"keen": 3,
 				"skilled": 0,
 				"expert": 0,
@@ -377,21 +377,11 @@
 			},
 			{
 				"novice": 100,
-				"casual": 97,
+				"casual": 91,
 				"regular": 73,
 				"steady": 30,
-				"keen": 2,
+				"keen": 5,
 				"skilled": 0,
-				"expert": 3,
-				"master": 0
-			},
-			{
-				"novice": 100,
-				"casual": 100,
-				"regular": 100,
-				"steady": 75,
-				"keen": 64,
-				"skilled": 2,
 				"expert": 0,
 				"master": 0
 			},
@@ -399,30 +389,8 @@
 				"novice": 100,
 				"casual": 100,
 				"regular": 100,
-				"steady": 92,
-				"keen": 94,
-				"skilled": 56,
-				"expert": 2,
-				"master": 3
-			}
-		],
-		"hana": [
-			{
-				"novice": 28,
-				"casual": 6,
-				"regular": 6,
-				"steady": 3,
-				"keen": 0,
-				"skilled": 0,
-				"expert": 0,
-				"master": 3
-			},
-			{
-				"novice": 86,
-				"casual": 75,
-				"regular": 16,
-				"steady": 3,
-				"keen": 0,
+				"steady": 81,
+				"keen": 48,
 				"skilled": 3,
 				"expert": 0,
 				"master": 0
@@ -430,9 +398,41 @@
 			{
 				"novice": 100,
 				"casual": 100,
-				"regular": 94,
-				"steady": 59,
-				"keen": 27,
+				"regular": 100,
+				"steady": 86,
+				"keen": 83,
+				"skilled": 42,
+				"expert": 0,
+				"master": 3
+			}
+		],
+		"hana": [
+			{
+				"novice": 6,
+				"casual": 0,
+				"regular": 0,
+				"steady": 3,
+				"keen": 0,
+				"skilled": 0,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 78,
+				"casual": 52,
+				"regular": 14,
+				"steady": 0,
+				"keen": 0,
+				"skilled": 0,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 100,
+				"casual": 98,
+				"regular": 83,
+				"steady": 28,
+				"keen": 0,
 				"skilled": 0,
 				"expert": 0,
 				"master": 0
@@ -440,11 +440,115 @@
 			{
 				"novice": 100,
 				"casual": 100,
+				"regular": 98,
+				"steady": 100,
+				"keen": 89,
+				"skilled": 59,
+				"expert": 8,
+				"master": 0
+			},
+			{
+				"novice": 100,
+				"casual": 100,
 				"regular": 100,
-				"steady": 98,
-				"keen": 94,
-				"skilled": 58,
-				"expert": 9,
+				"steady": 100,
+				"keen": 100,
+				"skilled": 98,
+				"expert": 78,
+				"master": 3
+			}
+		],
+		"yue": [
+			{
+				"novice": 52,
+				"casual": 17,
+				"regular": 6,
+				"steady": 0,
+				"keen": 0,
+				"skilled": 0,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 95,
+				"casual": 84,
+				"regular": 38,
+				"steady": 11,
+				"keen": 0,
+				"skilled": 0,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 100,
+				"casual": 95,
+				"regular": 89,
+				"steady": 78,
+				"keen": 13,
+				"skilled": 0,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 100,
+				"casual": 100,
+				"regular": 92,
+				"steady": 89,
+				"keen": 78,
+				"skilled": 27,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 100,
+				"casual": 100,
+				"regular": 100,
+				"steady": 100,
+				"keen": 98,
+				"skilled": 95,
+				"expert": 25,
+				"master": 0
+			}
+		],
+		"nova": [
+			{
+				"novice": 56,
+				"casual": 9,
+				"regular": 3,
+				"steady": 3,
+				"keen": 3,
+				"skilled": 0,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 97,
+				"casual": 66,
+				"regular": 27,
+				"steady": 3,
+				"keen": 0,
+				"skilled": 0,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 100,
+				"casual": 100,
+				"regular": 91,
+				"steady": 66,
+				"keen": 5,
+				"skilled": 0,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 100,
+				"casual": 98,
+				"regular": 100,
+				"steady": 91,
+				"keen": 98,
+				"skilled": 45,
+				"expert": 0,
 				"master": 0
 			},
 			{
@@ -454,111 +558,7 @@
 				"steady": 100,
 				"keen": 100,
 				"skilled": 97,
-				"expert": 78,
-				"master": 11
-			}
-		],
-		"yue": [
-			{
-				"novice": 19,
-				"casual": 11,
-				"regular": 0,
-				"steady": 3,
-				"keen": 0,
-				"skilled": 0,
-				"expert": 0,
-				"master": 0
-			},
-			{
-				"novice": 89,
-				"casual": 52,
-				"regular": 11,
-				"steady": 0,
-				"keen": 0,
-				"skilled": 0,
-				"expert": 0,
-				"master": 3
-			},
-			{
-				"novice": 98,
-				"casual": 95,
-				"regular": 83,
-				"steady": 56,
-				"keen": 5,
-				"skilled": 0,
-				"expert": 0,
-				"master": 0
-			},
-			{
-				"novice": 97,
-				"casual": 98,
-				"regular": 98,
-				"steady": 91,
-				"keen": 73,
-				"skilled": 16,
-				"expert": 3,
-				"master": 0
-			},
-			{
-				"novice": 100,
-				"casual": 100,
-				"regular": 100,
-				"steady": 100,
-				"keen": 97,
-				"skilled": 91,
-				"expert": 25,
-				"master": 0
-			}
-		],
-		"nova": [
-			{
-				"novice": 55,
-				"casual": 2,
-				"regular": 2,
-				"steady": 3,
-				"keen": 0,
-				"skilled": 0,
-				"expert": 0,
-				"master": 0
-			},
-			{
-				"novice": 83,
-				"casual": 66,
-				"regular": 23,
-				"steady": 3,
-				"keen": 0,
-				"skilled": 0,
-				"expert": 0,
-				"master": 0
-			},
-			{
-				"novice": 100,
-				"casual": 100,
-				"regular": 84,
-				"steady": 42,
-				"keen": 9,
-				"skilled": 0,
-				"expert": 0,
-				"master": 0
-			},
-			{
-				"novice": 100,
-				"casual": 100,
-				"regular": 94,
-				"steady": 94,
-				"keen": 83,
-				"skilled": 47,
-				"expert": 2,
-				"master": 0
-			},
-			{
-				"novice": 100,
-				"casual": 100,
-				"regular": 100,
-				"steady": 100,
-				"keen": 94,
-				"skilled": 84,
-				"expert": 25,
+				"expert": 34,
 				"master": 0
 			}
 		],
@@ -1380,5 +1380,5 @@
 			0.5
 		]
 	},
-	"secs": 108
+	"secs": 112
 }

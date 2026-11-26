@@ -730,7 +730,7 @@ func _refund_pair() -> void:
 	var extra: = int(play.gained) - _gained_base
 	if extra == 0:
 		return
-	G.S.gems = int(G.S.gems) - extra
+	V10Money.grant({"gems": -extra}, "duel_pair_refund")
 	play.gained = _gained_base
 	if play.fx_layer:
 		for i in range(play.fx_layer.get_child_count() - 1, -1, -1):

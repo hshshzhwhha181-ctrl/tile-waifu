@@ -63,7 +63,7 @@ func _ready() -> void:
 	U.album_dir_override = OS.get_user_data_dir().path_join("ch_selftest_photos")
 	U.reward_sink = func(r: Dictionary, src: String): paid.append({"r": r, "src": src})
 	_profile(SAVE_A, "Ника Ветер")
-	var t0: = Time.get_ticks_msec()
+	var t0: = U.tick_ms()
 	_codec()
 	_typos()
 	_crockford()
@@ -84,13 +84,29 @@ func _ready() -> void:
 		print("CHALLENGE %-9s %d/%d" % [s, int(sec_ok.get(s, 0)), int(sec_total[s])])
 	if not fails.is_empty():
 		print("CHALLENGE fails: %d" % fails.size())
-	print("CHALLENGE time %.1f s, rendering %s" % [(Time.get_ticks_msec() - t0) / 1000.0, "on" if rendering else "off (headless: poster pixels skipped)"])
+	print("CHALLENGE time %.1f s, rendering %s" % [(U.tick_ms() - t0) / 1000.0, "on" if rendering else "off (headless: poster pixels skipped)"])
 	print("CHALLENGE_SELFTEST %d/%d" % [ok, total])
 	for p in [SAVE_A, SAVE_B]:
 		for q in [p, p.get_basename() + ".tmp.json", p.get_basename() + ".bak.json"]:
 			if FileAccess.file_exists(q):
 				DirAccess.remove_absolute(ProjectSettings.globalize_path(q))
+	await _teardown()
 	get_tree().quit(0 if ok == total and total > 0 else 1)
+
+
+func _teardown() -> void:
+	if main and is_instance_valid(main):
+		main.queue_free()
+		main = null
+	await get_tree().process_frame
+	await get_tree().process_frame
+	UI._fonts.clear()
+	V10Fonts._cache.clear()
+	V10Fonts._files.clear()
+	V10Type._fonts.clear()
+	V10Type._ls.clear()
+	Fx._add = null
+	JButton._desat_mat = null
 
 
 # a separate save file per profile: wiped, loaded fresh, a nick, the tutorial done
@@ -310,7 +326,8 @@ func _nick() -> void:
 	check(C.nick_suffix("бля") == "", "no suffix for a bad nick")
 	check(C.nick_suffix("") == "", "no suffix without a nick")
 	var p: = {"mode": 1, "gen": 0, "key": 2, "tenths": 700, "stars": 3}
-	check(C.share_text(p, {"nick": "пиздец"}).find(":") == C.share_text(p, {"nick": "пиздец"}).find("Код вызова:") + 10, "share text drops a bad nick")
+	var st_bad: = C.share_text(p, {"nick": "пиздец"})
+	check(st_bad.rfind(":") == st_bad.find("Код вызова:") + 10 and not st_bad.contains("пиздец"), "share text drops a bad nick")
 
 # ---------------------------------------------------------------- deal
 
@@ -449,16 +466,12 @@ func _rewards() -> void:
 	# texts
 	for k in ST.REASON_TEXT:
 		check(U.bad_words(String(ST.REASON_TEXT[k])).is_empty(), "reason text clean: %s" % k)
-	# apply_rewards without a sink: G.econ.grant when the economy is wired, else S.gems
+	# apply_rewards without a sink: V10Money.grant updates both econ wallet and G.S.gems mirror
 	U.reward_sink = Callable()
-	var g0: = int(G.S.gems)
-	var econ = G.get("econ")
-	if econ == null:
-		U.apply_rewards({"gems": 5}, "challenge_win")
-		check(int(G.S.gems) == g0 + 5, "apply_rewards → S.gems +5 when the economy facade is not wired")
-		G.S.gems = g0
-	else:
-		check(econ.has_method("grant"), "apply_rewards → G.econ.grant")
+	var g0: = V10Money.bal("gems")
+	U.apply_rewards({"gems": 5}, "challenge_win")
+	check(V10Money.bal("gems") == g0 + 5 and int(G.S.gems) == g0 + 5, "apply_rewards → V10Money.grant (+5 crystals)")
+	V10Money.grant({"gems": -5}, "challenge_selftest_restore")
 	U.reward_sink = func(r: Dictionary, src: String): paid.append({"r": r, "src": src})
 	# the save key
 	var S: = {}
@@ -537,10 +550,13 @@ func _boot_main() -> void:
 	add_child(main)
 	await get_tree().process_frame
 	await get_tree().process_frame
-	# the title splash (skipped by --shots in the demo) is not part of this test
+	# the title splash (skipped by --shots in the demo) is hidden so its _wait_tap coroutine never sees a freed node
 	for c in main.get_children():
 		if not c in [main.screen_root, main.topbar, main.navbar, main.overlay, main.trans, main.finger]:
-			c.queue_free()
+			if c is CanvasItem:
+				(c as CanvasItem).visible = false
+			if c is Control:
+				(c as Control).mouse_filter = Control.MOUSE_FILTER_IGNORE
 	await get_tree().process_frame
 
 
@@ -758,8 +774,8 @@ func _ch_of(p: Dictionary, nick: String) -> Dictionary:
 
 func _bot(pl: Control, max_s: = 60.0) -> bool:
 	var b = pl.get("board")
-	var t0: = Time.get_ticks_msec()
-	while is_instance_valid(pl) and is_instance_valid(b) and b.board_count() > 0 and (Time.get_ticks_msec() - t0) < max_s * 1000.0:
+	var t0: = U.tick_ms()
+	while is_instance_valid(pl) and is_instance_valid(b) and b.board_count() > 0 and (U.tick_ms() - t0) < max_s * 1000.0:
 		if b.input_on:
 			var t = b.solver_move()
 			if t:
@@ -810,12 +826,15 @@ func _e2e() -> void:
 	await _wait(0.4)
 	check(sc.state == "card" and sc.cur.deal.ok and String(sc.cur.dc.nick) == "Ника Ветер", "friend: «Вставить» → the card of Ника Ветер")
 	check(ST.no_pay_reason(C.core(ctx.p)) == "", "friend: a win would pay")
+	var dc_b: Dictionary = sc.cur.dc.duplicate(true)
+	check(not SCR.can_throw_from_victory({"unlocked": 15}) and SCR.can_throw_from_victory({"unlocked": 16}), "Victory ⋯ gate: hidden before L15, open from L15")
+	check(SCR.victory_more_item(pa if is_instance_valid(pa) else sc, 45.0, 3, {"unlocked": 10}).is_empty(), "Victory ⋯ item empty before L15")
 	sc.play()
 	await _wait(2.4)
 	var pb: Control = main.screen
 	check(String(pb.get("mode")) == "challenge", "friend: the run starts")
 	check(int(pb.get("ch_fingerprint")) == fp_a, "friend: the SAME deal as the author's (board fingerprint)")
-	check(D.deal_hash(ctx.p) == D.deal_hash(sc.cur.dc), "friend: the same deal hash")
+	check(D.deal_hash(ctx.p) == D.deal_hash(dc_b), "friend: the same deal hash")
 	var gb: = int(G.S.gems)
 	var won_b: = await _bot(pb)
 	check(won_b, "friend: the table is cleared")
@@ -874,8 +893,16 @@ func _files() -> void:
 	var n: = 0
 	for f in ALL_FILES:
 		var src2: = FileAccess.get_file_as_string("res://scripts/v10/duels/challenge/" + f)
+		var in_banned: = false
 		for line in src2.split("\n"):
-			if line.strip_edges().begins_with("#"):
+			var st_line: = line.strip_edges()
+			if st_line.begins_with("#"):
+				continue
+			if st_line.begins_with("const UI_BANNED"):
+				in_banned = true
+			if in_banned:
+				if "]" in st_line:
+					in_banned = false
 				continue
 			for m in lit.search_all(line):
 				var s: = m.get_string(1)

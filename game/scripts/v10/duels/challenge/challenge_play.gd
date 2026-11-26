@@ -27,13 +27,20 @@ func build(m, args: Dictionary) -> void:
 	super.build(m, args)
 	if mode == "challenge":
 		CH_RUN.attach(self, args.challenge)
-		ch_gems_lock = int(G.S.gems)
+		ch_gems_lock = V10Money.bal("gems")
+
+
+# whatever crystals the table paid on its own go back through the same door they came in by
+func _ch_hold_gems() -> void:
+	var over: = V10Money.bal("gems") - ch_gems_lock
+	if over > 0:
+		V10Money.grant({"gems": -over}, "challenge_hold")
 
 
 func _process(dt: float) -> void:
 	super._process(dt)
-	if ch_gems_lock >= 0 and int(G.S.gems) > ch_gems_lock:
-		G.S.gems = ch_gems_lock
+	if ch_gems_lock >= 0 and V10Money.bal("gems") > ch_gems_lock:
+		_ch_hold_gems()
 
 
 func _v6_setup(args: Dictionary) -> bool:
@@ -142,7 +149,7 @@ func _on_clear() -> void:
 	if not is_inside_tree():
 		return
 	if ch_gems_lock >= 0:
-		G.S.gems = mini(int(G.S.gems), ch_gems_lock)
+		_ch_hold_gems()
 		ch_gems_lock = -1
 	var run: = CH_RUN.of(self)
 	if run:

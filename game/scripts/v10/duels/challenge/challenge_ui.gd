@@ -49,13 +49,17 @@ static func quiet(icon: String, on_press: Callable, px: = 48) -> V10Button:
 
 static func text(t: String, role: String, sz: int, color: Color, w: = 0.0, lines: = 1, on_art: = false) -> Label:
 	var l: = V10Type.label(t, role, sz, color, on_art)
-	if w > 0.0:
-		l.size = Vector2(w, V10Type.line_h(sz) * lines)
-		l.custom_minimum_size = Vector2(w, 0)
 	if lines > 1:
 		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		l.max_lines_visible = lines
 		l.vertical_alignment = VERTICAL_ALIGNMENT_TOP
+	else:
+		l.clip_text = true
+	if w > 0.0:
+		var box: = Vector2(w, V10Type.line_h(sz) * lines)
+		l.custom_minimum_size = Vector2(w, 0)
+		l.size = box
+		l.set_deferred("size", box)
 	return l
 
 

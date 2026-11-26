@@ -15,6 +15,9 @@ const D: = preload("res://scripts/v10/duels/duel_state.gd")
 const SIM: = preload("res://scripts/v10/duels/duel_sim.gd")
 const RUN: = preload("res://scripts/v10/duels/duel_run.gd")
 const PLAY2: = preload("res://scripts/v10/duels/duel_play.gd")
+const INFO: = preload("res://scripts/v10/duels/duel_info.gd")
+const VS: = preload("res://scripts/v10/duels/duel_vs.gd")
+const SCREEN: = preload("res://scripts/v10/duels/duel_screen.gd")
 
 var args: = {}
 var ok: = 0
@@ -51,7 +54,7 @@ func _run() -> void:
 		await _shots(String(args.duel_shots))
 		get_tree().quit(0)
 		return
-	var t0: = Time.get_ticks_msec()
+	var t0: = U.tick_ms()
 	U.no_disk = true
 	_elo()
 	_seasons()
@@ -66,9 +69,26 @@ func _run() -> void:
 	_reset_test_state()
 	U.no_disk = false
 	await _real_matches()
-	print("DUEL_SELFTEST time %.1f s" % ((Time.get_ticks_msec() - t0) / 1000.0))
+	await _ui_screen()
+	print("DUEL_SELFTEST time %.1f s" % ((U.tick_ms() - t0) / 1000.0))
 	print("DUEL_SELFTEST %d/%d" % [ok, total])
+	await _teardown()
 	get_tree().quit(0 if ok == total else 1)
+
+
+func _teardown() -> void:
+	if main and is_instance_valid(main):
+		main.queue_free()
+		main = null
+	await get_tree().process_frame
+	await get_tree().process_frame
+	UI._fonts.clear()
+	V10Fonts._cache.clear()
+	V10Fonts._files.clear()
+	V10Type._fonts.clear()
+	V10Type._ls.clear()
+	Fx._add = null
+	JButton._desat_mat = null
 
 
 func _reset_test_state() -> void:
@@ -125,7 +145,7 @@ func _elo() -> void:
 
 func _seasons() -> void:
 	var s1: = U.season_start(U.SEASON_ONE)
-	check("season 1 starts Mon 23 Nov 2026 04:00 MSK", s1 == Time.get_unix_time_from_datetime_string("2026-11-23T01:00:00"), str(s1))
+	check("season 1 starts Mon 23 Nov 2026 04:00 MSK", s1 == V10Meta.day_index("2026-11-23") * 86400 + 3600, str(s1))
 	check("season is 28 days", U.season_end(U.SEASON_ONE) - s1 == 28 * 86400)
 	check("season id at its edges", U.season_id(s1) == U.SEASON_ONE and U.season_id(s1 - 1) == U.SEASON_ONE - 1)
 	check("season num", U.season_num(U.SEASON_ONE) == 1 and U.season_num(U.SEASON_ONE + 1) == 2)
@@ -478,12 +498,14 @@ func _clear_main() -> void:
 		if c in [main.screen_root, main.topbar, main.navbar, main.overlay, main.trans, main.finger]:
 			continue
 		if c is CanvasItem and not c.name.begins_with("V"):
-			c.queue_free()
+			(c as CanvasItem).visible = false
+			if c is Control:
+				(c as Control).mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 
 func _wait_end(run, secs: float) -> bool:
-	var t0: = Time.get_ticks_msec()
-	while is_instance_valid(run) and not run.finished and (Time.get_ticks_msec() - t0) < secs * 1000.0:
+	var t0: = U.tick_ms()
+	while is_instance_valid(run) and not run.finished and (U.tick_ms() - t0) < secs * 1000.0:
 		await get_tree().process_frame
 	return is_instance_valid(run) and run.finished
 
@@ -492,7 +514,9 @@ func _real_matches() -> void:
 	await _boot_main()
 	G.S.rp = 2000
 	G.S.level_partner = "mc"
-	G.S.gems = 500
+	G.S.shards["rin"] = 99
+	G.S.shards["hana"] = 99
+	V10Money.grant({"gems": 500 - V10Money.bal("gems")}, "duel_selftest_init")
 	var d: = D.st()
 	RUN.auto_gap = 0.32
 	RUN.auto_notice = 0.6
@@ -597,6 +621,132 @@ func _real_matches() -> void:
 	RUN.auto_gap = 0.0
 
 
+func _audit_duel_ui(root: Node, what: String) -> Dictionary:
+	var roles: = {"primary": [], "secondary": [], "tertiary": []}
+	var taps: = []
+	var sizes: = {}
+	var small: = []
+	var bad: = []
+	var texts: = []
+	var words: = 0
+	var word_re: = RegEx.create_from_string("[A-Za-zА-Яа-яЁё]{2,}")
+	var stack: Array = [root]
+	while not stack.is_empty():
+		var n: Node = stack.pop_back()
+		if not is_instance_valid(n) or n.is_queued_for_deletion():
+			continue
+		if n is CanvasItem and not (n as CanvasItem).visible:
+			continue
+		if n is SubViewport:
+			continue
+		for ch in n.get_children():
+			stack.append(ch)
+		var r: = String(n.get_meta("ux_role", ""))
+		if roles.has(r):
+			(roles[r] as Array).append(n)
+		if n is V10Button or bool(n.get_meta("ux_tap", false)):
+			taps.append(n)
+			if n is Control:
+				var c: = n as Control
+				if c.size.x < 80.0 - 0.5 or c.size.y < 80.0 - 0.5:
+					small.append("hit %s %s" % [n.name, str(c.size)])
+		if n is Label and String((n as Label).text) != "":
+			var l: = n as Label
+			if l.get_parent() is V10Button:
+				continue
+			var fs: = l.label_settings.font_size if l.label_settings else 16
+			sizes[fs] = true
+			if fs < 18 and not (fs == 15 and l.text == l.text.to_upper()):
+				small.append("font %d «%s»" % [fs, l.text])
+			texts.append(l.text)
+			for w in l.text.split(" ", false):
+				if word_re.search(w) != null:
+					words += 1
+			var b: = U.lint(l.text)
+			if not b.is_empty():
+				bad.append("«%s» %s" % [l.text, str(b)])
+	var vs_sz: = get_viewport().get_visible_rect().size
+	check("%s: 1 primary" % what, (roles.primary as Array).size() == 1, str((roles.primary as Array).size()))
+	check("%s: ≤ 2 secondary" % what, (roles.secondary as Array).size() <= 2, str((roles.secondary as Array).size()))
+	check("%s: ≤ 2 quiet" % what, (roles.tertiary as Array).size() <= 2, str((roles.tertiary as Array).size()))
+	check("%s: ≤ 10 tappables" % what, taps.size() <= 10, str(taps.size()))
+	check("%s: hit ≥ 80, text ≥ 18" % what, small.is_empty(), str(small))
+	check("%s: ≤ 4 font sizes" % what, sizes.size() <= 4, str(sizes.keys()))
+	check("%s: ≤ 60 words" % what, words <= 60, str(words))
+	check("%s: strings lint-clean" % what, bad.is_empty(), str(bad))
+	if (roles.primary as Array).size() == 1:
+		var pb: Control = roles.primary[0]
+		check("%s: primary ≥ 440×104 in bottom third" % what,
+			pb.size.x >= 440.0 and pb.size.y >= 104.0 and pb.global_position.y >= vs_sz.y * 2.0 / 3.0 - 2.0,
+			"%s at %d" % [str(pb.size), int(pb.global_position.y)])
+	return {"texts": texts, "words": words}
+
+
+func _ui_screen() -> void:
+	check("V10DuelInfo MODES §7.1 contract", String(INFO.INFO.id) == "duels" and String(INFO.INFO.shelf) == "trials" and INFO.HOW.size() == 3)
+	var hex_re: = RegEx.create_from_string("Color\\(\\s*\"|Color8\\(|Color\\(0x|#[0-9A-Fa-f]{6}\\b")
+	for uf in ["duel_info.gd", "duel_vs.gd", "duel_screen.gd"]:
+		var src: = FileAccess.get_file_as_string("res://scripts/v10/duels/" + uf)
+		check("%s: zero hex colours" % uf, hex_re.search(src) == null)
+
+	for c in main.overlay.get_children():
+		c.queue_free()
+	if main.screen and is_instance_valid(main.screen):
+		main.screen.queue_free()
+	await get_tree().process_frame
+
+	G.S.rp = 2000
+	var sc: = SCREEN.new()
+	sc.position = main.CR.position
+	sc.size = main.CR.size
+	main.screen_root.add_child(sc)
+	main.screen = sc
+	main.screen_id = "duels"
+	sc.setup(main, {"tab": "ranked"})
+	await get_tree().process_frame
+	await get_tree().process_frame
+
+	var r_aud: = _audit_duel_ui(sc, "duels ranked")
+	var r_joined: = " ".join(r_aud.texts)
+	check("ranked shows ИИ · героиня, шанс, подлость and Дуэль недели",
+		r_joined.contains("ИИ · героиня") and r_joined.contains("шанс:") and r_joined.contains("Подлость:") and r_joined.contains("Дуэль недели"),
+		r_joined)
+	check("ranked primary «В бой»", sc.btn_primary != null and sc.btn_primary.text == "В бой")
+
+	sc.select_tab("friendly")
+	await get_tree().process_frame
+	var f_aud: = _audit_duel_ui(sc, "duels friendly")
+	var f_joined: = " ".join(f_aud.texts)
+	check("friendly shows подлость and ИИ · героиня", f_joined.contains("Подлость:") and f_joined.contains("ИИ · героиня"))
+
+	# Help sheet «?»
+	var hsh: = sc.open_help()
+	await get_tree().process_frame
+	check("duels help sheet opens", hsh != null and hsh.title_l.text == "Дуэли")
+	hsh.close()
+	await get_tree().process_frame
+
+	# VS overlay plan: full first time, 0.5 s afterwards, tap skips immediately
+	D.reset_session()
+	check("vs_plan full first time", bool(D.vs_plan().full))
+	var vs_done: = [false]
+	var vs_node: = VS.new()
+	vs_node.size = Vector2(720, 1280)
+	main.overlay.add_child(vs_node)
+	vs_node.setup({"partner": "mc", "rival": "yue", "form": 4})
+	vs_node.done.connect(func(): vs_done[0] = true)
+	check("vs_plan short after first", not bool(D.vs_plan().full) and is_equal_approx(float(D.vs_plan().secs), 0.5))
+	vs_node.finish_vs()
+	check("vs skip finishes immediately", vs_done[0])
+	vs_node.queue_free()
+
+	# Button to «Вызов по коду» navigates cleanly
+	sc.open_challenge()
+	await get_tree().process_frame
+	await get_tree().process_frame
+	check("button to Вызов по коду opens challenge screen", String(main.screen_id) == "challenge" and main.screen is V10ChallengeScreen)
+
+
 func btn_caps(play) -> bool:
 	for k in ["hint", "undo", "shuffle"]:
 		var cap: String = play.get("btn_" + k).get_node("Cap").text
@@ -648,17 +798,17 @@ func _shots(dir: String) -> void:
 	var a: = D.start(off, "mc")
 	var p: = _mount(a)
 	var run = p.duel
-	var t0: = Time.get_ticks_msec()
-	while is_instance_valid(run) and run.target.is_empty() and Time.get_ticks_msec() - t0 < 20000:
+	var t0: = U.tick_ms()
+	while is_instance_valid(run) and run.target.is_empty() and U.tick_ms() - t0 < 20000:
 		await get_tree().process_frame
 	await get_tree().create_timer(0.35).timeout
 	await _snap(dir, "duel_mark_" + tag)
-	while is_instance_valid(run) and not run.casting and not run.finished and Time.get_ticks_msec() - t0 < 90000:
+	while is_instance_valid(run) and not run.casting and not run.finished and U.tick_ms() - t0 < 90000:
 		await get_tree().process_frame
 	await get_tree().create_timer(0.6).timeout
 	await _snap(dir, "duel_trick_" + tag)
 	Engine.time_scale = 3.0
-	while is_instance_valid(run) and not run.finished and Time.get_ticks_msec() - t0 < 180000:
+	while is_instance_valid(run) and not run.finished and U.tick_ms() - t0 < 180000:
 		await get_tree().process_frame
 	Engine.time_scale = 1.0
 	await get_tree().create_timer(2.2).timeout
@@ -681,7 +831,7 @@ func _calibrate() -> void:
 	var hs: Array = F.heroes(true) if String(args.get("duel_cal_heroes", "all")) == "all" else F.heroes()
 	if args.has("duel_cal_only"):
 		hs = Array(String(args.duel_cal_only).split(","))
-	var t0: = Time.get_ticks_msec()
+	var t0: = U.tick_ms()
 	var data: = SIM.calibrate(games, hs, true)
 	for h in hs:
 		print("DUEL_CAL %s %s raw %s" % [h, str(data.ratings[h]), str(data.raw[h])])
@@ -692,7 +842,8 @@ func _calibrate() -> void:
 	if String(args.get("duel_cal_write", "1")) == "1":
 		var okw: = SIM.write(ProjectSettings.globalize_path(R.RATINGS_PATH), data)
 		print("DUEL_CAL wrote %s %s" % [R.RATINGS_PATH, okw])
-	print("DUEL_CAL done %.1f s" % ((Time.get_ticks_msec() - t0) / 1000.0))
+	print("DUEL_CAL done %.1f s" % ((U.tick_ms() - t0) / 1000.0))
+	await _teardown()
 	get_tree().quit(0)
 
 

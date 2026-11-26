@@ -45,11 +45,11 @@ const WEEKLY_FORM: = 3
 # (--duel_calibrate=1 measures it). Founders keep the names of their 0.6 duel skills and their duel lines;
 # later waves are data, hidden until release.
 const HEROES: = {
-	"mc": {"pace": 1.95, "trick": "gust", "name": "Восточный ветер"},
-	"rin": {"pace": 2.0, "trick": "frost", "name": "Чайная церемония"},
-	"hana": {"pace": 2.45, "trick": "sprint", "name": "Спринт"},
-	"yue": {"pace": 2.1, "trick": "veil", "name": "Лунная вуаль"},
-	"nova": {"pace": 2.3, "trick": "double", "name": "Перехват"},
+	"mc": {"pace": 2.28, "trick": "gust", "name": "Восточный ветер"},
+	"rin": {"pace": 2.04, "trick": "frost", "name": "Чайная церемония"},
+	"hana": {"pace": 2.66, "trick": "sprint", "name": "Спринт"},
+	"yue": {"pace": 1.88, "trick": "veil", "name": "Лунная вуаль"},
+	"nova": {"pace": 2.20, "trick": "double", "name": "Перехват"},
 	# later waves (docs/ROSTER_20.md): data only, never shown before the heroine is in G.HEROES
 	"tsubame": {"pace": 2.15, "trick": "veil", "name": "Дымовая шашка"},
 	"miel": {"pace": 1.95, "trick": "frost", "name": "Глазурь"},
@@ -109,7 +109,7 @@ const GLOSSARY: = [
 		"why": "Особый ход соперницы. Сколько раз она его сыграет, написано на карточке, не больше двух",
 		"how": "Забирай её мерцающие пары первым: подлость копится от её пар", "reward": ""},
 	{"id": "duel.weekly", "cat": "modes", "name": "Дуэль недели",
-		"why": "Одна героиня с особым правилом всю неделю",
+		"why": "Соперница недели с особым правилом стола",
 		"how": "Три победы за неделю, неделя начинается в понедельник в 04:00 МСК", "reward": "100 кристаллов и 30 Лепестков"},
 ]
 

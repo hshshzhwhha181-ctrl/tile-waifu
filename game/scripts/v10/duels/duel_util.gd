@@ -204,6 +204,11 @@ static func fmt_delta(n: int) -> String:
 	return "±0"
 
 
+# milliseconds of the process clock, for benchmarks and test timeouts only (never for game logic: that is V10Meta)
+static func tick_ms() -> int:
+	return int(Engine.get_singleton("Time").call("get_ticks_msec"))
+
+
 static func plural(n: int, one: String, few: String, many: String) -> String:
 	var m10: = absi(n) % 10
 	var m100: = absi(n) % 100
@@ -284,20 +289,13 @@ static func apply_rewards(rewards: Dictionary, src: String) -> Array:
 		return rows
 	var gems: = int(rewards.get("gems", 0))
 	var petals: = int(rewards.get("petals", 0))
-	var econ = G.get("econ") if has_g() else null
-	if (gems > 0 or petals > 0) and econ is Object and (econ as Object).has_method("grant"):
+	if (gems > 0 or petals > 0) and has_g():
 		var g: = {}
 		if gems > 0:
-			g["crystal"] = gems
+			g["gems"] = gems
 		if petals > 0:
-			g["petal"] = petals
-		econ.grant(g, src)
-	elif has_g():
-		var S: Dictionary = save()
-		if gems > 0:
-			S["gems"] = int(S.get("gems", 0)) + gems
-		if petals > 0:
-			S["petals"] = int(S.get("petals", 0)) + petals
+			g["petals"] = petals
+		V10Money.grant(g, src)
 	var aff: Dictionary = rewards.get("aff", {})
 	for h in aff:
 		bond(String(h), int(aff[h]))

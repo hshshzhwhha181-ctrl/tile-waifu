@@ -258,7 +258,7 @@ static func table_cfg(h: String, f: int, seed_v: int) -> Dictionary:
 # results[h][f-1][bot] = [her_score, games]
 static func play_cells(games: int, heroes: Array, verbose: = false) -> Dictionary:
 	var res: = {}
-	var t0: = Time.get_ticks_msec()
+	var t0: = U.tick_ms()
 	for h in heroes:
 		res[h] = []
 		for f in range(1, F.FORMS + 1):
@@ -273,7 +273,7 @@ static func play_cells(games: int, heroes: Array, verbose: = false) -> Dictionar
 				cell[bot] = [sc, games]
 			res[h].append(cell)
 		if verbose:
-			print("DUEL_CAL %s done (%.0f s)" % [h, (Time.get_ticks_msec() - t0) / 1000.0])
+			print("DUEL_CAL %s done (%.0f s)" % [h, (U.tick_ms() - t0) / 1000.0])
 	return res
 
 
@@ -345,7 +345,7 @@ static func monotone(v: Array) -> Array:
 
 
 static func calibrate(games: int, heroes: Array, verbose: = false) -> Dictionary:
-	var t0: = Time.get_ticks_msec()
+	var t0: = U.tick_ms()
 	var cells: = play_cells(games, heroes, verbose)
 	var ft: = fit(cells)
 	var ratings: = {}
@@ -374,7 +374,7 @@ static func calibrate(games: int, heroes: Array, verbose: = false) -> Dictionary
 	return {"ver": 1, "generated": U.cal_key(), "games_per_cell": games, "anchor": {"bot": ANCHOR, "rating": int(ANCHOR_R)},
 		"bots": bots, "ratings": ratings, "raw": raw, "monotone_fixed": fixed, "her_score_x100": winrates,
 		"forms": {"pace_k": F.PACE_K, "telegraph": F.TELEGRAPH, "need": F.NEED, "trick_n": F.TRICK_N, "soft_steal": F.SOFT_STEAL},
-		"secs": int((Time.get_ticks_msec() - t0) / 1000.0)}
+		"secs": int((U.tick_ms() - t0) / 1000.0)}
 
 
 static func write(path: String, data: Dictionary) -> bool:

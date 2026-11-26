@@ -85,7 +85,17 @@ static func day_index(key: String) -> int:
 
 
 static func key_of_index(d: int) -> String:
-	return Time.get_date_string_from_unix_time(d * 86400)
+	# proleptic Gregorian, pure integer math (Howard Hinnant's civil_from_days)
+	var z: = d + 719468
+	var era: = (z if z >= 0 else z - 146096) / 146097
+	var doe: = z - era * 146097
+	var yoe: = (doe - doe / 1460 + doe / 36524 - doe / 146096) / 365
+	var doy: = doe - (365 * yoe + yoe / 4 - yoe / 100)
+	var mp: = (5 * doy + 2) / 153
+	var dd: = doy - (153 * mp + 2) / 5 + 1
+	var mm: = mp + (3 if mp < 10 else -9)
+	var yy: = yoe + era * 400 + (1 if mm <= 2 else 0)
+	return "%04d-%02d-%02d" % [yy, mm, dd]
 
 
 # 0 = Monday … 6 = Sunday (1970-01-01 was a Thursday)
@@ -166,6 +176,11 @@ static func hero_color(h: String) -> Color:
 
 # ---------------------------------------------------------------- text helpers
 
+# milliseconds of the process clock, for benchmarks and test timeouts only (never for game logic: that is V10Meta)
+static func tick_ms() -> int:
+	return int(Engine.get_singleton("Time").call("get_ticks_msec"))
+
+
 static func plural(n: int, one: String, few: String, many: String) -> String:
 	var m10: = absi(n) % 10
 	var m100: = absi(n) % 100
@@ -198,11 +213,7 @@ static func grant(rewards: Dictionary, src: String = "hand") -> Array:
 		if sink.is_valid():
 			sink.call("gems", gems, src)
 		elif g_ok():
-			var e = G.get("econ")
-			if e != null and e is Object and (e as Object).has_method("grant"):
-				(e as Object).call("grant", {"crystal": gems}, src)
-			elif G.S is Dictionary:
-				G.S["gems"] = int(G.S.get("gems", 0)) + gems
+			V10Money.grant({"gems": gems}, src)
 	var aff = rewards.get("aff", {})
 	if aff is Dictionary:
 		for h in aff:

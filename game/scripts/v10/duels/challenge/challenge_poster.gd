@@ -197,9 +197,9 @@ static func make(inf: Dictionary) -> Control:
 	code.size = Vector2(560, 56)
 	root.add_child(code)
 	items.append(code)
-	var where: = V10Type.label("Столы → Соперницы → Вызов по коду", "ui", 18, V10DS.PAPER_500)
+	var where: = V10Type.label("Столы → Испытания и соперницы → Вызов по коду", "ui", 18, V10DS.PAPER_500)
 	where.position = Vector2(LX, BAND_Y + 96)
-	where.size = Vector2(520, 26)
+	where.size = Vector2(560, 26)
 	root.add_child(where)
 	root.set_meta("text_nodes", items)
 	return root

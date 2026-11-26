@@ -281,7 +281,7 @@ static func _regexes() -> void:
 	_re_tw = RegEx.new()
 	_re_tw.compile("(?i)(?<![0-9A-Z])T\\s?W" + sep + "([0-9A-Z]{4})" + sep + "([0-9A-Z]{4})" + sep + "([0-9A-Z]{5})(?![0-9A-Z])" + tail)
 	_re_bare = RegEx.new()
-	_re_bare.compile("(?i)(?<![0-9A-Z])([0-9A-Z]{4})[\\-\\x{2010}-\\x{2015}\\x{2212}]([0-9A-Z]{4})[\\-\\x{2010}-\\x{2015}\\x{2212}]([0-9A-Z]{5})(?![0-9A-Z])" + tail)
+	_re_bare.compile("(?i)(?<![0-9A-Z])([0-9A-Z]{4})[\\s\\-\\x{2010}-\\x{2015}\\x{2212}]{1,2}([0-9A-Z]{4})[\\s\\-\\x{2010}-\\x{2015}\\x{2212}]{1,2}([0-9A-Z]{5})(?![0-9A-Z])" + tail)
 	_re_flat = RegEx.new()
 	_re_flat.compile("(?i)(?<![0-9A-Z])([0-9A-Z]{13})(?![0-9A-Z])" + tail)
 
@@ -383,5 +383,5 @@ static func share_text(p: Dictionary, info: Dictionary) -> String:
 	lines.append(String(info.get("line", "Мой стол — %s. Сможешь?" % t)))
 	lines.append("%s · %s · %s" % [String(info.get("mode_name", "Путь")), String(info.get("table", "")), U.stars_text(int(p.stars))])
 	lines.append("Код вызова: %s" % code)
-	lines.append("Tile Waifu → Столы → Соперницы → Вызов по коду → Вставить")
+	lines.append("Tile Waifu → Столы → Испытания и соперницы → Вызов по коду → Вставить")
 	return "\n".join(lines)

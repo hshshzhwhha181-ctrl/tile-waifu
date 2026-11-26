@@ -152,13 +152,17 @@ func show_home() -> void:
 	var inhale: = []
 	if ents.is_empty():
 		_hero_cover()
-		var t1: = UI2.text("Друг прислал код?", "display", 32, V10DS.PAPER_100, 400)
+		var t1: = UI2.text("Друг прислал код?", "display", 32, V10DS.PAPER_100, 360)
+		t1.name = "EmptyTitle"
 		t1.position = Vector2(UI2.M, y + 24)
 		page.add_child(t1)
+		t1.set_deferred("size", Vector2(360, V10Type.line_h(32)))
 		var t2: = UI2.text("Скопируй его сообщение целиком и вставь сюда. Сыграешь тот же стол и сравнишь время.",
-			"ui", 22, V10DS.PAPER_300, 380, 4)
+			"ui", 22, V10DS.PAPER_300, 360, 4)
+		t2.name = "EmptyBody"
 		t2.position = Vector2(UI2.M, y + 80)
 		page.add_child(t2)
+		t2.set_deferred("size", Vector2(360, V10Type.line_h(22) * 4))
 		inhale += [t1, t2]
 	else:
 		var t3: = UI2.text("Вставь код друга: сыграешь тот же стол и сравнишь время.", "ui", 22, V10DS.PAPER_300, UI2.W - 2 * UI2.M, 2)
@@ -203,7 +207,7 @@ func _hero_cover() -> void:
 	tr.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var fw: = float(V8Art.RIG_FACE_W.get(hero, 90.0))
 	var s: = 96.0 / fw
-	var face_at: = Vector2(536, _y0() + 210)
+	var face_at: = Vector2(548, _y0() + 344)
 	tr.size = tex.get_size() * s
 	tr.position = face_at - V8Art.rig_face(hero) * s
 	page.add_child(tr)
@@ -263,7 +267,7 @@ func _row(e: Dictionary, w: float) -> Control:
 	r.add_child(l1)
 	var l2t: = ""
 	if sent:
-		l2t = "%s · %s" % [U.fmt_time(int(e.author_t)), U.date_text(Time.get_date_string_from_unix_time(int(e.get("at", 0))))]
+		l2t = "%s · %s" % [U.fmt_time(int(e.author_t)), U.date_text(U.stamp_of(int(e.get("at", 0))).substr(0, 10))]
 	elif int(e.get("my_t", 0)) > 0:
 		l2t = "автор %s · ты %s" % [U.fmt_time(int(e.author_t)), U.fmt_time(int(e.my_t))]
 	else:
@@ -520,6 +524,34 @@ static func ctx_from_entry(e: Dictionary) -> Dictionary:
 	var hero: = String(gg.S.get("level_partner", "mc")) if gg else "mc"
 	return {"p": p, "deal": deal if deal.ok else {"mode_name": D.MODE_NAMES.get(int(e.mode), ""), "table": String(e.get("title", ""))},
 		"hero": hero, "outfit": P._equipped(hero), "nick": U.my_nick()}
+
+
+const VICTORY_MIN_UNLOCKED: = 16  # UX_RULES §3.5: «Вызов» in Victory «⋯» appears after level 15 (unlocked >= 16)
+
+
+static func can_throw_from_victory(save_d: Dictionary = {}) -> bool:
+	var s: Dictionary = save_d
+	if s.is_empty():
+		var gg: = U.g()
+		if gg and gg.get("S") is Dictionary:
+			s = gg.S
+	return int(s.get("unlocked", 1)) >= VICTORY_MIN_UNLOCKED
+
+
+# W4 hook for Victory «⋯» menu (V10HudVictory / play.gd): returns {} before L15 or on non-challengeable modes,
+# else {id: "challenge", label: "Бросить вызов", action: Callable} opening ThrowSheet in 1 layer.
+static func victory_more_item(play: Node, secs: float, stars: int, save_d: Dictionary = {}) -> Dictionary:
+	if not can_throw_from_victory(save_d):
+		return {}
+	var run_s: Script = load("res://scripts/v10/duels/challenge/challenge_run.gd")
+	var ctx: Dictionary = run_s.call("ctx_from_play", play, secs, stars) if run_s else {}
+	if not bool(ctx.get("ok", false)):
+		return {}
+	return {
+		"id": "challenge",
+		"label": "Бросить вызов",
+		"action": func(): open_throw(play, ctx),
+	}
 
 
 static func open_throw(host: Node, ctx: Dictionary) -> UI2.Sheet:

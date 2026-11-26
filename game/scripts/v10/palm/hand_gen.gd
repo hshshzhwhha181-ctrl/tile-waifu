@@ -921,7 +921,7 @@ static func norm(e: Dictionary) -> Dictionary:
 
 # --hand_gen=N: N days from ORIGIN_IDX into DATA_PATH. Returns stats {days, forms, ms}.
 static func write_table(n: int = DAYS) -> Dictionary:
-	var t0: = Time.get_ticks_msec()
+	var t0: = U.tick_ms()
 	var es: = []
 	var forms: = {}
 	var fails: = []
@@ -940,7 +940,7 @@ static func write_table(n: int = DAYS) -> Dictionary:
 		f.store_string(JSON.stringify(doc, "", false))
 		f.close()
 	reload()
-	return {"days": n, "forms": forms, "fails": fails, "ms": Time.get_ticks_msec() - t0, "path": path}
+	return {"days": n, "forms": forms, "fails": fails, "ms": U.tick_ms() - t0, "path": path}
 
 
 static func board_cfg(e: Dictionary) -> Dictionary:
