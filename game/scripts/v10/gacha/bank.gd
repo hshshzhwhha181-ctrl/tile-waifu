@@ -70,7 +70,7 @@ static func split_text(sp: Dictionary) -> String:
 	if int(sp.tickets) > 0:
 		parts.append("%d %s" % [sp.tickets, plural(int(sp.tickets), "билет", "билета", "билетов")])
 	if int(sp.gems) > 0:
-		parts.append("%s кристаллов" % V10Rates.group(int(sp.gems)))
+		parts.append("%s %s" % [V10Rates.group(int(sp.gems)), plural(int(sp.gems), "кристалл", "кристалла", "кристаллов")])
 	if int(sp.get("moon", 0)) > 0:
 		parts.append("%s Лунного камня" % V10Rates.group(int(sp.moon)))
 	return "Спишется: " + " → ".join(parts) if not parts.is_empty() else ""

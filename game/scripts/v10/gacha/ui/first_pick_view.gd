@@ -128,11 +128,21 @@ func _breathe(c: Control, i: int) -> void:
 	if not V9Feel.can_fx() or not is_instance_valid(c):
 		return
 	var t: = c.create_tween().set_loops()
+	c.set_meta("breath", t)
 	t.tween_interval(i * 0.4)
 	t.tween_property(c, "scale", Vector2(1.018, 1.018), 1.7).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	t.parallel().tween_property(c, "rotation", deg_to_rad(0.6 * (1 if i % 2 == 0 else -1)), 1.7).set_trans(Tween.TRANS_SINE)
 	t.tween_property(c, "scale", Vector2.ONE, 1.7).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	t.parallel().tween_property(c, "rotation", 0.0, 1.7).set_trans(Tween.TRANS_SINE)
+
+
+func _still(c: Control) -> void:
+	if c.has_meta("breath"):
+		var bt: Tween = c.get_meta("breath")
+		if bt and bt.is_valid():
+			bt.kill()
+		c.remove_meta("breath")
+	c.rotation = 0.0
 
 
 func _card(it: Dictionary, r: Rect2) -> Control:
@@ -182,6 +192,8 @@ func _focus(i: int) -> void:
 	title_l.create_tween().tween_property(title_l, "modulate:a", 0.0, 0.2)
 	sub_l.create_tween().tween_property(sub_l, "modulate:a", 0.0, 0.2)
 	c.set_meta("home", c.position)
+	# the looping breath tweens the same scale: it has to stop, or it pulls the focused card back to 1.0
+	_still(c)
 	var k2: = minf(1.9, (H * 0.5) / c.size.y)
 	var target: = Vector2(W * 0.5, H * 0.36) - c.size * 0.5
 	var t: = c.create_tween().set_parallel()
@@ -220,7 +232,6 @@ func _detail(it: Dictionary) -> void:
 	var by: = H - 150.0
 	pick_btn = JButton.make("Выбрать её", "pink", Rect2(24, by, W - 48, 104), null, 32)
 	pick_btn.set_meta("ux_role", "primary")
-	pick_btn.pulse = true
 	pick_btn.pressed.connect(_choose)
 	detail.add_child(pick_btn)
 	var tryb: = JButton.make("Примерить стиль", "glass", Rect2(W * 0.5 + 6, by - 92, W * 0.5 - 30, 80), null, 22)
@@ -253,9 +264,11 @@ func _unfocus() -> void:
 	if focus_i < 0:
 		return
 	var c: Control = cards[focus_i]
+	var fi: = focus_i
 	var t: = c.create_tween().set_parallel()
 	t.tween_property(c, "position", c.get_meta("home"), 0.3).set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_OUT)
 	t.tween_property(c, "scale", Vector2.ONE, 0.3).set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_OUT)
+	t.chain().tween_callback(func(): _breathe(c, fi))
 	for k in cards.size():
 		var o: Control = cards[k]
 		o.mouse_filter = Control.MOUSE_FILTER_STOP

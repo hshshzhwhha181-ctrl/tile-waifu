@@ -16,7 +16,7 @@ extends RefCounted
 #   V10Rates.mean_ssr_wishes(ver) -> float  expected wishes per SSR
 #   V10Rates.item_odds(banner, pool) -> Array[{id, rar, base, total, featured}]   per item, in %, both columns sum 100
 #   V10Rates.ref_rub_per_pull() -> float    reference rubles per wish (spec §2.2: 1190 ₽ = 1090 moon, 150 per wish)
-#   V10Rates.worst_lines() -> Array[String] the two «худший случай» lines of the rules tab
+#   V10Rates.worst_lines(rub) -> Array[String] the two «худший случай» lines of the rules tab (rub=false: no «₽»)
 #   V10Rates.rub_text(rub) -> String        «≈ 19 700 ₽» (rounded to hundreds)
 
 const VER_NOW: = 2
@@ -172,11 +172,12 @@ static func pct(x: float) -> String:
 	return ("%.2f %%" % x).replace(".", ",")
 
 
-static func worst_lines() -> Array:
+# rub = false: the same two lines without rubles (UX_RULES §3.5 / С-2: no «₽» on screen before L8)
+static func worst_lines(rub: = true) -> Array:
 	var r: = ref_rub_per_pull()
 	return [
-		"SSR героини баннера — не позже %d-го желания %s" % [WORST_FEATURED, rub_text(r * WORST_FEATURED)],
-		"Любая SSR из постоянных — через Свечу за %d желаний %s" % [SPARK, rub_text(r * SPARK)],
+		"SSR героини баннера — не позже %d-го желания%s" % [WORST_FEATURED, (" " + rub_text(r * WORST_FEATURED)) if rub else ""],
+		"Любая SSR из постоянных — через Свечу за %d желаний%s" % [SPARK, (" " + rub_text(r * SPARK)) if rub else ""],
 	]
 
 

@@ -7,13 +7,14 @@ extends "res://scripts/screens/summon.gd"
 #
 # Banner page (magazine cover, UX_RULES §6.8): full-bleed key art, the banner card(s) in the lacquer frame on the
 # right, overline + Playfair title on the left, one lacquer sheet with the SSR line, the promise line and the
-# candelabra, then «Загадать ×1» (secondary) and «Загадать ×10» (primary). The header «?» and
-# «Шансы и правила ›» in the sheet open V10OddsScreen. Swipe or the tab spine switches banners (≤ 3).
+# candelabra, then «Загадать ×1» (secondary) and «Загадать ×10» (primary, «Игра»). «ⓘ Шансы» in the sheet opens
+# V10OddsScreen. Swipe switches banners (≤ 3, page dots). A spend that touches Лунный камень turns the button into
+# the «Касса» class with the split, and every such spend (and crystals from 1000) goes through V10PullConfirm.
 #
 # Integrator: main.SCREENS["summon"] → this script (one line, hook H1 in README); dev acts: see dev_act().
 
 const NAV_H: = 132.0
-const SPINE_Y: = 224.0
+const SPINE_Y: = 224.0          # top of the page content under the header (the 0.9 tab spine is gone)
 
 var gacha: V10Gacha2
 var bank: V10GachaBank
@@ -30,6 +31,8 @@ var _candles_before: = 0
 var first_view: Control
 var dev_no_first: = false
 var dev_first_force: = false
+var confirm: V10PullConfirm        # the open purchase confirmation (UX_RULES §5.2.6), if any
+var left_steps: Array = []         # «Ещё N желаний до SSR» after each card of the running pull
 
 
 static func make_gacha() -> V10Gacha2:
@@ -82,11 +85,13 @@ func _build_banner() -> void:
 	circle.visible = false
 	page = banner_root
 	_art_layer()
-	V8Header.make(banner_root, main, "Желания", main.back, func(): _open_odds())
+	# one entry to the odds: «ⓘ Шансы» next to the wish buttons (С-5); the header keeps only «‹» until the
+	# HUD v2 header puts «ⓘ Шансы» in its right slot (README, hook H1)
+	V8Header.make(banner_root, main, "Желания", main.back)
 	set_meta("v8_back", main.back)
-	_spine()
 	_title_block()
 	_sheet()
+	_dots()
 	_buttons()
 
 
@@ -118,7 +123,7 @@ func _art_layer() -> void:
 
 
 func _card_rect() -> Rect2:
-	var top: = SPINE_Y + 70.0
+	var top: = SPINE_Y + 36.0
 	var bottom: = H - NAV_H - 360.0
 	# the card never takes more than 58 % of the width (the title column keeps ≥ 40 %) and centres in the free band
 	var h: = clampf(bottom - top, 380.0, 640.0)
@@ -201,52 +206,25 @@ func _item_title(id: String) -> String:
 	return "%s · %s" % [G.HEROES[it.hero].name, it.name] if it.has("hero") else String(it.name)
 
 
-# the banner spine: up to 3 names, the current one in paper with a gold underline; a swipe does the same
-func _spine() -> void:
+# page dots (HUD_V2 §8.4): up to 3 banners, the current one in gold; banners change by swipe. Not tappable, no
+# words: the overline of each page says which banner it is (the old name spine cost 6 words and 3 taps on a hub).
+func _dots() -> void:
 	if blist.size() < 2:
 		return
-	var x: = 32.0
-	var names: = []
-	for b in blist:
-		names.append(_spine_name(b))
-	var f: = UI.font("body", 900)
-	var gap: = 28.0
+	var by: = H - NAV_H - 24.0 - 112.0
+	var y: = by - 214.0 - 22.0
 	for i in blist.size():
-		var t: String = names[i]
+		var d: = Panel.new()
 		var on: = i == bsel
-		var tw: = f.get_string_size(t, HORIZONTAL_ALIGNMENT_LEFT, -1, 22).x
-		var b: = Control.new()
-		b.position = Vector2(x - 10, SPINE_Y - 14)
-		b.size = Vector2(tw + 20, 64)
-		b.mouse_filter = Control.MOUSE_FILTER_STOP
-		b.set_meta("ux_role", "secondary")
-		var l: = V10GUI.lbl(t, 22, V10GUI.PAPER_100 if on else V10GUI.PAPER_500, "body", 900)
-		l.position = Vector2(10, 10)
-		V10GUI.shadowed(l, 0.8)
-		b.add_child(l)
-		if on:
-			var u: = ColorRect.new()
-			u.color = V10GUI.GOLD_500
-			u.position = Vector2(10, 46)
-			u.size = Vector2(tw, 2)
-			u.mouse_filter = Control.MOUSE_FILTER_IGNORE
-			b.add_child(u)
-		var idx: = i
-		b.gui_input.connect(func(e):
-			if e is InputEventMouseButton and e.pressed and idx != bsel:
-				V9Feel.press(b, "tap", "button")
-				_switch(idx))
-		banner_root.add_child(b)
-		x += tw + gap
-
-
-func _spine_name(b: Dictionary) -> String:
-	match String(b.kind):
-		"phase":
-			return String(b.name)
-		"newbie":
-			return "Первый гость"
-	return String(b.name)
+		var sb: = StyleBoxFlat.new()
+		sb.bg_color = V10GUI.GOLD_300 if on else Color(V10GUI.PAPER_500, 0.55)
+		sb.set_corner_radius_all(4)
+		d.add_theme_stylebox_override("panel", sb)
+		d.size = Vector2(8, 8)
+		d.position = Vector2(32 + i * 16, y)
+		d.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		d.name = "Dot%d" % i
+		banner_root.add_child(d)
 
 
 func _switch(i: int, dir: = 0) -> void:
@@ -288,7 +266,7 @@ func _page_input(e: InputEvent) -> void:
 func _title_block() -> void:
 	var k: = _kind()
 	var x: = 32.0
-	var y: = SPINE_Y + 76.0
+	var y: = SPINE_Y + 40.0
 	var col: = V10GUI.GOLD_500
 	var over: = ""
 	var title: = String(cur_b.get("name", ""))
@@ -296,20 +274,24 @@ func _title_block() -> void:
 	var t_now: = V10Banners.eff_now(G.S)
 	match k:
 		"phase":
-			over = "%s · %s" % [cur_b.name, "новая героиня" if String(cur_b.half) == "A" else "цель на выбор"]
+			over = String(cur_b.name)
 			var tid: = String(cur_b.get("target", ""))
 			var it: Dictionary = G.ITEM.get(tid, {})
 			title = String(it.get("name", cur_b.sub))
 			sub = G.HEROES[it.hero].name if it.has("hero") else ""
 		"newbie":
 			over = "для новых гостей"
+			sub = newbie_sub(bool(G.S.get("newbie_ssr", false)))
 		_:
+			# the overline already says «постоянные желания»: no second line with the same words
 			over = "постоянные желания"
+			sub = ""
 	var ol: = V10GUI.overline(over, col)
 	ol.position = Vector2(x, y)
 	V10GUI.shadowed(ol, 0.9)
 	banner_root.add_child(ol)
-	var maxw: = (_card_rect().position.x - 44.0) if k == "phase" else W * 0.62
+	# the newbie heroine's face sits at x ≈ 430–530: the column stays left of it with the 48 px margin (Г-1)
+	var maxw: = (_card_rect().position.x - 44.0) if k == "phase" else (340.0 if k == "newbie" else W * 0.62)
 	var fs: = 56
 	while fs > 34 and UI.longest_word_w(title, fs, "title", 700) > maxw:
 		fs -= 2
@@ -323,6 +305,9 @@ func _title_block() -> void:
 	var yy: = y + 26 + th
 	if sub != "":
 		var sl: = V10GUI.lbl(sub, 24, V10GUI.PAPER_300, "body", 800)
+		if k != "phase":
+			sl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			sl.size = Vector2(maxw, 10)
 		sl.position = Vector2(x, yy)
 		V10GUI.shadowed(sl, 0.85)
 		banner_root.add_child(sl)
@@ -330,7 +315,7 @@ func _title_block() -> void:
 			var pill: = V10GUI.rar_pill("SSR", 30)
 			pill.position = Vector2(x + sl.get_minimum_size().x + 12, yy + 1)
 			banner_root.add_child(pill)
-		yy += 40
+		yy += maxf(40.0, sl.get_minimum_size().y + 8)
 	if k == "phase":
 		var until: = V10GClock.until_text(int(cur_b.end), t_now)
 		var dl: = V10GUI.lbl(until, 18, V10GUI.PAPER_500 if not V10Banners.countdown_visible(cur_b, t_now) else V10GUI.ROSE_300, "body", 700)
@@ -339,13 +324,18 @@ func _title_block() -> void:
 		banner_root.add_child(dl)
 		yy += 34
 		if (cur_b.get("ssr", []) as Array).size() >= 2:
-			var hint: = V10GUI.lbl("Цель желания — коснись карточки", 18, V10GUI.GOLD_300, "body", 800)
+			var hint: = V10GUI.lbl("Коснись — сменить цель", 18, V10GUI.GOLD_300, "body", 800)
 			hint.position = Vector2(x, yy)
 			V10GUI.shadowed(hint, 0.85)
 			banner_root.add_child(hint)
 	var nodes: = [ol, tl]
 	for n in nodes:
 		UI.slide_in(n, Vector2(-16, 0), 0.04 * nodes.find(n), 0.24)
+
+
+# the newbie promise (spec Г4): the SSR outfit is promised once; after it came, only the discount is left
+static func newbie_sub(ssr_done: bool) -> String:
+	return "Скидка: 120 кристаллов вместо 150" if ssr_done else "SSR-наряд, которого у тебя нет, — до 50-го желания"
 
 
 func _sheet() -> void:
@@ -366,87 +356,106 @@ func _sheet() -> void:
 		hard = mini(hard, gacha.pity(cur_b) + left)
 	var bar: = V10GUI.line_bar(Rect2(20, 52, r.size.x * 0.56, 3), 1.0 - float(left) / float(hard), V10GUI.GOLD_500 if gold else V10GUI.JADE_300)
 	sh.add_child(bar)
-	# line 2: the promise in plain words (UX_RULES §4.2)
+	# line 2: the promise in plain words (UX_RULES §4.2, §9 P0-5)
 	var l2t: = ""
 	match k:
 		"phase":
-			l2t = "Следующая SSR — точно героиня баннера ✓" if gacha.guar(cur_b) else "Половина шансов, что SSR — героиня баннера"
+			l2t = "Следующая SSR — героиня баннера ✓" if gacha.guar(cur_b) else "SSR — героиня баннера: шанс 50 %"
 		"newbie":
-			l2t = "Осталось %d из 50 · SSR-наряд, которого у тебя нет" % gacha.newbie_left() if not bool(G.S.get("newbie_ssr", false)) else "Осталось %d из 50 · 120 кристаллов вместо 150" % gacha.newbie_left()
+			l2t = "Осталось %d из 50 по 120 кристаллов" % gacha.newbie_left()
 		_:
-			l2t = "SSR — не позже 60-го желания · все постоянные наряды"
-	var l2: = V10GUI.lbl(l2t, 18, V10GUI.GOLD_300 if gacha.guar(cur_b) else V10GUI.PAPER_300, "body", 700)
-	l2.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	l2.size = Vector2(r.size.x * 0.6, 10)
-	l2.position = Vector2(20, 66)
-	sh.add_child(l2)
-	# candelabra + «Свечи: 137/200» on the right
+			l2t = "SSR — не позже 60-го желания"
+	if l2t != "":
+		var l2: = V10GUI.lbl(l2t, 18, V10GUI.GOLD_300 if gacha.guar(cur_b) and k == "phase" else V10GUI.PAPER_300, "body", 700)
+		l2.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		l2.size = Vector2(r.size.x * 0.6, 10)
+		l2.position = Vector2(20, 66)
+		sh.add_child(l2)
+	# candelabra + «Свечи: 137/200» on the right; at 200 the line becomes the quiet «Зажечь Свечу ›»
 	var cw: = r.size.x * 0.36
 	candles_node = V10Candelabra.new()
 	candles_node.size = Vector2(cw, 96)
 	candles_node.position = Vector2(r.size.x - cw - 12, 4)
 	candles_node.set_count(int(G.S.candles))
 	sh.add_child(candles_node)
-	var cl: = V10GUI.lbl("Свечи: %d/%d" % [mini(int(G.S.candles), V10Rates.SPARK), V10Rates.SPARK], 18, V10GUI.PAPER_300, "body", 800)
-	UI.center_label(cl, Rect2(r.size.x - cw - 12, 100, cw, 26))
-	sh.add_child(cl)
 	if gacha.can_spark():
-		var sb: = JButton.make("Зажечь Свечу", "gold", Rect2(r.size.x - cw - 12, 126, cw, 60), null, 20)
-		sb.set_meta("ux_role", "secondary")
-		sb.shine_every = 2.8
-		sb.pressed.connect(func(): _open_spark())
-		sh.add_child(sb)
-	# «Шансы и правила ›»
-	var ol: = Control.new()
-	ol.position = Vector2(12, r.size.y - 54)
-	ol.size = Vector2(250, 50)
-	ol.mouse_filter = Control.MOUSE_FILTER_STOP
-	ol.set_meta("ux_role", "tertiary")
-	var oll: = V10GUI.lbl("Шансы и правила ›", 18, V10GUI.GOLD_500, "body", 800)
-	oll.position = Vector2(8, 14)
-	ol.add_child(oll)
-	ol.gui_input.connect(func(e):
-		if e is InputEventMouseButton and e.pressed:
-			V9Feel.press(ol, "tap", "button")
-			_open_odds())
-	sh.add_child(ol)
-	odds_link = ol
+		var sl: = V10GUI.link("Зажечь Свечу ›", Vector2(0, 100), func(): _open_spark(), V10GUI.GOLD_300, 18)
+		sl.position.x = r.size.x - 12 - cw * 0.5 - sl.size.x * 0.5
+		sl.name = "SparkLink"
+		sh.add_child(sl)
+	else:
+		var cl: = V10GUI.lbl("Свечи: %d/%d" % [mini(int(G.S.candles), V10Rates.SPARK), V10Rates.SPARK], 18, V10GUI.PAPER_300, "body", 800)
+		UI.center_label(cl, Rect2(r.size.x - cw - 12, 100, cw, 26))
+		sh.add_child(cl)
+	# «ⓘ Шансы» (UX_RULES §5.3.5, С-5): next to the random purchase, one tap to V10OddsScreen
+	odds_link = V10GUI.link("ⓘ Шансы", Vector2(8, r.size.y - 84), func(): _open_odds(), V10GUI.GOLD_500, 18)
+	sh.add_child(odds_link)
 	UI.slide_in(sh, Vector2(0, 24), 0.08, 0.24)
 
 
 func _buttons() -> void:
 	var by: = H - NAV_H - 24.0 - 112.0
 	var k: = _kind()
-	var gem: = V8Art.cur("gem")
-	var tick: = V8Art.cur("ticket")
 	if k != "newbie":
-		pull1_btn = JButton.make("Загадать ×1", "glass", Rect2(24, by, 260, 112), null, 28)
-		_cost_line(pull1_btn, 1, gem, tick)
+		pull1_btn = _pull_button(1, Rect2(24, by, 216, 112), "Загадать ×1", "glass")
 		pull1_btn.set_meta("ux_role", "secondary")
-		pull1_btn.pressed.connect(func(): _pull(1))
-		pull1_btn.set_gate(func(): return _can_pull(1), func(): _pull(1))
 		banner_root.add_child(pull1_btn)
 		UI.slide_in(pull1_btn, Vector2(0, 40), 0.1, 0.24)
-	var r10: = Rect2(300, by, W - 324, 112) if k != "newbie" else Rect2(24, by, W - 48, 112)
-	pull10_btn = JButton.make("Загадать ×10", "pink", r10, null, 32)
-	_cost_line(pull10_btn, 10, gem, tick)
+	# the primary is ≥ 440 × 104 (UX_RULES §6.1); one blik on the screen (its shine), no pulse: the breathing
+	# banner card is the screen's one infinite animation
+	var r10: = Rect2(W - 24 - 440, by, 440, 112) if k != "newbie" else Rect2(24, by, W - 48, 112)
+	pull10_btn = _pull_button(10, r10, "Загадать ×10", "pink")
 	pull10_btn.set_meta("ux_role", "primary")
-	pull10_btn.shine_every = 2.8
-	pull10_btn.pulse = _can_pull(10)
-	pull10_btn.pressed.connect(func(): _pull(10))
-	pull10_btn.set_gate(func(): return _can_pull(10), func(): _pull(10))
 	banner_root.add_child(pull10_btn)
 	UI.slide_in(pull10_btn, Vector2(0, 40), 0.14, 0.24)
 
 
-func _cost_line(btn: JButton, n: int, gem: Texture2D, tick: Texture2D) -> void:
+# a wish button: «Игра» (pal) while tickets and crystals pay; the «Касса» class with the split as soon as the
+# spend touches Лунный камень (UX_RULES §5.3.7). The tap goes through _pull → V10PullConfirm when it must ask.
+func _pull_button(n: int, r: Rect2, text: String, pal: String, act: = Callable()) -> JButton:
 	var sp: = gacha.split(cur_b, n)
-	if int(sp.tickets) >= n:
-		btn.set_cost(tick, n, 22)
-	elif int(sp.tickets) > 0:
-		btn.set_sub("%d билет + %s" % [sp.tickets, UI.fmt(int(sp.gems) + int(sp.moon))] if int(sp.tickets) == 1 else "%d билета + %s" % [sp.tickets, UI.fmt(int(sp.gems) + int(sp.moon))], 20)
+	var b: JButton
+	if int(sp.get("moon", 0)) > 0 and bool(sp.get("ok", false)):
+		var rest: = spend_text(sp, false)
+		b = V10GUI.kassa_button(text, "%s Лунного камня" % V10Rates.group(int(sp.moon)), r, ("+ " + rest) if rest != "" else "")
 	else:
-		btn.set_cost(gem, gacha.cost(cur_b, n), 22)
+		b = JButton.make(text, pal, r, null, 24)
+		_cost_line(b, n, sp)
+		if pal == "pink":
+			b.shine_every = 2.8
+	# the quiet button sounds softer than the primary (UX_RULES §7, З-2)
+	b.sound = "pop" if pal == "pink" else "tap"
+	if not act.is_valid():
+		act = func(): _pull(n)
+	b.pressed.connect(act)
+	# a refused tap runs the same path, which says why (toast); seq is open only on the results screen
+	b.set_gate(func(): return gacha.can_pull(cur_b, n), act)
+	return b
+
+
+func _cost_line(btn: JButton, n: int, sp: Dictionary) -> void:
+	if int(sp.tickets) >= n:
+		btn.set_cost(V8Art.cur("ticket"), n, 20)
+	elif int(sp.tickets) > 0:
+		btn.set_sub(spend_text(sp), 20)
+	else:
+		btn.set_cost(V8Art.cur("gem"), gacha.cost(cur_b, n), 20)
+
+
+# «3 билета + 1 050 кристаллов» (every number with its unit, UX_RULES §4.1.3); moon = false leaves Лунный камень
+# out (the «Касса» shows it on its own line)
+static func spend_text(sp: Dictionary, moon: = true) -> String:
+	var parts: = []
+	var t: = int(sp.get("tickets", 0))
+	var g: = int(sp.get("gems", 0))
+	var m: = int(sp.get("moon", 0))
+	if t > 0:
+		parts.append("%d %s" % [t, V10GachaBank.plural(t, "билет", "билета", "билетов")])
+	if g > 0:
+		parts.append("%s %s" % [V10Rates.group(g), V10GachaBank.plural(g, "кристалл", "кристалла", "кристаллов")])
+	if moon and m > 0:
+		parts.append("%s Лунного камня" % V10Rates.group(m))
+	return " + ".join(parts)
 
 
 # ---------------------------------------------------------------- pulling
@@ -459,14 +468,34 @@ func _can_pull(n: int) -> bool:
 
 
 func _pull(n: int) -> void:
-	if seq != null:
+	if seq != null or (confirm != null and is_instance_valid(confirm) and not confirm.is_queued_for_deletion() and confirm.mouse_filter != Control.MOUSE_FILTER_IGNORE):
 		return
 	if not gacha.can_pull(cur_b, n):
 		V9Feel.deny(pull1_btn if n == 1 and is_instance_valid(pull1_btn) else pull10_btn)
 		main.toast("Не хватает кристаллов: задания дня и Путь дают ещё", "gem")
 		return
+	var sp: = gacha.split(cur_b, n)
+	if V10PullConfirm.needed(sp, G.S):
+		confirm = V10PullConfirm.open(_overlay(), {"n": n, "sp": sp, "banner_name": String(cur_b.get("name", "")),
+			"title": "Загадать ×%d" % n}, func(): _pull_go(n), func(): _open_odds())
+		return
+	_pull_go(n)
+
+
+# playtest / demo: press «Загадать» on an open confirmation sheet (main.gd --pt, README hook H1)
+func demo_confirm() -> bool:
+	if confirm == null or not is_instance_valid(confirm) or confirm.mouse_filter == Control.MOUSE_FILTER_IGNORE:
+		return false
+	confirm._yes()
+	return true
+
+
+func _pull_go(n: int) -> void:
+	if seq != null or not gacha.can_pull(cur_b, n):
+		return
 	var ctx: = {"pity": gacha.pity(cur_b), "guar": gacha.guar(cur_b), "newbie_left": gacha.newbie_left(),
-		"skip": V9Summon.can_skip(int(G.S.pulls)), "left": gacha.pity_left(cur_b)}
+		"newbie_ssr": bool(G.S.get("newbie_ssr", false)), "skip": V9Summon.can_skip(int(G.S.pulls)),
+		"left": gacha.pity_left(cur_b)}
 	_candles_before = int(G.S.candles)
 	var res: = gacha.pull(cur_b, n)
 	if res.is_empty():
@@ -496,38 +525,58 @@ func _sequence(res: Array, ctx: = {}) -> void:
 	super._sequence(res, ctx)
 	# the 0.9 sequence set its pity/guarantee tracks from the 0.9 counters before its first await: replace them
 	var p: = int(ctx.get("pity", 0))
+	var nl: = int(ctx.get("newbie_left", 0))
+	var nssr: = bool(ctx.get("newbie_ssr", true))
 	pity_steps = []
 	guar_steps = []
-	for r in res:
-		var v: Dictionary = r.get("v10", {})
-		pity_steps.append(int(v.get("pity", p)))
+	left_steps = []
+	for i in res.size():
+		var v: Dictionary = res[i].get("v10", {})
+		p = int(v.get("pity", p))
+		pity_steps.append(p)
 		guar_steps.append(bool(v.get("guar", false)))
+		# the newbie SSR promise counts down with the wishes left, until its SSR came (spec Г4)
+		if String(v.get("rar", "")) == "SSR":
+			nssr = true
+		var left: = V10Rates.HARD - p
+		if _kind() == "newbie" and not nssr:
+			left = mini(left, nl - (i + 1))
+		left_steps.append(maxi(1, left))
 
 
+# the guarantee panel (HUD_V2 §8.4, UX_RULES P2-24): hidden during the ritual (lantern, colour climb); it slides
+# in with the first turned card and ticks per card from there
 func _build_top_hud() -> void:
 	top_hud = Control.new()
 	top_hud.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	top_hud.visible = false
 	seq.add_child(top_hud)
-	var box: = V10GUI.sheet(Rect2(20, 18, 330, 92), 0.82)
+	var box: = V10GUI.sheet(Rect2(20, 18, 420, 96), 0.82)
 	top_hud.add_child(box)
 	var left: = int(seq_ctx.get("left", V10Rates.HARD - int(seq_ctx.get("pity", 0))))
-	pity_num = V10GUI.lbl(_left_text(left), 20, V10GUI.PAPER_100, "body", 900)
-	pity_num.position = Vector2(14, 8)
+	pity_num = V10GUI.lbl(_left_text(left), 24, V10GUI.PAPER_100, "body", 900)
+	pity_num.position = Vector2(14, 6)
 	box.add_child(pity_num)
 	pity_bar = null
-	var bar: = V10GUI.line_bar(Rect2(14, 40, 300, 3), 1.0 - float(left) / V10Rates.HARD, V10GUI.GOLD_500)
+	var bar: = V10GUI.line_bar(Rect2(14, 44, 390, 3), 1.0 - float(left) / V10Rates.HARD, V10GUI.GOLD_500)
 	bar.name = "Bar"
 	box.add_child(bar)
-	guar_lbl = V10GUI.lbl("", 16, V10GUI.PAPER_300, "body", 800)
-	guar_lbl.position = Vector2(14, 52)
+	guar_lbl = V10GUI.lbl("", 18, V10GUI.PAPER_300, "body", 800)
+	guar_lbl.position = Vector2(14, 56)
 	box.add_child(guar_lbl)
 	if _kind() == "newbie":
-		guar_lbl.text = "SSR-наряд — не позже 50-го желания"
+		guar_lbl.text = "SSR-наряд — до 50-го желания" if not bool(seq_ctx.get("newbie_ssr", true)) else "120 кристаллов вместо 150"
 	elif _kind() == "phase":
 		_set_guar(bool(seq_ctx.get("guar", false)))
 	else:
 		guar_lbl.text = "Пять ветров · все постоянные наряды"
-	UI.slide_in(top_hud, Vector2(0, -30), 0.2)
+
+
+func _show_top_hud() -> void:
+	if top_hud == null or not is_instance_valid(top_hud) or top_hud.visible:
+		return
+	top_hud.visible = true
+	UI.slide_in(top_hud, Vector2(0, -30), 0.0)
 
 
 func _left_text(left: int) -> String:
@@ -537,20 +586,19 @@ func _left_text(left: int) -> String:
 func _set_guar(g: bool) -> void:
 	if guar_lbl == null or not is_instance_valid(guar_lbl) or _kind() != "phase":
 		return
-	guar_lbl.text = "Следующая SSR — точно героиня баннера ✓" if g else "Половина шансов: SSR — героиня баннера"
+	guar_lbl.text = "Следующая SSR — героиня баннера ✓" if g else "SSR — героиня баннера: шанс 50 %"
 	guar_lbl.label_settings.font_color = V10GUI.GOLD_300 if g else V10GUI.PAPER_300
 
 
 func _tick_pity(i: int) -> void:
 	if i < 0 or i >= pity_steps.size() or pity_num == null or not is_instance_valid(pity_num):
 		return
-	var p: int = pity_steps[i]
-	var left: = V10Rates.HARD - p
-	if _kind() == "newbie" and not bool(G.S.get("newbie_ssr", false)):
-		left = mini(left, gacha.newbie_left())
+	_show_top_hud()
+	var left: int = left_steps[i] if i < left_steps.size() else V10Rates.HARD - int(pity_steps[i])
 	pity_num.text = _left_text(left)
 	var bar: Control = pity_num.get_parent().get_node_or_null("Bar")
-	V10GUI.set_bar(bar, 1.0 - float(left) / V10Rates.HARD)
+	var hard: = mini(V10Rates.HARD, int(pity_steps[i]) + left)
+	V10GUI.set_bar(bar, 1.0 - float(left) / float(maxi(1, hard)))
 	if String(seq_res[i].get("rar", "R")) == "SSR":
 		UI.punch(pity_num, 0.3, 0.4)
 		Fx.burst(top_hud, Vector2(90, 40), "sparkle", 18, V9Summon.COL.SSR, 0.6)
@@ -578,14 +626,17 @@ func _card(r: Dictionary, sz: Vector2) -> Control:
 		for ch in rt.get_children():
 			if ch is Label:
 				(ch as Label).text = V10Gacha2.rar10(String(r.rar))
-	var dup: = front.get_node_or_null("Dup")
-	if dup:
-		dup.queue_free()
-		front.remove_child(dup)
+	# one mark per card (UX_RULES §9 P0-6, §3.6.6): no «НОВОЕ» sticker, no 0.9 «+25» gem tag; a repeat shows only
+	# what it became (✦ or Лепестки) and gives up its rarity pill for it (the frame keeps the rarity colour)
+	for nm in ["Dup", "New"]:
+		var old: = front.get_node_or_null(nm)
+		if old:
+			front.remove_child(old)
+			old.queue_free()
 	if v.is_empty() or bool(v.get("new", false)):
 		return c
 	var small: = sz.x < 200
-	var h: = 28.0 if small else 38.0
+	var h: = 30.0 if small else 38.0
 	var txt: = ""
 	var col: = V10GUI.LAV
 	var ico: Texture2D = null
@@ -597,8 +648,10 @@ func _card(r: Dictionary, sz: Vector2) -> Control:
 		ico = G.fx("petal")
 	if txt == "":
 		return c
+	if rt:
+		rt.visible = false
 	var f: = UI.font("body", 900)
-	var fs: = 16 if small else 22
+	var fs: = 18 if small else 22
 	var iw: = h * 0.8 if ico else 0.0
 	var w: = f.get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x + h * 0.8 + iw
 	var p: = Panel.new()
@@ -678,10 +731,14 @@ func _showcase_base(r: Dictionary, done: Array) -> void:
 
 func _showcase_extras(node: Control, r: Dictionary, v: Dictionary) -> void:
 	# 0.10 words: «Ульта» is «Приём» (UX_RULES §4.2)
+	var new_t: = V6Txt.s("common.new")
 	for l in node.find_children("*", "Label", true, false):
 		var lb: = l as Label
 		if lb.text.begins_with("Ульта «"):
 			lb.text = lb.text.replace("Ульта «", "Приём «")
+		elif lb.text == new_t and lb.get_parent() is Control and lb.get_parent() != node:
+			# the 0.9 red «НОВОЕ» plate over the showcase (UX_RULES §3.6.6: such stickers are gone)
+			(lb.get_parent() as Control).visible = false
 	# the hanko: «Сбылось» on the banner's heroine, «Свеча» on a candle exchange, «Твоя» on the first pick
 	var seal: = ""
 	if bool(v.get("spark", false)):
@@ -724,29 +781,23 @@ func _star_row(lv: int, up: bool) -> Control:
 
 func _results(res: Array) -> void:
 	results_shown = true
+	_show_top_hud()
 	var by: = H - 170.0
 	var n: = res.size()
-	# UX_RULES §5.2.7: after the result «Готово» is the primary, «Ещё ×N» the quiet secondary
-	var ok: = JButton.make("Готово", "pink", Rect2(W - 380, by, 356, 112), null, 32)
+	# UX_RULES §5.2.7: after the result «Готово» is the primary (≥ 440 wide), «Ещё ×N» the quiet secondary; a spend
+	# that touches Лунный камень is a «Касса» and is confirmed (it goes through _pull)
+	var ok: = JButton.make("Готово", "pink", Rect2(W - 464, by, 440, 112), null, 28)
 	ok.set_meta("ux_role", "primary")
 	ok.pressed.connect(_close_seq)
 	seq.add_child(ok)
 	blist = gacha.banners()
 	var still: = bsel < blist.size() and String(blist[bsel].id) == String(cur_b.id)
 	if still:
-		var again: = JButton.make("Ещё ×%d" % n, "glass", Rect2(24, by, 300, 112), null, 28)
-		var sp: = gacha.split(cur_b, n)
-		if int(sp.tickets) >= n:
-			again.set_cost(V8Art.cur("ticket"), n, 22)
-		else:
-			again.set_cost(V8Art.cur("gem"), gacha.cost(cur_b, n), 22)
+		# the sequence closes first, so a confirmation sheet opens over the banner, never over the results
+		var again: = _pull_button(n, Rect2(24, by, W - 504, 112), "Ещё ×%d" % n, "glass", func():
+			_close_seq()
+			_pull(n))
 		again.set_meta("ux_role", "secondary")
-		again.pressed.connect(func():
-			_close_seq()
-			_pull(n))
-		again.set_gate(func(): return gacha.can_pull(cur_b, n), func():
-			_close_seq()
-			_pull(n))
 		seq.add_child(again)
 		UI.slide_in(again, Vector2(0, 60), 0.08)
 	UI.slide_in(ok, Vector2(0, 60), 0.0)
