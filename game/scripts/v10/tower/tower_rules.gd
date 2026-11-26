@@ -104,7 +104,7 @@ func apply_op(play, op: Dictionary) -> void:
 		"fog":
 			fog_left = int(op.lift)
 			for i in op.tiles:
-				_veil(board.tiles[int(i)], Color(0.62, 0.6, 0.72), -1.0)
+				_veil(board.tiles[int(i)], V10DS.TINT_SCENE, -1.0)
 		"fog_lift":
 			_clear_veils()
 		"peek":
@@ -137,7 +137,7 @@ func apply_op(play, op: Dictionary) -> void:
 			var fr: = board.free_tiles().filter(func(t): return not t.pending and not t.secret and not veils.has(t))
 			fr.sort_custom(func(a, b): return a.step < b.step)
 			for t in fr.slice(0, int(op.n)):
-				_veil(t, Color(0.32, 0.26, 0.55), float(op.secs))
+				_veil(t, V10DS.hero("yue").deep, float(op.secs))
 		"frost":
 			var fr2: = board.free_tiles().filter(func(t): return not t.pending and t.ice <= 0 and t.shard == "")
 			fr2.sort_custom(func(a, b): return a.step > b.step)
@@ -145,14 +145,14 @@ func apply_op(play, op: Dictionary) -> void:
 				t.ice = 1
 				t._update_ice()
 		"gust":
-			var fr3: = board.free_tiles().filter(func(t): return not t.pending and t.shard == "")
+			var fr3: = board.free_tiles().filter(func(t): return not t.pending and t.shard == "" and t.face != V6SpecialBoard.JOKER)
 			fr3.sort_custom(func(a, b): return a.step < b.step)
 			board.reassign_faces(fr3.slice(0, int(op.n)))
 		"smoke":
 			fog_left = pairs + int(op.pairs)
 			var d: = describe(board).filter(func(x): return board.on_board(board.tiles[int(x.i)]))
 			for i in M.fog_tiles({"seed": int(cfg.get("seed", 7)) + pairs}, d, float(op.share)):
-				_veil(board.tiles[int(i)], Color(0.45, 0.45, 0.5), -1.0)
+				_veil(board.tiles[int(i)], V10DS.PAPER_700, -1.0)
 	if play.has_method("_refresh"):
 		play._refresh()
 
@@ -160,6 +160,7 @@ func apply_op(play, op: Dictionary) -> void:
 func _veil(t: Tile, col: Color, secs: float) -> void:
 	if veils.has(t) or not t.alive:
 		return
+	var calm: = V10TowerUI.calm()
 	var v: = Node2D.new()
 	v.z_index = 3
 	t.add_child(v)
@@ -170,11 +171,11 @@ func _veil(t: Tile, col: Color, secs: float) -> void:
 	v.add_child(m)
 	v.modulate.a = 0.0
 	var tw: = v.create_tween()
-	tw.tween_property(v, "modulate:a", 1.0, 0.25)
+	tw.tween_property(v, "modulate:a", 1.0, 0.12 if calm else 0.25)
 	veils[t] = v
 	if secs > 0.0:
 		tw.tween_interval(secs)
-		tw.tween_property(v, "modulate:a", 0.0, 0.35)
+		tw.tween_property(v, "modulate:a", 0.0, 0.12 if calm else 0.35)
 		tw.tween_callback(func():
 			veils.erase(t)
 			v.queue_free())
@@ -257,7 +258,7 @@ func help_ok(kind: String) -> bool:
 	return true
 
 func help_off_text(kind: String) -> String:
-	var names: = {"hint": "Без подсказок", "undo": "Без отмен", "shuffle": "Без смешиваний", "ult": "Без ульты"}
+	var names: = {"hint": "Без подсказок", "undo": "Без отмен", "shuffle": "Без смешиваний", "ult": "Без приёма"}
 	return "Проклятие «%s»" % String(names.get(kind, kind))
 
 func paid_help() -> bool:

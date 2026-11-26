@@ -36,6 +36,10 @@ var mod_total: = {}
 var cur: = ""
 var fails: = []
 var args: = {}
+var _wall_s: = 0.0
+
+func _process(delta: float) -> void:
+	_wall_s += delta / maxf(0.001, Engine.time_scale)
 
 func _ready() -> void:
 	for a in OS.get_cmdline_user_args():
@@ -43,7 +47,7 @@ func _ready() -> void:
 			var kv: = a.substr(2).split("=", true, 1)
 			args[kv[0]] = kv[1]
 	var all: bool = args.get("tower_selftest", "0") == "1"
-	var t0: = Time.get_ticks_msec()
+	var t0: = _wall_s
 	P._test_S = {}
 	J._test_S = {}
 	TB._test_profile_id = "selftest"
@@ -63,13 +67,33 @@ func _ready() -> void:
 		await _rules()
 	if all or args.has("tower_bots"):
 		await _bots()
+	if args.has("tower_hygiene"):
+		var ui_h: Script = load("res://scripts/v10/tower/ui/tower_ui_selftest.gd")
+		ui_h.call("_hygiene", self)
+	if all or args.has("tower_ui_selftest"):
+		var prev_p = P._test_S
+		var prev_j = J._test_S
+		P._test_S = null
+		J._test_S = null
+		var ui_st: Script = load("res://scripts/v10/tower/ui/tower_ui_selftest.gd")
+		await ui_st.call("run_into", self)
+		P._test_S = prev_p
+		J._test_S = prev_j
 	if args.has("journey_sweep"):
 		await _sweep()
 	for m in mod_total:
-		print("  %-8s %d/%d" % [m, int(mod_ok.get(m, 0)), int(mod_total[m])])
+		print("  %-10s %d/%d" % [m, int(mod_ok.get(m, 0)), int(mod_total[m])])
 	for f in fails.slice(0, 40):
 		print("  FAIL ", f)
-	print("TOWER_SELFTEST %d/%d (%.1f s)" % [ok, total, (Time.get_ticks_msec() - t0) / 1000.0])
+	print("TOWER_SELFTEST %d/%d (%.1f s)" % [ok, total, _wall_s - t0])
+	await get_tree().process_frame
+	await get_tree().process_frame
+	UI._fonts.clear()
+	V10Fonts._cache.clear()
+	V10Fonts._files.clear()
+	V10Type._fonts.clear()
+	V10Type._ls.clear()
+	Fx._add = null
 	get_tree().quit(0 if ok == total and total > 0 else 1)
 
 func check(cond: bool, what: String) -> void:
@@ -448,8 +472,8 @@ func _journey() -> void:
 	var w: = 2900
 	var t_edge: = U.week_start(w)
 	check(U.week_id(t_edge - 1) == w - 1 and U.week_id(t_edge) == w, "the week turns on Monday 04:00 MSK")
-	var dd: = Time.get_datetime_dict_from_unix_time(t_edge + U.MSK_OFFSET)
-	check(int(dd.weekday) == 1 and int(dd.hour) == 4 and int(dd.minute) == 0, "week start is Monday 04:00 MSK (%s)" % str(dd))
+	var dd: = U.civil_from_unix(t_edge + U.MSK_OFFSET)
+	check(int(dd.wd_mon) == 0 and int(dd.hour) == 4 and int(dd.minute) == 0, "week start is Monday 04:00 MSK (%s)" % str(dd))
 	check(U.week_refresh_text(w).ends_with("04:00 МСК") and U.week_refresh_text(w).begins_with("пн"), "refresh text: " + U.week_refresh_text(w))
 	check(not U.show_countdown(w, t_edge + 3600) and U.show_countdown(w, U.week_end(w) - 3600), "countdown only in the last 48 h")
 	# one week = one set of tables, for every attempt
@@ -736,7 +760,7 @@ func journey_bot(skill: String, w: int, sd: int) -> Dictionary:
 func _bots() -> void:
 	cur = "bots"
 	var n: = int(args.get("bot_runs", "100"))
-	var t0: = Time.get_ticks_msec()
+	var t0: = _wall_s
 	var hit: = 0
 	var floors: = []
 	for i in n:
@@ -747,7 +771,7 @@ func _bots() -> void:
 		if i % 5 == 4:
 			await get_tree().process_frame
 	floors.sort()
-	print("  bots: pagoda expert heat 0: floor>=10 %d/%d, median floor %d (%.1f s)" % [hit, n, floors[n / 2], (Time.get_ticks_msec() - t0) / 1000.0])
+	print("  bots: pagoda expert heat 0: floor>=10 %d/%d, median floor %d (%.1f s)" % [hit, n, floors[n / 2], _wall_s - t0])
 	check(float(hit) / n >= 0.6, "pagoda expert heat 0 reaches floor 10 in >= 60%% (%d/%d)" % [hit, n])
 	var hot: = []
 	for i in mini(n, 20):
@@ -813,7 +837,7 @@ func _make_matrix() -> void:
 	var floors_ref: = [10, 18, 26]
 	var seeds: = int(args.get("matrix_seeds", "8"))
 	var raw: = {}
-	var t0: = Time.get_ticks_msec()
+	var t0: = _wall_s
 	var single: = {}
 	var base: = _floor_rate({}, floors_ref, seeds)
 	for k in keys:
@@ -868,7 +892,7 @@ func _make_matrix() -> void:
 	var f: = FileAccess.open(M.MATRIX_PATH, FileAccess.WRITE)
 	f.store_string(JSON.stringify(out, "\t"))
 	f.close()
-	print("MODS_MATRIX base %.2f pairs %d forbidden %d max heat %d (%.1f s)" % [base, rates.size(), minimal.size(), mh, (Time.get_ticks_msec() - t0) / 1000.0])
+	print("MODS_MATRIX base %.2f pairs %d forbidden %d max heat %d (%.1f s)" % [base, rates.size(), minimal.size(), mh, _wall_s - t0])
 
 const MATRIX_MIN: = 0.34
 
