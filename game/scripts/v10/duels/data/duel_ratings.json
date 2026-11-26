@@ -1,0 +1,1384 @@
+{
+	"ver": 1,
+	"generated": "2026-11-26",
+	"games_per_cell": 32,
+	"anchor": {
+		"bot": "casual",
+		"rating": 1000
+	},
+	"bots": {
+		"novice": 753,
+		"casual": 1000,
+		"regular": 1206,
+		"steady": 1424,
+		"keen": 1642,
+		"skilled": 1884,
+		"expert": 2253,
+		"master": 2536
+	},
+	"ratings": {
+		"mc": [
+			494,
+			909,
+			1271,
+			1599,
+			1967
+		],
+		"rin": [
+			690,
+			1034,
+			1319,
+			1621,
+			1820
+		],
+		"hana": [
+			455,
+			965,
+			1343,
+			1931,
+			2319
+		],
+		"yue": [
+			773,
+			1164,
+			1489,
+			1749,
+			2123
+		],
+		"nova": [
+			773,
+			1082,
+			1457,
+			1870,
+			2163
+		],
+		"tsubame": [
+			637,
+			965,
+			1354,
+			1725,
+			2065
+		],
+		"miel": [
+			747,
+			1082,
+			1371,
+			1691,
+			1909
+		],
+		"lian": [
+			730,
+			1060,
+			1457,
+			1745,
+			2013
+		],
+		"jess": [
+			664,
+			1015,
+			1412,
+			1764,
+			2084
+		],
+		"tsuru": [
+			623,
+			1071,
+			1492,
+			2013,
+			2334
+		],
+		"kohaku": [
+			671,
+			1078,
+			1405,
+			1684,
+			2041
+		],
+		"shirin": [
+			537,
+			992,
+			1350,
+			1722,
+			2070
+		],
+		"mari": [
+			575,
+			996,
+			1443,
+			2013,
+			2371
+		],
+		"hibana": [
+			702,
+			961,
+			1319,
+			1635,
+			1904
+		],
+		"nemi": [
+			677,
+			1118,
+			1402,
+			1879,
+			2118
+		],
+		"zlata": [
+			664,
+			1060,
+			1392,
+			1784,
+			2089
+		],
+		"minamo": [
+			623,
+			1103,
+			1440,
+			1760,
+			2041
+		],
+		"kira": [
+			702,
+			1074,
+			1385,
+			1776,
+			2099
+		],
+		"vesper": [
+			719,
+			1111,
+			1461,
+			1879,
+			2148
+		],
+		"sigrid": [
+			736,
+			1056,
+			1440,
+			1606,
+			1858
+		]
+	},
+	"raw": {
+		"mc": [
+			494,
+			909,
+			1271,
+			1599,
+			1967
+		],
+		"rin": [
+			690,
+			1034,
+			1319,
+			1621,
+			1820
+		],
+		"hana": [
+			455,
+			965,
+			1343,
+			1931,
+			2319
+		],
+		"yue": [
+			773,
+			1164,
+			1489,
+			1749,
+			2123
+		],
+		"nova": [
+			773,
+			1082,
+			1457,
+			1870,
+			2163
+		],
+		"tsubame": [
+			637,
+			965,
+			1354,
+			1725,
+			2065
+		],
+		"miel": [
+			747,
+			1082,
+			1371,
+			1691,
+			1909
+		],
+		"lian": [
+			730,
+			1060,
+			1457,
+			1745,
+			2013
+		],
+		"jess": [
+			664,
+			1015,
+			1412,
+			1764,
+			2084
+		],
+		"tsuru": [
+			623,
+			1071,
+			1492,
+			2013,
+			2334
+		],
+		"kohaku": [
+			671,
+			1078,
+			1405,
+			1684,
+			2041
+		],
+		"shirin": [
+			537,
+			992,
+			1350,
+			1722,
+			2070
+		],
+		"mari": [
+			575,
+			996,
+			1443,
+			2013,
+			2371
+		],
+		"hibana": [
+			702,
+			961,
+			1319,
+			1635,
+			1904
+		],
+		"nemi": [
+			677,
+			1118,
+			1402,
+			1879,
+			2118
+		],
+		"zlata": [
+			664,
+			1060,
+			1392,
+			1784,
+			2089
+		],
+		"minamo": [
+			623,
+			1103,
+			1440,
+			1760,
+			2041
+		],
+		"kira": [
+			702,
+			1074,
+			1385,
+			1776,
+			2099
+		],
+		"vesper": [
+			719,
+			1111,
+			1461,
+			1879,
+			2148
+		],
+		"sigrid": [
+			736,
+			1056,
+			1440,
+			1606,
+			1858
+		]
+	},
+	"monotone_fixed": 0,
+	"her_score_x100": {
+		"mc": [
+			{
+				"novice": 3,
+				"casual": 3,
+				"regular": 0,
+				"steady": 8,
+				"keen": 0,
+				"skilled": 0,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 73,
+				"casual": 36,
+				"regular": 3,
+				"steady": 3,
+				"keen": 0,
+				"skilled": 0,
+				"expert": 6,
+				"master": 0
+			},
+			{
+				"novice": 100,
+				"casual": 84,
+				"regular": 67,
+				"steady": 22,
+				"keen": 0,
+				"skilled": 0,
+				"expert": 0,
+				"master": 3
+			},
+			{
+				"novice": 100,
+				"casual": 100,
+				"regular": 89,
+				"steady": 97,
+				"keen": 38,
+				"skilled": 0,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 100,
+				"casual": 98,
+				"regular": 97,
+				"steady": 100,
+				"keen": 95,
+				"skilled": 73,
+				"expert": 3,
+				"master": 0
+			}
+		],
+		"rin": [
+			{
+				"novice": 41,
+				"casual": 8,
+				"regular": 0,
+				"steady": 0,
+				"keen": 0,
+				"skilled": 0,
+				"expert": 0,
+				"master": 3
+			},
+			{
+				"novice": 88,
+				"casual": 53,
+				"regular": 22,
+				"steady": 3,
+				"keen": 3,
+				"skilled": 0,
+				"expert": 0,
+				"master": 3
+			},
+			{
+				"novice": 100,
+				"casual": 91,
+				"regular": 73,
+				"steady": 30,
+				"keen": 5,
+				"skilled": 0,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 100,
+				"casual": 100,
+				"regular": 100,
+				"steady": 81,
+				"keen": 48,
+				"skilled": 3,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 100,
+				"casual": 100,
+				"regular": 100,
+				"steady": 86,
+				"keen": 83,
+				"skilled": 42,
+				"expert": 0,
+				"master": 3
+			}
+		],
+		"hana": [
+			{
+				"novice": 6,
+				"casual": 0,
+				"regular": 0,
+				"steady": 3,
+				"keen": 0,
+				"skilled": 0,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 78,
+				"casual": 52,
+				"regular": 14,
+				"steady": 0,
+				"keen": 0,
+				"skilled": 0,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 100,
+				"casual": 98,
+				"regular": 83,
+				"steady": 28,
+				"keen": 0,
+				"skilled": 0,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 100,
+				"casual": 100,
+				"regular": 98,
+				"steady": 100,
+				"keen": 89,
+				"skilled": 59,
+				"expert": 8,
+				"master": 0
+			},
+			{
+				"novice": 100,
+				"casual": 100,
+				"regular": 100,
+				"steady": 100,
+				"keen": 100,
+				"skilled": 98,
+				"expert": 78,
+				"master": 3
+			}
+		],
+		"yue": [
+			{
+				"novice": 52,
+				"casual": 17,
+				"regular": 6,
+				"steady": 0,
+				"keen": 0,
+				"skilled": 0,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 95,
+				"casual": 84,
+				"regular": 38,
+				"steady": 11,
+				"keen": 0,
+				"skilled": 0,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 100,
+				"casual": 95,
+				"regular": 89,
+				"steady": 78,
+				"keen": 13,
+				"skilled": 0,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 100,
+				"casual": 100,
+				"regular": 92,
+				"steady": 89,
+				"keen": 78,
+				"skilled": 27,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 100,
+				"casual": 100,
+				"regular": 100,
+				"steady": 100,
+				"keen": 98,
+				"skilled": 95,
+				"expert": 25,
+				"master": 0
+			}
+		],
+		"nova": [
+			{
+				"novice": 56,
+				"casual": 9,
+				"regular": 3,
+				"steady": 3,
+				"keen": 3,
+				"skilled": 0,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 97,
+				"casual": 66,
+				"regular": 27,
+				"steady": 3,
+				"keen": 0,
+				"skilled": 0,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 100,
+				"casual": 100,
+				"regular": 91,
+				"steady": 66,
+				"keen": 5,
+				"skilled": 0,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 100,
+				"casual": 98,
+				"regular": 100,
+				"steady": 91,
+				"keen": 98,
+				"skilled": 45,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 100,
+				"casual": 100,
+				"regular": 100,
+				"steady": 100,
+				"keen": 100,
+				"skilled": 97,
+				"expert": 34,
+				"master": 0
+			}
+		],
+		"tsubame": [
+			{
+				"novice": 23,
+				"casual": 3,
+				"regular": 6,
+				"steady": 6,
+				"keen": 0,
+				"skilled": 0,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 80,
+				"casual": 47,
+				"regular": 11,
+				"steady": 3,
+				"keen": 0,
+				"skilled": 0,
+				"expert": 3,
+				"master": 0
+			},
+			{
+				"novice": 100,
+				"casual": 95,
+				"regular": 72,
+				"steady": 42,
+				"keen": 2,
+				"skilled": 0,
+				"expert": 0,
+				"master": 3
+			},
+			{
+				"novice": 100,
+				"casual": 98,
+				"regular": 97,
+				"steady": 97,
+				"keen": 64,
+				"skilled": 20,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 100,
+				"casual": 100,
+				"regular": 100,
+				"steady": 97,
+				"keen": 95,
+				"skilled": 89,
+				"expert": 19,
+				"master": 0
+			}
+		],
+		"miel": [
+			{
+				"novice": 55,
+				"casual": 11,
+				"regular": 2,
+				"steady": 0,
+				"keen": 0,
+				"skilled": 0,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 95,
+				"casual": 53,
+				"regular": 34,
+				"steady": 9,
+				"keen": 0,
+				"skilled": 0,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 100,
+				"casual": 97,
+				"regular": 77,
+				"steady": 39,
+				"keen": 6,
+				"skilled": 3,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 100,
+				"casual": 100,
+				"regular": 97,
+				"steady": 91,
+				"keen": 69,
+				"skilled": 6,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 100,
+				"casual": 100,
+				"regular": 100,
+				"steady": 86,
+				"keen": 92,
+				"skilled": 67,
+				"expert": 2,
+				"master": 0
+			}
+		],
+		"lian": [
+			{
+				"novice": 61,
+				"casual": 2,
+				"regular": 0,
+				"steady": 0,
+				"keen": 0,
+				"skilled": 0,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 97,
+				"casual": 63,
+				"regular": 22,
+				"steady": 2,
+				"keen": 0,
+				"skilled": 0,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 97,
+				"casual": 97,
+				"regular": 95,
+				"steady": 61,
+				"keen": 8,
+				"skilled": 0,
+				"expert": 3,
+				"master": 0
+			},
+			{
+				"novice": 100,
+				"casual": 100,
+				"regular": 97,
+				"steady": 95,
+				"keen": 83,
+				"skilled": 9,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 100,
+				"casual": 100,
+				"regular": 97,
+				"steady": 98,
+				"keen": 94,
+				"skilled": 88,
+				"expert": 6,
+				"master": 0
+			}
+		],
+		"jess": [
+			{
+				"novice": 38,
+				"casual": 2,
+				"regular": 3,
+				"steady": 3,
+				"keen": 0,
+				"skilled": 0,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 88,
+				"casual": 63,
+				"regular": 14,
+				"steady": 0,
+				"keen": 0,
+				"skilled": 0,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 100,
+				"casual": 98,
+				"regular": 92,
+				"steady": 45,
+				"keen": 5,
+				"skilled": 0,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 100,
+				"casual": 100,
+				"regular": 97,
+				"steady": 91,
+				"keen": 81,
+				"skilled": 20,
+				"expert": 3,
+				"master": 0
+			},
+			{
+				"novice": 100,
+				"casual": 100,
+				"regular": 100,
+				"steady": 97,
+				"keen": 100,
+				"skilled": 80,
+				"expert": 30,
+				"master": 0
+			}
+		],
+		"tsuru": [
+			{
+				"novice": 23,
+				"casual": 0,
+				"regular": 0,
+				"steady": 3,
+				"keen": 3,
+				"skilled": 0,
+				"expert": 6,
+				"master": 0
+			},
+			{
+				"novice": 86,
+				"casual": 64,
+				"regular": 28,
+				"steady": 6,
+				"keen": 0,
+				"skilled": 0,
+				"expert": 0,
+				"master": 3
+			},
+			{
+				"novice": 100,
+				"casual": 100,
+				"regular": 92,
+				"steady": 69,
+				"keen": 16,
+				"skilled": 0,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 100,
+				"casual": 100,
+				"regular": 100,
+				"steady": 98,
+				"keen": 92,
+				"skilled": 78,
+				"expert": 14,
+				"master": 0
+			},
+			{
+				"novice": 100,
+				"casual": 100,
+				"regular": 100,
+				"steady": 98,
+				"keen": 97,
+				"skilled": 97,
+				"expert": 83,
+				"master": 9
+			}
+		],
+		"kohaku": [
+			{
+				"novice": 36,
+				"casual": 5,
+				"regular": 0,
+				"steady": 3,
+				"keen": 0,
+				"skilled": 3,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 92,
+				"casual": 66,
+				"regular": 28,
+				"steady": 5,
+				"keen": 0,
+				"skilled": 0,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 100,
+				"casual": 97,
+				"regular": 83,
+				"steady": 44,
+				"keen": 11,
+				"skilled": 3,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 100,
+				"casual": 100,
+				"regular": 100,
+				"steady": 88,
+				"keen": 66,
+				"skilled": 6,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 100,
+				"casual": 100,
+				"regular": 100,
+				"steady": 91,
+				"keen": 100,
+				"skilled": 91,
+				"expert": 11,
+				"master": 0
+			}
+		],
+		"shirin": [
+			{
+				"novice": 19,
+				"casual": 2,
+				"regular": 0,
+				"steady": 0,
+				"keen": 0,
+				"skilled": 0,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 80,
+				"casual": 58,
+				"regular": 11,
+				"steady": 3,
+				"keen": 0,
+				"skilled": 0,
+				"expert": 0,
+				"master": 3
+			},
+			{
+				"novice": 100,
+				"casual": 91,
+				"regular": 70,
+				"steady": 45,
+				"keen": 0,
+				"skilled": 0,
+				"expert": 3,
+				"master": 3
+			},
+			{
+				"novice": 100,
+				"casual": 100,
+				"regular": 100,
+				"steady": 89,
+				"keen": 73,
+				"skilled": 13,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 100,
+				"casual": 100,
+				"regular": 100,
+				"steady": 100,
+				"keen": 100,
+				"skilled": 92,
+				"expert": 9,
+				"master": 0
+			}
+		],
+		"mari": [
+			{
+				"novice": 22,
+				"casual": 5,
+				"regular": 0,
+				"steady": 0,
+				"keen": 0,
+				"skilled": 0,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 86,
+				"casual": 55,
+				"regular": 13,
+				"steady": 3,
+				"keen": 0,
+				"skilled": 0,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 100,
+				"casual": 92,
+				"regular": 94,
+				"steady": 45,
+				"keen": 23,
+				"skilled": 0,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 100,
+				"casual": 100,
+				"regular": 100,
+				"steady": 100,
+				"keen": 92,
+				"skilled": 80,
+				"expert": 11,
+				"master": 0
+			},
+			{
+				"novice": 100,
+				"casual": 100,
+				"regular": 100,
+				"steady": 100,
+				"keen": 100,
+				"skilled": 100,
+				"expert": 91,
+				"master": 5
+			}
+		],
+		"hibana": [
+			{
+				"novice": 42,
+				"casual": 5,
+				"regular": 6,
+				"steady": 2,
+				"keen": 0,
+				"skilled": 0,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 84,
+				"casual": 45,
+				"regular": 9,
+				"steady": 0,
+				"keen": 0,
+				"skilled": 0,
+				"expert": 3,
+				"master": 0
+			},
+			{
+				"novice": 100,
+				"casual": 89,
+				"regular": 73,
+				"steady": 34,
+				"keen": 2,
+				"skilled": 0,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 97,
+				"casual": 98,
+				"regular": 95,
+				"steady": 78,
+				"keen": 70,
+				"skilled": 0,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 97,
+				"casual": 100,
+				"regular": 100,
+				"steady": 89,
+				"keen": 88,
+				"skilled": 72,
+				"expert": 0,
+				"master": 0
+			}
+		],
+		"nemi": [
+			{
+				"novice": 44,
+				"casual": 5,
+				"regular": 0,
+				"steady": 0,
+				"keen": 0,
+				"skilled": 0,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 89,
+				"casual": 77,
+				"regular": 36,
+				"steady": 3,
+				"keen": 0,
+				"skilled": 3,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 98,
+				"casual": 97,
+				"regular": 89,
+				"steady": 48,
+				"keen": 3,
+				"skilled": 0,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 100,
+				"casual": 100,
+				"regular": 100,
+				"steady": 98,
+				"keen": 83,
+				"skilled": 52,
+				"expert": 3,
+				"master": 0
+			},
+			{
+				"novice": 100,
+				"casual": 100,
+				"regular": 100,
+				"steady": 100,
+				"keen": 100,
+				"skilled": 89,
+				"expert": 28,
+				"master": 0
+			}
+		],
+		"zlata": [
+			{
+				"novice": 36,
+				"casual": 3,
+				"regular": 0,
+				"steady": 6,
+				"keen": 0,
+				"skilled": 0,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 89,
+				"casual": 75,
+				"regular": 13,
+				"steady": 6,
+				"keen": 0,
+				"skilled": 0,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 100,
+				"casual": 100,
+				"regular": 86,
+				"steady": 42,
+				"keen": 3,
+				"skilled": 0,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 100,
+				"casual": 100,
+				"regular": 100,
+				"steady": 88,
+				"keen": 81,
+				"skilled": 28,
+				"expert": 0,
+				"master": 3
+			},
+			{
+				"novice": 100,
+				"casual": 100,
+				"regular": 100,
+				"steady": 98,
+				"keen": 97,
+				"skilled": 84,
+				"expert": 25,
+				"master": 3
+			}
+		],
+		"minamo": [
+			{
+				"novice": 31,
+				"casual": 3,
+				"regular": 2,
+				"steady": 0,
+				"keen": 0,
+				"skilled": 0,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 97,
+				"casual": 66,
+				"regular": 30,
+				"steady": 6,
+				"keen": 0,
+				"skilled": 3,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 100,
+				"casual": 95,
+				"regular": 89,
+				"steady": 50,
+				"keen": 19,
+				"skilled": 0,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 100,
+				"casual": 100,
+				"regular": 100,
+				"steady": 91,
+				"keen": 77,
+				"skilled": 23,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 100,
+				"casual": 100,
+				"regular": 100,
+				"steady": 100,
+				"keen": 97,
+				"skilled": 78,
+				"expert": 14,
+				"master": 3
+			}
+		],
+		"kira": [
+			{
+				"novice": 42,
+				"casual": 9,
+				"regular": 0,
+				"steady": 3,
+				"keen": 0,
+				"skilled": 0,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 88,
+				"casual": 77,
+				"regular": 22,
+				"steady": 3,
+				"keen": 0,
+				"skilled": 0,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 97,
+				"casual": 95,
+				"regular": 86,
+				"steady": 47,
+				"keen": 3,
+				"skilled": 0,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 100,
+				"casual": 100,
+				"regular": 100,
+				"steady": 92,
+				"keen": 80,
+				"skilled": 22,
+				"expert": 3,
+				"master": 0
+			},
+			{
+				"novice": 100,
+				"casual": 98,
+				"regular": 98,
+				"steady": 95,
+				"keen": 94,
+				"skilled": 91,
+				"expert": 34,
+				"master": 0
+			}
+		],
+		"vesper": [
+			{
+				"novice": 50,
+				"casual": 3,
+				"regular": 0,
+				"steady": 3,
+				"keen": 3,
+				"skilled": 0,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 83,
+				"casual": 81,
+				"regular": 34,
+				"steady": 6,
+				"keen": 0,
+				"skilled": 0,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 100,
+				"casual": 94,
+				"regular": 92,
+				"steady": 63,
+				"keen": 14,
+				"skilled": 0,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 100,
+				"casual": 100,
+				"regular": 100,
+				"steady": 91,
+				"keen": 91,
+				"skilled": 42,
+				"expert": 6,
+				"master": 6
+			},
+			{
+				"novice": 100,
+				"casual": 100,
+				"regular": 100,
+				"steady": 100,
+				"keen": 97,
+				"skilled": 91,
+				"expert": 39,
+				"master": 0
+			}
+		],
+		"sigrid": [
+			{
+				"novice": 52,
+				"casual": 9,
+				"regular": 0,
+				"steady": 3,
+				"keen": 0,
+				"skilled": 0,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 92,
+				"casual": 67,
+				"regular": 20,
+				"steady": 2,
+				"keen": 0,
+				"skilled": 0,
+				"expert": 0,
+				"master": 0
+			},
+			{
+				"novice": 100,
+				"casual": 91,
+				"regular": 92,
+				"steady": 58,
+				"keen": 9,
+				"skilled": 0,
+				"expert": 3,
+				"master": 0
+			},
+			{
+				"novice": 100,
+				"casual": 97,
+				"regular": 95,
+				"steady": 78,
+				"keen": 53,
+				"skilled": 0,
+				"expert": 3,
+				"master": 0
+			},
+			{
+				"novice": 100,
+				"casual": 100,
+				"regular": 100,
+				"steady": 95,
+				"keen": 78,
+				"skilled": 55,
+				"expert": 0,
+				"master": 0
+			}
+		]
+	},
+	"forms": {
+		"pace_k": [
+			1.76,
+			1.35,
+			1.0,
+			0.7,
+			0.47
+		],
+		"telegraph": [
+			1.2,
+			1.07,
+			0.95,
+			0.82,
+			0.7
+		],
+		"need": [
+			7,
+			6,
+			5,
+			5,
+			4
+		],
+		"trick_n": [
+			1,
+			1,
+			1,
+			2,
+			2
+		],
+		"soft_steal": [
+			0.0,
+			0.1,
+			0.22,
+			0.35,
+			0.5
+		]
+	},
+	"secs": 112
+}
