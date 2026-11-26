@@ -322,6 +322,9 @@ static func _scene_strings(out: Array, kind: String, d: Dictionary, id: String) 
 # the banned fragments in one string (V10Lint.BANNED with its ALLOW list, plus EXTRA_BANNED)
 static func lint(text: String) -> Array:
 	var bad: = V10Lint.check(text)
+	for u in V10Lint.ui_check(text):
+		if not (u in bad):
+			bad.append(u)
 	var low: = text.to_lower()
 	for w in EXTRA_BANNED:
 		if low.find(w) >= 0 and not (w in bad):

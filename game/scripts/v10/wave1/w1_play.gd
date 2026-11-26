@@ -39,7 +39,7 @@ const SKILLS: = {
 	"tsubame": {"name": "Теневой шаг", "desc": "снимает пару, зажатую соседями сбоку"},
 	"miel": {"name": "Печенье-джокер", "desc": "кладёт в лоток печенье, которое встаёт в пару к любой фишке"},
 	"kohaku": {"name": "Лисий оберег", "desc": "вешает на лоток оберег от переполнения и подсвечивает пару"},
-	"shirin": {"name": "Танец монет", "desc": "снимает пару и сразу зажигает лихорадку"},
+	"shirin": {"name": "Танец монет", "desc": "снимает пару и сразу зажигает Азарт"},
 	"zlata": {"name": "Огненный шлейф", "desc": "снимает пару и растапливает лёд и замки между её фишками"},
 }
 
@@ -190,6 +190,9 @@ const PASSIVES: = {
 static func passive_engine(h: String) -> String:
 	return String(PASSIVES[h].engine) if PASSIVES.has(h) else h
 
+static func dar_line(h: String) -> String:
+	return "Дар: %s" % String(PASSIVES[h].short) if PASSIVES.has(h) else ""
+
 
 # ---------------------------------------------------------------- V6ModesData.BLESS («Лунная лестница», 0.6 climb)
 # Same ids and names as V10ModsData.BLESS (Пагода), with effects the 0.6 climb run already has (lamps, hint, undo,
@@ -273,11 +276,11 @@ const AI_STYLES: = {
 	"miel": {"call": 0.4, "riichi": 0.75, "defense": 0.4, "skill": 0.83, "value": 0.95, "speed": 0.95, "name": "Слоёное тесто",
 		"desc": "Не торопится: слой за слоем собирает руку подороже и смело идёт до конца."},
 	"kohaku": {"call": 0.3, "riichi": 0.85, "defense": 0.75, "skill": 0.9, "value": 1.05, "speed": 1.0, "name": "Лисья уловка",
-		"desc": "Любит риичи и дорогие руки, но при первой опасности прячет хвост в защиту."},
+		"desc": "Любит раннюю готовность и дорогие руки, но при первой опасности прячет хвост в защиту."},
 	"shirin": {"call": 0.35, "riichi": 0.6, "defense": 0.85, "skill": 0.9, "value": 0.9, "speed": 0.9, "name": "Звёздный расклад",
 		"desc": "Читает стол, как ладонь: терпеливо ждёт верную руку и редко рискует."},
 	"zlata": {"call": 0.7, "riichi": 0.95, "defense": 0.25, "skill": 0.88, "value": 1.1, "speed": 1.05, "name": "Огненный размах",
-		"desc": "Играет широко и щедро: риичи, дора и ни шагу назад."},
+		"desc": "Играет широко и щедро: ранняя готовность, дора и ни шагу назад."},
 }
 
 
@@ -551,6 +554,9 @@ static func self_check() -> Array:
 	for s in all_texts():
 		var t: = String(s)
 		var lint: = V10Lint.check(t)
+		for u in V10Lint.ui_check(t):
+			if not (u in lint):
+				lint.append(u)
 		if not lint.is_empty() or "бесплатн" in t.to_lower():
 			bad.append("text «%s»: %s" % [t, str(lint)])
 		for ch in t:

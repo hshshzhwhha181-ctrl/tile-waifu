@@ -48,7 +48,7 @@ const HERO_ORDER: = ["tsubame", "miel", "kohaku", "shirin", "zlata"]
 
 const HEROES: = {
 	"tsubame": {"name": "Цубамэ", "title": "Курьер миров, 24 года", "age": "24 года", "job": "куноити-курьер гильдии «Ночные ласточки», носит письма между мирами", "color": Color("c8283c")},
-	"miel": {"name": "Миэль", "title": "Кондитер, 25 лет", "age": "25 лет", "job": "кондитер западного квартала, хозяйка кондитерской «Мёд и пар»", "color": Color("e0566f")},
+	"miel": {"name": "Миэль", "title": "Кондитер, 25 лет", "age": "25 лет", "job": "кондитер западной улицы, хозяйка кондитерской «Мёд и пар»", "color": Color("e0566f")},
 	"kohaku": {"name": "Кохаку", "title": "Лиса-жрица, на вид 25", "age": "на вид 25 (лисе 900 лет)", "job": "белая лиса-жрица храма Тысячи врат", "color": Color("f3efe9")},
 	"shirin": {"name": "Ширин", "title": "Танцовщица, 26 лет", "age": "26 лет", "job": "танцовщица и гадалка каравана «Семь колодцев»", "color": Color("d9b26f")},
 	"zlata": {"name": "Злата", "title": "Царевна весны, 25 лет", "age": "25 лет", "job": "царевна Жар-птица из сказочного царства", "color": Color("c3242b")},
@@ -76,25 +76,47 @@ const RANK_OF_RAR: = {"R": "A", "SR": "S", "SSR": "SSR"}
 #                                 class of the founders); the modest preset / photos / posters / feed draw `alt`
 # No `pass` item: the season pass prize is picked per season by the economy lane (V10Catalog «@season_outfit»).
 const ITEMS: = [
-	{"id": "tb_base", "cat": "outfit", "hero": "tsubame", "rar": "R", "name": "Ночная ласточка", "img": "tb_base"},
-	{"id": "tb_post", "cat": "outfit", "hero": "tsubame", "rar": "SR", "name": "Почта сквозь миры", "img": "tb_post"},
-	{"id": "tb_crimson", "cat": "outfit", "hero": "tsubame", "rar": "SSR", "name": "Алая луна клана", "img": "tb_crimson"},
-	{"id": "me_base", "cat": "outfit", "hero": "miel", "rar": "R", "name": "Утренняя выпечка", "img": "me_base"},
-	{"id": "me_parlor", "cat": "outfit", "hero": "miel", "rar": "SR", "name": "Салон «Мёд»", "img": "me_parlor"},
-	{"id": "me_gala", "cat": "outfit", "hero": "miel", "rar": "SSR", "name": "Сахарный бал", "img": "me_gala"},
-	{"id": "ko_base", "cat": "outfit", "hero": "kohaku", "rar": "SR", "name": "Жрица тысячи врат", "img": "ko_base"},
-	{"id": "ko_matsuri", "cat": "outfit", "hero": "kohaku", "rar": "R", "name": "Ночной мацури", "img": "ko_matsuri", "shop": 480, "nogacha": true},
-	{"id": "ko_kyubi", "cat": "outfit", "hero": "kohaku", "rar": "SSR", "name": "Девятихвостая", "img": "ko_kyubi", "bold": true, "sfw": false, "alt": "ko_matsuri"},
-	{"id": "ko_vow", "cat": "outfit", "hero": "kohaku", "rar": "SSR", "name": "Обет лисьей свадьбы", "img": "ko_vow", "nogacha": true},
-	{"id": "sh_base", "cat": "outfit", "hero": "shirin", "rar": "SR", "name": "Танец семи колодцев", "img": "sh_base"},
-	{"id": "sh_oasis", "cat": "outfit", "hero": "shirin", "rar": "R", "name": "Оазис", "img": "sh_oasis", "shop": 480, "nogacha": true},
-	{"id": "sh_sun", "cat": "outfit", "hero": "shirin", "rar": "SSR", "name": "Дочь полуденного солнца", "img": "sh_sun"},
-	{"id": "sh_night", "cat": "outfit", "hero": "shirin", "rar": "SSR", "name": "Тысяча и одна партия", "img": "sh_night"},
-	{"id": "zl_base", "cat": "outfit", "hero": "zlata", "rar": "SSR", "name": "Жар-птица", "img": "zl_base"},
-	{"id": "zl_fair", "cat": "outfit", "hero": "zlata", "rar": "SR", "name": "Масленичная ярмарка", "img": "zl_fair"},
-	{"id": "zl_ember", "cat": "outfit", "hero": "zlata", "rar": "SSR", "name": "Царица-пламя", "img": "zl_ember"},
-	{"id": "zl_vow", "cat": "outfit", "hero": "zlata", "rar": "SSR", "name": "Обет Жар-птицы", "img": "zl_vow", "nogacha": true},
+	{"id": "tb_base", "cat": "outfit", "hero": "tsubame", "rar": "R", "rank": "A", "name": "Ночная ласточка", "img": "tb_base", "sfw": true, "lw": "LW33"},
+	{"id": "tb_post", "cat": "outfit", "hero": "tsubame", "rar": "SR", "rank": "S", "name": "Почта сквозь миры", "img": "tb_post", "sfw": true, "lw": "LW34"},
+	{"id": "tb_crimson", "cat": "outfit", "hero": "tsubame", "rar": "SSR", "rank": "SSR", "name": "Алая луна клана", "img": "tb_crimson", "sfw": true, "lw": "LW35"},
+	{"id": "me_base", "cat": "outfit", "hero": "miel", "rar": "R", "rank": "A", "name": "Утренняя выпечка", "img": "me_base", "sfw": true, "lw": "LW36"},
+	{"id": "me_parlor", "cat": "outfit", "hero": "miel", "rar": "SR", "rank": "S", "name": "Салон «Мёд»", "img": "me_parlor", "sfw": true, "lw": "LW37"},
+	{"id": "me_gala", "cat": "outfit", "hero": "miel", "rar": "SSR", "rank": "SSR", "name": "Сахарный бал", "img": "me_gala", "sfw": true, "lw": "LW38"},
+	{"id": "ko_base", "cat": "outfit", "hero": "kohaku", "rar": "SR", "rank": "S", "name": "Жрица тысячи врат", "img": "ko_base", "sfw": true, "lw": "LW48"},
+	{"id": "ko_matsuri", "cat": "outfit", "hero": "kohaku", "rar": "R", "rank": "A", "name": "Ночной мацури", "img": "ko_matsuri", "sfw": true, "lw": "LW49", "shop": 480, "nogacha": true},
+	{"id": "ko_kyubi", "cat": "outfit", "hero": "kohaku", "rar": "SSR", "rank": "SSR", "name": "Девятихвостая", "img": "ko_kyubi", "bold": true, "sfw": false, "alt": "ko_matsuri", "lw": "LW50"},
+	{"id": "ko_vow", "cat": "outfit", "hero": "kohaku", "rar": "SSR", "rank": "SSR", "name": "Обет лисьей свадьбы", "img": "ko_vow", "sfw": true, "lw": "LW51", "nogacha": true},
+	{"id": "sh_base", "cat": "outfit", "hero": "shirin", "rar": "SR", "rank": "S", "name": "Танец семи колодцев", "img": "sh_base", "sfw": true, "lw": "LW52"},
+	{"id": "sh_oasis", "cat": "outfit", "hero": "shirin", "rar": "R", "rank": "A", "name": "Оазис", "img": "sh_oasis", "sfw": true, "lw": "LW53", "shop": 480, "nogacha": true},
+	{"id": "sh_sun", "cat": "outfit", "hero": "shirin", "rar": "SSR", "rank": "SSR", "name": "Дочь полуденного солнца", "img": "sh_sun", "sfw": true, "lw": "LW54"},
+	{"id": "sh_night", "cat": "outfit", "hero": "shirin", "rar": "SSR", "rank": "SSR", "name": "Тысяча и одна партия", "img": "sh_night", "sfw": true, "lw": "LW55"},
+	{"id": "zl_base", "cat": "outfit", "hero": "zlata", "rar": "SSR", "rank": "SSR", "name": "Жар-птица", "img": "zl_base", "sfw": true, "lw": "LW68"},
+	{"id": "zl_fair", "cat": "outfit", "hero": "zlata", "rar": "SR", "rank": "S", "name": "Масленичная ярмарка", "img": "zl_fair", "sfw": true, "lw": "LW69"},
+	{"id": "zl_ember", "cat": "outfit", "hero": "zlata", "rar": "SSR", "rank": "SSR", "name": "Царица-пламя", "img": "zl_ember", "sfw": true, "lw": "LW70"},
+	{"id": "zl_vow", "cat": "outfit", "hero": "zlata", "rar": "SSR", "rank": "SSR", "name": "Обет Жар-птицы", "img": "zl_vow", "sfw": true, "lw": "LW71", "nogacha": true},
 ]
+
+# Legwear metadata (docs/LEGWEAR.md §3.1, §3.2): unique LW code, RU/EN names, rank, heroine and sfw flag per outfit
+const LEGWEAR: = {
+	"tb_base": {"code": "LW33", "hero": "tsubame", "rank": "A", "ru": "Ласточка", "en": "Swallow Print", "sfw": true},
+	"tb_post": {"code": "LW34", "hero": "tsubame", "rank": "S", "ru": "Лента почтальона", "en": "Courier Side-Lacing", "sfw": true},
+	"tb_crimson": {"code": "LW35", "hero": "tsubame", "rank": "SSR", "ru": "Сасико клана", "en": "Sashiko Clan Mark", "sfw": true},
+	"me_base": {"code": "LW36", "hero": "miel", "rank": "A", "ru": "Карамельная лента", "en": "Caramel Ribbon", "sfw": true},
+	"me_parlor": {"code": "LW37", "hero": "miel", "rank": "S", "ru": "Медовые соты", "en": "Dripping Honey", "sfw": true},
+	"me_gala": {"code": "LW38", "hero": "miel", "rank": "SSR", "ru": "Безе", "en": "Meringue Ruffle", "sfw": true},
+	"ko_base": {"code": "LW48", "hero": "kohaku", "rank": "S", "ru": "Бубенцы мико", "en": "Bell-Bow Thigh-Highs", "sfw": true},
+	"ko_matsuri": {"code": "LW49", "hero": "kohaku", "rank": "A", "ru": "Лисьи огни", "en": "Fox-Fire Knee Socks", "sfw": true},
+	"ko_kyubi": {"code": "LW50", "hero": "kohaku", "rank": "SSR", "ru": "Офуда", "en": "Ofuda Band", "sfw": false},
+	"ko_vow": {"code": "LW51", "hero": "kohaku", "rank": "SSR", "ru": "Красная нить", "en": "Red Thread", "sfw": true},
+	"sh_base": {"code": "LW52", "hero": "shirin", "rank": "S", "ru": "Пайал", "en": "Coin Payal", "sfw": true},
+	"sh_oasis": {"code": "LW53", "hero": "shirin", "rank": "A", "ru": "Базарные манжеты", "en": "Embroidered Cuffs", "sfw": true},
+	"sh_sun": {"code": "LW54", "hero": "shirin", "rank": "SSR", "ru": "Мехенди-стремя", "en": "Henna Stirrup", "sfw": true},
+	"sh_night": {"code": "LW55", "hero": "shirin", "rank": "SSR", "ru": "Звёздный арабеск", "en": "Star Arabesque", "sfw": true},
+	"zl_base": {"code": "LW68", "hero": "zlata", "rank": "SSR", "ru": "Золотая роспись", "en": "Gold-Thread Firebird", "sfw": true},
+	"zl_fair": {"code": "LW69", "hero": "zlata", "rank": "S", "ru": "Ярмарочная вышивка", "en": "Cross-Stitch Ribbon Ties", "sfw": true},
+	"zl_ember": {"code": "LW70", "hero": "zlata", "rank": "SSR", "ru": "Тлеющий шов", "en": "Ember Seam", "sfw": true},
+	"zl_vow": {"code": "LW71", "hero": "zlata", "rank": "SSR", "ru": "Кокошник", "en": "Gold-Sheen Vow", "sfw": true},
+}
 
 const BASE_OUTFITS: = ["tb_base", "me_base", "ko_base", "sh_base", "zl_base"]
 const VOW_AFF: = {"ko_vow": 10, "zl_vow": 10}
@@ -204,6 +226,15 @@ static func hero_of_img(img: String) -> String:
 # Симпатия level that grants an «Обет» outfit; 0 = not a vow
 static func vow_level(id: String) -> int:
 	return int(VOW_AFF.get(id, 0))
+
+
+static func legwear(id: String) -> Dictionary:
+	return LEGWEAR.get(id, {})
+
+
+static func outfit_rank(id: String) -> String:
+	var it: = item(id)
+	return String(it.get("rank", RANK_OF_RAR.get(String(it.get("rar", "")), "")))
 
 
 static func stage_bg(h: String) -> String:
@@ -615,7 +646,11 @@ static func _lint(t: String) -> Array:
 	var s: = _script_of("V10Lint")
 	if s == null:
 		return ["V10Lint missing"]
-	return s.call("check", t)
+	var bad: Array = s.call("check", t)
+	for u in s.call("ui_check", t):
+		if not (u in bad):
+			bad.append(u)
+	return bad
 
 
 # every check the wave-1 core data must pass; `files` also checks the art on disk and the measured JSON tables
@@ -671,11 +706,15 @@ static func selfcheck(files: = true) -> Array:
 		var id: = String(it.get("id", ""))
 		ck.call(not seen.has(id), "outfit id %s unique" % id)
 		seen[id] = true
-		for k in ["id", "cat", "hero", "rar", "name", "img"]:
+		for k in ["id", "cat", "hero", "rar", "rank", "name", "img", "sfw", "lw"]:
 			ck.call(it.has(k), "%s.%s" % [id, k])
 		ck.call(String(it.get("cat", "")) == "outfit", "%s is an outfit" % id)
 		ck.call(HEROES.has(String(it.get("hero", ""))), "%s hero" % id)
 		ck.call(String(it.get("rar", "")) in RANK_OF_RAR, "%s rar" % id)
+		ck.call(String(it.get("rank", "")) == String(RANK_OF_RAR.get(String(it.get("rar", "")), "")), "%s rank matches rar" % id)
+		var lw: Dictionary = LEGWEAR.get(id, {})
+		ck.call(not lw.is_empty() and String(lw.get("code", "")) == String(it.get("lw", "")) and String(lw.get("hero", "")) == String(it.get("hero", "")) and String(lw.get("rank", "")) == String(it.get("rank", "")) and bool(lw.get("sfw", true)) == bool(it.get("sfw", true)), "%s legwear LW metadata matches" % id)
+		ck.call(_cyr(String(lw.get("ru", ""))) and _lint(String(lw.get("ru", ""))).is_empty(), "%s legwear RU name clean" % id)
 		ck.call(String(it.get("img", "")) == id, "%s img = id" % id)
 		ck.call(not it.get("start", false) and not it.get("hidden", false), "%s is neither start nor hidden" % id)
 		var nm: = String(it.get("name", ""))

@@ -93,7 +93,7 @@ const RAR: = {
 }
 const VOWS: = ["ko_vow", "zl_vow"]
 
-# target: as V9Ults.CORES (pair / swipe / row / tier / none). desc is the short line of «Умение «…»: …» (levels screen,
+# target: as V9Ults.CORES (pair / swipe / row / tier / none). desc is the short line of «Приём «…»: …» (levels screen,
 # ≤ 45 letters); rule is the whole rule for help / glossary cards.
 const CORES: = {
 	"tsubame": {"name": "Теневой шаг", "desc": "снимает пару, зажатую соседями сбоку",
@@ -105,8 +105,8 @@ const CORES: = {
 	"kohaku": {"name": "Лисий оберег", "desc": "оберег на лотке спасёт от переполнения",
 		"rule": "Вешает на лоток оберег. Если лоток переполнится, оберег сгорит и унесёт старую фишку лотка вместе с её парой — без проигрыша. Сразу подсвечивает 1 пару. Оберег один: если он уже висит, снимает 1 пару.",
 		"target": "none", "pairs": 1, "charm": 1, "charm_burn": 2, "highlight_pair": true},
-	"shirin": {"name": "Танец монет", "desc": "снимает 1 пару и зажигает лихорадку",
-		"rule": "Снимает 1 пару и сразу зажигает лихорадку по обычным правилам.",
+	"shirin": {"name": "Танец монет", "desc": "снимает 1 пару и зажигает Азарт",
+		"rule": "Снимает 1 пару и сразу зажигает Азарт по обычным правилам.",
 		"target": "pair", "pairs": 1, "fever": true},
 	"zlata": {"name": "Огненный шлейф", "desc": "снимает пару, растапливая лёд на её пути",
 		"rule": "Снимает выбранную пару и растапливает весь лёд и замки на линии между двумя её фишками.",
@@ -117,8 +117,8 @@ const CORES: = {
 const RANKED_CORES: = {
 	"kohaku": {"rule": "Вешает на лоток оберег. Если лоток переполнится, оберег сгорит и унесёт старую фишку лотка вместе с её парой — без проигрыша. Оберег один: если он уже висит, снимает 1 пару.",
 		"highlight_pair": false},
-	"shirin": {"desc": "снимает 1 пару и копит лихорадку",
-		"rule": "Снимает 1 пару и добавляет шкале лихорадки полступени комбо.", "fever": false, "fever_charge": 0.06},
+	"shirin": {"desc": "снимает 1 пару и копит Азарт",
+		"rule": "Снимает 1 пару и добавляет шкале Азарта полступени комбо.", "fever": false, "fever_charge": 0.06},
 	"zlata": {"desc": "снимает пару и растапливает 1 лёд",
 		"rule": "Снимает выбранную пару и растапливает 1 лёд или замок, сначала на её линии.", "melt_line": false, "melt": 1},
 }
@@ -1111,6 +1111,9 @@ static func _latin(s: String) -> bool:
 # banned fragments in a heroine string: V10Lint.BANNED (+ «бесплатн» next to a price) and the HEROINES §4 red lines
 static func banned(text: String) -> Array:
 	var bad: Array = V10Lint.check(text)
+	for u in V10Lint.ui_check(text):
+		if not (u in bad):
+			bad.append(u)
 	var low: = text.to_lower()
 	for w in RED_LINES:
 		if low.find(w) >= 0:
@@ -1118,17 +1121,26 @@ static func banned(text: String) -> Array:
 	return bad
 
 
-# G.HEROES as the game sees it (the integrator may merge wave 1 through a function rather than the const)
+# G.HEROES as the game sees it (the integrator may merge wave 1 through a function or V10Wave1.heroes() rather than the const)
 static func _heroes_table() -> Dictionary:
 	var g: = _g()
-	if g == null:
-		return {}
-	if g.has_method("heroes"):
+	if g != null and g.has_method("heroes"):
 		var hs = g.call("heroes")
 		if hs is Dictionary:
 			return hs
-	var h0 = g.get("HEROES")
-	return h0 if h0 is Dictionary else {}
+	for c in ProjectSettings.get_global_class_list():
+		if String(c.get("class", "")) == "V10Wave1":
+			var w1 = load(String(c.path))
+			if w1 != null and bool(w1.call("is_installed")):
+				var wh = w1.call("heroes")
+				if wh is Dictionary and not wh.is_empty():
+					return wh
+			break
+	if g != null:
+		var h0 = g.get("HEROES")
+		if h0 is Dictionary:
+			return h0
+	return {}
 
 
 static func texts() -> Array:

@@ -649,6 +649,90 @@
 				0.4087
 			],
 			"face_w": 150.2
+		},
+		"tsubame_sad": {
+			"file": "res://assets/v10/wave1/emotions/tsubame_sad.webp",
+			"size": [
+				600,
+				800
+			],
+			"face": [
+				0.618,
+				0.3769
+			],
+			"face_w": 147.9
+		},
+		"miel_sad": {
+			"file": "res://assets/v10/wave1/emotions/miel_sad.webp",
+			"size": [
+				600,
+				800
+			],
+			"face": [
+				0.5369,
+				0.292
+			],
+			"face_w": 164.8
+		},
+		"kohaku_happy": {
+			"file": "res://assets/v10/wave1/emotions/kohaku_happy.webp",
+			"size": [
+				600,
+				800
+			],
+			"face": [
+				0.5234,
+				0.3833
+			],
+			"face_w": 156.2
+		},
+		"shirin_happy": {
+			"file": "res://assets/v10/wave1/emotions/shirin_happy.webp",
+			"size": [
+				600,
+				800
+			],
+			"face": [
+				0.4991,
+				0.3759
+			],
+			"face_w": 129.3
+		},
+		"shirin_sad": {
+			"file": "res://assets/v10/wave1/emotions/shirin_sad.webp",
+			"size": [
+				600,
+				800
+			],
+			"face": [
+				0.5471,
+				0.3896
+			],
+			"face_w": 150.1
+		},
+		"shirin_pout": {
+			"file": "res://assets/v10/wave1/emotions/shirin_pout.webp",
+			"size": [
+				600,
+				800
+			],
+			"face": [
+				0.5471,
+				0.3896
+			],
+			"face_w": 150.1
+		},
+		"zlata_pout": {
+			"file": "res://assets/v10/wave1/emotions/zlata_pout.webp",
+			"size": [
+				600,
+				800
+			],
+			"face": [
+				0.5012,
+				0.4069
+			],
+			"face_w": 140.5
 		}
 	},
 	"poses": {
@@ -1001,7 +1085,9 @@
 		"poses": "face_rect in px of the pose webp (same rule); <hero>_idle is the base FINAL card",
 		"emotions": "face = face centre as a fraction of the file (V8Art.EMO_FACE), face_w = face width in file px (V8Art.EMO_FACE_W, 1.75 × eye distance)",
 		"pending": [],
-		"emotions_missing": [
+		"emotions_missing": [],
+		"emotions_auto": [],
+		"emotions_derived": [
 			"tsubame_sad",
 			"miel_sad",
 			"kohaku_happy",
@@ -1009,7 +1095,6 @@
 			"shirin_sad",
 			"shirin_pout",
 			"zlata_pout"
-		],
-		"emotions_auto": []
+		]
 	}
 }

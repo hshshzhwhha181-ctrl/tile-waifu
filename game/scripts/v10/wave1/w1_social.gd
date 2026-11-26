@@ -84,7 +84,7 @@ const VOL: = {"threads": 14, "daily": 7, "outfit_threads": 2, "stickers": 8, "fe
 const MOODS: = ["warm", "fun", "tease", "tired", "win"]
 const REACT_KEYS: = ["heart", "laugh", "wow", "sad", "fire", "tea", "sticker_warm", "sticker_fun", "sticker_tease",
 	"sticker_tired", "sticker_win"]
-const WEEK_BLACK: = ["проигр", "ноч", "не было", "пропуст", "₽", "трат", "покуп", "другие игроки", "лучше, чем"]
+const WEEK_BLACK: = ["проигр", "ноч", "не было", "пропуст", "\u20bd", "трат", "покуп", "другие игроки", "лучше, чем"]
 const GENDERED: = ["ты пришёл", "ты пришла", "ты был ", "ты была", "ты собрал ", "ты подарил ", "уходил "]
 
 static var _cache: = {}
