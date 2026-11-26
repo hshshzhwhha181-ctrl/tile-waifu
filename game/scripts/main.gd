@@ -244,19 +244,20 @@ func _meet_scene(sp: Control, hero: Hero) -> void :
 		"Перед каждой партией я гадаю на омикудзи. А девушки квартала, если подружишься, помогут своими умениями.", 
 		"Ну что, садись напротив. Первую партию сыграем вместе, я подскажу.", 
 	]
-	var box: = UI.rbox("plum", Rect2(CR.position.x + 18, H - safe_bottom - 330, CR.size.x - 36, 220), 28, 4, 12)
-	box.colors(Color(0.16, 0.08, 0.26, 0.94), Color(0.08, 0.04, 0.14, 0.96)).borders(Color("fff0b8"), Color("c58a2c"))
+	var box: = UI.rbox("plum", Rect2(CR.position.x + 14, H - safe_bottom - 344, CR.size.x - 28, 252), 28, 4, 12)
+	box.colors(Color(0.11, 0.045, 0.16, 0.94), Color(0.05, 0.02, 0.08, 0.97)).borders(Color("ffeaa8"), Color("c88f32"))
 	sp.add_child(box)
-	var nameplate: = UI.rbox("pink", Rect2(30, -26, 220, 48), 22, 3, 8)
+	var nameplate: = UI.rbox("pink", Rect2(26, -28, 256, 54), 24, 3, 8)
+	nameplate.borders(Color("ffeaa8"), Color("c88f32"))
 	box.add_child(nameplate)
-	nameplate.add_child(UI.center_label(UI.label("Маджонг-тян", 22, Color.WHITE, Color("7a2346"), 4, "body", 900), Rect2(0, 0, 220, 48)))
-	var txt: = UI.label("", 25, Color("fff1dc"), UI.DARK, 2, "body", 800)
-	txt.position = Vector2(30, 40)
-	txt.size = Vector2(CR.size.x - 100, 150)
+	nameplate.add_child(UI.center_label(UI.label("Маджонг-тян", 26, Color("fff8ec"), Color("4a1028"), 5, "body", 900), Rect2(0, 0, 256, 54)))
+	var txt: = UI.label("", 27, Color("fff7eb"), Color(0.05, 0.02, 0.08, 0.96), 4, "body", 800)
+	txt.position = Vector2(28, 38)
+	txt.size = Vector2(CR.size.x - 84, 174)
 	txt.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(txt)
-	var more: = UI.label("▼", 20, Color("ffd98a"))
-	more.position = Vector2(CR.size.x - 90, 180)
+	var more: = UI.label("▼", 24, Color("ffe28a"))
+	more.position = Vector2(CR.size.x - 78, 206)
 	box.add_child(more)
 	UI.slide_in(box, Vector2(0, 60), 0.0, 0.35)
 	for line in lines:
