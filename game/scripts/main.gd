@@ -26,6 +26,7 @@ var SCREENS: = {
 	"profile": preload("res://scripts/v08/profile/profile_screen.gd"),
 	"letters": preload("res://scripts/v09/letters/letters_screen.gd"),
 	"tables": preload("res://scripts/v10/core/tables_hub.gd"),
+	"v10boudoir": preload("res://scripts/v10/salon/vip_boudoir_screen.gd"),
 }
 
 var W: = 720.0

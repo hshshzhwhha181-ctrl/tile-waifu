@@ -780,6 +780,10 @@ func _finish(victory: bool) -> void:
 		rw = V10AdventureData.record_win(stage_idx, battle.dmg_total)
 		V10Money.grant({"gems": int(rw.gems), "coins": int(rw.coins)}, "adventure")
 		G.add_aff(hero_id, int(rw.aff))
+		var gift_tier: = 1 if stage_idx < 2 else (2 if stage_idx < 4 else 3)
+		var g_id: = V10AffCurve.award_boss_gift(gift_tier)
+		var g_def: = V10AffCurve.gift_def(g_id)
+		rw["gift_name"] = String(g_def.get("name", ""))
 		G.save()
 	else:
 		Sfx.say(hero_id, "lose")
@@ -799,7 +803,8 @@ func _finish(victory: bool) -> void:
 	t_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	card.add_child(t_lbl)
 	var refund_note: = ("\nВозвращено чая: +%d" % refunded) if refunded > 0 else ""
-	var sub_txt: String = ("%s повержен!\nНаграда: +%d кристаллов · +%d монет · +%d симпатии" % [String(battle.m.name), int(rw.gems), int(rw.coins), int(rw.aff)]) if victory else ("%s оказался сильнее.%s\nСнимай золотые пары и жми Суперудар внизу для оглушения!" % [String(battle.m.name), refund_note])
+	var gift_note: = ("\nТрофей: Подарок «%s»" % String(rw.get("gift_name", ""))) if String(rw.get("gift_name", "")) != "" else ""
+	var sub_txt: String = ("%s повержен!\nНаграда: +%d кристаллов · +%d монет · +%d симпатии%s" % [String(battle.m.name), int(rw.gems), int(rw.coins), int(rw.aff), gift_note]) if victory else ("%s оказался сильнее.%s\nСнимай золотые пары и жми Суперудар внизу для оглушения!" % [String(battle.m.name), refund_note])
 	var sub: = UI.label(sub_txt, 20, Color("#F2E6D8"), Color(0.06, 0.03, 0.10), 3, "body", 800)
 	sub.position = Vector2(24, 92)
 	sub.size = Vector2(card.size.x - 48, 138)

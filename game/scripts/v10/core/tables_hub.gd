@@ -9,6 +9,9 @@ const SHELVES: = [
 	["Приключение · Битвы с монстрами", [
 		["adventure", "Битва с монстрами"],
 	]],
+	["VIP-Салон · Будуары 16+", [
+		["salon_vip", "VIP-Будуары Салона"],
+	]],
 	["Пасьянсы", [
 		["classic", "Классика"],
 		["triples", "Тройки"],
@@ -63,6 +66,7 @@ const ART: = {
 	"blitz": [HF + "banner_shirin.png", Vector2(0.5, 0.35), 1.0, "hint"],
 	"tourney": ["res://assets/v08/ui/bg/tourney.webp", Vector2(0.5, 0.5), 1.0, "trophy"],
 	"adventure": ["res://assets/v10/adventure/paper_oni.png", Vector2(0.5, 0.32), 1.0, "trophy"],
+	"salon_vip": ["res://assets/v10/salon_vip/boudoir_mc.webp", Vector2(0.5, 0.42), 1.0, "heart"],
 	"default": [HF + "banner_path.png", Vector2(0.5, 0.35), 1.0, "nav:play"],
 }
 
@@ -95,6 +99,9 @@ func build(m, args: Dictionary) -> void:
 	tint.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(tint)
 	V8Header.make(self, main, "Столы", Callable(), _hub_help)
+	var st_pill: = V10Stamina.make_pill(main)
+	st_pill.position = Vector2(W - 92.0 - 166.0, 24.0)
+	add_child(st_pill)
 	_scroll = ScrollContainer.new()
 	_scroll.name = "TablesScroll"
 	_scroll.position = Vector2(0.0, 104.0)
@@ -312,7 +319,7 @@ func _caption(text: String, y: float, accent: Color) -> float:
 func _mode_is_open(id: String) -> bool:
 	var u: = int(G.S.get("unlocked", 1))
 	match id:
-		"adventure":
+		"adventure", "salon_vip":
 			return true
 		"classic":
 			return u >= 10
@@ -392,6 +399,8 @@ func _status_v10(id: String) -> String:
 		"adventure":
 			var ai: Dictionary = V10AdventureData.hub_card_info()
 			return String(ai.get("subtitle", "Сразись с ёкай-боссами"))
+		"salon_vip":
+			return "4 будуара · Подарки симпатии 16+"
 		"classic":
 			return "Свободная · День · Память"
 		"triples":
@@ -446,6 +455,8 @@ func _open_v10(id: String) -> void:
 		"adventure":
 			var ai2: Dictionary = V10AdventureData.hub_card_info()
 			main.go("adventure", {"stage": int(ai2.get("stage", 0)), "hero": hero})
+		"salon_vip":
+			main.go("v10boudoir", {"hero": hero})
 		"classic":
 			main.go("mj_classic_lobby", {"hero": "mc", "partner": hero})
 		"triples":

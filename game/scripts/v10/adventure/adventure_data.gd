@@ -408,9 +408,9 @@ static func ult_video_path(hero_id: String, equipped_id: String = "") -> String:
 	var cands: Array[String] = []
 	if equipped_id != "":
 		cands.append("%s/%s.ogv" % [ULT_VIDEO_DIR, equipped_id])
-		if equipped_id == "o_queen":
+		if equipped_id in ["y_queen", "y_ball", "o_queen"]:
 			cands.append("%s/yue_queen.ogv" % ULT_VIDEO_DIR)
-		elif equipped_id == "o_roof":
+		elif equipped_id in ["n_ssr", "n_offline", "o_roof"]:
 			cands.append("%s/nova_roof.ogv" % ULT_VIDEO_DIR)
 		elif equipped_id == "o_base" and hero_id == "mc":
 			cands.append("%s/mc_base.ogv" % ULT_VIDEO_DIR)

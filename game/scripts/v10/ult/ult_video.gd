@@ -51,6 +51,10 @@ static func resolve_video_path(h: String, outf: String = "") -> String:
 	var cands: Array[String] = []
 	if outf != "":
 		cands.append(VID_DIR + outf + ".ogv")
+		if outf in ["y_queen", "y_ball", "o_queen"]:
+			cands.append(VID_DIR + "yue_queen.ogv")
+		elif outf in ["n_ssr", "n_offline", "o_roof"]:
+			cands.append(VID_DIR + "nova_roof.ogv")
 	if img_id != "":
 		cands.append(VID_DIR + img_id + ".ogv")
 	if h != "":

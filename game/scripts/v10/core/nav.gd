@@ -103,6 +103,18 @@ static func path_info() -> Dictionary:
 
 static func play_path(main) -> void:
 	var cur: = V10PathState.current()
+	var is_auto: = false
+	for ua in OS.get_cmdline_user_args():
+		if ua.begins_with("--shots=") or ua.begins_with("--smoke") or ua.begins_with("--selftest") or ua.begins_with("--tut") or ua.begins_with("--contract"):
+			is_auto = true
+			break
+	if not is_auto:
+		var tea_cost: = V10Stamina.cost_for_level(cur, "path")
+		if tea_cost > 0:
+			if not V10Stamina.can_spend(tea_cost):
+				V10Stamina.open_sheet(main)
+				return
+			V10Stamina.spend(tea_cost, "path")
 	var hero: String = G.S.level_partner if G.hero_unlocked(G.S.level_partner) else "mc"
 	main.go("play", {"level": cur, "partner": hero, "v10_cfg": V10PathState.play_cfg(cur)})
 

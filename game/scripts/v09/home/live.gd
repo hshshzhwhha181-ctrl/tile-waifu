@@ -560,18 +560,32 @@ func say(text: String, emo: = "", voice: = "", talk: = true) -> void:
 	# eyes (bottom past head − 0.45 r), it hangs just under her chin with the tail pointing up instead.
 	var hr: float = (_home_pt(from_art(geom.head + Vector2(0, float(geom.head_r)))) - head).y
 	var h: = _bubble_h(text, with_av)
-	var top: = 176.0 if mode == "video" else BUBBLE_TOP
-	pos.y = maxf(top, head.y - hr - 30.0 - h)
 	var over_clock: = false
-	if pos.y + h > head.y - hr * 0.45:
-		# 0.9: every reply (hand, outfit, room — not only the head) stays above her head: rise over the clock plate
-		# first; only a line too long even for that hangs under her chin
-		pos.y = maxf(BUBBLE_TOP_MIN, head.y - hr - 30.0 - h)
-		over_clock = pos.y < top
+	var h2: Control = home.get_node_or_null("V10HudHome") as Control
+	if h2 != null and home.size.y > 700.0:
+		# 0.11.0 Tea House: float cleanly above the bottom action dock so the bubble NEVER covers
+		# the heroine's face or the top-right Framing / Tea Stamina / Mute pills.
+		var w: = BUBBLE_W + (AV - 6.0 if with_av else 0.0)
+		var play_top: float = home.size.y - 310.0
+		var hm = home.get("main")
+		var h2L = h2.get("L")
+		if h2L is Dictionary and (h2L as Dictionary).has("play") and hm != null:
+			play_top = float(((h2L as Dictionary)["play"] as Rect2).position.y) - float(hm.CR.position.y)
+		pos.x = clampf((home.size.x - w) * 0.5, 24.0, maxf(24.0, home.size.x - w - 24.0))
+		pos.y = clampf(play_top - h - 28.0, 260.0, maxf(260.0, home.size.y - h - 220.0))
+		tail_up = true
+	else:
+		var top: = 176.0 if mode == "video" else BUBBLE_TOP
+		pos.y = maxf(top, head.y - hr - 30.0 - h)
 		if pos.y + h > head.y - hr * 0.45:
-			pos.y = maxf(96.0, BUBBLE_TOP_MIN - 12.0)
-			tail_up = false
-			over_clock = true
+			# 0.9: every reply (hand, outfit, room — not only the head) stays above her head: rise over the clock plate
+			# first; only a line too long even for that hangs under her chin
+			pos.y = maxf(BUBBLE_TOP_MIN, head.y - hr - 30.0 - h)
+			over_clock = pos.y < top
+			if pos.y + h > head.y - hr * 0.45:
+				pos.y = maxf(96.0, BUBBLE_TOP_MIN - 12.0)
+				tail_up = false
+				over_clock = true
 	bubble = _bubble(text, pos, _paint_emo(emo) if with_av else emo, with_av, tail_up, head.x - pos.x)
 	home.set("bubble", bubble)
 	_clock_fade(over_clock, bubble)

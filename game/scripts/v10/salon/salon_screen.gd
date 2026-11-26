@@ -58,10 +58,25 @@ func build(m, args: Dictionary) -> void:
 	bg.size = br.size
 	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(bg)
+	var vip_bg_p: = "res://assets/v10/salon_vip/boudoir_mc.webp"
+	if ResourceLoader.exists(vip_bg_p):
+		var vbg: = TextureRect.new()
+		vbg.texture = load(vip_bg_p)
+		vbg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		vbg.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+		vbg.position = br.position
+		vbg.size = br.size
+		vbg.modulate = Color(0.55, 0.38, 0.48, 0.38)
+		vbg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		add_child(vbg)
 	_top_pad = _safe_top()
 	_header_h = _top_pad + 112.0
 	_build_map()
 	_build_header()
+	if main != null and ResourceLoader.exists("res://assets/v10/salon_vip/boudoir_mc.webp"):
+		var vb: = _vip_boudoir_banner(minf(W, 1000.0))
+		vb.position = Vector2(0, _header_h + 2.0)
+		add_child(vb)
 	_build_bottom()
 	toast_box = Control.new()
 	toast_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -165,7 +180,8 @@ func _fill() -> void:
 		c.queue_free()
 	zones.clear()
 	var zw: = minf(W, 1000.0)
-	_spacer(_header_h + 8)
+	var vip_extra: = 132.0 if (main != null and ResourceLoader.exists("res://assets/v10/salon_vip/boudoir_mc.webp")) else 0.0
+	_spacer(_header_h + 8.0 + vip_extra)
 	# the one locked teaser on top: the next locked zone, else arc 2
 	var ids: Array = V10SalonData.zone_ids()
 	var shown: = []
@@ -203,6 +219,62 @@ func _spacer(h: float) -> void:
 	s.custom_minimum_size = Vector2(W, h)
 	s.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	list.add_child(s)
+
+
+func _vip_boudoir_banner(zw: float) -> Control:
+	var c: = Control.new()
+	c.size = Vector2(W, 122)
+	c.custom_minimum_size = Vector2(W, 122)
+	c.mouse_filter = Control.MOUSE_FILTER_STOP
+	var bw: = zw - 48.0
+	var bx: = (W - zw) * 0.5 + 24.0
+	var frame: = Panel.new()
+	frame.position = Vector2(bx, 2)
+	frame.size = Vector2(bw, 116)
+	frame.clip_contents = true
+	frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var sb: = StyleBoxFlat.new()
+	sb.bg_color = Color(0.14, 0.05, 0.16, 0.98)
+	sb.border_color = V10SalonUI.GOLD_300
+	sb.set_border_width_all(2)
+	sb.set_corner_radius_all(18)
+	sb.shadow_color = Color(0.0, 0.0, 0.0, 0.65)
+	sb.shadow_size = 10
+	frame.add_theme_stylebox_override("panel", sb)
+	c.add_child(frame)
+	var thumbs: Array[String] = ["boudoir_mc.webp", "teabar_rin.webp", "moonbath_yue.webp", "penthouse_nova.webp"]
+	var tw: = bw / float(thumbs.size())
+	for i in thumbs.size():
+		var tp: String = "res://assets/v10/salon_vip/" + thumbs[i]
+		if ResourceLoader.exists(tp):
+			var tr: = TextureRect.new()
+			tr.texture = load(tp)
+			tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+			tr.position = Vector2(float(i) * tw, 0)
+			tr.size = Vector2(tw + 2.0, 116)
+			tr.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			frame.add_child(tr)
+	var shade: = ColorRect.new()
+	shade.color = Color(0.07, 0.02, 0.11, 0.50)
+	shade.size = Vector2(bw, 116)
+	shade.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	frame.add_child(shade)
+	var ov: = V10SalonUI.label("VIP · 4 БУДУАРА ГЕРОИНЬ 16+", 18, V10SalonUI.GOLD_300, "body", 800, 0.9)
+	ov.position = Vector2(20, 12)
+	frame.add_child(ov)
+	var title: = V10SalonUI.label("VIP-Будуары Салона ›", 32, V10SalonUI.PAPER_100, "italic", 600, 0.95)
+	title.position = Vector2(20, 36)
+	frame.add_child(title)
+	var sub: = V10SalonUI.label("Алый будуар · Бар Рин · Купальни Юэ · Пентхаус Новы", 18, V10SalonUI.PAPER_300, "body", 700, 0.85)
+	sub.position = Vector2(20, 82)
+	frame.add_child(sub)
+	c.gui_input.connect(func(e: InputEvent) -> void:
+		if (e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT) or (e is InputEventScreenTouch and e.pressed):
+			c.accept_event()
+			if main != null and main.has_method("go"):
+				main.go("v10boudoir", {}))
+	return c
 
 
 func _lock_plate(zid: String, sz: Vector2) -> Control:
