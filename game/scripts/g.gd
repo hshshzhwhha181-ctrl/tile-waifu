@@ -64,13 +64,13 @@ var ITEMS: = [
 	{"id": "r_idol", "cat": "outfit", "hero": "rin", "rar": "SSR", "name": "Звёздная айдол", "img": "rin_idol"}, 
 	{"id": "h_base", "cat": "outfit", "hero": "hana", "rar": "R", "name": "Спортивный стиль", "img": "hana_base"}, 
 	{"id": "h_street", "cat": "outfit", "hero": "hana", "rar": "SR", "name": "Уличный раннер", "img": "hana_street"}, 
-	{"id": "h_beach", "cat": "outfit", "hero": "hana", "rar": "SR", "name": "Летний пляж", "img": "hana_beach", "bold": true, "alt": "hana_winter"}, 
-	{"id": "h_gym", "cat": "outfit", "hero": "hana", "rar": "SSR", "name": "Чемпионка зала", "img": "hana_gym", "bold": true, "alt": "hana_winter"}, 
+	{"id": "h_beach", "cat": "outfit", "hero": "hana", "rar": "SR", "name": "Летний пляж", "img": "hana_beach", "bold": true, "sfw": false, "alt": "hana_winter"}, 
+	{"id": "h_gym", "cat": "outfit", "hero": "hana", "rar": "SSR", "name": "Чемпионка зала", "img": "hana_gym", "bold": true, "sfw": false, "alt": "hana_winter"}, 
 	{"id": "y_base", "cat": "outfit", "hero": "yue", "rar": "SR", "name": "Лунная принцесса", "img": "yue_base"}, 
-	{"id": "y_duel", "cat": "outfit", "hero": "yue", "rar": "SSR", "name": "Драконья дуэлянтка", "img": "yue_duel", "bold": true, "alt": "yue_base"}, 
+	{"id": "y_duel", "cat": "outfit", "hero": "yue", "rar": "SSR", "name": "Драконья дуэлянтка", "img": "yue_duel", "bold": true, "sfw": false, "alt": "yue_base"}, 
 	{"id": "y_queen", "cat": "outfit", "hero": "yue", "rar": "SSR", "name": "Королева лунной ночи", "img": "yue_queen"}, 
 	{"id": "n_base", "cat": "outfit", "hero": "nova", "rar": "SR", "name": "Нетраннер", "img": "nova_base"}, 
-	{"id": "n_ssr", "cat": "outfit", "hero": "nova", "rar": "SSR", "name": "Неоновый форсаж", "img": "nova_ssr", "bold": true, "alt": "nova_base"}, 
+	{"id": "n_ssr", "cat": "outfit", "hero": "nova", "rar": "SSR", "name": "Неоновый форсаж", "img": "nova_ssr", "bold": true, "sfw": false, "alt": "nova_base"}, 
 
 	{"id": "o_cozy", "cat": "outfit", "hero": "mc", "rar": "SR", "name": "Уютный вечер", "img": "mc_cozy", "shop": 680, "nogacha": true}, 
 	{"id": "r_yukata", "cat": "outfit", "hero": "rin", "rar": "SR", "name": "Летняя юката", "img": "rin_yukata", "shop": 680, "nogacha": true}, 
@@ -117,34 +117,124 @@ const LOCS: = [
 const SHAPE_NAMES: = {"rect": "Плато", "heart": "Сердце", "diamond": "Ромб", "butterfly": "Бабочка", "cross": "Крест", "ring": "Кольцо", "pyramid": "Пагода", "towers": "Две башни"}
 const HARD_NAMES: = ["", "Сложный", "Очень сложный"]
 var LEVELS: = []
+var _arcs_built: = {}
 
+# 0.10 W2: 1000-level Path via V10LevelGen, materialized lazily by 100-level arc (Arc 0 built at startup in ~65 ms;
+# Arcs 1..9 hold light stubs until ensure_arc/level_at touches them).
 func _build_levels() -> void :
 	LEVELS.clear()
-	for li in LOCS.size():
-		var L: Dictionary = LOCS[li]
-		var stl: Array = V6Worlds.stages(li, L)
-		for si in stl.size():
-			var st: Array = stl[si]
-			var mech: String = st[6]
-			var n: = LEVELS.size()
-			var lv: = {
-				"name": L.name, "loc": li, "stage": si, "code": "%d-%d" % [li + 1, si + 1], 
-				"bg": L.bg, "fx": L.fx, "tint": L.tint, "hero": L.hero, "shard": L.shard, 
-				"shape": st[0], "cols": st[1], "rows": st[2], "layers": st[3], "fill": st[4], "faces": st[5], 
-				"mech": mech, "hard": st[7], "seed": 11 + n * 11, 
-				"gold": (4 + 2 * (li / 2)) if "gold" in mech else 0, 
-				"ice": (3 + li) if "ice" in mech else 0, 
-				"hidden": "hidden" in mech, 
-				"reward": {"gems": 100 + n * 10 + st[7] * 60}, 
-				"goal": "Очисти стол и найди частичку героини: %s" % HEROES[L.shard].name, 
-				"intro": L.intro, 
-			}
-			V6Worlds.decorate(lv, st, li, si)
-			if si == stl.size() - 1:
-				lv.reward["item"] = L.item
-			if n == 0:
-				lv.reward["item"] = "s_lemon"
-			LEVELS.append(lv)
+	_arcs_built.clear()
+	for i in V10LevelGen.TOTAL:
+		var w: = i / V10LevelGen.PER_WORLD
+		var Wd: Dictionary = V10LevelGen.WORLD[w]
+		var tier: = V10LevelGen.tier_of(i)
+		LEVELS.append({
+			"v10_id": i, "code": V10LevelGen.code(i), "world": w, "num": i % V10LevelGen.PER_WORLD + 1,
+			"name": str(Wd.name), "loc": mini(w, LOCS.size() - 1), "world_loc": w, "stage": i % V10LevelGen.PER_WORLD,
+			"bg": str(Wd.bg), "fx": str(Wd.fx), "tint": LOCS[mini(w, LOCS.size() - 1)].tint,
+			"hero": V10LevelGen.ready_hero(str(Wd.hero), w), "shard": V10LevelGen.ready_hero(str(Wd.shard), w),
+			"tier": tier, "tier_name": str(V10LevelGen.TIER_NAMES.get(tier, "")), "hard": int(V10LevelGen.TIER_HARD.get(tier, 0)),
+			"boss": V10LevelGen.is_boss(i), "peak": V10LevelGen.is_peak(i), "legend": tier == "legendary",
+			"shape": "rect", "cols": 6, "rows": 8, "layers": 3, "fill": 0.7, "faces": 12, "seed": 11 + i * 11,
+			"mech": "", "gold": 0, "ice": 0, "hidden": false, "reward": {"gems": 2, "per_star": 2, "first_only": true},
+			"goal": "Очисти стол", "intro": str(LOCS[mini(w, LOCS.size() - 1)].intro), "_lazy": true,
+		})
+	ensure_arc(0)
+
+
+func ensure_arc(w: int) -> void :
+	w = clampi(w, 0, V10LevelGen.WORLDS - 1)
+	if _arcs_built.has(w):
+		return
+	_arcs_built[w] = true
+	var base: = w * V10LevelGen.PER_WORLD
+	for k in V10LevelGen.PER_WORLD:
+		var i: = base + k
+		var lv: Dictionary = V10PathState._lv_cache.get(i, V10LevelGen.level(i))
+		V10PathState._lv_cache[i] = lv
+		var copy: = lv.duplicate(true)
+		copy["world_loc"] = int(lv.get("loc", w))
+		copy["loc"] = mini(int(lv.get("loc", w)), LOCS.size() - 1)
+		copy["tint"] = LOCS[int(copy.loc)].tint
+		if not copy.has("goal"):
+			copy["goal"] = "Очисти стол"
+		if not copy.has("intro") or str(copy.intro).length() < 12:
+			var il: = str(copy.get("intro_line", ""))
+			copy["intro"] = il if il != "" else str(LOCS[int(copy.loc)].intro)
+		LEVELS[i] = copy
+
+
+func level_at(i: int) -> Dictionary:
+	i = clampi(i, 0, V10LevelGen.TOTAL - 1)
+	ensure_arc(i / V10LevelGen.PER_WORLD)
+	return LEVELS[i]
+
+
+func loc_name(w: int) -> String:
+	if w >= 0 and w < V10LevelGen.WORLDS:
+		return str(V10LevelGen.WORLD[w].name)
+	return str(LOCS[clampi(w, 0, LOCS.size() - 1)].name)
+
+
+# 0.10 W2 (levels/README.md, INTEGRATION_0.10.md §4 W2): one-time 48 → 1000 migration for legacy saves.
+#   passed = clamp(old_unlocked - 1, 0, 48), raised to k + 1 if stars[k] > 0 (48 passed when index 47 has stars).
+#   new_unlocked = 1 if passed == 0 else clamp(round(passed * 100 / 48) + 1, 1, released_total).
+#   Each old star at 0..47 moves to the nearest unused non-Peak main-path level around round(old_i * 99 / 47) in Arc 1,
+#   preserving 100 % of earned stars (Salon bank == sum of legacy stars).
+static func migrate_48_to_1000(st_dict: Dictionary) -> void :
+	if not (st_dict.get("v10_levels") is Dictionary):
+		st_dict["v10_levels"] = {}
+	var lv10: Dictionary = st_dict["v10_levels"]
+	if bool(lv10.get("mig48", false)):
+		return
+	var old_stars: Dictionary = st_dict.get("stars", {}) if st_dict.get("stars") is Dictionary else {}
+	var old_unl: = maxi(1, int(st_dict.get("unlocked", 1)))
+	var has_hi: = old_unl > 48
+	for k in old_stars:
+		if int(k) >= 48:
+			has_hi = true
+			break
+	if has_hi:
+		lv10["mig48"] = true
+		return
+	var passed: = clampi(old_unl - 1, 0, 48)
+	var max_idx: = -1
+	for k in old_stars:
+		var idx: = int(k)
+		if idx >= 0 and idx < 48 and int(old_stars[k]) > 0:
+			passed = maxi(passed, idx + 1)
+			max_idx = maxi(max_idx, idx)
+	if old_unl <= 6 and max_idx < 6:
+		lv10["mig48"] = true
+		return
+	var new_stars: = {}
+	var used: = {}
+	var keys: = old_stars.keys()
+	keys.sort_custom(func(a, b): return int(a) < int(b))
+	for k in keys:
+		var sv: = clampi(int(old_stars[k]), 0, 3)
+		if sv <= 0:
+			continue
+		var oi: = clampi(int(k), 0, 47)
+		var target: = clampi(int(round(oi * 99.0 / 47.0)), 0, 99)
+		var pick: = -1
+		for d in 100:
+			for cand in ([target] if d == 0 else [target - d, target + d]):
+				if cand >= 0 and cand < 100 and not V10LevelGen.is_peak(cand) and not used.has(cand):
+					pick = cand
+					break
+			if pick >= 0:
+				break
+		if pick < 0:
+			pick = target
+		used[pick] = true
+		new_stars[str(pick)] = sv
+	st_dict["stars"] = new_stars
+	if passed <= 0:
+		st_dict["unlocked"] = 1
+	else:
+		st_dict["unlocked"] = clampi(int(round(passed * 100.0 / 48.0)) + 1, 1, V10PathState.released_total())
+	lv10["mig48"] = true
 
 
 func level_feature(lv: Dictionary) -> String:
@@ -368,7 +458,11 @@ func skin_source(id: String) -> String:
 			return "награда за партию %s" % lv.code
 	return "в Желаниях"
 
-func skin_look() -> Dictionary:
+func skin_look(ranked: bool = false) -> Dictionary:
+	var lsc = load("res://scripts/v10/look/look.gd")
+	if lsc != null:
+		var big: = bool(S.get("v10_clarity", {}).get("big", false)) if S.get("v10_clarity") is Dictionary else false
+		return lsc.tile_look(S, {"ranked": ranked, "big_symbols": big})
 	return SKIN_LOOK.get(S.get("skin", "s_sakura"), SKIN_LOOK.s_sakura)
 
 const SHARDS_NEED: = 5
@@ -423,10 +517,9 @@ func draw_fortune(lv: = {}) -> Dictionary:
 
 const PULL_COST: = 150
 const NEWBIE_COST: = 1200
-const EXCHANGE_COST: = 120
 
 const BANNERS: = [
-	{"id": "newbie", "name": "Первый гость", "sub": "20 желаний со скидкой 20%, SSR среди них", "hero": "mc", "item": "o_dragon", "img": "mc_dragon", "color": Color("ff8fb8"), "newbie": true}, 
+	{"id": "newbie", "name": "Первый гость", "sub": "50 желаний по 120 кристаллов, SSR среди них", "hero": "mc", "item": "o_dragon", "img": "mc_dragon", "color": Color("ff8fb8"), "newbie": true}, 
 	{"id": "moon", "name": "Лунная ночь", "sub": "Шанс SSR повышен", "hero": "yue", "item": "y_queen", "img": "yue_queen", "color": Color("8f7cff")}, 
 	{"id": "neon", "name": "Неоновый форсаж", "sub": "Только на время события", "hero": "nova", "item": "n_ssr", "img": "nova_ssr", "color": Color("38d9ff")}, 
 ]
@@ -599,6 +692,18 @@ func v10_attach() -> void :
 	V10Save.migrate(S)
 	V10Registry.ensure_all(S)
 	V10Money.attach(S)
+	V10Fonts.deco = bool(S.get("deco_fonts", true))
+	var tt_sc = load("res://scripts/v10/look/tile_themes.gd")
+	if tt_sc != null:
+		tt_sc.anim_on = fx_level() != "min"
+	var hs_sc = load("res://scripts/v10/look/hud_skin.gd")
+	var lk_sc = load("res://scripts/v10/look/look.gd")
+	if hs_sc != null and lk_sc != null:
+		hs_sc.sync(lk_sc.current(S))
+	if V10Registry.wired("salon"):
+		V10Salon.notify_stars(0)
+	if V10Registry.wired("phone"):
+		V10Phone.reset()
 
 
 func _load_game() -> void :
@@ -717,6 +822,9 @@ func set_fx_level(l: String) -> void :
 		return
 	S.fx_level = l
 	_sync_v6_fx()
+	var tt_sc = load("res://scripts/v10/look/tile_themes.gd")
+	if tt_sc != null:
+		tt_sc.anim_on = l != "min"
 	settings_changed.emit("fx_level")
 
 
@@ -802,16 +910,18 @@ func level_stars(i: int) -> int:
 func owns(id: String) -> bool:
 	return S.owned.has(id)
 
-# a duplicate pull turns into this many crystals (summon shows it on the card)
+# 0.10 (M4): duplicates in gacha go to V10Stars (✦ / Лепестки), never DUP_GEMS; DUP_GEMS stays only for 0.9 UI fallback
 const DUP_GEMS: = 25
 
 func give(id: String) -> bool:
-
-	if owns(id):
-		V10Money.grant({"gems": DUP_GEMS}, "dup")
+	if id == "" or owns(id):
 		return false
 	S.owned[id] = true
 	return true
+
+
+func give_new(id: String) -> bool:
+	return give(id)
 
 func add_aff(hero: String, n: int) -> void :
 	S.aff[hero] = int(S.aff.get(hero, 0)) + n
@@ -858,7 +968,7 @@ func rar_color(r: String) -> Color:
 
 func art_tex(it: Dictionary) -> Texture2D:
 
-	if S.get("modest", false) and it.get("bold", false) and it.has("alt"):
+	if S.get("modest", false) and (it.get("bold", false) or not bool(it.get("sfw", true))) and it.has("alt"):
 		return load("res://assets/outfits/%s.webp" % it.alt)
 	return item_tex(it)
 
@@ -931,8 +1041,12 @@ func pass_tier() -> int:
 
 func add_pass_xp(n: int) -> void :
 	S.pass.xp = int(S.pass.xp) + n
+	if econ != null:
+		econ.pass_.add_xp(n)
 
 func month_card_days() -> int:
+	if econ != null and econ.shop.month_days_left() > 0:
+		return econ.shop.month_days_left()
 	var u: String = S.month_card.get("until", "")
 	if u == "":
 		return 0
@@ -941,84 +1055,42 @@ func month_card_days() -> int:
 
 
 
-func roll() -> String:
-	S.pity = int(S.pity) + 1
-	S.sr_pity = int(S.sr_pity) + 1
-	var rate: = 0.03
-	if S.pity >= 60:
-		rate = 1.0
-	elif S.pity > 45:
-		rate = 0.03 + (S.pity - 45) * 0.06
-	var r: = rng.randf()
-	if r < rate:
-		S.pity = 0
-		S.sr_pity = 0
-		return "SSR"
-	if S.sr_pity >= 10 or r < rate + 0.15:
-		S.sr_pity = 0
-		return "SR"
-	return "R"
+func _make_gacha() -> V10Gacha2:
+	var bk: = V10GachaBank.new(S)
+	bk.live_money = true
+	bk.give_fn = func(id: String) -> bool: return give_new(id)
+	return V10Gacha2.new(S, ITEMS, bk)
 
-# one item from pool that this pull has not drawn yet (unowned ones first when prefer_new); once every item in it
-# has come up the pool starts a new pass (so 8 R cards from 5 R items are 5 + 3 different ones, never 4× one item)
-func _draw_fresh(pool: Array, drawn: Dictionary, prefer_new: bool) -> Dictionary:
-	var left: = pool.filter( func(x): return not drawn.has(x.id))
-	if left.is_empty():
-		# every item of this pool came up once: start a fresh pass, again without replacement, and not with the
-		# item that closed the last pass (no two of the same card side by side)
-		for x in pool:
-			drawn.erase(x.id)
-		var last: = String(drawn.get("_last", ""))
-		left = pool.filter( func(x): return x.id != last) if pool.size() > 1 else pool
-	if prefer_new:
-		var fresh: = left.filter( func(x): return not owns(x.id))
-		if not fresh.is_empty():
-			left = fresh
-	var it: Dictionary = left[rng.randi() % left.size()]
-	drawn["_last"] = it.id
-	return it
+
+func roll() -> String:
+	var g2: = _make_gacha()
+	var b: Dictionary = g2.banners()[0]
+	if not g2.can_pull(b, 1):
+		V10Money.grant({"tickets": 1}, "roll_proxy")
+	var r: Array = g2.pull(b, 1)
+	if r.is_empty():
+		return "R"
+	return V10Gacha2.rar09(String(r[0].rar))
+
 
 func pull(n: int, banner: Dictionary, gifted: bool = false) -> Array:
-	var res: = []
-	var newbie: bool = banner.get("newbie", false)
-	# 0.8: inside one pull R and SR items are drawn without replacement (the pool refills only when it runs dry),
-	# and the player's first 10-pull prefers pieces they do not own yet, so a gifted 10-pull is not three of the
-	# same background
-	var first: bool = n == 10 and (gifted or newbie or int(S.pulls) == 0)
-	var drawn: = {}
-	for i in n:
-		var rar: = roll()
-		if demo_force_ssr and n == 10 and i == 6:
-			rar = "SSR"
-			S.pity = 0
-		if newbie:
-			S.newbie_left = int(S.newbie_left) - 1
-			if rar == "SSR":
-				S.newbie_ssr = true
-			elif int(S.newbie_left) <= 0 and not S.newbie_ssr:
-				rar = "SSR"
-				S.pity = 0
-				S.newbie_ssr = true
-		var pool: = ITEMS.filter( func(x): return x.rar == rar and not x.get("start", false) and not x.get("nogacha", false) and not x.get("hidden", false))
-		var it: Dictionary = _draw_fresh(pool, drawn, first)
-		if rar == "SSR":
-			if newbie:
-				pool = pool.filter( func(x): return x.cat == "outfit")
-				it = pool[rng.randi() % pool.size()]
-			elif S.guar or rng.randf() < 0.5 or (demo_force_ssr and i == 6):
-				it = ITEM[banner.item]
-				S.guar = false
-			else:
-				var off: = pool.filter( func(x): return x.id != banner.item)
-				it = off[rng.randi() % off.size()]
-				S.guar = true
-		drawn[it.id] = true
-		var is_new: = give(it.id)
-		var r: = it.duplicate()
-		r["new"] = is_new
-		res.append(r)
-	S.pulls = int(S.pulls) + n
-	S.ex = int(S.ex) + n
-	add_pass_xp(10 * n)
+	var g2: = _make_gacha()
+	var bl: = g2.banners()
+	var b: Dictionary = bl[0]
+	for cand in bl:
+		if (banner.get("newbie", false) and String(cand.get("kind", "")) == "newbie") or String(cand.get("hero", "")) == String(banner.get("hero", "")):
+			b = cand
+			break
+	if gifted or not g2.can_pull(b, n):
+		V10Money.grant({"tickets": n}, "pull_proxy")
+	var raw: = g2.pull(b, n)
 	save()
-	return res
+	var out: = []
+	for r in raw:
+		var it: Dictionary = r.get("item", ITEM.get(String(r.get("id", "")), {}))
+		var o: Dictionary = it.duplicate()
+		o["rar"] = V10Gacha2.rar09(String(r.rar))
+		o["new"] = bool(r.get("new", false))
+		o["v10"] = r
+		out.append(o)
+	return out

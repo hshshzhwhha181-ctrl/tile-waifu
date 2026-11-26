@@ -52,7 +52,10 @@ func set_spec(s: String) -> void:
 	else:
 		match kind:
 			"art":
-				_tex = V8Art.icon(arg)
+				if ResourceLoader.exists("res://assets/v10/shop/%s.png" % arg):
+					_tex = load("res://assets/v10/shop/%s.png" % arg)
+				else:
+					_tex = V8Art.icon(arg)
 			"cur":
 				_tex = V8Art.cur(arg)
 			"rank":

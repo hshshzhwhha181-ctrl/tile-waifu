@@ -21,9 +21,11 @@ const REPLY_AFF: = 5
 const COMBO_MIN: = 5
 const COMEBACK_DAYS: = 2
 # when more events than the daily cap come in, the stronger story wins
-const PRIORITY: = {"comeback": 0, "rank": 1, "combo": 2, "first_win": 3}
+const PRIORITY: = {"bday": -2, "ask_bday": -1, "comeback": 0, "while_away": 0, "week": 1, "salon_scene": 1, "rank": 2, "combo": 3, "first_win": 4}
 const EVENTS: = ["first_win", "combo", "rank", "comeback"]
-const EV_TAG: = {"first_win": "Первая победа дня", "combo": "Рекорд комбо", "rank": "Новый ранг", "comeback": "С возвращением"}
+const EXTRA_EVENTS: = ["bday", "week", "ask_bday", "while_away", "salon_scene"]
+const EV_TAG: = {"first_win": "Первая победа дня", "combo": "Рекорд комбо", "rank": "Новый ранг", "comeback": "С возвращением",
+	"bday": "День рождения", "week": "Письмо недели", "ask_bday": "Вопрос от неё", "while_away": "Пока тебя не было", "salon_scene": "Салон"}
 const PLAY_SCRIPT: = "res://scripts/screens/play.gd"
 
 static var _installed: = false
@@ -149,7 +151,7 @@ static func total_wins() -> int:
 
 
 static func queue(ev: String, vars: = {}) -> void:
-	if not ev in EVENTS:
+	if not (ev in EVENTS or ev in EXTRA_EVENTS):
 		push_warning("V9Letters.queue: unknown event '%s'" % ev)
 		return
 	var s: = st()
@@ -215,8 +217,12 @@ static func _pick_hero(s: Dictionary) -> String:
 
 static func _make(ev: String, vars: Dictionary, h: = "") -> Dictionary:
 	var s: = st()
+	if h == "" and vars.has("hero"):
+		h = str(vars.hero)
 	if h == "":
 		h = _pick_hero(s)
+	if ev in ["salon_scene", "ask_bday"]:
+		return _make_custom(ev, vars, h)
 	var vs: = V9LetterText.variants(h, ev)
 	if vs.is_empty():
 		return {}
@@ -233,6 +239,74 @@ static func _make(ev: String, vars: Dictionary, h: = "") -> Dictionary:
 		s.list.pop_back()
 	s.n += 1
 	s.evs.append(ev)
+	return l
+
+
+static func _make_custom(ev: String, _vars: Dictionary, h: String) -> Dictionary:
+	var s: = st()
+	s.seq += 1
+	var custom: Dictionary
+	if ev == "ask_bday":
+		custom = {
+			"subj": "Когда у тебя праздник?", "emo": "shy",
+			"body": V10RitLines.pick("ask_bday", h, 0),
+			"replies": ["Рассказать", "Не хочу говорить"],
+			"answers": ["Записала! В этот день чайная будет особенно тёплой.", "Хорошо, тогда просто будем праздновать каждый хороший вечер."],
+			"sign": V9LetterText.SIGN.get(h, V10RitBridge.short_name(h)), "ps": "", "tag": EV_TAG.ask_bday,
+		}
+	else:
+		custom = {
+			"subj": "Спасибо за вечер в салоне", "emo": "happy",
+			"body": "Вчерашний вечер в обновлённом зале до сих пор греет. Я оставила для тебя твоё любимое место у лампы — заходи в любое время.",
+			"replies": ["Обязательно загляну сегодня.", "Мне там тоже очень уютно."],
+			"answers": ["Тогда ставлю чайник заранее~", "Значит, мы всё сделали не зря."],
+			"sign": V9LetterText.SIGN.get(h, V10RitBridge.short_name(h)), "ps": V9LetterText.PS.get(h, ""), "tag": EV_TAG.salon_scene,
+		}
+	var l: = {"id": s.seq, "h": h, "ev": ev, "k": 0, "t": V10Meta.now_unix(), "day": G.today(),
+		"read": false, "reply": -1, "vars": {}, "custom": custom}
+	s.list.push_front(l)
+	while s.list.size() > KEEP:
+		s.list.pop_back()
+	s.n += 1
+	s.evs.append(ev)
+	return l
+
+
+# 0.10 W2 (rituals H5): deliver pre-composed ritual letters (bday, week, while_away) idempotently once per day.
+static func push_ritual(d: Dictionary) -> Dictionary:
+	var s: = st()
+	var ev: = str(d.get("ev", d.get("kind", "week")))
+	var h: = str(d.get("h", d.get("hero", G.S.get("partner", "mc"))))
+	if not G.HEROES.has(h):
+		h = "mc"
+	var today: = G.today()
+	for old in s.list:
+		if old is Dictionary and str(old.get("day", "")) == today and str(old.get("ev", "")) == ev and str(old.get("h", "")) == h:
+			return {}
+	var body_txt: = str(d.get("body", ""))
+	if body_txt == "" and d.has("open"):
+		var lines: = [str(d.get("open", ""))]
+		for f in d.get("facts", []):
+			lines.append("• " + str(f))
+		if str(d.get("close", "")) != "":
+			lines.append(str(d.get("close", "")))
+		body_txt = "\n".join(lines)
+	var custom: = {
+		"subj": str(d.get("subj", EV_TAG.get(ev, "Письмо"))),
+		"body": body_txt, "emo": str(d.get("emo", "happy")),
+		"replies": d.get("replies", ["Спасибо за письмо!", "Скоро загляну за стол."]),
+		"answers": d.get("answers", ["Всегда рада написать тебе~", "Чай уже ждёт!"]),
+		"sign": str(d.get("sign", V9LetterText.SIGN.get(h, G.HEROES[h].name))),
+		"ps": str(d.get("ps", "")), "tag": str(EV_TAG.get(ev, "Письмо")),
+	}
+	if ev == "week" and d.has("open"):
+		custom["week_doc"] = d.duplicate(true)
+	s.seq += 1
+	var l: = {"id": s.seq, "h": h, "ev": ev, "k": 0, "t": V10Meta.now_unix(), "day": today,
+		"read": false, "reply": -1, "vars": {}, "custom": custom}
+	s.list.push_front(l)
+	while s.list.size() > KEEP:
+		s.list.pop_back()
 	return l
 
 
@@ -255,7 +329,7 @@ static func demo() -> void:
 # ------------------------------------------------------------------ reading
 
 static func list() -> Array:
-	return st().list.filter(func(l): return l is Dictionary and V9LetterText.LETTERS.has(str(l.get("h", ""))))
+	return st().list.filter(func(l): return l is Dictionary and (l.has("custom") or V9LetterText.LETTERS.has(str(l.get("h", "")))))
 
 
 static func find(id: int) -> Dictionary:
@@ -266,6 +340,8 @@ static func find(id: int) -> Dictionary:
 
 
 static func view(l: Dictionary) -> Dictionary:
+	if l.get("custom") is Dictionary:
+		return (l.custom as Dictionary).duplicate(true)
 	var vs: = V9LetterText.variants(str(l.get("h", "mc")), str(l.get("ev", "")))
 	if vs.is_empty():
 		return {}

@@ -35,10 +35,14 @@ static var _force: = ""
 
 static func force(mode: String) -> void:
 	_force = mode
+	V10ShopPay.force_store = mode == "store"
+	V10ShopPay.force_test = mode == "test"
 
 
 static func unforce() -> void:
 	_force = ""
+	V10ShopPay.force_store = false
+	V10ShopPay.force_test = false
 
 
 static func build() -> String:

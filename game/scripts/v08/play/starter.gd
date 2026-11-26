@@ -19,7 +19,6 @@ const T: = {
 	"outfit": "«Императрица дракона» · SSR",
 	"left": "Ещё %s",
 	"info": "Предложим один раз.\nНапоминать не будем.",
-	"buy": "149 ₽ (тест)",
 	"got": "Набор твой. Это тест, деньги не списаны",
 }
 
@@ -107,21 +106,16 @@ static func popup(main) -> RBox:
 	var info: = UI.label(T.info, 17, UI.MUTED)
 	info.position = Vector2(312, 370)
 	p.add_child(info)
-	var buy: = JButton.make(T.buy, "gold", Rect2(60, 470, 540, 96), null, 34)
+	var buy: = JButton.make(V10Sku.fmt_rub(149), "gold", Rect2(60, 470, 540, 96), null, 34)
 	buy.shine_every = 2.0
 	buy.pressed.connect( func():
 		if owned():
 			Common.close_popup(p)
 			return
-		V10Money.grant({"gems": GEMS}, "starter")
-		G.give(ITEM)
-		st().bought = true
-		G.save()
-		if main.has_method("fly_gems"):
-			main.fly_gems(buy.get_global_rect().get_center(), 8)
-		if main.has_method("refresh_currency"):
-			main.refresh_currency(true)
-		main.toast(T.got, "gift")
-		Common.close_popup(p))
+		var sm: = V10ShopHub.model()
+		Common.close_popup(p)
+		if sm != null:
+			V10ShopFlow.confirm(main.get("screen") if main.get("screen") is Control else main, sm, "guest_149"))
 	p.add_child(buy)
+	V10ShopGuard.guard(p)
 	return p

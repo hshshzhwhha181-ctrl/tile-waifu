@@ -153,7 +153,13 @@ static func grant(rewards: Dictionary, src: String) -> Array:
 		var v = rewards[k]
 		match k:
 			"gems", "coins", "tickets", "petals":
-				G.S[k] = int(G.S.get(k, 0)) + int(v)
+				var mon: = klass("V10Money")
+				if not V10RitSave._bound and mon != null and mon.has_method("grant"):
+					mon.call("grant", {k: int(v)}, src)
+				else:
+					G.S[k] = int(G.S.get(k, 0)) + int(v)
+			"leaves":
+				V10Streak.st().leaves = mini(V10Streak.LEAF_MAX, int(V10Streak.st().leaves) + int(v))
 			"hints", "shuffles", "undos":
 				var inv: Dictionary = G.S.get("v10_items", {})
 				inv[k] = int(inv.get(k, 0)) + int(v)

@@ -215,14 +215,14 @@ static func _cutin() -> void :
 
 static func _settings() -> void :
 	G.S = G.default_state()
-	_check("defaults full / full", G.fx_level() == "full" and G.ult_cutin() == "full" and int(G.S.ver) == 7)
+	_check("defaults full / full", G.fx_level() == "full" and G.ult_cutin() == "full" and int(G.S.ver) == G.SAVE_VER)
 	var v6: = G.default_state()
 	v6.ver = 6
 	v6.erase("fx_level")
 	v6.erase("ult_cutin")
 	v6["v6_fx"] = {"shake": false, "flash": false}
 	_check("v6 save applies", G.apply_state(JSON.parse_string(JSON.stringify(v6))))
-	_check("v6 -> v7: ver 7", int(G.S.ver) == 7)
+	_check("v6 -> current: ver bumped", int(G.S.ver) == G.SAVE_VER)
 	_check("v6 -> v7: shake off becomes mid", G.fx_level() == "mid" and G.ult_cutin() == "full")
 	v6.v6_fx = {"shake": true}
 	G.apply_state(JSON.parse_string(JSON.stringify(v6)))

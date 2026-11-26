@@ -23,6 +23,8 @@ extends Control
 
 const VIDEO_PATH: = "res://assets/v09/video/mc_lobby.ogv"
 const STILL_PATH: = "res://assets/v09/video/mc_lobby_still.webp"
+const RIG10_SCN: = "res://assets/v10/rig/mc_gown/rig.scn"
+const RIG10_TSCN: = "res://assets/v10/rig/mc_gown/rig.tscn"
 const PATCH_HOLD: = 2.1
 const PATCH_IN: = 0.2
 const PATCH_OUT: = 0.38
@@ -55,6 +57,8 @@ var art_focus: = Vector2(0.5, 0.4)
 var geom: = {}
 var touch: = V9Touch.new()
 var video: VideoStreamPlayer
+var rig10: V10LiveRig
+var _last_rig_zone: = "head"
 var patch: TextureRect
 var patch_emo: = ""
 var _patch_left: = 0.0
@@ -69,6 +73,36 @@ var fps_lbl: Label
 var zones_dbg: = false
 var _t: = 0.0
 var _cool_i: = 0
+
+
+static func rig10_wanted(h: String) -> bool:
+	return h == "mc" and G.equipped("mc") == "" and (ResourceLoader.exists(RIG10_SCN) or ResourceLoader.exists(RIG10_TSCN))
+
+
+static func build_rig10(parent: Control, sz: Vector2, show_bg: bool = true) -> V10LiveRig:
+	var pth: = RIG10_SCN if ResourceLoader.exists(RIG10_SCN) else RIG10_TSCN
+	if not ResourceLoader.exists(pth):
+		return null
+	var packed = load(pth)
+	if not (packed is PackedScene):
+		return null
+	var rig: V10LiveRig = (packed as PackedScene).instantiate() as V10LiveRig
+	if rig == null:
+		return null
+	rig.name = "V10LiveRig"
+	rig.show_background = show_bg
+	rig.handle_input = false
+	var fxl: = G.fx_level()
+	rig.motion = 1.0 if fxl == "full" else (0.75 if fxl == "mid" else 0.5)
+	rig.auto_gestures = fxl != "min"
+	var ky: = sz.y / 1280.0
+	var k: = 0.645 * ky
+	rig.scale = Vector2.ONE * k
+	rig.position = Vector2(sz.x * 0.5 - 581.0 * k, sz.y + 12.0 * ky - 1400.0 * k)
+	parent.add_child(rig)
+	rig.appear()
+	V10Voice.bind_rig(rig, "mc")
+	return rig
 
 
 static func video_wanted(h: String) -> bool:
@@ -142,8 +176,12 @@ static func make(h_: Control, mode_: String, opts: Dictionary) -> V9HomeLive:
 		"video":
 			l.video = opts.get("video")
 			l.geom = V9Touch.video_geom()
+		"rig10":
+			l.rig10 = opts.get("rig10")
+			l.geom = {"head": Vector2(700, 228), "head_r": 160.0, "hand": Vector2(420, 680), "hand_r": 90.0,
+				"cx": 700.0, "band_y": Vector2(400, 470), "band_dx": Vector2(10, 110), "body": Rect2(700, 500, 300, 260)}
 	h_.add_child(l)
-	if mode_ == "video" and not G.settings_changed.is_connected(l._on_settings):
+	if mode_ in ["video", "rig10"] and not G.settings_changed.is_connected(l._on_settings):
 		G.settings_changed.connect(l._on_settings)
 	var args: = OS.get_cmdline_user_args()
 	l.zones_dbg = "--zones=1" in args
@@ -155,9 +193,14 @@ static func make(h_: Control, mode_: String, opts: Dictionary) -> V9HomeLive:
 
 # «Эффекты» turned down while home is open: the loop stops on its first frame (the still under it)
 func _on_settings(key: String) -> void:
-	if key == "fx_level" and video and is_instance_valid(video) and G.fx_level() != "full":
-		video.stop()
-		video.visible = false
+	if key == "fx_level":
+		if video and is_instance_valid(video) and G.fx_level() != "full":
+			video.stop()
+			video.visible = false
+		if rig10 and is_instance_valid(rig10):
+			var fxl: = G.fx_level()
+			rig10.motion = 1.0 if fxl == "full" else (0.75 if fxl == "mid" else 0.5)
+			rig10.auto_gestures = fxl != "min"
 
 
 # ------------------------------------------------------------------ geometry
@@ -167,6 +210,9 @@ func to_art(p: Vector2) -> Vector2:
 	match mode:
 		"rig":
 			return hero.sprite.get_global_transform().affine_inverse() * p
+		"rig10":
+			if rig10 and is_instance_valid(rig10) and rig10.art:
+				return rig10.art.get_global_transform().affine_inverse() * p
 		"art":
 			var loc: Vector2 = art.get_global_transform().affine_inverse() * p
 			var uv: = loc / art.size
@@ -182,6 +228,9 @@ func from_art(p: Vector2) -> Vector2:
 	match mode:
 		"rig":
 			return hero.sprite.get_global_transform() * p
+		"rig10":
+			if rig10 and is_instance_valid(rig10) and rig10.art:
+				return rig10.art.get_global_transform() * p
 		"art":
 			var sc: = _cover_scale()
 			var ctr: = art_focus.clamp(sc * 0.5, Vector2.ONE - sc * 0.5)
@@ -199,11 +248,35 @@ func _cover_scale() -> Vector2:
 
 
 func zone_at(p: Vector2) -> String:
+	if mode == "rig10" and rig10 and is_instance_valid(rig10):
+		var rz: = rig10.zone_at(to_art(p))
+		_last_rig_zone = rz
+		match rz:
+			"none":
+				return "body"
+			"armL", "armR":
+				return "hand"
+			"hair", "head":
+				return "head"
+			"outfit":
+				return "outfit"
+		return "bg"
 	return V9Touch.classify(geom, to_art(p))
 
 
 # a representative screen point of a zone (dev taps, demo)
 func zone_point(zone: String) -> Vector2:
+	if mode == "rig10":
+		match zone:
+			"head":
+				return from_art(Vector2(700, 180))
+			"hand":
+				return from_art(Vector2(420, 680))
+			"outfit":
+				return from_art(Vector2(750, 435))
+			"body":
+				return from_art(Vector2(820, 620))
+		return get_global_transform() * Vector2(size.x - 70.0, size.y * 0.62)
 	match zone:
 		"head":
 			return from_art(geom.head)
@@ -243,11 +316,18 @@ func tap_zone(zone: String) -> void:
 func _tap(p: Vector2, force: = "") -> void:
 	idle_t = 0.0
 	var zone: = force if force != "" else zone_at(p)
+	if force != "":
+		_last_rig_zone = {"head": "head", "hand": "armR", "outfit": "outfit", "body": "none", "bg": "bg"}.get(force, "bg")
 	var d: = touch.decide(zone, _t)
 	if d.kind == "quiet":
 		# 0.9 (spec §C): a tap on «body» (chest, hips, legs) gets no answer at all — no squash, haptic, sound or line,
 		# and it does not count toward the «не так быстро» spam line either (decide() returns before the tally)
 		return
+	if mode == "rig10" and rig10 and is_instance_valid(rig10):
+		if d.kind == "cool":
+			rig10.react(_last_rig_zone, p)
+		else:
+			rig10.tap(p)
 	if d.kind == "cool":
 		_cool_ack()
 		return
@@ -307,8 +387,13 @@ func _react(d: Dictionary, p: Vector2) -> void:
 			Fx.burst(home, _home_pt(p), "heart", maxi(2, int(round(6 * fs))))
 	if zone != "bg" or not entry.is_empty():
 		show_emotion(emo)
-	if not entry.is_empty():
-		say(entry.text, emo, entry.voice)
+	if d.line:
+		var rz_voice: String = _last_rig_zone if mode == "rig10" else String({"head": "head", "hand": "armR", "outfit": "outfit"}.get(zone, zone))
+		var vt: = V10Voice.tap(hid, rz_voice, {"aff": G.aff_level(hid)})
+		if vt != "":
+			say(vt, emo, "", false)
+		elif not entry.is_empty():
+			say(entry.text, emo, entry.voice)
 	if d.aff:
 		_gain(p)
 
@@ -430,7 +515,7 @@ func say(text: String, emo: = "", voice: = "", talk: = true) -> void:
 		return
 	if bubble and is_instance_valid(bubble):
 		bubble.queue_free()
-	var with_av: = mode != "rig"
+	var with_av: = not (mode in ["rig", "rig10"])
 	var head: = _home_pt(from_art(geom.head))
 	# 0.10 W1: the tea house moves the bubble right of its lanterns (home.v10_bubble_x)
 	var bx = home.get("v10_bubble_x")
@@ -589,11 +674,16 @@ func _process(dt: float) -> void:
 		idle_lines += 1
 		idle_t = 0.0
 		next_micro = randf_range(IDLE_MICRO.x, IDLE_MICRO.y)
-		var n: = V9TouchLines.pool(hid, "idle").size()
-		if n > 0:
-			var e: = V9TouchLines.entry(hid, "idle", randi() % n)
-			show_emotion(e.emo)
-			say(e.text, e.emo, e.voice)
+		var iv: = V10Voice.play(hid, "idle")
+		if iv != "":
+			show_emotion("happy")
+			say(iv, "happy", "", false)
+		else:
+			var n: = V9TouchLines.pool(hid, "idle").size()
+			if n > 0:
+				var e: = V9TouchLines.entry(hid, "idle", randi() % n)
+				show_emotion(e.emo)
+				say(e.text, e.emo, e.voice)
 	if fps_lbl and is_instance_valid(fps_lbl) and Engine.get_process_frames() % 15 == 0:
 		_update_fps()
 	if zones_dbg:

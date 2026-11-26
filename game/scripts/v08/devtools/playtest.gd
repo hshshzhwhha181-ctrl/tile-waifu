@@ -257,8 +257,15 @@ func find(root: Node, pred: Callable) -> Node:
 func find_label(root: Node, text: String) -> Label:
 	return find(root, func(c): return c is Label and text in (c as Label).text and on_screen(c)) as Label
 
-func find_button(root: Node, text: String) -> JButton:
-	return find(root, func(c): return c is JButton and (c as JButton).lbl != null and text in (c as JButton).lbl.text and on_screen(c)) as JButton
+func find_button(root: Node, text: String) -> Control:
+	return find(root, func(c):
+		if not on_screen(c):
+			return false
+		if c is JButton and (c as JButton).lbl != null and text in (c as JButton).lbl.text:
+			return true
+		if c is V10Button and (c as V10Button).lbl != null and text in (c as V10Button).lbl.text:
+			return true
+		return false) as Control
 
 func tap_text(root: Node, text: String) -> String:
 	var l: = find_label(root, text)
@@ -500,22 +507,20 @@ func _fresh() -> String:
 	e = await tap_node(hub.scroll_plate, "«Столы» Path scroll")
 	if e != "":
 		return e
-	e = await on("levels")
-	if e != "":
-		return e
-	await wait(1.5)
-	await shot("levels")
-	e = await tap_node(main.screen.play_btn, "levels play")
+	e = await on("v10path")
 	if e != "":
 		return e
 	await wait(0.9)
-	if popup() == null:
+	await shot("levels")
+	var pcard: Control = main.overlay.get_node_or_null("PathCard")
+	if pcard == null:
+		main.screen.open_card(V10PathState.current())
+		await wait(0.6)
+		pcard = main.overlay.get_node_or_null("PathCard")
+	if pcard == null:
 		return "level card did not open"
 	await shot("level_card")
-	e = await tap_button(popup(), "Сесть за стол")
-	if e != "":
-		return e
-	e = await partner_go("lv2")
+	e = await tap_button(pcard, "Играть")
 	if e != "":
 		return e
 	step = "level2"
@@ -527,9 +532,9 @@ func _fresh() -> String:
 	if main.screen.victory_next_btn == null or str(main.screen.victory_next_btn.name) != "MoreLevel":
 		return "the Path win has no «Ещё уровень» (MoreLevel)"
 	await shot("lv2_more_level")
-	var lv2_screen = main.screen
+	var lv2_id: int = main.screen.get_instance_id()
 	await tap(pos_of(main.screen.victory_next_btn))
-	if not await until(func(): return main.screen != lv2_screen and main.screen_id == "play", 10.0):
+	if not await until(func(): return main.screen != null and main.screen.get_instance_id() != lv2_id and main.screen_id == "play", 10.0):
 		return "«Ещё уровень» did not start the next table (on %s)" % main.screen_id
 	step = "level3"
 	e = await play_level("lv3", false)
@@ -631,15 +636,63 @@ func _fresh() -> String:
 	await swipe(Vector2(360, 1000), Vector2(360, 500), 0.4)
 	await wait(0.8)
 	await shot("shop_scroll")
-	# ---- home again (0.10: no offer before L8, UX §3.5 / О-3)
+	# ---- home again (0.10: no offer before L8, UX §3.5 / О-3; morning tray & Salon lantern after L2)
 	step = "home2"
 	e = await go_tab("home")
 	if e != "":
 		return e
-	if await until(func(): return popup() != null, 3.0):
+	await wait(0.9)
+	var tv_node: Control = null
+	for c in main.overlay.get_children():
+		if c is V10TrayView:
+			tv_node = c
+			break
+	if tv_node != null and is_instance_valid(tv_node):
+		await shot("morning_tray")
+		if tv_node._btn != null and is_instance_valid(tv_node._btn):
+			var tv_id: = tv_node.get_instance_id()
+			await tap(pos_of(tv_node._btn))
+			await until(func():
+				var n = instance_from_id(tv_id)
+				return n == null or not (n as Node).is_inside_tree(), 4.0)
+			await wait(0.4)
+	if await until(func(): return popup() != null, 1.5):
 		await shot("home_offer")
 		return "an offer popped up on the tea house before L8"
 	await shot("home2")
+	# ---- Salon lantern (after L2) → Salon → restore first task if bank >= 3★ → back
+	step = "salon"
+	var home_sal = main.screen
+	if home_sal.home2 == null or home_sal.home2.lantern_tr.size() < 2 or not home_sal.home2.lantern_tr[1].visible:
+		return "Salon lantern not shown after L2"
+	e = await tap_node(home_sal.home2.lantern_tr[1], "lantern «Салон»")
+	if e != "":
+		return e
+	e = await on("v10salon")
+	if e != "":
+		return e
+	await wait(0.9)
+	await shot("salon")
+	if main.screen.intro_plate and is_instance_valid(main.screen.intro_plate):
+		await tap(Vector2(main.W * 0.5, main.H * 0.5))
+		await wait(0.4)
+	if V10Salon.can_restore_any() and main.screen.play_btn != null:
+		await tap(pos_of(main.screen.play_btn))
+		await wait(1.6)
+		await shot("salon_restored")
+	await key(KEY_ESCAPE)
+	e = await on("home", 6.0)
+	if e != "":
+		return "back from Salon: " + e
+	await wait(0.5)
+	# ---- Streak calendar sheet
+	step = "streak_sheet"
+	var st_sh: = V10StreakSheet.open(main.overlay)
+	await wait(0.6)
+	await shot("streak_sheet")
+	if is_instance_valid(st_sh):
+		st_sh.close()
+		await wait(0.4)
 	step = "home_touch"
 	e = await home_touch()
 	if e != "":
@@ -667,40 +720,39 @@ func _fresh() -> String:
 		await wait(0.4)
 	step = "mail"
 	home = main.screen
+	var u_was: = int(G.S.unlocked)
+	if u_was < V10Nav.PHONE_AT and home.home2.phone_b.visible:
+		return "Phone icon visible before L5"
+	G.S.unlocked = maxi(u_was, V10Nav.PHONE_AT)
+	home.refresh_badges()
+	await wait(0.2)
 	e = await tap_node(home.home2.phone_b, "«Телефон»")
 	if e != "":
 		return e
-	# 0.9: «Письма» is the letters screen (scripts/v09/letters): open the newest letter, answer it, back home
-	e = await on("letters")
-	if e != "":
-		return e
-	await shot("mail")
-	var lcard: Control = null
-	for c in main.screen.list.get_children():
-		if str(c.name).begins_with("Letter"):
-			lcard = c
+	await wait(0.8)
+	var ph_ov: Control = null
+	for c in main.overlay.get_children():
+		if "pages" in c and "frame" in c:
+			ph_ov = c
 			break
-	if lcard != null:
-		e = await tap_node(lcard, "letter card")
-		if e != "":
-			return e
-		await wait(0.7)
-		await shot("letter")
-		var lrb = popup().get_node_or_null("Reply0") if popup() != null else null
-		if lrb != null:
-			e = await tap_node(lrb, "letter reply")
-			if e != "":
-				return e
-			await wait(0.9)
-			await shot("letter_reply")
-		if popup() != null:
-			e = await close_popup()
-			if e != "":
-				return e
-	e = await go_tab("home")
-	if e != "":
-		return e
-	await wait(1.0)
+	if ph_ov == null:
+		return "Phone overlay did not open"
+	await shot("phone_chats")
+	ph_ov.call("select", "mail")
+	await wait(0.4)
+	await shot("phone_mail")
+	ph_ov.call("select", "feed")
+	await wait(0.4)
+	await shot("phone_feed")
+	await key(KEY_ESCAPE)
+	await wait(0.6)
+	if is_instance_valid(ph_ov) and ph_ov.is_inside_tree() and not ph_ov.has_meta("closing"):
+		ph_ov.call("back")
+		await wait(0.5)
+	G.S.unlocked = u_was
+	if main.screen_id == "home" and main.screen and main.screen.has_method("refresh_badges"):
+		main.screen.refresh_badges()
+	await wait(0.5)
 	# ---- tournament (0.10: a shelf of «Столы» and the «Неделя» row from L16; opened directly here)
 	step = "rating"
 	main.go("v7tourney", {"tab": "quarter"})
@@ -990,6 +1042,7 @@ func fx_toggle() -> String:
 		await key(KEY_ESCAPE)
 		if not await until(func(): return popup() == null, 2.0):
 			return "Android back did not close the settings popup"
+		await wait(0.3)
 		e = await header_back()
 		if e != "":
 			return e

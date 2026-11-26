@@ -75,35 +75,35 @@ static func _stub() -> V10StubPay:
 static func _catalog() -> void:
 	var bad: = V10Catalog.validate()
 	_check(bad.is_empty(), "catalog passes the store rules: %s" % str(bad))
-	_near(V10Catalog.base_rub_per_pull(), 79.0 / 1.2, 0.01, "base pack ₽ per pull")
+	_near(V10Catalog.base_rub_per_pull(), 1190.0 / 1090.0 * 150.0, 0.01, "reference pack ₽ per wish (spec §2.2)")
 	var mx: = 0
 	for s in V10Catalog.SKUS:
 		mx = maxi(mx, int(s.rub))
-		_check(V10Catalog.pull_value(s, false) > 0.0, "%s has a pull value for «≈ N ₽ за крутку»" % s.id)
+		_check(V10Catalog.pull_value(s, false) > 0.0, "%s has a pull value for «≈ N ₽ за желание»" % s.id)
 		_check(V10Catalog.ladder_ratio(s, false) <= V10Catalog.LADDER_MAX + 1e-6, "%s ladder ≤ 3×" % s.id)
 		if s.kind == "currency":
 			_check(V10Catalog.ladder_ratio(s, true) <= V10Catalog.LADDER_MAX + 1e-6, "%s first purchase ≤ 3×" % s.id)
 			_check(bool(s.requires_server), "%s consumable needs the server wallet" % s.id)
 	_check(mx <= 4990, "no SKU above 4990 ₽")
 	var month: = V10Catalog.sku("month_449")
-	_near(V10Catalog.ladder_ratio(month), 3.0, 0.1, "month card ≈ 3× (CEO_PLAN §2)")
-	_near(V10Catalog.ladder_ratio(V10Catalog.sku("pass_899")), 2.0, 0.15, "pass ≈ 2× (CEO_PLAN §2)")
+	_near(V10Catalog.ladder_ratio(month), 2.92, 0.1, "month card ≈ 2.92× (spec Л4)")
+	_near(V10Catalog.ladder_ratio(V10Catalog.sku("pass_899")), 2.13, 0.15, "pass ≈ 2.13× (spec Л5)")
 	_check(not bool(month.get("requires_server", false)) and bool(month.restorable), "month card is restorable without the server")
 	# a deliberately broken SKU is caught by the validator
 	var orig: Array = V10Catalog.SKUS
 	var cheap: = {"id": "evil", "kind": "starter", "rub": 149, "grant": {"moon": 12000}}
 	_check(V10Catalog.ladder_ratio(cheap) > 3.0, "validator math flags a 10× offer like the old «1200 + SSR за 149 ₽»")
 	_check(V10Catalog.ladder_ratio(V10Catalog.sku("moon_180"), true) <= 2.0 + 1e-6, "first purchase double ≤ 2×")
-	# rate schedule = g.gd roll()
-	_near(V10Catalog.ssr_rate(1), 0.03, 1e-9, "SSR 3 % at pull 1")
-	_near(V10Catalog.ssr_rate(45), 0.03, 1e-9, "SSR 3 % at pull 45")
-	_near(V10Catalog.ssr_rate(46), 0.09, 1e-9, "soft pity: 9 % at pull 46")
-	_near(V10Catalog.ssr_rate(59), 0.87, 1e-9, "soft pity: 87 % at pull 59")
+	# rate schedule = V10Rates v2 (spec Г1)
+	_near(V10Catalog.ssr_rate(1), 0.016, 1e-9, "SSR 1.6 % at pull 1")
+	_near(V10Catalog.ssr_rate(45), 0.016, 1e-9, "SSR 1.6 % at pull 45")
+	_near(V10Catalog.ssr_rate(46), 0.076, 1e-9, "soft pity: 7.6 % at pull 46")
+	_near(V10Catalog.ssr_rate(59), 0.856, 1e-9, "soft pity: 85.6 % at pull 59")
 	_near(V10Catalog.ssr_rate(60), 1.0, 1e-9, "hard pity at 60")
 	_near(V10Gacha.rate_at(50, 50), 1.0, 1e-9, "beginner hard pity at 50")
 	_check(V10Catalog.fmt_rub(4990) == "4 990 ₽" and V10Catalog.fmt_rub(79) == "79 ₽", "ruble format")
 	var tot: = V10Catalog.pass_track_total(true)
-	_check(int(tot.get("wish", 0)) == 9 and int(tot.get("crystal", 0)) == 2960, "premium track total 2960 crystals + 9 wishes: %s" % str(tot))
+	_check(int(tot.get("wish", 0)) == 5 and int(tot.get("crystal", 0)) == 1000, "premium track total 1000 crystals + 5 wishes (spec Л5): %s" % str(tot))
 	_check(orig.size() == V10Catalog.SKUS.size(), "catalog untouched")
 
 
@@ -441,9 +441,9 @@ static func _monte_carlo() -> void:
 			a_items[it.id] = int(a_items.get(it.id, 0)) + 1
 	# advertised base rates (before soft pity / S guarantee)
 	var pb: = float(base_ssr) / float(base_trials)
-	_near(pb, 0.03, 5.0 * sqrt(0.03 * 0.97 / base_trials), "MC base SSR rate 3 %")
+	_near(pb, 0.016, 5.0 * sqrt(0.016 * 0.984 / base_trials), "MC base SSR rate 1.6 %")
 	var ps: = float(s_hits) / float(s_trials)
-	_near(ps, 0.15, 5.0 * sqrt(0.15 * 0.85 / s_trials), "MC base S rate 15 %")
+	_near(ps, 0.13, 5.0 * sqrt(0.13 * 0.87 / s_trials), "MC base S rate 13 %")
 	# pity bounds
 	_check(max_gap <= 60, "MC: never more than 60 pulls without SSR (%d)" % max_gap)
 	_check(max_gap_s <= 10, "MC: never more than 10 pulls without S+ (%d)" % max_gap_s)
@@ -564,7 +564,7 @@ static func _odds() -> void:
 	_check(mu > 20.0 and mu < 40.0, "expected pulls per SSR plausible (%.2f)" % mu)
 	var cons: = V10Odds.consolidated()
 	_near(float(cons.SSR) + float(cons.S) + float(cons.A), 1.0, 1e-9, "consolidated rates sum to 1")
-	_check(float(cons.S) > 0.15, "S consolidated above base thanks to the 10-pull guarantee (%.4f)" % float(cons.S))
+	_check(float(cons.S) > 0.13, "S consolidated above base thanks to the 10-pull guarantee (%.4f)" % float(cons.S))
 	var sum_d: = 0.0
 	for x in V10Odds.first_ssr_dist():
 		sum_d += float(x)
@@ -610,16 +610,16 @@ static func _shop() -> void:
 	e.spend.set_age_verified(true)
 	# first pack: double; second: normal bonus
 	var r: = sh.buy("moon_180")
-	_check(r.ok and e.wallet.balance("moon") == 360, "first purchase doubled (%d)" % e.wallet.balance("moon"))
+	_check(r.ok and e.wallet.balance("moon") == 120, "first purchase doubled (%d)" % e.wallet.balance("moon"))
 	var rc: Dictionary = sh.st.receipts[0]
 	_check(rc.st == "confirmed" and rc.sku == "moon_180" and rc.rub == 79 and rc.first, "receipt written and confirmed")
 	sh.buy("moon_180")
-	_check(e.wallet.balance("moon") == 540, "second purchase without the first bonus")
+	_check(e.wallet.balance("moon") == 180, "second purchase without the first bonus")
 	_check(p.confirms == 2, "every delivery confirmed with the store")
 	# cancel / fail
 	p.next_status = "cancelled"
 	var rcan: = sh.buy("moon_900")
-	_check(rcan.ok and sh.st.orders[rcan.oid].st == "cancelled" and e.wallet.balance("moon") == 540, "cancelled: nothing granted")
+	_check(rcan.ok and sh.st.orders[rcan.oid].st == "cancelled" and e.wallet.balance("moon") == 180, "cancelled: nothing granted")
 	p.next_status = "failed"
 	var rf: = sh.buy("moon_900")
 	_check(sh.st.orders[rf.oid].st == "failed" and sh.st.receipts.size() == 2, "failed: nothing granted, no receipt")
@@ -629,21 +629,21 @@ static func _shop() -> void:
 	_check(sh.st.orders[rp.oid].st == "pending", "pending order")
 	_check(sh.can_buy("moon_900").reason == "in_progress", "no second order while one is pending")
 	p.complete(rp.oid, "paid")
-	_check(sh.st.orders[rp.oid].st == "delivered" and e.wallet.balance("moon") == 540 + 1720, "pending order delivered when paid")
+	_check(sh.st.orders[rp.oid].st == "delivered" and e.wallet.balance("moon") == 180 + 600, "pending order delivered when paid")
 	# duplicate store callback → delivered once
 	p.next_status = "paid"
 	p.duplicate = true
 	sh.buy("moon_3000")
 	p.duplicate = false
 	var n3: int = sh.st.receipts.filter(func(x): return x.sku == "moon_3000").size()
-	_check(n3 == 1 and e.wallet.balance("moon") == 2260 + 5420, "duplicate callback delivers once")
+	_check(n3 == 1 and e.wallet.balance("moon") == 780 + 1960, "duplicate callback delivers once")
 	# crash between payment and delivery: callback lost → reconcile delivers and confirms
 	p.instant = false
 	sh.buy("moon_6000")
 	p.restart()
-	_check(e.wallet.balance("moon") == 7680, "nothing delivered before the callback")
+	_check(e.wallet.balance("moon") == 2740, "nothing delivered before the callback")
 	var done: = sh.reconcile()
-	_check(done.size() == 1 and e.wallet.balance("moon") == 7680 + 10440, "reconcile delivers a paid, undelivered purchase")
+	_check(done.size() == 1 and e.wallet.balance("moon") == 2740 + 3960, "reconcile delivers a paid, undelivered purchase")
 	_check(sh.st.receipts[-1].st == "confirmed", "and confirms it")
 	_check(sh.reconcile().is_empty(), "reconcile is idempotent")
 	p.instant = true
@@ -655,23 +655,23 @@ static func _shop() -> void:
 	p.fail_confirm = false
 	sh.reconcile()
 	_check(sh.st.receipts[-1].st == "confirmed" and e.wallet.balance("moon") == before, "reconcile confirms without re-delivering")
-	# once-only and windows
+	# once-only and progress gates (spec Л3: no calendar expiry on starter sets)
 	_check(sh.buy("first_79").ok and e.wallet.balance("coin") == 2000, "first purchase set")
 	_check(sh.can_buy("first_79").reason == "owned", "once-only set cannot be bought twice")
 	var offers: = sh.offers()
 	var guest: Array = offers.filter(func(o): return o.id == "guest_149")
-	_check(guest.size() == 1 and int(guest[0].until) == int(sh.st.install) + 14 * 86400, "beginner set shows its end date, no countdown")
-	_check(String(guest[0].per_pull).begins_with("≈ ") and String(guest[0].per_pull).ends_with("₽ за крутку"), "«≈ N ₽ за крутку» on offers")
+	_check(guest.size() == 1 and int(guest[0].until) == 0, "beginner set has no calendar expiry (gated by Path level)")
+	_check(String(guest[0].per_pull).begins_with("≈ ") and String(guest[0].per_pull).ends_with("₽ за желание"), "«≈ N ₽ за желание» on offers")
 	_check(offers.filter(func(o): return o.id == "first_79").is_empty(), "bought once-only set leaves the list")
 	_adv(e, 15 * 86400)
-	_check(sh.available("guest_149").reason == "expired", "beginner set gone after 14 days")
+	_check(sh.available("guest_149").ok, "beginner set remains available until bought (no 14-day timer)")
 	# month card
 	var m0: = e.wallet.balance("moon")
 	_check(sh.buy("month_449").ok and e.wallet.balance("moon") == m0 + 300, "month card: 300 now")
 	_check(sh.month_days_left() == 30 and sh.ad_free(), "30 days, ads skipped")
 	var c0: = e.wallet.balance("crystal")
-	_check(not sh.month_claim().is_empty() and sh.month_claim().is_empty(), "90 crystals once a day")
-	_check(e.wallet.balance("crystal") == c0 + 90, "daily 90")
+	_check(not sh.month_claim().is_empty() and sh.month_claim().is_empty(), "30 crystals once a day")
+	_check(e.wallet.balance("crystal") == c0 + 30, "daily 30 (spec Л4)")
 	_adv(e, 86400)
 	_check(not sh.month_claim().is_empty() and sh.month_days_left() == 29, "next day claim, 29 days left")
 	for i in 4:
@@ -694,17 +694,17 @@ static func _refunds_restore() -> void:
 	var e: = _econ(p)
 	e.shop.caps.server_wallet = true
 	e.spend.set_age_verified(true)
-	e.shop.buy("moon_3000")         # 5420 moon (first)
+	e.shop.buy("moon_3000")         # 1960 moon (first)
 	var pid: String = e.shop.st.receipts[0].pid
-	e.wallet.spend_premium(5000, "pull")
+	e.wallet.spend_premium(1800, "pull")
 	p.refund(pid)
 	_check(e.shop.receipt(pid).st == "refunded", "refund notice marks the receipt")
-	_check(e.wallet.balance("moon") == 0 and e.wallet.debt("moon") == 5000, "spent refunded moonstone becomes debt (%d)" % e.wallet.debt("moon"))
+	_check(e.wallet.balance("moon") == 0 and e.wallet.debt("moon") == 1800, "spent refunded moonstone becomes debt (%d)" % e.wallet.debt("moon"))
 	_check(e.spend.spent_30d() == 0, "refunded purchase leaves the 30-day total")
 	_check(not e.shop.refund(pid), "refund is idempotent")
 	_check(not e.shop.refund("nope"), "unknown refund ignored")
 	e.shop.buy("moon_180")
-	_check(e.wallet.debt("moon") == 5000 - 360 and e.wallet.balance("moon") == 0, "next purchase pays the debt first")
+	_check(e.wallet.debt("moon") == 1800 - 120 and e.wallet.balance("moon") == 0, "next purchase pays the debt first")
 	_check(e.wallet.audit().is_empty(), "wallet invariant after refunds")
 	# month card refund
 	e.shop.buy("month_449")
@@ -726,7 +726,7 @@ static func _refunds_restore() -> void:
 	e.item_revoked.connect(func(id, _s): revoked.append(id))
 	e.shop.refund(ppid)
 	_check(not bool(e.pass_.st.prem) and int(e.pass_.st.cp) == 0, "pass refund: premium off")
-	_check(int(e.wallet.st.revoked.crystal) == 880, "pass refund claws back premium crystals (%d)" % int(e.wallet.st.revoked.crystal))
+	_check(int(e.wallet.st.revoked.crystal) == 306, "pass refund claws back premium crystals (%d)" % int(e.wallet.st.revoked.crystal))
 	# restore on a fresh install: entitlements back, currency not re-granted
 	var p2: = _stub()
 	var e3: = _econ(p2)
@@ -811,7 +811,7 @@ static func _pass() -> void:
 	var e2: = _econ(_stub())
 	e2.pass_.rollover("s1", T0, T0 + 42 * 86400)
 	e2.shop.buy("pass_1490")
-	_check(e2.pass_.tier() == 10 and e2.wallet.balance("moon") == 1500, "deluxe: +10 tiers and moonstone")
+	_check(e2.pass_.tier() == 10 and e2.wallet.balance("moon") == 300, "deluxe: +10 tiers and moonstone")
 
 
 # ================================================================= summon flow (payment + grants)
@@ -897,7 +897,7 @@ static func _save() -> void:
 	var back = JSON.parse_string(txt)
 	_check(back is Dictionary and V10Econ.verify(back), "seal survives a JSON round trip (ints become floats)")
 	var e2: = V10Econ.load_dict(back, p, [], "tw-econ-v1:5e1f0c2a9b", e.clock._m_wall)
-	_check(e2.wallet.balance("crystal") == e.wallet.balance("crystal") and e2.wallet.balance("moon") == 360, "balances restored")
+	_check(e2.wallet.balance("crystal") == e.wallet.balance("crystal") and e2.wallet.balance("moon") == 120, "balances restored")
 	_check(typeof(e2.st.wallet.bal.crystal) == TYPE_INT, "numbers normalised to int on load")
 	_check(e2.energy.value() == 127 and e2.gacha.candles("lim_zlata") == 10, "energy and candles restored")
 	_check(e2.shop.st.receipts.size() == 1 and e2.gacha.counter("limited").p == e.gacha.counter("limited").p, "receipts and pity restored")

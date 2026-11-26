@@ -35,7 +35,7 @@ var spend: V10Spend
 var shop: V10Shop
 var owns: Callable
 var season_outfit: = ""         # what pass tier 30 «@season_outfit» resolves to this season
-var pass_xp_per_pull: = 10
+var pass_xp_per_pull: = 0
 
 
 # t0 > 0: a manual clock starting at t0 (selftests, replays); 0 = real clock

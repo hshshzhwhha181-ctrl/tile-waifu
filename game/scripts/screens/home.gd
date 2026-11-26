@@ -37,13 +37,45 @@ func build(m, _args: Dictionary) -> void :
 		# dev: preview home at another effects level (--fx=full|mid|min)
 		if a.begins_with("--fx=") and a.substr(5) in G.FX_LEVELS:
 			G.S.fx_level = a.substr(5)
+	V10HudSkin.sync(V10Look.current())
+	V10Voice.visit()
 	V9Letters.install()
+	V10Phone.ensure()
+	var rit_day: = V10Rituals.day_start()
+	for rl in rit_day.get("letters", []):
+		if rl is Dictionary:
+			V9Letters.push_ritual(rl)
+	var cb_gap: = int(rit_day.get("comeback", {}).get("gap", 0)) if rit_day.get("comeback") is Dictionary else 0
+	if cb_gap >= 2:
+		V10Phone.event({"kind": "comeback", "days": cb_gap})
+	V10Phone.tick()
+	if int(G.S.get("unlocked", 1)) >= 4:
+		V10Seven.visit(G.S, V10Meta.day_key())
+	_offer_ritual_scenes(rit_day)
+	_offer_gacha_scenes()
+	_offer_look_scenes()
 	var new_letters: = V9Letters.tick()
-	Common.backdrop(self, "menu", size, 0.0, 1.0, Color.WHITE, Vector2(0.5, 0.5))
-	# 0.9 video pilot: Маджонг-тян's lobby loop (her room and her in one clip) instead of the room art + rig
-	if V9HomeLive.video_wanted(str(G.S.partner)):
+	var salon_bg: = V10Salon.lobby_texture()
+	if salon_bg != "" and ResourceLoader.exists(salon_bg):
+		var sbg: = TextureRect.new()
+		sbg.texture = load(salon_bg)
+		sbg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		sbg.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+		var br0: = V10Layout.bleed_rect(self)
+		sbg.position = br0.position
+		sbg.size = br0.size
+		sbg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		add_child(sbg)
+	else:
+		Common.backdrop(self, "menu", size, 0.0, 1.0, Color.WHITE, Vector2(0.5, 0.5))
+	# 0.10 W3: Маджонг-тян's living illustration rig (rig10, ≤ 1 rig and ≤ 1 video per screen, UX_RULES Г-4)
+	var bday_partner: = V10Bday.today_hero() == str(G.S.partner)
+	var rig10: V10LiveRig = null
+	if not bday_partner and V9HomeLive.rig10_wanted(str(G.S.partner)):
+		rig10 = V9HomeLive.build_rig10(self, size, salon_bg == "")
+	elif not bday_partner and salon_bg == "" and V9HomeLive.video_wanted(str(G.S.partner)):
 		video = V9HomeLive.build_video(self, size)
-	if video == null:
+	if video == null and rig10 == null:
 		Common.rays(self, Vector2(W * 0.52, H * 0.34), 1000, Color(1, 0.93, 0.8, 0.45), 10, 0.03, 0.35)
 	Fx.ambient(self, "petals", size)
 
@@ -54,7 +86,7 @@ func build(m, _args: Dictionary) -> void :
 	ped.position = Vector2(W * 0.52, floor_y - 10)
 	ped.scale = Vector2(6.0, 1.1)
 	ped.modulate = Color(1, 0.85, 0.9, 0.5)
-	ped.visible = video == null
+	ped.visible = video == null and rig10 == null
 	add_child(ped)
 	hero = Hero.new().setup(G.S.partner, H * 0.64)
 	hero.position = Vector2(W * 0.52, floor_y)
@@ -62,12 +94,14 @@ func build(m, _args: Dictionary) -> void :
 	# 0.9: every tap on her (and on the room) goes through V9HomeLive, not the rig's own tap
 	hero.interactive = false
 	UI.slide_in(hero, Vector2(0, 60), 0.05, 0.6)
-	# 0.8: her legs fade out under the button cluster (no shoes peeking between the plate and the CTA). 0.9: the fade
-	# starts at the top of the cluster (Режимы, y ≈ 900), not right under the hem — her legs stay skin and colour
 	var oid: = G.equipped(G.S.partner)
 	var live_opts: = {"hero": hero}
 	var live_mode: = "rig"
-	if video != null:
+	if rig10 != null:
+		hero.visible = false
+		live_mode = "rig10"
+		live_opts["rig10"] = rig10
+	elif video != null:
 		hero.visible = false
 		live_mode = "video"
 		live_opts["video"] = video
@@ -96,12 +130,19 @@ func build(m, _args: Dictionary) -> void :
 		live_opts.merge({"art": art, "tex_size": Vector2(otex.get_width(), otex.get_height()), "focus": Vector2(float(ofc[0]), 0.4),
 			"face_rect": _face_rect(oid, otex, ofc), "art_key": okey})
 	live = V9HomeLive.make(self, live_mode, live_opts)
-	# 0.10 W1 (UX §3.3, HUD_V2 §8.2): the v2 tea house — avatar + nick, Телефон, the lanterns, the partner plate and
-	# ONE «Играть · N». The 0.9 left column, the league / event / offer cards, «Режимы», «Сесть за стол», the currencies
-	# and the affection plate with «ещё N сегодня» are gone (their rows live in «Сегодня» and on «Столы»).
-	_build_v10(new_letters.size() > 0 or V9Letters.badge_count() > 0)
+	if bday_partner:
+		hero.visible = false
+		if live:
+			live.set_process(false)
+			live.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		V10BdayCake.open(self, str(G.S.partner))
+	# 0.10 W1+W2 (UX §3.3, HUD_V2 §8.2): the v2 tea house — avatar + nick, Телефон, the lanterns, the partner plate and
+	# ONE «Играть · N».
+	_build_v10(new_letters.size() > 0 or V10Phone.badge() > 0)
 	V10Hooks.emit_home_built(self)  # 0.10 hook: V10EntryQueue.run() (one full-screen scene per launch)
-	if not new_letters.is_empty():
+	if V10EntryQueue.shown_this_launch().is_empty() and _tray_allowed() and V10Tray.should_show():
+		_open_morning_tray.call_deferred()
+	if not new_letters.is_empty() and V10Nav.phone_open():
 		_letter_arrived.call_deferred()
 	await get_tree().create_timer(0.9).timeout
 	if is_inside_tree():
@@ -181,13 +222,24 @@ func _rating_mark(b: Control) -> void :
 
 func refresh_badges() -> void :
 	if home2:
-		home2.phone_dot = V9Letters.badge_count() > 0
-		home2.lit = [V10Nav.today_open(), false, false]
-		home2.deco.queue_redraw()
+		var pb: = V10Phone.badge()
+		home2.phone_shown = V10Nav.phone_open()
+		home2.phone_count = pb
+		home2.phone_dot = pb > 0
+		home2.shown = [V10Nav.today_lit(), V10Nav.salon_open(), V10Nav.streak_shown()]
+		home2.lit = [V10Nav.today_open(), V10Nav.salon_lit(), V10Nav.streak_lit()]
+		home2.layout_now()
 
-# «Письма» (0.9): the letters screen — heroines' letters with replies, plus the 0.7/0.8 date notes and scene notices.
+# 0.10 W2: Телефон overlay (лента · чаты · почта), gated after L5 (UX §3.5).
 func open_mail() -> void :
-	main.go("letters")
+	if not V10Nav.phone_open():
+		main.toast(V10Nav.T_LOCK % (V10Nav.PHONE_AT - 1), "lock")
+		return
+	var ph: = V10Phone.open(main, {})
+	if ph:
+		ph.tree_exited.connect(func():
+			if is_inside_tree():
+				refresh_badges())
 
 # a letter was written while she was away: the Письма icon bows once with a little sparkle
 func _letter_arrived() -> void :
@@ -474,15 +526,125 @@ func dev_act(a: String) -> void :
 		"blink":
 			hero.set_process(false)
 			hero.mat.set_shader_parameter("blink", 1.0)
+		"phone":
+			V10Phone.open(main, {})
+		"streak":
+			V10StreakSheet.open(main.overlay)
+		"tray":
+			_open_morning_tray()
 
 
-# ── 0.10 W1: V10HudHome over the living heroine (scripts/v10/hud2/hud_home.gd, HUD_V2 §8.2) ─────────────────────
+func _tray_allowed() -> bool:
+	var meta = G.S.get("v10_meta", {})
+	var days: = int(meta.get("days_seen", 0)) if meta is Dictionary else 0
+	return int(G.S.get("unlocked", 1)) >= 4 or days >= 2
+
+
+func _open_morning_tray() -> void :
+	if not is_inside_tree() or main == null or main.overlay == null:
+		return
+	var tv: = V10TrayView.open(main.overlay)
+	if tv:
+		tv.finished.connect(func(_r):
+			if is_inside_tree():
+				main.refresh_currency(true)
+				refresh_badges())
+
+
+func _offer_ritual_scenes(rit_day: Dictionary) -> void :
+	var key: = V10Meta.day_key()
+	var sc = rit_day.get("scene", {})
+	if sc is Dictionary and not (sc as Dictionary).is_empty():
+		var tier: = str(sc.get("tier", "warm"))
+		var cb_info: Dictionary = rit_day.get("comeback", {}) if rit_day.get("comeback") is Dictionary else {}
+		V10EntryQueue.offer("comeback", key, func() -> void:
+			if main == null or main.overlay == null:
+				return
+			var cs: = V10ComebackScene.play(main.overlay, tier, {
+				"h": str(G.S.partner), "heroes": V10Phone.owned(), "letters": int(cb_info.get("letters", 0)),
+			})
+			cs.finished.connect(func(_sk: bool):
+				V10EntryQueue.done("comeback", key)
+				if str(cb_info.get("ladder", "")) != "" and main and main.overlay:
+					var ls: = V10LadderScreen.open(main.overlay, key)
+					ls.odds_requested.connect(func():
+						if main.SCREENS.has("odds"):
+							ls.queue_free()
+							main.go("odds", {"source": "tickets"}))))
+	if bool(rit_day.get("player_bday", false)):
+		V10EntryQueue.offer("player_bday", key, func() -> void:
+			if main == null or main.overlay == null:
+				return
+			var voc: = str(V10Phone.st().get("name", {}).get("voc", ""))
+			var ps: = V10PlayerBdayScene.play(main.overlay, {"name_voc": voc, "rows": V10PlayerBday.claim_gift(key)})
+			ps.finished.connect(func():
+				V10EntryQueue.done("player_bday", key)
+				if is_inside_tree():
+					main.refresh_currency(true)
+					refresh_badges()))
+
+
+func _offer_gacha_scenes() -> void :
+	if not V10Registry.wired("gacha"):
+		return
+	var g2: = V10WishScreen.make_gacha()
+	var gs: = V10Banners.state(G.S)
+	if bool(gs.get("fp_letter", false)):
+		gs["fp_letter"] = false
+		V9Letters.push_ritual({"id": "fp_comp", "hero": "mc", "subject": "Все три SSR уже твои",
+			"body": "В твоём гардеробе уже все три первых SSR-наряда чайной! Держи 10 билетов желания в благодарность.",
+			"rewards": {}})
+		G.save()
+	if G.summon_open() and g2.first_needed():
+		V10EntryQueue.offer("banner_phase", "first_ssr", func() -> void:
+			if main == null or not is_inside_tree():
+				return
+			V10EntryQueue.done("banner_phase", "first_ssr")
+			main.go("summon"))
+	if int(G.S.get("rates_ver", 2)) == 1:
+		V10EntryQueue.offer("rules_note", "v2_rates", func() -> void:
+			V10EntryQueue.done("rules_note", "v2_rates")
+			var sl: = V10Rates.summary_lines()
+			var body_t: = "В Желаниях обновились правила: %s (%s итоговый с гарантом на 60-м), Свеча желаний не сгорает." % [
+				str(sl[0].rar) + " " + V10Rates.pct(float(sl[0].base)), V10Rates.pct(float(sl[0].total))]
+			V9Letters.push_ritual({"id": "v2_rates_note", "hero": "mc", "subject": "Новые правила желаний",
+				"body": body_t, "rewards": {}})
+			G.save()
+			if is_inside_tree():
+				refresh_badges())
+
+
+func _offer_look_scenes() -> void :
+	if not V10HudSkin.skinned() or V10Look.previewing():
+		return
+	if not (G.S.get("v10_skins_seen") is Dictionary):
+		G.S["v10_skins_seen"] = {}
+	var seen_sk: Dictionary = G.S.v10_skins_seen
+	var sid: = V10HudSkin.active
+	if bool(seen_sk.get(sid, false)):
+		return
+	V10EntryQueue.offer("table_style", sid, func() -> void:
+		if main == null or main.overlay == null or not is_inside_tree():
+			return
+		seen_sk[sid] = true
+		G.save()
+		V10SkinAssemble.play(main.overlay, self, sid,
+			func(): V10EntryQueue.done("table_style", sid),
+			func():
+				V10Look.set_choice(G.S, "hud", V10Look.BASE)
+				V10HudSkin.sync(V10Look.current())
+				G.save()
+				V10EntryQueue.done("table_style", sid)))
+
+
+# ── 0.10 W1+W2: V10HudHome over the living heroine (scripts/v10/hud2/hud_home.gd, HUD_V2 §8.2) ─────────────────────
 var home2: V10HudHome
 var avatar_hit: Control
 var v10_bubble_x = null  # V9HomeLive.say: x of the speech bubble (right of the lit lanterns)
 
 func _build_v10(mail_new: bool) -> void :
 	var pi: = V10Nav.path_info()
+	var pb: = V10Phone.badge()
 	# a night.900 scrim behind the status row (avatar, nick, Телефон): paper text stays ≥ 4.5:1 on a bright room
 	var scrim: = TextureRect.new()
 	var gt: = GradientTexture2D.new()
@@ -498,15 +660,20 @@ func _build_v10(mail_new: bool) -> void :
 	scrim.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	scrim.name = "StatusScrim"
 	add_child(scrim)
+	var sh_arr: = [V10Nav.today_lit(), V10Nav.salon_open(), V10Nav.streak_shown()]
+	var lit_arr: = [V10Nav.today_open(), V10Nav.salon_lit(), V10Nav.streak_lit()]
 	home2 = V10HudHome.new()
 	home2.configure({"hero": str(G.S.partner), "nick": G.nick(), "level": pi.code, "path": pi.loc,
 		"affinity": G.aff_level(str(G.S.partner)),
-		"own_figure": true, "own_backdrop": true, "own_nav": true, "phone_dot": mail_new,
-		# Сегодня from L6 (UX §3.5); Салон and Серия arrive with W2
-		"shown": [V10Nav.today_lit(), false, false], "lit": [V10Nav.today_open(), false, false]})
+		"own_figure": true, "own_backdrop": true, "own_nav": true,
+		"phone_shown": V10Nav.phone_open(), "phone_dot": mail_new, "phone_count": pb,
+		"shown": sh_arr, "lit": lit_arr})
 	add_child(home2)
-	var shown_n: = 1 if V10Nav.today_lit() else 0
-	v10_bubble_x = 40.0 + shown_n * 112.0 + 4.0 if shown_n > 0 else null
+	var rightmost: = -1
+	for i in sh_arr.size():
+		if bool(sh_arr[i]):
+			rightmost = i
+	v10_bubble_x = 40.0 + (rightmost + 1) * 112.0 + 4.0 if rightmost >= 0 else null
 	# its layout is in viewport px; the screen sits in the content column
 	home2.set_anchors_preset(Control.PRESET_TOP_LEFT)
 	home2.position = -main.CR.position
@@ -515,14 +682,38 @@ func _build_v10(mail_new: bool) -> void :
 	play_btn = null
 	aff_root = home2.partner
 	home2.play_b.set_meta("ux_role", "primary")
+	home2.play_b.set_meta("tut_id", "home.play")
 	home2.partner.set_meta("ux_role", "secondary")
+	home2.partner.set_meta("tut_id", "home.hero")
 	home2.phone_b.set_meta("ux_role", "tertiary")
+	home2.phone_b.set_meta("tut_id", "home.phone")
+	if home2.lantern_tr.size() >= 3:
+		home2.lantern_tr[0].set_meta("tut_id", "home.today")
+		home2.lantern_tr[1].set_meta("tut_id", "home.salon")
+		home2.lantern_tr[2].set_meta("tut_id", "home.streak")
 	home2.play_pressed.connect(func(): V10Nav.play_path(main))
 	home2.partner_pressed.connect(func(): main.go("collection", {"hero": str(G.S.partner)}))
 	home2.phone_pressed.connect(open_mail)
 	home2.lantern_pressed.connect(func(i: int):
 		if i == 0:
-			V10Nav.today_sheet(main))
+			V10Nav.today_sheet(main)
+		elif i == 1:
+			main.go("v10salon")
+		elif i == 2:
+			var ss: = V10StreakSheet.open(main.overlay)
+			ss.closed.connect(func():
+				if is_inside_tree():
+					refresh_badges()))
+	if V10Nav.salon_open() and not bool(V10Salon.st().get("hint_seen", false)):
+		V10Salon.st()["hint_seen"] = true
+		G.save()
+		_salon_finger_hint.call_deferred()
+	# streak day-roll micro-feedback (forgiven / cooled)
+	for ev in V10Streak.take_events():
+		if ev is Dictionary and str(ev.get("kind", "")) == "forgiven":
+			var fl: = V10RitLines.pick("forgiven", str(G.S.partner), 0)
+			if fl != "":
+				_say.call_deferred(fl)
 	# the player's own avatar in the ring + one tap area over avatar and nick → Профиль (1)
 	var L: Dictionary = home2.L
 	var ar: Rect2 = L.avatar
@@ -543,9 +734,46 @@ func _build_v10(mail_new: bool) -> void :
 			V9Feel.press(av)
 			main.go("profile", {"from": "home"}))
 	home2.add_child(avatar_hit)
+	var sm_disc: = V10ShopHub.model()
+	if sm_disc != null and sm_disc.econ.shop.month_days_left() > 0:
+		var md: = V10MonthDisc.make(sm_disc, false)
+		md.position = Vector2(W - 144.0, (L.avatar as Rect2).end.y + 18.0)
+		home2.add_child(md)
+	if V10Look.previewing():
+		home2.shown = [false, false, false]
+		home2.layout_now()
+		var pv_h: = str(V10Look._preview.get("hero", "mc"))
+		var pv_o: = str(V10Look._preview.get("outfit", ""))
+		var pb_bar: = V10PreviewBar.open(home2, pv_h, pv_o, func(): main.go("summon"), 88.0)
+		pb_bar.closed.connect(func(to_b: bool):
+			if not to_b and is_inside_tree():
+				refresh_badges())
 
 
 # V9HomeLive calls this after a touch added affection: the partner plate shows the new number
 func _build_affection() -> void :
 	if home2 and home2.partner:
 		home2.partner.subtitle = "Симпатия · %d" % G.aff_level(str(G.S.partner))
+
+
+# UX §3.5 / INTEGRATION §4 W2: one-time gentle finger pointer on the «Салон» lantern right after L2
+func _salon_finger_hint() -> void :
+	if not is_inside_tree() or home2 == null or home2.lantern_tr.size() < 2:
+		return
+	var lt: Control = home2.lantern_tr[1]
+	if not lt.visible:
+		return
+	var fp: = TextureRect.new()
+	fp.texture = G.fx("finger")
+	fp.size = Vector2(56, 56)
+	fp.position = lt.position + Vector2(lt.size.x * 0.45, lt.size.y * 0.72)
+	fp.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	fp.modulate = Color(V10DS.GOLD_300, 0.92)
+	fp.name = "SalonFingerHint"
+	home2.add_child(fp)
+	var tw: = fp.create_tween()
+	for _k in 4:
+		tw.tween_property(fp, "position:y", fp.position.y - 10.0, 0.38).set_trans(Tween.TRANS_SINE)
+		tw.tween_property(fp, "position:y", fp.position.y, 0.38).set_trans(Tween.TRANS_SINE)
+	tw.tween_property(fp, "modulate:a", 0.0, 0.3)
+	tw.tween_callback(fp.queue_free)

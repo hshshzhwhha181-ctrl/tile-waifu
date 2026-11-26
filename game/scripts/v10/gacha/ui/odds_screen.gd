@@ -22,6 +22,7 @@ static func rub_ok() -> bool:
 		return bool(rub_ok_fn.call())
 	return int(G.S.get("unlocked", 0)) >= 9
 
+var main = null
 var gacha: V10Gacha2
 var banner: Dictionary = {}
 var args: Dictionary = {}
@@ -49,7 +50,10 @@ static func open_args(parent: Control, a: Dictionary) -> V10OddsScreen:
 	return s
 
 
-func build(_m, a: Dictionary) -> void:
+func build(m, a: Dictionary) -> void:
+	main = m
+	if main != null and main.has_method("show_chrome"):
+		main.show_chrome(false, false)
 	_setup(a)
 
 
@@ -81,6 +85,7 @@ func _setup(a: Dictionary) -> void:
 	add_child(t)
 	# a quiet ✕ (UX_RULES §6.5): no medallion, a glyph in an 80 px hit zone
 	add_child(V10GUI.quiet_icon("✕", Vector2(W - 104, 40), close))
+	set_meta("v8_back", close)
 	_set_tab(int(a.get("tab", 0)))
 	modulate.a = 0.0
 	position.y = 24
@@ -97,6 +102,9 @@ func _source_name() -> String:
 
 
 func close() -> void:
+	if main != null and main.get("screen") == self:
+		main.back()
+		return
 	var t: = create_tween()
 	t.tween_property(self, "modulate:a", 0.0, 0.18)
 	t.tween_callback(queue_free)
@@ -198,7 +206,7 @@ func _odds(list: Control) -> float:
 func _rules(list: Control) -> float:
 	var y: = 12.0
 	var items: = [
-		["SSR — не позже 60-го желания", "С 46-го желания без SSR шанс растёт на 6 % за каждое. Счётчик общий для всех фаз Луны и переходит из фазы в фазу; у «Пяти ветров» и «Первого гостя» свой."],
+		["SSR — не позже 60-го желания", V10Rates.soft_rule_line()],
 		["Половина шансов, что SSR — героиня баннера", "Если выпала другая SSR, следующая SSR на баннере фазы — точно героиня баннера. В «Полнолунии» героиню выбираешь сам: «Цель желания» меняется бесплатно и обещание не сбрасывает."],
 		["S или выше — хотя бы раз в 10 желаний", "Три S баннера фазы получают половину всех выпадений S."],
 		["Свеча желаний", "Каждое желание на любом баннере, и за билет тоже, зажигает свечу. Свечи не сгорают. 200 свечей — любая SSR постоянных желаний или текущей фазы на выбор."],
@@ -300,6 +308,9 @@ func _chest(list: Control) -> float:
 	t.position = Vector2(32, y)
 	list.add_child(t)
 	y += 48
-	for r in args.get("rows", []):
+	var rows: Array = args.get("rows", [])
+	if rows.is_empty() and providers.has("chest") and (providers["chest"] as Callable).is_valid():
+		rows = (providers["chest"] as Callable).call(args)
+	for r in rows:
 		y = _row(list, y, [String(r.get("name", "")), "", String(r.get("text", ""))], [20, 20, 20], [V10GUI.PAPER_100, V10GUI.PAPER_100, V10GUI.GOLD_300], [32.0, W - 200.0, W - 32.0]) + 10
 	return y

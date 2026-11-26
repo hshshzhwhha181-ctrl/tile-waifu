@@ -158,7 +158,7 @@ func offers() -> Array:
 		o["grant_now"] = V10Catalog.sku_grant(s, first)
 		var pv: = V10Catalog.pull_value(s, first)
 		o["pulls"] = pv
-		o["per_pull"] = "≈ %s за крутку" % V10Catalog.fmt_rub(float(s.rub) / pv) if pv > 0.0 else ""
+		o["per_pull"] = V10Sku.per_wish(float(s.rub) / pv) if pv > 0.0 else ""
 		var win: = int(s.get("window_days", 0))
 		o["until"] = int(st.install) + win * V10Catalog.DAY if win > 0 else 0
 		out.append(o)

@@ -26,6 +26,7 @@ static func run() -> int:
 	_save_fallback()
 	_migration_v5()
 	_migration_v7()
+	_migration_48_to_1000()
 	_add_rp()
 	G.S = real_state
 	G.save_path = real_path
@@ -57,9 +58,11 @@ static func late_game_state() -> Dictionary:
 	var s: = G.default_state()
 	s.gems = 23456
 	s.coins = 98765
-	s.unlocked = G.LEVELS.size()
-	for i in G.LEVELS.size():
-		s.stars[str(i)] = 1 + i % 3
+	s.unlocked = 120
+	for i in 120:
+		if not V10LevelGen.is_peak(i):
+			s.stars[str(i)] = 1 + i % 3
+	s["v10_levels"] = {"mig48": true}
 	for it in G.ITEMS:
 		s.owned[it.id] = true
 	s.partner = "yue"
@@ -71,7 +74,7 @@ static func late_game_state() -> Dictionary:
 	s.pulls = 312
 	s.pity = 37
 	s.yaku_seen = {"clean": true, "calm": true, "riichi": true, "dragon": true}
-	s.v6_map = {"chests": {"0": true, "1": true, "2": true}, "seen": G.LEVELS.size()}
+	s.v6_map = {"chests": {"0": true, "1": true, "2": true}, "seen": 48}
 	s["pass"] = {"owned": true, "xp": 2750, "claimed": 27}
 	s.month_card = {"until": "2026-12-20", "last": "2026-11-22"}
 	s.v7_room = {"items": ["lamp", "rug", "shelf"], "pos": {"lamp": [120, 340]}, "notes": ["Привет! «Кавычки», ёлка, 漢字 и эмодзи ✨"]}
@@ -103,7 +106,7 @@ static func _round_trip() -> void :
 	_check("import of exported code succeeds", ok, V8Recovery.last_error)
 	_check("round-trip state identical", _norm_no_econ(G.S) == want)
 	_check("round-trip wallet identical", [V10Money.bal("gems"), V10Money.bal("coins")] == want_bal and V10Econ.verify(G.S.econ))
-	_check("round-trip progress (rp/gems/unlocked)", int(G.S.rp) == 1777 and int(G.S.gems) == 23456 and int(G.S.unlocked) == G.LEVELS.size())
+	_check("round-trip progress (rp/gems/unlocked)", int(G.S.rp) == 1777 and int(G.S.gems) == 23456 and int(G.S.unlocked) == 120)
 	_check("round-trip profile", str(G.S.profile.nick) == "Лунная Сова" and bool(G.S.profile_done))
 	_check("imported save written to disk", G.read_save_file(G.save_path) is Dictionary)
 	_check("pre-import backup written", FileAccess.file_exists(V8Recovery.PRE_IMPORT_PATH))
@@ -169,30 +172,44 @@ static func _migration_v5() -> void :
 	old.erase("profile")
 	old.erase("profile_done")
 	old.erase("stats")
+	old.erase("v10_levels")
+	old.unlocked = 48
+	old.stars = {}
+	for i in 48:
+		old.stars[str(i)] = 1 + i % 3
 	old.ver = 5
 	var d = JSON.parse_string(JSON.stringify(old))
 	_check("v5 save applies", G.apply_state(d))
 	_check("v5 -> current: ver bumped", int(G.S.ver) == G.SAVE_VER)
 	_check("v5 -> v6: profile card shown again", G.S.profile_done == false and str(G.S.profile.nick) == "" and str(G.S.profile.id).length() == 8)
-	_check("v5 -> v6: progress kept", int(G.S.rp) == 1777 and int(G.S.unlocked) == G.LEVELS.size() and G.S.stars.size() == G.LEVELS.size())
+	_check("v5 -> v6: progress kept", int(G.S.rp) == 1777 and int(G.S.unlocked) >= 48 and G.S.stars.size() == 48)
 	_check("v5 -> v6: stats empty dict", G.S.stats is Dictionary and G.S.stats.is_empty())
 	var code: = V8Recovery.export_code(d)
 	G.S = G.default_state()
 	_check("0.7 save code imports with migration", V8Recovery.import_code(code) and int(G.S.ver) == G.SAVE_VER and not G.S.profile_done)
 
 
-# 0.10 (docs/INTEGRATION_0.10.md §3.7): a 0.9 save (ver 7) → ver 8 exactly once; old keys kept, the W1 module keys
+# 0.10 (docs/INTEGRATION_0.10.md §3.7): a 0.9 save (ver 7) → ver 8 exactly once; old keys kept, the W1+W2 module keys
 # registered, the wallet built from the 0.9 balances and sealed, a second pass adds nothing, damaged new keys are
 # repaired, the .bak fallback works on ver 8, and the 0.9 mirrors S.gems / S.coins follow the wallet.
 const W1_KEYS: = ["v10_meta", "v10_afisha", "econ", "v10_shop", "v10_cos_owned", "v10_cos_seen", "v10_feats", "v10_auth",
-	"v10_tut", "v10_clarity", "look", "hero_combo", "a11y_calm"]
+	"v10_tut", "v10_clarity", "look", "hero_combo", "a11y_calm",
+	"v10_levels", "v10_boosters", "v10_salon", "v10_phone", "v10_feed"]
+
+static func _all_v10_keys() -> Array:
+	var out: = W1_KEYS.duplicate()
+	for k in V10RitSave.defaults():
+		if not (k in out):
+			out.append(str(k))
+	return out
 
 static func _migration_v7() -> void :
 	var old: = late_game_state()
 	old.ver = 7
 	old.streak = 9
 	old.login = {"n": 12, "last": "2026-11-20"}
-	for k in W1_KEYS:
+	var all_keys: = _all_v10_keys()
+	for k in all_keys:
 		old.erase(k)
 	var d = JSON.parse_string(JSON.stringify(old))
 	_check("v7 save applies", G.apply_state(d))
@@ -202,9 +219,9 @@ static func _migration_v7() -> void :
 		if k != "streak" and not G.S.has(k):
 			keep = false
 	_check("v7 -> v8: every 0.9 key kept", keep)
-	_check("v7 -> v8: progress kept", int(G.S.rp) == 1777 and int(G.S.unlocked) == G.LEVELS.size() and str(G.S.profile.nick) == "Лунная Сова")
+	_check("v7 -> v8: progress kept", int(G.S.rp) == 1777 and int(G.S.unlocked) == 120 and str(G.S.profile.nick) == "Лунная Сова")
 	var missing: = []
-	for k in W1_KEYS:
+	for k in all_keys:
 		if not G.S.has(k):
 			missing.append(k)
 	_check("v7 -> v8: W1 module keys registered", missing.is_empty(), str(missing))
@@ -239,6 +256,41 @@ static func _migration_v7() -> void :
 	G.load_game()
 	_check("ver 8: damaged main -> backup with the wallet", G.loaded_from == G._bak_path() and int(G.S.ver) == 8 and V10Money.bal("gems") == 23000)
 	_check("econ audit clean after migration", G.econ != null and (G.econ.audit() as Array).is_empty(), str(G.econ.audit() if G.econ else []))
+
+
+# 0.10 W2 (INTEGRATION_0.10.md §4 W2): 0.9 fixture with 48 cleared levels → formula round(N * 100 / 48) + 1 opens 2-1
+# (unlocked = 101), all 48 star entries preserved without loss on Arc 1 main-path nodes, Salon bank == sum of stars
+# (intro «У тебя уже N★…»), and reloading changes nothing.
+static func _migration_48_to_1000() -> void :
+	var old: = G.default_state()
+	old.ver = 7
+	for k in _all_v10_keys():
+		old.erase(k)
+	old.unlocked = 48
+	old.stars = {}
+	var sum_old: = 0
+	for i in 48:
+		var st_v: = 1 + i % 3
+		old.stars[str(i)] = st_v
+		sum_old += st_v
+	var d = JSON.parse_string(JSON.stringify(old))
+	_check("48->1000: 0.9 48-level save applies", G.apply_state(d))
+	var want_unl: = int(round(48 * 100.0 / 48.0)) + 1
+	_check("48->1000: unlocked mapped by formula (%d)" % want_unl, int(G.S.unlocked) == want_unl, str(G.S.unlocked))
+	var sum_new: = 0
+	var no_peaks: = true
+	for k in G.S.stars:
+		sum_new += int(G.S.stars[k])
+		if V10LevelGen.is_peak(int(k)):
+			no_peaks = false
+	_check("48->1000: zero stars lost (%d == %d, main nodes)" % [sum_new, sum_old], sum_new == sum_old and G.S.stars.size() == 48 and no_peaks)
+	V10Salon.notify_stars(0)
+	_check("48->1000: Salon bank == sum of stars (%d)" % V10Salon.bank(), V10Salon.bank() == sum_old)
+	_check("48->1000: Salon intro greets veteran stars", V10Salon.intro_text() == (V10SalonData.INTRO_OLD % sum_old), V10Salon.intro_text())
+	G.save()
+	var snap: = _norm(G.S)
+	G.load_game()
+	_check("48->1000: reload is idempotent", _norm(G.S) == snap and V10Salon.bank() == sum_old)
 
 
 static func _add_rp() -> void :

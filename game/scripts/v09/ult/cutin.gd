@@ -500,7 +500,7 @@ func _build_text(shout: String, main: Color, accent: Color, ink: Color) -> void 
 		medal.add_child(tick)
 
 	var hero_name: String = String(G.HEROES.get(hero, {}).get("name", "")).to_upper()
-	tag_l = UI.label("УЛЬТА · %s" % hero_name, 17, GOLD, ink.darkened(0.5), 4, "body", 900)
+	tag_l = UI.label("ПРИЁМ · %s" % hero_name, 17, GOLD, ink.darkened(0.5), 4, "body", 900)
 	var tf: FontVariation = (tag_l.label_settings.font as FontVariation).duplicate()
 	tf.spacing_glyph = 3
 	tag_l.label_settings.font = tf
@@ -620,6 +620,8 @@ func _sheen_at(x: float, a: float) -> void :
 
 
 func _name_font() -> FontVariation:
+	if V10Fonts.deco and V10Fonts.SKIN_FONTS.has(hero):
+		return V10Fonts.skin(hero, "title", 56)
 	var ts: = TextServerManager.get_primary_interface()
 	var fv: = FontVariation.new()
 	fv.base_font = load("res://assets/fonts/playfair-i-cyr.woff2")

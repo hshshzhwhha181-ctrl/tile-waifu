@@ -252,12 +252,15 @@ func _try_style(it: Dictionary) -> void:
 	var c: Control = cards[focus_i]
 	V9Feel.press(c, "select", "button")
 	var tint: = Color(G.HEROES[it.hero].color)
-	# the table takes her colours: the three tiles glow in her accent, petals of her colour rise from them
 	for tile in tiles:
 		var tl: Sprite2D = tile
 		tl.create_tween().tween_property(tl, "modulate", Color(tint.r, tint.g, tint.b, 1.0), 0.3)
 		Fx.burst(self, tl.position, "petal", 8, tint.lerp(Color.WHITE, 0.4), 0.8)
 	Sfx.play("sparkle", 1.2, -6.0)
+	var main = get_tree().current_scene if is_inside_tree() else null
+	if main != null and "SCREENS" in main and main.SCREENS.has("home"):
+		V10Look.preview(String(it.hero), String(it.id))
+		main.go("home", {"tryon": true})
 
 
 func _unfocus() -> void:

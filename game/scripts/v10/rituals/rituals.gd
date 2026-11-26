@@ -60,14 +60,21 @@ static func day_start(key: = "") -> Dictionary:
 
 static func on_game_ended(r: Dictionary) -> Dictionary:
 	var key: = V10RitClock.day_key()
-	V10Tele.note_game(r, key)
+	var rn: = r.duplicate()
+	if not rn.has("won") and rn.has("win"):
+		rn["won"] = bool(rn.win)
+	V10Tele.note_game(rn, key)
 	var out: = {"streak": {}, "ask_bday": false}
-	if bool(r.get("won", false)):
+	if bool(rn.get("won", false)):
 		out.streak = V10Streak.on_win(key)
 		var first: = str(V10Tele.st().first_key)
 		if V10PlayerBday.ask_due(key, first, true):
 			V10PlayerBday.mark_asked()
 			out.ask_bday = true
+			if not V10RitSave._bound:
+				var lt: = V10RitBridge.klass("V9Letters")
+				if lt != null and lt.has_method("queue"):
+					lt.call("queue", "ask_bday")
 	V10RitSave.save()
 	return out
 

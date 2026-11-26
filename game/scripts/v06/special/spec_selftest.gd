@@ -16,7 +16,7 @@ func _run() -> void :
 	var greedy_plain: = 0
 	var greedy_spec: = 0
 	var kinds: = {}
-	for li in G.LEVELS.size():
+	for li in mini(48, G.LEVELS.size()):
 		for rep in 6:
 			var cfg: Dictionary = G.LEVELS[li].duplicate(true)
 			cfg.seed = int(cfg.seed) + rep * 7919

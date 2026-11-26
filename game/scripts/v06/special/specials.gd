@@ -69,6 +69,8 @@ static func plan_for(cfg: Dictionary, mode: String) -> Dictionary:
 			p.event = "event" in ks or "all" in ks
 			p.pool = ["starfall", "giftdrop", "wind", "golden", "challenge"]
 			return p
+	if cfg.has("v10_plan") and mode == "":
+		return (cfg.v10_plan as Dictionary).duplicate(true)
 	if mode == "blitz":
 		p.gift = 1
 		p.bomb = 1

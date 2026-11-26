@@ -23,7 +23,7 @@ static func model() -> V10ShopModel:
 	if _m != null and is_same(_m.econ, g.econ) and is_same(_m.st, S.v10_shop):
 		return _m
 	_m = V10ShopModel.new(g.econ, S.v10_shop)
-	_m.level_fn = func(): return int(S.get("level", 0))
+	_m.level_fn = func(): return maxi(0, int(S.get("unlocked", 1)) - 1)
 	_m.owns_fn = func(id): return bool(g.call("owns", id)) if g.has_method("owns") else false
 	_m.items_fn = func():
 		var out: = []
@@ -32,7 +32,34 @@ static func model() -> V10ShopModel:
 					and bool(it.get("sfw", not bool(it.get("bold", false)))):
 				out.append(it)
 		return out
+	_m.free_paths_fn = func() -> Array:
+		var fp: = []
+		var t: Dictionary = g.tasks()
+		var left_g: = 0
+		for i in g.TASKS.size():
+			if not bool(t.claimed[i]):
+				left_g += int(g.TASKS[i].gems)
+		if left_g > 0 and int(S.get("unlocked", 1)) >= 7:
+			fp.append({"text": "Задания дня: +%d кристаллов" % left_g, "go": "today"})
+		fp.append({"text": "Столы Пути: +15 кристаллов за первую победу", "go": "path"})
+		return fp
 	return _m
+
+
+static func _go_free(main, go: String) -> void:
+	if main == null:
+		return
+	var nav_sc = load("res://scripts/v10/core/nav.gd")
+	if go == "pass":
+		main.go("shop", {"v10": "pass"})
+	elif go == "today" and nav_sc:
+		nav_sc.today_sheet(main)
+	elif go == "path" and nav_sc:
+		nav_sc.play_path(main)
+
+
+static func go_free_cb(main) -> Callable:
+	return func(go: String) -> void: _go_free(main, go)
 
 
 # main.gd screen adapter: SCREENS["shop"] = preload("res://scripts/v10/shop/shop2_screen.gd")
@@ -51,13 +78,12 @@ static func build_into(screen: Control, main, args: Dictionary) -> void:
 			s = V10Shop2.make(m, {"tab": int(args.get("tab", 0)), "bottom_reserve": 120.0})
 	s.size = screen.size
 	screen.add_child(s)
-	s.go_screen.connect(func(to: String, a: Dictionary):
-		match to:
-			"back":
-				main.back()
-			"pass", "purchases":
-				var aa: = a.duplicate()
-				aa["v10"] = to
-				main.go("shop", aa)
-			"odds":
-				main.go("odds", a))
+	s.go_screen.connect(func(to: String, a: Dictionary) -> void:
+		if to == "back":
+			main.back()
+		elif to in ["pass", "purchases"]:
+			var aa: = a.duplicate()
+			aa["v10"] = to
+			main.go("shop", aa)
+		elif to == "odds":
+			main.go("odds", a))

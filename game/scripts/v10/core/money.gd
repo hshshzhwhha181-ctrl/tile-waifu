@@ -137,7 +137,25 @@ static func attach(S: Dictionary) -> void:
 	if not (ed is Dictionary) or (ed as Dictionary).is_empty() or not ((ed as Dictionary).get("wallet") is Dictionary):
 		ed = V10Econ.from_legacy(S, V10Meta.now_unix())
 		S["econ"] = ed
-	var e: = V10Econ.load_dict(ed)
+	var cur = g.get("econ")
+	var e: V10Econ
+	if cur is V10Econ and is_same(ed, (cur as V10Econ).st):
+		e = cur as V10Econ
+	else:
+		e = V10Econ.load_dict(ed)
+		e.season_outfit = "y_ball"
+		e.item_granted.connect(func(id: String, _src: String) -> void:
+			var gg = _g()
+			if gg == null:
+				return
+			if gg.ITEM.has(id):
+				gg.give_new(id)
+			else:
+				V10ProfileCos.grant(gg.S, id))
+		e.changed.connect(func() -> void:
+			if not _attaching:
+				_write_mirrors())
+	e.shop.set_provider(V10ShopPay.make_provider())
 	e.owns = func(id: String) -> bool: return g.owns(id)
 	S["econ"] = e.st
 	g.set("econ", e)

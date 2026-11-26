@@ -181,6 +181,8 @@ func tap(t: Tile) -> void :
 					x.face = t.face
 					break
 	super.tap(t)
+	if is_instance_valid(t) and tray.has(t) and not t.pending and tray.size() < slots:
+		unstick()
 
 func _match(a: Tile, b: Tile) -> void :
 	_pair_gone(a, b, true)

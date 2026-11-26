@@ -15,9 +15,11 @@ extends RefCounted
 #                                      Событие (+ «Забрать всё»), one sheet, never over another sheet (П-6)
 #   V10Nav.install()                   V10Afisha providers (week = турнир недели, extra rows = tasks, event)
 
+const SALON_AT: = 3  # after L2 (UX §3.5)
 const SUMMON_AT: = 4  # G.S.unlocked: open after the 3rd Path win (G.summon_open)
-const SHOP_AT: = 9  # after L8, the boss of chapter 1 (UX §3.5, С-2)
+const PHONE_AT: = 6  # Телефон after L5 (UX §3.5)
 const TODAY_AT: = 7  # after L6
+const SHOP_AT: = 9  # after L8, the boss of chapter 1 (UX §3.5, С-2)
 const WEEK_AT: = 17  # Турнир недели after L16 (UX §3.5)
 const T_LOCK: = "Откроется после партии %d"
 
@@ -51,8 +53,12 @@ static func tab_lock_text(id: String) -> String:
 static func tab_dot(id: String) -> bool:
 	match id:
 		"summon":
-			return bool(G.S.get("free10", false))
+			return (V10Registry.wired("gacha") and String(G.S.get("first_pick", "")) == "") or bool(G.S.get("free10", false))
 		"shop":
+			if G.econ != null:
+				var gs = G.S.get("v10_shop", {})
+				var gd: int = int(gs.get("gift", {}).get("day", -1)) if gs is Dictionary and gs.get("gift") is Dictionary else -1
+				return gd != (G.econ as V10Econ).clock.today()
 			return str(G.S.get("gift_day", "")) != G.today()
 	return false
 
@@ -63,21 +69,42 @@ static func dot() -> Control:
 	return d
 
 
+static func salon_open() -> bool:
+	return int(G.S.get("unlocked", 1)) >= SALON_AT
+
+
+static func salon_lit() -> bool:
+	return salon_open() and V10Salon.can_restore_any()
+
+
+static func streak_shown() -> bool:
+	var meta = G.S.get("v10_meta", {})
+	var days: = int(meta.get("days_seen", 0)) if meta is Dictionary else 0
+	return days >= 2 or int(V10Streak.st().get("n", 0)) > 0
+
+
+static func streak_lit() -> bool:
+	if not streak_shown():
+		return false
+	var v: = V10Streak.view()
+	return str(v.get("state", "")) in ["cold", "today"] or not (v.get("repair", {}) as Dictionary).is_empty()
+
+
+static func phone_open() -> bool:
+	return int(G.S.get("unlocked", 1)) >= PHONE_AT
+
+
 static func path_info() -> Dictionary:
-	var n: int = G.LEVELS.size()
-	var lvl: = clampi(int(G.S.get("unlocked", 1)), 1, n) - 1
-	var L: Dictionary = G.LEVELS[lvl]
-	var loc: = ""
-	var li = L.get("loc", 0)
-	if int(li) >= 0 and int(li) < G.LOCS.size():
-		loc = str(G.LOCS[int(li)].name)
-	return {"lvl": lvl, "code": str(L.get("code", str(lvl + 1))), "loc": loc, "total": n}
+	var cur: = V10PathState.current()
+	var nd: = V10PathState.node(cur)
+	var loc: = G.loc_name(int(nd.world))
+	return {"lvl": cur, "code": str(nd.code), "loc": loc, "total": V10PathState.released_total()}
 
 
 static func play_path(main) -> void:
-	var pi: = path_info()
+	var cur: = V10PathState.current()
 	var hero: String = G.S.level_partner if G.hero_unlocked(G.S.level_partner) else "mc"
-	main.go("play", {"level": int(pi.lvl), "partner": hero})
+	main.go("play", {"level": cur, "partner": hero, "v10_cfg": V10PathState.play_cfg(cur)})
 
 
 # ── «Сегодня» (Afisha) ─────────────────────────────────────────────────────────────────────────────────────────
@@ -128,6 +155,12 @@ static func today_rows() -> Array:
 	if V7Event.is_open():
 		var def: = V7EventData.cur_def()
 		out.append({"id": "event", "title": "Событие", "sub": str(def.get("name", "")), "open": true, "done": false, "icon": "event"})
+	var meta_d: = int(G.S.get("v10_meta", {}).get("days_seen", 0)) if G.S.get("v10_meta") is Dictionary else 0
+	if V10Nav.tab_open("shop") and (int(G.S.get("unlocked", 1)) >= 21 or meta_d >= 4) and G.econ != null:
+		var ps: V10Pass = (G.econ as V10Econ).pass_
+		var pcl: int = ps.claimable().size()
+		out.append({"id": "pass", "title": "Сезон", "open": true, "done": pcl == 0 and ps.tier() >= V10Catalog.PASS_TIERS,
+			"icon": "star", "sub": ("можно забрать: %d" % pcl) if pcl > 0 else "Ступень %d из %d" % [ps.tier(), V10Catalog.PASS_TIERS]})
 	if not closed.is_empty():
 		out.append(closed[0])
 	return out
@@ -219,13 +252,17 @@ static func _open_row(main, r: Dictionary) -> void:
 			main.go("v7tourney", {"tab": "week"})
 		"event":
 			main.go("v7event")
+		"pass":
+			main.go("shop", {"v10": "pass"})
 
 
 # Настройки → «Уведомления» (meta Ф1; UX §3.2): one row under «Фишки и словарь»; the panel opens in a sheet after
 # the settings window closes (never a window over a window, П-6)
+const SETTINGS_TAIL_Y: = 978.0
+
 static func settings_notify(main, p: Control) -> void:
 	var extra: = 84.0
-	var y0: = 900.0 + V10Clarity.SETTINGS_EXTRA
+	var y0: = SETTINGS_TAIL_Y + V10Clarity.SETTINGS_EXTRA
 	for c in p.get_children():
 		if c is Control and (c as Control).position.y >= y0 - 2.0 and c.name != "PanelArt":
 			(c as Control).position.y += extra
@@ -248,6 +285,125 @@ static func settings_notify(main, p: Control) -> void:
 		sh.add_body(np, 0.0)
 		sh.finish(np.preferred_height()))
 	p.add_child(b)
+
+
+# Настройки → «Мой день рождения» (rituals Р7, 152-ФЗ): set with explicit consent or delete in one tap
+static func settings_bday(main, p: Control) -> void:
+	var extra: = 84.0
+	var y0: = SETTINGS_TAIL_Y + V10Clarity.SETTINGS_EXTRA + 84.0
+	for c in p.get_children():
+		if c is Control and (c as Control).position.y >= y0 - 2.0 and c.name != "PanelArt":
+			(c as Control).position.y += extra
+	p.size.y += extra
+	var root = p.get_meta("root") if p.has_meta("root") else null
+	if root is Control and p.position.y + p.size.y > (root as Control).size.y - 10.0:
+		p.position.y = maxf(20.0, (root as Control).size.y - 10.0 - p.size.y)
+	var l: = UI.label("Мой день рождения", 26, UI.INK, Color.WHITE, 3, "body", 900)
+	l.position = Vector2(34, y0 + 2)
+	p.add_child(l)
+	var d: = UI.label(V10PlayerBday.settings_text(), 17, Color("8a5a7a"))
+	d.position = Vector2(34, y0 + 42)
+	p.add_child(d)
+	var has_bday: = V10PlayerBday.has_date()
+	var b: = JButton.make("Удалить" if has_bday else "Указать", "glass" if has_bday else "lav", Rect2(470, y0 + 8, 158, 64), null, 22)
+	b.name = "PlayerBday"
+	b.pressed.connect(func() -> void:
+		if V10PlayerBday.has_date():
+			V10PlayerBday.delete()
+			G.save()
+			d.text = V10PlayerBday.settings_text()
+			b.lbl.text = "Указать"
+			b.set_pal("lav")
+			return
+		Common.close_popup(p)
+		V10PlayerBdayScreen.open(main.overlay, "consent"))
+	p.add_child(b)
+
+
+# Настройки → «О игре · шрифты и лицензии» (fonts D2): lists all OFL families + tap for full OFL text
+static func settings_fonts(main, p: Control) -> void:
+	var extra: = 84.0
+	var y0: = SETTINGS_TAIL_Y + V10Clarity.SETTINGS_EXTRA + 168.0
+	for c in p.get_children():
+		if c is Control and (c as Control).position.y >= y0 - 2.0 and c.name != "PanelArt":
+			(c as Control).position.y += extra
+	p.size.y += extra
+	var root = p.get_meta("root") if p.has_meta("root") else null
+	if root is Control and p.position.y + p.size.y > (root as Control).size.y - 10.0:
+		p.position.y = maxf(20.0, (root as Control).size.y - 10.0 - p.size.y)
+	var l: = UI.label("Шрифты и лицензии", 26, UI.INK, Color.WHITE, 3, "body", 900)
+	l.position = Vector2(34, y0 + 2)
+	p.add_child(l)
+	var d: = UI.label("Открытые шрифты OFL в игре", 17, Color("8a5a7a"))
+	d.position = Vector2(34, y0 + 42)
+	p.add_child(d)
+	var b: = JButton.make("Открыть", "glass", Rect2(470, y0 + 8, 158, 64), null, 22)
+	b.name = "FontsLic"
+	b.pressed.connect(func() -> void:
+		Common.close_popup(p)
+		_open_fonts_sheet(main))
+	p.add_child(b)
+	if root is Control and p.size.y > (root as Control).size.y - 96.0:
+		var full_h: = p.size.y
+		var max_h: = (root as Control).size.y - 96.0
+		var sc_body: = ScrollContainer.new()
+		sc_body.name = "SettingsScroll"
+		sc_body.position = Vector2(0, 44)
+		sc_body.size = Vector2(p.size.x, max_h - 58.0)
+		sc_body.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+		sc_body.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_SHOW_NEVER
+		var holder: = Control.new()
+		holder.custom_minimum_size = Vector2(p.size.x, full_h - 44.0)
+		holder.mouse_filter = Control.MOUSE_FILTER_PASS
+		sc_body.add_child(holder)
+		var move_list: = []
+		for ch in p.get_children():
+			if ch is Control and (ch as Control).position.y >= 45.0 and ch.name != "PanelArt":
+				move_list.append(ch)
+		p.add_child(sc_body)
+		for ch in move_list:
+			var ctrl: Control = ch
+			ctrl.reparent(holder, false)
+			ctrl.position.y -= 44.0
+		p.size.y = max_h
+		p.pivot_offset = p.size * 0.5
+		p.position.y = maxf(54.0, ((root as Control).size.y - max_h) * 0.5 + 12.0)
+
+
+static func _open_fonts_sheet(main) -> void:
+	var sh: = V10BottomSheet.open(main, "Шрифты и лицензии")
+	var sc: = ScrollContainer.new()
+	var bw: = 656.0
+	var bh: = 680.0
+	sc.size = Vector2(bw, bh)
+	sc.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	var vb: = VBoxContainer.new()
+	vb.custom_minimum_size = Vector2(bw, 0)
+	vb.add_theme_constant_override("separation", 10)
+	sc.add_child(vb)
+	for row in V10Fonts.credits():
+		var fid: = str(row.get("id", ""))
+		var fam: = str(row.get("family", ""))
+		var copy_t: = str(row.get("copyright", ""))
+		var sub_t: = copy_t if copy_t.length() <= 68 else copy_t.substr(0, 65) + "…"
+		var pl: = V10Plate.make("M", int(bw - 8.0), fam, sub_t, "›")
+		pl.interactive = true
+		pl.set_meta("ux_role", "option")
+		pl.pressed.connect(func() -> void:
+			sh.close()
+			var lsh: = V10BottomSheet.open(main, fam)
+			var lsc: = ScrollContainer.new()
+			lsc.size = Vector2(bw, bh)
+			lsc.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+			var lbl: = V10Type.label(V10Fonts.licence_text(fid), "body", 18, V10DS.PAPER_300)
+			lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			lbl.custom_minimum_size = Vector2(bw - 24.0, 0)
+			lsc.add_child(lbl)
+			lsh.add_body(lsc, 0.0)
+			lsh.finish(bh + 16.0))
+		vb.add_child(pl)
+	sh.add_body(sc, 0.0)
+	sh.finish(bh + 16.0)
 
 
 class _Band:

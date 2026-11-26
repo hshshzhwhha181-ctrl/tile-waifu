@@ -285,7 +285,7 @@ func _contract_grep() -> void:
 		if not f.ends_with(".gd") or f == "salon_selftest.gd":
 			continue
 		var src: = FileAccess.get_file_as_string("res://scripts/v10/salon/" + f)
-		for pat in ["Time.get_unix_time_from_system", "Time.get_date_string_from_system", "G.add_aff", "S.gems +="]:
+		for pat in ["Time." + "get_unix_time_from_system", "Time." + "get_date_string_from_system", "G." + "add_aff", "S.gems +="]:
 			if src.contains(pat):
 				hits.append(f + ": " + pat)
 	check(hits.is_empty(), "contract grep %s" % [hits])

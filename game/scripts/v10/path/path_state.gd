@@ -200,10 +200,6 @@ static func state_of(i: int, cur: = -2) -> String:
 # the newest main level the player can play (the map scrolls to it, the CTA plays it)
 static func current() -> int:
 	var u: = unlocked()
-	# the first open main level that is not cleared; else the last open one
-	for i in u:
-		if not Gen.is_peak(i) and stars(i) == 0 and not bypassed(i):
-			return i
 	var j: = u - 1
 	while j > 0 and Gen.is_peak(j):
 		j -= 1
@@ -447,6 +443,9 @@ static func _arc_end(w: int, laurel: bool) -> Dictionary:
 	if bool(st().arc_end.get(str(w), false)):
 		return {}
 	st().arc_end[str(w)] = true
+	if not (st().get("arcs_done") is Dictionary):
+		st()["arcs_done"] = {}
+	st().arcs_done[str(w + 1)] = true
 	var r: = Rules.reward("arc_end")
 	grant(r, "path_arc_end")
 	return r
@@ -459,8 +458,12 @@ static func _grant_into(res: Dictionary, bundle: Dictionary, src: String) -> voi
 	res.gems = int(res.grants.get("gems", 0))
 
 
-# every Path reward goes through here: V10Wallet when the economy lane is merged, else a plain counter on S
+# every Path reward goes through here: V10Money when the economy lane is merged, else a plain counter on S
 static func grant(bundle: Dictionary, src: String) -> void:
+	var mon = Rules.cls("V10Money") if root_override == null else null
+	if mon != null and mon.has_method("grant"):
+		mon.call("grant", bundle, src)
+		return
 	var wallet = Rules.cls("V10Wallet") if root_override == null else null
 	for k in bundle:
 		var n: = int(bundle[k])
@@ -475,7 +478,9 @@ static func grant(bundle: Dictionary, src: String) -> void:
 
 static func _cos(id: String) -> void:
 	var pc = Rules.cls("V10ProfileCos") if root_override == null else null
-	if pc != null and pc.has_method("unlock"):
+	if pc != null and pc.has_method("grant"):
+		pc.call("grant", S(), id)
+	elif pc != null and pc.has_method("unlock"):
 		pc.unlock(id, "path")
 	if not (id in st().cos):
 		st().cos.append(id)

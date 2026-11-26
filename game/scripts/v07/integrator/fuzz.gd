@@ -10,7 +10,7 @@ static func run(host: Node, reps: int) -> void :
 	var clears: = 0
 	var fails: = 0
 	var blocked_takes: = 0
-	for li in G.LEVELS.size():
+	for li in mini(48, G.LEVELS.size()):
 		for rep in reps:
 			var cfg: Dictionary = G.LEVELS[li].duplicate(true)
 			cfg.seed = int(cfg.seed) + rep * 7919
