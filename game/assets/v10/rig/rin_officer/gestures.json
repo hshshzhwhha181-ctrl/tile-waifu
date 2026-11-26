@@ -1,7 +1,7 @@
 {
   "rig": "rin_officer",
   "hero": "rin",
-  "outfits": ["r_base", "r_agent"],
+  "outfits": ["r_base", "r_agent", "r_officer"],
   "scene": "res://assets/v10/rig/rin_officer/rig.tscn",
   "fit": {"center_x": 725, "height": 0.705, "bottom": 12},
   "motion": {"default": 1.0, "fx_min": 0.5, "profile": 0.7},
