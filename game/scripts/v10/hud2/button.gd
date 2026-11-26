@@ -36,6 +36,36 @@ var _l: Label
 var _ov: Label
 var _down: = false
 
+const HF_RED_PATH: = "res://assets/v10/hf_ui/btn_lacquer_red.png"
+const HF_BUY_PATH: = "res://assets/v10/hf_ui/btn_lacquer_buy.png"
+static var _tex_red: Texture2D
+static var _tex_buy: Texture2D
+static var _tex_loaded: = false
+
+
+static func _hf_tex(is_buy: bool) -> Texture2D:
+	if not _tex_loaded:
+		_tex_loaded = true
+		if ResourceLoader.exists(HF_RED_PATH):
+			_tex_red = load(HF_RED_PATH) as Texture2D
+		if ResourceLoader.exists(HF_BUY_PATH):
+			_tex_buy = load(HF_BUY_PATH) as Texture2D
+	return _tex_buy if is_buy else _tex_red
+
+
+static func draw_hf_pill(ci: CanvasItem, tex: Texture2D, r: Rect2, src: Rect2, src_cap: float, mod: Color) -> void:
+	var rad: = minf(26.0, r.size.y * 0.46)
+	ci.draw_colored_polygon(rr_pts(Rect2(r.position + Vector2(0, 4), r.size), rad, 8), Color(V10DS.NIGHT_900, 0.48))
+	var dcap: = minf(r.size.x * 0.46, src_cap * (r.size.y / maxf(1.0, src.size.y)))
+	ci.draw_texture_rect_region(tex, Rect2(r.position.x, r.position.y, dcap, r.size.y),
+		Rect2(src.position.x, src.position.y, src_cap, src.size.y), mod)
+	var mw: = r.size.x - dcap * 2.0
+	if mw > 0.5:
+		ci.draw_texture_rect_region(tex, Rect2(r.position.x + dcap, r.position.y, mw, r.size.y),
+			Rect2(src.position.x + src_cap, src.position.y, src.size.x - src_cap * 2.0, src.size.y), mod)
+	ci.draw_texture_rect_region(tex, Rect2(r.end.x - dcap, r.position.y, dcap, r.size.y),
+		Rect2(src.end.x - src_cap, src.position.y, src_cap, src.size.y), mod)
+
 
 static func make(k: String, t: String, sz: Vector2) -> V10Button:
 	var b: = V10Button.new()
@@ -128,6 +158,7 @@ static func lacquer(ci: CanvasItem, r: Rect2, rad: float, c_top: Color, c_mid: C
 
 func _init() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
+	texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	_l = Label.new()
 	_l.label_settings = V10Type.settings("ui", 22, V10DS.PAPER_100, true)
 	_l.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -162,7 +193,7 @@ func _relayout() -> void:
 	update_minimum_size()
 	pivot_offset = btn_size * 0.5
 	match kind:
-		"play":
+		"play", "primary":
 			V10Type.fit(_l, text, "button_play", btn_size.x - 88.0, 1, V10DS.BTN_PLAY_TEXT, true)
 			_l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			_l.position = Vector2(44, 0)
@@ -200,17 +231,20 @@ func _draw_diamond(c: Vector2, r: float, col: Color) -> void:
 func _draw() -> void:
 	var r: = Rect2(Vector2.ZERO, btn_size)
 	match kind:
-		"play":
-			var rad: = minf(26.0, btn_size.y * 0.32)
-			var ct: = V10DS.BTN_PLAY_DOWN_TOP if _down else V10DS.BTN_PLAY_TOP
-			var cm: = V10DS.BTN_PLAY_DOWN_BOT if _down else V10DS.BTN_PLAY_MID
-			var cb: = V10DS.BTN_PLAY_DOWN_BOT if _down else V10DS.BTN_PLAY_BOT
-			lacquer(self, r, rad, ct, cm, cb, 0.85 if _down else 1.0, V10DS.BTN_PLAY_GLOW, 0.18 if _down else 0.30)
-			# Flanking gold diamond ornaments
-			var dc: = Color(V10DS.PLATE_SPARK, 0.75 if _down else 0.95)
-			var yc: = btn_size.y * 0.5
-			_draw_diamond(Vector2(26.0, yc), 5.5, dc)
-			_draw_diamond(Vector2(btn_size.x - 26.0, yc), 5.5, dc)
+		"play", "primary":
+			var tred: = _hf_tex(false)
+			if tred != null:
+				draw_hf_pill(self, tred, r, Rect2(6.0, 48.0, 668.0, 105.0), 112.0, V10DS.PAPER_500 if _down else Color.WHITE)
+			else:
+				var rad: = minf(26.0, btn_size.y * 0.32)
+				var ct: = V10DS.BTN_PLAY_DOWN_TOP if _down else V10DS.BTN_PLAY_TOP
+				var cm: = V10DS.BTN_PLAY_DOWN_BOT if _down else V10DS.BTN_PLAY_MID
+				var cb: = V10DS.BTN_PLAY_DOWN_BOT if _down else V10DS.BTN_PLAY_BOT
+				lacquer(self, r, rad, ct, cm, cb, 0.85 if _down else 1.0, V10DS.BTN_PLAY_GLOW, 0.18 if _down else 0.30)
+				var dc: = Color(V10DS.PLATE_SPARK, 0.75 if _down else 0.95)
+				var yc: = btn_size.y * 0.5
+				_draw_diamond(Vector2(26.0, yc), 5.5, dc)
+				_draw_diamond(Vector2(btn_size.x - 26.0, yc), 5.5, dc)
 			# Crisp dark wine outline/drop behind ivory label (keeps Label outline_size == 0 for hud2_selftest)
 			if is_instance_valid(_l) and _l.text != "" and _l.label_settings != null:
 				var f: Font = _l.label_settings.font
@@ -219,8 +253,8 @@ func _draw() -> void:
 				if tw <= _l.size.x + 2.0:
 					var bx: = _l.position.x + (_l.size.x - tw) * 0.5
 					var by: = _l.position.y + (_l.size.y - f.get_height(fs)) * 0.5 + f.get_ascent(fs)
-					var oc: = Color(V10DS.BTN_PLAY_OUTLINE, 0.82)
-					for off in [Vector2(-1.6, 0), Vector2(1.6, 0), Vector2(0, -1.6), Vector2(0, 1.6), Vector2(0, 3.2)]:
+					var oc: = Color(V10DS.BTN_PLAY_OUTLINE, 0.86)
+					for off in [Vector2(-1.8, 0), Vector2(1.8, 0), Vector2(0, -1.8), Vector2(0, 1.8), Vector2(0, 3.2)]:
 						draw_string(f, Vector2(bx, by) + off, _l.text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, oc)
 			# Decorative flanking gold hairlines on overline
 			if overline != "":
@@ -232,9 +266,13 @@ func _draw() -> void:
 					V10Plate.hairline(self, g0, g1, -18.0, Color(V10DS.GOLD_500, 0.72))
 					V10Plate.hairline(self, mid + ow * 0.5 + 12.0, minf(btn_size.x - 16.0, mid + ow * 0.5 + 48.0), -18.0, Color(V10DS.GOLD_500, 0.72))
 		"cash":
-			var ct2: = V10DS.NIGHT_600 if _down else V10DS.BTN_CASH_TOP
-			var cb2: = V10DS.NIGHT_700 if _down else V10DS.BTN_CASH_BOT
-			lacquer(self, r, 12.0, ct2, ct2.lerp(cb2, 0.5), cb2, 0.95, V10DS.PAPER_100, 0.14)
+			var tbuy: = _hf_tex(true)
+			if tbuy != null:
+				draw_hf_pill(self, tbuy, r, Rect2(5.0, 47.0, 670.0, 104.0), 60.0, V10DS.PAPER_500 if _down else Color.WHITE)
+			else:
+				var ct2: = V10DS.NIGHT_600 if _down else V10DS.BTN_CASH_TOP
+				var cb2: = V10DS.NIGHT_700 if _down else V10DS.BTN_CASH_BOT
+				lacquer(self, r, 12.0, ct2, ct2.lerp(cb2, 0.5), cb2, 0.95, V10DS.PAPER_100, 0.14)
 		"secondary":
 			var st: = V10DS.BTN_SEC_DOWN_TOP if _down else V10DS.BTN_SEC_TOP
 			var sb_bot: = V10DS.BTN_SEC_DOWN_BOT if _down else V10DS.BTN_SEC_BOT

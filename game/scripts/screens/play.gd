@@ -79,6 +79,7 @@ var first_pairs_bonus: = 0
 # 0.9 Ultimate (scripts/v09/ult/ult_cast.gd); v9_from_ult is true while an ult removes a pair (its matched signal)
 var ult: V9UltCast
 var v9_from_ult: = false
+var v10_fx_hud: V10MatchFxHud
 
 func build(m, args: Dictionary) -> void :
 	main = m
@@ -153,16 +154,25 @@ func build(m, args: Dictionary) -> void :
 	Fx.ambient(self, cfg.fx, size)
 	Common.vignette(self, size, Color(0.25, 0.08, 0.18), 0.55)
 	_build_hud()
-	board_rect = Rect2(10, 318, W - 20, H - 318 - 186)
+	board_rect = Rect2(10, 318, W - 20, H - 318 - 208)
 	_make_board()
 	V10Hooks.emit_game_started({"mode": _v10_mode(), "level": lvl, "hero": partner, "seed": int(cfg.get("seed", 0)), "cfg": cfg})  # 0.10 hook
 	_apply_perk()
 	fx_layer = Node2D.new()
 	add_child(fx_layer)
 	v7combo = V7Combo.new().setup(self)
+	v7combo.self_modulate = Color(1, 1, 1, 0)
+	if v7combo.pill:
+		v7combo.pill.modulate.a = 0.0
+		if v7combo.pill_lbl:
+			v7combo.pill_lbl.self_modulate = Color(1, 1, 1, 0)
+		if v7combo.pill_sub:
+			v7combo.pill_sub.self_modulate = Color(1, 1, 1, 0)
 	add_child(v7combo)
-	# 0.9: no full-screen fever vignette — it pulsed over the board at every fx level; V7Combo's burning table
-	# frame (outside the tiles, gated by S.fx_level) carries the fever now
+	v10_fx_hud = V10MatchFxHud.new().setup(self, 254.0 if mode != "duel" else 298.0)
+	add_child(v10_fx_hud)
+	if v10_fx_hud.badge_lbl:
+		combo_lbl = v10_fx_hud.badge_lbl
 	_build_bottom()
 	if mode == "duel":
 		duel = V6Duel.new()
@@ -336,13 +346,18 @@ func _apply_perk() -> void :
 		"small": hint_n += 1
 	hint_n += int(cfg.get("extra_hints", 0))
 	V7Passives.attach(self)
+	if mode != "duel":
+		for c in get_children():
+			if c is V7PassiveRun and c.chip:
+				c.chip.position = Vector2(W - 76.0, 68.0)
 
 
 func _build_hud() -> void :
 	var home_b: = _v8_round_btn(V8Art.nav("home"), Rect2(12, 22, 70, 70), 0.62, func(): main.leave_match())
 	home_b.set_meta("tut_id", "match.pause")
 
-	var gp: = UI.rbox("cream", Rect2(92, 16, W - 92 - 258, 104), 26, 4, 12)
+	var gp_w: = (W - 92.0 - 258.0) if mode == "duel" else (W - 92.0 - 154.0)
+	var gp: = UI.rbox("cream", Rect2(92, 16, gp_w, 104), 26, 4, 12)
 	add_child(gp)
 	var t1: = UI.label(("%s · %s" % [cfg.get("code", str(lvl + 1)), cfg.name]) if mode == "" else cfg.name, 18, Color("ffd98a"), Color(0.1, 0.05, 0.2), 3, "body", 900)
 	t1.position = Vector2(16, 6)
@@ -380,31 +395,21 @@ func _build_hud() -> void :
 		score_lbl.position = Vector2(gp.size.x - 90, 52)
 		gp.add_child(score_lbl)
 
-	# 0.9: the skill meter is the Ultimate: need / start charge from V9Ults (ranked: 6, start 0)
+	# 0.11: Heroine & Ultimate moved to the BOTTOM under the thumb (V10BottomUltStage, 136x136 gold medallion + УЛЬТА!)
 	ult = V9UltCast.new().setup(self)
 	add_child(ult)
 	SKILL_NEED = ult.need()
 	skill_charge = ult.start_charge()
-	var stage_w: = 242.0 if _slot_count() <= 4 else 186.0
-	if mode == "duel":
-		stage = V6HeroStage.new().setup(partner, Rect2(98, 22, 92, 92), {"compact": true})
-	else:
-		# 0.8: only «Симпатия N» on the stage tag — the skill threshold is on the «умение 0/N» bar, and the long
-		# bond_text («… · умение за 7 пар · наряд +N») ran past the right screen edge
-		stage = V6HeroStage.new().setup(partner, Rect2(W - stage_w - 8, 66, stage_w, 240), {"tag": "Симпатия %d" % G.aff_level(partner)})
+	stage = V10BottomUltStage.new().setup_bottom(partner, Rect2(W - 252.0, H - 198.0, 242.0, 188.0), {"tag": "Симпатия %d" % G.aff_level(partner)})
+	stage.z_index = 26
 	add_child(stage)
 	if ult.mod != "":
 		stage.set_ult_badge(ult.mod, G.HEROES[partner].color, String(V9Ults.MODS[ult.mod].desc))
 	stage.pressed.connect( func():
-		# 0.9: every portrait tap is answered. Busy (a cast running) or ready-but-the-board-is-busy (deal, fail
-		# delay, clear) is a deny — never silence and never a chat that hides the ready glow. A talk tap gets the
-		# press; the bubble has its own cooldown so mashing does not stack lines.
 		if ult.busy:
 			V9Feel.deny(stage)
 			return
 		if skill_ready and not board.input_on:
-			# ready, but the table is busy (deal, a fail beat, a clear): the deny and a short line that says why,
-			# so the glow does not read as broken
 			V9Feel.deny(stage)
 			_speak_wait()
 			return
@@ -417,35 +422,39 @@ func _build_hud() -> void :
 	stage.set_meta("tut_id", "match.hero")
 	if not (mode in ["duel", "v7tourney", "duel_ranked"]) and V10Comeback.rested() > 0:
 		_v10_rested_bar = V10RestedBar.new()
-		_v10_rested_bar.position = Vector2(maxf(14.0, stage.position.x - 120.0), stage.position.y + stage.size.y + 2.0)
+		_v10_rested_bar.position = Vector2(12.0, 98.0)
 		add_child(_v10_rested_bar)
 		_v10_rested_bar.set_value(V10Comeback.rested())
 
-
-	var gem: = UI.rbox("plum", Rect2(14, 132, 112, 44), 22, 2, 8)
+	var gem_rect: = Rect2(14, 132, 112, 44) if mode == "duel" else Rect2(W - 140.0, 18.0, 128.0, 44.0)
+	var gem: = UI.rbox("plum", gem_rect, 22, 2, 8)
 	gem.set_param("border_top", Color("ffe7a6")).set_param("border_bottom", Color("c58a2c"))
 	add_child(gem)
 	gem.add_child(V8Art.rect(V8Art.cur("gem"), Rect2(2, 2, 40, 40)))
 	gems_lbl = UI.label(UI.fmt(G.S.gems), 19, Color.WHITE, Color(0.2, 0.05, 0.2), 3, "body", 900)
 	gems_lbl.position = Vector2(46, 0)
-	gems_lbl.size = Vector2(60, 44)
+	gems_lbl.size = Vector2(gem_rect.size.x - 52.0, 44)
 	gems_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	gems_lbl.pivot_offset = Vector2(30, 22)
 	gem.add_child(gems_lbl)
 
 	var ns: = _slot_count()
 	var gap: = 10.0
-	var tray_room: = W - 12 - (stage_w + 16 if mode != "duel" else 258.0)
-	var sw: = minf(108.0, (tray_room - 28 - (ns - 1) * gap) / ns)
-	var tw: = ns * sw + (ns - 1) * gap + 28
-	tray_box = UI.rbox("plum", Rect2(12 + (tray_room - tw) * 0.5, 172, tw, 128), 28, 4, 12)
+	var tray_y: = 172.0 if mode == "duel" else 130.0
+	var tray_h: = 128.0 if mode == "duel" else 120.0
+	var slot_h: = 108.0 if mode == "duel" else 102.0
+	var tray_room: = (W - 12.0 - 258.0) if mode == "duel" else (W - 28.0)
+	var sw: = minf(104.0, (tray_room - 28.0 - (ns - 1) * gap) / ns)
+	var tw: = ns * sw + (ns - 1) * gap + 28.0
+	var tray_x: = (12.0 + (tray_room - tw) * 0.5) if mode == "duel" else ((W - tw) * 0.5)
+	tray_box = UI.rbox("plum", Rect2(tray_x, tray_y, tw, tray_h), 28, 4, 12)
 	tray_box.set_param("border_top", Color("ffe7a6")).set_param("border_bottom", Color("c58a2c"))
 	tray_box.set_meta("tut_id", "match.tray")
 	V6HudStyle.tray(tray_box, V7Album.table_for(cfg.get("bg", "")))
 	add_child(tray_box)
 	slot_rects.clear()
 	for i in ns:
-		var r: = Rect2(14 + i * (sw + gap), 10, sw, 108)
+		var r: = Rect2(14 + i * (sw + gap), (tray_h - slot_h) * 0.5, sw, slot_h)
 		var sl: = UI.rbox("plum", r, 18, 2, 4)
 		sl.colors(Color(0, 0, 0, 0.35), Color(0, 0, 0, 0.22)).set_param("shadow_color", Color(0, 0, 0, 0))
 		sl.borders(Color(1, 1, 1, 0.12), Color(1, 1, 1, 0.25))
@@ -454,7 +463,7 @@ func _build_hud() -> void :
 		slot_rects.append(Rect2(tray_box.position + r.position, r.size))
 
 	var mb: = Control.new()
-	mb.position = Vector2(tray_box.position.x, 296)
+	mb.position = Vector2(tray_box.position.x, tray_box.position.y + tray_h + 4.0)
 	add_child(mb)
 	combo_lbl = UI.label("", 18, Color("ffe7a6"), Color(0.25, 0.05, 0.2), 4, "body", 900)
 	combo_lbl.position = Vector2(0, -6)
@@ -471,11 +480,13 @@ func _build_hud() -> void :
 	mb.visible = false
 
 func _build_bottom() -> void :
-	# 0.8: sound (84) + undo / hint / shuffle (112 each) are one row centred under the board with equal 50 px gaps,
-	# so the left and right margins match (was 25 px left, 160 px right)
-	var gap: = 50.0
-	var x0: = (W - (84.0 + 3.0 * 112.0 + 3.0 * gap)) * 0.5
-	var xs: = [x0 + 84.0 + gap, x0 + 84.0 + 112.0 + 2.0 * gap, x0 + 84.0 + 224.0 + 3.0 * gap]
+	# 0.11: Compact left-to-center booster dock [Sound (68) | Отмена | Подсказка | Мешать (98 each)],
+	# leaving the bottom-right 252 px clear for the 136x136 Heroine Ultimate Medallion!
+	var x_snd: = 12.0
+	var gap: = 20.0
+	var bw: = 98.0
+	var x0: = x_snd + 68.0 + 16.0
+	var xs: = [x0, x0 + bw + gap, x0 + (bw + gap) * 2.0]
 	btn_undo = _action("undo", V6Txt.s("play.undo"), xs[0], "rose")
 	btn_undo.pressed.connect(_undo)
 	btn_hint = _action("hint", V6Txt.s("play.hint"), xs[1], "gold")
@@ -483,23 +494,18 @@ func _build_bottom() -> void :
 	btn_hint.pressed.connect(_hint)
 	btn_shuffle = _action("shuffle", V6Txt.s("play.shuffle"), xs[2], "mint")
 	btn_shuffle.pressed.connect(_shuffle)
-	# 0.9: a help tap that would be refused answers with the deny alone (JButton gate), then the handler says why
 	btn_undo.set_gate( func(): return _help_ok("undo"), _undo)
 	btn_hint.set_gate( func(): return _help_ok("hint"), _hint)
 	btn_shuffle.set_gate( func(): return _help_ok("shuffle"), _shuffle)
-	# (riichi disables them; a tap then reaches the same handlers through `denied`, which say «заблокировано»)
-	# 0.8: sound on / off right in the match (icon/sound, icon/sound_off), bottom left beside the helps
-	btn_sound = _v8_round_btn(V8Art.icon("sound" if _v8_sound_on() else "sound_off"), Rect2(x0, H - 158, 84, 84), 0.6, _v8_toggle_sound)
+	btn_sound = _v8_round_btn(V8Art.icon("sound" if _v8_sound_on() else "sound_off"), Rect2(x_snd, H - 156.0, 68.0, 68.0), 0.6, _v8_toggle_sound)
 
 func _action(icon: String, text: String, x: float, pal: String) -> JButton:
-
-	var b: = JButton.make("", "graphite", Rect2(x, H - 172, 112, 112), null, 20, 56)
-	b.box.set_param("border", 4.0).set_param("gloss", 0.1)
-	# 0.8: the bare gold glyphs of the art set (icon/undo, hint, shuffle: 160 px drawn at 64)
-	var ic: = V8Art.rect(V8Art.icon(icon), Rect2(24, 20, 64, 64))
+	var b: = JButton.make("", "graphite", Rect2(x, H - 174.0, 98.0, 98.0), null, 20, 49.0)
+	b.box.set_param("border", 4.0).set_param("gloss", 0.12)
+	var ic: = V8Art.rect(V8Art.icon(icon), Rect2(20, 17, 58, 58))
 	ic.name = "Icon"
 	b.add_child(ic)
-	var cap: = UI.center_label(UI.label(text, 16, UI.INK, UI.DARK, 4, "body", 900), Rect2(-20, 110, 152, 30))
+	var cap: = UI.center_label(UI.label(text, 15, UI.INK, UI.DARK, 4, "body", 900), Rect2(-18, 98, 134, 28))
 	cap.name = "Cap"
 	cap.set_meta("base", text)
 	b.add_child(cap)
@@ -654,47 +660,46 @@ func _intro() -> void :
 
 
 func _tip(text: String) -> void :
-	# 0.8: sized from the wrapped text; it sits in the band of the action buttons (v8_bottom_card), never over
-	# the table, and the buttons step aside while it is shown
-	var tw_: = W - 170.0
-	var th: float = UI.font("body", 800).get_multiline_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, tw_, 18).y
-	var h: = maxf(104.0, 36.0 + th + 14.0)
-	var tc: = UI.rbox("cream", Rect2(20, H - 186 - h, W - 40, h), 24, 3, 10)
+	# 0.11: sized to fit left of the bottom-right Heroine Ult Medallion so her Ult stays 100% visible!
+	var card_w: = W - 278.0
+	var tw_: = card_w - 104.0
+	var th: float = UI.font("body", 800).get_multiline_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, tw_, 17).y
+	var h: = maxf(98.0, 34.0 + th + 14.0)
+	var tc: = UI.rbox("cream", Rect2(12, H - 186 - h, card_w, h), 22, 3, 8)
 	tc.add_to_group("v6_tip")
 	tc.z_index = 35
 	v8_bottom_card(tc)
 	tc.set_param("border_top", Color("e8c9a0")).set_param("border_bottom", Color("a8697a"))
 	add_child(tc)
-	tc.add_child(Common.avatar("mc", Rect2(8, 8, 84, 84), "gold"))
-	var nm: = UI.label(V6Txt.s("play.perk_tip") % [G.HEROES[partner].name, G.PERKS[partner]], 16, Color("b8406c"), Color.WHITE, 3, "body", 900)
-	nm.position = Vector2(102, 8)
-	nm.size = Vector2(W - 170, 24)
+	tc.add_child(Common.avatar("mc", Rect2(8, (h - 76.0) * 0.5, 76, 76), "gold"))
+	var nm: = UI.label(V6Txt.s("play.perk_tip") % [G.HEROES[partner].name, G.PERKS[partner]], 15, Color("b8406c"), Color.WHITE, 3, "body", 900)
+	nm.position = Vector2(92, 6)
+	nm.size = Vector2(tw_, 22)
 	nm.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	nm.clip_text = true
 	tc.add_child(nm)
-	var l: = UI.label(text, 18, UI.INK)
+	var l: = UI.label(text, 17, UI.INK)
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	l.custom_minimum_size = Vector2(W - 170, 0)
-	l.position = Vector2(102, 34)
-	l.size = Vector2(W - 170, h - 44)
+	l.custom_minimum_size = Vector2(tw_, 0)
+	l.position = Vector2(92, 30)
+	l.size = Vector2(tw_, h - 38)
 	tc.add_child(l)
 	UI.slide_in(tc, Vector2(0, 40), 0.0, 0.35)
-	# 0.8: at most 2.5 s on screen (2.1 s + fade), and a tap on the table closes it at once
 	var t: Tween = tc.create_tween()
 	t.tween_interval(2.1)
 	t.tween_property(tc, "modulate:a", 0.0, 0.4)
 	t.tween_callback(tc.queue_free)
 
 
-# 0.8: a card that explains something during a match (intro tip, V6Specials «Новинка») goes into the band of
-# the action buttons under the table, never over a tile row. The buttons hide while one is shown (a tap on
-# the card closes it), and come back when the last card goes or the player taps a tile.
 var _v8_bar_cards: Array = []
 
 func v8_bottom_card(c: Control) -> void :
-	var top: = board_rect.end.y + 4.0
+	var max_w: = W - 276.0
+	if c.size.x > max_w:
+		c.size.x = max_w
+	var top: = board_rect.end.y + 6.0
 	var h: = c.size.y
-	c.position = Vector2(20, top + maxf(0.0, (H - 8.0 - top - h) * 0.5))
+	c.position = Vector2(12, top + maxf(0.0, (H - 10.0 - top - h) * 0.5))
 	c.mouse_filter = Control.MOUSE_FILTER_STOP
 	c.gui_input.connect( func(e):
 		if (e is InputEventMouseButton and e.pressed) or (e is InputEventScreenTouch and e.pressed):
@@ -802,7 +807,7 @@ func now() -> float:
 	return G.time
 
 func _process(dt: float) -> void :
-	var ult_freeze: = (ult != null and ult.busy) or V9Cutin.any_playing()
+	var ult_freeze: = (ult != null and ult.busy) or V9Cutin.any_playing() or V10UltVideo.any_playing()
 	if ult_freeze:
 		# Pause combo expiry and fever timers frame-by-frame while an Ultimate or Cutin is playing
 		if board and board.combo > 0:
@@ -913,7 +918,8 @@ func _on_match(mid: Vector2, combo: int, gold: bool, shard: String) -> void :
 		UI.punch(combo_lbl, 0.35)
 		var tiers: = ["", "", "Дуэт", "Трио", "Каскад", "Цветение", "Небесный поток"]
 		if combo in [3, 5, 8, 12, 16] or (combo >= 20 and combo % 5 == 0):
-			_combo_banner("%s ×%d" % [V7Combo.TIERS.filter( func(x): return combo >= int(x[0])).back()[1], combo], combo)
+			if v10_fx_hud == null:
+				_combo_banner("%s ×%d" % [V7Combo.TIERS.filter( func(x): return combo >= int(x[0])).back()[1], combo], combo)
 			stage.flash_emotion(_v8_combo_emotion(combo))
 		if combo >= 3:
 			Sfx.play("combo", 1.0 + combo * 0.03)
@@ -940,6 +946,8 @@ func _on_match(mid: Vector2, combo: int, gold: bool, shard: String) -> void :
 		duel.on_player_pair(mid)
 	if v7combo and not from_ult:
 		v7combo.on_match(mid, combo, gain)
+	if v10_fx_hud and not from_ult:
+		v10_fx_hud.on_match(combo, now() < fever_until)
 	_refresh()
 
 func _shard_found(h: String, mid: Vector2) -> void :
@@ -962,7 +970,7 @@ func _combo_banner(word: String, combo: int) -> void :
 	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	l.pivot_offset = Vector2(280, 22)
 	l.rotation = deg_to_rad(randf_range(-1.5, 1.5))
-	v8_band(l, 0.4, true, 0, true)
+	v8_band(l, 0.95, true, 0, true)
 	if not l.is_inside_tree():
 		return
 	l.scale = Vector2(1.3, 1.3)
@@ -1085,9 +1093,11 @@ func _fever() -> void :
 		Sfx.play("fever")
 	var rib: = Common.ribbon(self, V6Txt.s("play.fever"), Rect2(0, 0, 400, V8_BAND_H), "gold", 30)
 	remove_child(rib)
-	v8_band(rib, 1.0, true, 1)
+	v8_band(rib, 1.15, true, 1)
 	if rib.is_inside_tree():
 		UI.pop_in(rib, 0.0, 0.6)
+	if v10_fx_hud:
+		v10_fx_hud.on_fever()
 	# the frame of V7Combo carries the fever (no full-screen vignette or embers over the tiles)
 
 func _on_deny(_t: Tile) -> void :
@@ -1545,7 +1555,26 @@ func _skill_ready() -> void :
 func _use_skill() -> void :
 	if ult == null or ult.busy:
 		return
+	if ult.blocked() != "":
+		await ult.begin()
+		return
+	var saved_force: = ult.force_mode
+	if saved_force == "" and G.ult_cutin() != "off":
+		var vid: = V10UltVideo.play(self, partner, G.equipped(partner), ult.ult_name())
+		if vid != null and not vid.is_done():
+			var was_in: = board.input_on if board else false
+			if board:
+				board.input_on = false
+			await vid.finished
+			if not is_inside_tree():
+				return
+			if board and was_in:
+				board.input_on = true
+			if vid.played_visual:
+				ult.force_mode = "short"
 	await ult.begin()
+	if ult:
+		ult.force_mode = saved_force
 	if is_inside_tree():
 		_refresh()
 
@@ -1711,19 +1740,17 @@ func _check_riichi_force() -> void :
 # 0.9: the riichi offer takes the sound button's slot at the left end of the button row (a round gold-rim badge
 # the size of the helps), so it never overlaps a booster; the sound toggle comes back once riichi is declared
 func _riichi_make() -> void :
-	var d: = 108.0
-	var cx: = btn_sound.position.x + btn_sound.size.x * 0.5 if btn_sound else 117.0
-	# 0.9: the same round lacquer disc as the helps beside it (gold rim, gloss), with a crimson core — the flat tan
-	# «gold» disc read as a placeholder — and a centred two-line caption
-	riichi_btn = JButton.make("", "graphite", Rect2(cx - d * 0.5, H - 170, d, d), null, 20, d * 0.5)
+	var d: = 82.0
+	var rx: = 8.0
+	riichi_btn = JButton.make("", "graphite", Rect2(rx, H - 164.0, d, d), null, 18, d * 0.5)
 	riichi_btn.box.set_param("border", 4.0).set_param("gloss", 0.16)
 	riichi_btn.box.colors(Color("c23a4e"), Color("5a0f1e")).borders(Color("ffe7a6"), Color("c58a2c"))
 	var rt: String = V6Txt.s("play.riichi").to_lower()
 	rt = rt.left(1).to_upper() + rt.substr(1)
-	var rl: = UI.center_label(UI.label(rt, 22, Color("fff2d2"), Color("3a0812"), 5, "body", 900), Rect2(0, d * 0.5 - 30, d, 30))
+	var rl: = UI.center_label(UI.label(rt, 18, Color("fff2d2"), Color("3a0812"), 4, "body", 900), Rect2(0, d * 0.5 - 26, d, 26))
 	rl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	riichi_btn.add_child(rl)
-	var rs: = UI.center_label(UI.label(V6Txt.s("play.riichi_sub"), 16, Color("ffe7a6"), Color("3a0812"), 4, "body", 900), Rect2(0, d * 0.5 + 2, d, 24))
+	var rs: = UI.center_label(UI.label(V6Txt.s("play.riichi_sub"), 14, Color("ffe7a6"), Color("3a0812"), 3, "body", 900), Rect2(0, d * 0.5, d, 22))
 	rs.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	riichi_btn.add_child(rs)
 	riichi_btn.z_index = 40
@@ -1902,7 +1929,9 @@ func _on_clear() -> void :
 		"rank_title": str(G.rank_of(int(G.S.rp)).title) if not rank_ups.is_empty() else "",
 	})  # 0.10 hook
 	board.input_on = false
-	await get_tree().create_timer(0.4).timeout
+	if v10_fx_hud:
+		v10_fx_hud.on_victory()
+	await get_tree().create_timer(0.4 if DisplayServer.get_name() == "headless" else 0.85).timeout
 	if not is_inside_tree():
 		return
 	_victory(stars, reward, secs, first)
@@ -1920,6 +1949,8 @@ func _v8_modal_open() -> void :
 	_v8_fold_fortune()
 	if v7combo:
 		v7combo.stop()
+	if v10_fx_hud:
+		v10_fx_hud.stop()
 	_v6_clear_tips()
 	# banners and plaques drawn above the board (z ≥ 30) would show through the window: hide them until it closes
 	for c in get_children():
@@ -1954,6 +1985,8 @@ func _v8_end_overlays() -> void :
 			b.visible = false
 	if v7combo:
 		v7combo.stop()
+	if v10_fx_hud:
+		v10_fx_hud.stop()
 	_v6_clear_tips()
 	get_tree().call_group("v6_chip", "queue_free")
 	# a hidden member of «v6_tip» keeps queued intro cards (V6Specials) from popping up over the result
@@ -2816,6 +2849,20 @@ func dev_act(a: String) -> void :
 			_skill_ready()
 		"useskill":
 			_use_skill()
+		"combo_ult":
+			_v8_fold_fortune()
+			_v6_clear_tips()
+			_v8_bar_clear()
+			for p_i in 3:
+				var ps: = ult.pairs() if ult else []
+				if ps.is_empty():
+					break
+				var pr: Array = ps[0]
+				board.tap(pr[0])
+				board.tap(pr[1])
+				await get_tree().create_timer(0.18).timeout
+			skill_charge = SKILL_NEED
+			_skill_ready()
 		"rapid":
 			var fr: = board.free_tiles()
 			var used: = {}
