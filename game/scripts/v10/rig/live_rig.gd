@@ -31,6 +31,11 @@ signal gesture_started(name: String)
 @export var auto_gestures: = true
 @export var gesture_gap: = Vector2(4.0, 8.0)  # seconds between autonomous gestures (start to start)
 @export var gesture_seed: = 0  # 0 = random
+@export var up_amp: = 1.0  # amplitude scale for tier="up" gestures in base builds (DATA.md, LEGWEAR §4.1)
+
+var gesture_pool: Array = []  # optional filtered autonomous pool set by V10RigCatalog
+var blocked_gestures: = {}  # name -> true when gated out (e.g. bold in SFW/Yandex, legs in alt_rect, o_tutor)
+var up_gestures: = {"lean_in": true, "air_kiss": true, "hip_pop": true, "lunge_lean": true, "shy_peek": true}
 
 const TAU_: = TAU
 const SUBSTEP: = 1.0 / 120.0
@@ -415,11 +420,17 @@ func _update_idle_beats(delta: float) -> void:
 		if t - _last_reaction_t < 2.0:
 			busy = true
 		if _next_gesture <= 0.0 and not busy:
+			var src_pool: Array = gesture_pool if not gesture_pool.is_empty() else GESTURES
 			var pool: = []
-			for g in GESTURES:
-				if g != _last_gesture:
+			for g in src_pool:
+				if g != _last_gesture and not blocked_gestures.has(g):
 					pool.append(g)
-			gesture(pool[rng.randi() % pool.size()], true)
+			if pool.is_empty() and not src_pool.is_empty():
+				for g in src_pool:
+					if not blocked_gestures.has(g):
+						pool.append(g)
+			if not pool.is_empty():
+				gesture(pool[rng.randi() % pool.size()], true)
 			_next_gesture = rng.randf_range(gesture_gap.x, gesture_gap.y)
 		elif _next_gesture <= 0.0:
 			_next_gesture = 0.6
@@ -715,6 +726,8 @@ class _Hearts:
 			var s: = (1.0 - pow(1.0 - minf(x / 0.18, 1.0), 3.0)) * (1.0 + 0.25 * sin(minf(x / 0.18, 1.0) * PI))
 			s *= 1.0 + 0.35 * x
 			var a: = 1.0 - smoothstep(0.55, 1.0, x)
+			if s < 0.04 or a <= 0.005:
+				continue  # a zero-size heart is a degenerate polygon (triangulation error)
 			_heart(h.p, 24.0 * s, h.rot + 0.12 * sin(h.t * 5.0), a)
 
 	func _heart(c: Vector2, r: float, rot: float, a: float) -> void:
@@ -745,6 +758,8 @@ func _spawn_heart(side: float) -> void:
 # ---------------------------------------------------------------- gestures
 
 func gesture(name: String, auto: = false) -> void:
+	if blocked_gestures.has(name):
+		return
 	var s: = 1.0 if rng.randf() < 0.5 else -1.0
 	var g: = _build(name, s, Vector2.ZERO)
 	if g.is_empty():
@@ -760,8 +775,20 @@ func _start(g: Dictionary) -> void:
 	g.t = 0.0
 	g.t0 = t
 	g.kind = g.get("kind", g.name)
+	var g_name: String = str(g.get("name", ""))
+	var scale_up: bool = up_amp != 1.0 and up_gestures.has(g_name)
+	if scale_up and up_amp < 0.99:
+		# LEGWEAR §4.1: in base builds tier="up" runs at x0.6 without extra facial flirting (winks / hearts)
+		g.erase("hearts")
+		if g.has("tracks"):
+			g.tracks.erase("wink_l")
+			g.tracks.erase("wink_r")
 	for k in g.tracks.keys():
-		g.tracks[k] = PackedFloat32Array(g.tracks[k])
+		var arr: = PackedFloat32Array(g.tracks[k])
+		if scale_up and (not FACE_CH.has(k) or k == "blush"):
+			for i in range(1, arr.size(), 2):
+				arr[i] *= up_amp
+		g.tracks[k] = arr
 	actions.append(g)
 
 
@@ -960,6 +987,16 @@ func _build(name: String, s: float, p: Vector2) -> Dictionary:
 				"wink_l": [0.0, 0.0, 1.05, 0.0, 1.15, 1.0, 1.5, 1.0, 1.62, 0.0],
 				"blush": [0.0, 0.0, 0.3, 0.4, 2.0, 0.0]},
 				"mouth": [[0.15, 0.7, "ah"], [0.7, 1.1, "small"], [1.1, 1.8, "closed"]]}
+		"look_neutral":
+			# UX_RULES §8.2, DATA.md: plain neutral look — no wink, no blush, no smile change, no motion below chest
+			var dn: = p - face_pivot if p != Vector2.ZERO else Vector2.ZERO
+			var lnx: = clampf(dn.x / 320.0, -1.0, 1.0)
+			var lny: = clampf(dn.y / 480.0, -1.0, 1.0)
+			return {"name": "look_neutral", "kind": "neutral", "dur": 1.4, "side": 1.0, "tracks": {
+				"look_x": [0.0, 0.0, 0.08, lnx * 2.4, 0.95, lnx * 2.0, 1.4, 0.0],
+				"look_y": [0.0, 0.0, 0.08, lny * 1.1, 0.95, lny * 0.9, 1.4, 0.0],
+				"head": [0.0, 0.0, 0.09, lnx * 1.4, 0.95, lnx * 1.2, 1.4, 0.0],
+				"neck": [0.0, 0.0, 0.12, lnx * 0.5, 1.4, 0.0]}}
 	return {}
 
 
@@ -1075,9 +1112,20 @@ func react(zone: String, at_global: = Vector2.INF) -> void:
 	var p: = face_pivot + Vector2(300, 0)
 	if at_global != Vector2.INF:
 		p = art.get_global_transform().affine_inverse() * at_global
-	var kind: String = {"head": "nuzzle", "armL": "hair_touch", "armR": "wave", "hair": "tail_flick",
-			"outfit": "look", "bg": "look"}.get(zone, "look")
+	if zone in ["torso", "body", "bust", "hips", "neutral", "none"]:
+		_react_neutral(p if at_global != Vector2.INF else Vector2.ZERO)
+		return
+	var kind: String = {"head": "nuzzle", "armL": "hair_touch", "armR": "wave", "hand": "wave",
+			"shoulder": "shoulder_roll", "hair": "tail_flick", "outfit": "look", "bg": "look", "room": "look"}.get(zone, "look")
 	_react_kind(kind, p)
+
+
+func _react_neutral(p: Vector2) -> void:
+	var g: = _build("look_neutral", 1.0, p)
+	if g.is_empty():
+		return
+	g.kind = "neutral"
+	_start(g)
 
 
 func _react_kind(kind: String, p: Vector2) -> void:

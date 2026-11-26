@@ -1,0 +1,31 @@
+{
+ "_doc": "tools/face_patches_cfg.py config for Rin (officer coat). Variants v1..v6 = Higgsfield gpt_image_2_6 edits of face_ref (art 2048 px box ref_box, 720 px, sent at 1024): v1 eyes closed + fan and hand removed (under-plate), v2 happy ^^ + laugh, v3 frown + pout, v4 glasses slid down + look over the rims + smirk, v5 'ah', v6 'oh'. Jobs in README.md.",
+ "body_size": 1400,
+ "ref_box": [660, 60, 1380, 780],
+ "patches": [
+  {"name": "eyes_closed", "file": "v1.png", "box": [596, 186, 782, 262], "ellipses": [[640, 234, 33, 18], [731, 207, 33, 17]],
+   "align": [580, 150, 800, 300], "exclude": [598, 188, 780, 258]},
+  {"name": "fan_plate", "file": "v1.png", "box": [470, 270, 770, 532], "plate": true,
+   "ellipses": [[690, 318, 46, 34], [645, 360, 62, 44], [595, 400, 58, 50], [545, 445, 56, 52], [520, 500, 50, 40]],
+   "align": [690, 300, 860, 470], "exclude": [690, 300, 740, 360]},
+  {"name": "eyes_happy", "file": "v2.png", "box": [596, 180, 782, 262], "ellipses": [[640, 232, 34, 20], [731, 205, 34, 19]],
+   "align": [580, 150, 800, 300], "exclude": [598, 182, 780, 258]},
+  {"name": "mouth_laugh", "file": "v2.png", "box": [668, 268, 760, 328], "ellipses": [[711, 297, 28, 19], [738, 285, 12, 9]], "thresh": 10,
+   "align": [640, 250, 800, 360], "exclude": [672, 272, 756, 324]},
+  {"name": "eyes_frown", "file": "v3.png", "box": [590, 160, 786, 262], "ellipses": [[640, 226, 38, 30], [731, 198, 38, 30]],
+   "align": [580, 140, 800, 300], "exclude": [592, 162, 784, 258]},
+  {"name": "mouth_pout", "file": "v3.png", "box": [664, 264, 766, 332], "ellipses": [[711, 297, 28, 20], [738, 285, 12, 9]], "clean": [[734, 286, 4]], "thresh": 9, "grow": 5,
+   "align": [640, 250, 800, 360], "exclude": [668, 268, 762, 328]},
+  {"name": "over_glasses", "file": "v4.png", "box": [576, 156, 812, 318], "thresh": 10, "grow": 6, "feather": 5,
+   "ellipses": [[642, 246, 54, 40], [738, 216, 54, 40], [690, 236, 30, 26]],
+   "align": [560, 120, 840, 360], "exclude": [580, 160, 808, 314]},
+  {"name": "mouth_smirk", "file": "v4.png", "box": [668, 268, 760, 328], "ellipses": [[711, 297, 28, 19]], "thresh": 9,
+   "align": [640, 250, 800, 360], "exclude": [672, 272, 756, 324]},
+  {"name": "mouth_ah", "file": "v5.png", "box": [668, 268, 760, 328], "ellipses": [[711, 297, 28, 19], [738, 285, 12, 9]], "clean": [[734, 286, 4]], "thresh": 10,
+   "align": [640, 250, 800, 360], "exclude": [672, 272, 756, 324]},
+  {"name": "mouth_oh", "file": "v6.png", "box": [668, 268, 760, 328], "ellipses": [[711, 297, 28, 19], [738, 285, 12, 9]], "clean": [[734, 286, 4]], "thresh": 10,
+   "align": [640, 250, 800, 360], "exclude": [672, 272, 756, 324]}
+ ],
+ "winks": {"from": "eyes_closed", "split_x": 688, "soft": 10},
+ "blush": {"box": [596, 220, 800, 300], "cheeks": [[650, 262, 30, 13, 0.55], [765, 236, 26, 12, 0.5]], "rgb": [255, 110, 128]}
+}
