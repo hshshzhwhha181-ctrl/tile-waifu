@@ -20,6 +20,8 @@ var crits: = 0
 var best_combo: = 0
 var ults_used: = 0
 var hits_taken: = 0
+var debuffs_applied: = 0
+var debuffs_cleansed: = 0
 var over: = false
 var won: = false
 
@@ -81,8 +83,17 @@ func on_move() -> Dictionary:
 	var d: = V10AdventureData.calc_monster_attack(stage, false)
 	hero_hp -= d
 	hits_taken += 1
+	debuffs_applied += 1
 	_check_end()
-	return {"attack": true, "damage": d, "stunned": false, "lost": over and not won}
+	return {
+		"attack": true,
+		"damage": d,
+		"stunned": false,
+		"debuff": String(m.get("debuff", "fog")),
+		"debuff_name": String(m.get("debuff_name", "")),
+		"debuff_count": int(m.get("debuff_count", 2)),
+		"lost": over and not won,
+	}
 
 
 func on_overflow() -> Dictionary:
@@ -91,9 +102,18 @@ func on_overflow() -> Dictionary:
 	var d: = V10AdventureData.calc_monster_attack(stage, true)
 	hero_hp -= d
 	hits_taken += 1
+	debuffs_applied += 1
 	moves_left = int(m.cadence)
 	_check_end()
-	return {"attack": true, "damage": d, "overflow": true, "lost": over and not won}
+	return {
+		"attack": true,
+		"damage": d,
+		"overflow": true,
+		"debuff": String(m.get("debuff", "fog")),
+		"debuff_name": String(m.get("debuff_name", "")),
+		"debuff_count": int(m.get("debuff_count", 2)),
+		"lost": over and not won,
+	}
 
 
 func use_ult() -> Dictionary:
@@ -102,11 +122,18 @@ func use_ult() -> Dictionary:
 	var r: Dictionary = V10AdventureData.calc_ult_damage(stage, hero)
 	ult = 0
 	ults_used += 1
-	mon_hp -= int(r.damage)
-	dmg_total += int(r.damage)
+	debuffs_cleansed += 1
+	var total_dmg: int = int(r.damage)
+	mon_hp -= total_dmg
+	dmg_total += total_dmg
 	stun = int(r.stun_turns)
 	hero_hp = mini(V10AdventureData.HERO_MAX_HP, hero_hp + int(r.heal))
 	_check_end()
+	var h1: int = int(round(float(total_dmg) * 0.28))
+	var h2: int = int(round(float(total_dmg) * 0.33))
+	var h3: int = maxi(1, total_dmg - h1 - h2)
+	r["hits"] = [h1, h2, h3]
+	r["cleansed"] = true
 	r["killed"] = won
 	return r
 

@@ -17,6 +17,19 @@ const COMBO_STEP: = 0.25
 const COMBO_CAP: = 6
 const ULT_STUN_TURNS: = 2
 const ULT_HEAL: = 15
+const STAMINA_COST: = 15
+const STAMINA_DEFEAT_REFUND: = 10
+const STAMINA_SCRIPT_PATH: = "res://scripts/v10/economy/stamina.gd"
+const ULT_VIDEO_DIR: = "res://assets/v10/ult_video"
+const CG_16_DIR: = "res://assets/v10/cg_16"
+
+const HERO_ULTS: = {
+	"mc": {"title": "Цветение Тысячи Костей", "accent": Color("#FFB86C")},
+	"rin": {"title": "Алый Шёлк Полнолуния", "accent": Color("#FF6B8B")},
+	"hana": {"title": "Пламенный Рывок Бури", "accent": Color("#FF8E53")},
+	"yue": {"title": "Приговор Лунного Зеркала", "accent": Color("#B89CFF")},
+	"nova": {"title": "Квантовый Разлом Небес", "accent": Color("#6CE6FF")},
+}
 
 const MONSTERS: Array[Dictionary] = [
 	{
@@ -162,6 +175,7 @@ const HERO_PERKS: = {
 }
 
 static var _tex_cache: = {}
+static var _stamina_mock = null
 
 
 static func count() -> int:
@@ -190,6 +204,12 @@ static func monster_texture(monster_id: String) -> Texture2D:
 	var tex: Texture2D = null
 	if ResourceLoader.exists(p):
 		tex = load(p) as Texture2D
+	if tex == null:
+		var gp: = ProjectSettings.globalize_path(p)
+		if FileAccess.file_exists(gp):
+			var raw: = Image.load_from_file(gp)
+			if raw != null and not raw.is_empty():
+				tex = ImageTexture.create_from_image(raw)
 	if tex == null:
 		# Graceful fallback crest if texture hasn't been imported yet
 		var img: = Image.create(128, 128, false, Image.FORMAT_RGBA8)
@@ -380,3 +400,86 @@ static func hub_card_info(S = null) -> Dictionary:
 		"art": art_path(String(m.id)),
 		"accent": m.accent,
 	}
+
+
+# ── Ultimate Video & CG Resolvers + Soft V10Stamina Hook ──────────────────────
+
+static func ult_video_path(hero_id: String, equipped_id: String = "") -> String:
+	var cands: Array[String] = []
+	if equipped_id != "":
+		cands.append("%s/%s.ogv" % [ULT_VIDEO_DIR, equipped_id])
+		if equipped_id == "o_queen":
+			cands.append("%s/yue_queen.ogv" % ULT_VIDEO_DIR)
+		elif equipped_id == "o_roof":
+			cands.append("%s/nova_roof.ogv" % ULT_VIDEO_DIR)
+		elif equipped_id == "o_base" and hero_id == "mc":
+			cands.append("%s/mc_base.ogv" % ULT_VIDEO_DIR)
+	cands.append("%s/%s.ogv" % [ULT_VIDEO_DIR, hero_id])
+	for p in cands:
+		if ResourceLoader.exists(p) or FileAccess.file_exists(ProjectSettings.globalize_path(p)):
+			return p
+	return ""
+
+
+static func ult_cg_texture(hero_id: String, equipped_id: String = "") -> Texture2D:
+	var cands: Array[String] = []
+	if equipped_id == "o_roof":
+		cands.append("%s/nova_roof.webp" % CG_16_DIR)
+	elif equipped_id == "o_base" and hero_id == "mc":
+		cands.append("%s/mc_base.webp" % CG_16_DIR)
+	cands.append("%s/%s.webp" % [CG_16_DIR, hero_id])
+	cands.append("res://assets/hero/%s.png" % hero_id)
+	for p in cands:
+		if ResourceLoader.exists(p):
+			var t: = load(p) as Texture2D
+			if t != null:
+				return t
+		var gp: = ProjectSettings.globalize_path(p)
+		if FileAccess.file_exists(gp):
+			var im: = Image.load_from_file(gp)
+			if im != null and not im.is_empty():
+				return ImageTexture.create_from_image(im)
+	return null
+
+
+static func stamina_api():
+	if _stamina_mock != null:
+		return _stamina_mock
+	if ResourceLoader.exists(STAMINA_SCRIPT_PATH):
+		return load(STAMINA_SCRIPT_PATH)
+	return null
+
+
+static func can_afford_stamina(cost: int = STAMINA_COST) -> bool:
+	var api = stamina_api()
+	if api == null or not api.has_method("can_spend"):
+		return true
+	return bool(api.call("can_spend", cost))
+
+
+static func try_spend_stamina(main_node = null, cost: int = STAMINA_COST) -> bool:
+	var api = stamina_api()
+	if api == null:
+		return true
+	if api.has_method("can_spend") and not bool(api.call("can_spend", cost)):
+		if main_node != null and api.has_method("open_sheet"):
+			api.call("open_sheet", main_node)
+		return false
+	if api.has_method("spend"):
+		return bool(api.call("spend", cost, "adventure"))
+	return true
+
+
+static func refund_defeat_stamina(amount: int = STAMINA_DEFEAT_REFUND) -> int:
+	var api = stamina_api()
+	if api != null and api.has_method("refund"):
+		api.call("refund", amount)
+		return amount
+	return 0
+
+
+static func stamina_badge_text() -> String:
+	var api = stamina_api()
+	if api != null and api.has_method("current") and api.has_method("cap"):
+		return "Чай %d/%d · -%d" % [int(api.call("current")), int(api.call("cap")), STAMINA_COST]
+	return "Чай -%d" % STAMINA_COST
