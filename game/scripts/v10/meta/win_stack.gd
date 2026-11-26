@@ -35,8 +35,11 @@ static var _ticks: = {}
 
 
 static func add_bar(id: String, prio: int, builder: Callable, opts: Dictionary = {}) -> void:
-	_bars[id] = {"id": id, "prio": prio, "builder": builder, "when": opts.get("when", Callable()),
-		"modes": opts.get("modes", [])}
+	var modes: Array = opts.get("modes", [])
+	if id == "salon" and modes.is_empty():
+		# spec Ф5: the salon bar belongs to the Path only, whoever registers it
+		modes = ["path"]
+	_bars[id] = {"id": id, "prio": prio, "builder": builder, "when": opts.get("when", Callable()), "modes": modes}
 
 
 static func add_tick(id: String, builder: Callable, opts: Dictionary = {}) -> void:

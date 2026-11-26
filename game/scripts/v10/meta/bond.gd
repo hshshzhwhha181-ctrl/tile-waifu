@@ -8,7 +8,9 @@ extends RefCounted
 #   V10Bond.soft_today(h) -> int       soft points given to `h` today (resets at 04:00 with V10Meta.day_key)
 #   V10Bond.capped(h) -> bool          soft cap reached
 #   V10Bond.chip_text(n) -> "+3"       the chip at the heart, always shown when something was given
-#   V10Bond.today_text(h) -> String    "" below 20/25; «сегодня 22/25» from 20; «На сегодня она уже счастлива» at 25
+#   V10Bond.today_text(h) -> String    "" below the cap; «На сегодня она уже счастлива» at 25 (grey, no «+0»).
+#                                      No «сегодня 22/25» counter: UX_RULES §4.1 п.7 and §8.5 forbid limit counters
+#                                      around the heroine (they turn affection into a duty); UX_RULES wins over spec §2.4
 #   V10Bond.touch_left(h) -> int       today's touches left (sub-limit 3 of the soft cap)
 #
 # SOFT sources share one cap of 25 a heroine a day: touch +1 (own sub-limit 3/day, as 0.9), letter reply
@@ -20,7 +22,6 @@ extends RefCounted
 # Applying: sink(h, n) — by default G.add_aff (the only allowed call site); selftests swap it for a dict.
 
 const SOFT_CAP: = 25
-const SHOW_FROM: = 20
 const TOUCH_CAP: = 3
 
 const SOFT: = ["touch", "letter_reply", "chat_branch", "feed_like", "feed_reply", "hand", "duel_friendly", "salon_guest", "egg"]
@@ -28,7 +29,6 @@ const SOFT: = ["touch", "letter_reply", "chat_branch", "feed_like", "feed_reply"
 const HARD: = ["gift", "date", "bday", "comeback", "streak_milestone", "zone_scene_first", "level_win", "event_win",
 	"pair", "match_gift", "special", "story", "mode_win", "duel"]
 
-const T_TODAY: = "сегодня %d/%d"
 const T_HAPPY: = "На сегодня она уже счастлива"
 
 static var sink: Callable = Callable()
@@ -99,9 +99,4 @@ static func chip_text(n: int) -> String:
 
 
 static func today_text(h: String) -> String:
-	var s: = soft_today(h)
-	if s >= SOFT_CAP:
-		return T_HAPPY
-	if s >= SHOW_FROM:
-		return T_TODAY % [s, SOFT_CAP]
-	return ""
+	return T_HAPPY if soft_today(h) >= SOFT_CAP else ""

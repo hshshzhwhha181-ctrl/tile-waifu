@@ -51,6 +51,7 @@ static func run(strict_grep: = false) -> int:
 	_win()
 	_more()
 	_afisha()
+	_ui()
 	_shop_logic()
 	_grep(strict_grep)
 	V10Meta.clear_now()
@@ -167,7 +168,7 @@ static func _bond() -> void:
 		t += V10Bond.gain("hana", 1, "touch")
 	check(t == 3 and V10Bond.touch_left("hana") == 0, "touch sub-limit 3/day")
 	V10Bond.gain("yue", 22, "letter_reply")
-	check(V10Bond.today_text("yue") == "сегодня 22/25", "«сегодня 22/25» from 20 (%s)" % V10Bond.today_text("yue"))
+	check(V10Bond.today_text("yue") == "", "no «сегодня 22/25» limit counter (UX §4.1 п.7, §8.5) (%s)" % V10Bond.today_text("yue"))
 	V10Bond.gain("nova", 5, "hand")
 	check(V10Bond.today_text("nova") == "", "no counter below 20")
 	check(V10Bond.gain("nova", 4, "chat_branch") == 4 and V10Bond.chip_text(3) == "+3", "chip «+3»")
@@ -240,6 +241,25 @@ static func _notify() -> void:
 			if V10NotifyText.text(id, "rin").find("₽") >= 0:
 				plan_has_price = true
 	check(not plan_has_price, "no price in any notification")
+	# a plan whose consent / category is switched off is dropped, never sent
+	V10Meta.bind({})
+	V10Meta.set_now(t0)
+	V10Notify.set_consent(true)
+	check(not V10Notify.request("feed", t0, "rin").is_empty(), "feed planned")
+	V10Notify.set_cat("feed", false)
+	check((V10Meta.st().notify.queued as Dictionary).is_empty(), "switching the category off drops its queued plan")
+	V10Notify.set_cat("feed", true)
+	V10Notify.request("salon", t0)
+	V10Notify.set_consent(false)
+	check((V10Meta.st().notify.queued as Dictionary).is_empty() and V10Notify.advance(t0 + 86400).is_empty(),
+		"«Не сейчас» after consent drops the plan; nothing is sent")
+	V10Notify.set_consent(true)
+	V10Notify.request("salon", t0)
+	V10Meta.st().consent.push = false
+	check(V10Notify.advance(t0 + 86400).is_empty() and int(V10Meta.st().notify.last_unix) == 0,
+		"advance never sends without consent (budget not spent)")
+	check(V10NotifyText.text("bday_1", "hana").begins_with(V10NotifyText.hero_name("hana")),
+		"birthday line starts with the name (no «У Хана»): %s" % V10NotifyText.text("bday_1", "hana"))
 	var ents: = V10Notify.log_entries()
 	check(ents.size() > 5 and FileAccess.file_exists(V10Notify.log_path), "plan log written to user://v10_logs (%d)" % ents.size())
 
@@ -281,6 +301,18 @@ static func _lint() -> void:
 	check(V10Lint.ok("Награда бесплатно за вход"), "«бесплатно» alone is allowed")
 	check(not V10Lint.ok("Сейчас бесплатно, потом 79 ₽"), "«бесплатно» next to a price is banned")
 	check(not V10Lint.ok("Новый баннер уже здесь"), "«баннер» is banned in heroine text")
+	check(not V10Lint.ok("Я тут одна весь вечер") and not V10Lint.ok("Купи мне чаю") and not V10Lint.ok("Цена вопроса"),
+		"«одна», «купи», «цена» as words are banned")
+	check(V10Lint.ok("Однако чай остыл") and V10Lint.ok("Новая модная шляпка") and V10Lint.ok("Новая сцена в салоне")
+		and V10Lint.ok("Её реакция была мгновенной") and V10Lint.ok("Комната свободна"),
+		"no false hits: однако, модная, сцена, реакция, свободна")
+	# UI jargon (UX_RULES §4.2–§4.3, С-1)
+	for bad_t in ["Гарант SSR 60", "Крутка ×10", "Ивент недели", "Ульта готова", "Яку: Чистый стол", "SR+ и выше",
+			"−20%", "ХИТ", "ЦЕЛЬ 44", "Режимы", "Коснись её: ещё 3 сегодня", "Поручения", "Рядом с тобой"]:
+		check(not V10Lint.ui_ok(bad_t), "UI lint catches «%s»" % bad_t)
+	for good_t in ["Ещё уровень · 58", "Режим дня ×2", "SSR — не позже 60-го желания", "Сегодня в чайной", "Партия дня",
+			"Покупки откроются с выходом игры в RuStore", "Все режимы на одном экране", "В чайную", "культура"]:
+		check(V10Lint.ui_ok(good_t), "UI lint passes «%s» %s" % [good_t, str(V10Lint.ui_check(good_t))])
 
 
 # ── SAVE_VER 8 ─────────────────────────────────────────────────────────────────────────────────────────────────
@@ -347,6 +379,14 @@ static func _save() -> void:
 	s3.erase("login")
 	V10Save.migrate(s3)
 	check(int(s3.v10_meta.days_seen) == 0 and int(s3.ver) == 8, "a save without login migrates")
+	# the recovery code carries the migrated save (spec §2.6: recovery_selftest stays green). V8Recovery refuses a
+	# save newer than G.SAVE_VER, so the round trip runs once the integrator has bumped SAVE_VER to 8.
+	if int(G.SAVE_VER) >= V10Save.VER:
+		var code: = V8Recovery.export_code(s)
+		var dec: = V8Recovery.decode(code)
+		check(bool(dec.ok) and (dec.state as Dictionary).get("v10_meta") is Dictionary, "recovery code round trip keeps v10_meta")
+	else:
+		info.append("recovery round trip of a v8 save: runs after the SAVE_VER 8 bump (G.SAVE_VER = %d)" % int(G.SAVE_VER))
 	V10Save._defaults.erase("v10_test")
 	V10Save._defaults.erase("v10_late")
 	V10Save._migrators.clear()
@@ -375,6 +415,8 @@ static func _win() -> void:
 	check(built.size() == 2, "build_bars → 2 controls")
 	for b in built:
 		(b as Node).free()
+	V10WinStack.add_bar("salon", V10WinStack.PRIO_SALON, mk.call("salon"))
+	check(ids.call(V10WinStack.pick({"mode": "blitz"})).find("salon") < 0, "salon registered without modes stays path-only")
 	V10WinStack.add_bar("salon", V10WinStack.PRIO_SALON, func(_c, _w): return null, {"modes": ["path"]})
 	var b2: = V10WinStack.build_bars({"mode": "path"}, 600.0)
 	check(b2.size() == 2 and str(b2[0].name) == "mastery" and str(b2[1].name) == "pass", "an empty salon bar gives its place")
@@ -397,9 +439,38 @@ static func _win() -> void:
 		if c.has_meta("v10_bar_id"):
 			nbars += 1
 	check(nbars == 2, "the panel shows ≤ 2 bars with 9 registered (%d)" % nbars)
+	for i in 3:
+		V10WinStack.add_tick("wide%d" % i, func(_c): return {"icon": "gift", "text": "Очень длинная подпись тика %d" % i},
+			{"order": 5 + i})
+	var pw: = V10WinPanel.make({"mode": "path", "level": 3, "count": 10, "stars_map": {}}, 620.0)
+	var tr_end: = 0.0
+	for c in pw.tick_row.get_children():
+		tr_end = maxf(tr_end, (c as Control).position.x + (c as Control).size.x)
+	check(pw.tick_row != null and tr_end <= 620.5, "5 ticks never run past the panel edge (%d)" % int(tr_end))
+	pw.free()
+	for i in 3:
+		V10WinStack.remove("wide%d" % i)
 	check(p.more_btn != null and p.more_btn.lbl.text == "Ещё уровень · 5", "panel button «Ещё уровень · 5» (%s)" % (p.more_btn.lbl.text if p.more_btn else "-"))
-	check(p.alt_btn != null and p.alt_btn.lbl.text == "В чайную", "no salon → small «В чайную»")
+	check(p.alt_btn != null and str(p.alt_btn.lbl.text).begins_with("В чайную"), "no salon → secondary «В чайную» (UX §3.4)")
+	var rl: = V10MetaUI.roles(p)
+	check(rl.primary == 1 and rl.secondary <= 2 and rl.tertiary <= 2, "П-1: 1 primary, ≤2 secondary (%s)" % str(rl))
+	check(p.more_btn.size.x >= 440.0 and p.more_btn.size.y >= 104.0, "В-6: primary ≥ 440×104 (%s)" % str(p.more_btn.size))
+	check(V10MetaUI.small_hits(p).is_empty(), "В-6: every hit zone ≥ 80 %s" % str(V10MetaUI.small_hits(p)))
+	var nmore: = [0]
+	p.more.connect(func(_n): nmore[0] += 1)
+	p._on_more()
+	p._on_more()
+	check(nmore[0] == 1, "«Ещё уровень» fires once (a 2nd tap during the wipe is ignored)")
 	p.free()
+	var pe: = V10WinPanel.make({"mode": "path", "level": 9, "count": 10, "stars_map": {}}, 620.0)
+	check(pe.more_btn != null and pe.more_btn.name == "HomeBtn" and pe.end_note != null and not pe.more_btn.disabled,
+		"end of the path: «В чайную» is the primary, the caption says why (no grey dead button)")
+	check(V10MetaUI.roles(pe).primary == 1, "end of the path: exactly 1 primary")
+	pe.free()
+	var bar: = V10WinBar.make(600.0, {"title": "Фонари у входа", "have": 3, "need": 4, "gain": 1})
+	check(bar.mouse_filter == Control.MOUSE_FILTER_IGNORE and not bar.has_meta("ux_role"), "a bar is information, not a button (default)")
+	check(bar.size.y == 80.0, "bar = HUD_V2 M plate 80 px")
+	bar.free()
 	var p2: = V10WinPanel.make({"mode": "blitz"}, 620.0)
 	check(p2.more_btn == null, "non-path: no «Ещё уровень» row")
 	p2.free()
@@ -417,7 +488,7 @@ static func _more() -> void:
 	var st: = V10MoreLevel.state({"level": 56, "count": 100, "stars_map": {}})
 	check(st.enabled and st.text == "Ещё уровень · 58" and int(st.next) == 57, "button «Ещё уровень · 58»")
 	var st2: = V10MoreLevel.state({"level": 99, "count": 100, "stars_map": {}})
-	check(not st2.enabled and st2.text == "Скоро новая арка", "at the limit: «Скоро новая арка» grey")
+	check(not st2.enabled and st2.text == V10MoreLevel.T_SOON, "at the limit: the caption «%s»" % V10MoreLevel.T_SOON)
 	V10MoreLevel.label_of = func(i): return "Путь %d" % (i + 1)
 	check(V10MoreLevel.state({"level": 0, "count": 5, "stars_map": {}}).text == "Ещё уровень · Путь 2", "label_of hook")
 	V10MoreLevel.label_of = Callable()
@@ -501,6 +572,97 @@ static func _afisha() -> void:
 	V10Afisha.unbind()
 
 
+# ── UX_RULES §10 «А» items on the lane's own screens (until --ux_selftest exists) ─────────────────────────────
+static func _ui() -> void:
+	_mod = "ux"
+	V10Meta.bind({})
+	V10Afisha.bind({})
+	V10Meta.set_now(_lt("2026-11-24T12:00:00"))
+	# fresh save: only Партия дня is open → the card shows it + ONE closed teaser (В-8), no lock icons
+	V10Afisha.set_provider("mode_open", func(_id): return false)
+	var vis: = V10Afisha.visible(V10Afisha.rows())
+	var closed: = 0
+	for r in vis:
+		if not bool(r.open):
+			closed += 1
+	check(closed <= 1 and vis.size() == 2, "В-8: open rows + ≤ 1 closed teaser (%d rows, %d closed)" % [vis.size(), closed])
+	var card: = V10AfishaCard.make(Vector2(656, 0))
+	var rl: = V10MetaUI.roles(card)
+	check(rl.primary == 1 and rl.secondary <= 2, "П-1 sheet: one primary «Играть» (%s)" % str(rl))
+	check(card.play_btn != null and card.play_btn.lbl.text == "Играть", "the primary plays the first unplayed row")
+	var locks: = 0
+	for n in card.find_children("*", "TextureRect", true, false):
+		if (n as TextureRect).texture == V8Art.icon("lock"):
+			locks += 1
+	check(locks == 0, "no lock icons on closed rows (UX §6.4)")
+	card.free()
+	# a full day: every row open, all four visible, the sheet within its budget
+	V10Afisha.set_provider("mode_open", func(_id): return true)
+	V10Afisha.set_provider("salon", func(): return {"open": true, "sub": "Фонари у входа · ★ 12 в банке"})
+	V10Afisha.set_provider("week", func(): return {"open": true, "title": "Пагода Луны", "sub": "этаж 7"})
+	V10Afisha.set_provider("hand", func(): return true)
+	var full: = V10AfishaCard.make(Vector2(656, 0))
+	var fsz: = V10MetaUI.font_sizes(full)
+	check(fsz.size() <= 4 and int(fsz[0]) >= 18, "П-2/В-2 sheet: ≤ 4 type sizes, none under 18 (%s)" % str(fsz))
+	check(V10MetaUI.small_hits(full).is_empty(), "В-6 sheet: hit zones ≥ 80 %s" % str(V10MetaUI.small_hits(full)))
+	check(V10MetaUI.tappables(full).size() <= 10, "П-2 sheet: ≤ 10 tappables (%d)" % V10MetaUI.tappables(full).size())
+	var bad: = V10Lint.ui_scan(V10MetaUI.texts(full))
+	check(bad.is_empty(), "С-1 sheet: no jargon %s" % str(bad))
+	full.free()
+	# all played → the primary becomes «Понятно»
+	for k in ["daily", "mode", "salon", "week"]:
+		V10Afisha.mark(k)
+	var done_card: = V10AfishaCard.make(Vector2(656, 0))
+	check(done_card.play_btn != null and done_card.play_btn.name == "Close" and V10MetaUI.roles(done_card).primary == 1,
+		"everything played: the primary is «Понятно»")
+	done_card.free()
+	# Столы: the same component, two rows, no button of its own; the rows are the 2 secondary actions
+	var tables: = V10AfishaCard.make(Vector2(656, 0), {"only": ["daily", "mode"], "play": false, "header": false})
+	var tr: = V10MetaUI.roles(tables)
+	check(tr.primary == 0 and tr.secondary <= 2 and tables.row_nodes.size() == 2, "Столы block: 2 rows as secondary, no primary (%s)" % str(tr))
+	tables.free()
+	for pv in ["mode_open", "salon", "week", "hand"]:
+		V10Afisha.set_provider(pv, Callable())
+	V10Afisha.unbind()
+	# glossary entries (V10Glossary limits of v10-clarity: name ≤ 26, why ≤ 74, how ≤ 92, reward ≤ 60)
+	var gl_bad: = []
+	for e in V10Afisha.GLOSSARY:
+		if str(e.name).length() > 26 or str(e.why).length() > 74 or str(e.how).length() > 92 or str(e.reward).length() > 60 \
+				or str(e.why) == "":
+			gl_bad.append(e.id)
+	check(V10Afisha.GLOSSARY.size() >= 3 and gl_bad.is_empty(), "П-4: glossary entries for the card's terms %s" % str(gl_bad))
+	# Настройки → Уведомления: consent card and the switches
+	V10Meta.bind({})
+	var np: = V10NotifyPanel.make(612)
+	var nr: = V10MetaUI.roles(np)
+	check(nr.primary == 1 and nr.secondary == 1, "П-1 consent: «Разрешить» primary, «Не сейчас» secondary (%s)" % str(nr))
+	var yes: JButton = np.find_child("Allow", true, false)
+	var no: JButton = np.find_child("NotNow", true, false)
+	check(yes != null and no != null and yes.size == no.size and yes._pal == no._pal, "consent buttons: equal size and look")
+	check(int(V10MetaUI.font_sizes(np)[0]) >= 18 and V10MetaUI.font_sizes(np).size() <= 3, "В-2 notify: text ≥ 18, ≤ 3 sizes %s" % str(V10MetaUI.font_sizes(np)))
+	check(V10MetaUI.small_hits(np).is_empty(), "В-6 notify: hit zones ≥ 80 %s" % str(V10MetaUI.small_hits(np)))
+	np.free()
+	# every visible string of the lane passes the UI lint (С-1)
+	var strs: = [V10Afisha.T_REFRESH, V10Afisha.T_PLAYED, V10Afisha.T_X2, V10Afisha.T_SOON_SALON, V10Afisha.T_SOON_WEEK,
+		V10MoreLevel.T_MORE % "58", V10MoreLevel.T_SOON, V10MoreLevel.T_SOON_HINT, V10ShopGuard.T_SOON, V10ShopGuard.T_SOON_HINT,
+		V10ShopGuard.T_TEST, V10NotifyPanel.ASK, V10Bond.T_HAPPY, V10Notify.next_text(V10Meta.now_unix()), "Сегодня в чайной",
+		"В чайную", "В салон", "Играть", "Понятно", "Разрешить", "Не сейчас", "Уведомления выключены"]
+	for k in V10Afisha.MODE_NAMES:
+		strs.append(V10Afisha.MODE_NAMES[k])
+	for k in V10Notify.CAT_NAMES:
+		strs.append(V10Notify.CAT_NAMES[k])
+		strs.append(V10NotifyPanel.CAT_SUB[k])
+	strs.append_array(V10NotifyText.all_lines())
+	var ub: = V10Lint.ui_scan(strs)
+	check(ub.is_empty(), "С-1: every lane string passes V10Lint.ui_check %s" % str(ub))
+	# button captions ≤ 18 characters (UX §4.1 п.2)
+	var long: = []
+	for b in ["Играть", "Понятно", "В чайную", "В салон", V10MoreLevel.T_MORE % "100", "Разрешить", "Не сейчас", V10ShopGuard.T_SOON]:
+		if str(b).length() > 18:
+			long.append(b)
+	check(long.is_empty(), "button captions ≤ 18 characters %s" % str(long))
+
+
 # ── Ф7 store fuse (logic; the real shop screen is checked in meta_runner) ──────────────────────────────────────
 static func _shop_logic() -> void:
 	_mod = "shop"
@@ -554,6 +716,7 @@ static func _grep(strict: bool) -> void:
 	var time_hits: = []
 	var aff_hits: = []
 	var own_bad: = []
+	var rub_hits: = []
 	for f in files:
 		var p: String = f
 		if p.ends_with("meta_selftest.gd"):
@@ -565,6 +728,8 @@ static func _grep(strict: bool) -> void:
 			time_hits.append("%s×%d" % [p.get_file(), tcount])
 			if is_meta:
 				own_bad.append(p)
+		if txt.find("₽") >= 0 and not is_meta and not p.ends_with("screens/shop.gd"):
+			rub_hits.append(p.get_file())
 		var acount: = txt.count("G.add_aff(")
 		if acount > 0 and not p.ends_with("/v10/meta/bond.gd"):
 			aff_hits.append("%s×%d" % [p.get_file(), acount])
@@ -577,6 +742,8 @@ static func _grep(strict: bool) -> void:
 	else:
 		info.append("to integrate (time → V10Meta): %s" % ", ".join(time_hits))
 		info.append("to integrate (G.add_aff → V10Bond.gain): %s" % ", ".join(aff_hits))
+	# ₽ captions outside the guarded shop screen: each one needs V10ShopGuard in a store build (README hook 8)
+	info.append("₽ outside screens/shop.gd (guard them, README hook 8): %s" % ", ".join(rub_hits))
 
 
 static func _list(dir: String, out: Array) -> void:
