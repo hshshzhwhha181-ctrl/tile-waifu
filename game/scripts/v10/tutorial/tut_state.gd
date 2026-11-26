@@ -50,7 +50,7 @@ static func ensure(S: Dictionary) -> Dictionary:
 		d[k] = int(d[k])
 	d.v = VER
 	if int(d.t0) <= 0:
-		d.t0 = int(Time.get_unix_time_from_system())
+		d.t0 = V10Meta.now_unix()
 	if int(d.first_day) <= 0:
 		d.first_day = _today_index()
 	if fresh or old_v < 2:
@@ -92,7 +92,7 @@ static func _legacy_check(S: Dictionary, d: Dictionary) -> void:
 
 
 static func _today_index() -> int:
-	return V10Meta.day_index(V10Meta.key_of(int(Time.get_unix_time_from_system())))
+	return V10Meta.day_index(V10Meta.day_key())
 
 
 static func seen(id: String) -> bool:
@@ -147,7 +147,19 @@ static func funnel_mark(ev: String) -> void:
 	var d: = st()
 	if d.funnel.has(ev):
 		return
-	d.funnel[ev] = int(Time.get_unix_time_from_system()) - int(d.t0)
+	d.funnel[ev] = V10Meta.now_unix() - int(d.t0)
+
+
+static func replay() -> void:
+	var d: = st()
+	d.skipped = false
+	d.hints = true
+	if d.get("tries", null) is Dictionary:
+		(d.tries as Dictionary).clear()
+	for k in V10TutLines.MATCH:
+		if String(k).begins_with("m_") or String(k).begins_with("v_"):
+			d.seen.erase(String(k))
+	save()
 
 
 static func funnel(ev: String) -> int:

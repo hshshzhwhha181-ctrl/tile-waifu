@@ -28,11 +28,12 @@
 | `tut_reveal.gd` | `V10Reveal` | Ворота UX §3.5: `is_open`, `locked_text`, `due_intros` |
 | `tut_target.gd` | `V10TutTarget` | `tut_id` → прямоугольник на экране (мета, группы, провайдеры, запасные пути) |
 | `coach.gd` + `spotlight.gdshader` | `V10Coach` | Оверлей: затемнение с окном, реплика Caveat, имя-надстрочник, кольцо касания, «Пропустить» |
-| `tut_help.gd` | `V10TutHelp` | Листы «?» и «Как играть», тост «Откроется после партии N» |
-| `tutorial.gd` | `V10Tutorial` | Оркестр: `attach(main)`, слежение за экранами, очередь вступлений, публичный API |
+| `tut_help.gd` | `V10TutHelp` | Листы «?» (3 строки с иконкой + «Понятно» + «Подробнее») и «Как играть», тост «Откроется после партии N» |
+| `v10_help.gd` | `V10Help` | Публичный фасад совместимости (`open`, `open_how_to`, `help_button`, `on_help`, `settings_hook`, `settings_plate`) |
+| `tutorial.gd` | `V10Tutorial` | Оркестр: `attach(main)`, `chapters_enabled = true`, слежение за экранами, очередь вступлений, публичный API |
 | `tut_match.gd` | `V10TutMatch` | Сценарий первой партии + реплики механик в любой партии |
-| `tut_selftest.gd/.tscn` | `V10TutSelftest` | `--tut_selftest=1`, `--tut_shots=<dir>`, `--tut_bot=1` |
-| `tut_demo.gd` | `V10TutDemo` | Хосты HUD v2 (Чайная/Партия/Победа) с тегами `tut_id` для скриншотов и геометрии |
+| `tut_selftest.gd/.tscn` + `tut_logic_test.gd` + `test/tut_test.tscn` | `V10TutSelftest` | Автотест модуля: статический линт, геометрия и бюджеты HUD v2, живой прогон L1 → Победа → Чайная → Столы → Настройки |
+| `tut_demo.gd` | `V10TutDemo` | Хосты HUD v2 (Чайная/Столы/Партия/Победа) с тегами `tut_id` для скриншотов и геометрии |
 
 ### 2.1 `V10TutState` (`tut_state.gd`)
 ```gdscript

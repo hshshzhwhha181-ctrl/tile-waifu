@@ -86,7 +86,7 @@ func _ready() -> void:
 	_last_move = _start_t
 	lvl = int(_sv("lvl", 0))
 	mode = String(_sv("mode", ""))
-	l1 = lvl == 0 and mode == "" and (replay_l1 or (V10TutState.hints_on() and not V10TutState.first_match_done()))
+	l1 = V10Tutorial.chapters_enabled and lvl == 0 and mode == "" and (replay_l1 or (V10TutState.hints_on() and not V10TutState.first_match_done()))
 	if l1:
 		replay_l1 = false
 		V10TutState.funnel_mark("l1_start")
@@ -402,7 +402,7 @@ func _enqueue_once(key: String) -> void:
 
 # m_danger / m_ult: once ever; on L1 always allowed, elsewhere they are this match's one mechanic line
 func _special(key: String) -> void:
-	if not V10TutState.hints_on() or V10TutState.seen(key) or (not l1 and mech_done):
+	if not V10Tutorial.chapters_enabled or not V10TutState.hints_on() or V10TutState.seen(key) or (not l1 and mech_done):
 		return
 	_enqueue_once(key)
 	if key == "m_danger":
@@ -413,7 +413,7 @@ func _special(key: String) -> void:
 
 
 func _mech(key: String, ttl: float) -> void:
-	if l1 or mech_done or not V10TutState.hints_on() or V10TutState.seen(key):
+	if not V10Tutorial.chapters_enabled or l1 or mech_done or not V10TutState.hints_on() or V10TutState.seen(key):
 		return
 	_enqueue_once(key)
 	for q in _queue:
@@ -542,19 +542,24 @@ func speaker() -> String:
 	return p if p != "" else "mc"
 
 
-# The line's zone next to the heroine. HUD v2: x 232–520 under the tray (HUD_V2 §8.1, y ≈ 912).
-# 0.9 play.gd: the band under the field (the help-button row; the 0.9 intro card uses the same band) — the field,
-# the tray and the portrait are never covered.
+# The line's zone next to the heroine. HUD v2: the lower scene band beside/below her face (HUD_V2 §8.1), clear of
+# the help discs, the tray and face_rect + 48. 0.9 play.gd: the band under the field (never over tiles or portrait).
 func hero_anchor() -> Rect2:
 	if _hud != null and is_instance_valid(_hud):
+		var vs: = get_viewport().get_visible_rect().size
+		var B: = float(_hud.L.get("B", 0.0))
 		var tr: Rect2 = _hud.L.get("tray", Rect2(16, 792, 688, 104))
-		# left edge: right of the help row when it is shown (L4+), the safe margin on L1–L3 (no help row, UX P0-4)
-		var x0: = tr.position.x + 8.0
-		if _hud.help_row != null and _hud.help_row.is_visible_in_tree():
-			x0 = _hud.help_row.get_global_rect().end.x + 16.0
-		var face: Rect2 = _hud.hero_face_global().grow(48.0)
-		var x1: = maxf(x0 + 288.0, face.position.x - 8.0)
-		return Rect2(x0, tr.end.y + 4.0, x1 - x0, 112.0)
+		var wide: = bool(_hud.L.get("wide", false))
+		var x0: = maxf(24.0, tr.position.x - 160.0) if wide else (tr.position.x + 8.0)
+		# narrow phones with help discs visible (L4+): start right of the disc + count column, NOT full-screen help_row
+		if not wide and _hud.help_row != null and _hud.help_row.is_visible_in_tree():
+			var dr: = _help_discs_rect()
+			if dr.has_area():
+				x0 = maxf(x0, dr.end.x + 12.0)
+		var x1: = (vs.x - 24.0) if wide else (tr.end.x - 8.0)
+		var y0: = tr.end.y + 8.0
+		var y1: = maxf(y0 + 112.0, vs.y - B - 16.0)
+		return Rect2(x0, y0, maxf(240.0, x1 - x0), y1 - y0)
 	var sr: = _screen_rect()
 	var f: = _field_rect()
 	var bottom: = sr.end.y - 8.0
@@ -562,11 +567,33 @@ func hero_anchor() -> Rect2:
 	return Rect2(sr.position.x + 24.0, top, sr.size.x - 48.0, bottom - top)
 
 
+func _help_discs_rect() -> Rect2:
+	if _hud == null or not is_instance_valid(_hud) or _hud.help_row == null or not _hud.help_row.is_visible_in_tree():
+		return Rect2()
+	var r: = Rect2()
+	for k in _hud.discs:
+		var d = _hud.discs[k]
+		if d is Control and (d as Control).is_visible_in_tree():
+			var g: = Rect2((d as Control).get_global_rect().position, Vector2(128, 80))
+			r = g if not r.has_area() else r.merge(g)
+	return r
+
+
 func avoid_rects() -> Array:
 	if _hud != null and is_instance_valid(_hud):
-		return [_hud.hero_face_global().grow(48.0), _hud.board_rect()]
+		var out: = [_hud.hero_face_global().grow(48.0), _hud.board_rect()]
+		var dr: = _help_discs_rect()
+		if dr.has_area():
+			out.append(dr)
+		return out
+	var out0: = []
 	var f: = _field_rect()
-	return [f] if f.size.x > 2.0 else []
+	if f.size.x > 2.0:
+		out0.append(f)
+	var por = _sv("portrait", null)
+	if por is Control and is_instance_valid(por) and (por as Control).is_visible_in_tree():
+		out0.append(V10TutTarget.rect_of(por).grow(8.0))
+	return out0
 
 
 func _screen_rect() -> Rect2:

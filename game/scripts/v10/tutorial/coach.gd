@@ -77,6 +77,7 @@ var _line_text: = ""
 var _speaker: = ""
 var _lines: = 0
 var _last_tap_frame: = -1
+var _hole_down: = false
 var _last_vs: = Vector2.ZERO
 
 var _dim: ColorRect
@@ -142,6 +143,7 @@ func show_step(s: Dictionary) -> void:
 	_end_at = -1.0
 	_end_reason = ""
 	_ring_on = false
+	_hole_down = false
 	_skip_armed = -1.0
 	_line_text = String(s.get("line", "")) if mode != "ring" else ""
 	_speaker = _speaker_id(String(s.get("speaker", "")))
@@ -356,7 +358,7 @@ func _show_line() -> void:
 		_block.visible = false
 		_written = true
 		return
-	if _block.visible and _block.modulate.a > 0.05:
+	if _block.visible and _block.modulate.a > 0.05 and _written and not bool(spec.get("instant", false)):
 		# a new line over an old one: the old one goes out first (120 ms), then the pen writes the new one
 		_tw_block = create_tween()
 		_tw_block.tween_property(_block, "modulate:a", 0.0, MIN_T)
@@ -471,6 +473,10 @@ func _ctx() -> String:
 
 func _column(vs: Vector2) -> Rect2:
 	var ins: = V10Hud2Util.safe_insets(vs)
+	if _ctx() == "match" and vs.x > 760.0:
+		return Rect2(24.0 + float(ins.get("left", 0.0)), float(ins.top) + 16.0,
+			vs.x - 48.0 - float(ins.get("left", 0.0)) - float(ins.get("right", 0.0)),
+			vs.y - float(ins.top) - float(ins.bottom) - 32.0)
 	var cx: = floorf(maxf(0.0, (vs.x - 720.0) * 0.5))
 	var m: = 32.0 if _ctx() == "hub" else 24.0
 	var w: = minf(720.0, vs.x)
@@ -568,11 +574,12 @@ func _place(animate: bool) -> void:
 	_por.position = Vector2.ZERO
 	_block.size = rr.size
 	_placed_for = _hole if _has_hole else Rect2()
-	if animate and _block.visible and _fx_ok():
+	if animate and _block.visible and _fx_ok() and not bool(spec.get("instant", false)):
 		_kill(_tw_move)
 		_tw_move = create_tween()
 		_tw_move.tween_property(_block, "position", rr.position, V10DS.T_IN).set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_OUT)
 	else:
+		_kill(_tw_move)
 		_block.position = rr.position
 	_place_skip()
 
@@ -774,12 +781,18 @@ func _gui_input(e: InputEvent) -> void:
 func _input(e: InputEvent) -> void:
 	if not _showing or not _revealed or _degraded or not _has_hole or not mode in ["tap", "do", "ring"]:
 		return
-	if not _is_press(e):
+	var press: = _is_press(e)
+	var rel: = _is_release(e)
+	if not press and not rel:
 		return
 	var p: = (make_input_local(e) as InputEventMouse).position if e is InputEventMouse else _touch_pos(e)
-	if _hit.has_point(p):
-		# the tap goes on to the game first; the step ends after this frame
-		_on_hole_tap.call_deferred(_gen)
+	if press:
+		_hole_down = _hit.has_point(p)
+	elif rel and _hole_down:
+		_hole_down = false
+		if _hit.grow(12.0).has_point(p):
+			# both press and release reached the underlying control; close the coach right after this frame
+			_on_hole_tap.call_deferred(_gen)
 
 
 func _touch_pos(e: InputEvent) -> Vector2:

@@ -19,6 +19,7 @@ const GATES: = {
 	"morning_tray": {"day": 2},
 	"phone.feed": {"day": 3},
 	"path.boosters": {"lvl": 10},
+	"path.ogonyok": {"lvl": 10},
 	"mode.blitz": {"lvl": 12},
 	"afisha.mode_day": {"lvl": 12},
 	"victory.challenge": {"lvl": 15},
@@ -46,6 +47,22 @@ const GATES: = {
 	"mode.pagoda": {"rank": 9},
 }
 
+const SCREEN_GROUPS: = {
+	"tables": "tables",
+	"levels": "tables",
+	"v10path": "tables",
+	"salon": "salon",
+	"v10salon": "salon",
+	"room": "salon",
+	"collection": "collection",
+	"heroines": "collection",
+	"summon": "summon",
+	"wishes": "summon",
+	"phone": "phone",
+	"v10phone": "phone",
+	"letters": "phone",
+}
+
 
 static func levels_done() -> int:
 	return _levels_done(V10TutState._root())
@@ -60,9 +77,20 @@ static func _day(d: Dictionary) -> int:
 
 
 static func _rank(S: Dictionary) -> int:
+	if S.has("rank_index"):
+		return int(S.get("rank_index", 0))
 	if G != null and G.has_method("rank_index"):
 		return int(G.rank_index(int(S.get("rp", 0))))
 	return 0
+
+
+static func _multi_heroines(S: Dictionary) -> bool:
+	var hs = S.get("heroes", null)
+	if hs is Array and (hs as Array).size() > 1:
+		return true
+	if hs is Dictionary and (hs as Dictionary).size() > 1:
+		return true
+	return false
 
 
 static func is_open(id: String) -> bool:
@@ -83,8 +111,8 @@ static func is_open_in(S: Dictionary, d: Dictionary, id: String) -> bool:
 	if g.has("rank"):
 		return _rank(S) >= int(g.rank)
 	if g.has("flag"):
-		# tab.heroines: right after the first SSR pick (one fullscreen flow after L3), at the latest after L4
-		if lv >= int(g.get("lvl", 0)) and String(S.get(g.flag, "")) != "":
+		# tab.heroines: right after the first SSR pick (one fullscreen flow after L3), or ≥2 heroines, at latest after L4
+		if lv >= int(g.get("lvl", 0)) and (String(S.get(g.flag, "")) != "" or _multi_heroines(S)):
 			return true
 		return lv >= int(g.get("or_lvl", 9999))
 	if g.has("day") and not g.has("lvl"):
@@ -114,6 +142,16 @@ static func locked_text(id: String) -> String:
 	return V10TutLines.ui("locked_level", {"n": int(g.get("lvl", 0))})
 
 
+static func screen_matches(intro_screen: String, current_sid: String) -> bool:
+	if intro_screen == "*":
+		return true
+	if intro_screen == current_sid:
+		return true
+	var g1: = String(SCREEN_GROUPS.get(intro_screen, intro_screen))
+	var g2: = String(SCREEN_GROUPS.get(current_sid, current_sid))
+	return g1 == g2
+
+
 # Intros whose gate is open, not yet seen, allowed on this screen — sorted by prio.
 static func due_intros(screen_id: String) -> Array:
 	var d: = V10TutState.st()
@@ -124,7 +162,7 @@ static func due_intros(screen_id: String) -> Array:
 		if bool(d.seen.get(id, false)):
 			continue
 		var sc: = String(e.get("screen", "home"))
-		if sc != "*" and sc != screen_id:
+		if not screen_matches(sc, screen_id):
 			continue
 		if id == "v10_welcome":
 			if not bool(d.get("legacy", false)):

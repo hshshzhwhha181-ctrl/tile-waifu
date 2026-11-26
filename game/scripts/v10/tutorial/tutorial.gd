@@ -4,7 +4,7 @@ extends Node
 #   - watches the screen (main.screen_root.child_entered_tree + a frame, and a 0.25 s timer on main.screen_id);
 #   - plays at most ONE intro per screen arrival and at most ONE «new system» per entry into the Чайная (UX О-1);
 #   - owns the single V10Coach shared by the match driver (V10TutMatch) and by other lanes (say());
-#   - registers the dynamic tut_id providers (tiles of the first match, 0.9 victory/levels/help nodes).
+#   - registers the dynamic tut_id providers (tiles of the first match, HUD v2 / W1 / 0.9 nodes).
 # Never shows anything while main.busy, during a transition, a V6Story scene, a full-screen view (title), a popup or
 # a sheet. A spotlight whose target disappears ends («lost»); a watchdog closes any step the coach forgets.
 #
@@ -16,9 +16,14 @@ const MAX_TRIES: = 3          # an intro whose target is never found: retried on
 const HUB_DIM: = 0.72
 const MATCH_SCREENS: = ["play", "arena", "v7play"]
 const VICTORY_SETTLE: = 1.6   # stars stamp in before v_stars
+const TAB_NAMES: = {
+	"home": "Чайная", "collection": "Героини", "tables": "Столы", "levels": "Столы",
+	"summon": "Желания", "shop": "Лавка",
+}
 
 static var inst: V10Tutorial
-static var shown: Array = []  # every intro / line id the coach was asked to show this launch, in order
+static var chapters_enabled: = true   # rewritten for 0.10 5-tab nav & HUD v2; W4 keeps true (false = «?» / gates only)
+static var shown: Array = []          # every intro / line id the coach was asked to show this launch, in order
 
 var main: Node
 var coach: V10Coach
@@ -52,9 +57,11 @@ static func attach(m: Node) -> V10Tutorial:
 		return null
 	if inst != null and is_instance_valid(inst):
 		if inst.main == m:
+			_sync_story_intro()
 			return inst
 		inst.queue_free()
 	V10TutState.st()
+	_sync_story_intro()
 	var t: = V10Tutorial.new()
 	t.name = "V10Tutorial"
 	t.main = m
@@ -65,12 +72,23 @@ static func attach(m: Node) -> V10Tutorial:
 	return t
 
 
+# Prevents V6Story.before_go() from deadlocking when G.S.intro_done is already set (e.g. test boot / migrated saves).
+static func _sync_story_intro() -> void:
+	if G != null and G.S is Dictionary and bool(G.S.get("intro_done", false)) and V6Story != null:
+		if not V6Story.seen("intro"):
+			V6Story.st().seen["intro"] = true
+
+
 static func main_node() -> Node:
 	return inst.main if inst != null and is_instance_valid(inst) else null
 
 
-static func owns_first_match() -> bool:
+static func active() -> bool:
 	return inst != null and is_instance_valid(inst)
+
+
+static func owns_first_match() -> bool:
+	return active() and chapters_enabled
 
 
 static func is_open(id: String) -> bool:
@@ -89,20 +107,44 @@ static func locked_tap(id: String, at) -> void:
 	V10TutHelp.locked_toast(_host(), r, txt)
 
 
-static func help(screen_id: = "") -> void:
-	var sid: = screen_id
+# Accepts help(), help("tables") or legacy help(main, "tables").
+static func help(a = "", b: = "") -> void:
+	var host: Node = _host()
+	var sid: = ""
+	if a is Node:
+		host = a
+		sid = String(b)
+	else:
+		sid = String(a)
 	var m: = main_node()
-	if sid == "" and m != null:
-		sid = String(m.get("screen_id"))
 	if inst != null and is_instance_valid(inst):
 		inst._yield_coach()
-	V10TutHelp.open(_host(), V10TutHelp.topic_for_screen(sid))
+	if sid == "" and a is Node and b == "":
+		V10TutHelp.open_how_to(host)
+		return
+	if sid == "" and m != null:
+		sid = String(m.get("screen_id"))
+	V10TutHelp.open(host, V10TutHelp.topic_for_screen(sid))
 
 
 static func how_to() -> void:
 	if inst != null and is_instance_valid(inst):
 		inst._yield_coach()
 	V10TutHelp.open_how_to(_host())
+
+
+static func tip_now(topic: String) -> void:
+	if V10TutLines.INTROS.has(topic):
+		replay(topic)
+	else:
+		V10TutHelp.open(_host(), topic)
+
+
+static func fill(s: String) -> String:
+	var out: = s.replace("{tabs}", "Чайная · Героини · Столы · Желания · Лавка")
+	for k in TAB_NAMES:
+		out = out.replace("{tab:%s}" % k, String(TAB_NAMES[k]))
+	return out
 
 
 # Shared coach for other lanes: one heroine line (+ optional spotlight), same look as the tutorial.
@@ -124,6 +166,7 @@ static func event(ev_name: String, data: = {}) -> void:
 	match ev_name:
 		"replay_first_match":
 			V10TutMatch.replay_l1 = true
+			_sync_story_intro()
 			for k in V10TutLines.MATCH:
 				if String(k).begins_with("m_") or String(k).begins_with("v_"):
 					V10TutState.unmark(String(k))
@@ -143,7 +186,10 @@ static func event(ev_name: String, data: = {}) -> void:
 		inst._tick.call_deferred()
 
 
-static func replay(intro_id: String) -> void:
+static func replay(intro_id: = "") -> void:
+	if intro_id == "":
+		V10TutState.replay()
+		return
 	V10TutState.unmark(intro_id)
 	var d: = V10TutState.st()
 	if d.get("tries", null) is Dictionary:
@@ -274,6 +320,8 @@ func _ready() -> void:
 
 
 func _exit_tree() -> void:
+	_cb = Callable()
+	_say_q.clear()
 	if match_driver != null and is_instance_valid(match_driver):
 		match_driver.stop()
 	if coach != null and is_instance_valid(coach):
@@ -307,6 +355,8 @@ func _tick() -> void:
 		_say_next(sid)
 	if _showing():
 		return
+	if not chapters_enabled and _replay_id == "":
+		return
 	if V10TutMatch.victory_pending and not sid in MATCH_SCREENS and not popup:
 		_victory_elsewhere(sid)
 		return
@@ -335,6 +385,7 @@ func _arrive(sid: String, scr) -> void:
 	_arr_t = _now()
 	_arr_shown = false
 	_next_try = 0.0
+	V10TutTarget.clear_cache()
 	# a hub intro / a line of the previous screen does not follow the player
 	if _showing() and (owner_kind == "intro" or owner_kind == "say" or owner_kind == "victory"):
 		complete_step("lost")
@@ -372,10 +423,16 @@ func _hard_blocked() -> bool:
 		if c == self or c in skip or not (c is Control):
 			continue
 		var cc: = c as Control
-		if not cc.visible:
+		if not cc.visible or c.is_queued_for_deletion():
 			continue
 		if c is V6StoryScene or (cc.size.x >= vs.x * 0.8 and cc.size.y >= vs.y * 0.8):
 			return true
+	if is_inside_tree():
+		var cs: = get_tree().current_scene
+		if cs != null and cs != main:
+			for c2 in cs.get_children():
+				if c2 is V6StoryScene and (c2 as CanvasItem).visible and not c2.is_queued_for_deletion():
+					return true
 	if _sheet_open():
 		return true
 	return false
@@ -388,23 +445,31 @@ func _popup_open() -> bool:
 		return false
 	var vs: = _vs()
 	for c in (ov as Node).get_children():
-		if not (c is Control) or not (c as Control).visible or c.is_queued_for_deletion():
+		if not (c is Control) or not (c as Control).visible or c.is_queued_for_deletion() or c.has_meta("closing"):
 			continue
 		if c.has_meta("popup") or c.has_meta("v8_back") or (c as Control).size.y >= vs.y * 0.6:
 			return true
 	return false
 
 
-# A «?» / «Как играть» sheet (or anything else) on the tutorial layer besides the coach.
+# A «?» / «Как играть» sheet on V10TutSheetLayer (or anything besides the coach on V10TutLayer).
 func _sheet_open() -> bool:
-	var l: = get_tree().root.get_node_or_null("V10TutLayer") if is_inside_tree() else null
-	if l == null:
+	if V10TutHelp.current() != null:
+		return true
+	if not is_inside_tree():
 		return false
-	for c in l.get_children():
-		if c == coach or not (c is CanvasItem) or c.is_queued_for_deletion():
+	for lname in ["V10TutLayer", "V10TutSheetLayer"]:
+		var l: = get_tree().root.get_node_or_null(lname)
+		if l == null:
 			continue
-		if (c as CanvasItem).visible:
-			return true
+		for c in l.get_children():
+			if c == coach or c.name == "V10TutToast" or String(c.get_meta("tut_id", "")) == "tut.toast" \
+					or not (c is CanvasItem) or c.is_queued_for_deletion():
+				continue
+			if "closing" in c and bool(c.get("closing")):
+				continue
+			if (c as CanvasItem).visible:
+				return true
 	return false
 
 
@@ -425,7 +490,7 @@ func _try_intro(sid: String, popup: bool) -> void:
 	for id in cands:
 		var e: Dictionary = V10TutLines.INTROS[id]
 		var forced: bool = id == _replay_id
-		if not forced and (_arr_shown or not V10TutState.hints_on()):
+		if not forced and (not chapters_enabled or _arr_shown or not V10TutState.hints_on()):
 			continue
 		var anywhere: = String(e.get("screen", "")) == "*"
 		if popup and not (anywhere and String(e.get("mode", "")) == "wait"):
@@ -489,9 +554,8 @@ func _intro_done(id: String, _res: String) -> void:
 
 static func speaker_of(s: String) -> String:
 	if s == "partner" or s == "":
-		var p: = "mc"
-		if G != null and G.S is Dictionary:
-			p = String(G.S.get("partner", "mc"))
+		var S: = V10TutState._root()
+		var p: = String(S.get("partner", "mc"))
 		return p if p != "" else "mc"
 	return s
 
@@ -501,25 +565,62 @@ func _heroine_visible() -> bool:
 		return true
 	var scr = main.get("screen")
 	if scr is Object and is_instance_valid(scr):
-		var h = scr.get("hero") if "hero" in scr else null
-		if h is CanvasItem and is_instance_valid(h) and (h as CanvasItem).is_visible_in_tree():
+		for k in ["hero", "video", "rig"]:
+			var h = scr.get(k) if k in scr else null
+			if h is CanvasItem and is_instance_valid(h) and (h as CanvasItem).is_visible_in_tree():
+				return true
+		var hm = scr.get("home2") if "home2" in scr else null
+		if hm is V10HudHome and is_instance_valid(hm):
 			return true
 	return false
 
 
+# Sacred zone UX_RULES Г-1: never let any coach text overlap face_rect + 48 px on any screen.
 func _face_avoid() -> Array:
+	var out: = []
 	var scr = main.get("screen")
 	if not (scr is Object) or not is_instance_valid(scr):
-		return []
+		return out
 	if scr.has_method("hero_face_global"):
 		var r = scr.call("hero_face_global")
-		if r is Rect2:
-			return [(r as Rect2).grow(48.0)]
-	var h = scr.get("hero") if "hero" in scr else null
-	if h is Node2D and is_instance_valid(h) and h.has_method("face_local"):
-		var p: Vector2 = (h as Node2D).get_global_transform_with_canvas() * Vector2(h.call("face_local"))
-		return [Rect2(p - Vector2(90, 90), Vector2(180, 180)).grow(48.0)]
-	return []
+		if r is Rect2 and (r as Rect2).has_area():
+			out.append((r as Rect2).grow(48.0))
+	if scr is V10HudHome:
+		var hf0 = (scr as V10HudHome).L.get("hero_face", Rect2())
+		if hf0 is Rect2 and (hf0 as Rect2).has_area():
+			out.append((hf0 as Rect2).grow(48.0))
+	var hm = scr.get("home2") if "home2" in scr else null
+	if hm is V10HudHome and is_instance_valid(hm):
+		var hf1 = (hm as V10HudHome).L.get("hero_face", Rect2())
+		if hf1 is Rect2 and (hf1 as Rect2).has_area():
+			out.append((hf1 as Rect2).grow(48.0))
+	if scr is V10HudVictory:
+		var lv: Dictionary = (scr as V10HudVictory).L
+		if lv.has("hero_pos") and lv.has("hero_scale"):
+			var s: float = float(lv.hero_scale)
+			var fv: = Rect2(Vector2(lv.hero_pos) + V10HudMatch.RIG_FACE_RECT.position * s, V10HudMatch.RIG_FACE_RECT.size * s)
+			out.append(fv.grow(48.0))
+	var vp = scr.get("video") if "video" in scr else null
+	if vp is Control and is_instance_valid(vp) and (vp as Control).is_visible_in_tree():
+		var vr: = V10TutTarget.rect_of(vp)
+		out.append(Rect2(vr.position + Vector2(vr.size.x * 0.36, vr.size.y * 0.14), Vector2(vr.size.x * 0.28, vr.size.y * 0.16)).grow(48.0))
+	for holder in [scr, scr.get("stage") if "stage" in scr else null]:
+		if not (holder is Node) or not is_instance_valid(holder):
+			continue
+		var h = holder.get("hero") if "hero" in holder else null
+		if h == null:
+			for ch in (holder as Node).get_children():
+				if ch is Node2D and (ch.has_method("head_global") or ch.has_method("face_local")):
+					h = ch
+					break
+		if h is Node2D and is_instance_valid(h) and (h as CanvasItem).is_visible_in_tree():
+			if h.has_method("head_global"):
+				var pg: Vector2 = h.call("head_global")
+				out.append(Rect2(pg - Vector2(80, 80), Vector2(160, 160)).grow(48.0))
+			elif h.has_method("face_local"):
+				var p: Vector2 = (h as Node2D).get_global_transform_with_canvas() * Vector2(h.call("face_local"))
+				out.append(Rect2(p - Vector2(90, 90), Vector2(180, 180)).grow(48.0))
+	return out
 
 
 func _eq_shown() -> bool:
@@ -581,8 +682,9 @@ func _victory_elsewhere(sid: String) -> void:
 	var e: Dictionary = V10TutLines.MATCH[key]
 	var spec: = {
 		"id": key, "line": V10TutLines.match_line(key), "speaker": "mc", "portrait": false,
-		"target": String(e.target), "mode": String(e.mode), "dim": 0.0, "place": "auto", "ctx": "work",
-		"hold": 4.0, "timeout": 15.0, "skippable": false, "root": main,
+		"target": String(e.target), "mode": String(e.mode),
+		"dim": HUB_DIM if String(e.mode) == "do" else 0.0, "place": "auto", "ctx": "work",
+		"avoid": _face_avoid(), "hold": 4.0, "timeout": 15.0, "skippable": false, "root": main,
 	}
 	show_spec(spec, "victory", func(_r: String):
 		V10TutState.mark(key)
@@ -593,16 +695,19 @@ func _victory_elsewhere(sid: String) -> void:
 
 
 # ---------------------------------------------------------------- dynamic providers ---------------------------------
-# Providers answer only for the 0.9 nodes they know; otherwise null, and V10TutTarget goes on to tags / fallbacks.
 
 static func _register_providers() -> void:
 	V10TutTarget.provide("match.tile_a", func(): return V10TutMatch.tile_rect(0))
 	V10TutTarget.provide("match.tile_b", func(): return V10TutMatch.tile_rect(1))
 	V10TutTarget.provide("match.board", func(): return _p_board())
+	V10TutTarget.provide("match.status", func(): return _p_status())
 	V10TutTarget.provide("match.help", func(): return _p_help())
+	V10TutTarget.provide("match.hero", func(): return _p_match_hero())
 	V10TutTarget.provide("win.stars", func(): return _p_win_stars())
+	V10TutTarget.provide("win.rewards", func(): return _p_win_rewards())
 	V10TutTarget.provide("win.home", func(): return _p_win_home())
 	V10TutTarget.provide("tables.play", func(): return _p_tables_play())
+	V10TutTarget.provide("heroines.partner", func(): return _p_heroines_partner())
 
 
 static func _scr() -> Object:
@@ -615,28 +720,67 @@ static func _scr() -> Object:
 
 static func _vis(n) -> bool:
 	return n is CanvasItem and is_instance_valid(n) and (n as CanvasItem).is_inside_tree() \
-		and (n as CanvasItem).is_visible_in_tree() and not (n as Node).is_queued_for_deletion()
+		and (n as CanvasItem).is_visible_in_tree() and (n as CanvasItem).modulate.a > 0.05 \
+		and not (n as Node).is_queued_for_deletion()
+
+
+static func _hud_match(s: Object) -> V10HudMatch:
+	if s is V10HudMatch:
+		return s as V10HudMatch
+	if s == null:
+		return null
+	for k in ["hud", "hud2"]:
+		var h = s.get(k) if k in s else null
+		if h is V10HudMatch and is_instance_valid(h):
+			return h as V10HudMatch
+	return null
 
 
 # the field: HUD v2 board_rect(), or the 0.9 play-local board_rect in viewport px
 static func _p_board():
 	var s: = _scr()
-	if s == null or not (s is Control) or not ("board_rect" in s):
+	if s == null:
 		return null
-	for k in ["hud", "hud2"]:
-		var h = s.get(k) if k in s else null
-		if h is V10HudMatch and is_instance_valid(h):
-			return {"rect": (h as V10HudMatch).board_rect(), "radius": 4.0}
+	var hm: = _hud_match(s)
+	if hm != null:
+		return {"rect": hm.board_rect(), "radius": 4.0}
+	if not (s is Control) or not ("board_rect" in s):
+		return null
 	var br: Rect2 = s.get("board_rect")
 	if br.size.x < 2.0:
 		return null
 	return {"rect": (s as Control).get_global_transform_with_canvas() * br, "radius": 4.0}
 
 
-# 0.9: the three help buttons as one row (HUD v2 answers through the fallback s:hud.help_row)
+# HUD v2 status («1-2 · Осталось» + «30»): merge both labels into one spotlight rect.
+static func _p_status():
+	var s: = _scr()
+	var hm: = _hud_match(s)
+	if hm != null and _vis(hm.status_l):
+		var r: = V10TutTarget.rect_of(hm.status_l)
+		if _vis(hm.status_n):
+			r = r.merge(V10TutTarget.rect_of(hm.status_n))
+		return {"rect": r, "radius": 4.0, "node": hm.status_l}
+	return null
+
+
+# Help row: on HUD v2 merge the 3 disc hit rects (help_row itself is viewport-sized); on 0.9 merge btn_undo/hint/shuffle.
 static func _p_help():
 	var s: = _scr()
-	if s == null or not ("btn_hint" in s) or s.get("hud") != null:
+	if s == null:
+		return null
+	var hm: = _hud_match(s)
+	if hm != null:
+		if hm.help_row == null or not _vis(hm.help_row):
+			return null
+		var rh: = Rect2()
+		for k in hm.discs:
+			var d = hm.discs[k]
+			if _vis(d) and d is Control:
+				var g: = Rect2((d as Control).get_global_rect().position, Vector2(128, 80))
+				rh = g if rh.size == Vector2.ZERO else rh.merge(g)
+		return {"rect": rh, "radius": 4.0} if rh.size.x > 2.0 else null
+	if not ("btn_hint" in s):
 		return null
 	var r: = Rect2()
 	for k in ["btn_undo", "btn_hint", "btn_shuffle"]:
@@ -647,48 +791,125 @@ static func _p_help():
 	return {"rect": r, "radius": 4.0} if r.size.x > 2.0 else null
 
 
-# 0.9 victory window: the three star sockets (104 px) on V8Result/Plate
+# Heroine + Приём ring in match: on HUD v2 frame her figure inside scene (never the full-width hero_holder container).
+static func _p_match_hero():
+	var s: = _scr()
+	if s == null:
+		return null
+	var hm: = _hud_match(s)
+	if hm != null and _vis(hm.scene):
+		var hf: Rect2 = hm.hero_face_global()
+		var hv: Rect2 = hm.L.get("hero_view", Rect2())
+		if hf.has_area() and hv.has_area():
+			var x0: = maxf(hv.position.x + 16.0, hf.get_center().x - 148.0)
+			var x1: = minf(hv.end.x - 16.0, hf.get_center().x + 148.0)
+			var y0: = maxf(hv.position.y + 4.0, hf.position.y - 24.0)
+			var y1: = minf(hv.end.y - 16.0, y0 + 320.0)
+			return {"rect": Rect2(x0, y0, maxf(160.0, x1 - x0), maxf(160.0, y1 - y0)), "radius": 16.0, "node": hm.scene}
+	return null
+
+
+# Victory stars: HUD v2 stars_c or 0.9 V8Result/Plate star sockets.
 static func _p_win_stars():
 	var s: = _scr()
-	if s == null or not ("victory_next_btn" in s) or not (s is Node):
+	if s == null or not (s is Node):
 		return null
+	if s is V10HudVictory and _vis((s as V10HudVictory).stars_c):
+		return {"rect": V10TutTarget.rect_of((s as V10HudVictory).stars_c), "radius": 4.0, "node": (s as V10HudVictory).stars_c}
+	if "victory_next_btn" in s:
+		var plate: = (s as Node).get_node_or_null("V8Result/Plate")
+		if plate != null and _vis(plate):
+			var r: = Rect2()
+			var n: = 0
+			for c in plate.get_children():
+				if c is Control and absf((c as Control).size.x - 104.0) < 1.0 and absf((c as Control).size.y - 104.0) < 1.0:
+					var rc: = V10TutTarget.rect_of(c)
+					r = rc if n == 0 else r.merge(rc)
+					n += 1
+					if n == 3:
+						break
+			if n > 0:
+				return {"rect": r.grow(8.0), "radius": 4.0}
+	return null
+
+
+# Victory rewards row (0.9 V8Result/Plate crystal row or HUD v2 reward tokens).
+static func _p_win_rewards():
+	var s: = _scr()
+	if s == null or not (s is Node):
+		return null
+	if s is V10HudVictory and _vis((s as V10HudVictory).caption_l):
+		return {"rect": V10TutTarget.rect_of((s as V10HudVictory).caption_l), "radius": 4.0}
 	var plate: = (s as Node).get_node_or_null("V8Result/Plate")
-	if plate == null or not _vis(plate):
-		return null
-	var r: = Rect2()
-	var n: = 0
-	for c in plate.get_children():
-		if c is Control and absf((c as Control).size.x - 104.0) < 1.0 and absf((c as Control).size.y - 104.0) < 1.0:
-			var rc: = V10TutTarget.rect_of(c)
-			r = rc if n == 0 else r.merge(rc)
-			n += 1
-			if n == 3:
-				break
-	return {"rect": r.grow(8.0), "radius": 4.0} if n > 0 else null
+	if plate != null and _vis(plate):
+		for c in plate.get_children():
+			if c is Control and _vis(c) and absf((c as Control).size.y - 84.0) < 8.0:
+				return {"rect": V10TutTarget.rect_of(c), "radius": 4.0, "node": c}
+	return null
 
 
-# 0.9 victory window: the second button is «На главную» while Желания are closed
+# Victory «В чайную»: V10HudVictory.home_b, W1 V10WinPanel (AltBtn / HomeBtn), or 0.9 victory_summon_btn.
 static func _p_win_home():
 	var s: = _scr()
-	if s == null or not ("victory_summon_btn" in s):
+	if s == null or not (s is Node):
 		return null
-	var b = s.get("victory_summon_btn")
-	if not _vis(b) or (G != null and G.has_method("summon_open") and bool(G.summon_open())):
-		return null
-	return {"rect": V10TutTarget.rect_of(b), "radius": 4.0, "node": b}
+	if s is V10HudVictory and _vis((s as V10HudVictory).home_b):
+		var hb: = (s as V10HudVictory).home_b
+		return {"rect": V10TutTarget.rect_of(hb), "radius": 4.0, "node": hb}
+	# W1 V10WinPanel inside play.gd's V8Result: alt_btn («В чайную») or more_btn («HomeBtn» at end of path)
+	var res_root: = (s as Node).get_node_or_null("V8Result")
+	if res_root != null:
+		for ch in res_root.get_children():
+			if ch is V10WinPanel and _vis(ch):
+				var wp: = ch as V10WinPanel
+				if wp.alt_btn != null and _vis(wp.alt_btn):
+					var lbl = wp.alt_btn.get("lbl") if "lbl" in wp.alt_btn else null
+					var txt: = String(lbl.text) if lbl is Label else ""
+					if txt == "" or "чайную" in txt.to_lower():
+						return {"rect": V10TutTarget.rect_of(wp.alt_btn), "radius": 4.0, "node": wp.alt_btn}
+				if wp.more_btn != null and wp.more_btn.name == "HomeBtn" and _vis(wp.more_btn):
+					return {"rect": V10TutTarget.rect_of(wp.more_btn), "radius": wp.more_btn.size.y * 0.5, "node": wp.more_btn}
+	if "victory_summon_btn" in s:
+		var b = s.get("victory_summon_btn")
+		if _vis(b) and not (G != null and G.has_method("summon_open") and bool(G.summon_open())):
+			return {"rect": V10TutTarget.rect_of(b), "radius": 4.0, "node": b}
+	return null
 
 
-# 0.9 «Столы» = levels screen: its «Партия N» button
+# «Столы» (tables_hub.gd / levels.gd): ★ «Играть · N» button.
 static func _p_tables_play():
 	var m: = main_node()
 	var s: = _scr()
-	if m == null or s == null or String(m.get("screen_id")) != "levels" or not ("play_btn" in s):
+	if m == null or s == null or not String(m.get("screen_id")) in ["tables", "levels", "v10path"]:
 		return null
-	var b = s.get("play_btn")
-	if not _vis(b):
+	for k in ["play_btn", "play_b"]:
+		if k in s:
+			var b = s.get(k)
+			if _vis(b):
+				var r: = V10TutTarget.rect_of(b)
+				return {"rect": r, "radius": r.size.y * 0.5, "node": b}
+	return null
+
+
+# «Героини» (collection.gd): the Partner / action button or info card.
+static func _p_heroines_partner():
+	var m: = main_node()
+	var s: = _scr()
+	if m == null or s == null or not String(m.get("screen_id")) in ["collection", "heroines"]:
 		return null
-	var r: = V10TutTarget.rect_of(b)
-	return {"rect": r, "radius": r.size.y * 0.5, "node": b}
+	if not (s is Node):
+		return null
+	for jb in (s as Node).find_children("*", "JButton", true, false):
+		if _vis(jb) and "lbl" in jb and jb.lbl is Label:
+			var tx: = String(jb.lbl.text).to_lower()
+			if "партнёр" in tx or "подарить" in tx:
+				var r: = V10TutTarget.rect_of(jb)
+				return {"rect": r, "radius": 4.0, "node": jb}
+	for vb in (s as Node).find_children("*", "V10Button", true, false):
+		if _vis(vb) and String((vb as Node).get_meta("ux_role", "")) == "primary":
+			var r2: = V10TutTarget.rect_of(vb)
+			return {"rect": r2, "radius": r2.size.y * 0.5, "node": vb}
+	return null
 
 
 # ---------------------------------------------------------------- helpers -------------------------------------------

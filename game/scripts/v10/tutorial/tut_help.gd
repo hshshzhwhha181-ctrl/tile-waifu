@@ -1,45 +1,71 @@
 class_name V10TutHelp
 extends RefCounted
-# «?» and «Как играть» sheets, and the «Откроется после партии N» toast (README §2.5; UX §2 п.4, §3.7, §4.4, §6.4;
-# HUD_V2 §2 «Лист»: surface night.700, radius 4 on top, a stack of M plates, H1 Display 44 by the left margin).
+# «?» and «Как играть» sheets, and the «Откроется после партии N» toast (README §2.5; UX §2 п.4, §3.7, §4.1.9, §4.4,
+# §6.4; HUD_V2 §2 «Лист»: surface night.700, radius 4 on top, a stack of M plates, H1 Display 44 by the left margin).
 #
-#   V10TutHelp.open(host, "teahouse")       # «?» of a screen: H1 + ≤ 3 rows (icon + one line) + «Понятно»
+#   V10TutHelp.open(host, "teahouse")       # «?» of a screen: H1 + ≤ 3 rows (icon + ≤ 2 lines) + «Понятно» + «Подробнее»
 #   V10TutHelp.open_how_to(host)            # «Как играть»: open topics (+ ≤ 1 teaser), hints switch, «Первая партия»
+#   V10TutHelp.help_button(parent, rect_or_pos, host, topic)   # quiet 80×80 «?» button
+#   V10TutHelp.settings_hook(main, popup)   # Settings «Как играть» row (closes popup before opening sheet, П-6)
 #   V10TutHelp.close_all(host)
 #   V10TutHelp.locked_toast(host, rect, V10Reveal.locked_text(id))
 #
-# One sheet at a time (UX §3.7 «окно поверх окна запрещено»): opening a sheet closes the previous one, a topic
-# tapped in «Как играть» swaps the SAME sheet (with «‹» back), «Словарь» closes the sheet before it opens.
-# Sheets live on CanvasLayer 93 «V10TutSheetLayer» (above screens and the coach). Android back / Esc closes
-# through main's own back chain (a tiny proxy child of main carries meta "v8_back").
+# One sheet at a time (UX §3.7 «окно поверх окна запрещено»): opening a sheet closes any previous sheet or popup,
+# a topic tapped in «Как играть» (or «Подробнее» on «?») swaps the SAME sheet in place, «Словарь» closes the sheet first.
 
 const LAYER: = 93
-const SCREEN_TOPIC: = {"home": "teahouse", "levels": "tables", "summon": "wishes", "collection": "heroines",
-	"shop": "shop", "play": "play", "salon": "salon", "phone": "phone", "afisha": "today", "streak": "streak",
-	"v10salon": "salon", "victory": "victory", "tables": "tables", "wishes": "wishes", "heroines": "heroines"}
+const SCREEN_TOPIC: = {
+	"home": "teahouse", "levels": "tables", "tables": "tables", "v10path": "tables", "modes": "tables",
+	"summon": "wishes", "wishes": "wishes", "odds": "wishes",
+	"collection": "heroines", "heroines": "heroines",
+	"shop": "shop", "play": "play", "victory": "victory",
+	"salon": "salon", "v10salon": "salon", "v10scene": "salon", "room": "salon",
+	"phone": "phone", "v10phone": "phone", "letters": "phone",
+	"afisha": "today", "today": "today", "streak": "streak",
+	"triples": "triples", "mj_triples": "triples",
+	"riichi": "riichi", "mj_riichi": "riichi", "sanma": "riichi", "mj_sanma": "riichi",
+	"koikoi": "koikoi", "mj_koikoi": "koikoi",
+	"pagoda": "pagoda", "v10pagoda": "pagoda",
+	"journey": "journey", "v10journey": "journey",
+	"duels": "duels", "duel": "duels", "v10duel": "duels", "arena": "duels", "v7tourney": "tables",
+}
 # monoline icon of each «Как играть» topic (V10Icons.NAMES)
-const TOPIC_ICON: = {"play": "tab_tables", "help_row": "hint", "priem": "avatar_ring", "teahouse": "tab_tea",
+const TOPIC_ICON: = {
+	"play": "tab_tables", "help_row": "hint", "priem": "avatar_ring", "teahouse": "tab_tea",
 	"tables": "arrow_r", "salon": "heart", "wishes": "tab_wishes", "heroines": "tab_heroines", "phone": "phone",
-	"today": "info", "streak": "heart", "shop": "tab_shop", "victory": "info", "tabs": "tab_tea"}
+	"today": "info", "streak": "heart", "shop": "tab_shop", "victory": "info", "tabs": "tab_tea",
+	"triples": "tab_tables", "riichi": "tab_tables", "koikoi": "tab_tables",
+	"pagoda": "arrow_r", "journey": "arrow_r", "duels": "tab_tables",
+}
+const TOPIC_GLOSSARY: = {
+	"play": "rules", "help_row": "rules", "priem": "rules", "salon": "salon",
+	"wishes": "wish", "shop": "wish", "heroines": "hero", "today": "afisha",
+}
 const MARGIN: = 32.0
 const ROW_W: = 656
 const ROW_STEP: = 88.0  # M plate 80 + 8
+const SETTINGS_EXTRA: = 84.0
 
 static var _sheet: WeakRef = null
 static var _toast: WeakRef = null
 
 
 static func topic_for_screen(screen_id: String) -> String:
+	if V10TutLines.HELP.has(screen_id):
+		return screen_id
 	return String(SCREEN_TOPIC.get(screen_id, "play"))
 
 
-static func open(host: Node, topic: String) -> Control:
-	if not V10TutLines.HELP.has(topic):
+static func open(host: Node, topic: String = "") -> Control:
+	if topic == "":
+		return open_how_to(host)
+	var tp: = topic if V10TutLines.HELP.has(topic) else topic_for_screen(topic)
+	if not V10TutLines.HELP.has(tp):
 		return open_how_to(host)
 	var sh: = _new_sheet(host)
 	if sh == null:
 		return null
-	sh.show_topic(topic, false, false)
+	sh.show_topic(tp, false, false)
 	return sh
 
 
@@ -51,10 +77,86 @@ static func open_how_to(host: Node) -> Control:
 	return sh
 
 
+static func on_help(host: Node, topic: = "") -> Callable:
+	return func() -> void:
+		if V10Tutorial.inst != null and is_instance_valid(V10Tutorial.inst):
+			V10Tutorial.inst._yield_coach()
+		if topic == "":
+			var m: = _main_of(host)
+			var sid: = String(m.get("screen_id")) if m != null else ""
+			open(host, topic_for_screen(sid))
+		else:
+			open(host, topic)
+
+
+# Quiet 80×80 «?» button in HUD v2 style (UX §6.5 «Тихая»). Accepts a Rect2 or Vector2 position (or null = (0,0)).
+static func help_button(parent: Control, pos_or_rect = null, host: Node = null, topic: = "") -> V10Button:
+	var h: Node = host if host != null else parent
+	var b: = V10Button.make("quiet", "", Vector2(80, 80))
+	b.icon = "help"
+	b.icon_color = V10DS.PAPER_300
+	b.name = "HelpBtn"
+	b.set_meta("ux_role", "tertiary")
+	b.set_meta("tut_id", "help." + (topic if topic != "" else "screen"))
+	if pos_or_rect is Rect2:
+		var r: Rect2 = pos_or_rect
+		b.position = r.position + (r.size - Vector2(80, 80)) * 0.5
+	elif pos_or_rect is Vector2:
+		b.position = pos_or_rect
+	b.pressed.connect(on_help(h, topic))
+	if parent != null:
+		parent.add_child(b)
+	return b
+
+
+# Settings → «Как играть» row on main.gd's current Common.popup: closes the popup BEFORE opening the sheet (П-6).
+static func settings_hook(main: Node, p: Control) -> Control:
+	if p == null or not is_instance_valid(p):
+		return null
+	var y0: = p.size.y - 68.0
+	for c in p.get_children():
+		if c is Control and (c as Control).position.y >= y0 - 4.0 and c.name != "PanelArt":
+			(c as Control).position.y += SETTINGS_EXTRA
+	p.size.y += SETTINGS_EXTRA
+	var root = p.get_meta("root") if p.has_meta("root") else null
+	if root is Control and p.position.y + p.size.y > (root as Control).size.y - 10.0:
+		p.position.y = maxf(20.0, (root as Control).size.y - 10.0 - p.size.y)
+	var l: = UI.label(V10TutLines.ui("how_to"), 26, UI.INK, Color.WHITE, 3, "body", 900)
+	l.position = Vector2(34, y0 + 2)
+	p.add_child(l)
+	var d: = UI.label(V10TutLines.ui("hints_sub"), 18, V10DS.PAPER_500)
+	d.position = Vector2(34, y0 + 42)
+	p.add_child(d)
+	var b: = JButton.make("Открыть", "lav", Rect2(470, y0 + 8, 158, 64), null, 22)
+	b.name = "HowToPlay"
+	b.set_meta("tut_id", "settings.how_to")
+	b.pressed.connect(func() -> void:
+		Common.close_popup(p)
+		open_how_to(main))
+	p.add_child(b)
+	return b
+
+
+# HUD v2 M-plate row for the v2 Settings sheet: closes any open sheet/popup before opening «Как играть» (П-6).
+static func settings_plate(main: Node, w: int = ROW_W) -> V10Plate:
+	var pl: = V10Plate.make("M", w, V10TutLines.ui("how_to"), V10TutLines.ui("hints_sub"), "", "help")
+	pl.on_art = false
+	pl.interactive = true
+	pl.right_slot = V10Icons.icon("arrow_r", 24, V10DS.PAPER_500)
+	pl.name = "HowToPlate"
+	pl.set_meta("ux_role", "secondary")
+	pl.set_meta("tut_id", "settings.how_to")
+	pl.pressed.connect(func() -> void:
+		_close_popups(_main_of(main))
+		open_how_to(main))
+	return pl
+
+
 static func close_all(_host: Node = null) -> void:
 	var sh: = current()
 	if sh != null:
 		(sh as Sheet).close()
+	_sheet = null
 
 
 static func current() -> Control:
@@ -69,6 +171,10 @@ static func current() -> Control:
 static func layer(host: Node) -> CanvasLayer:
 	var root: = host.get_tree().root if host != null and host.is_inside_tree() else null
 	if root == null:
+		var ml: = Engine.get_main_loop()
+		if ml is SceneTree:
+			root = (ml as SceneTree).root
+	if root == null:
 		return null
 	var l: = root.get_node_or_null("V10TutSheetLayer") as CanvasLayer
 	if l == null:
@@ -82,15 +188,49 @@ static func layer(host: Node) -> CanvasLayer:
 
 static func _new_sheet(host: Node) -> Sheet:
 	close_all(host)
+	var m: = _main_of(host)
+	_close_popups(m)
+	if V10Tutorial.inst != null and is_instance_valid(V10Tutorial.inst):
+		V10Tutorial.inst._yield_coach()
 	var l: = layer(host)
 	if l == null:
 		return null
 	var sh: = Sheet.new()
 	sh.host = host
-	sh.main = _main_of(host)
+	sh.main = m
 	l.add_child(sh)
 	_sheet = weakref(sh)
 	return sh
+
+
+# Never open a sheet over a popup or another bottom sheet (UX §3.7 / П-6).
+static func _close_popups(main: Node) -> void:
+	if main == null or not is_instance_valid(main):
+		return
+	var ov = main.get("overlay") if "overlay" in main else null
+	if not (ov is Node):
+		return
+	for c in (ov as Node).get_children():
+		if not is_instance_valid(c) or c.is_queued_for_deletion():
+			continue
+		if c.has_meta("closing"):
+			continue
+		if c.has_method("close"):
+			c.call("close")
+			continue
+		if c.has_meta("popup"):
+			var closed: = false
+			for ch in c.get_children():
+				if ch is Control and ch.has_meta("root"):
+					Common.close_popup(ch as Control)
+					closed = true
+					break
+			if not closed:
+				c.set_meta("closing", true)
+				c.visible = false
+				c.queue_free()
+		elif c.has_meta("v8_back") and c.get_meta("v8_back") is Callable:
+			(c.get_meta("v8_back") as Callable).call()
 
 
 static func _main_of(host: Node) -> Node:
@@ -113,6 +253,8 @@ static func locked_toast(host: Node, at: Rect2, text: String) -> void:
 	if _toast != null:
 		var old = _toast.get_ref()
 		if old is Control and is_instance_valid(old):
+			(old as Node).name = "_closing_toast"
+			(old as Control).visible = false
 			(old as Control).queue_free()
 	var vs: = l.get_viewport().get_visible_rect().size
 	var ins: = V10Hud2Util.safe_insets(vs)
@@ -345,7 +487,7 @@ class Sheet:
 		elif V10TutHelp._press(e):
 			scrim.accept_event()
 
-	# ---------------------------------------------------------------- «?» of one topic
+	# ---------------------------------------------------------------- «?» of one topic (UX §4.1.9)
 
 	func _build_topic(t: String, back: bool) -> Control:
 		var d: Dictionary = V10TutLines.HELP.get(t, {})
@@ -364,7 +506,7 @@ class Sheet:
 			bb.pressed.connect(func() -> void: show_list())
 			p.add_child(bb)
 			x = 88.0
-		var links: = _links(p, y, back)
+		var links: = _links(p, y)
 		var h1: = V10Type.label(V10TutLines.t(String(d.get("title", ""))), "display", 44, V10DS.PAPER_100)
 		h1.position = Vector2(x, y)
 		h1.size = Vector2(links - 16.0 - x, 52)
@@ -386,11 +528,14 @@ class Sheet:
 		ok_b.set_meta("tut_id", "help.understood")
 		ok_b.pressed.connect(close)
 		p.add_child(ok_b)
-		y += 104.0
+		y += 104.0 + 8.0
+		# UX §4.1.9: 3 icon-lines + «Подробнее» (swaps to «Как играть» in the same sheet, or opens Glossary after close);
+		# when the intro was already seen, «Показать в игре» sits beside it (≤ 2 secondary actions, П-1).
 		var rid: = V10TutHelp._replay_id(t)
-		if rid != "":
-			y += 8.0
-			var sb: = V10Button.make("secondary", V10TutLines.ui("show_in_game"), Vector2(560, 80))
+		var gl: = V10TutHelp._glossary()
+		var want_more: = (not back) or gl != null
+		if rid != "" and want_more:
+			var sb: = V10Button.make("secondary", V10TutLines.ui("show_in_game"), Vector2(272, 80))
 			sb.position = Vector2(80, y)
 			sb.set_meta("ux_role", "secondary")
 			sb.set_meta("tut_id", "help.replay")
@@ -398,13 +543,44 @@ class Sheet:
 				close()
 				V10Tutorial.replay(rid))
 			p.add_child(sb)
+			var mb: = V10Button.make("secondary", V10TutLines.ui("more"), Vector2(272, 80))
+			mb.position = Vector2(80 + 272 + 16, y)
+			mb.set_meta("ux_role", "secondary")
+			mb.set_meta("tut_id", "help.more")
+			mb.pressed.connect(func() -> void: _on_more(t, back))
+			p.add_child(mb)
+			y += 80.0
+		elif rid != "":
+			var sb2: = V10Button.make("secondary", V10TutLines.ui("show_in_game"), Vector2(560, 80))
+			sb2.position = Vector2(80, y)
+			sb2.set_meta("ux_role", "secondary")
+			sb2.set_meta("tut_id", "help.replay")
+			sb2.pressed.connect(func() -> void:
+				close()
+				V10Tutorial.replay(rid))
+			p.add_child(sb2)
+			y += 80.0
+		elif want_more:
+			var mb2: = V10Button.make("secondary", V10TutLines.ui("more"), Vector2(560, 80))
+			mb2.position = Vector2(80, y)
+			mb2.set_meta("ux_role", "secondary")
+			mb2.set_meta("tut_id", "help.more")
+			mb2.pressed.connect(func() -> void: _on_more(t, back))
+			p.add_child(mb2)
 			y += 80.0
 		p.set_meta("h", y + 16.0)
 		p.size = Vector2(720, y + 16.0)
 		return p
 
+	func _on_more(t: String, back: bool) -> void:
+		if not back:
+			show_list()
+			return
+		var cat: = String(V10TutHelp.TOPIC_GLOSSARY.get(t, ""))
+		_open_glossary(cat)
+
 	# quiet text links in the H1 row, right-aligned; returns the x where they start
-	func _links(p: Control, y: float, back: bool) -> float:
+	func _links(p: Control, y: float) -> float:
 		var right: = 720.0 - 8.0
 		var gl: = V10TutHelp._glossary()
 		if page_kind == "list":
@@ -421,26 +597,19 @@ class Sheet:
 			var g: = QuietText.make(V10TutLines.ui("glossary"))
 			g.position = Vector2(right - g.size.x, y - 14.0)
 			g.set_meta("tut_id", "help.glossary")
-			g.pressed.connect(_open_glossary)
+			g.pressed.connect(func() -> void: _open_glossary(""))
 			p.add_child(g)
 			right -= g.size.x
-		if page_kind == "topic" and not back:
-			var hw: = QuietText.make(V10TutLines.ui("how_to"))
-			hw.position = Vector2(right - hw.size.x, y - 14.0)
-			hw.set_meta("tut_id", "help.how_to")
-			hw.pressed.connect(func() -> void: show_list())
-			p.add_child(hw)
-			right -= hw.size.x
 		return right
 
-	func _open_glossary() -> void:
+	func _open_glossary(cat: String = "") -> void:
 		var gl: = V10TutHelp._glossary()
 		var h: Node = main if main != null and is_instance_valid(main) else host
 		close()
 		if gl != null and h != null and is_instance_valid(h):
-			gl.call("open", h, "")
+			gl.call("open", h, cat)
 
-	# one help row: M plate, monoline icon, one sentence (UI 22, wraps to a second line rather than cut)
+	# one help row: M plate, monoline icon, one concise sentence (UI 22→18, ≤ 2 lines, UX §4.1.9)
 	func _row(icon_name: String, text: String) -> V10Plate:
 		var pl: = V10Plate.make("M", ROW_W, "", "", "", icon_name)
 		pl.on_art = false
@@ -462,7 +631,7 @@ class Sheet:
 		var p: = Control.new()
 		p.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		var y: = 32.0
-		var links: = _links(p, y, false)
+		var links: = _links(p, y)
 		var h1: = V10Type.label(V10TutLines.ui("how_to"), "display", 44, V10DS.PAPER_100)
 		h1.position = Vector2(MARGIN, y)
 		h1.size = Vector2(links - 16.0 - MARGIN, 52)
@@ -514,9 +683,9 @@ class Sheet:
 		# the list may scroll if the screen is short; the button row stays put under it
 		var vs: = _vs()
 		var ins: = _ins()
-		var fixed: = y + 24.0 + 80.0 + 16.0
+		var fixed: = y + 24.0 + 104.0 + 8.0 + 80.0 + 16.0
 		var avail: = vs.y - float(ins.top) - 48.0 - float(ins.bottom) - 16.0 - fixed
-		var list_h: = minf(ly, maxf(ROW_STEP * 2.0, avail))
+		var list_h: = minf(ly, maxf(ROW_STEP * 3.0, avail))
 		_clip = Control.new()
 		_clip.clip_contents = true
 		_clip.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -528,6 +697,15 @@ class Sheet:
 		_scroll_max = maxf(0.0, ly - list_h)
 		p.add_child(_clip)
 		y += list_h + 24.0
+		var ok_b: = V10Button.make("play", V10TutLines.ui("understood"), Vector2(560, 104))
+		ok_b.breathing = false
+		ok_b.sheen = false
+		ok_b.position = Vector2(80, y)
+		ok_b.set_meta("ux_role", "primary")
+		ok_b.set_meta("tut_id", "help.understood")
+		ok_b.pressed.connect(close)
+		p.add_child(ok_b)
+		y += 104.0 + 8.0
 		var fb: = V10Button.make("secondary", V10TutLines.ui("replay_first"), Vector2(560, 80))
 		fb.position = Vector2(80, y)
 		fb.set_meta("ux_role", "secondary")

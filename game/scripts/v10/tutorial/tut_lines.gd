@@ -7,7 +7,7 @@ extends RefCounted
 # The heroine never talks about money, the shop or offers (UX §5.2, §8.3).
 #
 # INTROS: one heroine line + one spotlight (UX §2 rule 7, §3.5). Keys:
-#   screen  – main.screen_id where it may play ("home", "levels" = Столы, "summon" = Желания, …; "*" = any)
+#   screen  – main.screen_id where it may play ("home", "tables"/"levels" = Столы, "summon" = Желания, …; "*" = any)
 #   target  – tut_id of the ONE element in the spotlight ("" = no spotlight, line only)
 #   gate    – V10Reveal gate id that must be open; the intro plays on the first hub entry after it opens
 #   speaker – "partner" (G.S.partner), "mc", or a heroine id (mode hostess)
@@ -22,18 +22,21 @@ const INTROS: = {
 	"home_first": {"screen": "home", "target": "home.play", "gate": "tab.tables", "speaker": "partner",
 		"mode": "tap", "prio": 10, "system": true, "help": "teahouse",
 		"line": "Это наша чайная. Жми «Играть» — и сразу за стол."},
-	"tables_first": {"screen": "levels", "target": "tables.play", "gate": "tab.tables", "speaker": "partner",
+	"tables_first": {"screen": "tables", "target": "tables.play", "gate": "tab.tables", "speaker": "partner",
 		"mode": "tap", "prio": 11, "system": false, "help": "tables",
 		"line": "Здесь Путь и все столы. Начинай с «Играть»."},
 	"lantern_salon": {"screen": "home", "target": "lantern.salon", "gate": "lantern.salon", "speaker": "mc",
 		"mode": "do", "prio": 20, "system": true, "help": "salon",
-		"line": "Салон проснулся. Загляни — вывеска ждёт твоих звёзд."},
+		"line": "Салон проснулся! Начни с задачи «Вывеска — 3★»."},
 	"wishes_first": {"screen": "home", "target": "nav.wishes", "gate": "tab.wishes", "speaker": "mc",
 		"mode": "do", "prio": 30, "system": true, "help": "wishes",
 		"line": "Загадай желание: первую героиню выбираешь ты."},
 	"heroines_first": {"screen": "*", "target": "nav.heroines", "gate": "tab.heroines", "speaker": "partner",
 		"mode": "tap", "prio": 31, "system": false, "help": "heroines",
-		"line": "Твоя героиня ждёт во вкладке «Героини». Наряды, стиль и история — там."},
+		"line": "Во вкладке «Героини» — наряды, стиль и её Дар."},
+	"heroines_partner": {"screen": "collection", "target": "heroines.partner", "gate": "tab.heroines", "speaker": "partner",
+		"mode": "tap", "prio": 32, "system": false, "help": "heroines",
+		"line": "Выбери партнёра и наряд — её Дар играет с тобой."},
 	"phone_first": {"screen": "home", "target": "home.phone", "gate": "phone", "speaker": "partner",
 		"mode": "do", "prio": 50, "system": true, "help": "phone",
 		"line": "Тебе письмо. Загляни в телефон."},
@@ -46,57 +49,57 @@ const INTROS: = {
 	"path_boosters": {"screen": "*", "target": "level.boosters", "gate": "path.boosters", "speaker": "partner",
 		"mode": "wait", "prio": 80, "system": true, "help": "play",
 		"line": "Огонёк пути и бустеры — для трудных столов."},
-	"tables_tourney": {"screen": "levels", "target": "tables.tourney", "gate": "tables.tourney", "speaker": "partner",
+	"tables_tourney": {"screen": "tables", "target": "tables.tourney", "gate": "tables.tourney", "speaker": "partner",
 		"mode": "tap", "prio": 90, "system": true, "help": "tables",
 		"line": "Турнир недели открыт: топ-5 поднимаются выше."},
 	# --- «Столы» shelves (MODES §6.4): the hostess introduces her table on the first visit after it opens --
-	"mode_classic": {"screen": "levels", "target": "tables.mode.classic", "gate": "mode.classic", "speaker": "mc",
+	"mode_classic": {"screen": "tables", "target": "tables.mode.classic", "gate": "mode.classic", "speaker": "mc",
 		"mode": "tap", "prio": 100, "system": true, "help": "tables",
 		"line": "Классика: снимай две одинаковые открытые фишки. Лотка нет~"},
-	"mode_triples": {"screen": "levels", "target": "tables.mode.triples", "gate": "mode.triples", "speaker": "hana",
-		"mode": "tap", "prio": 101, "system": true, "help": "tables",
+	"mode_triples": {"screen": "tables", "target": "tables.mode.triples", "gate": "mode.triples", "speaker": "hana",
+		"mode": "tap", "prio": 101, "system": true, "help": "triples",
 		"line": "Тройки: три одинаковые в лотке схлопываются. На старт!"},
-	"mode_connect": {"screen": "levels", "target": "tables.mode.connect", "gate": "mode.connect", "speaker": "rin",
+	"mode_connect": {"screen": "tables", "target": "tables.mode.connect", "gate": "mode.connect", "speaker": "rin",
 		"mode": "tap", "prio": 102, "system": true, "help": "tables",
-		"line": "Связи: пару снимает линия, не больше двух поворотов. Позволь."},
-	"mode_daily_task": {"screen": "levels", "target": "tables.mode.daily_task", "gate": "mode.daily_task", "speaker": "mc",
+		"line": "Связи: пару снимает линия, не больше двух поворотов."},
+	"mode_daily_task": {"screen": "tables", "target": "tables.mode.daily_task", "gate": "mode.daily_task", "speaker": "mc",
 		"mode": "tap", "prio": 103, "system": true, "help": "tables",
 		"line": "Задача дня: угадай, какую фишку сбросить. Сыграем?"},
-	"mode_hand": {"screen": "levels", "target": "tables.mode.hand", "gate": "mode.hand", "speaker": "hana",
+	"mode_hand": {"screen": "tables", "target": "tables.mode.hand", "gate": "mode.hand", "speaker": "hana",
 		"mode": "tap", "prio": 104, "system": true, "help": "tables",
 		"line": "Собери руку: бери фишки со стола, тройки сложатся сами."},
-	"mode_riichi": {"screen": "levels", "target": "tables.mode.riichi", "gate": "mode.riichi", "speaker": "mc",
-		"mode": "tap", "prio": 105, "system": true, "help": "tables",
+	"mode_riichi": {"screen": "tables", "target": "tables.mode.riichi", "gate": "mode.riichi", "speaker": "mc",
+		"mode": "tap", "prio": 105, "system": true, "help": "riichi",
 		"line": "Стол на четверых: японский маджонг против трёх героинь."},
-	"mode_cube": {"screen": "levels", "target": "tables.mode.cube", "gate": "mode.cube", "speaker": "nova",
+	"mode_cube": {"screen": "tables", "target": "tables.mode.cube", "gate": "mode.cube", "speaker": "nova",
 		"mode": "tap", "prio": 106, "system": true, "help": "tables",
 		"line": "Куб: вращай его и снимай пары с открытых граней."},
-	"mode_koikoi": {"screen": "levels", "target": "tables.mode.koikoi", "gate": "mode.koikoi", "speaker": "rin",
-		"mode": "tap", "prio": 107, "system": true, "help": "tables",
+	"mode_koikoi": {"screen": "tables", "target": "tables.mode.koikoi", "gate": "mode.koikoi", "speaker": "rin",
+		"mode": "tap", "prio": 107, "system": true, "help": "koikoi",
 		"line": "Коикои: собирай карты месяцев. Позволь показать."},
-	"mode_dragon": {"screen": "levels", "target": "tables.mode.dragon", "gate": "mode.dragon", "speaker": "nova",
+	"mode_dragon": {"screen": "tables", "target": "tables.mode.dragon", "gate": "mode.dragon", "speaker": "nova",
 		"mode": "tap", "prio": 108, "system": true, "help": "tables",
 		"line": "Дракон над столом: каждая пара — удар по боссу."},
-	"mode_palm": {"screen": "levels", "target": "tables.mode.palm", "gate": "mode.palm", "speaker": "partner",
+	"mode_palm": {"screen": "tables", "target": "tables.mode.palm", "gate": "mode.palm", "speaker": "partner",
 		"mode": "tap", "prio": 109, "system": true, "help": "tables",
 		"line": "Чтение руки: угадай, какую фишку я жду."},
-	"mode_garden": {"screen": "levels", "target": "tables.mode.garden", "gate": "mode.garden", "speaker": "yue",
+	"mode_garden": {"screen": "tables", "target": "tables.mode.garden", "gate": "mode.garden", "speaker": "yue",
 		"mode": "tap", "prio": 110, "system": true, "help": "tables",
 		"line": "Сад: волны без таймера. Любопытно, сколько продержишься."},
-	"mode_journey": {"screen": "levels", "target": "tables.mode.journey", "gate": "mode.journey", "speaker": "partner",
-		"mode": "tap", "prio": 111, "system": true, "help": "tables",
+	"mode_journey": {"screen": "tables", "target": "tables.mode.journey", "gate": "mode.journey", "speaker": "partner",
+		"mode": "tap", "prio": 111, "system": true, "help": "journey",
 		"line": "Странствие: недельный забег за пятью печатями."},
-	"mode_duels": {"screen": "levels", "target": "tables.mode.duels", "gate": "mode.duels", "speaker": "hana",
-		"mode": "tap", "prio": 112, "system": true, "help": "tables",
+	"mode_duels": {"screen": "tables", "target": "tables.mode.duels", "gate": "mode.duels", "speaker": "hana",
+		"mode": "tap", "prio": 112, "system": true, "help": "duels",
 		"line": "Дуэли: гонка на общем столе. Реванш — сразу!"},
-	"mode_etudes": {"screen": "levels", "target": "tables.mode.etudes", "gate": "mode.etudes", "speaker": "yue",
+	"mode_etudes": {"screen": "tables", "target": "tables.mode.etudes", "gate": "mode.etudes", "speaker": "yue",
 		"mode": "tap", "prio": 113, "system": true, "help": "tables",
 		"line": "Этюды: все пары разные, а в лотке три места."},
-	"mode_shift": {"screen": "levels", "target": "tables.mode.shift", "gate": "mode.shift", "speaker": "rin",
+	"mode_shift": {"screen": "tables", "target": "tables.mode.shift", "gate": "mode.shift", "speaker": "rin",
 		"mode": "tap", "prio": 114, "system": true, "help": "tables",
 		"line": "Смена в чайной: собирай заказы гостий. Позволь."},
-	"mode_pagoda": {"screen": "levels", "target": "tables.mode.pagoda", "gate": "mode.pagoda", "speaker": "partner",
-		"mode": "tap", "prio": 115, "system": true, "help": "tables",
+	"mode_pagoda": {"screen": "tables", "target": "tables.mode.pagoda", "gate": "mode.pagoda", "speaker": "partner",
+		"mode": "tap", "prio": 115, "system": true, "help": "pagoda",
 		"line": "Пагода: поднимайся этаж за этажом."},
 	# --- legacy 0.9 players: one line about the new navigation, then everything already open is «seen» --
 	"v10_welcome": {"screen": "home", "target": "nav.tables", "gate": "", "speaker": "partner",
@@ -105,9 +108,9 @@ const INTROS: = {
 }
 
 # First match (L1) and match mechanics. Placed in the heroine zone (HUD_V2 §8.1), never over the field.
-# {n} in m_tray is the tray size with the right plural (see tray_line()).
+# {n} in m_tray is the tray size with the right plural (see places()).
 const MATCH: = {
-	"m_a": {"target": "match.tile_a", "mode": "do", "line": "Коснись этой фишки — она уйдёт в лоток."},
+	"m_a": {"target": "match.tile_a", "mode": "do", "line": "Коснись фишки — она уйдёт в лоток."},
 	"m_b": {"target": "match.tile_b", "mode": "do", "line": "Теперь такую же — и пара уйдёт."},
 	"m_left": {"target": "match.status", "mode": "tap", "line": "Здесь видно, сколько фишек осталось."},
 	"m_free": {"target": "match.tile_a", "mode": "wait", "line": "Открытая — та, что ничем не прижата."},
@@ -118,7 +121,7 @@ const MATCH: = {
 	"v_stars": {"target": "win.stars", "mode": "wait", "line": "Стол чист! Звёзды — за игру без помощи."},
 	"v_home": {"target": "win.home", "mode": "do", "line": "Пойдём, покажу нашу чайную."},
 	# mechanics, once each, at most one per match, never on L1 except where noted
-	"match_help": {"target": "match.help", "mode": "tap", "line": "Это помощь. Выручит, но без третьей звезды~"},
+	"match_help": {"target": "match.help", "mode": "tap", "line": "Подсказка, Отмена и Перемешать выручат, но без третьей звезды~"},
 	"match_combo": {"target": "match.combo", "mode": "wait", "line": "Пары без пауз — и растёт ×2, ×3…"},
 	"match_fever": {"target": "", "mode": "wait", "line": "Азарт! Сейчас каждая пара ценнее."},
 	"match_stake": {"target": "match.stake", "mode": "tap", "line": "Ставка ×2: награда вдвое без помощи."},
@@ -126,14 +129,14 @@ const MATCH: = {
 
 # Speaker for a match line = the match partner (screen.partner), Маджонг-тян on L1.
 
-# «?» in a screen header (UX §2 rule 4, §4.4): one sheet, title + ≤ 3 rows (monoline icon + one line).
+# «?» in a screen header (UX §2 rule 4, §4.1.9, §4.4): one sheet, title + ≤ 3 rows (monoline icon + ≤ 2 lines) + «Подробнее».
 # replay = intro id for «Показать в игре» (only if already seen). Icons: V10Icons.NAMES.
 const HELP: = {
 	"teahouse": {"title": "Чайная", "replay": "home_first", "rows": [
 		["heart", "Касайся героини — она отвечает."],
 		["tab_tables", "«Играть» ведёт к следующему столу Пути."],
 		["info", "Фонарь горит, когда там есть дело."]]},
-	"play": {"title": "Партия", "replay": "", "rows": [
+	"play": {"title": "Пары и лоток", "replay": "", "rows": [
 		["tab_tables", "Снимай фишки парами: две одинаковые открытые."],
 		["info", "Открытая фишка: сверху пусто, сбоку есть место."],
 		["hint", "Отмена, Подсказка, Перемешать выручат, но третью звезду не дадут."]]},
@@ -144,17 +147,18 @@ const HELP: = {
 	"tables": {"title": "Столы", "replay": "tables_first", "rows": [
 		["tab_tables", "Путь — главная дорога, глава за главой."],
 		["info", "Новые столы открываются по одному, по ходу игры."],
-		["arrow_r", "«Сегодня»: партия дня и режим дня."]]},
+		["arrow_r", "«Сегодня»: партия дня и режим дня ×2."]]},
 	"salon": {"title": "Салон", "replay": "lantern_salon", "rows": [
 		["info", "Звёзды из партий чинят зоны Салона."],
-		["arrow_r", "Начни с вывески: она стоит 3 звезды."]]},
+		["arrow_r", "Начни с задачи «Вывеска — 3★»."],
+		["heart", "Готовая зона открывает новую сцену героини."]]},
 	"wishes": {"title": "Желания", "replay": "wishes_first", "rows": [
 		["info", "Здесь всё случайное. Шансы — по кнопке «Шансы»."],
 		["tab_wishes", "SSR — не позже 60-го желания."],
 		["heart", "Повтор наряда даёт Созвездие и Лепестки."]]},
 	"heroines": {"title": "Героини", "replay": "heroines_first", "rows": [
-		["tab_heroines", "Наряды, стиль и история каждой героини."],
-		["heart", "Подарки поднимают Симпатию."],
+		["tab_heroines", "Наряды, стиль и Дар каждой героини."],
+		["heart", "Партнёр встречает в Чайной и играет с тобой."],
 		["info", "Редкость — это сколько косметики у наряда. Силы в рейтинге она не даёт."]]},
 	"shop": {"title": "Лавка", "replay": "", "rows": [
 		["tab_shop", "Здесь ты точно знаешь, что получишь."],
@@ -162,48 +166,82 @@ const HELP: = {
 		["heart", "Подарок дня забирай раз в день."]]},
 	"phone": {"title": "Телефон", "replay": "phone_first", "rows": [
 		["phone", "Почта, Чаты и Лента: героини пишут тебе."],
-		["heart", "Ответ выбирай касанием — она его запомнит."]]},
+		["heart", "Ответ выбирай касанием — она его запомнит."],
+		["info", "Новые чаты и лента приходят со второго дня."]]},
 	"today": {"title": "Сегодня", "replay": "lantern_today", "rows": [
 		["info", "Всё на день: партия дня и задания дня."],
+		["tab_tables", "В режиме дня ×2 вдвое больше монет и очков ранга."],
 		["arrow_r", "Новый день начинается в 04:00."]]},
 	"streak": {"title": "Серия", "replay": "lantern_streak", "rows": [
 		["heart", "Заходи в гости — подарки копятся."],
-		["info", "Ничего не сгорит, даже если день пропущен."]]},
+		["info", "Ничего не сгорит, даже если день пропущен."],
+		["arrow_r", "Утренний поднос ждёт раз в сутки."]]},
 	"tabs": {"title": "Вкладки", "replay": "v10_welcome", "rows": [
-		["tab_tea", "Чайная: твоя героиня и «Играть»."],
-		["tab_tables", "Столы: Путь и все режимы."],
-		["tab_heroines", "Героини, Желания и Лавка — рядом."]]},
+		["tab_tea", "Чайная: твоя героиня и кнопка «Играть»."],
+		["tab_tables", "Столы: Путь и все режимы на одном экране."],
+		["tab_heroines", "Героини, Желания и Лавка — рядом внизу."]]},
 	"priem": {"title": "Приём", "replay": "", "rows": [
 		["heart", "Приём — особый ход героини."],
 		["info", "Пары заряжают кольцо вокруг неё."],
 		["arrow_r", "Кольцо полное — коснись героини."]]},
 	"help_row": {"title": "Помощь", "replay": "", "rows": [
 		["undo", "Отмена возвращает фишку из лотка."],
-		["hint", "Подсказка показывает пару."],
+		["hint", "Подсказка показывает открытую пару."],
 		["shuffle", "Перемешать раскладывает стол заново."]]},
+	"triples": {"title": "Тройки", "replay": "mode_triples", "rows": [
+		["tab_tables", "Собирай в лоток по три одинаковые открытые фишки."],
+		["info", "Тройка схлопывается и освобождает лоток."],
+		["heart", "Приём партнёра работает прямо на столе."]]},
+	"riichi": {"title": "Стол на четверых", "replay": "mode_riichi", "rows": [
+		["tab_tables", "Японский маджонг против трёх героинь."],
+		["info", "Собери готовую комбинацию из четырёх групп и пары."],
+		["arrow_r", "Начни с учебного зала — подсказки включены."]]},
+	"koikoi": {"title": "Коикои", "replay": "mode_koikoi", "rows": [
+		["tab_tables", "Бери карты одного месяца со стола в пару."],
+		["info", "Сложи комбинацию карт раньше соперницы."],
+		["heart", "Скажи «Коикои», чтобы продолжить раунд за больший счёт."]]},
+	"pagoda": {"title": "Пагода", "replay": "mode_pagoda", "rows": [
+		["tab_tables", "Поднимайся этаж за этажом с новыми условиями."],
+		["info", "Выбирай благословения перед сложными этажами."],
+		["arrow_r", "Чем выше этаж и Жар, тем ценнее награда."]]},
+	"journey": {"title": "Странствие", "replay": "mode_journey", "rows": [
+		["tab_tables", "Недельный маршрут за пятью печатями."],
+		["info", "Каждый стол маршрута меняет правила раскладки."],
+		["arrow_r", "Все пять печатей открывают сундук недели."]]},
+	"duels": {"title": "Дуэли", "replay": "mode_duels", "rows": [
+		["tab_tables", "Гонка на одной раскладке против соперницы."],
+		["info", "Серии пар без пауз ускоряют победу."],
+		["arrow_r", "Дружеская или рейтинговая — выбор перед стартом."]]},
 }
 
 # «Как играть» (one sheet, rows open the topic in place). Only open topics are listed, plus ≤ 1 teaser.
 # gate "" = always open.
 const HOW_TO: = [
-	{"topic": "play", "title": "Партия", "sub": "Пары, лоток и звёзды", "gate": ""},
+	{"topic": "play", "title": "Пары и лоток", "sub": "Пары, лоток и звёзды", "gate": ""},
 	{"topic": "help_row", "title": "Помощь", "sub": "Отмена, Подсказка, Перемешать", "gate": "match.help"},
 	{"topic": "priem", "title": "Приём", "sub": "Особый ход героини", "gate": ""},
 	{"topic": "teahouse", "title": "Чайная", "sub": "Героиня и «Играть»", "gate": "tab.tables"},
 	{"topic": "tables", "title": "Столы", "sub": "Путь и режимы", "gate": "tab.tables"},
 	{"topic": "salon", "title": "Салон", "sub": "Звёзды чинят зоны", "gate": "lantern.salon"},
 	{"topic": "wishes", "title": "Желания", "sub": "Случайное и шансы", "gate": "tab.wishes"},
-	{"topic": "heroines", "title": "Героини", "sub": "Наряды, стиль, история", "gate": "tab.heroines"},
+	{"topic": "heroines", "title": "Героини", "sub": "Наряды, стиль и Дар", "gate": "tab.heroines"},
 	{"topic": "phone", "title": "Телефон", "sub": "Письма и чаты", "gate": "phone"},
 	{"topic": "today", "title": "Сегодня", "sub": "Дела на день", "gate": "lantern.today"},
-	{"topic": "streak", "title": "Серия", "sub": "Подарки за визиты", "gate": "lantern.streak"},
+	{"topic": "streak", "title": "Серия", "sub": "Подарки каждый день", "gate": "lantern.streak"},
 	{"topic": "shop", "title": "Лавка", "sub": "Известное, без случайности", "gate": "tab.shop"},
+	{"topic": "triples", "title": "Тройки", "sub": "Три одинаковые в лотке", "gate": "mode.triples"},
+	{"topic": "riichi", "title": "Стол на четверых", "sub": "Партия против трёх героинь", "gate": "mode.riichi"},
+	{"topic": "koikoi", "title": "Коикои", "sub": "Карты двенадцати месяцев", "gate": "mode.koikoi"},
+	{"topic": "journey", "title": "Странствие", "sub": "Маршрут за пятью печатями", "gate": "mode.journey"},
+	{"topic": "duels", "title": "Дуэли", "sub": "Гонка на одной раскладке", "gate": "mode.duels"},
+	{"topic": "pagoda", "title": "Пагода", "sub": "Этаж за этажом", "gate": "mode.pagoda"},
 ]
 
 # System strings (not the heroine's voice): Nunito, UX §4.
 const UI: = {
 	"how_to": "Как играть",
 	"understood": "Понятно",
+	"more": "Подробнее",
 	"show_in_game": "Показать в игре",
 	"replay_first": "Первая партия",
 	"hints": "Подсказки героини",
@@ -258,7 +296,7 @@ static func intro_line(id: String) -> String:
 
 
 static func hero_name(id: String) -> String:
-	if G.HEROES.has(id):
+	if G != null and G.HEROES.has(id):
 		return String(G.HEROES[id].get("name", id))
 	return id
 
@@ -285,4 +323,6 @@ static func all_ui_strings() -> Array:
 	for e in HOW_TO:
 		out.append(String(e.title))
 		out.append(String(e.sub))
+	for k in RANK_GATES:
+		out.append(String(RANK_GATES[k]))
 	return out
