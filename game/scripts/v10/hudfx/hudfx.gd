@@ -132,6 +132,7 @@ static func _stream(name: String) -> AudioStream:
 
 
 static func sound(name: String, pitch: = 1.0, db: = 0.0) -> void:
+	db = minf(db, 0.0)  # sfx are peak-normalised to -6 dBFS (UX_RULES 7.4): a caller can only go quieter
 	# hudfx sounds ride the juice player pool (SFX bus, respects S.sound); missing file → juice name → fallback
 	var st: = _stream(name)
 	if st == null:

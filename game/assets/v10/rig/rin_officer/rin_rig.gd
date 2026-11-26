@@ -133,11 +133,17 @@ func _update_idle_beats(delta: float) -> void:
 		if t - _last_reaction_t < 2.5:
 			busy = true
 		if _next_gesture <= 0.0 and not busy:
+			var src_pool: Array = gesture_pool if not gesture_pool.is_empty() else RIN_GESTURES
 			var pool: = []
-			for g in RIN_GESTURES:
-				if g != _last_gesture:
+			for g in src_pool:
+				if g != _last_gesture and not blocked_gestures.has(g):
 					pool.append(g)
-			gesture(pool[rng.randi() % pool.size()], true)
+			if pool.is_empty() and not src_pool.is_empty():
+				for g in src_pool:
+					if not blocked_gestures.has(g):
+						pool.append(g)
+			if not pool.is_empty():
+				gesture(pool[rng.randi() % pool.size()], true)
 			_next_gesture = rng.randf_range(gesture_gap.x, gesture_gap.y)
 		elif _next_gesture <= 0.0:
 			_next_gesture = 0.8
@@ -262,8 +268,11 @@ func react(zone: String, at_global: = Vector2.INF) -> void:
 	var p: = face_pivot + Vector2(300, 0)
 	if at_global != Vector2.INF:
 		p = art.get_global_transform().affine_inverse() * at_global
-	var kind: String = {"head": "pat", "armL": "fan_hide", "armR": "adjust_glasses", "hair": "braid_flick",
-			"outfit": "look", "bg": "look"}.get(zone, "look")
+	if zone in ["torso", "body", "bust", "hips", "neutral", "none"]:
+		_react_neutral(p if at_global != Vector2.INF else Vector2.ZERO)
+		return
+	var kind: String = {"head": "pat", "armL": "fan_hide", "armR": "adjust_glasses", "hand": "adjust_glasses",
+			"shoulder": "settle", "hair": "braid_flick", "outfit": "look", "bg": "look", "room": "look"}.get(zone, "look")
 	_react_kind(kind, p)
 
 

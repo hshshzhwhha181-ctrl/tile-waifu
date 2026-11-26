@@ -86,12 +86,14 @@ func _update_idle_beats(delta: float) -> void:
 
 
 func _pool() -> Array:
+	if not gesture_pool.is_empty():
+		return gesture_pool.filter(func(g): return not blocked_gestures.has(g))
 	var p: Array = HANA_GESTURES.duplicate()
 	if flirt_level >= 6:
 		p.append_array(FLIRT_GESTURES)
 	if flirt_level >= 9:
 		p.append_array(KISS_GESTURES)
-	return p
+	return p.filter(func(g): return not blocked_gestures.has(g))
 
 
 func _update_actions(delta: float) -> void:
@@ -113,6 +115,16 @@ func _pose_body() -> void:
 	# her raised arm breathes a little on its own (it has no IK pin to keep it still)
 	var arm: Bone2D = bones["armL_up"]
 	arm.rotation += deg_to_rad(0.9 * _n([4.3, 7.1], _seed.x + 3.0) * motion)
+
+
+func _solve_ik() -> void:
+	super._solve_ik()
+	# armR is painted on Layer_body (not split): keep the palm aligned with her waist after elbow IK so her fingers
+	# rest on her hip instead of shearing the waist mesh when the elbow bends
+	if bones.has("handR") and bones.has("spine"):
+		var hr: Bone2D = bones["handR"]
+		var sp: Bone2D = bones["spine"]
+		hr.global_rotation = sp.global_rotation + deg_to_rad(ch.handR)
 
 
 func _update_face(delta: float) -> void:
@@ -139,8 +151,11 @@ func react(zone: String, at_global: = Vector2.INF) -> void:
 	var p: = face_pivot + Vector2(300, 0)
 	if at_global != Vector2.INF:
 		p = art.get_global_transform().affine_inverse() * at_global
-	var kind: String = {"head": "head_pat", "armL": "fist_pump", "armR": "hip_check", "hair": "hair_shake",
-			"outfit": "jacket_tug", "bg": "look"}.get(zone, "look")
+	if zone in ["torso", "body", "bust", "hips", "neutral", "none"]:
+		_react_neutral(p if at_global != Vector2.INF else Vector2.ZERO)
+		return
+	var kind: String = {"head": "head_pat", "armL": "fist_pump", "armR": "hip_check", "hand": "fist_pump",
+			"shoulder": "jacket_tug", "hair": "hair_shake", "outfit": "jacket_tug", "bg": "look", "room": "look"}.get(zone, "look")
 	_react_kind(kind, p)
 
 
@@ -446,12 +461,15 @@ class _Sparks:
 
 	func _draw() -> void:
 		for s in list:
-			if s.t < 0.0:
+			if s.t <= 0.001:
 				continue
 			var x: float = s.t / s.life
 			var pop: = minf(x / 0.16, 1.0)
 			var k: = (1.0 - pow(1.0 - pop, 3.0)) * (1.0 + 0.35 * sin(pop * PI)) * (1.0 - 0.5 * x)
 			var a: = 1.0 - smoothstep(0.5, 1.0, x)
+			# a zero-radius star is a degenerate polygon (triangulation error): skip the invisible frames
+			if s.size * k < 0.75 or a <= 0.005:
+				continue
 			_star(s.p, s.size * k, s.rot + x * 1.2, a)
 
 	func _star(c: Vector2, r: float, rot: float, a: float) -> void:

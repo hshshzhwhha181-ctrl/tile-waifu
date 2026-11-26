@@ -1,0 +1,82 @@
+{
+  "rig": "mc_gown",
+  "hero": "mc",
+  "outfits": ["o_base", "o_dragon", "o_tutor"],
+  "scene": "res://assets/v10/rig/mc_gown/rig.tscn",
+  "fit": {"center_x": 581, "height": 0.705, "bottom": 12},
+  "motion": {"default": 1.0, "fx_min": 0.5, "profile": 0.7},
+  "framing": "knee",
+  "up_amp": 0.6,
+  "gestures": [
+    {"id": "mc.hip_pop", "name": "hip_pop", "use": "auto", "tier": "up", "rig": "R", "legs": true,
+     "framing": "thigh", "outfits_allow": [], "outfits_deny": ["o_tutor"], "aff_min": 0, "dur": 2.0, "sfx": "tile_click"},
+    {"id": "mc.lean_in", "name": "lean_in", "use": "auto", "tier": "up", "rig": "R", "legs": false,
+     "framing": "thigh", "outfits_allow": [], "outfits_deny": ["o_tutor"], "aff_min": 3, "dur": 2.6, "sfx": null},
+    {"id": "mc.air_kiss", "name": "air_kiss", "use": "auto", "tier": "up", "rig": "R", "legs": false,
+     "framing": "thigh", "outfits_allow": [], "outfits_deny": ["o_tutor"], "aff_min": 6, "dur": 2.4, "sfx": null},
+    {"id": "mc.tail_flick", "name": "tail_flick", "use": "both", "tier": "base", "rig": "R", "legs": false,
+     "framing": "any", "outfits_allow": [], "outfits_deny": [], "aff_min": 0, "dur": 1.9, "sfx": null},
+    {"id": "mc.shoulder_roll", "name": "shoulder_roll", "use": "both", "tier": "base", "rig": "R", "legs": false,
+     "framing": "thigh", "outfits_allow": [], "outfits_deny": [], "aff_min": 0, "dur": 2.6, "sfx": null},
+    {"id": "knee_in", "name": "knee_in", "use": "auto", "tier": "bold", "rig": "R", "legs": true,
+     "framing": "knee", "outfits_allow": [], "outfits_deny": ["o_tutor"], "aff_min": 6, "dur": 2.4, "sfx": "silk_swish"},
+    {"id": "mc.hair_touch", "name": "hair_touch", "use": "both", "tier": "base", "rig": "R", "legs": false,
+     "framing": "any", "outfits_allow": [], "outfits_deny": [], "aff_min": 0, "dur": 2.4, "sfx": null},
+    {"id": "mc.nuzzle", "name": "nuzzle", "use": "react", "tier": "base", "rig": "R", "legs": false,
+     "framing": "any", "outfits_allow": [], "outfits_deny": [], "aff_min": 0, "dur": 2.6, "sfx": null},
+    {"id": "mc.wave", "name": "wave", "use": "react", "tier": "base", "rig": "R", "legs": false,
+     "framing": "any", "outfits_allow": [], "outfits_deny": [], "aff_min": 0, "dur": 2.0, "sfx": null},
+    {"id": "mc.look", "name": "look", "use": "react", "tier": "base", "rig": "R", "legs": false,
+     "framing": "any", "outfits_allow": [], "outfits_deny": [], "aff_min": 0, "dur": 2.3, "sfx": null},
+    {"id": "mc.pout", "name": "pout", "use": "react", "tier": "base", "rig": "R", "legs": false,
+     "framing": "any", "outfits_allow": [], "outfits_deny": [], "aff_min": 0, "dur": 2.8, "sfx": null},
+    {"id": "look_neutral", "name": "look_neutral", "use": "react", "tier": "base", "rig": "R", "legs": false,
+     "framing": "any", "outfits_allow": [], "outfits_deny": [], "aff_min": 0, "dur": 1.4, "sfx": null},
+    {"id": "leg_idle", "name": "leg_idle", "use": "layer", "tier": "base", "rig": "R", "legs": true,
+     "framing": "knee", "outfits_allow": [], "outfits_deny": [], "aff_min": 0, "dur": 4.0, "sfx": "silk_swish"},
+    {"id": "sheen_sweep", "name": "sheen_sweep", "use": "fx", "tier": "base", "rig": "S", "legs": true,
+     "framing": "knee", "outfits_allow": ["o_base", "o_dragon"], "outfits_deny": ["o_tutor"], "aff_min": 0, "dur": 0.6, "sfx": "silk_swish"},
+    {"id": "mc.knee_in_heel", "name": "knee_in_heel", "use": "auto", "tier": "bold", "rig": "V", "legs": true,
+     "framing": "full", "outfits_allow": [], "outfits_deny": ["o_tutor"], "aff_min": 6, "dur": 2.8, "sfx": "heel_tap",
+     "status": "n/a: shoe/heel outside knee-up 1400px key art"},
+    {"id": "mc.shoe_dangle", "name": "shoe_dangle", "use": "auto", "tier": "bold", "rig": "V", "legs": true,
+     "framing": "full", "outfits_allow": ["o_base", "o_cafe", "o_dragon"], "outfits_deny": ["o_tutor"], "aff_min": 6, "dur": 3.2, "sfx": "heel_tap",
+     "status": "n/a: armrest seated full-body pose only"}
+  ],
+  "reactions": {
+    "zones": {
+      "head": "nuzzle",
+      "armL": "hair_touch",
+      "armR": "wave",
+      "hair": "tail_flick",
+      "outfit": "look",
+      "bg": "look"
+    },
+    "dead_zones": ["bust", "hips"],
+    "neutral": "look_neutral",
+    "pout": "pout",
+    "by_aff": {
+      "0": ["tail_flick", "shoulder_roll", "hair_touch"],
+      "3": ["hip_pop", "lean_in"],
+      "6": ["air_kiss"],
+      "9": ["air_kiss", "lean_in"]
+    },
+    "idle_20s": ["hair_touch", "shoulder_roll"],
+    "greet": "wave"
+  },
+  "shaders": {
+    "sheen": {
+      "layer": "thigh",
+      "mask": "sheen_mask.png",
+      "knee_y": 1280,
+      "from": [580, 1282],
+      "to": [620, 1396],
+      "width": 18,
+      "strength": 0.35,
+      "color": [0.80, 0.74, 0.64],
+      "dur": 0.6,
+      "period": [8, 12],
+      "polys": [[[455, 1282], [720, 1282], [754, 1398], [454, 1398]]]
+    }
+  }
+}

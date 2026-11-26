@@ -1,0 +1,78 @@
+{
+  "rig": "rin_officer",
+  "hero": "rin",
+  "outfits": ["r_base", "r_agent"],
+  "scene": "res://assets/v10/rig/rin_officer/rig.tscn",
+  "fit": {"center_x": 725, "height": 0.705, "bottom": 12},
+  "motion": {"default": 1.0, "fx_min": 0.5, "profile": 0.7},
+  "framing": "knee",
+  "up_amp": 0.6,
+  "gestures": [
+    {"id": "rin.over_glasses", "name": "over_glasses", "use": "auto", "tier": "base", "rig": "R+P", "legs": false,
+     "framing": "thigh", "outfits_allow": [], "outfits_deny": [], "aff_min": 0, "dur": 3.6, "sfx": null},
+    {"id": "rin.adjust_glasses", "name": "adjust_glasses", "use": "both", "tier": "base", "rig": "R+P", "legs": false,
+     "framing": "any", "outfits_allow": [], "outfits_deny": [], "aff_min": 0, "dur": 3.4, "sfx": null},
+    {"id": "rin.fan_hide", "name": "fan_hide", "use": "both", "tier": "up", "rig": "R", "legs": false,
+     "framing": "thigh", "outfits_allow": [], "outfits_deny": [], "aff_min": 3, "dur": 3.4, "sfx": null},
+    {"id": "rin.smirk", "name": "smirk", "use": "auto", "tier": "up", "rig": "R", "legs": false,
+     "framing": "thigh", "outfits_allow": [], "outfits_deny": [], "aff_min": 6, "dur": 3.2, "sfx": null},
+    {"id": "rin.settle", "name": "settle", "use": "both", "tier": "base", "rig": "R", "legs": false,
+     "framing": "any", "outfits_allow": [], "outfits_deny": [], "aff_min": 0, "dur": 3.6, "sfx": null},
+    {"id": "rin.ponder", "name": "ponder", "use": "auto", "tier": "base", "rig": "R", "legs": false,
+     "framing": "any", "outfits_allow": [], "outfits_deny": [], "aff_min": 0, "dur": 3.6, "sfx": null},
+    {"id": "rin.pat", "name": "pat", "use": "react", "tier": "base", "rig": "R", "legs": false,
+     "framing": "any", "outfits_allow": [], "outfits_deny": [], "aff_min": 0, "dur": 2.9, "sfx": null},
+    {"id": "rin.braid_flick", "name": "braid_flick", "use": "react", "tier": "base", "rig": "R", "legs": false,
+     "framing": "any", "outfits_allow": [], "outfits_deny": [], "aff_min": 0, "dur": 2.6, "sfx": null},
+    {"id": "rin.look", "name": "look", "use": "react", "tier": "base", "rig": "R", "legs": false,
+     "framing": "any", "outfits_allow": [], "outfits_deny": [], "aff_min": 0, "dur": 2.6, "sfx": null},
+    {"id": "rin.huff", "name": "huff", "use": "react", "tier": "base", "rig": "R+P", "legs": false,
+     "framing": "any", "outfits_allow": [], "outfits_deny": [], "aff_min": 0, "dur": 3.0, "sfx": null},
+    {"id": "look_neutral", "name": "look_neutral", "use": "react", "tier": "base", "rig": "R", "legs": false,
+     "framing": "any", "outfits_allow": [], "outfits_deny": [], "aff_min": 0, "dur": 1.4, "sfx": null},
+    {"id": "sheen_sweep", "name": "sheen_sweep", "use": "fx", "tier": "base", "rig": "S", "legs": true,
+     "framing": "knee", "outfits_allow": ["r_base", "r_agent"], "outfits_deny": [], "aff_min": 0, "dur": 0.65, "sfx": "silk_swish"},
+    {"id": "rin.leg_recross", "name": "leg_recross", "use": "auto", "tier": "bold", "rig": "V", "legs": true,
+     "framing": "full", "outfits_allow": ["r_after"], "outfits_deny": [], "aff_min": 6, "dur": 6.0, "sfx": "heel_tap",
+     "status": "n/a: r_after seated stool video clip only"},
+    {"id": "rin.shoe_dangle", "name": "shoe_dangle", "use": "auto", "tier": "bold", "rig": "V", "legs": true,
+     "framing": "full", "outfits_allow": ["r_after"], "outfits_deny": [], "aff_min": 6, "dur": 6.4, "sfx": "heel_tap",
+     "status": "n/a: r_after seated stool video clip only"}
+  ],
+  "reactions": {
+    "zones": {
+      "head": "pat",
+      "armL": "fan_hide",
+      "armR": "adjust_glasses",
+      "hair": "braid_flick",
+      "outfit": "look",
+      "bg": "look"
+    },
+    "dead_zones": ["bust", "hips"],
+    "neutral": "look_neutral",
+    "pout": "huff",
+    "by_aff": {
+      "0": ["settle", "ponder", "over_glasses"],
+      "3": ["adjust_glasses", "fan_hide"],
+      "6": ["smirk"],
+      "9": ["smirk", "over_glasses"]
+    },
+    "idle_20s": ["ponder", "over_glasses"],
+    "greet": "adjust_glasses"
+  },
+  "shaders": {
+    "sheen": {
+      "layer": "body",
+      "mask": "sheen_mask.png",
+      "knee_y": 1290,
+      "from": [690, 1292],
+      "to": [690, 1396],
+      "width": 16,
+      "strength": 0.30,
+      "color": [0.76, 0.78, 0.80],
+      "dur": 0.65,
+      "period": [9, 13],
+      "polys": [[[540, 1292], [842, 1292], [805, 1398], [580, 1398]]]
+    }
+  }
+}
