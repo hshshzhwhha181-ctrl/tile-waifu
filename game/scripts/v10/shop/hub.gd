@@ -11,8 +11,6 @@ static var _m: V10ShopModel = null
 
 
 static func model() -> V10ShopModel:
-	if _m != null:
-		return _m
 	var tree: = Engine.get_main_loop() as SceneTree
 	var g = tree.root.get_node_or_null("G") if tree else null
 	if g == null or g.get("econ") == null:
@@ -21,6 +19,9 @@ static func model() -> V10ShopModel:
 	var S: Dictionary = g.S
 	if not (S.get("v10_shop") is Dictionary):
 		S["v10_shop"] = V10ShopModel.defaults()
+	# a loaded / reset save or a new econ replaces the dictionaries: never keep writing into the old ones
+	if _m != null and is_same(_m.econ, g.econ) and is_same(_m.st, S.v10_shop):
+		return _m
 	_m = V10ShopModel.new(g.econ, S.v10_shop)
 	_m.level_fn = func(): return int(S.get("level", 0))
 	_m.owns_fn = func(id): return bool(g.call("owns", id)) if g.has_method("owns") else false

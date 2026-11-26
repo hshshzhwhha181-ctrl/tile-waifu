@@ -5,8 +5,17 @@ extends RefCounted
 # UX_RULES §4.2/§4.3/§5 is enforced in one place: «желание» (never «крутка»), «= N желаний», «≈ N ₽ за желание»,
 # «Пополнить», no «ВЫГОДНО», no «−N%», dates instead of countdowns.
 
+# UX §4.3 jargon + the «было» names of §4.2 that could reach a shop string (substring, any case)
 const BANNED_UI: = ["крутк", "гача", "ролл", "донат", "ВЫГОДНО", "ХИТ", "BEST", "NEW", "успей", "последний шанс",
-	"только сегодня", "гарант", "pity", "пити", "50/50", "−%", "-%", "скидк", "Камни"]
+	"только сегодня", "гарант", "pity", "пити", "50/50", "−%", "-%", "скидк", "Камни", "ивент", "фивер", "ульта",
+	"риичи", "квартал", "перк", "банер", "топ-100", "Гардероб", "Поручени", "Визиты", "Рядом с тобой", "Лихорадк",
+	"Лунная лестница", "Чайный абонемент", "Богин"]
+# tokens that need word edges / numbers (case-sensitive): SR, SR+, SSR+, R as a rarity, −N%, +N%, «осталось N штук»,
+# ID outside «О игре» (VK ID / Яндекс ID are product names), «ещё N … сегодня» (UX §4.1.7)
+const BANNED_RE: = ["(?<![A-Za-z])SR\\+?(?![A-Za-z])", "SSR\\+", "(?<![A-Za-zА-Яа-яЁё])R(?![A-Za-zА-Яа-яЁё])",
+	"[−-]\\s?\\d+\\s?%", "\\+\\s?\\d+\\s?%", "(?i)осталось\\s+\\d+\\s+шт", "(?<!VK )(?<!Яндекс )(?<![A-Za-z])ID(?![A-Za-z])",
+	"(?i)ещё\\s+\\d+[^.·]*сегодня"]
+static var _re: Array = []
 
 const MONTHS_GEN: = ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября",
 	"ноября", "декабря"]
@@ -144,4 +153,12 @@ static func lint(s: String) -> Array:
 	for w in BANNED_UI:
 		if s.findn(w) >= 0:
 			bad.append(w)
+	if _re.is_empty():
+		for p in BANNED_RE:
+			var r: = RegEx.new()
+			r.compile(p)
+			_re.append(r)
+	for i in _re.size():
+		if (_re[i] as RegEx).search(s) != null:
+			bad.append(BANNED_RE[i])
 	return bad

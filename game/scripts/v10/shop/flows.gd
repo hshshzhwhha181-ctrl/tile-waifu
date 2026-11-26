@@ -66,7 +66,8 @@ static func confirm(host: Control, m: V10ShopModel, sku: String) -> V10ShopSheet
 	pl.position = Vector2(V10ShopSheet.PAD, y)
 	pl.size = Vector2(W * 0.5, 48)
 	b.add_child(pl)
-	var pw: = V10ShopKit.lbl(String(c.per_wish), "ui", 18, V10DS.PAPER_300)
+	var pw: = V10ShopKit.lbl(V10ShopModel.value_line(c), "ui", 18, V10DS.PAPER_300)   # «= N желаний · ≈ N ₽ за желание»
+	pw.name = "PerWish"
 	pw.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	pw.position = Vector2(V10ShopSheet.PAD + W * 0.4, y)
 	pw.size = Vector2(W * 0.6, 48)
@@ -110,6 +111,7 @@ static func confirm(host: Control, m: V10ShopModel, sku: String) -> V10ShopSheet
 	pay.setup(String(c.price), "Оплатить", Vector2(W, 104))
 	pay.position = Vector2(V10ShopSheet.PAD, y)
 	pay.set_meta("ux_role", "primary_cash")
+	pay.set_meta("rub_card", c)
 	b.add_child(pay)
 	if not cb.ok:
 		pay.enabled = false
@@ -124,30 +126,37 @@ static func confirm(host: Control, m: V10ShopModel, sku: String) -> V10ShopSheet
 		V10ShopKit.press(cancel)
 		sh.close())
 	b.add_child(cancel)
-	y += 84
-	var off: = V10ShopW.Tap.new()
+	y += 92
+	var off: = V10ShopW.Tap.new()      # 56 visible, 80 hit (12 above / below), not over «Отмена»
 	off.dip = false
+	off.name = "Offer"
 	off.position = Vector2(V10ShopSheet.PAD, y)
-	off.size = Vector2(W, 44)
+	off.size = Vector2(W, 56)
 	off.set_meta("ux_role", "link")
 	var ol: = V10ShopKit.lbl(OFFER_TXT, "ui", 18, V10DS.PAPER_500)
 	ol.size = off.size
 	off.add_child(ol)
 	off.pressed.connect(func(): V10ShopKit.toast(host, "Оферта откроется в браузере"))
 	b.add_child(off)
-	y += 52
+	y += 64
 	sh.finish(y)
 
 	# purchase flow on the economy signals (one sheet = one order)
 	var shop: = m.econ.shop
 	var st: = {"oid": ""}
 	var on_ok: = func(r: Dictionary) -> void:
-		if String(r.get("oid", "")) != String(st.oid) and String(st.oid) != "":
+		if String(st.oid) != "" and String(r.get("oid", "")) != String(st.oid):
 			return
+		# no order id yet: only a synchronous answer to OUR tap counts — an older order finishing (reconcile, a
+		# pending one) while the sheet is open must not close it with someone else's hanko
+		if String(st.oid) == "" and (not sh.busy or String(r.get("sku", "")) != sku):
+			return
+		sh.busy = false
 		_delivered(host, m, sh, pay, r)
 	var on_fail: = func(o: Dictionary, why: String) -> void:
 		if String(o.get("oid", "")) != String(st.oid):
 			return
+		sh.busy = false
 		pay.loading = false
 		var cancelled: = String(o.get("st", "")) == "cancelled" or why == "user_cancelled"
 		status.text = "Оплата отменена" if cancelled else "Оплата не прошла. Деньги не списаны"
@@ -156,6 +165,7 @@ static func confirm(host: Control, m: V10ShopModel, sku: String) -> V10ShopSheet
 	var on_pend: = func(o: Dictionary) -> void:
 		if String(o.get("oid", "")) != String(st.oid):
 			return
+		sh.busy = false
 		pay.loading = false
 		pay.enabled = false
 		pay._lay()
@@ -179,8 +189,10 @@ static func confirm(host: Control, m: V10ShopModel, sku: String) -> V10ShopSheet
 		var p: = m.provider()
 		if p is V10StubPay:
 			(p as V10StubPay).instant = false
+		sh.busy = true
 		var res: = m.buy(sku)
 		if not bool(res.get("ok", false)):
+			sh.busy = false
 			pay.loading = false
 			status.text = m.reason_txt(String(res.get("reason", "")))
 			return
@@ -227,20 +239,52 @@ static func _delivered(host: Control, m: V10ShopModel, sh: V10ShopSheet, pay: Co
 
 
 # ================================================================ «Не хватает»
-static func need(host: Control, m: V10ShopModel, deficit: int, go_topup: Callable = Callable()) -> V10ShopSheet:
-	var sh: = V10ShopSheet.make(host, "Не хватает %s" % V10ShopTxt.amount("crystal", deficit), "need")
+# UX §3.4: the main action is the FIRST free path (a «Забрать» on its row), the smallest pack is secondary, × is quiet.
+# A free path is actionable when we can act on it here: «gift» (claimed in place), «pass» (the host's go_screen or
+# go_free), any other «go» id through go_free (or model.free_paths_go). Rows without one stay plain text.
+static func need(host: Control, m: V10ShopModel, deficit: int, go_topup: Callable = Callable(), go_free: Callable = Callable()) -> V10ShopSheet:
+	var sh: = V10ShopSheet.make(host, "Не хватает кристаллов", "need")
 	var n: = m.need(deficit)
 	var y: = sh.top()
 	var W: = sh.inner_w()
+	# the number in Numerals, not in the Display title (HUD_V2 §3: every number is Numerals)
+	var dl: = V10ShopKit.lbl("ещё " + V10ShopTxt.amount("crystal", deficit), "num", 28, V10DS.GOLD_300)
+	dl.name = "Deficit"
+	dl.position = Vector2(V10ShopSheet.PAD, y - 8)
+	dl.size = Vector2(W, 36)
+	sh.body.add_child(dl)
+	y += 40
 	sh.text("БЕСПЛАТНО", y, "overline", 15, V10DS.GOLD_500)
 	y += 28
+	if not go_free.is_valid() and m.free_paths_go.is_valid():
+		go_free = m.free_paths_go
 	if bool(n.free_none):
 		sh.text("Бесплатных путей сегодня нет — загляни завтра", y, "ui", 22, V10DS.PAPER_300)
 		y += 36
 	else:
+		var primary_done: = false
 		for f in n.free:
-			sh.text(String(f.text), y, "ui", 22, V10DS.PAPER_100)
-			y += 36
+			var go: = String((f as Dictionary).get("go", ""))
+			var act: = Callable()
+			if not primary_done and go != "":
+				act = _free_action(host, m, sh, go, go_free)
+			if act.is_valid():
+				primary_done = true
+				var tl: = sh.text(String(f.text), y + 20, "ui", 22, V10DS.PAPER_100)
+				tl.size.x = W - 200 - 16
+				var b: = V10Button.make("play", "Забрать" if go in ["gift", "pass"] else "Открыть", Vector2(200, 80))
+				b.name = "FreePath"
+				b.sheen = false
+				b.position = Vector2(V10ShopSheet.PAD + W - 200, y)
+				b.set_meta("ux_role", "primary")
+				b.pressed.connect(func():
+					V10ShopKit.press(b, true)
+					act.call())
+				sh.body.add_child(b)
+				y += 88
+			else:
+				sh.text(String(f.text), y, "ui", 22, V10DS.PAPER_100)
+				y += 36
 	if String(n.moon_note) != "":
 		sh.text(String(n.moon_note), y + 4, "ui", 18, V10DS.PAPER_500)
 		y += 34
@@ -266,6 +310,8 @@ static func need(host: Control, m: V10ShopModel, deficit: int, go_topup: Callabl
 		sl.size = Vector2(W - 108 - 184, 30)
 		row.add_child(sl)
 		var cash: = V10ShopW.Cash.new().setup(String(pk.price), "", Vector2(168, 64))
+		cash.name = "Cash"
+		cash.set_meta("rub_card", pk)
 		cash.position = Vector2(W - 168 - 12, 24)
 		cash.enabled = bool(pk.available)
 		cash._lay()
@@ -275,6 +321,8 @@ static func need(host: Control, m: V10ShopModel, deficit: int, go_topup: Callabl
 		y += 124
 		if go_topup.is_valid():
 			var all: = V10Button.make("secondary", "Все пакеты", Vector2(W, 80))
+			all.name = "AllPacks"
+			all.set_meta("ux_role", "secondary")
 			all.position = Vector2(V10ShopSheet.PAD, y)
 			all.pressed.connect(func():
 				V10ShopKit.press(all)
@@ -284,6 +332,35 @@ static func need(host: Control, m: V10ShopModel, deficit: int, go_topup: Callabl
 			y += 84
 	sh.finish(y + 16)
 	return sh
+
+
+static func _free_action(host: Control, m: V10ShopModel, sh: V10ShopSheet, go: String, go_free: Callable) -> Callable:
+	match go:
+		"gift":
+			if not m.gift_ready():
+				return Callable()
+			return func():
+				sh.close()
+				m.gift_claim(false, func(g: Dictionary):
+					if g.is_empty() or not is_instance_valid(host):
+						return
+					V10ShopKit.toast(host, "Зачислено: %s · баланс %s" % [V10ShopTxt.amount("crystal", int(g.get("crystal", 0))), V10ShopTxt.num(m.bal("crystal"))])
+					_refresh(host))
+		"pass":
+			if go_free.is_valid():
+				return func():
+					sh.close()
+					go_free.call("pass")
+			if host.has_signal("go_screen"):
+				return func():
+					sh.close()
+					host.emit_signal("go_screen", "pass", {})
+			return Callable()
+	if go_free.is_valid():
+		return func():
+			sh.close()
+			go_free.call(go)
+	return Callable()
 
 
 # ================================================================ known outfit for crystals / petals
@@ -325,10 +402,13 @@ static func outfit(host: Control, m: V10ShopModel, it: Dictionary, done: Callabl
 	if is_petal:
 		split_txt = "Спишется: %s · останется %s" % [V10ShopTxt.amount("petal", price), V10ShopTxt.num(m.bal("petal") - price)]
 	else:
+		# UX §5.3: «Спишется: 450 кристаллов → 150 Лунного камня · останется …»
 		var sp2: = m.crystal_split(price)
 		split_txt = "Спишется: %s" % V10ShopTxt.amount("crystal", int(sp2.crystal))
 		if int(sp2.moon) > 0:
-			split_txt += " → %s" % V10ShopTxt.amount("moon", int(sp2.moon))
+			split_txt += " → %s · останется %s" % [V10ShopTxt.amount("moon", int(sp2.moon)), V10ShopTxt.amount("moon", m.bal("moon") - int(sp2.moon))]
+		else:
+			split_txt += " · останется %s" % V10ShopTxt.amount("crystal", m.bal("crystal") - int(sp2.crystal))
 	var l3: = V10ShopKit.wrap(V10ShopKit.lbl(split_txt, "ui", 18, V10DS.PAPER_300), 3)
 	l3.position = Vector2(x, y + 84)
 	l3.size = Vector2(W - 176, 84)
@@ -336,8 +416,9 @@ static func outfit(host: Control, m: V10ShopModel, it: Dictionary, done: Callabl
 	y += 216
 	var uses_moon: = not is_petal and int(m.crystal_split(price).moon) > 0
 	var btn: Control
-	if uses_moon:   # moonstone is money: «Касса» class (UX §5.2.7)
-		var cash: = V10ShopW.Cash.new().setup(V10ShopTxt.num(price), "Купить наряд", Vector2(W, 104))
+	if uses_moon:   # moonstone is money: «Касса» class (UX §5.2.7); the number keeps its unit (UX §4.1.3)
+		var cash: = V10ShopW.Cash.new().setup(V10ShopTxt.amount("crystal", price), "Купить наряд", Vector2(W, 104))
+		cash.name = "Pay"
 		btn = cash
 		cash.pressed.connect(func():
 			sh.close()
@@ -345,6 +426,8 @@ static func outfit(host: Control, m: V10ShopModel, it: Dictionary, done: Callabl
 	else:
 		var pb: = V10Button.make("play", "Купить · " + V10ShopTxt.num(price), Vector2(W, 104))
 		pb.breathing = false
+		pb.sheen = false      # the screen under the sheet already has its one sheen (carousel)
+		pb.name = "Pay"
 		btn = pb
 		pb.pressed.connect(func():
 			V10ShopKit.press(pb, true)
@@ -354,11 +437,23 @@ static func outfit(host: Control, m: V10ShopModel, it: Dictionary, done: Callabl
 	btn.set_meta("ux_role", "primary")
 	sh.body.add_child(btn)
 	y += 112
+	if uses_moon:   # the §5.3 template for money: «Отмена» ≥ 80 px under «Касса»
+		var cancel: = V10Button.make("secondary", "Отмена", Vector2(W, 80))
+		cancel.name = "Cancel"
+		cancel.position = Vector2(V10ShopSheet.PAD, y)
+		cancel.set_meta("ux_role", "secondary")
+		cancel.pressed.connect(func():
+			V10ShopKit.press(cancel)
+			sh.close())
+		sh.body.add_child(cancel)
+		y += 84
 	if not is_petal and not uses_moon:
-		var na: = V10ShopW.Tap.new()
+		var na: = V10ShopW.Tap.new()      # 64 visible, 80 hit, clear of the button above
 		na.dip = false
-		na.position = Vector2(V10ShopSheet.PAD, y)
-		na.size = Vector2(W, 56)
+		na.name = "NoAsk"
+		na.set_meta("ux_role", "tertiary")
+		na.position = Vector2(V10ShopSheet.PAD, y + 4)
+		na.size = Vector2(W, 64)
 		var nl: = V10ShopKit.lbl("Больше не спрашивать для кристаллов", "ui", 18, V10DS.PAPER_500)
 		nl.size = na.size
 		na.add_child(nl)
@@ -366,7 +461,7 @@ static func outfit(host: Control, m: V10ShopModel, it: Dictionary, done: Callabl
 			m.st.crystal_noask = true
 			nl.text = "✓ Больше не спрашивать для кристаллов")
 		sh.body.add_child(na)
-		y += 60
+		y += 76
 	sh.finish(y + 16)
 
 

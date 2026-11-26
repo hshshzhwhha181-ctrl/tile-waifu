@@ -7,10 +7,15 @@ extends RefCounted
 # duplicate + pending completion, age bands and teen caps, offer popup cadence, rewarded-ad caps and month bypass,
 # gift once a day, cover(), pass retro-grant.
 # Layout (SubViewports at 7 aspects × 3 tabs + pass + purchases + age + sheets): nothing outside the screen width,
-# hit zones ≥ 56 (Cash/Tap/V10Button ≥ 56 high), ≤ 1 primary, no rose on ₽, every ₽ card has «≈ … за желание»,
-# ≤ 2 currencies, banned words absent, text ≥ 18 px (15 only for overline), ≤ 10 tappables in the first screenful.
+# hit zones ≥ 80 (UX §6.1: Tap hit rect / V10Button height), ≤ 1 primary, no rose on ₽, every ₽ price shows «= N желаний»
+# and «≈ N ₽ за желание», ≤ 2 currencies, banned words absent, text ≥ 18 px (15 only for overline), ≤ 10 tappables in
+# the first screenful. Regressions (review 0.10): no ₽ before L8, honest «самый низкий», carousel swipe = one card,
+# pass/purchases keep the toast through a rebuild, «Не хватает» has one primary, month disc is decoration on Чайная,
+# age gate re-shows for a blocked year, history shows the real grant, no closing the confirm sheet mid-payment.
 
 static var ok: = 0
+static var _word_re: RegEx = null
+const WORDS_CHECK: = false
 static var total: = 0
 static var fails: Array = []
 
@@ -59,6 +64,10 @@ static func _logic() -> void:
 	var minr: = INF
 	for c in cards:
 		minr = minf(minr, float(c.per_wish_rub))
+	var shown_min: = 0
+	for c in cards:
+		if roundi(float(c.per_wish_rub)) == roundi(minr):
+			shown_min += 1
 	for c in cards:
 		var s: = V10Catalog.sku(String(c.id))
 		var v: = V10Catalog.pull_value(s, bool(c.first))
@@ -69,7 +78,24 @@ static func _logic() -> void:
 			best += 1
 			check(absf(float(c.per_wish_rub) - minr) < 0.01, "best is the true minimum")
 		check(V10ShopTxt.lint(String(c.title) + String(c.per_wish) + String(c.eq) + String(c.first_txt)).is_empty(), "%s card text lint" % c.id)
-	check(best == 1, "exactly one «самый низкий ₽ за желание» (%d)" % best)
+	# «самый низкий» only when it is visibly true: one pack with the lowest ROUNDED «≈ N ₽», else no label at all
+	check(best == (1 if shown_min == 1 else 0), "first-purchase state: «самый низкий» only if visibly lowest (best %d, packs at min %d)" % [best, shown_min])
+	var ml: = _model()
+	ml.econ.spend.set_age_verified(true)      # 12 718 ₽ in one go is above the unverified 3 000 ₽ cap
+	(ml.provider() as V10StubPay).next_status = "paid"
+	for c in cards:
+		ml.buy(String(c.id))
+	var later: = ml.topup()
+	var later_best: = []
+	for c in later:
+		if bool(c.best):
+			later_best.append(String(c.id))
+	check(later_best == ["moon_14000"], "after first purchases: exactly one «самый низкий» on the true best %s" % str(later_best))
+	for c in later:
+		if bool(c.best):
+			for o in later:
+				if o.id != c.id:
+					check(roundi(float(o.per_wish_rub)) > roundi(float(c.per_wish_rub)), "best %s is visibly lower than %s" % [c.id, o.id])
 	# 3× rule for every SKU, booster value included
 	for s in m.econ.shop.all_skus():
 		for first in [false, true]:
@@ -79,9 +105,15 @@ static func _logic() -> void:
 	# ladder by level
 	var lv: = {"v": 0}
 	m.level_fn = func(): return lv.v
+	# UX §3.5 / С-2: no «₽» anywhere before L8 (Желания open at L3 and reach «Не хватает»)
+	for l in [0, 5, 7]:
+		lv.v = l
+		check(not m.cash_visible() and m.topup().is_empty() and m.vitrina().is_empty() and (m.ladder().current as Dictionary).is_empty()
+			and (m.need(300).pack as Dictionary).is_empty(), "level %d: no ₽ card, pack or ladder step (С-2)" % l)
+	lv.v = 8
 	var l0: = m.ladder()
-	check(String(l0.current.get("id", "")) == "first_79", "level 0: ladder step 1 = first_79")
-	check(String(l0.next.get("title", "")) == "Набор первого гостя", "level 0: next step silhouette")
+	check(String(l0.current.get("id", "")) == "first_79", "level 8: ladder step 1 = first_79")
+	check(String(l0.next.get("title", "")) == "Набор первого гостя", "level 8: next step silhouette")
 	lv.v = 35
 	var ids35: = _ladder_ids(m)
 	check("traveler_199" in ids35, "level 35: traveler set visible")
@@ -92,7 +124,7 @@ static func _logic() -> void:
 	check("growth_1490" in ids61, "level 61: growth visible")
 	lv.v = 120
 	check(not ("growth_1490" in _ladder_ids(m)), "level 120: growth gone")
-	lv.v = 5
+	lv.v = 8
 	check(String(m.ladder().next.get("unlock", "")).find("Откроется") == 0, "silhouette says «Откроется …»")
 	# no time words / dates in any card
 	var re: = RegEx.new()
@@ -101,6 +133,8 @@ static func _logic() -> void:
 	for c in m.vitrina() + m.topup():
 		var all: = String(c.title) + " " + " ".join(c.lines) + " " + String(c.per_wish)
 		check(re.search(all) == null, "%s: no timers or dates in card" % c.id)
+		var vl: = V10ShopModel.value_line(c)
+		check(vl.find("желани") >= 0 and vl.find("за желание") >= 0 and String(c.eq).find("желани") >= 0, "%s: value line «= N желаний · ≈ N ₽ за желание» (С-3)" % c.id)
 	# store build: no ₽ anywhere
 	var ms: = _model({"store": true})
 	check(ms.topup().is_empty() and ms.vitrina().is_empty(), "store build: no ₽ cards")
@@ -126,6 +160,17 @@ static func _logic() -> void:
 	V10Age.set_year(st, ny - 25, t0)
 	check(V10Age.bold_ok(st) and V10Age.check(st, 4990, 0).ok, "adult: ok + bold_ok")
 	check(V10Age.band_of(ny - 18, t0) == "teen", "year-only gate is conservative at 18")
+	# a blocked year must bring the stop screen back on every start (not only while the year is unset)
+	var sb: = {}
+	check(V10Age.needs_gate(sb, t0), "age: gate needed while unset")
+	V10Age.set_year(sb, ny - 12, t0)
+	check(V10Age.needs_gate(sb, t0), "age: a blocked year keeps the gate after a restart")
+	V10Age.set_year(sb, ny - 30, t0)
+	check(not V10Age.needs_gate(sb, t0), "age: an allowed year passes")
+	var sr: = {}
+	V10Age.set_year(sr, ny - 17, t0)
+	V10Age.refresh(sr, t0 + 2 * 366 * 86400)
+	check(V10Age.band(sr) == "adult", "age: the band follows the calendar (17 → adult two years later)")
 	check(not m.econ.spend.check(V10Catalog.AGE_LIMIT_RUB_30D + 1).ok, "unverified 18+: 3000 ₽ cap (V10Spend)")
 	# offers cadence
 	var os: = {}
@@ -135,6 +180,12 @@ static func _logic() -> void:
 	check(not V10Offers.can_popup(os, _with(base, "install", 9700)).ok, "no popup in the first 600 s")
 	check(not V10Offers.can_popup(os, _with(base, "level", 7)).ok, "no popup before L8")
 	check(not V10Offers.can_popup(os, _with(base, "first_ssr_session", true)).ok, "no popup in the first-SSR session")
+	# «Словарь» articles for the shop terms (П-4): V10Glossary limits, clean words
+	for e in V10ShopData.GLOSSARY:
+		check(String(e.name).length() <= 26 and String(e.why).length() <= 74 and String(e.how).length() <= 92
+			and V10ShopTxt.lint(String(e.name) + " " + String(e.why) + " " + String(e.how)).is_empty(), "glossary %s fits V10Glossary" % e.id)
+	check(not V10Offers.can_popup(os, _with(base, "first_ssr_t", 10000 - 3600)).ok and V10Offers.can_popup(os, _with(_with(base, "now", 200000), "first_ssr_t", 100000)).ok,
+		"no popup for 24 h after the first SSR (UX §3.5)")
 	V10Offers.mark_shown(os, 5)
 	check(not V10Offers.can_popup(os, base).ok, "popup once a day")
 	check(V10Offers.can_popup(os, _with(base, "day", 6)).ok, "popup next day")
@@ -170,6 +221,15 @@ static func _logic() -> void:
 	var nd: = mn.need(300)
 	check(not (nd.free as Array).is_empty(), "need: free paths listed")
 	check(not (nd.pack as Dictionary).is_empty(), "need: one pack")
+	for f in nd.free:
+		check(V10ShopTxt.lint(String(f.text)).is_empty(), "need: «%s» passes the lint (no «ещё N сегодня»)" % f.text)
+	check(not V10ShopTxt.lint("Задания дня: ещё 50 сегодня").is_empty() and not V10ShopTxt.lint("SR+ наряд").is_empty()
+		and V10ShopTxt.lint("SSR-наряд сезона").is_empty() and V10ShopTxt.lint("через VK ID или Яндекс ID").is_empty(), "lint: §4.3 tokens with word edges")
+	# purchase history shows what the purchase really gave (first purchase doubled)
+	var mh: = _model()
+	(mh.provider() as V10StubPay).next_status = "paid"
+	mh.buy("moon_900")
+	check(mh.receipt_title(mh.receipts()[0]) == V10ShopTxt.amount("moon", 1720), "history: first purchase shows 1 720, not today's 900")
 	# pass retro-grant
 	var mp: = _model({"pass_xp": 1240})
 	var tier: = mp.econ.pass_.tier()
@@ -258,6 +318,8 @@ static func _purchase_flow(host: Node) -> void:
 	var mm: = mc.bal("moon")
 	pay.fire()
 	check(pay.loading, "confirm: spinner while waiting")
+	sh.close()
+	check(not sh._closing and V10ShopSheet.current == sh, "confirm: tap outside / back wait while the payment is in flight")
 	pay.fire()
 	await host.get_tree().process_frame
 	await host.get_tree().process_frame
@@ -266,6 +328,102 @@ static func _purchase_flow(host: Node) -> void:
 	check(_find_text(scr, "Зачислено:"), "confirm: toast «Зачислено: …»")
 	check(scr.find_child("Hanko", true, false) != null, "confirm: hanko seal")
 	vp.svc.queue_free()
+	await _regressions(host)
+
+
+# ================================================================ review regressions (screens)
+static func _regressions(host: Node) -> void:
+	var tree: = host.get_tree()
+	# carousel: one finger = touch + emulated mouse; one swipe must move exactly one card
+	var vp: = await _vp(host, Vector2(720, 1280))
+	var mc: = _model()
+	mc.econ.shop._month_extend()
+	var scr: = V10Shop2.make(mc, {"tab": 0})
+	vp.host.add_child(scr)
+	await tree.process_frame
+	var car: = scr.carousel
+	check(car != null and car.cards.size() >= 2, "carousel has cards")
+	if car and car.cards.size() >= 2:
+		var p0: = Vector2(120, 150)
+		for ev in [_mb(true, p0), _st(true, p0)]:
+			car._gui_input(ev)
+		var mm: = InputEventMouseMotion.new()
+		mm.position = p0 - Vector2(180, 0)
+		mm.relative = Vector2(-180, 0)
+		car._gui_input(mm)
+		for ev in [_mb(false, p0 - Vector2(180, 0)), _st(false, p0 - Vector2(180, 0))]:
+			car._gui_input(ev)
+		check(car.cur == 1, "carousel: one swipe (touch + emulated mouse) = one card (cur %d)" % car.cur)
+	# «Не хватает»: the first actionable free path is the ONE primary (UX §3.4)
+	var nsh: = V10ShopFlow.need(scr, mc, 320, Callable(scr, "go_topup"))
+	await tree.process_frame
+	var prim: = 0
+	for n in _all(nsh):
+		if n is Control and String((n as Control).get_meta("ux_role", "")) == "primary":
+			prim += 1
+	check(prim == 1, "need: exactly one primary (first free path) (%d)" % prim)
+	var fp: V10Button = nsh.find_child("FreePath", true, false)
+	check(fp != null and fp.kind == "play", "need: the free path is a «Забрать» button")
+	check(not _find_text(nsh, "сегодня ") or _find_text(nsh, "Бесплатных путей сегодня нет"), "need: no «ещё N сегодня»")
+	nsh.close(true)
+	vp.svc.queue_free()
+	# pass: «Забрать всё» → the toast and the hanko survive the rebuild (UX §5.2.8)
+	var vp2: = await _vp(host, Vector2(720, 1280))
+	var mp: = _model({"pass_xp": 1240})
+	var ps: = V10PassScreen.make(mp)
+	vp2.host.add_child(ps)
+	await tree.process_frame
+	check(ps.find_child("PremLabel", true, false) != null and String((ps.find_child("PremLabel", true, false) as Label).text).find("С ПРОПУСКОМ") > 0, "pass: one track caption instead of a lock on every tile")
+	check(String((ps.find_child("XpLeft", true, false) as Label).text).begins_with("ещё "), "pass: «ещё N опыта до …», not «N / M»")
+	for sku in ["pass_899", "pass_1490"]:
+		var eq: Label = ps.find_child("Eq_" + sku, true, false)
+		var pw: Label = ps.find_child("PerWish_" + sku, true, false)
+		check(eq != null and eq.text.find("желани") >= 0 and pw != null and pw.text.find("за желание") >= 0, "pass: %s shows = N желаний and ≈ ₽ за желание" % sku)
+	ps._claim_all()
+	await tree.process_frame
+	await tree.process_frame
+	check(_find_text(ps, "Зачислено:") and ps.find_child("Hanko", true, false) != null, "pass: «Забрать всё» toast + hanko survive the rebuild")
+	vp2.svc.queue_free()
+	# purchases: the restore toast survives the rebuild
+	var vp3: = await _vp(host, Vector2(720, 1280))
+	var pu: = V10Purchases.make(_model())
+	vp3.host.add_child(pu)
+	await tree.process_frame
+	(pu.find_child("Restore", true, false) as V10Button).pressed.emit()
+	await tree.process_frame
+	await tree.process_frame
+	check(_find_text(pu, "Всё уже на месте") or _find_text(pu, "Восстановлено"), "purchases: restore toast survives the rebuild")
+	vp3.svc.queue_free()
+	# month disc on Чайная: decoration only — no tap, no dot (UX §3.3 / §3.6.4)
+	var md: = V10MonthDisc.make(mc)
+	host.add_child(md)
+	await tree.process_frame
+	check(md.mouse_filter == Control.MOUSE_FILTER_IGNORE and not md.has_meta("v10_tap"), "month disc: not tappable on Чайная")
+	md.queue_free()
+	# age gate: a stored blocked year shows the stop screen again
+	var vp4: = await _vp(host, Vector2(720, 1280))
+	var ast: = {}
+	V10Age.set_year(ast, V10Age.year_now(mc.now()) - 12, mc.now())
+	var ag: = V10AgeGate.make(ast, mc.now())
+	vp4.host.add_child(ag)
+	await tree.process_frame
+	check(ag.find_child("Stop", true, false) != null and ag.drum == null, "age gate: blocked year → stop screen on restart")
+	vp4.svc.queue_free()
+
+
+static func _mb(down: bool, p: Vector2) -> InputEventMouseButton:
+	var e: = InputEventMouseButton.new()
+	e.button_index = MOUSE_BUTTON_LEFT
+	e.pressed = down
+	e.position = p
+	return e
+
+
+static func _st(down: bool, p: Vector2) -> InputEventScreenTouch:
+	var e: = InputEventScreenTouch.new()
+	e.pressed = down
+	e.position = p
+	return e
 
 
 static func _find_text(n: Node, s: String) -> bool:
@@ -305,8 +463,25 @@ static func _layouts(host: Node) -> void:
 			var tag: = "%dx%d tab%d" % [vs.x, vs.y, tab]
 			_check_screen(scr, vs, tag, tab == 0)
 			if tab == 2:
+				# «самый низкий ₽ за желание» on screen = the model's honest best (none while every pack reads «≈ 33 ₽»)
 				var bests: = scr.find_children("Best", "Label", true, false)
-				check(bests.size() == 1, "%s: one best label" % tag)
+				var want: = 0
+				for c in m.topup():
+					if bool(c.best):
+						want += 1
+				check(want <= 1 and bests.size() == want, "%s: best labels on screen = model (%d / %d)" % [tag, bests.size(), want])
+				if vs == Vector2(720, 1280) or vs == Vector2(720, 1600):
+					# after the first purchases the true best is visibly lower: exactly ONE label, on that pack
+					var ml: = _model()
+					ml.econ.spend.set_age_verified(true)
+					for c in ml.topup():
+						ml.buy(String(c.id))
+					var sl: = V10Shop2.make(ml, {"tab": 2, "bottom_reserve": 120.0})
+					vp.host.add_child(sl)
+					await host.get_tree().process_frame
+					var bl: = sl.find_children("Best", "Label", true, false)
+					check(bl.size() == 1 and String((bl[0] as Node).get_parent().name) == "Pack_moon_14000", "%s later: exactly one «самый низкий» label, on the true best" % tag)
+					sl.queue_free()
 				for p in scr.find_children("Pack_*", "", true, false):
 					var pw: Label = p.get_node_or_null("PerWish")
 					check(pw != null and pw.text.find("за желание") >= 0 and pw.text.find("желани") >= 0, "%s: %s shows = N желаний · ≈ ₽" % [tag, p.name])
@@ -333,6 +508,37 @@ static func _layouts(host: Node) -> void:
 				var bb: = g.btn.get_global_rect()
 				check(bb.end.y <= vs.y and bb.position.y >= vs.y * 0.5, "%dx%d age: button in the lower half, on screen" % [vs.x, vs.y])
 			vp2.svc.queue_free()
+	# sheets over the shop (each is its own «screen» for the budget): confirm, «Не хватает», outfit with moonstone
+	for vs in [Vector2(720, 1280), Vector2(720, 1600)]:
+		for which in ["confirm", "need", "outfit"]:
+			var vp5: = await _vp(host, vs)
+			var m5: = _model({"moon": 300})
+			var s5: = V10Shop2.make(m5, {"tab": 0})
+			vp5.host.add_child(s5)
+			await host.get_tree().process_frame
+			var sh: V10ShopSheet
+			match which:
+				"confirm":
+					sh = V10ShopFlow.confirm(s5, m5, "guest_149")
+				"need":
+					sh = V10ShopFlow.need(s5, m5, 320, Callable(s5, "go_topup"))
+				"outfit":
+					for it in m5.outfits("crystal"):
+						if not bool(it.owned) and int(it.price) >= 1000:
+							V10ShopFlow.outfit(s5, m5, it)
+							break
+					sh = V10ShopSheet.current
+			await host.get_tree().process_frame
+			check(sh != null, "%dx%d sheet %s opens" % [vs.x, vs.y, which])
+			if sh:
+				_check_screen(sh, vs, "%dx%d sheet %s" % [vs.x, vs.y, which], false)
+				var prim: = 0
+				for n in _all(sh):
+					if n is Control and String((n as Control).get_meta("ux_role", "")) in ["primary", "primary_cash"]:
+						prim += 1
+				check(prim == 1, "%dx%d sheet %s: exactly one primary (%d)" % [vs.x, vs.y, which, prim])
+				sh.close(true)
+			vp5.svc.queue_free()
 	# store build screen: zero cash buttons
 	var vp3: = await _vp(host, Vector2(720, 1280))
 	for tab in 3:
@@ -369,6 +575,14 @@ static func _check_screen(scr: Control, vs: Vector2, tag: String, budget: bool) 
 	var banned: = []
 	var curs: = 0
 	var taps_first: = 0
+	var rub_cards: = []
+	var all_text: = ""
+	var words: = 0
+	var sizes: = {}
+	var bars: = 0
+	if _word_re == null:
+		_word_re = RegEx.new()
+		_word_re.compile("[\\p{L}\\d]")
 	var scroll: ScrollContainer = scr.get_node_or_null("Scroll")
 	var view_rect: = Rect2(Vector2.ZERO, vs)
 	if scroll:
@@ -388,8 +602,10 @@ static func _check_screen(scr: Control, vs: Vector2, tag: String, budget: bool) 
 			var h: = c.size.y
 			if c is V10Button:
 				h = (c as V10Button).btn_size.y
-			if h < 56.0:
-				small_hit.append(String(c.name))
+			elif c is V10ShopW.Tap:
+				h = (c as V10ShopW.Tap).hit_rect().size.y
+			if h < 80.0 - 0.5 and String(c.get_meta("ux_role", "")) != "test":
+				small_hit.append("%s %d" % [c.name, h])
 			if budget and view_rect.encloses(r) and not c.get_parent() is V10ShopW.Seg:
 				taps_first += 1
 		if c.get_meta("ux_role", "") == "primary" or (c is V10Button and (c as V10Button).kind == "play"):
@@ -409,8 +625,26 @@ static func _check_screen(scr: Control, vs: Vector2, tag: String, budget: bool) 
 					banned.append("%s (%s)" % [l.text, ", ".join(bad)])
 		if c.name.begins_with("Cur_"):
 			curs += 1
+		if c.has_meta("rub_card"):
+			rub_cards.append(c.get_meta("rub_card"))
+		if c is Label:
+			all_text += (c as Label).text + "\n"
+			# §3.7 budget of the first screenful: words and font sizes of what is actually on screen
+			var lt: = (c as Label).text
+			if lt != "" and view_rect.intersects(r) and (c as Label).label_settings:
+				sizes[(c as Label).label_settings.font_size] = true
+				for wd in lt.split(" ", false):
+					if _word_re.search(wd) != null:
+						words += 1
+		if c is V10ShopW.Bar and view_rect.intersects(r):
+			bars += 1
+	var no_value: = []
+	for rc in rub_cards:
+		if all_text.find(String(rc.get("eq", "?"))) < 0 or all_text.find(String(rc.get("per_wish", "?"))) < 0 or String(rc.get("eq", "")) == "":
+			no_value.append(String(rc.get("id", "")))
+	check(no_value.is_empty(), "%s: every ₽ price shows «= N желаний» and «≈ N ₽ за желание» %s" % [tag, str(no_value)])
 	check(out_w == 0, "%s: nothing outside the screen width (%d)" % [tag, out_w])
-	check(small_hit.is_empty(), "%s: hit zones ≥ 56 %s" % [tag, str(small_hit)])
+	check(small_hit.is_empty(), "%s: hit zones ≥ 80 %s" % [tag, str(small_hit)])
 	check(primaries <= 1, "%s: ≤ 1 primary (%d)" % [tag, primaries])
 	check(rose_cash == 0, "%s: no rose on ₽" % tag)
 	check(tiny.is_empty(), "%s: text ≥ 18 px %s" % [tag, str(tiny.slice(0, 3))])
@@ -418,6 +652,12 @@ static func _check_screen(scr: Control, vs: Vector2, tag: String, budget: bool) 
 	check(curs <= 2, "%s: ≤ 2 currencies" % tag)
 	if budget:
 		check(taps_first <= 10, "%s: ≤ 10 tappables in the first screenful (%d)" % [tag, taps_first])
+	var sz: = sizes.keys()
+	sz.sort()
+	print("    BUDGET %s: words %d, sizes %s, bars %d" % [tag, words, str(sz), bars])
+	if WORDS_CHECK:
+		check(words <= 60, "%s: ≤ 60 words on screen (UX §3.7) (%d)" % [tag, words])
+	check(bars <= 2, "%s: ≤ 2 progress bars (%d)" % [tag, bars])
 
 
 static func _inside_hscroll(c: Node) -> bool:

@@ -31,10 +31,7 @@ func refresh() -> void:
 
 
 func build() -> void:
-	for c in get_children():
-		if c is V10ShopSheet:
-			continue
-		c.queue_free()
+	V10ShopKit.clear(self)          # keeps an open sheet and the toast («Восстановлено …»)
 	vs = get_viewport_rect().size
 	size = vs
 	var base: = ColorRect.new()
@@ -115,7 +112,7 @@ func build() -> void:
 	var ly: = 0.0
 	var rows: Array = []
 	for o in m.pending_orders():
-		rows.append({"t": int(o.t), "sku": String(o.sku), "rub": int(o.rub), "st": "pending"})
+		rows.append({"t": int(o.t), "sku": String(o.sku), "rub": int(o.rub), "st": "pending", "grant": {}})
 	for r in m.receipts():
 		rows.append(r)
 	if rows.is_empty():
@@ -126,7 +123,7 @@ func build() -> void:
 	for r in rows:
 		var st_txt: String = {"delivered": "зачислено", "confirmed": "зачислено", "restored": "восстановлено",
 			"refunded": "возврат", "pending": "ждём подтверждения банка"}.get(String(r.st), String(r.st))
-		var a: = V10ShopKit.lbl(m.sku_title(String(r.sku)), "ui", 22, V10DS.PAPER_100)
+		var a: = V10ShopKit.lbl(m.receipt_title(r), "ui", 22, V10DS.PAPER_100)
 		a.position = Vector2(0, ly)
 		a.size = Vector2(cw * 0.66, 32)
 		box.add_child(a)
@@ -150,9 +147,10 @@ func build() -> void:
 	rs.pressed.connect(func():
 		V10ShopKit.press(rs)
 		var done: = m.econ.shop.reconcile()
-		V10ShopKit.toast(self, "Восстановлено покупок: %d" % done.size() if not done.is_empty() else "Всё уже на месте")
-		build())
+		build()
+		V10ShopKit.toast(self, "Восстановлено покупок: %d" % done.size() if not done.is_empty() else "Всё уже на месте"))
 	add_child(rs)
+	V10ShopKit.raise_fx(self)
 
 
 func _cap_reason() -> String:
@@ -170,7 +168,7 @@ func _row(cx: float, cw: float, y: float, title: String, val: String, nm: String
 	t.dip = false
 	t.position = Vector2(cx, y)
 	t.size = Vector2(cw, 80)
-	t.set_meta("ux_role", "secondary")
+	t.set_meta("ux_role", "row")      # a settings list row, not one of the screen's ≤ 2 secondary actions
 	var l: = V10ShopKit.lbl("", "ui", 22, V10DS.PAPER_100)
 	V10Type.fit(l, title, "text_l", cw * 0.6, 1, V10DS.PAPER_100)
 	l.size = Vector2(cw * 0.6, 80)

@@ -7,11 +7,13 @@ extends RefCounted
 #
 #   card(sku)       -> {id, kind, overline, title, lines[≤3], rub, price, wishes, eq, per_wish_rub, per_wish, first,
 #                       first_txt, available, reason, reason_txt, art, once, best}
-#   topup()         -> 6 moonstone cards, exactly one has best = true (lowest real ₽ per wish right now)
+#   topup()         -> 6 moonstone cards; best = true on at most one: the lowest real ₽ per wish, and only when that
+#                      is visibly true (its rounded «≈ N ₽» is below every other pack's — no label on a tie)
 #   ladder()        -> {"current": card|{}, "next": {title, unlock}|{}}  — gated by Path level, no dates
 #   vitrina()       -> ≤ 3 paid cards (ladder step, month card, season pass) — the gift is separate
 #   outfits(mode)   -> outfit cards for «за кристаллы» / «за лепестки»
-#   need(deficit)   -> {free:[{text}], moon_note, pack: card}
+#   need(deficit)   -> {free:[{text, go}], moon_note, pack: card}  (go: "gift" | "pass" | an id for free_paths_go)
+#   cash_visible()  -> false in the store build AND before Path level 8 (UX §3.5, С-2: no «₽» before L8)
 #   buy(sku)        -> age layer + econ.shop.buy (one entry point for every ₽ button)
 #
 # S.v10_shop (registered via V10Registry/V10Save at integration): {"gift": {"day", "x2"}, "age": {...},
@@ -24,7 +26,9 @@ var st: Dictionary
 var level_fn: Callable            # () -> int, Path level (V10Path / G.S.level)
 var items_fn: Callable            # () -> Array of outfit dicts {id, name, rar, hero, img, shop}
 var owns_fn: Callable             # (id) -> bool
-var free_paths_fn: Callable       # () -> Array of {"text": "Задания дня: ещё 50 сегодня"} from other modules
+var free_paths_fn: Callable       # () -> Array of {"text": "Задания дня: ещё 50 кристаллов", "go": "today"} (other modules;
+                                  # no «ещё N сегодня» wording — UX §4.1.7)
+var free_paths_go: Callable       # (go: String) -> void, opens the screen of an outside free path (integrator)
 var ads: V10Ads
 var ads_stub: V10AdsStub
 
@@ -50,6 +54,8 @@ func ensure() -> void:
 	st["cool_asked"] = bool(st.get("cool_asked", false))
 	st["crystal_noask"] = bool(st.get("crystal_noask", false))
 	V10Age.ensure(st)
+	if econ != null:
+		V10Age.refresh(st, now())     # a 17-year-old turns 18: the stored band follows the calendar
 	V10Offers.ensure(st)
 
 
@@ -81,7 +87,16 @@ func provider() -> V10PaymentProvider:
 
 
 func cash_visible() -> bool:
-	return V10ShopPay.cash_visible(provider())
+	return level() >= V10ShopData.SHOP_FROM_LEVEL and V10ShopPay.cash_visible(provider())
+
+
+# «= N желаний · ≈ N ₽ за желание» — the one value line under every ₽ price (UX §5.2.2, С-3)
+static func value_line(c: Dictionary) -> String:
+	var parts: = []
+	for k in ["eq", "per_wish"]:
+		if String(c.get(k, "")) != "":
+			parts.append(String(c[k]))
+	return " · ".join(parts)
 
 
 # wishes a SKU is worth: catalog value + boosters at their crystal value (spec Л3: booster = 60 кр-экв.)
@@ -159,13 +174,13 @@ func card(id: String) -> Dictionary:
 			c.overline = _ladder_name(id).to_upper()
 			c.title = _content_title(g)
 			var rest: = _content_parts(g).slice(2)
-			c.lines = [c.eq + (" · " + ", ".join(rest) if not rest.is_empty() else ""), "Один раз, без срока"]
+			c.lines = ([", ".join(rest)] if not rest.is_empty() else []) + ["Один раз, без срока"]
 			c.art = _ladder_art(id)
 		"month":
 			c.overline = "ЛУННЫЙ АБОНЕМЕНТ · 30 ДНЕЙ"
 			c.title = "%s сразу + %s в день" % [V10ShopTxt.amount("moon", int(V10Catalog.MONTH_NOW.moon)),
 				V10ShopTxt.amount("crystal", int(V10Catalog.MONTH_DAILY.crystal))]
-			c.lines = ["Не подписка, без автопродления", "Награды за ролики — без ролика", c.eq]
+			c.lines = ["Не подписка, без автопродления", "Награды за ролики — без ролика"]
 			c.art = "item_month"
 		"pass":
 			var deluxe: = bool(s.get("deluxe", false))
@@ -283,8 +298,16 @@ func topup() -> Array:
 	for i in out.size():
 		if bi < 0 or float(out[i].per_wish_rub) < float(out[bi].per_wish_rub) - 0.001:
 			bi = i
+	# «самый низкий ₽ за желание» only if it is true on the screen too (UX §5.2.3, HUD_V2 §8.5): the best pack's
+	# rounded «≈ N ₽» must be below every other pack's. With the first-purchase double every pack reads «≈ 33 ₽» —
+	# a label there would nudge a new player to the 3 790 ₽ pack over a 0,01 ₽ difference.
 	if bi >= 0:
-		out[bi].best = true
+		var shown_best: = roundi(float(out[bi].per_wish_rub))
+		var unique: = true
+		for i in out.size():
+			if i != bi and roundi(float(out[i].per_wish_rub)) <= shown_best:
+				unique = false
+		out[bi].best = unique
 	return out
 
 
@@ -529,3 +552,12 @@ func sku_title(id: String) -> String:
 	if c.is_empty():
 		return id
 	return String(c.name)
+
+
+# what the purchase actually gave (a first currency purchase is doubled — the history shows 1 720, not today's 900)
+func receipt_title(r: Dictionary) -> String:
+	var s: = econ.shop.sku(String(r.get("sku", "")))
+	var g: Dictionary = r.get("grant", {}) if r.get("grant") is Dictionary else {}
+	if String(s.get("kind", "")) == "currency" and int(g.get("moon", 0)) > 0:
+		return V10ShopTxt.amount("moon", int(g.moon))
+	return sku_title(String(r.get("sku", "")))
