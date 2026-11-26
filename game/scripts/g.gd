@@ -924,10 +924,18 @@ func give_new(id: String) -> bool:
 	return give(id)
 
 func add_aff(hero: String, n: int) -> void :
-	S.aff[hero] = int(S.aff.get(hero, 0)) + n
+	if not (S.get("aff") is Dictionary):
+		S["aff"] = {}
+	S.aff[hero] = maxi(0, int(S.aff.get(hero, 0)) + n)
 
 func aff_level(hero: String) -> int:
-	return 1 + int(S.aff.get(hero, 0)) / 100
+	return V10AffCurve.level_for_xp(int(S.get("aff", {}).get(hero, 0)) if S.get("aff") is Dictionary else 0)
+
+func aff_info(hero: String) -> Dictionary:
+	return V10AffCurve.progress(int(S.get("aff", {}).get(hero, 0)) if S.get("aff") is Dictionary else 0)
+
+func aff_ratio(hero: String) -> float:
+	return float(aff_info(hero).get("ratio", 0.0))
 
 # the outfit image an item actually shows: a retired (hidden) item never shows its own art, even to a save that
 # owns it (o_tutor: HEROINES.md §6) — it draws its "alt" until it is redrawn
