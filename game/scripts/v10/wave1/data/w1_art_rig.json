@@ -1,0 +1,171 @@
+{
+ "tsubame": {
+  "file": "res://assets/v10/wave1/hero/tsubame.png",
+  "source": "w1src/tsubame__tb_base__shy.png",
+  "source_note": "tb_base «shy» slot (FINAL is cut at the thighs, no feet)",
+  "fit": {
+   "scale": 0.69623,
+   "ox": -8.71,
+   "oy": -147.08,
+   "bbox_src": [24, 263, 1219, 1998],
+   "limited_by": "width"
+  },
+  "rig": {
+   "head_c": [650, 190],
+   "head_r": 92,
+   "neck": [652, 262],
+   "chest_c": [667, 355],
+   "chest_r": [72, 48],
+   "waist_y": 470,
+   "feet": [655, 1240],
+   "hair_l": [500, 300, 15, 10],
+   "hair_r": [0, 0, 0, 0],
+   "eye_l": [623, 205, 14.3, 6.2],
+   "eye_r": [673.5, 201.8, 11.8, 5.8],
+   "mouth": [655, 241, 0, 6],
+   "lash": "342428",
+   "lid_l": [633, 195.5, 636, 195],
+   "lid_r": [665.7, 193, 676.9, 186.9],
+   "lid_tilt": [0.14, -0.25],
+   "face_w": 88.6,
+   "av": [651.6, 208.9, 4.79],
+   "zoom_k": 1.3
+  },
+  "notes": "Mouth hidden behind the scarf: talk flap off (mouth half-w 0), the point is where her lips are under it. Scarf + ponytail fill the left of the canvas, so the body stands right of centre (feet x 655); the fit is width-limited, her face is ~6% smaller than the founders'. Scarf tip fades out (the source frame cuts it). hair_l = ponytail + scarf; the head zone just reaches the letter hand (sub-pixel wobble)."
+ },
+ "miel": {
+  "file": "res://assets/v10/wave1/hero/miel.png",
+  "source": "w1src/miel__me_base__select.png",
+  "source_note": "me_base «select» slot (FINAL: closed eyes, non-LW36 stockings)",
+  "fit": {
+   "scale": 0.5908,
+   "ox": 203.63,
+   "oy": 79.53,
+   "bbox_src": [36, 14, 740, 1971],
+   "limited_by": "face"
+  },
+  "rig": {
+   "head_c": [405, 180],
+   "head_r": 112,
+   "neck": [452, 285],
+   "chest_c": [487, 410],
+   "chest_r": [85, 60],
+   "waist_y": 520,
+   "feet": [447, 1240],
+   "hair_l": [0, 0, 0, 0],
+   "hair_r": [0, 0, 0, 0],
+   "eye_l": [388.6, 210.8, 15.5, 6.6],
+   "eye_r": [439, 183.6, 11.5, 6.0],
+   "mouth": [431, 227, 0, 8],
+   "lash": "5d3525",
+   "lid_l": [378.3, 204, 394.3, 195.8],
+   "lid_r": [425.7, 181.3, 439.6, 169.4],
+   "lid_tilt": [-0.42, -0.56],
+   "face_w": 100.2,
+   "av": [422.4, 197.1, 4.23],
+   "zoom_k": 1.15
+  },
+  "notes": "Open smile: talk flap off (mouth half-w 0, the point is the closed-lip line). Curls stay still: the skirt frill hangs right under them inside any hair_l band. Strong head tilt: lid_tilt follows it."
+ },
+ "kohaku": {
+  "file": "res://assets/v10/wave1/hero/kohaku.png",
+  "source": "w1src/kohaku__ko_base__shy.png",
+  "source_note": "ko_base «shy» slot (FINAL: staff on the torii, foot on a step)",
+  "fit": {
+   "scale": 0.56231,
+   "ox": -47.21,
+   "oy": 111.51,
+   "bbox_src": [246, 64, 1243, 2014],
+   "limited_by": "face"
+  },
+  "rig": {
+   "head_c": [428, 268],
+   "head_r": 115,
+   "neck": [463, 355],
+   "chest_c": [470, 440],
+   "chest_r": [80, 55],
+   "waist_y": 560,
+   "feet": [432, 1240],
+   "hair_l": [222, 300, 25, 12],
+   "hair_r": [612, 420, 12, 10],
+   "eye_l": [405, 304.5, 14.5, 5],
+   "eye_r": [456.5, 277.8, 15, 4.8],
+   "mouth": [451.5, 323.5, 10, 4],
+   "lash": "4d2b29",
+   "lid_l": [393.4, 297.6, 409.7, 292.4],
+   "lid_r": [440.8, 278.2, 461.7, 262.7],
+   "lid_tilt": [-0.22, -0.56],
+   "face_w": 101.5,
+   "av": [441.1, 292.1, 4.18],
+   "zoom_k": 1.13
+  },
+  "notes": "hair_l = the fox tail (wag); its motion-blurred tip keeps the art's blur as soft decontaminated alpha. hair_r = the free strands right of the sleeve. Half-lidded, tilted eyes: eye boxes cover the thick lash."
+ },
+ "shirin": {
+  "file": "res://assets/v10/wave1/hero/shirin.png",
+  "source": "w1src/FINAL_shirin.png",
+  "source_note": "sh_base approved card FINAL_shirin.png",
+  "fit": {
+   "scale": 0.60319,
+   "ox": 7.8,
+   "oy": 42.45,
+   "bbox_src": [2, 15, 1358, 1992],
+   "limited_by": "face"
+  },
+  "rig": {
+   "head_c": [440, 195],
+   "head_r": 118,
+   "neck": [448, 282],
+   "chest_c": [480, 387],
+   "chest_r": [85, 50],
+   "waist_y": 520,
+   "feet": [440, 1240],
+   "hair_l": [200, 380, 20, 8],
+   "hair_r": [600, 380, 20, 8],
+   "eye_l": [417, 215.6, 13, 4.8],
+   "eye_r": [467.5, 204.5, 12, 4.6],
+   "mouth": [449, 247, 11, 4.5],
+   "lash": "251c20",
+   "lid_l": [406.4, 204.8, 428.8, 207.5],
+   "lid_r": [454.4, 198.9, 465, 195],
+   "lid_tilt": [0.04, -0.22],
+   "face_w": 90.5,
+   "av": [445.6, 215.0, 4.69],
+   "zoom_k": 1.27
+  },
+  "notes": "hair_l / hair_r = the veil wings under her open arms (hands stay above y_min)."
+ },
+ "zlata": {
+  "file": "res://assets/v10/wave1/hero/zlata.png",
+  "source": "w1src/FINAL_zlata.png",
+  "source_note": "zl_base approved card FINAL_zlata.png",
+  "fit": {
+   "scale": 0.61997,
+   "ox": 6.76,
+   "oy": 15.84,
+   "bbox_src": [2, 6, 1344, 1981],
+   "limited_by": "width"
+  },
+  "rig": {
+   "head_c": [430, 160],
+   "head_r": 135,
+   "neck": [432, 248],
+   "chest_c": [443, 370],
+   "chest_r": [75, 45],
+   "waist_y": 510,
+   "feet": [405, 1240],
+   "hair_l": [225, 450, 20, 8],
+   "hair_r": [620, 450, 20, 8],
+   "eye_l": [406, 178, 13.5, 4.7],
+   "eye_r": [454, 176, 13, 4.6],
+   "mouth": [432, 207.5, 13, 4.5],
+   "lash": "3a1c17",
+   "lid_l": [408, 169, 420.3, 171.7],
+   "lid_r": [447.1, 166.3, 452, 166],
+   "face_w": 84.1,
+   "av": [431.0, 179.6, 5.04],
+   "zoom_k": 1.37
+  },
+  "notes": "hair_l / hair_r = the outer feathers of the firebird mantle (boots stay outside the bands); the braid lies over the chest and stays still. The kokoshnik turns with the head (head_r 135)."
+ }
+}

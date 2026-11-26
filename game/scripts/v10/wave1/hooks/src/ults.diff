@@ -1,0 +1,110 @@
+--- a/game/scripts/v09/core/ults.gd
++++ b/game/scripts/v09/core/ults.gd
+@@ -274,8 +274,10 @@
+ 
+ static func has(id: String) -> bool:
+-	return ULTS.has(id)
++	return ULTS.has(id) or (V10Wave1.released() and V10W1Ults.has(id))  # wave-1 hook
+ 
+ 
+ static func get_ult(id: String) -> Dictionary:
++	if not ULTS.has(id) and V10Wave1.released() and V10W1Ults.has(id):  # wave-1 hook
++		return V10W1Ults.get_ult(id)
+ 	return ULTS.get(id, {})
+ 
+@@ -284,6 +286,8 @@
+ static func for_hero(hero: String) -> String:
+ 	var id: String = G.equipped(hero) if G.S is Dictionary and G.S.has("outfit") else ""
+-	if id != "" and ULTS.has(id):
++	if id != "" and has(id):  # wave-1 hook (was ULTS.has)
+ 		return id
++	if V10Wave1.released() and V10W1Ults.is_hero(hero):  # wave-1 hook
++		return V10W1Ults.base(hero)
+ 	return String(BASE.get(hero, "o_base"))
+ 
+@@ -292,4 +296,6 @@
+ # show their "alt" art (same rules as G.item_img / G.art_tex)
+ static func shown(id: String, modest = null) -> Dictionary:
++	if not ULTS.has(id) and V10Wave1.released() and V10W1Ults.has(id):  # wave-1 hook: wave-1 art dir + JSON rects
++		return V10W1Ults.shown(id, modest)
+ 	var u: = get_ult(id)
+ 	var img: String = u.get("ref_img", "")
+@@ -313,5 +319,6 @@
+ 	var u: = get_ult(id)
+ 	if bool(u.get("redraw", false)):
+-		var sh: = shown(String(BASE.get(String(u.get("hero", "mc")), "o_base")), modest)
++		var uh: = String(u.get("hero", "mc"))
++		var sh: = shown(V10W1Ults.base(uh) if V10W1Ults.is_hero(uh) else String(BASE.get(uh, "o_base")), modest)  # wave-1 hook
+ 		sh["redraw"] = true
+ 		return sh
+@@ -349,4 +356,6 @@
+ 
+ static func core(hero: String, ranked: = false) -> Dictionary:
++	if not CORES.has(hero) and V10Wave1.released() and V10W1Ults.is_hero(hero):  # wave-1 hook
++		return V10W1Ults.core(hero, ranked)
+ 	var c: Dictionary = CORES.get(hero, CORES.mc).duplicate()
+ 	if ranked and RANKED_CORES.has(hero):
+@@ -378,5 +387,5 @@
+ static func start_charge_for(id: String, ranked: = false) -> int:
+ 	var it: Dictionary = G.ITEM.get(id, {})
+-	return start_charge(String(it.get("rar", "R")), ranked, id in G.BASE_OUTFITS)
++	return start_charge(String(it.get("rar", V10W1Ults.RAR.get(id, "R"))), ranked, id in G.BASE_OUTFITS or V10W1Ults.is_base(id))  # wave-1 hook
+ 
+ 
+--- a/game/scripts/v09/ult/ult_cast.gd
++++ b/game/scripts/v09/ult/ult_cast.gd
+@@ -176,6 +176,7 @@
+ 	if bd == null:
+ 		return []
+-	return bd._pairs_on_board().filter( func(p): return p[0].face == p[1].face and p[0].face != JOKER and p[0].ice <= 0 and p[1].ice <= 0\
++	var ps: Array = bd._pairs_on_board().filter( func(p): return p[0].face == p[1].face and p[0].face != JOKER and p[0].ice <= 0 and p[1].ice <= 0\
+ 	and not p[0].pending and not p[1].pending and bd.on_board(p[0]) and bd.on_board(p[1]))
++	return V10W1Ults.cast_pairs(self, ps) if V10W1Ults.is_hero(hero) else ps  # wave-1 hook: Цубамэ's targets
+ 
+ 
+@@ -214,4 +215,6 @@
+ 	if bd == null:
+ 		return "…"
++	if V10W1Ults.is_hero(hero):  # wave-1 hook
++		return V10W1Ults.cast_blocked(self)
+ 	match hero:
+ 		"rin":
+@@ -382,4 +385,6 @@
+ 
+ func auto_pick() -> Dictionary:
++	if V10W1Ults.is_hero(hero):  # wave-1 hook
++		return V10W1Ults.cast_auto_pick(self)
+ 	var bd: = _board()
+ 	var n: = int(core.get("pairs", 1))
+@@ -861,4 +866,6 @@
+ 				if int(core.get("reveal", 0)) > 0 and _alive() and not _open_one(col):
+ 					_melt_one(col)
++		"tsubame", "miel", "kohaku", "shirin", "zlata":  # wave-1 hook: her core on the strong beat
++			V10W1Ults.cast_apply(self, pick, col)
+ 		_:
+ 			if pick.has("from") and pick.has("to") and (pick["to"] - pick["from"]).length() >= 24.0:
+--- a/game/scripts/v10/mj/triples/ults_triples.gd
++++ b/game/scripts/v10/mj/triples/ults_triples.gd
+@@ -28,4 +28,6 @@
+ 
+ static func core(hero: String) -> Dictionary:
++	if not EFFECT.has(hero) and V10Wave1.released() and V10W1Ults.is_hero(hero):  # wave-1 hook
++		return V10W1Ults.triples_core(hero)
+ 	var c: Dictionary = V9Ults.core(hero if EFFECT.has(hero) else "mc", false)
+ 	var e: Dictionary = EFFECT.get(hero, EFFECT.mc).duplicate()
+--- a/game/scripts/v09/ult/ult_selftest.gd
++++ b/game/scripts/v09/ult/ult_selftest.gd
+@@ -101,4 +101,6 @@
+ 			# ranked Yue is levelled like the others (V9Ults.RANKED_CORES.yue): the pair at her beam + 1 tile
+ 			want_pairs = 1 if ranked else 0
++		"tsubame", "miel", "kohaku", "shirin", "zlata":  # wave-1 hook: a cookie / a charm removes nothing at once
++			want_pairs = V10W1Ults.cast_expect(hero, ranked, tray0 == 0)
+ 	_check("from_ult pairs = core", box[0] == want_pairs, "got %d want %d" % [box[0], want_pairs])
+ 	_check("no plain pairs", box[1] == 0, "%d" % box[1])
+@@ -207,5 +209,5 @@
+ 		_check("skip returns control fast", ms2 < 700, "%d ms" % ms2)
+ 		await _wait(play, 0.6)
+-		_check("skip: effect still applied", hero in ["rin", "yue"] or box[0] > 0, "%d" % box[0])
++		_check("skip: effect still applied", hero in ["rin", "yue"] or box[0] > 0 or V10W1Ults.joker_on(bd) or V10W1Ults.charm_on(bd), "%d" % box[0])  # wave-1 hook
+ 
+ 	# ── 5. short clip: ≤ 0.6 s and a tap during it is replayed on the board ──
