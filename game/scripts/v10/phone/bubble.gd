@@ -9,7 +9,8 @@ const P: = preload("res://scripts/v10/phone/phone.gd")
 const PUI: = preload("res://scripts/v10/phone/phone_ui.gd")
 const D: = preload("res://scripts/v10/chat/chat_data.gd")
 
-const FS: = 23
+const FS: = 22                 # Body (§6.3); notes, captions, transcripts and timings are Caption 18
+const FS_S: = 18
 const PAD: = Vector2(20, 13)
 const RAD: = 24.0
 const STICKER: = 196.0
@@ -21,7 +22,7 @@ var mine: = false
 var kind: = "text"
 var text: = ""
 var max_w: = 440.0
-var accent: = Color("e3a1b0")
+var accent: = PUI.HERO_FALLBACK
 var react_glyph: = ""
 var tex: Texture2D = null
 var fallback: Dictionary = {}
@@ -90,15 +91,15 @@ func _measure() -> void:
 			_th = 0.0
 			if text != "":
 				_tw = PHOTO_W - PAD.x * 2
-				_th = f.get_multiline_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, _tw, FS - 2).y
+				_th = f.get_multiline_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, _tw, FS_S).y
 			sz = Vector2(PHOTO_W, PHOTO_H + (_th + 18.0 if text != "" else 0.0))
 		"voice":
 			var w: = minf(max_w, 330.0)
 			_tw = w - PAD.x * 2
-			_th = f.get_multiline_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, _tw, FS - 4).y if text != "" else 0.0
+			_th = f.get_multiline_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, _tw, FS_S).y if text != "" else 0.0
 			sz = Vector2(w, 70.0 + (_th + 8.0 if text != "" else 0.0))
 		"note":
-			_tw = f.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, 17).x
+			_tw = f.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, FS_S).x
 			sz = Vector2(_tw + 36.0, 34.0)
 		_:
 			var one: = f.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, FS).x
@@ -155,8 +156,8 @@ func _draw() -> void:
 				var gs: = f.get_string_size(g, HORIZONTAL_ALIGNMENT_LEFT, -1, 64)
 				draw_string(PUI.body(900), r.get_center() + Vector2(-gs.x * 0.5, 18), g, HORIZONTAL_ALIGNMENT_LEFT, -1, 64, Color.WHITE)
 				var lb: = str(fallback.get("label", ""))
-				var ls: = f.get_string_size(lb, HORIZONTAL_ALIGNMENT_LEFT, -1, 18)
-				draw_string(PUI.body(900), Vector2((r.size.x - ls.x) * 0.5, r.size.y - 22), lb, HORIZONTAL_ALIGNMENT_LEFT, -1, 18, Color.WHITE)
+				var ls: = f.get_string_size(lb, HORIZONTAL_ALIGNMENT_LEFT, -1, FS_S)
+				draw_string(PUI.body(900), Vector2((r.size.x - ls.x) * 0.5, r.size.y - 22), lb, HORIZONTAL_ALIGNMENT_LEFT, -1, FS_S, Color.WHITE)
 		"typing":
 			draw_style_box(_bubble_box(), r)
 			for i in 3:
@@ -166,12 +167,12 @@ func _draw() -> void:
 		"note":
 			var s: = PUI.box(Color(1, 1, 1, 0.07), 17)
 			draw_style_box(s, r)
-			draw_string(f, Vector2(18, 23), text, HORIZONTAL_ALIGNMENT_LEFT, -1, 17, PUI.MUTED)
+			draw_string(f, Vector2(18, 24), text, HORIZONTAL_ALIGNMENT_LEFT, -1, FS_S, PUI.MUTED)
 		"photo":
 			draw_style_box(_bubble_box(), r)
 			if text != "":
 				var col: = Color.WHITE if mine else PUI.INK
-				f.draw_multiline_string(get_canvas_item(), Vector2(PAD.x, PHOTO_H + 4 + f.get_ascent(FS - 2)), text, HORIZONTAL_ALIGNMENT_LEFT, _tw, FS - 2, -1, col)
+				f.draw_multiline_string(get_canvas_item(), Vector2(PAD.x, PHOTO_H + 4 + f.get_ascent(FS_S)), text, HORIZONTAL_ALIGNMENT_LEFT, _tw, FS_S, -1, col)
 		"voice":
 			draw_style_box(_bubble_box(), r)
 			var col: = Color.WHITE if mine else accent.darkened(0.35)
@@ -193,9 +194,9 @@ func _draw() -> void:
 				var bx: = x0 + w * float(i) / bars
 				draw_line(Vector2(bx, 36 - hgt * 0.5), Vector2(bx, 36 + hgt * 0.5), Color(col, 1.0 if on else 0.42), 4.0, true)
 			var secs: = "0:%02d" % int(msg.get("sec", 3))
-			draw_string(f, Vector2(r.size.x - PAD.x - 40, 43), secs, HORIZONTAL_ALIGNMENT_LEFT, -1, 18, Color(col, 0.85))
+			draw_string(f, Vector2(r.size.x - PAD.x - 40, 43), secs, HORIZONTAL_ALIGNMENT_LEFT, -1, FS_S, Color(col, 0.85))
 			if text != "":
-				f.draw_multiline_string(get_canvas_item(), Vector2(PAD.x, 70 + f.get_ascent(FS - 4)), text, HORIZONTAL_ALIGNMENT_LEFT, _tw, FS - 4, -1, Color(col, 0.8) if not mine else Color(1, 1, 1, 0.85))
+				f.draw_multiline_string(get_canvas_item(), Vector2(PAD.x, 70 + f.get_ascent(FS_S)), text, HORIZONTAL_ALIGNMENT_LEFT, _tw, FS_S, -1, Color(col, 0.8) if not mine else Color(1, 1, 1, 0.85))
 		_:
 			draw_style_box(_bubble_box(), r)
 			var col2: = Color.WHITE if mine else PUI.INK
@@ -203,16 +204,19 @@ func _draw() -> void:
 	if react_glyph != "":
 		var cx: = (size.x - 26.0) if not mine else 26.0
 		var cp: = Vector2(cx, body_h + 2.0)
-		draw_circle(cp, 19.0, Color("2a1a22"))
+		draw_circle(cp, 19.0, PUI.INK)
 		draw_circle(cp, 16.0, PUI.CREAM)
-		var gs2: = PUI.body(900).get_string_size(react_glyph, HORIZONTAL_ALIGNMENT_LEFT, -1, 18)
-		draw_string(PUI.body(900), cp + Vector2(-gs2.x * 0.5, 7), react_glyph, HORIZONTAL_ALIGNMENT_LEFT, -1, 18, Color("d24a6a"))
+		var gs2: = PUI.body(900).get_string_size(react_glyph, HORIZONTAL_ALIGNMENT_LEFT, -1, FS_S)
+		draw_string(PUI.body(900), cp + Vector2(-gs2.x * 0.5, 7), react_glyph, HORIZONTAL_ALIGNMENT_LEFT, -1, FS_S, PUI.HEART_DEEP)
 
 
 # spring entrance: bubbles grow from their tail corner
 func appear(delay: = 0.0) -> void:
-	scale = Vector2(0.4, 0.4)
 	modulate.a = 0.0
+	if PUI.calm():
+		create_tween().tween_property(self, "modulate:a", 1.0, 0.12).set_delay(delay)
+		return
+	scale = Vector2(0.4, 0.4)
 	var t: = create_tween().set_parallel()
 	t.tween_property(self, "scale", Vector2.ONE, 0.42).set_delay(delay).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	t.tween_property(self, "modulate:a", 1.0, 0.16).set_delay(delay)

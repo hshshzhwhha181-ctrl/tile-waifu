@@ -1,8 +1,9 @@
 class_name V10PhoneButton
 extends Control
 
-# The home «Телефон» button (replaces «Письма», §Р8 п.1): a small lacquered phone with the partner's colour glow,
-# a red badge = letters + chats waiting + new posts, a soft «buzz» wiggle every few seconds while something is unread.
+# The home «Телефон» button (replaces «Письма», §Р8 п.1): a small lacquered phone with the partner's colour glow and
+# the one number badge of the game (UX_RULES §3.6: rose.300, до 9, дальше «9+») = letters + chats waiting + new posts.
+# A quiet icon of the Чайная (role tertiary, §3.4). The badge never pulses and the button never wiggles (§3.6 п.6, §6.7).
 #   home.gd (integrator):  add_child(V10PhoneButton.make(main, Rect2(x, y, 112, 128)))
 # Tap → V10Phone.open(main). refresh() re-reads the badge (call on home_built / day_rolled / after a match).
 
@@ -12,7 +13,6 @@ const PUI: = preload("res://scripts/v10/phone/phone_ui.gd")
 var main
 var body: Control
 var badge: Control
-var _t: = 0.0
 
 
 static func make(m, r: Rect2) -> V10PhoneButton:
@@ -27,6 +27,7 @@ static func make(m, r: Rect2) -> V10PhoneButton:
 
 func _build() -> void:
 	pivot_offset = size * 0.5
+	PUI.role(self, "tertiary")
 	body = Control.new()
 	body.size = size
 	body.pivot_offset = Vector2(size.x * 0.5, size.y * 0.8)
@@ -46,7 +47,7 @@ func _build() -> void:
 	heart.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	heart.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	body.add_child(heart)
-	var cap: = PUI.label("Телефон", 19, PUI.TEXT, PUI.body(900), 4, Color(0.1, 0.03, 0.07, 0.85))
+	var cap: = PUI.label("Телефон", PUI.FS_CAPTION, PUI.TEXT, PUI.body(900), 4, Color(0.1, 0.03, 0.07, 0.85))
 	cap.position = Vector2(-10, ph + 10)
 	cap.size = Vector2(size.x + 20, 28)
 	cap.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -62,15 +63,3 @@ func refresh() -> void:
 	badge = PUI.badge(P.badge(), Vector2(size.x * 0.78 + 6, 8))
 	add_child(badge)
 
-
-func _process(dt: float) -> void:
-	if badge == null or not badge.visible:
-		return
-	_t += dt
-	# every 4 s a short «buzz»: the phone wiggles twice (never while the effects are set to minimum)
-	if _t >= 4.0:
-		_t = 0.0
-		if V9Feel.can_fx():
-			var t: = body.create_tween()
-			for a in [0.09, -0.09, 0.06, -0.04, 0.0]:
-				t.tween_property(body, "rotation", a, 0.06)

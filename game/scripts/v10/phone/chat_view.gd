@@ -100,26 +100,17 @@ func _header() -> void:
 	line.size = Vector2(W, 2)
 	line.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(line)
-	var back: = Control.new()
+	var back: = PUI.icon_button("back", Rect2(0, 12, 80, 80), PUI.GOLD, 26.0, 3.5)
 	back.name = "Back"
-	back.position = Vector2(4, 16)
-	back.size = Vector2(72, 72)
-	back.pivot_offset = back.size * 0.5
-	var arrow: = PUI.label("‹", 64, PUI.GOLD, PUI.body(700))
-	arrow.size = back.size
-	arrow.position = Vector2(0, -8)
-	arrow.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	arrow.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	back.add_child(arrow)
 	add_child(back)
 	PUI.tap(back, close, "tap")
-	avatar = V8Art.emotion_avatar(hero, "happy", Rect2(76, 14, 76, 76), "gold")
+	avatar = V8Art.emotion_avatar(hero, "happy", Rect2(80, 14, 76, 76), "gold")
 	add_child(avatar)
-	var nm: = PUI.label(P.hero_name(hero), 40 if PUI.has_caveat() else 32, hc.lerp(Color.WHITE, 0.45), PUI.hand(), 4, Color(0.1, 0.03, 0.07, 0.8))
-	nm.position = Vector2(166, 10 if PUI.has_caveat() else 14)
+	var nm: = PUI.label(P.hero_name(hero), PUI.fs_hand(), hc.lerp(Color.WHITE, 0.45), PUI.hand())
+	nm.position = Vector2(170, 8 if PUI.has_caveat() else 12)
 	nm.size = Vector2(W - 190, 50)
 	add_child(nm)
-	status_l = PUI.label("в сети", 18, Color("9fe0bf"), PUI.body(800))
+	status_l = PUI.label("в сети", PUI.FS_CAPTION, PUI.JADE_300, PUI.body(800))
 	status_l.position = Vector2(168, 60)
 	status_l.size = Vector2(W - 190, 26)
 	add_child(status_l)
@@ -127,8 +118,7 @@ func _header() -> void:
 
 func close() -> void:
 	PUI.snd("tab")
-	var t: = create_tween()
-	t.tween_property(self, "position:x", W, 0.26).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+	var t: = PUI.leave(self, "position:x", W, 0.26)
 	t.tween_callback(func():
 		closed.emit()
 		queue_free())
@@ -136,8 +126,7 @@ func close() -> void:
 
 func slide_in() -> void:
 	position.x = W
-	var t: = create_tween()
-	t.tween_property(self, "position:x", 0.0, 0.34).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	PUI.enter(self, "position:x", 0.0, 0.34)
 
 
 # --- content ------------------------------------------------------------------------------
@@ -287,7 +276,7 @@ func _play(msgs: Array, done: Callable) -> void:
 
 func _set_typing(on: bool, voice: = false) -> void:
 	status_l.text = ("записывает голосовое…" if voice else "печатает…") if on else "в сети"
-	status_l.label_settings.font_color = hc.lerp(Color.WHITE, 0.4) if on else Color("9fe0bf")
+	status_l.label_settings.font_color = hc.lerp(Color.WHITE, 0.4) if on else PUI.JADE_300
 	if on and typing == null:
 		typing = BUB.make({"who": "h", "k": "typing"}, W * 0.74, hc)
 		typing.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -300,7 +289,7 @@ func _set_typing(on: bool, voice: = false) -> void:
 
 
 func _bounce_avatar(amt: = 0.08) -> void:
-	if not is_instance_valid(avatar):
+	if not is_instance_valid(avatar) or PUI.calm():
 		return
 	var t: = avatar.create_tween()
 	t.tween_property(avatar, "scale", Vector2.ONE * (1.0 + amt), 0.09).set_trans(Tween.TRANS_QUAD)
@@ -322,17 +311,17 @@ func _build_bar() -> void:
 	var hs: = []
 	for i in choices.size():
 		var ch: Dictionary = choices[i]
-		var ph: = 64.0
+		var ph: = 80.0
 		if ch.has("t"):
-			var th: = PUI.body(800).get_multiline_string_size(str(ch.t), HORIZONTAL_ALIGNMENT_CENTER, pw - 110, 22).y
-			ph = maxf(64.0, th + 30.0)
+			var th: = PUI.body(800).get_multiline_string_size(str(ch.t), HORIZONTAL_ALIGNMENT_LEFT, pw - 84, PUI.FS_BODY).y
+			ph = maxf(80.0, th + 30.0)
 		else:
 			ph = 96.0
 		hs.append(ph)
 	var total: = 0.0
 	for ph in hs:
 		total += ph + gap
-	var sticker_btn_h: = 0.0 if not choices.is_empty() else 76.0
+	var sticker_btn_h: = 0.0 if not choices.is_empty() else 92.0
 	bar_h = total + sticker_btn_h + 34.0
 	bar.position = Vector2(0, H - bar_h)
 	bar.size = Vector2(W, bar_h)
@@ -340,15 +329,24 @@ func _build_bar() -> void:
 	bar.add_child(bg)
 	scroll.size.y = H - HEAD_H - bar_h + 18.0
 	y = 18.0
+	# 2–3 reply pills are one action: the screen's primary (§3.4 «Телефон / чат»)
+	var group: = Control.new()
+	group.name = "Pills"
+	group.size = bar.size
+	group.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	bar.add_child(group)
+	if not choices.is_empty():
+		PUI.role(group, "primary")
 	for i in choices.size():
 		var ch: Dictionary = choices[i]
 		var p: = _pill(ch, Rect2(22, y, pw, hs[i]), i)
-		bar.add_child(p)
+		group.add_child(p)
 		PUI.pop_in(p, 0.06 * i, 0.85, 0.36)
 		pills.append(p)
 		y += hs[i] + gap
 	if choices.is_empty():
-		var sb: = _sticker_button(Rect2(22, y, pw, 64))
+		var sb: = _sticker_button(Rect2(22, y, pw, 80))
+		PUI.role(sb, "primary")      # the conversation is over: a sticker is the one thing left to do
 		bar.add_child(sb)
 		PUI.pop_in(sb, 0.0, 0.9)
 	_scroll_end(false)
@@ -360,11 +358,12 @@ func _pill(ch: Dictionary, r: Rect2, i: int) -> Control:
 	c.position = r.position
 	c.size = r.size
 	c.pivot_offset = r.size * 0.5
-	var sb: = PUI.box(Color(0.16, 0.11, 0.15, 0.96), r.size.y * 0.5 if r.size.y < 80 else 28.0, 2.0, Color(hc.lerp(PUI.GOLD, 0.5), 0.85), 8, Color(0, 0, 0, 0.4))
+	var sb: = PUI.box(Color(0.16, 0.11, 0.15, 0.96), minf(r.size.y * 0.5, 40.0), 2.0, Color(hc.lerp(PUI.GOLD, 0.5), 0.85))
 	c.add_child(PUI.panel(Rect2(Vector2.ZERO, r.size), sb))
-	var num: = PUI.label(["①", "②", "③"][mini(i, 2)], 26, PUI.GOLD, PUI.body(900))
+	var num: = PUI.label(["①", "②", "③"][mini(i, 2)], PUI.FS_BODY, PUI.GOLD, PUI.body(900))
 	num.position = Vector2(18, (r.size.y - 36) * 0.5)
 	num.size = Vector2(36, 36)
+	num.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	c.add_child(num)
 	if ch.has("sticker"):
 		var t: = P.sticker_tex(str(ch.sticker))
@@ -377,13 +376,13 @@ func _pill(ch: Dictionary, r: Rect2, i: int) -> Control:
 			tr.size = Vector2(84, 84)
 			tr.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			c.add_child(tr)
-		var lb: = PUI.label("Стикер «%s»" % str(D.sticker(str(ch.sticker)).get("label", "")), 22, PUI.TEXT, PUI.body(800))
+		var lb: = PUI.label("Стикер «%s»" % str(D.sticker(str(ch.sticker)).get("label", "")), PUI.FS_BODY, PUI.TEXT, PUI.body(800))
 		lb.position = Vector2(160, 0)
 		lb.size = Vector2(r.size.x - 180, r.size.y)
 		lb.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		c.add_child(lb)
 	else:
-		var l: = PUI.label(str(ch.get("t", "")), 22, PUI.TEXT, PUI.body(800))
+		var l: = PUI.label(str(ch.get("t", "")), PUI.FS_BODY, PUI.TEXT, PUI.body(800))
 		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		l.position = Vector2(62, 0)
 		l.size = Vector2(r.size.x - 84, r.size.y)
@@ -399,8 +398,8 @@ func _sticker_button(r: Rect2) -> Control:
 	c.position = r.position
 	c.size = r.size
 	c.pivot_offset = r.size * 0.5
-	c.add_child(PUI.panel(Rect2(Vector2.ZERO, r.size), PUI.box(Color(0.2, 0.13, 0.17, 0.96), r.size.y * 0.5, 2.0, Color(PUI.GOLD, 0.7), 8)))
-	var l: = PUI.label("✿  Отправить стикер", 23, PUI.GOLD, PUI.body(900))
+	c.add_child(PUI.panel(Rect2(Vector2.ZERO, r.size), PUI.box(Color(0.2, 0.13, 0.17, 0.96), r.size.y * 0.5, 2.0, Color(PUI.GOLD, 0.7))))
+	var l: = PUI.label("✿  Отправить стикер", PUI.FS_BODY, PUI.GOLD, PUI.body(900))
 	l.size = r.size
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -458,19 +457,20 @@ func _aff_chip(n: int) -> void:
 	chip.position = Vector2(W * 0.5 - 70, HEAD_H + 30)
 	chip.size = Vector2(140, 52)
 	chip.pivot_offset = chip.size * 0.5
-	chip.add_child(PUI.panel(Rect2(Vector2.ZERO, chip.size), PUI.box(Color("d24a6a"), 26, 3.0, Color("ffd7e0"), 10, Color(0.5, 0, 0.15, 0.5))))
-	var l: = PUI.label("♥ +%d" % n, 28, Color.WHITE, PUI.body(900))
+	chip.add_child(PUI.panel(Rect2(Vector2.ZERO, chip.size), PUI.box(PUI.HEART_DEEP, 26)))
+	var l: = PUI.label("♥ +%d" % n, PUI.FS_BODY, Color.WHITE, PUI.body(900))
 	l.size = chip.size
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	chip.add_child(l)
 	add_child(chip)
 	PUI.pop_in(chip, 0.0, 0.4, 0.5)
-	PUI.burst(self, chip.position + chip.size * 0.5, Color("ff8fb8"), 10, "♥", 110)
+	PUI.burst(self, chip.position + chip.size * 0.5, PUI.HEART, 10, "♥", 110)
 	var t: = chip.create_tween()
 	t.tween_interval(1.4)
-	t.tween_property(chip, "position:y", chip.position.y - 40, 0.4)
-	t.parallel().tween_property(chip, "modulate:a", 0.0, 0.4)
+	if not PUI.calm():
+		t.tween_property(chip, "position:y", chip.position.y - 40, 0.4)
+	t.parallel().tween_property(chip, "modulate:a", 0.0, 0.4 if not PUI.calm() else 0.12)
 	t.tween_callback(chip.queue_free)
 
 
@@ -487,21 +487,22 @@ func _show_reactions(b: V10Bubble) -> void:
 	if react_bar != null and is_instance_valid(react_bar):
 		react_bar.queue_free()
 	var rs: Array = D.meta().get("reactions", [])
-	var w: = 70.0 * rs.size() + 20.0
+	var w: = 80.0 * rs.size() + 16.0
 	var c: = Control.new()
 	c.name = "Reactions"
+	PUI.role(c, "primary")
 	var gp: = b.get_global_rect().position - get_global_rect().position
-	c.position = Vector2(clampf(gp.x, 12, W - w - 12), clampf(gp.y - 84, HEAD_H + 6, H - 200))
-	c.size = Vector2(w, 74)
-	c.pivot_offset = Vector2(36, 74)
-	c.add_child(PUI.panel(Rect2(Vector2.ZERO, c.size), PUI.box(Color(0.15, 0.1, 0.13, 0.98), 37, 2.0, Color(PUI.GOLD, 0.6), 14, Color(0, 0, 0, 0.5))))
+	c.position = Vector2(clampf(gp.x, 12, maxf(12.0, W - w - 12)), clampf(gp.y - 100, HEAD_H + 6, H - 220))
+	c.size = Vector2(w, 92)
+	c.pivot_offset = Vector2(40, 92)
+	c.add_child(PUI.panel(Rect2(Vector2.ZERO, c.size), PUI.box(Color(0.15, 0.1, 0.13, 0.98), 46, 2.0, Color(PUI.GOLD, 0.6))))
 	for i in rs.size():
 		var r: Dictionary = rs[i]
 		var it: = Control.new()
-		it.position = Vector2(12 + i * 70, 6)
-		it.size = Vector2(62, 62)
+		it.position = Vector2(8 + i * 80, 6)
+		it.size = Vector2(80, 80)
 		it.pivot_offset = it.size * 0.5
-		var gl: = PUI.label(str(r.glyph), 30, Color("ffb3c6") if r.id != "tea" else Color("a9d9c4"), PUI.body(900))
+		var gl: = PUI.label(str(r.glyph), PUI.FS_H3, PUI.ROSE_300 if r.id != "tea" else PUI.JADE_300, PUI.body(900))
 		gl.size = it.size
 		gl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		gl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -554,7 +555,7 @@ func open_tray() -> void:
 		return
 	tray = TRAY.new()
 	add_child(tray)
-	tray.build(W, minf(H * 0.62, 100.0 + 2.0 * (W - 28.0) / 4.0 + 44.0), hero)
+	tray.build(W, minf(H * 0.62, 104.0 + 2.0 * (W - 28.0) / 4.0 + 44.0), hero)
 	tray.position = Vector2(0, H)
 	tray.picked.connect(_send_sticker)
 	tray.closed.connect(func(): tray = null)
@@ -566,15 +567,16 @@ func _send_sticker(sid: String) -> void:
 		return
 	var r: Dictionary = P.transport().sticker(hero, sid, P.ctx())
 	if not r.get("ok", false):
-		V9Feel.deny(bar)
+		V9Feel.haptic("deny")      # the interface never shakes (§6.7)
 		return
 	var b: = _add({"who": "me", "k": "sticker", "id": sid, "tid": tid, "i": -1})
 	PUI.snd("sticker_pop")
-	V9Feel.haptic("match")
-	b.scale = Vector2(0.2, 0.2)
-	var t: = b.create_tween()
-	t.tween_property(b, "scale", Vector2.ONE * 1.12, 0.22).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	t.tween_property(b, "scale", Vector2.ONE, 0.18)
+	V9Feel.haptic("select")        # secondary action: lighter than the reply pill («button», §7.4)
+	if not PUI.calm():
+		b.scale = Vector2(0.2, 0.2)
+		var t: = b.create_tween()
+		t.tween_property(b, "scale", Vector2.ONE * 1.12, 0.22).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		t.tween_property(b, "scale", Vector2.ONE, 0.18)
 	_scroll_end()
 	G.save()
 	var reply: = str(r.get("reply", ""))
@@ -625,7 +627,7 @@ func _play_voice(b: V10Bubble) -> void:
 		b.voice_t = v
 		b.queue_redraw()
 		# lip-sync: the avatar «speaks» with small bounces on the waveform beats
-		if is_instance_valid(avatar):
+		if is_instance_valid(avatar) and not PUI.calm():
 			avatar.scale = Vector2.ONE * (1.0 + 0.035 * absf(sin(v * sec * 11.0)))
 		, 0.0, 1.0, sec)
 	t.tween_callback(func():

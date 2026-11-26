@@ -17,6 +17,7 @@ extends RefCounted
 #   V10Phone.set_player_name(nom, g)             «Как ей тебя звать?»
 #   V10Phone.sticker_tex(id) -> Texture2D the sticker art or null (UI then draws glyph + label)
 #   V10Phone.open(main, args)             slides the phone over the current screen (overlay); see phone_screen.gd
+#   V10Phone.shutdown()                   drops the static caches at app exit
 #
 # Test hooks: day_shift (days added to the day key), bond_sink (Callable(h, n, src) -> int used instead of V10Bond).
 
@@ -25,6 +26,7 @@ const D: = preload("res://scripts/v10/chat/chat_data.gd")
 const FEED: = preload("res://scripts/v10/chat/chat_feed.gd")
 const TR: = preload("res://scripts/v10/chat/local_transport.gd")
 const NAMES: = preload("res://scripts/v10/phone/names.gd")
+const PUI: = preload("res://scripts/v10/phone/phone_ui.gd")
 
 const META_PATH: = "res://scripts/v10/meta/meta.gd"
 const BOND_PATH: = "res://scripts/v10/meta/bond.gd"
@@ -165,6 +167,15 @@ static func reset() -> void:
 	_tr = null
 
 
+# app exit (integrator: main's NOTIFICATION_WM_CLOSE_REQUEST / tree_exiting) and test teardown: drop every static
+# reference (transport, test sink, font / texture / sound caches) so nothing outlives the SceneTree
+static func shutdown() -> void:
+	_tr = null
+	bond_sink = Callable()
+	day_shift = 0
+	PUI.clear()
+
+
 static func tick() -> Array:
 	return transport().tick(ctx()).get("opened", [])
 
@@ -226,7 +237,7 @@ static func photo_tex(img: String) -> Texture2D:
 
 
 static func hero_color(h: String) -> Color:
-	return G.HEROES[h].color if G.HEROES.has(h) else Color("e3a1b0")
+	return G.HEROES[h].color if G.HEROES.has(h) else PUI.HERO_FALLBACK
 
 
 static func hero_name(h: String) -> String:

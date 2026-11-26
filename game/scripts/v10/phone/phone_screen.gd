@@ -22,7 +22,7 @@ const BEZEL: = 14.0
 const CASE_R: = 58.0
 const SCREEN_R: = 44.0
 const HEAD_H: = 92.0
-const TABS_H: = 70.0
+const TABS_H: = 84.0          # 80 px tap rows (§6.1) + 4
 
 var main
 var W: = 720.0
@@ -100,7 +100,7 @@ func _build(m, args: Dictionary) -> void:
 		dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		add_child(dim)
 	_frame()
-	tab = str(args.get("tab", P.st().tab))
+	tab = str(args.get("tab", start_tab()))
 	if not tab in TAB_NAMES:
 		tab = "chats"
 	_tabs()
@@ -115,6 +115,15 @@ func _build(m, args: Dictionary) -> void:
 			(_page("mail") as V10MailView).open_letter(int(args.letter))).call_deferred()
 	elif tab == "chats" and not bool(P.st().named):
 		ask_name.call_deferred()
+
+
+# §3.2: the phone opens on the tab that has something new (Почта · Чаты · Лента), else where the player left it
+func start_tab() -> String:
+	var b: = P.badge_parts()
+	for k in ["mail", "chats", "feed"]:
+		if int(b.get(k, 0)) > 0:
+			return k
+	return str(P.st().tab)
 
 
 # frame size: a phone at any aspect — tall phones use the whole height, tablets and wide screens keep a phone
@@ -154,7 +163,7 @@ func _frame() -> void:
 	case.position = Vector2.ZERO
 	case.size = fr.size
 	case.setup(cc[0], cc[1], CASE_R, 4.0, 22.0)
-	case.borders(Color("f3d99a"), PUI.GOLD_D)
+	case.borders(PUI.GOLD_300, PUI.GOLD_D)
 	case.set_param("gloss", 0.12)
 	case.name = "Case"
 	frame.add_child(case)
@@ -185,35 +194,28 @@ func _frame() -> void:
 	frame.add_child(mask)
 	# speaker slit in the top bezel
 	frame.add_child(PUI.panel(Rect2(fr.size.x * 0.5 - 48, 9, 96, 8), PUI.box(Color(0, 0, 0, 0.55), 4, 1.0, Color(PUI.GOLD, 0.35))))
-	# head: title in handwriting + close
-	var title: = PUI.label("Телефон", 46 if PUI.has_caveat() else 34, PUI.GOLD, PUI.hand(), 4, Color(0.12, 0.04, 0.07, 0.85))
-	title.position = Vector2(30, 18 if PUI.has_caveat() else 26)
+	# head: title in handwriting (left field, §6.3) + a quiet close icon in an 80 px hit zone
+	var title: = PUI.label("Телефон", PUI.fs_hand(), PUI.GOLD, PUI.hand())
+	title.position = Vector2(30, 14 if PUI.has_caveat() else 24)
 	title.size = Vector2(300, 60)
 	screen.add_child(title)
-	var close_b: = Control.new()
+	var close_b: = PUI.icon_button("close", Rect2(sr.size.x - 92, 6, 80, 80), PUI.TEXT, 22.0, 3.0)
 	close_b.name = "Close"
-	close_b.position = Vector2(sr.size.x - 84, 16)
-	close_b.size = Vector2(64, 64)
-	close_b.pivot_offset = close_b.size * 0.5
-	close_b.add_child(PUI.panel(Rect2(6, 6, 52, 52), PUI.box(Color(1, 1, 1, 0.07), 26, 1.5, Color(PUI.GOLD, 0.5))))
-	var xl: = PUI.label("✕", 26, PUI.TEXT, PUI.body(900))
-	xl.size = close_b.size
-	xl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	xl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	close_b.add_child(xl)
 	screen.add_child(close_b)
 	PUI.tap(close_b, back, "tap")
 
 
+# segment Лента · Чаты · Почта: one control (role secondary); each tab is an 80 px tap row, the pill is 60 px
 func _tabs() -> void:
 	tabs = Control.new()
 	tabs.name = "Tabs"
-	tabs.position = Vector2(18, HEAD_H)
-	tabs.size = Vector2(sr.size.x - 36, TABS_H - 12)
+	tabs.position = Vector2(18, HEAD_H - 4)
+	tabs.size = Vector2(sr.size.x - 36, 80)
+	PUI.role(tabs, "secondary")
 	screen.add_child(tabs)
-	tabs.add_child(PUI.panel(Rect2(Vector2.ZERO, tabs.size), PUI.box(Color(0, 0, 0, 0.3), tabs.size.y * 0.5, 1.0, Color(1, 1, 1, 0.08))))
+	tabs.add_child(PUI.panel(Rect2(0, 10, tabs.size.x, 60), PUI.box(Color(0, 0, 0, 0.3), 30, 1.0, Color(PUI.TEXT, 0.08))))
 	var tw: = tabs.size.x / 3.0
-	indicator = PUI.panel(Rect2(4, 4, tw - 8, tabs.size.y - 8), PUI.box(Color(PUI.GOLD, 0.22), (tabs.size.y - 8) * 0.5, 2.0, Color(PUI.GOLD, 0.85), 6, Color(0.6, 0.4, 0.1, 0.25)))
+	indicator = PUI.panel(Rect2(4, 14, tw - 8, 52), PUI.box(Color(PUI.GOLD, 0.22), 26, 2.0, Color(PUI.GOLD, 0.85)))
 	indicator.name = "Indicator"
 	tabs.add_child(indicator)
 	var i: = 0
@@ -223,16 +225,13 @@ func _tabs() -> void:
 		c.position = Vector2(i * tw, 0)
 		c.size = Vector2(tw, tabs.size.y)
 		c.pivot_offset = c.size * 0.5
-		var l: = PUI.label(TAB_NAMES[k], 23, PUI.TEXT, PUI.body(900))
+		var l: = PUI.label(TAB_NAMES[k], PUI.FS_BODY, PUI.TEXT, PUI.body(900))
 		l.name = "L"
 		l.size = c.size
 		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		c.add_child(l)
-		var tw_txt: = PUI.body(900).get_string_size(TAB_NAMES[k], HORIZONTAL_ALIGNMENT_LEFT, -1, 23).x
-		var bd: = PUI.badge(0, Vector2(tw * 0.5 + tw_txt * 0.5 + 16, 12))
-		bd.name = "Badge"
-		c.add_child(bd)
+		c.add_child(PUI.dot(_dot_at(c, k), false))
 		tabs.add_child(c)
 		var kk: String = k
 		PUI.tap(c, func(): select(kk), "")
@@ -240,6 +239,12 @@ func _tabs() -> void:
 	refresh_badges()
 
 
+func _dot_at(c: Control, k: String) -> Vector2:
+	var tw_txt: = PUI.body(900).get_string_size(TAB_NAMES[k], HORIZONTAL_ALIGNMENT_LEFT, -1, PUI.FS_BODY).x
+	return Vector2(c.size.x * 0.5 + tw_txt * 0.5 + 12, c.size.y * 0.5 - 12)
+
+
+# §3.6: one 12 px dot per tab with something to answer or see; none on the tab being viewed (it is seen)
 func refresh_badges() -> void:
 	if tabs == null:
 		return
@@ -248,18 +253,14 @@ func refresh_badges() -> void:
 		var c: = tabs.get_node_or_null("Tab_" + k)
 		if c == null:
 			continue
-		var old: = c.get_node_or_null("Badge")
-		var n: = int(b[k])
-		var shown: bool = old != null and old.visible
-		if old != null:
-			c.remove_child(old)
-			old.queue_free()
-		var tw_txt: = PUI.body(900).get_string_size(TAB_NAMES[k], HORIZONTAL_ALIGNMENT_LEFT, -1, 23).x
-		var bd: = PUI.badge(n, Vector2(c.size.x * 0.5 + tw_txt * 0.5 + 16, 12))
-		bd.name = "Badge"
-		c.add_child(bd)
-		if n > 0 and not shown:
-			PUI.pop_in(bd, 0.25, 0.3, 0.4)
+		var d: Control = c.get_node_or_null("Badge")
+		if d == null:
+			continue
+		var on: bool = int(b[k]) > 0 and str(k) != tab
+		if on and not d.visible:
+			d.visible = true
+			PUI.pop_in(d, 0.2, 0.4, 0.3)
+		d.visible = on
 
 
 func _pager() -> void:
@@ -317,7 +318,11 @@ func select(k: String, anim: = true) -> void:
 			continue
 		if p == pg:
 			p.visible = true
-			if anim and changed:
+			if anim and changed and PUI.calm():
+				p.position.x = 0.0
+				p.modulate.a = 0.0
+				p.create_tween().tween_property(p, "modulate:a", 1.0, 0.12)
+			elif anim and changed:
 				p.position.x = pw * 0.35 * signf(to - from)
 				p.modulate.a = 0.0
 				var t: = p.create_tween().set_parallel()
@@ -329,7 +334,7 @@ func select(k: String, anim: = true) -> void:
 		else:
 			p.visible = false
 	var tw: = tabs.size.x / 3.0
-	if anim:
+	if anim and not PUI.calm():
 		var it: = indicator.create_tween()
 		it.tween_property(indicator, "position:x", to * tw + 4, 0.3).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	else:
@@ -340,8 +345,6 @@ func select(k: String, anim: = true) -> void:
 	if anim and changed:
 		PUI.snd("tab")
 		V9Feel.haptic("select")
-	if k == "feed" and pg.has_method("refresh") and changed:
-		pass
 	refresh_badges.call_deferred()
 
 
@@ -404,8 +407,7 @@ func _slide_up() -> void:
 	frame.position.y = H + 20
 	PUI.snd("phone_open")
 	V9Feel.haptic("button")
-	var t: = frame.create_tween()
-	t.tween_property(frame, "position:y", fr.position.y, 0.4).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	PUI.enter(frame, "position:y", fr.position.y, 0.4)
 
 
 # Android «назад»: the innermost layer first (reactions/tray/photo → chat → letter → name picker → phone)
@@ -441,8 +443,11 @@ func close() -> void:
 	G.save()
 	PUI.snd("phone_close")
 	var t: = create_tween().set_parallel()
-	t.tween_property(frame, "position:y", H + 40, 0.3).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
-	t.tween_property(dim, "color:a", 0.0, 0.3)
+	if PUI.calm():
+		t.tween_property(self, "modulate:a", 0.0, 0.12)
+	else:
+		t.tween_property(frame, "position:y", H + 40, 0.3).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
+		t.tween_property(dim, "color:a", 0.0, 0.3)
 	t.chain().tween_callback(func():
 		if overlay_mode:
 			queue_free()

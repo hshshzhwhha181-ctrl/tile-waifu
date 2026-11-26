@@ -3,6 +3,9 @@ usage: python3 -I game/scripts/v10/phone/tools/make_sfx.py game/assets/v10/phone
 import sys, os, math, wave, struct, random
 
 SR = 44100
+# UX_RULES §7.4: SFX peaks ≤ −6 dBFS → every file is normalised to at most −6.5 dBFS (0.473 of full scale)
+PEAK_MAX = 0.473
+random.seed(7)
 out = sys.argv[1] if len(sys.argv) > 1 else "game/assets/v10/phone/sfx"
 os.makedirs(out, exist_ok=True)
 
@@ -38,7 +41,7 @@ def write(name, dur, fn, gain=0.55):
         for i, x in enumerate(data):
             if i > n - fade:
                 x *= (n - i) / fade
-            frames += struct.pack("<h", int(max(-1, min(1, x / peak * gain)) * 32767))
+            frames += struct.pack("<h", int(max(-1, min(1, x / peak * min(gain, PEAK_MAX))) * 32767))
         w.writeframes(bytes(frames))
     print(name, dur)
 

@@ -53,7 +53,7 @@ func refresh() -> void:
 	sp.custom_minimum_size = Vector2(W, 4)
 	list.add_child(sp)
 	if posts.is_empty():
-		var e: = PUI.label("Лента пока пустая. Посты появляются два раза в неделю.", 22, PUI.MUTED, PUI.body(800))
+		var e: = PUI.label("Лента пока пустая. Посты появляются два раза в неделю.", PUI.FS_BODY, PUI.MUTED, PUI.body(800))
 		e.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		e.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		e.custom_minimum_size = Vector2(W - 60, 200)
@@ -65,7 +65,7 @@ func refresh() -> void:
 		list.add_child(c)
 		cards[str(p.id)] = c
 		i += 1
-	var end: = PUI.label("Это все посты. Новые — во вторник и пятницу.", 18, PUI.MUTED, PUI.body(800))
+	var end: = PUI.label("Это все посты. Новые — во вторник и пятницу.", PUI.FS_CAPTION, PUI.MUTED, PUI.body(800))
 	end.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	end.custom_minimum_size = Vector2(W, 80)
 	list.add_child(end)
@@ -77,11 +77,11 @@ func _card(p: Dictionary, fresh: bool, idx: int) -> Control:
 	var hc: = P.hero_color(h)
 	var cw: = W - 28.0
 	var bf: = PUI.body(800)
-	var cap_h: = bf.get_multiline_string_size(str(p.t), HORIZONTAL_ALIGNMENT_LEFT, cw - 44, 20).y
+	var cap_h: = bf.get_multiline_string_size(str(p.t), HORIZONTAL_ALIGNMENT_LEFT, cw - 44, PUI.FS_BODY).y
 	var ph: = minf(cw * 1.2, 640.0)
 	var y_photo: = 84.0
-	var y_act: = y_photo + ph + 8.0
-	var y_cap: = y_act + 60.0
+	var y_act: = y_photo + ph
+	var y_cap: = y_act + 84.0
 	var y_com: = y_cap + cap_h + 14.0
 	var c: = Control.new()
 	c.name = "Post_" + str(p.id)
@@ -89,27 +89,19 @@ func _card(p: Dictionary, fresh: bool, idx: int) -> Control:
 	var card: = Control.new()
 	card.position = Vector2(14, 0)
 	c.add_child(card)
-	var bg: = PUI.panel(Rect2(0, 0, cw, 100), PUI.box(Color(0.15, 0.105, 0.135, 0.98), 30, 1.0 if fresh else 0.0, Color(hc, 0.5), 10, Color(0, 0, 0, 0.4)))
+	# a new post is told by tone (a thin line in her colour), never by a «новое» sticker (§3.6 п.6)
+	var bg: = PUI.panel(Rect2(0, 0, cw, 100), PUI.box(Color(0.15, 0.105, 0.135, 0.98), 30, 1.0 if fresh else 0.0, Color(hc, 0.5)))
 	bg.name = "Bg"
 	card.add_child(bg)
 	card.add_child(V8Art.emotion_avatar(h, "happy", Rect2(16, 14, 58, 58), "gold"))
-	var nm: = PUI.label(P.hero_name(h), 32 if PUI.has_caveat() else 26, hc.lerp(Color.WHITE, 0.45), PUI.hand())
-	nm.position = Vector2(86, 10)
-	nm.size = Vector2(cw - 200, 40)
+	var nm: = PUI.label(P.hero_name(h), PUI.fs_hand(), hc.lerp(Color.WHITE, 0.45), PUI.hand())
+	nm.position = Vector2(86, 4 if PUI.has_caveat() else 8)
+	nm.size = Vector2(cw - 120, 44)
 	card.add_child(nm)
-	var dl: = PUI.label(date_label(int(p.day)), 16, PUI.MUTED, PUI.body(800))
+	var dl: = PUI.label(date_label(int(p.day)), PUI.FS_CAPTION, PUI.MUTED, PUI.body(800))
 	dl.position = Vector2(88, 48)
-	dl.size = Vector2(220, 22)
+	dl.size = Vector2(220, 26)
 	card.add_child(dl)
-	if fresh:
-		var nw: = PUI.label("новое", 15, Color.WHITE, PUI.body(900))
-		nw.position = Vector2(cw - 96, 26)
-		nw.size = Vector2(76, 28)
-		nw.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		nw.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		var np: = PUI.panel(Rect2(cw - 96, 26, 76, 28), PUI.box(PUI.DOT, 14))
-		card.add_child(np)
-		card.add_child(nw)
 	var photo_box: = Control.new()
 	photo_box.name = "Photo"
 	photo_box.position = Vector2(12, y_photo)
@@ -134,19 +126,19 @@ func _card(p: Dictionary, fresh: bool, idx: int) -> Control:
 	var like: = Control.new()
 	like.name = "Like"
 	like.position = Vector2(14, y_act)
-	like.size = Vector2(230, 52)
-	like.pivot_offset = Vector2(28, 26)
-	var hl: = PUI.label("♥" if p.liked else "♡", 40, Color("ff6f91") if p.liked else PUI.TEXT, PUI.body(900))
+	like.size = Vector2(230, 80)
+	like.pivot_offset = Vector2(28, 40)
+	var hl: = PUI.label("♥" if p.liked else "♡", PUI.fs_hand(), PUI.HEART if p.liked else PUI.TEXT, PUI.body(900))
 	hl.name = "Heart"
-	hl.size = Vector2(56, 52)
+	hl.size = Vector2(56, 80)
 	hl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	hl.pivot_offset = Vector2(28, 26)
+	hl.pivot_offset = Vector2(28, 40)
 	like.add_child(hl)
-	var lt: = PUI.label("Тебе нравится" if p.liked else "Нравится", 19, PUI.TEXT if p.liked else PUI.MUTED, PUI.body(800))
+	var lt: = PUI.label("Тебе нравится" if p.liked else "Нравится", PUI.FS_CAPTION, PUI.TEXT if p.liked else PUI.MUTED, PUI.body(800))
 	lt.name = "Txt"
 	lt.position = Vector2(60, 0)
-	lt.size = Vector2(170, 52)
+	lt.size = Vector2(170, 80)
 	lt.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	like.add_child(lt)
 	card.add_child(like)
@@ -161,7 +153,7 @@ func _card(p: Dictionary, fresh: bool, idx: int) -> Control:
 			last.t = 0
 		else:
 			last.t = now, "")
-	var cap: = PUI.label(str(p.t), 20, PUI.TEXT, bf)
+	var cap: = PUI.label(str(p.t), PUI.FS_BODY, PUI.TEXT, bf)
 	cap.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	cap.position = Vector2(22, y_cap)
 	cap.size = Vector2(cw - 44, cap_h + 4)
@@ -188,6 +180,10 @@ func _card(p: Dictionary, fresh: bool, idx: int) -> Control:
 	rbox.size = Vector2(cw, 10)
 	card.add_child(rbox)
 	_replies(rbox, p, cw)
+	if idx == 0:
+		# the newest post: its reply pills are the screen's one main action, the like is secondary (§3.4)
+		PUI.role(rbox, "primary")
+		PUI.role(like, "secondary")
 	var total: = y + rbox.size.y + 14.0
 	bg.size.y = total
 	c.custom_minimum_size = Vector2(W, total)
@@ -203,16 +199,16 @@ func _comment(h: String, t: String, w: float) -> Control:
 	var c: = Control.new()
 	var bf: = PUI.body(700)
 	var who: = P.hero_name(h)
-	var th: = bf.get_multiline_string_size(t, HORIZONTAL_ALIGNMENT_LEFT, w - 70, 18).y
-	c.size = Vector2(w, maxf(48.0, th + 34.0))
+	var th: = bf.get_multiline_string_size(t, HORIZONTAL_ALIGNMENT_LEFT, w - 70, PUI.FS_CAPTION).y
+	c.size = Vector2(w, maxf(48.0, th + 36.0))
 	c.add_child(V8Art.emotion_avatar(h, "happy", Rect2(0, 2, 42, 42), "glass"))
-	var n: = PUI.label(who, 16, P.hero_color(h).lerp(Color.WHITE, 0.4), PUI.body(900))
+	var n: = PUI.label(who, PUI.FS_CAPTION, P.hero_color(h).lerp(Color.WHITE, 0.4), PUI.body(900))
 	n.position = Vector2(54, 0)
-	n.size = Vector2(w - 60, 20)
+	n.size = Vector2(w - 60, 24)
 	c.add_child(n)
-	var l: = PUI.label(t, 18, Color("ddd0c2"), bf)
+	var l: = PUI.label(t, PUI.FS_CAPTION, PUI.PAPER_300, bf)
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	l.position = Vector2(54, 20)
+	l.position = Vector2(54, 24)
 	l.size = Vector2(w - 70, th + 4)
 	c.add_child(l)
 	return c
@@ -240,14 +236,14 @@ func _replies(box: Control, p: Dictionary, cw: float) -> void:
 	var bf: = PUI.body(800)
 	for i in reps.size():
 		var txt: = str(reps[i].t)
-		var w: = minf(cw - 36, bf.get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, 19).x + 48)
+		var w: = minf(cw - 36, bf.get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, PUI.FS_CAPTION).x + 48)
 		var b: = Control.new()
 		b.name = "Reply%d" % i
 		b.position = Vector2(18, y)
-		b.size = Vector2(w, 48)
+		b.size = Vector2(w, 80)                 # 56 px pill in an 80 px tap zone
 		b.pivot_offset = b.size * 0.5
-		b.add_child(PUI.panel(Rect2(Vector2.ZERO, b.size), PUI.box(Color(1, 1, 1, 0.05), 24, 1.5, Color(hc.lerp(PUI.GOLD, 0.5), 0.75))))
-		var l: = PUI.label(txt, 19, PUI.TEXT, bf)
+		b.add_child(PUI.panel(Rect2(0, 12, w, 56), PUI.box(Color(PUI.TEXT, 0.05), 28, 1.5, Color(hc.lerp(PUI.GOLD, 0.5), 0.75))))
+		var l: = PUI.label(txt, PUI.FS_CAPTION, PUI.TEXT, bf)
 		l.size = b.size
 		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -257,7 +253,7 @@ func _replies(box: Control, p: Dictionary, cw: float) -> void:
 		var pid: = str(p.id)
 		var ii: = i
 		PUI.tap(b, func(): do_reply(pid, ii), "")
-		y += 58.0
+		y += 80.0
 	box.size.y = y
 
 
@@ -278,12 +274,13 @@ func do_like(id: String, burst: bool) -> void:
 	var like: Control = c.find_child("Like", true, false)
 	if burst and photo != null:
 		var big: Label = photo.get_node("BigHeart")
-		big.scale = Vector2(0.3, 0.3)
+		big.scale = Vector2.ONE if PUI.calm() else Vector2(0.3, 0.3)
 		var t: = big.create_tween().set_parallel()
 		t.tween_property(big, "modulate:a", 1.0, 0.1)
-		t.tween_property(big, "scale", Vector2(1.15, 1.15), 0.32).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		if not PUI.calm():
+			t.tween_property(big, "scale", Vector2(1.15, 1.15), 0.32).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 		t.chain().tween_property(big, "modulate:a", 0.0, 0.3).set_delay(0.25)
-		PUI.burst(photo, photo.size * 0.5, Color("ff6f91"), 16, "♥", 210)
+		PUI.burst(photo, photo.size * 0.5, PUI.HEART, 16, "♥", 210)
 	var r: = FEED.like(P.feed_st(), id, P.ctx())
 	if not r.ok:
 		if not burst:
@@ -296,12 +293,12 @@ func do_like(id: String, burst: bool) -> void:
 	if like != null:
 		var hl: Label = like.get_node("Heart")
 		hl.text = "♥"
-		hl.label_settings.font_color = Color("ff6f91")
+		hl.label_settings.font_color = PUI.HEART
 		(like.get_node("Txt") as Label).text = "Тебе нравится"
 		(like.get_node("Txt") as Label).label_settings.font_color = PUI.TEXT
 		V9Feel.success(hl, "")
 		if not burst:
-			PUI.burst(like, Vector2(28, 26), Color("ff6f91"), 8, "♥", 70)
+			PUI.burst(like, Vector2(28, 40), PUI.HEART, 8, "♥", 70)
 
 
 func do_reply(id: String, i: int) -> void:
