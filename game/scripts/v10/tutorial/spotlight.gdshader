@@ -1,41 +1,51 @@
 shader_type canvas_item;
+render_mode unshaded;
 
-// V10Coach spotlight: dims the whole screen except a soft-edged rounded hole around the target, with a warm
-// gold rim that breathes. Drawn on one full-screen ColorRect; `size` is that rect in px (UV * size = pixel).
+// V10Coach spotlight (README §2.4): a night lacquer dim with ONE rounded window and a single gold hairline on its edge.
+// Every length is in px of the coach's rect (= the viewport: the coach is full rect at the origin of its CanvasLayer).
+// Colours come from V10DS through set_shader_parameter (no literals here).
 
-uniform vec2 size = vec2(720.0, 1280.0);
-uniform vec4 hole = vec4(0.0, 0.0, 0.0, 0.0);   // x, y, w, h in px
-uniform float radius = 26.0;
-uniform float feather = 22.0;
-uniform float has_hole = 1.0;                   // 0: plain dim (bubble-only step), 1: hole
-uniform vec4 dim : source_color = vec4(0.035, 0.02, 0.05, 0.74);
-uniform float rim = 0.0;                        // 0..1 rim strength (breathing)
-uniform vec4 rim_color : source_color = vec4(1.0, 0.86, 0.56, 1.0);
-uniform float amount = 1.0;                     // fade in / out of the whole layer
+uniform vec2 size_px = vec2(720.0, 1280.0);
+uniform vec4 hole = vec4(0.0);          // x, y, w, h; w or h < 1 -> no window (plain dim)
+uniform float radius = 4.0;
+uniform float soft = 10.0;              // dim fades in over this many px outside the window
+uniform vec4 dim_color = vec4(0.0, 0.0, 0.0, 0.72);   // rgb + alpha of the dim
+uniform vec4 rim_color = vec4(1.0, 1.0, 1.0, 0.0);    // the hairline (alpha 0 = none)
+uniform float rim_w = 1.5;
+uniform float amount = 1.0;             // master fade 0..1 (dim and hairline)
+uniform vec4 calm = vec4(0.0);          // the line's block: a soft edgeless shade behind it (no box), x y w h
+uniform float calm_a = 0.0;             // its alpha (dim colour)
+uniform float calm_soft = 56.0;         // how far it fades out around the block
 
-float sd_rrect(vec2 p, vec2 c, vec2 hs, float r) {
-	vec2 q = abs(p - c) - hs + vec2(r);
-	return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - r;
+float sd_rrect(vec2 p, vec2 b, float r) {
+	vec2 q = abs(p) - b + vec2(r);
+	return min(max(q.x, q.y), 0.0) + length(max(q, vec2(0.0))) - r;
 }
 
 void fragment() {
-	vec2 p = UV * size;
-	float a = 1.0;
-	float glow = 0.0;
-	if (has_hole > 0.5 && hole.z > 1.0 && hole.w > 1.0) {
-		vec2 hs = hole.zw * 0.5;
-		float r = min(radius, min(hs.x, hs.y));
-		float d = sd_rrect(p, hole.xy + hs, hs, r);
-		a = smoothstep(-feather * 0.25, feather, d);
-		// a thin warm line hugging the hole, and a wide faint halo outside it
-		glow = (exp(-abs(d - 3.0) / 3.5) * 0.85 + exp(-max(d, 0.0) / 38.0) * 0.18) * rim;
+	vec2 p = UV * size_px;
+	float a_dim = dim_color.a;
+	float a_rim = 0.0;
+	if (calm.z >= 1.0 && calm.w >= 1.0) {
+		// a stadium around the text block, fading over calm_soft px: reads as shade, never as a card
+		vec2 cs = calm.zw * 0.5;
+		float dc = sd_rrect(p - (calm.xy + cs), cs, min(cs.x, cs.y));
+		float k = 1.0 - smoothstep(-cs.y, max(calm_soft, 1.0), dc);
+		a_dim = max(a_dim, calm_a * k * k * (3.0 - 2.0 * k));
 	}
-	// the dim is a touch lighter toward the centre: a vignette, not a flat grey sheet
-	vec2 uvc = UV - vec2(0.5);
-	float vig = 1.0 + dot(uvc, uvc) * 0.35;
-	vec4 col = vec4(dim.rgb, clamp(dim.a * a * vig, 0.0, 0.92));
-	col.rgb = mix(col.rgb, rim_color.rgb, clamp(glow, 0.0, 1.0));
-	col.a = max(col.a, clamp(glow, 0.0, 1.0) * rim_color.a);
-	col.a *= amount;
-	COLOR = col;
+	if (hole.z >= 1.0 && hole.w >= 1.0) {
+		vec2 hs = hole.zw * 0.5;
+		float r = clamp(radius, 0.0, min(hs.x, hs.y));
+		float d = sd_rrect(p - (hole.xy + hs), hs, r);
+		a_dim *= smoothstep(0.0, max(soft, 0.001), d);
+		// a crisp line of rim_w px lying just outside the window edge, 1 px of anti-aliasing
+		float hw = rim_w * 0.5;
+		a_rim = clamp(hw + 0.5 - abs(d - hw), 0.0, 1.0) * rim_color.a;
+	}
+	float a = a_rim + a_dim * (1.0 - a_rim);
+	vec3 rgb = dim_color.rgb;
+	if (a > 0.0001) {
+		rgb = (rim_color.rgb * a_rim + dim_color.rgb * a_dim * (1.0 - a_rim)) / a;
+	}
+	COLOR = vec4(rgb, a * clamp(amount, 0.0, 1.0));
 }
