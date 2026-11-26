@@ -141,21 +141,23 @@ func _ask() -> void:
 	p.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	p.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT
 	p.size = Vector2(720 * 848.0 / 1264.0, 720)
-	p.position = Vector2(W - p.size.x + 60, 90)
+	# 9:20 and taller: the letter and its buttons move down with the extra height (buttons in the lower third)
+	var ex: = maxf(0.0, size.y - 1280.0) * 0.5
+	p.position = Vector2(W - p.size.x + 60, 90 + ex)
 	p.modulate = Color(0.85, 0.82, 0.84)
 	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_body.add_child(p)
-	_body.add_child(V10RitUI.grad(Rect2(0, 420, W, size.y - 420), Color(V10RitUI.NIGHT900, 0), V10RitUI.NIGHT900))
+	_body.add_child(V10RitUI.grad(Rect2(0, 420 + ex, W, size.y - 420 - ex), Color(V10RitUI.NIGHT900, 0), V10RitUI.NIGHT900))
 	var over: = V10RitUI.label("Письмо · %s" % V10RitBridge.short_name(h), 15, V10RitUI.GOLD500, "over")
 	over.position = Vector2(M, 120)
 	_body.add_child(over)
-	var paper: = V10RitUI.panel(Rect2(M, 640, W - 2 * M, 250), Color("efe3cf"), 4)
+	var paper: = V10RitUI.panel(Rect2(M, 640 + ex, W - 2 * M, 250), V10RitUI.WASHI, 4)
 	_body.add_child(paper)
-	var txt: = V10RitUI.wrap_w(V10RitUI.label(V10RitLines.pick("ask_bday", h, 0), 38, Color("3a2a2e"), "hand"), W - 2 * M - 56)
+	var txt: = V10RitUI.wrap_w(V10RitUI.label(V10RitLines.pick("ask_bday", h, 0), 38, V10RitUI.INK, "hand"), W - 2 * M - 56)
 	txt.label_settings.shadow_color = Color(0, 0, 0, 0)
 	txt.position = Vector2(28, 26)
 	paper.add_child(txt)
-	var sign: = V10RitUI.label("— " + V10RitBridge.short_name(h), 32, Color("7a4a56"), "hand")
+	var sign: = V10RitUI.label("— " + V10RitBridge.short_name(h), 32, V10RitUI.INK_SIGN, "hand")
 	sign.label_settings.shadow_color = Color(0, 0, 0, 0)
 	sign.position = Vector2(28, 186)
 	sign.size.x = W - 2 * M - 56
@@ -163,8 +165,8 @@ func _ask() -> void:
 	paper.add_child(sign)
 	# two buttons of EQUAL weight (152-ФЗ: refusing is as easy as agreeing)
 	var bw: = (W - 2 * M - 16) * 0.5
-	var b1: = V10RitUI.button("Рассказать", Rect2(M, 930, bw, 96), "secondary", func(): _show("consent"))
-	var b2: = V10RitUI.button("Не хочу говорить", Rect2(M + bw + 16, 930, bw, 96), "secondary", func():
+	var b1: = V10RitUI.button("Рассказать", Rect2(M, 930 + ex, bw, 96), "secondary", func(): _show("consent"))
+	var b2: = V10RitUI.button("Не хочу говорить", Rect2(M + bw + 16, 930 + ex, bw, 96), "secondary", func():
 		V10PlayerBday.decline()
 		_show("declined"))
 	for b in [b1, b2]:
@@ -186,7 +188,9 @@ func _consent_step() -> void:
 	purpose.position = Vector2(M, 160)
 	_body.add_child(purpose)
 	# drums: day | month (no year)
-	var dy: = 270.0
+	# 9:20 and taller: the drums move down a little, the consent row and the buttons sit in the lower third
+	var ex: = maxf(0.0, size.y - 1280.0)
+	var dy: = 270.0 + ex * 0.3
 	var band: = V10RitUI.panel(Rect2(M, dy + 160 - 34, W - 2 * M, 68), Color(V10RitUI.GOLD500, 0.08), 4, Color(V10RitUI.GOLD700, 0.5), 1)
 	_body.add_child(band)
 	_d_drum = Drum.new()
@@ -221,7 +225,7 @@ func _consent_step() -> void:
 	var row: = Button.new()
 	row.flat = true
 	row.focus_mode = Control.FOCUS_NONE
-	row.position = Vector2(M, 690)
+	row.position = Vector2(M, 690 + ex * 0.6)
 	row.size = Vector2(W - 2 * M, 110)
 	row.add_theme_stylebox_override("normal", V10RitUI.box(Color(V10RitUI.PAPER100, 0.05), 4))
 	row.add_theme_stylebox_override("hover", V10RitUI.box(Color(V10RitUI.PAPER100, 0.05), 4))
@@ -245,10 +249,10 @@ func _consent_step() -> void:
 		_tick_mark.visible = _consent
 		(_tick.get_theme_stylebox("panel") as StyleBoxFlat).bg_color = V10RitUI.GOLD500 if _consent else Color(0, 0, 0, 0)
 		_save.disabled = not _consent)
-	_save = V10RitUI.button("Сохранить", Rect2((W - 560) * 0.5, 850, 560, 104), "primary", _do_save)
+	_save = V10RitUI.button("Сохранить", Rect2((W - 560) * 0.5, 850 + ex, 560, 104), "primary", _do_save)
 	_save.disabled = true
 	_body.add_child(_save)
-	var no: = V10RitUI.button("Не хочу говорить", Rect2((W - 560) * 0.5, 970, 560, 88), "secondary", func():
+	var no: = V10RitUI.button("Не хочу говорить", Rect2((W - 560) * 0.5, 970 + ex, 560, 88), "secondary", func():
 		V10PlayerBday.decline()
 		_show("declined"))
 	_body.add_child(no)

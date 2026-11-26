@@ -31,7 +31,7 @@ const LADDER_LONG: = [
 	{"shuffles": 2, "undos": 2},
 	{"pick_outfit": true},
 	{"gems": 150},
-	{"frame": "back_at_table", "aff": {"partner": 30}},
+	{"frame": "fr_back", "aff": {"partner": 30}},
 ]
 const LADDER_SHORT: = [
 	{"gems": 100},
@@ -74,8 +74,12 @@ static func check(key: = "") -> Dictionary:
 	var last: = str(s.last_seen_key)
 	if last == key:
 		return res
+	# a wrong clock (moved back) must not move last_seen into the past: the next good day would then look like a
+	# long absence and hand out a scene, Отдых and a ladder with 10 билетов
+	if not V10RitClock.clock_ok() or (last != "" and V10RitClock.days_between(last, key) < 0):
+		return res
 	s.last_seen_key = key
-	if last == "" or not V10RitClock.clock_ok():
+	if last == "":
 		return res
 	var gap: = V10RitClock.days_between(last, key)
 	res.gap = gap
@@ -131,11 +135,14 @@ static func ladder_len(kind: String) -> int:
 	return LADDER_LONG.size() if kind == "long" else LADDER_SHORT.size()
 
 
-static func ladder_rewards(kind: String, i: int) -> Dictionary:
+# key fixes the year of the frame «Снова за столом · YYYY» (V10ProfileCos id fr_back_<year>)
+static func ladder_rewards(kind: String, i: int, key: = "") -> Dictionary:
 	var arr: Array = LADDER_LONG if kind == "long" else LADDER_SHORT
 	var r: Dictionary = arr[clampi(i, 0, arr.size() - 1)].duplicate(true)
 	if r.has("aff"):
 		r.aff = {V10RitBridge.partner(): int(r.aff.partner)}
+	if r.has("frame"):
+		r.frame = "%s_%d" % [str(r.frame), V10RitClock.year(key if key != "" else V10RitClock.day_key())]
 	return r
 
 
@@ -150,7 +157,7 @@ static func ladder_view(key: = "") -> Dictionary:
 	var can: bool = claimed < n and str(lad.last_claim_key) != key
 	var days: = []
 	for i in n:
-		days.append({"i": i, "rewards": ladder_rewards(kind, i), "state": "done" if i < claimed else ("ready" if i == claimed and can else ("next" if i == claimed else "later"))})
+		days.append({"i": i, "rewards": ladder_rewards(kind, i, key), "state": "done" if i < claimed else ("ready" if i == claimed and can else ("next" if i == claimed else "later"))})
 	return {"kind": kind, "days": days, "claimed": claimed, "can": can, "done": claimed >= n}
 
 
@@ -160,9 +167,10 @@ static func ladder_claim(key: = "") -> Array:
 	if v.is_empty() or not v.can:
 		return []
 	var lad: Dictionary = st().ladder
-	var r: = ladder_rewards(str(lad.kind), int(lad.claimed))
+	var r: = ladder_rewards(str(lad.kind), int(lad.claimed), key)
 	if r.has("frame"):
-		V10RitBridge.register_frame(str(r.frame), "Снова за столом", "comeback")
+		V10RitBridge.register_frame(str(r.frame), "Снова за столом · %d" % V10RitClock.year(key),
+			{"type": "grant", "event": "comeback", "hint": "Лестница возвращения, день 7", "year": V10RitClock.year(key)})
 	lad.claimed = int(lad.claimed) + 1
 	lad.last_claim_key = key
 	var rows: = V10RitBridge.grant(r, "comeback_ladder")

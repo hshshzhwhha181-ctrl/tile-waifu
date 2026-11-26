@@ -11,7 +11,11 @@ extends RefCounted
 #                              aff {h: n}, pick_outfit (the d5 ladder choice; integrator hook), rested
 #                              A sink callable (set_sink) replaces the whole thing in selftests.
 #   hero_name(h), hero_color(h), partner(), heroes() (only G.HEROES: unknown heroines never celebrate)
-#   register_frame(id, name, src)  V10ProfileCos.register when present (frames live there, spec §2.7)
+#   register_frame(id, name, src)  V10ProfileCos.register when present (frames live there, spec §2.7); src is the
+#                              registry's source dict ({type: bday|grant|streak, …}); ids follow the registry:
+#                              fr_tea_1/2, fr_bday_<h>_<year>, fr_me_<year>, fr_back_<year>
+#   bond_src(src) -> String    grant source → V10Bond source (comeback_ladder → comeback: hard, past the soft cap)
+#   face_of(motif) -> int      tile face id whose art shows that motif (G.TILE_NAMES), -1 when none
 #   reward_icon(kind) -> Texture2D
 #
 # Fallback grant writes the 0.10 glossary keys straight into G.S (gems, coins, tickets, petals); V10Wallet/V10Econ
@@ -168,19 +172,79 @@ static func grant(rewards: Dictionary, src: String) -> Array:
 	return r
 
 
+# spec §2.4: birthday, comeback and streak milestones are HARD sources (past the soft cap of 25 a day). V10Bond
+# knows them as "bday", "comeback", "streak_milestone"; an unknown source would be capped as a soft one.
+const BOND_SRC: = {"comeback_ladder": "comeback", "comeback": "comeback", "bday": "bday", "player_bday": "bday",
+	"streak_milestone": "streak_milestone"}
+
+
+static func bond_src(src: String) -> String:
+	return str(BOND_SRC.get(src, src))
+
+
 static func bond(h: String, n: int, src: String) -> void:
+	src = bond_src(src)
 	var b: = klass("V10Bond")
 	if b:
 		b.call("gain", h, n, src)
 
 
-static func register_frame(id: String, name: String, src: String) -> void:
+# the entry follows the V10ProfileCos schema (check_entry: tier A|S|SSR, src.type, look.base), so the registry
+# accepts it and grant() can hand it out; a frame the registry already builds itself (fr_tea_1/2) is left alone
+static func frame_entry(id: String, name: String, src: Dictionary) -> Dictionary:
+	var look: = {"base": "ring", "deco": "plate", "deco_col": "f2d49a"}
+	if src.has("year"):
+		look["text"] = str(int(src.year))
+	var h: = str(src.get("hero", ""))
+	if h != "":
+		look["deco_col"] = hero_color(h).to_html(false)
+		look["glow"] = look.deco_col
+	var e: = {"id": id, "kind": "frame", "name": name, "tier": "S", "src": src.duplicate(), "look": look}
+	if h != "":
+		e["hero"] = h
+	return e
+
+
+static func register_frame(id: String, name: String, src: Dictionary) -> void:
 	var cos: = klass("V10ProfileCos")
 	if cos == null:
 		return
 	if bool(cos.call("has", id, "")):
 		return
-	cos.call("register", {"id": id, "kind": "frame", "name": name, "tier": "event", "src": {"kind": src}})
+	var err = cos.call("register", frame_entry(id, name, src))
+	if str(err) != "":
+		push_warning("V10RitBridge.register_frame: %s" % err)
+
+
+# ── 0.9 login reward (moves onto the tray, UX_RULES §3.2) ─────────────────────────────────────────────────────
+
+const LOGIN_FALLBACK: = [{"gems": 50}, {"gems": 50}, {"coins": 500}, {"gems": 100}, {"gems": 50}, {"coins": 1000}, {"gems": 300}]
+
+
+static func login_reward(n: int) -> Dictionary:
+	var arr: Array = G.LOGIN_REWARDS if has_g() else LOGIN_FALLBACK
+	return (arr[posmod(n, arr.size())] as Dictionary).duplicate()
+
+
+# the calendar date S.login.last is compared with: G.today() in the game, the pinned clock in selftests
+static func legacy_today() -> String:
+	if V10RitSave._bound or not has_g():
+		var d: = Time.get_datetime_dict_from_unix_time(V10RitClock.now_unix() + V10RitClock.tz_bias_sec())
+		return "%04d-%02d-%02d" % [d.year, d.month, d.day]
+	return str(G.today())
+
+
+# ── tiles ──────────────────────────────────────────────────────────────────────────────────────────────────────
+
+const TILE_FALLBACK: = {"sakura": 0, "sunflower": 3, "moon": 7, "cake": 16, "matcha": 21, "diamond": 24}
+
+
+static func face_of(motif: String) -> int:
+	if motif == "":
+		return -1
+	if has_g():
+		return (G.TILE_NAMES as Array).find(motif)
+	return int(TILE_FALLBACK.get(motif, -1))
 
 
 static func reward_icon(kind: String) -> Texture2D:

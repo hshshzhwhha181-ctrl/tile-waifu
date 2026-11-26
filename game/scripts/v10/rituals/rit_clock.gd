@@ -13,7 +13,7 @@ extends RefCounted
 #   V10RitClock.days_between(a, b) -> int  (b − a in days, keys)        weekday(key) -> 0 = Mon … 6 = Sun
 #   V10RitClock.week_key(key) -> Monday key of that week                 md(key) -> [month, day]   year(key)
 #   V10RitClock.local_hour(u = -1) -> int  V10RitClock.unix_of(key, hour, minute) -> unix (local time)
-#   V10RitClock.clock_ok() -> bool         V10RitClock.fmt_until(key, hour) -> "чт 04:00"
+#   V10RitClock.clock_ok() -> bool         V10RitClock.fmt_until(key, hour) -> "чт, 2 дек, 04:00"
 
 const DAY_START_H: = 4
 const WD_SHORT: = ["пн", "вт", "ср", "чт", "пт", "сб", "вс"]
@@ -84,6 +84,10 @@ static func _arg_shift() -> int:
 static func tz_bias_sec() -> int:
 	if _tz != -100000:
 		return _tz * 60
+	# one zone for the whole game: V10Meta's (it can be pinned there) when the class exists
+	var m: = _meta()
+	if m:
+		return int(m.call("tz_bias_min")) * 60
 	return int(Time.get_time_zone_from_system().get("bias", 0)) * 60
 
 
@@ -160,9 +164,11 @@ static func clock_ok() -> bool:
 	return now_unix() >= _max_seen - 3600
 
 
-# «чт 04:00»: the moment a day-key deadline ends (deadline keys mean «until the start of that day»)
+# «чт, 2 дек, 04:00»: the moment a day-key deadline ends (deadline keys mean «until the start of that day»).
+# UX_RULES §4.1.7: time is shown as a date (weekday, day, month, hour), never as a bare weekday or a countdown.
 static func fmt_until(key: String, hour: = DAY_START_H) -> String:
-	return "%s %02d:00" % [WD_SHORT[weekday(key)], hour]
+	var m: = md(key)
+	return "%s, %d %s, %02d:00" % [WD_SHORT[weekday(key)], int(m[1]), MONTHS_SHORT[clampi(int(m[0]) - 1, 0, 11)], hour]
 
 
 static func fmt_date(m: int, d: int) -> String:

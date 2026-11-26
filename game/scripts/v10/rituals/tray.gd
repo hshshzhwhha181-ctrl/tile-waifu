@@ -9,6 +9,8 @@ extends RefCounted
 #       {icon: path | Texture2D, title: "Чайный лист", text: "+1 · серия под защитой", rewards: {…} (optional),
 #        claim: Callable() (optional; called exactly once on «Забрать всё»)}
 #       Higher prio first. Р3 (leaf) registers here; Г4 «Семь встреч» and Л4 абонемент register from their lanes.
+#       Built in: "streak_leaf" (the Monday leaf) and "visit" — UX_RULES §3.2/§9 P1-17: the 0.9 «Визиты» screen is
+#       removed and its daily login reward (G.LOGIN_REWARDS, S.login {n, last}) arrives on the tray instead.
 #   V10Tray.collect(key = today) -> Array      cards for today ([] when already claimed today)
 #   V10Tray.should_show(key = today) -> bool
 #   V10Tray.claim_all(key = today) -> Array    calls every claim once, grants rewards, marks the day; returns rows
@@ -45,6 +47,7 @@ static func install_builtins() -> void:
 		return
 	_builtins = true
 	register("streak_leaf", _leaf_card, 80)
+	register("visit", _visit_card, 60)
 
 
 # Р3: the Monday leaf (granted by V10Streak.weekly_leaf on the day roll) is shown here, so the player SEES it arrive
@@ -55,6 +58,26 @@ static func _leaf_card(key: String) -> Dictionary:
 	return {"icon": "res://assets/v10/rituals/leaf.webp", "title": "Чайный лист",
 		"text": "Листья: %d/%d" % [int(s.leaves), V10Streak.LEAF_MAX], "rewards": {},
 		"claim": func(): s.leaf_new_key = ""}
+
+
+# the 0.9 daily login reward, now on the tray (the old 7-day popup and the month calendar go away, hook H3).
+# Reads and advances S.login exactly as Daily.login did, so the two can never both pay for one day.
+static func _visit_card(_key: String) -> Dictionary:
+	var lg = V10RitSave.root().get("login")
+	if not (lg is Dictionary) or str(lg.get("last", "")) == V10RitBridge.legacy_today():
+		return {}
+	var rw: = V10RitBridge.login_reward(int(lg.get("n", 0)))
+	if rw.is_empty():
+		return {}
+	var kind: String = "gems" if rw.has("gems") else "coins"
+	var n: = int(rw[kind])
+	var unit: = V10RitLines.plural(n, "кристалл", "кристалла", "кристаллов") if kind == "gems" \
+		else V10RitLines.plural(n, "монета", "монеты", "монет")
+	return {"icon": V10RitBridge.ICONS.get(kind, V10RitBridge.ICONS.gems), "title": "За вход",
+		"text": "+%d %s" % [n, unit], "rewards": rw,
+		"claim": func():
+			lg.n = int(lg.get("n", 0)) + 1
+			lg.last = V10RitBridge.legacy_today()}
 
 
 static func _today(key: String) -> String:

@@ -121,7 +121,7 @@ static func gift_due(key: = "") -> bool:
 
 
 static func frame_id(y: int) -> String:
-	return "my_bday_%d" % y
+	return "fr_me_%d" % y
 
 
 static func claim_gift(key: = "") -> Array:
@@ -130,11 +130,11 @@ static func claim_gift(key: = "") -> Array:
 		return []
 	var y: = V10RitClock.year(key)
 	st().last_gift_year = y
-	V10RitBridge.register_frame(frame_id(y), "Мой праздник · %d" % y, "player_bday")
+	V10RitBridge.register_frame(frame_id(y), "Мой праздник · %d" % y, {"type": "bday", "hero": "", "year": y})
 	var r: Dictionary = GIFT.duplicate(true)
 	r["frame"] = frame_id(y)
 	r["aff"] = {V10RitBridge.partner(): GIFT_AFF}
-	var rows: = V10RitBridge.grant(r, "bday")
+	var rows: = V10RitBridge.grant(r, "player_bday")
 	V10RitSave.save()
 	return rows
 

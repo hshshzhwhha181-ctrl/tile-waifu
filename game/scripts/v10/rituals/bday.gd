@@ -81,11 +81,16 @@ static func sig_overlay(cfg: Dictionary, key: = "") -> Dictionary:
 	if faces.size() < 2:
 		return {}
 	var seed: = int(cfg.get("seed", 0))
-	var a: int = faces[posmod(seed, faces.size())]
-	var b: int = faces[posmod(seed * 7 + 3, faces.size())]
-	if b == a:
-		b = faces[posmod(faces.find(a) + 1, faces.size())]
-	# two kinds must stay distinguishable: kind A wears her emblem, kind B her birthday cake
+	# kind A wears her emblem, kind B her birthday cake. A face that already shows the emblem's motif (or a cake) is
+	# the one that gets swapped, so no two kinds on the board look alike; otherwise the seed picks (deterministic)
+	var motif: = V10RitBridge.face_of(str(V10BdayData.SIG_MOTIF.get(w.h, "")))
+	var cake: = V10RitBridge.face_of(V10BdayData.CAKE_MOTIF)
+	var pool: = faces.filter(func(f): return f != cake)
+	if pool.is_empty():
+		pool = faces
+	var a: int = motif if motif in faces else pool[posmod(seed, pool.size())]
+	var rest: = faces.filter(func(f): return f != a)
+	var b: int = cake if cake in rest else rest[posmod(seed * 7 + 3, rest.size())]
 	return {"h": w.h, "faces": [a, b], "icon": sig_icon(w.h), "icons": [sig_icon(w.h), cake_icon(w.h)]}
 
 
@@ -129,8 +134,9 @@ static func goal_view(key: = "") -> Dictionary:
 		"text": "Праздник %s: %d/%d пары её фишкой" % [V10RitBridge.gen_name(w.h), int(p.n), V10BdayData.GOAL_PAIRS]}
 
 
+# V10ProfileCos ids (v10-profile builds fr_bday_rin_2027 / fr_bday_nova_2027 itself; other years are registered here)
 static func frame_id(h: String, year: int) -> String:
-	return "bday_%s_%d" % [h, year]
+	return "fr_bday_%s_%d" % [h, year]
 
 
 static func claim(key: = "") -> Array:
@@ -139,7 +145,7 @@ static func claim(key: = "") -> Array:
 		return []
 	st().year_done[str(v.h)] = int(v.year)
 	var fid: = frame_id(v.h, v.year)
-	V10RitBridge.register_frame(fid, "Праздник %s · %d" % [v.gen, v.year], "bday")
+	V10RitBridge.register_frame(fid, "Праздник %s · %d" % [v.gen, v.year], {"type": "bday", "hero": str(v.h), "year": int(v.year)})
 	var r: Dictionary = V10BdayData.REWARD.duplicate(true)
 	r["frame"] = fid
 	r["aff"] = {str(v.h): V10BdayData.REWARD_AFF}

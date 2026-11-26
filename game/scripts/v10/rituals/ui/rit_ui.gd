@@ -25,6 +25,11 @@ const CINNABAR: = Color("c8463c")
 const EMBER: = Color("e07a7a")
 const TEAL: = Color("6fd6cf")
 const FROST: = Color("9fc4e8")
+# letter paper and ink (ask letter, week letter)
+const WASHI: = Color("efe3cf")
+const INK: = Color("3a2a2e")
+const INK_SOFT: = Color("6a4a52")
+const INK_SIGN: = Color("7a3a4a")
 
 const SFX_DIR: = "res://assets/v10/rituals/sfx/"
 const ART: = "res://assets/v10/rituals/"
