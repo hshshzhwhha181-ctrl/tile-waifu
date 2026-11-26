@@ -80,27 +80,26 @@ static func card_art(tex: Texture2D, r: Rect2, focus: = Vector2(0.5, 0.3), zoom:
 	t.material = m
 	return t
 
-static func bubble(parent: Control, text: String, pos: Vector2, width: = 300.0, tail_left: = true) -> Control:
+static func bubble(parent: Control, text: String, pos: Vector2, width: = 336.0, tail_left: = true) -> Control:
 	var root: = Control.new()
 	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.position = pos
-	var l: = UI.label(text, 22, UI.INK)
+	var l: = UI.label(text, 25, Color("fff7eb"), Color(0.06, 0.02, 0.09, 0.95), 4, "body", 800)
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	l.size = Vector2(width - 36, 0)
-	l.custom_minimum_size = Vector2(width - 36, 0)
+	l.size = Vector2(width - 40, 0)
+	l.custom_minimum_size = Vector2(width - 40, 0)
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	# 0.8: size the bubble from the wrapped text (same font, weight and width as the label), not a width guess
-	var th: float = UI.font("body", 800).get_multiline_string_size(text, HORIZONTAL_ALIGNMENT_CENTER, width - 40, 22, -1, TextServer.BREAK_MANDATORY | TextServer.BREAK_WORD_BOUND | TextServer.BREAK_ADAPTIVE).y
-	var h: float = maxf(56.0, 30.0 + th)
+	var th: float = UI.font("body", 800).get_multiline_string_size(text, HORIZONTAL_ALIGNMENT_CENTER, width - 44, 25, -1, TextServer.BREAK_MANDATORY | TextServer.BREAK_WORD_BOUND | TextServer.BREAK_ADAPTIVE).y
+	var h: float = maxf(64.0, 34.0 + th)
 	var tail: = Polygon2D.new()
-	tail.color = Color(0.12, 0.11, 0.13, 0.97)
+	tail.color = Color(0.11, 0.05, 0.14, 0.96)
 	tail.polygon = PackedVector2Array([Vector2(40, h - 6), Vector2(80, h - 6), Vector2(30, h + 22)]) if tail_left else PackedVector2Array([Vector2(width - 80, h - 6), Vector2(width - 40, h - 6), Vector2(width - 30, h + 22)])
 	root.add_child(tail)
-	var b: = UI.rbox("cream", Rect2(0, 0, width, h), 24, 3, 12)
-	b.set_param("border_top", Color("e8c9a0")).set_param("border_bottom", Color("a8697a"))
+	var b: = UI.rbox("plum", Rect2(0, 0, width, h), 24, 3, 12)
+	b.colors(Color(0.14, 0.07, 0.19, 0.95), Color(0.08, 0.035, 0.11, 0.97)).borders(Color("ffe8a6"), Color("c99236"))
 	root.add_child(b)
-	l.position = Vector2(18, 12)
-	l.size = Vector2(width - 36, h - 24)
+	l.position = Vector2(20, 12)
+	l.size = Vector2(width - 40, h - 24)
 	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	root.add_child(l)
 	root.size = Vector2(width, h)

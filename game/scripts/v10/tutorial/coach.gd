@@ -40,9 +40,11 @@ const MIN_T: = 0.12  # fx_level=min: every appearance
 const RING_EVERY: = 1.6
 const RING_T: = 0.9
 const SKIP_SURE_T: = 3.0
-const LINE_H: = 36.0  # Caveat 30 line (V10Type.LINE[30])
-const HEAD_H: = 24.0  # overline 20 + 4
-const POR: = 56.0
+const LINE_ROLE: = "ui_strong"
+const LINE_FS: = 25
+const LINE_H: = 34.0
+const HEAD_H: = 28.0
+const POR: = 68.0
 const POR_GAP: = 16.0
 
 var spec: = {}
@@ -225,16 +227,17 @@ func _build() -> void:
 	_block = Control.new()
 	_block.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_block.visible = false
+	_block.draw.connect(_draw_block)
 	add_child(_block)
 	_por = Control.new()
 	_por.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_por.size = Vector2(POR, POR)
 	_por.draw.connect(_draw_portrait)
 	_block.add_child(_por)
-	_name_l = V10Type.label("", "overline", 15, V10DS.GOLD_500, true)
+	_name_l = V10Type.label("", "overline", 19, V10DS.GOLD_300, true)
 	_name_l.clip_text = false
 	_block.add_child(_name_l)
-	_line_l = V10Type.label("", "hand", 30, V10DS.PAPER_100, true)
+	_line_l = V10Type.label("", LINE_ROLE, LINE_FS, V10DS.PAPER_100, true)
 	_line_l.clip_text = false
 	_line_l.text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING
 	_line_l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -248,9 +251,21 @@ func _build() -> void:
 	_skip.set_meta("tut_id", "tut.skip")
 	_skip.gui_input.connect(_skip_input)
 	add_child(_skip)
-	_skip_l = V10Type.label(V10TutLines.ui("skip"), "ui", 18, V10DS.PAPER_500)
+	_skip_l = V10Type.label(V10TutLines.ui("skip"), "ui_strong", 21, V10DS.GOLD_300)
 	_skip_l.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	_skip.add_child(_skip_l)
+
+
+func _draw_block() -> void:
+	if _line_text == "":
+		return
+	var r: = Rect2(Vector2(-16.0, -10.0), _block.size + Vector2(32.0, 20.0))
+	var sb: = StyleBoxFlat.new()
+	sb.bg_color = Color(V10DS.PLATE_BOT, V10DS.ON_ART_A)
+	sb.border_color = V10DS.GOLD_500
+	sb.set_border_width_all(2)
+	sb.set_corner_radius_all(18)
+	_block.draw_style_box(sb, r)
 
 
 # ------------------------------------------------------------------ show / end
@@ -508,14 +523,14 @@ func _avoid() -> Array:
 
 # Text width for `w` px, balanced so the lines are of similar length: Vector2(width, lines).
 func _measure(w: float) -> Vector2:
-	var n: = V10Type.lines_needed(_line_text, "hand", 30, w)
+	var n: = V10Type.lines_needed(_line_text, LINE_ROLE, LINE_FS, w)
 	if n <= 1:
-		return Vector2(minf(w, ceilf(V10Type.text_w(_line_text, "hand", 30)) + 6.0), 1)
+		return Vector2(minf(w, ceilf(V10Type.text_w(_line_text, LINE_ROLE, LINE_FS)) + 6.0), 1)
 	var lo: = w * 0.4
 	var hi: = w
 	for i in 12:
 		var mid: = (lo + hi) * 0.5
-		if V10Type.lines_needed(_line_text, "hand", 30, mid) <= n:
+		if V10Type.lines_needed(_line_text, LINE_ROLE, LINE_FS, mid) <= n:
 			hi = mid
 		else:
 			lo = mid
@@ -568,11 +583,12 @@ func _place(animate: bool) -> void:
 	var rr: Rect2 = best.r
 	_lines = int(m.y)
 	_name_l.position = Vector2(por_w, 0)
-	_name_l.size = Vector2(maxf(m.x, 160.0), 20)
+	_name_l.size = Vector2(maxf(m.x, 180.0), 24)
 	_line_l.position = Vector2(por_w, head)
-	_line_l.size = Vector2(m.x, m.y * LINE_H + 4.0)
+	_line_l.size = Vector2(m.x, m.y * LINE_H + 6.0)
 	_por.position = Vector2.ZERO
 	_block.size = rr.size
+	_block.queue_redraw()
 	_placed_for = _hole if _has_hole else Rect2()
 	if animate and _block.visible and _fx_ok() and not bool(spec.get("instant", false)):
 		_kill(_tw_move)
@@ -679,7 +695,7 @@ func _show_skip() -> void:
 	if not on:
 		_skip.visible = false
 		return
-	_skip_set(V10TutLines.ui("skip"), V10DS.PAPER_500)
+	_skip_set(V10TutLines.ui("skip"), V10DS.GOLD_300)
 	_skip.visible = true
 	_skip.modulate.a = 0.0
 	_tw_skip = create_tween()
@@ -699,7 +715,7 @@ func _hide_skip() -> void:
 
 func _skip_set(text: String, col: Color) -> void:
 	_skip_l.text = text
-	_skip_l.label_settings = V10Type.settings("ui", 18, col)
+	_skip_l.label_settings = V10Type.settings("ui_strong", 21, col, true)
 	_place_skip()
 
 
@@ -707,7 +723,7 @@ func _place_skip() -> void:
 	var vs: = get_viewport_rect().size
 	var ins: = V10Hud2Util.safe_insets(vs)
 	var cx: = floorf(maxf(0.0, (vs.x - 720.0) * 0.5))
-	var tw: = ceilf(V10Type.text_w(_skip_l.text, "ui", 18))
+	var tw: = ceilf(V10Type.text_w(_skip_l.text, "ui_strong", 21))
 	var sz: = Vector2(maxf(V10DS.HIT_MIN, tw + 48.0), V10DS.HIT_MIN)
 	var right: = cx + minf(720.0, vs.x) - 8.0
 	var top: = float(ins.top) + 4.0
@@ -846,7 +862,7 @@ func _process(dt: float) -> void:
 				_end("timeout")
 		if _showing and _skip_armed >= 0.0 and _t - _skip_armed > SKIP_SURE_T:
 			_skip_armed = -1.0
-			_skip_set(V10TutLines.ui("skip"), V10DS.PAPER_500)
+			_skip_set(V10TutLines.ui("skip"), V10DS.GOLD_300)
 	# smooth the window towards the target
 	if _has_hole:
 		var k: = 1.0 - exp(-16.0 * dt)

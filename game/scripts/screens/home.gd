@@ -24,6 +24,26 @@ var W: = 720.0
 var H: = 1280.0
 var live: V9HomeLive
 var video: VideoStreamPlayer
+var rig10_node: V10LiveRig
+var outfit_art: TextureRect
+var _hero_base_pos: = Vector2.ZERO
+var _hero_base_sc: = Vector2.ONE
+var _rig10_base_pos: = Vector2.ZERO
+var _rig10_base_sc: = 1.0
+var _video_base_rect: = Rect2()
+var _art_full_rect: = Rect2()
+var _art_fit_rect: = Rect2()
+var _art_base_focus: = Vector2(0.5, 0.4)
+var _crop_editing: = false
+var _crop_drag: = false
+var _crop_last_pt: = Vector2.ZERO
+var _crop_touches: = {}
+var _crop_pinch_d: = 0.0
+var _frame_pill: Panel
+var _frame_lbl: Label
+var _frame_bar: Control
+var _crop_catcher: Control
+const FRAME_NAMES: = ["Полный рост", "Ближе", "Портрет"]
 
 func build(m, _args: Dictionary) -> void :
 	main = m
@@ -37,6 +57,8 @@ func build(m, _args: Dictionary) -> void :
 		# dev: preview home at another effects level (--fx=full|mid|min)
 		if a.begins_with("--fx=") and a.substr(5) in G.FX_LEVELS:
 			G.S.fx_level = a.substr(5)
+		elif a.begins_with("--framing="):
+			_ensure_lobby_crop()["preset"] = clampi(int(a.substr(10)), 0, 2)
 	V10HudSkin.sync(V10Look.current())
 	V10Voice.visit()
 	V9Letters.install()
@@ -68,25 +90,30 @@ func build(m, _args: Dictionary) -> void :
 		sbg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		add_child(sbg)
 	else:
-		Common.backdrop(self, "menu", size, 0.0, 1.0, Color.WHITE, Vector2(0.5, 0.5))
-	# 0.10 W3: Маджонг-тян's living illustration rig (rig10, ≤ 1 rig and ≤ 1 video per screen, UX_RULES Г-4)
-	var bday_partner: = V10Bday.today_hero() == str(G.S.partner)
-	var want_rig10: = not bday_partner and V9HomeLive.rig10_wanted(str(G.S.partner))
-	if want_rig10 and salon_bg == "":
-		var rbg: = ColorRect.new()
-		rbg.color = V10DS.NIGHT_900
-		var rbr: = V10Layout.bleed_rect(self)
-		rbg.position = rbr.position
-		rbg.size = rbr.size
-		rbg.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		add_child(rbg)
+		Common.backdrop(self, "menu", size, 0.0, 1.08, Color(1.03, 1.0, 0.99), Vector2(0.5, 0.48))
+	# Resolve active heroine & equipped outfit (also honouring V10Look banner try-on if active)
+	var eff_partner: = str(G.S.partner)
+	var oid: = G.equipped(eff_partner)
+	if V10Look.previewing():
+		eff_partner = str(V10Look._preview.get("hero", eff_partner))
+		var pv_oid: = str(V10Look._preview.get("outfit", ""))
+		oid = pv_oid if (pv_oid != "" and not (pv_oid in G.BASE_OUTFITS) and G.ITEM.has(pv_oid)) else ""
+	# 0.10 W3: living illustration rig ONLY when wearing base outfit (equipped non-base outfits always render their own painting!)
+	var bday_partner: = V10Bday.today_hero() == eff_partner
+	var want_rig10: = not bday_partner and oid == "" and V9HomeLive.rig10_wanted(eff_partner)
 	var rig10: V10LiveRig = null
 	if want_rig10:
-		rig10 = V9HomeLive.build_rig10(self, size, salon_bg == "")
-	elif not bday_partner and salon_bg == "" and V9HomeLive.video_wanted(str(G.S.partner)):
+		rig10 = V9HomeLive.build_rig10(self, size, false, eff_partner)
+		rig10_node = rig10
+		if rig10 != null:
+			_rig10_base_pos = rig10.position
+			_rig10_base_sc = rig10.scale.x
+	elif not bday_partner and salon_bg == "" and oid == "" and V9HomeLive.video_wanted(eff_partner):
 		video = V9HomeLive.build_video(self, size)
-	if video == null and rig10 == null:
-		Common.rays(self, Vector2(W * 0.52, H * 0.34), 1000, Color(1, 0.93, 0.8, 0.45), 10, 0.03, 0.35)
+		if video != null:
+			_video_base_rect = Rect2(video.position, video.size)
+	if video == null:
+		Common.rays(self, Vector2(W * 0.52, H * 0.28), 1100, Color(1.0, 0.94, 0.80, 0.42), 10, 0.03, 0.36)
 	Fx.ambient(self, "petals", size)
 
 	var floor_y: = H - 120.0
@@ -96,15 +123,16 @@ func build(m, _args: Dictionary) -> void :
 	ped.position = Vector2(W * 0.52, floor_y - 10)
 	ped.scale = Vector2(6.0, 1.1)
 	ped.modulate = Color(1, 0.85, 0.9, 0.5)
-	ped.visible = video == null and rig10 == null
+	ped.visible = video == null and rig10 == null and oid == ""
 	add_child(ped)
-	hero = Hero.new().setup(G.S.partner, H * 0.64)
+	hero = Hero.new().setup(eff_partner, H * 0.64)
 	hero.position = Vector2(W * 0.52, floor_y)
+	_hero_base_pos = hero.position
+	_hero_base_sc = hero.scale
 	add_child(hero)
 	# 0.9: every tap on her (and on the room) goes through V9HomeLive, not the rig's own tap
 	hero.interactive = false
 	UI.slide_in(hero, Vector2(0, 60), 0.05, 0.6)
-	var oid: = G.equipped(G.S.partner)
 	var live_opts: = {"hero": hero}
 	var live_mode: = "rig"
 	if rig10 != null:
@@ -115,31 +143,29 @@ func build(m, _args: Dictionary) -> void :
 		hero.visible = false
 		live_mode = "video"
 		live_opts["video"] = video
-	elif oid != "":
-
-		# the outfit art is a full-height painting with the face near its top (y ≈ 0.11…0.19): drawn edge to edge it
-		# sits under the top bar and the greeting bubble. Push it down so her face lands where the rigged hero's face
-		# is (the bubble is placed from that head), centre the face horizontally, and fade the art's top edge in.
+	elif oid != "" and G.ITEM.has(oid):
 		var otex: = G.art_tex(G.ITEM[oid])
 		var okey: = otex.resource_path.get_file().get_basename()
 		var ofc: Array = V8Population.FACES.get(okey, [0.5, 0.17, 4.6])
-		# 0.10 M0: on tablets the painting bleeds past the column to the viewport edges (cover, aspect kept)
 		var abr: = V10Layout.bleed_rect(self)
 		var aw: = maxf(W, abr.size.x)
 		var ax: = minf(0.0, abr.position.x)
-		var osc: = maxf(aw / float(otex.get_width()), H / float(otex.get_height()))
-		var rig: Dictionary = Hero.RIGS.get(G.S.partner, Hero.RIGS.mc)
-		var face_y: float = floor_y - (rig.feet.y - V8Art.rig_face(G.S.partner).y) * (H * 0.64 / 1160.0) - 10.0
-		var dy: = clampf(face_y - float(ofc[1]) * otex.get_height() * osc, 0.0, 280.0)
-		var art: = Common.living_art(self, otex, Rect2(ax, dy, aw, H), Vector2(float(ofc[0]), 0.4), 110.0 if dy > 0.0 else 0.0)
+		_art_full_rect = Rect2(ax, abr.position.y, aw, abr.size.y)
+		var top_pad: = maxf(0.0, abr.position.y + 52.0)
+		_art_fit_rect = Rect2(ax, top_pad, aw, maxf(H - top_pad - 116.0, H * 0.78))
+		_art_base_focus = Vector2(float(ofc[0]), 0.44)
+		var art: = Common.living_art(self, otex, _art_fit_rect, _art_base_focus, 40.0)
+		outfit_art = art
 		move_child(art, 1)
-		var shade: = Common.vignette(self, size, Color(0.1, 0.03, 0.15), 0.45)
+		# Light warm rose-gold edge kiss instead of heavy dark vignette so the outfit & room stay vivid
+		var shade: = Common.vignette(self, size, Color(0.22, 0.08, 0.16), 0.12)
 		move_child(shade, 2)
 		hero.visible = false
 		live_mode = "art"
-		live_opts.merge({"art": art, "tex_size": Vector2(otex.get_width(), otex.get_height()), "focus": Vector2(float(ofc[0]), 0.4),
+		live_opts.merge({"art": art, "tex_size": Vector2(otex.get_width(), otex.get_height()), "focus": _art_base_focus,
 			"face_rect": _face_rect(oid, otex, ofc), "art_key": okey})
 	live = V9HomeLive.make(self, live_mode, live_opts)
+	_apply_lobby_crop(false)
 	if bday_partner:
 		hero.visible = false
 		if live:
@@ -150,7 +176,12 @@ func build(m, _args: Dictionary) -> void :
 	# ONE «Играть · N».
 	_build_v10(new_letters.size() > 0 or V10Phone.badge() > 0)
 	V10Hooks.emit_home_built(self)  # 0.10 hook: V10EntryQueue.run() (one full-screen scene per launch)
-	if V10EntryQueue.shown_this_launch().is_empty() and _tray_allowed() and V10Tray.should_show():
+	var is_shots: = false
+	for ua in OS.get_cmdline_user_args():
+		if ua.begins_with("--shots="):
+			is_shots = true
+			break
+	if not is_shots and V10EntryQueue.shown_this_launch().is_empty() and _tray_allowed() and V10Tray.should_show():
 		_open_morning_tray.call_deferred()
 	if not new_letters.is_empty() and V10Nav.phone_open():
 		_letter_arrived.call_deferred()
@@ -542,6 +573,16 @@ func dev_act(a: String) -> void :
 			V10StreakSheet.open(main.overlay)
 		"tray":
 			_open_morning_tray()
+		"frame_next":
+			_cycle_lobby_preset()
+		"frame_full":
+			_set_lobby_preset(0)
+		"frame_close":
+			_set_lobby_preset(1)
+		"frame_portrait":
+			_set_lobby_preset(2)
+		"frame_edit":
+			_toggle_crop_edit(not _crop_editing)
 
 
 func _tray_allowed() -> bool:
@@ -659,7 +700,7 @@ func _build_v10(mail_new: bool) -> void :
 	var scrim: = TextureRect.new()
 	var gt: = GradientTexture2D.new()
 	gt.gradient = Gradient.new()
-	gt.gradient.set_color(0, Color(V10DS.NIGHT_900, 0.72))
+	gt.gradient.set_color(0, Color(V10DS.NIGHT_900, 0.38))
 	gt.gradient.set_color(1, Color(V10DS.NIGHT_900, 0.0))
 	gt.fill_from = Vector2(0, 0)
 	gt.fill_to = Vector2(0, 1)
@@ -776,10 +817,11 @@ func _build_v10(mail_new: bool) -> void :
 			V9Feel.press(mute_btn, "tap")
 			main.toast("Звук включён" if on else "Звук выключен", "sound" if on else "sound_off"))
 	home2.add_child(mute_btn)
+	_build_framing_ui(L, ph_r)
 	var sm_disc: = V10ShopHub.model()
 	if sm_disc != null and sm_disc.econ.shop.month_days_left() > 0:
 		var md: = V10MonthDisc.make(sm_disc, false)
-		md.position = Vector2(W - 144.0, (L.avatar as Rect2).end.y + 18.0)
+		md.position = Vector2(W - 144.0, (L.avatar as Rect2).end.y + 68.0)
 		home2.add_child(md)
 	if V10Look.previewing():
 		home2.shown = [false, false, false]
@@ -819,3 +861,322 @@ func _salon_finger_hint() -> void :
 		tw.tween_property(fp, "position:y", fp.position.y, 0.38).set_trans(Tween.TRANS_SINE)
 	tw.tween_property(fp, "modulate:a", 0.0, 0.3)
 	tw.tween_callback(fp.queue_free)
+
+
+# ── 0.11.0 Azur Lane / BD2 Heroine Framing & Pan/Zoom Controls ─────────────────────────────────────────────
+
+func _ensure_lobby_crop() -> Dictionary:
+	if not (G.S.get("lobby_crop") is Dictionary):
+		G.S["lobby_crop"] = {"preset": 0, "by_hero": {}}
+	var lc: Dictionary = G.S["lobby_crop"]
+	if not lc.has("preset"):
+		lc["preset"] = 0
+	if not (lc.get("by_hero") is Dictionary):
+		lc["by_hero"] = {}
+	return lc
+
+
+func _hero_crop(h: String = "") -> Dictionary:
+	var hid: = h if h != "" else str(G.S.get("partner", "mc"))
+	var by_h: Dictionary = _ensure_lobby_crop()["by_hero"]
+	if not (by_h.get(hid) is Dictionary):
+		by_h[hid] = {"zoom": 1.0, "pan_x": 0.0, "pan_y": 0.0}
+	var c: Dictionary = by_h[hid]
+	c["zoom"] = clampf(float(c.get("zoom", 1.0)), 0.85, 2.2)
+	c["pan_x"] = clampf(float(c.get("pan_x", 0.0)), -0.35, 0.35)
+	c["pan_y"] = clampf(float(c.get("pan_y", 0.0)), -0.35, 0.35)
+	return c
+
+
+func _cycle_lobby_preset() -> void:
+	var lc: = _ensure_lobby_crop()
+	_set_lobby_preset((int(lc.get("preset", 0)) + 1) % 3)
+
+
+func _set_lobby_preset(p: int) -> void:
+	var lc: = _ensure_lobby_crop()
+	lc["preset"] = clampi(p, 0, 2)
+	var hc: = _hero_crop()
+	hc["zoom"] = 1.0
+	hc["pan_x"] = 0.0
+	hc["pan_y"] = 0.0
+	G.save()
+	_apply_lobby_crop(true)
+	if _frame_lbl and is_instance_valid(_frame_lbl):
+		_frame_lbl.text = FRAME_NAMES[int(lc["preset"])]
+	if main:
+		main.toast("Ракурс: %s" % FRAME_NAMES[int(lc["preset"])], "star")
+
+
+func _apply_lobby_crop(animate: bool) -> void:
+	var lc: = _ensure_lobby_crop()
+	var preset: = clampi(int(lc.get("preset", 0)), 0, 2)
+	var hc: = _hero_crop()
+	var zm_mul: = float(hc.get("zoom", 1.0))
+	var px: = float(hc.get("pan_x", 0.0))
+	var py: = float(hc.get("pan_y", 0.0))
+	var dur: = 0.24 if animate else 0.0
+	if outfit_art and is_instance_valid(outfit_art):
+		var p_zoom: float = float([1.0, 1.34, 1.82][preset]) * zm_mul
+		var p_fy: float = float([_art_base_focus.y, 0.35, 0.20][preset]) - py * 0.45
+		var p_fx: float = clampf(_art_base_focus.x - px * 0.45, 0.12, 0.88)
+		p_fy = clampf(p_fy, 0.10, 0.88)
+		var target_r: Rect2 = _art_fit_rect if (preset == 0 and absf(zm_mul - 1.0) < 0.03 and absf(py) < 0.02) else _art_full_rect
+		var sm: = outfit_art.material as ShaderMaterial
+		if sm:
+			sm.set_shader_parameter("top_fade", 40.0 / maxf(target_r.size.y, 1.0) if target_r == _art_fit_rect else 0.0)
+			if dur > 0.0:
+				var tw: = outfit_art.create_tween().set_parallel()
+				tw.tween_property(outfit_art, "position", target_r.position, dur).set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_OUT)
+				tw.tween_property(outfit_art, "size", target_r.size, dur).set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_OUT)
+				tw.tween_method(func(v: Vector2): sm.set_shader_parameter("size", v), outfit_art.size, target_r.size, dur)
+				tw.tween_method(func(v: float): sm.set_shader_parameter("zoom", v), float(sm.get_shader_parameter("zoom")), p_zoom, dur)
+				tw.tween_method(func(v: Vector2): sm.set_shader_parameter("focus", v), Vector2(sm.get_shader_parameter("focus")), Vector2(p_fx, p_fy), dur)
+			else:
+				outfit_art.position = target_r.position
+				outfit_art.size = target_r.size
+				sm.set_shader_parameter("size", target_r.size)
+				sm.set_shader_parameter("zoom", p_zoom)
+				sm.set_shader_parameter("focus", Vector2(p_fx, p_fy))
+		outfit_art.pivot_offset = target_r.size * Vector2(0.5, 0.4)
+		if live and is_instance_valid(live) and live.mode == "art":
+			live.art_focus = Vector2(p_fx, p_fy)
+			live.art_zoom = p_zoom
+		return
+	var rig_k: float = float([1.0, 1.30, 1.66][preset]) * zm_mul
+	var rig_dy: float = float([0.0, 160.0, 390.0][preset]) + py * 420.0
+	var rig_dx: float = px * 280.0
+	if rig10_node and is_instance_valid(rig10_node):
+		var sc10: float = _rig10_base_sc * rig_k
+		var anchor_x: float = _rig10_base_pos.x + 581.0 * _rig10_base_sc
+		var anchor_y: float = _rig10_base_pos.y + 340.0 * _rig10_base_sc
+		var np10: = Vector2(anchor_x - 581.0 * sc10 + rig_dx, anchor_y - 340.0 * sc10 + rig_dy * 0.25)
+		if dur > 0.0:
+			var tw10: = rig10_node.create_tween().set_parallel()
+			tw10.tween_property(rig10_node, "scale", Vector2.ONE * sc10, dur).set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_OUT)
+			tw10.tween_property(rig10_node, "position", np10, dur).set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_OUT)
+		else:
+			rig10_node.scale = Vector2.ONE * sc10
+			rig10_node.position = np10
+	elif video and is_instance_valid(video) and _video_base_rect.has_area():
+		var vsz: Vector2 = _video_base_rect.size * rig_k
+		var vc: Vector2 = _video_base_rect.position + Vector2(_video_base_rect.size.x * 0.5, _video_base_rect.size.y * 0.28)
+		var vp_pos: Vector2 = vc - Vector2(vsz.x * 0.5, vsz.y * 0.28) + Vector2(rig_dx, rig_dy * 0.3)
+		video.position = vp_pos
+		video.size = vsz
+		var st_n: = get_node_or_null("V9LobbyStill") as Control
+		if st_n:
+			st_n.position = vp_pos
+			st_n.size = vsz
+	elif hero and is_instance_valid(hero):
+		var nsc: Vector2 = _hero_base_sc * rig_k
+		var npos: Vector2 = _hero_base_pos + Vector2(rig_dx, (rig_k - 1.0) * H * 0.42 + py * 360.0)
+		if dur > 0.0:
+			var twh: = hero.create_tween().set_parallel()
+			twh.tween_property(hero, "scale", nsc, dur).set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_OUT)
+			twh.tween_property(hero, "position", npos, dur).set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_OUT)
+		else:
+			hero.scale = nsc
+			hero.position = npos
+
+
+func _build_framing_ui(L: Dictionary, ph_r: Rect2) -> void:
+	var lc: = _ensure_lobby_crop()
+	var cx: float = float(L.get("cx", 0.0))
+	var pill_w: = 220.0
+	var pill_h: = 48.0
+	var pill: = Panel.new()
+	pill.name = "FramePill"
+	var psb: = StyleBoxFlat.new()
+	psb.bg_color = Color(0.13, 0.07, 0.18, 0.88)
+	psb.border_color = Color(0.95, 0.80, 0.46, 0.90)
+	psb.set_border_width_all(2)
+	psb.set_corner_radius_all(24)
+	psb.shadow_color = Color(0.0, 0.0, 0.0, 0.45)
+	psb.shadow_size = 6
+	pill.add_theme_stylebox_override("panel", psb)
+	pill.position = Vector2(cx + 720.0 - pill_w - 16.0, ph_r.position.y + 82.0)
+	pill.size = Vector2(pill_w, pill_h)
+	pill.mouse_filter = Control.MOUSE_FILTER_STOP
+	pill.set_meta("ux_role", "tertiary")
+	home2.add_child(pill)
+	_frame_pill = pill
+	var glyph: = _FrameGlyph.new()
+	glyph.position = Vector2(10, 9)
+	glyph.size = Vector2(30, 30)
+	pill.add_child(glyph)
+	var lbl: = UI.label(FRAME_NAMES[clampi(int(lc.get("preset", 0)), 0, 2)], 17, Color("fff3d4"), Color(0.08, 0.03, 0.12, 0.95), 3, "body", 900)
+	lbl.position = Vector2(42, 0)
+	lbl.size = Vector2(124, pill_h)
+	lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	pill.add_child(lbl)
+	_frame_lbl = lbl
+	var sep: = ColorRect.new()
+	sep.color = Color(0.95, 0.80, 0.46, 0.45)
+	sep.position = Vector2(pill_w - 48.0, 9.0)
+	sep.size = Vector2(1.5, pill_h - 18.0)
+	sep.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	pill.add_child(sep)
+	var pan_lbl: = UI.center_label(UI.label("✥", 22, Color("ffe394"), Color(0.08, 0.03, 0.12), 3, "body", 900), Rect2(pill_w - 46.0, -1.0, 44.0, pill_h))
+	pan_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	pill.add_child(pan_lbl)
+	pill.gui_input.connect(func(e: InputEvent) -> void:
+		if (e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT) or (e is InputEventScreenTouch and e.pressed):
+			var lx: float = (e as InputEventMouseButton).position.x if e is InputEventMouseButton else (e as InputEventScreenTouch).position.x
+			pill.accept_event()
+			V9Feel.press(pill, "tap")
+			if lx >= pill_w - 50.0:
+				_toggle_crop_edit(not _crop_editing)
+			else:
+				_cycle_lobby_preset())
+
+
+func _toggle_crop_edit(on: bool) -> void:
+	_crop_editing = on
+	_crop_drag = false
+	_crop_touches.clear()
+	if _frame_bar and is_instance_valid(_frame_bar):
+		_frame_bar.queue_free()
+		_frame_bar = null
+	if _crop_catcher and is_instance_valid(_crop_catcher):
+		_crop_catcher.queue_free()
+		_crop_catcher = null
+	if not on or home2 == null:
+		G.save()
+		return
+	var catcher: = Control.new()
+	catcher.name = "LobbyCropCatcher"
+	catcher.position = Vector2.ZERO
+	catcher.size = home2.size
+	catcher.mouse_filter = Control.MOUSE_FILTER_STOP
+	catcher.gui_input.connect(_on_crop_input)
+	home2.add_child(catcher)
+	if _frame_pill and is_instance_valid(_frame_pill):
+		home2.move_child(_frame_pill, home2.get_child_count() - 1)
+	_crop_catcher = catcher
+	var bar: = Panel.new()
+	bar.name = "LobbyCropBar"
+	var bsb: = StyleBoxFlat.new()
+	bsb.bg_color = Color(0.11, 0.05, 0.16, 0.94)
+	bsb.border_color = Color("f8df95")
+	bsb.set_border_width_all(2)
+	bsb.set_corner_radius_all(20)
+	bar.add_theme_stylebox_override("panel", bsb)
+	bar.position = _frame_pill.position + Vector2(-44.0, 56.0)
+	bar.size = Vector2(264.0, 48.0)
+	bar.mouse_filter = Control.MOUSE_FILTER_STOP
+	home2.add_child(bar)
+	_frame_bar = bar
+	var acts: = [["−", func(): _step_lobby_zoom(-0.14)], ["Сброс", func(): _reset_lobby_crop()], ["+", func(): _step_lobby_zoom(0.14)], ["Готово", func(): _toggle_crop_edit(false)]]
+	var bx: = 6.0
+	var widths: = [46.0, 74.0, 46.0, 80.0]
+	for i in acts.size():
+		var bw: float = widths[i]
+		var cb: Callable = acts[i][1]
+		var hit: = Control.new()
+		hit.position = Vector2(bx, 4.0)
+		hit.size = Vector2(bw, 40.0)
+		hit.mouse_filter = Control.MOUSE_FILTER_STOP
+		var col: = Color("ffe6a0") if i == 3 else Color("fff6ea")
+		hit.add_child(UI.center_label(UI.label(acts[i][0], 17 if bw > 50.0 else 24, col, UI.DARK, 3, "body", 900), Rect2(0, 0, bw, 40.0)))
+		hit.gui_input.connect(func(e: InputEvent) -> void:
+			if (e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT) or (e is InputEventScreenTouch and e.pressed):
+				hit.accept_event()
+				V9Feel.press(hit, "tap")
+				cb.call())
+		bar.add_child(hit)
+		bx += bw + 2.0
+	if main:
+		main.toast("Тяни героиню пальцем · щипок меняет масштаб", "star")
+
+
+func _step_lobby_zoom(delta: float) -> void:
+	var hc: = _hero_crop()
+	hc["zoom"] = clampf(float(hc.get("zoom", 1.0)) + delta, 0.85, 2.2)
+	_apply_lobby_crop(false)
+
+
+func _reset_lobby_crop() -> void:
+	var hc: = _hero_crop()
+	hc["zoom"] = 1.0
+	hc["pan_x"] = 0.0
+	hc["pan_y"] = 0.0
+	_apply_lobby_crop(true)
+
+
+func _on_crop_input(e: InputEvent) -> void:
+	if e is InputEventMouseButton:
+		var mb: = e as InputEventMouseButton
+		if mb.button_index == MOUSE_BUTTON_LEFT:
+			_crop_drag = mb.pressed
+			_crop_last_pt = mb.position
+			_crop_catcher.accept_event()
+		elif mb.pressed and mb.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
+			_step_lobby_zoom(0.08 if mb.button_index == MOUSE_BUTTON_WHEEL_UP else -0.08)
+			_crop_catcher.accept_event()
+	elif e is InputEventMouseMotion and _crop_drag:
+		var mm: = e as InputEventMouseMotion
+		var d: = mm.position - _crop_last_pt
+		_crop_last_pt = mm.position
+		var hc: = _hero_crop()
+		hc["pan_x"] = clampf(float(hc.get("pan_x", 0.0)) + d.x / 720.0, -0.35, 0.35)
+		hc["pan_y"] = clampf(float(hc.get("pan_y", 0.0)) + d.y / 1280.0, -0.35, 0.35)
+		_apply_lobby_crop(false)
+		_crop_catcher.accept_event()
+	elif e is InputEventMagnifyGesture:
+		var mg: = e as InputEventMagnifyGesture
+		var hc2: = _hero_crop()
+		hc2["zoom"] = clampf(float(hc2.get("zoom", 1.0)) * mg.factor, 0.85, 2.2)
+		_apply_lobby_crop(false)
+		_crop_catcher.accept_event()
+	elif e is InputEventScreenTouch:
+		var st: = e as InputEventScreenTouch
+		if st.pressed:
+			_crop_touches[st.index] = st.position
+		else:
+			_crop_touches.erase(st.index)
+		if _crop_touches.size() == 2:
+			var pts: = _crop_touches.values()
+			_crop_pinch_d = (pts[0] as Vector2).distance_to(pts[1] as Vector2)
+		_crop_catcher.accept_event()
+	elif e is InputEventScreenDrag:
+		var sd: = e as InputEventScreenDrag
+		var prev: Vector2 = _crop_touches.get(sd.index, sd.position)
+		_crop_touches[sd.index] = sd.position
+		if _crop_touches.size() >= 2:
+			var pts2: = _crop_touches.values()
+			var nd: = (pts2[0] as Vector2).distance_to(pts2[1] as Vector2)
+			if _crop_pinch_d > 8.0:
+				var hc3: = _hero_crop()
+				hc3["zoom"] = clampf(float(hc3.get("zoom", 1.0)) * (nd / _crop_pinch_d), 0.85, 2.2)
+				_apply_lobby_crop(false)
+			_crop_pinch_d = nd
+		else:
+			var dp: = sd.position - prev
+			var hc4: = _hero_crop()
+			hc4["pan_x"] = clampf(float(hc4.get("pan_x", 0.0)) + dp.x / 720.0, -0.35, 0.35)
+			hc4["pan_y"] = clampf(float(hc4.get("pan_y", 0.0)) + dp.y / 1280.0, -0.35, 0.35)
+			_apply_lobby_crop(false)
+		_crop_catcher.accept_event()
+
+
+class _FrameGlyph:
+	extends Control
+
+	func _init() -> void:
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+	func _draw() -> void:
+		var col: = Color("ffe394")
+		var c: = size * 0.5
+		# Four gilded viewfinder corner brackets + inner portrait dot
+		var r: = 10.0
+		var l: = 5.0
+		for sx in [-1.0, 1.0]:
+			for sy in [-1.0, 1.0]:
+				var p: = c + Vector2(sx * r, sy * r)
+				draw_line(p, p + Vector2(-sx * l, 0), col, 2.2, true)
+				draw_line(p, p + Vector2(0, -sy * l), col, 2.2, true)
+		draw_arc(c, 4.2, 0, TAU, 24, col, 1.8, true)

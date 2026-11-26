@@ -65,7 +65,9 @@ func scenes_before(i: int) -> Array:
 	var out: = []
 	if stage == 0:
 		out.append("intro" if loc == 0 else "w%d_pre" % loc)
-	elif n >= 4 and stage == n / 2:
+	elif loc == 0 and stage == 1:
+		out.append("w0_mid")
+	elif n >= 4 and stage == mini(n / 2, 6):
 		out.append("w%d_mid" % loc)
 	return out.filter( func(s): return V6Scenes.SCENES.has(s))
 

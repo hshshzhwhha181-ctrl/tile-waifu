@@ -2,18 +2,14 @@ class_name V6StoryScene
 extends Control
 
 
-
 const EMO: = {"happy": "happy", "big": "big", "sad": "sad", "tap": "tap", "shy": "tap"}
 
-# 0.8: the emotion portrait of a line (V8Art.emotion, assets/v08/emotions). A line's tag wins (happy / sad / shy;
-# «big» is glad, or amazed when the line asks and exclaims); an untagged («tap» or none) line is read for simple
-# cues; nothing found = the rigged base portrait (her neutral face). Only the portrait changes, never the text.
 const EMO_TAG: = {"happy": "happy", "sad": "sad", "shy": "shy", "pout": "pout", "surprised": "surprised"}
 const EMO_CUES: = [
 	["surprised", ["?!", "!?", "Ой!", "Ой,", "Ах!", "Неужели", "Не может быть", "Вот это да"]],
 	["pout", ["Хм", "Не смотри", "Не пойми неправильно", "Опять", "Ну и ну", "Вообще-то", "Не обижусь", "заноза", "Ещё чего"]],
 	["sad", ["Глупо", "Прости", "жаль", "Жаль", "грустно", "одиноко", "плакать", "Холодно"]],
-	["shy", ["…Ладно", "покраснела", "Спасибо тебе", "Не уходи", "смущ", "мне нравится", "Мне нравится"]],
+	["shy", ["…Ладно", "покраснела", "Спасибо тебе", "Не уходи", "смущ", "мне нравится", "Мне нравится", "чулк", "шёлк"]],
 ]
 
 static func line_emotion(text: String, tag: String) -> String:
@@ -36,16 +32,22 @@ static func line_emotion(text: String, tag: String) -> String:
 var W: = 720.0
 var H: = 1280.0
 var heroes: = {}
+var cg_holder: Control
+var cg_rect: TextureRect
+var cg_active: = false
+var ui_hidden: = false
+var top_bar: ColorRect
+var ttl_lbl: Label
 var box: RBox
 var txt: Label
 var plate: RBox
 var plate_lbl: Label
+var plate_av: Control
 var more: Label
 var tapped: = false
 var skipping: = false
 var auto: = false
 var choice_layer: Control
-# 0.10 M0: camera cut-out / gesture bar insets (V10Layout), viewport px
 var _st: = 0.0
 var _sb: = 0.0
 
@@ -59,8 +61,6 @@ func play(id: String) -> void :
 	_st = float(ins.top)
 	_sb = float(ins.bottom)
 	mouse_filter = Control.MOUSE_FILTER_STOP
-	# above the match result window (play.gd V8Result z 300) and main.overlay (400 in a match): post-level scenes
-	# play from before_go() while the victory screen is still alive
 	z_index = 460
 	auto = "--autotap=1" in OS.get_cmdline_user_args() or "--story_auto=1" in OS.get_cmdline_user_args()
 	gui_input.connect(_on_input)
@@ -73,8 +73,15 @@ func play(id: String) -> void :
 		if skipping:
 			break
 		if e is Dictionary:
+			if e.has("cg") and not e.has("ask"):
+				_set_cg(str(e.cg))
+				continue
+			if e.has("cg"):
+				_set_cg(str(e.cg))
 			await _ask(e)
 		else:
+			if e.size() > 3 and str(e[3]) != "":
+				_set_cg(str(e[3]))
 			await _say(e[0], e[1], e[2] if e.size() > 2 else "")
 	var tout: = create_tween()
 	tout.tween_property(self, "modulate:a", 0.0, 0.35)
@@ -85,66 +92,114 @@ func _build(d: Dictionary, id: String) -> void :
 	var bg: String = d.get("bg", "play")
 	if not ResourceLoader.exists("res://assets/bg/%s.webp" % bg):
 		bg = "play"
-	Common.backdrop(self, bg, size, 0.0, 0.82, Color(0.95, 0.92, 1.0), Vector2(0.5, 0.45))
-	Common.vignette(self, size, Color(0.08, 0.03, 0.15), 0.7)
+	Common.backdrop(self, bg, size, 0.0, 0.94, Color(1.0, 0.97, 1.0), Vector2(0.5, 0.45))
+
+	cg_holder = Control.new()
+	cg_holder.name = "CgHolder"
+	var br: = V10Layout.bleed_rect(self)
+	cg_holder.position = br.position
+	cg_holder.size = br.size
+	cg_holder.clip_contents = true
+	cg_holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(cg_holder)
+
+	var init_cg: = str(d.get("cg", ""))
+	var want_cg: = init_cg != "" and not bool(G.S.get("modest", false)) and ResourceLoader.exists(init_cg)
+	Common.vignette(self, size, Color(0.10, 0.03, 0.14), 0.22 if want_cg else 0.48)
 	if d.get("fx", "") != "":
 		Fx.ambient(self, d.fx, size)
 
-	var top: = ColorRect.new()
-	top.color = Color(0.04, 0.02, 0.07, 0.55)
-	top.size = Vector2(W, 118 + _st)
-	top.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(top)
+	var cast: Array = d.get("cast", [])
+	for k in cast.size():
+		var h: String = cast[k]
+		var hero: = Hero.new().setup(h, H * 0.68)
+		hero.interactive = false
+		var x: = W * 0.5 if cast.size() == 1 else (W * 0.28 if k == 0 else W * 0.73)
+		hero.position = Vector2(x, H + 40)
+		if cast.size() > 1:
+			hero.scale = Vector2(0.94, 0.94)
+		# Bigger, closer heroine portrait busts (880 single / 740 duo)
+		if hero.use_bust(_first_emotion(d, h), 880.0 if cast.size() == 1 else 740.0, -268.0) and cast.size() > 1:
+			hero.position.x = W * (0.25 if k == 0 else 0.76)
+		add_child(hero)
+		UI.slide_in(hero, Vector2(0 if cast.size() == 1 else (-80 if k == 0 else 80), 60), 0.1 + k * 0.15, 0.6)
+		heroes[h] = hero
+
+	if want_cg:
+		_set_cg(init_cg, false)
+
+	top_bar = ColorRect.new()
+	top_bar.color = Color(0.05, 0.02, 0.08, 0.52)
+	top_bar.size = Vector2(W, 114 + _st)
+	top_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(top_bar)
 	var chapter: = ""
 	if id.begins_with("w") and id.substr(1, 1).is_valid_int() and int(id.substr(1, 1)) < G.LOCS.size():
 		chapter = G.LOCS[int(id.substr(1, 1))].name + " · "
 	elif id in ["intro", "first_win"]:
 		chapter = G.LOCS[0].name + " · "
-	var ttl: = UI.label(chapter + V6Scenes.TITLES.get(id, ""), 24, Color("ffe7a6"), UI.DARK, 4, "body", 900)
-	ttl.position = Vector2(28, 52 + _st)
-	add_child(ttl)
-	UI.slide_in(ttl, Vector2(-30, 0), 0.2, 0.5)
+	ttl_lbl = UI.label(chapter + V6Scenes.TITLES.get(id, ""), 26, Color("ffe9a8"), Color(0.06, 0.02, 0.09, 0.95), 4, "body", 900)
+	ttl_lbl.position = Vector2(24, 48 + _st)
+	Common.fit_line(ttl_lbl, W - 340.0, 18)
+	add_child(ttl_lbl)
+	UI.slide_in(ttl_lbl, Vector2(-30, 0), 0.2, 0.5)
 
-	var cast: Array = d.get("cast", [])
-	for k in cast.size():
-		var h: String = cast[k]
-		var hero: = Hero.new().setup(h, H * 0.64)
-		hero.interactive = false
-		var x: = W * 0.5 if cast.size() == 1 else (W * 0.3 if k == 0 else W * 0.72)
-		hero.position = Vector2(x, H + 40)
-		if cast.size() > 1:
-			hero.scale = Vector2(0.92, 0.92)
-		# 0.8: with emotion art she stands as her waist-up emotion portrait, the waist behind the dialogue box
-		# (the rigged full-length art stays when the files are missing)
-		if hero.use_bust(_first_emotion(d, h), 760.0 if cast.size() == 1 else 640.0, -250.0) and cast.size() > 1:
-			# two busts are wider than two full-length figures: a little further apart, overlapping only at the arms
-			hero.position.x = W * (0.26 if k == 0 else 0.75)
-		add_child(hero)
-		UI.slide_in(hero, Vector2(0 if cast.size() == 1 else (-80 if k == 0 else 80), 60), 0.1 + k * 0.15, 0.6)
-		heroes[h] = hero
-
-	# 0.10 M0: above the bottom inset; on tablets a readable measure (≤ 820) in the middle
-	var bw: = minf(W - 36.0, 820.0)
-	box = UI.rbox("plum", Rect2((W - bw) * 0.5, H - _sb - 300, bw, 256), 28, 4, 12)
-	box.colors(Color(0.14, 0.07, 0.2, 0.95), Color(0.07, 0.035, 0.12, 0.97)).borders(Color("fff0b8"), Color("c58a2c"))
+	# High-contrast Imperial Lacquer-Gold Dialogue Box with large 27px bold typography
+	var bw: = minf(W - 24.0, 840.0)
+	var bh: = 268.0
+	box = UI.rbox("plum", Rect2((W - bw) * 0.5, H - _sb - bh - 22.0, bw, bh), 28, 4, 14)
+	box.colors(Color(0.11, 0.045, 0.16, 0.93), Color(0.05, 0.02, 0.08, 0.97)).borders(Color("ffeaa8"), Color("c88f32"))
 	add_child(box)
-	plate = UI.rbox("pink", Rect2(30, -26, 250, 50), 22, 3, 8)
+	# Subtle inner gold hairline at top of dialogue box
+	var hair: = ColorRect.new()
+	hair.color = Color(1.0, 0.88, 0.58, 0.36)
+	hair.position = Vector2(28, 8)
+	hair.size = Vector2(bw - 56.0, 1.5)
+	hair.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	box.add_child(hair)
+
+	plate = UI.rbox("pink", Rect2(24, -30, 292, 56), 24, 3, 10)
+	plate.borders(Color("ffeaa8"), Color("c88f32"))
 	box.add_child(plate)
-	plate_lbl = UI.center_label(UI.label("", 22, Color.WHITE, Color("5a1a36"), 4, "body", 900), Rect2(0, 0, 250, 50))
+	plate_av = Control.new()
+	plate_av.position = Vector2(6, 2)
+	plate_av.size = Vector2(52, 52)
+	plate_av.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	plate.add_child(plate_av)
+	plate_lbl = UI.label("", 26, Color("fff8ec"), Color("4a1028"), 5, "body", 900)
+	plate_lbl.position = Vector2(64, 0)
+	plate_lbl.size = Vector2(218, 56)
+	plate_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	plate_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	plate.add_child(plate_lbl)
-	txt = UI.label("", 25, Color("fff1dc"), UI.DARK, 2, "body", 800)
-	txt.position = Vector2(30, 40)
-	txt.size = Vector2(bw - 64, 180)
+
+	txt = UI.label("", 27, Color("fff7eb"), Color(0.05, 0.02, 0.08, 0.96), 4, "body", 800)
+	txt.label_settings = txt.label_settings.duplicate()
+	txt.label_settings.line_spacing = 4.0
+	txt.position = Vector2(28, 38)
+	txt.size = Vector2(bw - 56.0, bh - 68.0)
 	txt.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(txt)
-	more = UI.label(V6Txt.s("story.next"), 20, Color("ffd98a"))
-	more.position = Vector2(bw - 54, 212)
+	more = UI.label(V6Txt.s("story.next"), 24, Color("ffe28a"), Color(0.05, 0.02, 0.08), 3, "body", 900)
+	more.position = Vector2(bw - 48, bh - 44)
 	box.add_child(more)
 	var mt: = more.create_tween().set_loops()
-	mt.tween_property(more, "position:y", 204.0, 0.45).set_trans(Tween.TRANS_SINE)
-	mt.tween_property(more, "position:y", 212.0, 0.45).set_trans(Tween.TRANS_SINE)
+	mt.tween_property(more, "position:y", bh - 52.0, 0.45).set_trans(Tween.TRANS_SINE)
+	mt.tween_property(more, "position:y", bh - 44.0, 0.45).set_trans(Tween.TRANS_SINE)
 	UI.slide_in(box, Vector2(0, 60), 0.15, 0.35)
-	var sk: = JButton.make(V6Txt.s("story.skip"), "glass", Rect2(W - 214, 36 + _st, 196, 60), null, 22)
+
+	if want_cg:
+		var view_b: = JButton.make("Арт", "graphite", Rect2(W - 324, 34 + _st, 102, 60), null, 22)
+		if view_b.box:
+			view_b.box.borders(Color("ffe7a6"), Color("a8742a"))
+		view_b.pressed.connect(func():
+			ui_hidden = not ui_hidden
+			box.visible = not ui_hidden
+			top_bar.visible = not ui_hidden
+			ttl_lbl.visible = not ui_hidden)
+		add_child(view_b)
+
+	var sk: = JButton.make(V6Txt.s("story.skip"), "glass", Rect2(W - 212, 34 + _st, 194, 60), null, 24)
 	sk.pressed.connect( func():
 		skipping = true
 		tapped = true)
@@ -154,7 +209,48 @@ func _build(d: Dictionary, id: String) -> void :
 	choice_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(choice_layer)
 
-# her face when she first appears: the emotion of her first line that has one, else glad
+func _set_cg(path: String, fade: bool = true) -> void:
+	if bool(G.S.get("modest", false)):
+		return
+	if path == "" or not ResourceLoader.exists(path):
+		cg_active = false
+		for h in heroes:
+			(heroes[h] as Hero).visible = true
+		if cg_rect and is_instance_valid(cg_rect):
+			cg_rect.queue_free()
+			cg_rect = null
+		return
+	var tex: = load(path) as Texture2D
+	if tex == null:
+		return
+	cg_active = true
+	for h in heroes:
+		(heroes[h] as Hero).visible = false
+	var tr: = TextureRect.new()
+	tr.texture = tex
+	tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	tr.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	tr.position = Vector2.ZERO
+	tr.size = cg_holder.size
+	tr.pivot_offset = Vector2(cg_holder.size.x * 0.5, cg_holder.size.y * 0.34)
+	tr.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	cg_holder.add_child(tr)
+	var old: = cg_rect
+	cg_rect = tr
+	if fade and old and is_instance_valid(old):
+		tr.modulate.a = 0.0
+		var ftw: = tr.create_tween()
+		ftw.tween_property(tr, "modulate:a", 1.0, 0.38)
+		ftw.tween_callback(func():
+			if is_instance_valid(old):
+				old.queue_free())
+	elif old and is_instance_valid(old):
+		old.queue_free()
+	var ktw: = tr.create_tween().set_loops()
+	ktw.tween_property(tr, "scale", Vector2(1.042, 1.042), 6.5).set_trans(Tween.TRANS_SINE)
+	ktw.tween_property(tr, "scale", Vector2.ONE, 6.5).set_trans(Tween.TRANS_SINE)
+
 func _first_emotion(d: Dictionary, h: String) -> String:
 	for e in d.lines:
 		if e is Array and e.size() > 1 and String(e[0]) == h:
@@ -164,10 +260,15 @@ func _first_emotion(d: Dictionary, h: String) -> String:
 	return "happy"
 
 func _on_input(e: InputEvent) -> void :
-	if e is InputEventMouseButton and e.pressed:
+	if (e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT) or (e is InputEventScreenTouch and e.pressed):
+		if ui_hidden:
+			ui_hidden = false
+			box.visible = true
+			top_bar.visible = true
+			ttl_lbl.visible = true
+			return
 		tapped = true
 
-# keep = true: a tap that already arrived (e.g. during a line's first 0.2 s) counts, so fast tappers never tap twice
 func _wait_tap(keep: = false) -> void :
 	if not keep:
 		tapped = false
@@ -182,31 +283,55 @@ func _focus(who: String) -> void :
 	for h in heroes:
 		var on: bool = h == who or who == ""
 		var hero: Hero = heroes[h]
+		hero.visible = not cg_active
 		hero.modulate = Color.WHITE if on else Color(0.55, 0.52, 0.65)
-		if h == who:
+		if not cg_active and h == who:
 			move_child(hero, box.get_index() - 1)
+
+func _update_plate_av(who: String, em: String) -> void:
+	for ch in plate_av.get_children():
+		ch.queue_free()
+	var en: = V8Art.emo_name(em) if em != "" else "happy"
+	if not V8Art.has_emotion(who, en):
+		en = "happy"
+	if V8Art.has_emotion(who, en):
+		var av: = V8Art.emotion_avatar(who, en, Rect2(0, 0, 52, 52), "gold")
+		av.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		plate_av.add_child(av)
 
 func _say(who: String, text: String, emo: = "") -> void :
 	_focus(who)
 	var narr: = who == "" or not G.HEROES.has(who)
 	plate.visible = not narr
+	var em: = line_emotion(text, emo)
 	if not narr:
 		plate_lbl.text = G.HEROES[who].name
-		plate.colors(G.HEROES[who].color.darkened(0.15), G.HEROES[who].color.darkened(0.45))
-	txt.label_settings.font_color = Color("d9cdf0") if narr else Color("fff1dc")
+		Common.fit_line(plate_lbl, 214.0, 20)
+		plate.colors(G.HEROES[who].color.darkened(0.22), G.HEROES[who].color.darkened(0.52))
+		_update_plate_av(who, em)
+	txt.label_settings.font_color = Color("eadff8") if narr else Color("fff7eb")
+	# Fit 27px bold down to 24px only for unusually long paragraphs so zero lines ever clip
+	var fs: = 27
+	var avail_w: = txt.size.x - 8.0
+	var avail_h: = txt.size.y
+	var fnt: = UI.font("body", 800)
+	while fs > 24:
+		var mh: = fnt.get_multiline_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, avail_w, fs, -1, TextServer.BREAK_MANDATORY | TextServer.BREAK_WORD_BOUND).y
+		if mh <= avail_h:
+			break
+		fs -= 1
+	txt.label_settings.font_size = fs
 	txt.text = text
 	txt.visible_ratio = 0.0
 	more.visible = false
-	if heroes.has(who):
+	if heroes.has(who) and not cg_active:
 		var hero: Hero = heroes[who]
-		# 0.8: crossfade (+ slight zoom) to the line's emotion portrait, face on the rig's face; neutral = the rig
-		hero.set_emotion(line_emotion(text, emo), 0.34, 1.0, 0.14)
+		hero.set_emotion(em, 0.34, 1.0, 0.14)
 		hero.react(EMO.get(emo, "happy" if emo == "" else "tap"))
 		hero.talk_left = minf(0.4 + text.length() * 0.045, 5.0)
 	Sfx.play("pop", 1.3, -12)
 	var tw: = create_tween()
 	tw.tween_property(txt, "visible_ratio", 1.0, text.length() * 0.02)
-	# 0.9: the bouncing ▼ shows while the game waits for the tap that advances, not after it
 	tw.tween_callback( func():
 		if is_instance_valid(more):
 			more.visible = true)
@@ -230,12 +355,11 @@ func _ask(e: Dictionary) -> void :
 	var opts: Array = e.ask
 	var picked: = [-1]
 	more.visible = false
-	var y: = H - _sb - 300 - 36 - opts.size() * 104
+	var y: = box.position.y - 24.0 - opts.size() * 104
 	var btns: = []
-	# 0.10 M0: on tablets the choices keep the text box's measure (≤ 820), centred; phones: 48 px margins as before
-	var cw: = minf(W - 96.0, 820.0)
+	var cw: = minf(W - 72.0, 820.0)
 	for k in opts.size():
-		var b: = JButton.make(opts[k][0], "gold" if k == 0 else "rose", Rect2((W - cw) * 0.5, y + k * 104, cw, 88), null, 26)
+		var b: = JButton.make(opts[k][0], "gold" if k == 0 else "pink", Rect2((W - cw) * 0.5, y + k * 104, cw, 92), null, 27)
 		b.pressed.connect( func(): picked[0] = k)
 		choice_layer.add_child(b)
 		UI.slide_in(b, Vector2(40, 0), k * 0.08, 0.3)
@@ -255,8 +379,8 @@ func _ask(e: Dictionary) -> void :
 		V10Bond.gain(who, aff, "story")
 		G.save()
 		var pos: = Vector2(W * 0.5, H * 0.42)
-		if heroes.has(who):
+		if heroes.has(who) and not cg_active:
 			pos = heroes[who].head_global_any() + Vector2(0, -40)
-		Fx.float_text(self, pos, V6Txt.s("story.aff") % [aff, G.HEROES[who].name], Color("ffd0e0"), 34)
+		Fx.float_text(self, pos, V6Txt.s("story.aff") % [aff, G.HEROES[who].name], Color("ffd0e0"), 36)
 		Sfx.play("gem", 1.2, -8)
 	await _say(who, o[1], "happy")
