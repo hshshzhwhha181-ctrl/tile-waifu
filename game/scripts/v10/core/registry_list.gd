@@ -45,7 +45,7 @@ static func register_all() -> void:
 		"ensure": func(S: Dictionary) -> void:
 			if not (S.get("v10_clarity") is Dictionary):
 				S["v10_clarity"] = {"marks": "auto", "big": false, "asked": false, "seen": {}, "tips": {}}})
-	R.module("tutorial", {"step": 1, "selftest": {"scene": "res://scripts/v10/tutorial/test/tut_test.tscn",
+	R.module("tutorial", {"step": 1, "selftest": {"scene": "res://scripts/v10/tutorial/tut_selftest.tscn",
 		"args": ["--save=user://tut_test.json", "--save_wipe=1", "--tut_static=1"], "marker": "V10TUT", "static_only": true},
 		# S.tut_done (0.9) becomes chapters.match1 only when the block is created: the module's own ensure does it
 		"ensure": func(S: Dictionary) -> void: V10TutState.ensure(S)})
@@ -124,7 +124,7 @@ static func register_all() -> void:
 				V10Clarity.open_glossary(main, topic)
 	# ── W3 ──────────────────────────────────────────────────────────────────────────────────────────────────────
 	R.module("gacha", {"step": 3, "selftest": {"scene": "res://scripts/v10/gacha/gacha_demo.tscn", "args": ["--gacha_selftest=1"],
-		"fast_args": ["--gacha_selftest=1", "--mc=0.1"], "marker": "GACHA_SELFTEST"},
+		"fast_args": ["--gacha_selftest=1", "--mc=0.5"], "marker": "GACHA_SELFTEST"},
 		"screens": {"summon": "res://scripts/v10/gacha/ui/wish_screen.gd", "odds": "res://scripts/v10/gacha/ui/odds_screen.gd"},
 		"nav": {"odds": ["summon", "shop"]},
 		"save": {"tickets": 0, "petals": 0, "candles": 0, "pity_std": 0, "s_pity_std": 0, "rates_ver": 2,
@@ -189,15 +189,102 @@ static func register_all() -> void:
 		V10Tray.register("month_card", month_fn, 75)
 	# ── W4 ──────────────────────────────────────────────────────────────────────────────────────────────────────
 	R.module("audio", {"step": 4, "selftest": {"scene": "res://scripts/v10/audio/v10_audio_selftest.tscn", "args": [], "marker": "V10AUDIO"}})
-	R.module("tower", {"step": 4, "selftest": {"scene": "res://scripts/v10/tower/tower_selftest.tscn", "args": ["--tower_selftest=1"], "marker": "TOWER_SELFTEST"}})
+	R.module("hudfx", {"step": 4, "selftest": {"scene": "res://scripts/v10/hudfx/hudfx_selftest.tscn", "args": ["--hudfx_selftest=1"], "marker": "HUDFX SELFTEST"}})
+	R.module("tower", {"step": 4, "selftest": {"scene": "res://scripts/v10/tower/tower_selftest.tscn",
+		"args": ["--tower_selftest=1"], "fast_args": ["--mods_selftest=1", "--pagoda_selftest=1", "--journey_selftest=1", "--tower_tables=1", "--tower_rules=1", "--tower_hygiene=1"],
+		"marker": "TOWER_SELFTEST"},
+		"screens": {
+			"pagoda": "res://scripts/v10/tower/pagoda_screen.gd",
+			"journey": "res://scripts/v10/tower/journey_screen.gd",
+			"tower_play": "res://scripts/v10/tower/tower_play.gd",
+		},
+		"nav": {"pagoda": ["tables"], "journey": ["tables", "home"], "tower_play": ["pagoda", "journey"]},
+		"save": {"v10_pagoda": V10Pagoda.DEFAULTS, "v10_journey": V10Journey.DEFAULTS},
+		"ensure": func(_S: Dictionary) -> void:
+			V10Pagoda.st()
+			V10Journey.st()})
 	R.module("mj_stage", {"step": 4, "selftest": {"scene": "res://scripts/v10/mj/stage/stage_selftest.tscn", "args": ["--mj_stage_selftest=1"], "marker": "MJ_STAGE"}})
 	R.module("mj_look", {"step": 4, "selftest": {"scene": "res://scripts/v10/mj/look/look_selftest.tscn", "args": ["--mj_look_selftest=1"],
 		"needs_render": true, "resolution": "720x1280", "marker": "MJ_LOOK"}})
 	R.module("mj_triples", {"step": 4, "selftest": {"scene": "res://scripts/v10/mj/triples/triples_selftest.tscn", "args": ["--mj_triples_selftest=1"],
-		"marker": "MJ_TRIPLES"}})
+		"marker": "MJ_TRIPLES"},
+		"screens": {"mj_triples": "res://scripts/v10/mj/triples/triples_screen.gd"},
+		"nav": {"mj_triples": ["tables"]}})
 	R.module("mj_riichi", {"step": 4, "selftest": {"scene": "res://scripts/v10/mj/riichi/riichi_selftest.tscn", "args": ["--mj_riichi_selftest=1"],
-		"fast_args": ["--mj_riichi_selftest=1", "--games=20"], "marker": "MJ_RIICHI"}})
+		"fast_args": ["--mj_riichi_selftest=1", "--games=20"], "marker": "MJ_RIICHI"},
+		"screens": {"mj_riichi": "res://scripts/v10/mj/riichi/riichi_screen.gd"},
+		"nav": {"mj_riichi": ["tables"]}})
 	R.module("mj_sanma", {"step": 4, "selftest": {"scene": "res://scripts/v10/mj/sanma/sanma_selftest.tscn", "args": ["--mj_sanma_selftest=1"],
-		"fast_args": ["--mj_sanma_selftest=1", "--games=20"], "marker": "MJ_SANMA"}})
+		"fast_args": ["--mj_sanma_selftest=1", "--games=20"], "marker": "MJ_SANMA"},
+		"screens": {"mj_sanma": "res://scripts/v10/mj/sanma/sanma_screen.gd"},
+		"nav": {"mj_sanma": ["tables"]}})
 	R.module("mj_koikoi", {"step": 4, "selftest": {"scene": "res://scripts/v10/mj/koikoi/koikoi_selftest.tscn", "args": ["--mj_koikoi_selftest=1"],
-		"fast_args": ["--mj_koikoi_selftest=1", "--games=100"], "marker": "MJ_KOIKOI"}})
+		"fast_args": ["--mj_koikoi_selftest=1", "--games=100"], "marker": "MJ_KOIKOI"},
+		"screens": {"mj_koikoi": "res://scripts/v10/mj/koikoi/koikoi_screen.gd"},
+		"nav": {"mj_koikoi": ["tables"]}})
+	R.module("mj_classic", {"step": 4, "selftest": {"scene": "res://scripts/v10/mj/classic/classic_selftest.tscn", "args": ["--mj_classic_selftest=1"],
+		"marker": "MJ_CLASSIC"},
+		"save": {"v10_mj_classic": V10MjClassicSave.DEFAULTS},
+		"ensure": func(S: Dictionary) -> void: V10MjClassicSave.ensure(S),
+		"screens": {
+			"mj_classic_lobby": "res://scripts/v10/mj/classic/classic_lobby.gd",
+			"mj_classic": "res://scripts/v10/mj/classic/classic_screen.gd",
+			"mj_memory": "res://scripts/v10/mj/classic/memory.gd",
+		},
+		"nav": {"mj_classic_lobby": ["tables"], "mj_classic": ["mj_classic_lobby", "tables"], "mj_memory": ["mj_classic_lobby", "tables"]}})
+	R.module("mj_connect", {"step": 4, "selftest": {"scene": "res://scripts/v10/mj/connect/connect_selftest.tscn", "args": ["--mj_connect_selftest=1"],
+		"marker": "MJ_CONNECT"},
+		"save": {"v10_mj_connect": V10MjConnectSave.DEFAULTS},
+		"ensure": func(S: Dictionary) -> void: V10MjConnectSave.ensure(S),
+		"screens": {"mj_connect": "res://scripts/v10/mj/connect/connect_screen.gd"},
+		"nav": {"mj_connect": ["tables"]}})
+	R.module("mj_cube", {"step": 4, "selftest": {"scene": "res://scripts/v10/mj/cube/cube_selftest.tscn", "args": ["--mj_cube_selftest=1"],
+		"marker": "MJ_CUBE"},
+		"save": {"v10_mj_cube": V10MjCubeSave.DEFAULTS},
+		"ensure": func(S: Dictionary) -> void: V10MjCubeSave.ensure(S),
+		"screens": {"mj_cube": "res://scripts/v10/mj/cube/cube_screen.gd"},
+		"nav": {"mj_cube": ["tables"]}})
+	R.module("mj_garden", {"step": 4, "selftest": {"scene": "res://scripts/v10/mj/garden/garden_selftest.tscn", "args": ["--mj_garden_selftest=1"],
+		"marker": "MJ_GARDEN"},
+		"save": {"v10_mj_garden": V10MjGardenSave.DEFAULTS},
+		"ensure": func(S: Dictionary) -> void: V10MjGardenSave.ensure(S),
+		"screens": {"mj_garden": "res://scripts/v10/mj/garden/garden_screen.gd"},
+		"nav": {"mj_garden": ["tables"]}})
+	R.module("mj_bridge", {"step": 4, "selftest": {"scene": "res://scripts/v10/mj/bridge/bridge_selftest.tscn", "args": ["--mj_bridge_selftest=1"],
+		"marker": "MJ_BRIDGE"},
+		"save": {"v10_mj_bridge": V10MjBridgeSave.DEFAULTS},
+		"ensure": func(S: Dictionary) -> void: V10MjBridgeSave.ensure(S),
+		"screens": {
+			"mj_bridge": "res://scripts/v10/mj/bridge/bridge_screen.gd",
+			"mj_bridge_daily": "res://scripts/v10/mj/bridge/bridge_daily_screen.gd",
+			"mj_bridge_hand": "res://scripts/v10/mj/bridge/bridge_hand_screen.gd",
+		},
+		"nav": {"mj_bridge": ["tables"], "mj_bridge_daily": ["tables"], "mj_bridge_hand": ["tables"]}})
+	R.module("palm", {"step": 4, "selftest": {"scene": "res://scripts/v10/palm/hand_selftest.tscn", "args": ["--hand_selftest=1"],
+		"fast_args": ["--hand_selftest=1", "--hand_real=24"], "marker": "HAND_SELFTEST"},
+		"screens": {"hand": V10PalmInfo.SCREEN_PATH},
+		"nav": {"hand": ["tables"]},
+		"save": {"v10_hand": V10HandState.defaults()},
+		"ensure": func(_S: Dictionary) -> void:
+			V10HandState.st()
+			V10HandState.register_cos()})
+	R.module("duels", {"step": 4, "selftest": {"scene": "res://scripts/v10/duels/duel_selftest.tscn",
+		"args": ["--duel_selftest=1", "--save=user://duel_selftest.json", "--save_wipe=1"], "marker": "DUEL_SELFTEST"},
+		"screens": {"duels": V10DuelInfo.SCREEN_PATH, "duel2": V10DuelInfo.PLAY_PATH},
+		"nav": {"duels": ["tables"], "duel2": ["duels"]},
+		"ensure": func(_S: Dictionary) -> void:
+			V10Duel.st()
+			V10DuelRank.register_cos()})
+	R.module("challenge", {"step": 4, "selftest": {"scene": "res://scripts/v10/duels/challenge/challenge_selftest.tscn",
+		"args": ["--challenge_selftest=1", "--save=user://ch_selftest.json", "--save_wipe=1"],
+		"marker": "CHALLENGE_SELFTEST"},
+		"screens": {"challenge": V10DuelInfo.CHALLENGE_PATH, "challenge_play": V10DuelInfo.CHALLENGE_PLAY_PATH},
+		"nav": {"challenge": ["tables"], "challenge_play": ["challenge"]},
+		"ensure": func(_S: Dictionary) -> void: V10ChallengeState.st()})
+	R.module("wave1", {"step": 4, "selftest": {"scene": "res://scripts/v10/wave1/wave1_selftest.tscn",
+		"args": ["--wave1_selftest=1"], "marker": "WAVE1_SELFTEST"}})
+	if R.STEP >= 4:
+		V10Afisha.set_provider("hand", func() -> bool: return bool(V10PalmInfo.afisha_entry().done))
+		for cdef in V10Pagoda.cos_defs():
+			if not V10ProfileCos.has(String(cdef.get("id", "")), ""):
+				V10ProfileCos.register(cdef)

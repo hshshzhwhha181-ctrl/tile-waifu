@@ -65,4 +65,6 @@ static func sfx(id: String) -> void:
 static func music(method: String, args: = []) -> void:
 	var m: = opt_class("V10Music")
 	if m:
-		m.callv(method, args)
+		var fn: = "play_screen" if method == "play_tab" else method
+		if m.has_method(fn):
+			m.callv(fn, args)

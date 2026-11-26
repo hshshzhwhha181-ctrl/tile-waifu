@@ -790,7 +790,11 @@ func _e2e() -> void:
 	# --- the author plays 1-4 (the hooked play screen: the deal is seeded like the hook asks)
 	_profile(SAVE_A, "Ника Ветер")
 	U.go_challenge(main, {})
-	await _wait(0.3)
+	var t_nav: = 0
+	while main.busy and t_nav < 60:
+		t_nav += 1
+		await _wait(0.05)
+	await _wait(0.1)
 	U.open_screen(main, load(PLAY), "play", {"level": 3, "partner": "mc"})
 	await _wait(2.2)
 	var pa: Control = main.screen

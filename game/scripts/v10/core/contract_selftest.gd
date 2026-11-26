@@ -39,6 +39,7 @@ static func run() -> int:
 	fails = []
 	_numbers()
 	_scan_all()
+	_parity_invariants()
 	print("CONTRACT_SELFTEST %d/%d" % [ok, total])
 	return total - ok
 
@@ -139,3 +140,98 @@ static func _walk(dir_path: String, ext: String, out: Array) -> void:
 				out.append(full)
 		n = d.get_next()
 	d.list_dir_end()
+
+
+static func _parity_invariants() -> void:
+	# 1. V6SpecialBoard synchronous Joker mate conversion on tap (prevents 0.24s async orphan-tile race)
+	var tree: = Engine.get_main_loop() as SceneTree
+	if tree != null and tree.root != null:
+		var b: = V6SpecialBoard.new()
+		tree.root.add_child(b)
+		var cfg: Dictionary = G.LEVELS[min(14, G.LEVELS.size() - 1)].duplicate(true)
+		b.setup(cfg)
+		b.slot_pos = [Vector2(100, 900), Vector2(200, 900), Vector2(300, 900), Vector2(400, 900), Vector2(500, 900)]
+		b.slot_size = 80.0
+		b.apply_specials({"joker": 1})
+		b.input_on = true
+		var jokers: Array = []
+		for t in b.tiles:
+			if t.face == V6SpecialBoard.JOKER:
+				jokers.append(t)
+		if jokers.size() == 2:
+			var j1: Tile = jokers[0]
+			var j2: Tile = jokers[1]
+			var reg: Tile = null
+			for t in b.tiles:
+				if t != j1 and t != j2 and t.face != V6SpecialBoard.JOKER and b.is_free(t) and b.takeable(t):
+					reg = t
+					break
+			if reg != null:
+				b.open_tile(j1)
+				var reg_face: int = reg.face
+				b.tap(reg)
+				b.tap(j1)
+				_check(j2.face == reg_face and j2.face != V6SpecialBoard.JOKER, "V6SpecialBoard Joker mate converts synchronously on tap")
+				b.shuffle_board()
+				var counts: = {}
+				for t in b.tiles:
+					if t.alive and not t.pending:
+						counts[t.face] = int(counts.get(t.face, 0)) + 1
+				var orphans: = 0
+				for f in counts:
+					if int(counts[f]) % 2 != 0:
+						orphans += 1
+				_check(orphans == 0, "0 orphan tiles after synchronous Joker tap + immediate shuffle_board()")
+			else:
+				_check(false, "found free regular tile for Joker parity test")
+		else:
+			_check(jokers.size() == 2, "V6SpecialBoard deals exactly 2 Jokers when specials.joker=1")
+		b.free()
+	# 2. V10TowerRules 'gust' trick never mutates Joker face or breaks tile parity
+	if tree != null and tree.root != null:
+		var tb: = V6SpecialBoard.new()
+		tree.root.add_child(tb)
+		var tcfg: Dictionary = G.LEVELS[min(14, G.LEVELS.size() - 1)].duplicate(true)
+		tb.setup(tcfg)
+		tb.apply_specials({"joker": 1})
+		var j_before: Array = []
+		for t in tb.tiles:
+			if t.face == V6SpecialBoard.JOKER:
+				j_before.append(t)
+				tb.open_tile(t)
+		var tr: = V10TowerRules.new()
+		var dummy_play: = _FakePlay.new(tb)
+		tr.apply_op(dummy_play, {"op": "gust", "n": 12})
+		var j_intact: = true
+		for j in j_before:
+			if (j as Tile).face != V6SpecialBoard.JOKER:
+				j_intact = false
+		_check(j_intact, "V10TowerRules gust keeps Joker tiles intact")
+		var tcounts: = {}
+		for t in tb.tiles:
+			if t.alive:
+				tcounts[t.face] = int(tcounts.get(t.face, 0)) + 1
+		var torphans: = 0
+		for f in tcounts:
+			if int(tcounts[f]) % 2 != 0:
+				torphans += 1
+		_check(torphans == 0, "0 orphan tiles after V10TowerRules gust")
+		dummy_play.free()
+		tb.free()
+	# 3. Path 1000 representative sample parity (regular, hard, boss, peak)
+	var sample_ok: = true
+	for idx in [0, 7, 15, 29, 47, 99, 250, 500, 999]:
+		var pc: Dictionary = V10LevelGen.level(idx)
+		var nt: = int(pc.get("tiles", 0))
+		if nt <= 0 or nt % 2 != 0:
+			sample_ok = false
+			break
+	_check(sample_ok, "Path 1000 sample levels (0..999 incl. bosses/peaks) have even tile counts")
+
+
+class _FakePlay:
+	extends Node
+	var board: TrayBoard
+
+	func _init(b: TrayBoard) -> void:
+		board = b

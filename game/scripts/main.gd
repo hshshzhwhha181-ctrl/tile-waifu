@@ -91,6 +91,11 @@ func _ready() -> void :
 	if G.demo:
 		run_demo()
 	_dev_args()
+	V10Juice.warm.call_deferred()
+	var uargs: = " ".join(OS.get_cmdline_user_args())
+	var skip_tut: = "--pt=" in uargs or "--shots" in uargs or "--layout_shots=" in uargs or "--layout_selftest=" in uargs or "--meta_shots=" in uargs or "--selftest" in uargs or "--fuzz=" in uargs or "--v10_selftest=" in uargs or G.demo
+	if not skip_tut:
+		V10Tutorial.attach(self)
 
 
 
@@ -317,7 +322,13 @@ func settings() -> void :
 				V10Fonts.deco = v
 			if key == "music":
 				Sfx.cur_music = ""
-				Sfx.music("menu" if v else "")
+				if V10Registry.wired("audio"):
+					if v:
+						V10Music.play_screen(screen_id)
+					else:
+						V10Music.stop(0.25)
+				else:
+					Sfx.music("menu" if v else "")
 			if key in ["modest", "deco_fonts"] and screen_id in ["home", "collection", "shop", "summon"]:
 				p.get_meta("root").set_meta("on_close", func():
 					var sid: = screen_id
@@ -353,7 +364,9 @@ func settings() -> void :
 	V10Clarity.settings_hook(self, p)  # v10-clarity hook: «Фишки и словарь»
 	V10Nav.settings_notify(self, p)  # 0.10 W1 (meta Ф1): «Уведомления»
 	V10Nav.settings_bday(self, p)  # 0.10 W2 (rituals Р7): «Мой день рождения»
-	V10Nav.settings_fonts(self, p)  # 0.10 W3 (fonts D2): «Шрифты и лицензии»
+	V10Nav.settings_account(self, p)  # 0.10 W4 (auth): «Аккаунт»
+	V10Nav.settings_help(self, p)  # 0.10 W4 (tutorial/help): «Как играть»
+	V10Nav.settings_fonts(self, p)  # 0.10 W3 (fonts D2): «Шрифты и лицензии» (wraps SettingsScroll)
 
 
 # one 3-way setting: caption, three segments (the chosen one painted like a selected tab) and a hint line
@@ -785,7 +798,7 @@ func refresh_nav() -> void :
 				c.remove_child(n)
 				n.queue_free()
 		var open: = V10Nav.tab_open(k)
-		var on: bool = k == screen_id or (k == "tables" and screen_id in ["levels", "modes", "v10path"])
+		var on: bool = k == screen_id or (k == "tables" and (screen_id in ["levels", "modes", "v10path", "pagoda", "journey", "duels", "challenge", "hand", "v7tourney"] or screen_id.begins_with("mj_")))
 		var col: = V10DS.GOLD_300 if on else (V10DS.PAPER_500 if open else Color(V10DS.PAPER_700, 0.55))
 		var ic = c.get_node("IC")
 		ic.set("color", col)
@@ -829,18 +842,23 @@ func go(id: String, args: = {}, animate: = true, remember: = true) -> void :
 		history.append([from_id, from_args])
 		if history.size() > 12:
 			history.pop_front()
+	var use_juice_trans: = animate and V10Registry.wired("juice")
 	if animate:
-		Sfx.play("whoosh", 1.0, -4)
-		var t: = create_tween()
-		t.tween_method( func(v): trans_mat.set_shader_parameter("progress", v), 0.0, 1.0, 0.32).set_trans(Tween.TRANS_QUAD)
-		await t.finished
+		if use_juice_trans:
+			var center: Vector2 = (tab_nodes[id] as Control).get_global_rect().get_center() if tab_nodes.has(id) else Vector2(-1, -1)
+			await V10Juice.cover("auto", 0.34, center, id)
+		else:
+			Sfx.play("whoosh", 1.0, -4)
+			var t: = create_tween()
+			t.tween_method( func(v): trans_mat.set_shader_parameter("progress", v), 0.0, 1.0, 0.32).set_trans(Tween.TRANS_QUAD)
+			await t.finished
 	if screen:
 		screen.queue_free()
 	screen_id = id
 	# 0.8: in a match, popups and toasts draw above everything of the table, also above tiles lifted into the
 	# tray (z 200+) or flying specials (z 160), so nothing from the match shows through a window. Elsewhere the
 	# overlay stays at z 0 under views added straight to main (title, story scenes).
-	var match_z: = PLAY_BACK.has(id)
+	var match_z: = PLAY_BACK.has(id) or id in ["tower_play", "duel2", "challenge_play"]
 	overlay.z_index = 400 if match_z else 0
 	trans.z_index = 450 if match_z else 0
 	screen = Control.new()
@@ -850,13 +868,28 @@ func go(id: String, args: = {}, animate: = true, remember: = true) -> void :
 	screen.size = CR.size
 	screen.set_meta("v8_args", args.duplicate())
 	screen_root.add_child(screen)
-	screen.call("build", self, args)
+	if screen.has_method("build"):
+		screen.call("build", self, args)
+	elif screen.has_method("setup"):
+		screen.call("setup", self, args)
+	if id == "mj_classic_lobby":
+		if screen.has_signal("play"):
+			screen.play.connect(func(a: Dictionary) -> void:
+				var target: = "mj_memory" if String(a.get("variant", "")) == "memory" else "mj_classic"
+				go(target, a))
+		if screen.has_signal("back"):
+			screen.back.connect(func() -> void: go("tables"))
+	elif id.begins_with("mj_") and screen.has_signal("finished"):
+		screen.finished.connect(func(res: Dictionary) -> void: V10Hooks.handle_mode_finished(self, res))
 	V10Hooks.emit_screen_shown(id, screen)  # 0.10 hook
 	refresh_currency()
 	refresh_nav()
 	if animate:
-		var t2: = create_tween()
-		t2.tween_method( func(v): trans_mat.set_shader_parameter("progress", v), 1.0, 0.0, 0.4).set_trans(Tween.TRANS_QUAD)
+		if use_juice_trans:
+			V10Juice.reveal(0.42)
+		else:
+			var t2: = create_tween()
+			t2.tween_method( func(v): trans_mat.set_shader_parameter("progress", v), 1.0, 0.0, 0.4).set_trans(Tween.TRANS_QUAD)
 	busy = false
 
 # «назад» of a V8Header: previous screen from the history (play screens are never returned to), else home.

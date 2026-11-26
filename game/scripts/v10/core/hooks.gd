@@ -157,6 +157,13 @@ func _ready() -> void:
 	V10Meta.bus().day_rolled.connect(func(_old: String, _new: String) -> void:
 		if V10Registry.wired("phone"):
 			V10Phone.tick())
+	# W4 audio: route screen changes to V10Music (0.4s crossfade, stops legacy Sfx.music automatically)
+	screen_shown.connect(func(id: String, _sc: Node) -> void:
+		if not V10Registry.wired("audio"):
+			return
+		var trk: = _music_screen_for(id)
+		if trk != "":
+			V10Music.play_screen(trk))
 	# meta: at most one full-screen entry scene per launch, offered by the modules, run when the tea house is up
 	home_built.connect(func(_h: Node) -> void: V10EntryQueue.run())
 	# the W1+W2 shell: Afisha providers, MoreLevel codes, WinStack salon bar + streak/flame/daily ticks
@@ -204,3 +211,101 @@ func _ready() -> void:
 			return V10WinBar.make(w, {"icon": "star", "title": "Сезон · ступень %d" % ps.tier(),
 				"have": int(ps.st.get("xp", 0)) % V10Catalog.PASS_XP_TIER, "need": V10Catalog.PASS_XP_TIER,
 				"gain": 0, "kind": "fill", "pal": "gold"}))
+
+
+const MODE_GEMS_DAILY_CAP: = 400
+const _MUSIC_MAP: = {
+	"home": "home", "profile": "home",
+	"v10path": "path", "levels": "path", "tables": "path", "modes": "path", "journey": "path",
+	"play": "play", "arena": "play", "v7play": "play", "tower_play": "play", "challenge_play": "play", "hand": "play",
+	"mj_classic": "play", "mj_classic_lobby": "play", "mj_memory": "play", "mj_triples": "play", "mj_connect": "play",
+	"mj_cube": "play", "mj_garden": "play", "mj_bridge": "play", "mj_bridge_daily": "play", "mj_bridge_hand": "play",
+	"mj_riichi": "play", "mj_sanma": "play", "mj_koikoi": "play",
+	"pagoda": "pagoda",
+	"duels": "duels", "duel2": "duels", "challenge": "duels", "v7tourney": "duels", "v7event": "duels",
+	"summon": "summon", "odds": "summon",
+	"shop": "shop", "v10pass": "shop",
+	"v10salon": "salon", "collection": "salon", "room": "salon",
+	"v10phone": "phone", "letters": "phone",
+}
+const _MODE_SCREEN: = {
+	"classic": "mj_classic", "memory": "mj_memory", "triples": "mj_triples", "connect": "mj_connect",
+	"cube": "mj_cube", "garden": "mj_garden", "bridge_daily": "mj_bridge_daily", "bridge_hand": "mj_bridge_hand",
+	"riichi": "mj_riichi", "sanma": "mj_sanma", "koikoi": "mj_koikoi",
+	"hand": "hand", "palm": "hand", "pagoda": "pagoda", "journey": "journey", "duels": "duels", "challenge": "challenge",
+}
+
+
+static func _music_screen_for(id: String) -> String:
+	return String(_MUSIC_MAP.get(id, ""))
+
+
+static func _screen_for_mode(mode: String) -> String:
+	if _MODE_SCREEN.has(mode):
+		return String(_MODE_SCREEN[mode])
+	return "mj_" + mode if mode != "" else "tables"
+
+
+static func _mode_gems_allow(want: int) -> int:
+	if want <= 0:
+		return 0
+	var meta: Dictionary = V10Meta.st()
+	var dk: = V10Meta.day_key()
+	var cap: Dictionary = meta.get("mode_gems", {}) if meta.get("mode_gems") is Dictionary else {}
+	if String(cap.get("day", "")) != dk:
+		cap = {"day": dk, "got": 0}
+	var left: = maxi(0, MODE_GEMS_DAILY_CAP - int(cap.get("got", 0)))
+	var give: = mini(want, left)
+	cap["got"] = int(cap.get("got", 0)) + give
+	meta["mode_gems"] = cap
+	return give
+
+
+func handle_mode_finished(main, res: Dictionary) -> void:
+	var mode: = String(res.get("mode", ""))
+	var rw: Dictionary = res.get("rewards", {}) if res.get("rewards") is Dictionary else {}
+	var reason: = "mj_" + (mode if mode != "" else "mode")
+	var cur: = {}
+	if not bool(res.get("rewards_paid", false)):
+		for k in ["coins", "petals", "tickets"]:
+			if int(rw.get(k, 0)) > 0:
+				cur[k] = int(rw[k])
+		var gems: = _mode_gems_allow(int(rw.get("gems", 0)))
+		if gems > 0:
+			cur["gems"] = gems
+		if not cur.is_empty():
+			V10Money.grant(cur, reason)
+		var aff: = int(rw.get("aff", 0))
+		var hero: = String(res.get("hero", ""))
+		if aff > 0 and hero != "":
+			V10Bond.gain(hero, aff, "mode_win")
+	if mode == "riichi":
+		var rs: Dictionary = G.S.get("v10_mj_riichi", {}) if G.S.get("v10_mj_riichi") is Dictionary else {}
+		rs["games"] = int(rs.get("games", 0)) + 1
+		G.S["v10_mj_riichi"] = rs
+	for ev in res.get("events", []):
+		emit_salon_event(G.S, ev)
+	emit_game_ended(res)
+	G.save()
+	if main == null or not is_instance_valid(main) or not main.has_method("go"):
+		return
+	var act: = String(res.get("action", "exit"))
+	var scr: = _screen_for_mode(mode)
+	if act == "next":
+		main.go(scr, {"level": int(res.get("level", 1)) + 1, "hero": String(res.get("hero", ""))})
+	elif act == "again" or act == "retry":
+		main.go(scr, {"level": int(res.get("level", 1)), "hero": String(res.get("hero", "")), "retry": randi()})
+	elif scr == "mj_classic" or scr == "mj_memory":
+		main.go("mj_classic_lobby", {})
+	else:
+		main.go("tables", {})
+
+
+static func emit_salon_event(S: Dictionary, ev) -> void:
+	if S == null or not (S is Dictionary):
+		return
+	var log: Array = S.get("v10_salon_events", []) if S.get("v10_salon_events") is Array else []
+	var id: = String(ev.get("id", "")) if ev is Dictionary else String(ev)
+	if id != "" and not (id in log):
+		log.append(id)
+		S["v10_salon_events"] = log

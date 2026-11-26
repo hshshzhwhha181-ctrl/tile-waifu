@@ -20,7 +20,7 @@ extends RefCounted
 
 # the integration step this build is at: modules of later steps keep their selftests in --v10_selftest but do not
 # put keys into the save or screens into the navigation yet
-const STEP: = 3
+const STEP: = 4
 
 static var _mods: = {}
 static var _order: Array = []

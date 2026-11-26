@@ -402,6 +402,17 @@ func _fresh() -> String:
 	await wait(1.4)
 	await shot("title")
 	await tap(pos_of(splash))
+	# ---- 0.10 age gate (V10AgeGate)
+	step = "age_gate"
+	var age: V10AgeGate = await wait_find(func(): return find(main, func(c): return c is V10AgeGate), 3.0)
+	if age != null:
+		await wait(0.6)
+		await shot("age_gate")
+		age.drum.set_year(1995)
+		await wait(0.3)
+		await shot("age_gate_picked")
+		await tap(pos_of(age.btn))
+		await wait(0.4)
 	# ---- player card
 	step = "card"
 	var card: V8ProfileCard = await wait_find(func(): return find(main, func(c): return c is V8ProfileCard), 6.0)
@@ -554,6 +565,37 @@ func _fresh() -> String:
 	await wait(0.8)
 	await shot("summon")
 	var sm = main.screen
+	# 0.10 W3: first entry into Желания shows V10FirstPickView («Кто будет хозяйкой твоего стола?»)
+	if "first_view" in sm and sm.first_view != null and is_instance_valid(sm.first_view):
+		step = "first_pick"
+		await wait(2.4)
+		var fp: V10FirstPickView = sm.first_view
+		await shot("first_pick")
+		if fp.cards.size() > 0:
+			await tap(pos_of(fp.cards[mini(1, fp.cards.size() - 1)]))
+			await wait(0.6)
+			if fp.pick_btn != null and is_instance_valid(fp.pick_btn):
+				await tap(pos_of(fp.pick_btn))
+				await wait(0.4)
+				await tap(pos_of(fp.pick_btn))
+		await until(func(): return sm.first_view == null or not is_instance_valid(sm.first_view) or not sm.first_view.is_inside_tree(), 8.0)
+		var t_cer: = Time.get_ticks_msec()
+		while Time.get_ticks_msec() - t_cer < 12000:
+			if sm.showcase != null and is_instance_valid(sm.showcase) and sm.showcase.is_inside_tree() and not sm.showcase.is_queued_for_deletion():
+				await wait(1.2)
+				await shot("first_pick_showcase")
+				await tap(Vector2(main.W * 0.5, main.H * 0.55))
+				await until(func(): return sm.showcase == null or not is_instance_valid(sm.showcase) or sm.showcase.is_queued_for_deletion(), 4.0)
+				break
+			await wait(0.3)
+		await wait(0.8)
+		var later_b: = find_button(main.overlay, "Позже")
+		if later_b != null:
+			await shot("first_pick_partner")
+			await tap(pos_of(later_b))
+			await wait(0.6)
+		step = "summon"
+		await shot("summon_banner")
 	if sm.pull10_btn and on_screen(sm.pull10_btn):
 		await tap(pos_of(sm.pull10_btn))
 		# 0.9 §E stage 1: the lantern drops in dark; a tap on it lights it

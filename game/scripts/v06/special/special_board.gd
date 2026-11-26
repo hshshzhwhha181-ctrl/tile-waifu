@@ -168,19 +168,30 @@ func tap(t: Tile) -> void :
 			tw.tween_property(ic, "rotation", 0.0, 0.06)
 		special.emit("blocked", {"tile": t, "kind": spec[t].kind})
 		return
+	var joker_pair: Array = []
 	if is_free(t) and t.ice <= 0:
 		if t.face == JOKER:
-
 			for x in tray:
 				if x.face != JOKER:
 					t.face = x.face
+					joker_pair = [t, x]
 					break
 		elif not tray.any( func(x): return x.face == t.face):
 			for x in tray:
 				if x.face == JOKER:
 					x.face = t.face
+					joker_pair = [x, t]
 					break
 	super.tap(t)
+	# 0.10 parity guard: convert the mate joker SYNCHRONOUSLY on tap (before the 0.24s _match_later delay)
+	# so rapid taps or shuffle_board() during flight can never leave an orphan tile without a twin.
+	if joker_pair.size() == 2 and not t.alive:
+		var j: Tile = joker_pair[0]
+		var o: Tile = joker_pair[1]
+		if spec.has(j) and spec[j].kind == "joker" and not (spec.has(o) and spec[o].kind == "joker"):
+			var mate: Tile = spec[j].get("mate")
+			if mate and mate.alive and mate.face == JOKER:
+				_joker_turn(mate, o)
 	if is_instance_valid(t) and tray.has(t) and not t.pending and tray.size() < slots:
 		unstick()
 

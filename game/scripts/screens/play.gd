@@ -564,6 +564,8 @@ func _refresh() -> void :
 			stage.say("tray_warn")
 	_v6_danger = danger
 	tray_box.borders(Color("ff8a9a") if danger else Color("ffe7a6"), Color("e8455f") if danger else Color("c58a2c"))
+	if V10Registry.wired("audio") and board != null:
+		V10Music.set_tension(float(board.tray.size()) / maxf(1.0, float(board.slots)))
 
 func _intro() -> void :
 	# 0.8: hold the «v6_tip» slot until the intro tip is shown, so a specials card never comes first and
@@ -806,6 +808,11 @@ func _process(dt: float) -> void :
 	if fever:
 		charge = (fever_until - now()) / 8.0
 	else:
+		if _v10_fever_on:
+			_v10_fever_on = false
+			if V10Registry.wired("audio"):
+				V10Music.fever(false)
+				V10SfxBank.play("fever_end")
 		charge = max(0.0, charge - dt * 0.05)
 	meter.size.x = max(12.0, meter_w * clamp(charge, 0.0, 1.0))
 	meter.set_param("glow", 1.0 if fever else 0.0)
@@ -871,7 +878,10 @@ func _on_match(mid: Vector2, combo: int, gold: bool, shard: String) -> void :
 	if not from_ult and combo in [5, 10, 20] and V10Voice.has(partner, "combo%d" % combo):
 		V10Voice.combo(partner, combo)
 	Fx.ring(fx_layer, mid, Color(1, 0.85, 0.5, 0.7), 1.0)
-	Fx.burst(fx_layer, mid, "sparkle", 8 + mini(combo, 8) * 2, Color(1, 0.9, 0.55) if not gold else Color(1, 0.8, 0.2), 1.0 + mini(combo, 8) * 0.05)
+	if V10Registry.wired("juice"):
+		V10Juice.tile_match(mid, pair_face, combo, gold)
+	else:
+		Fx.burst(fx_layer, mid, "sparkle", 8 + mini(combo, 8) * 2, Color(1, 0.9, 0.55) if not gold else Color(1, 0.8, 0.2), 1.0 + mini(combo, 8) * 0.05)
 	if combo >= 3:
 		Fx.burst(fx_layer, mid, "petal", 4 + mini(combo, 6))
 	Fx.float_text(fx_layer, mid + Vector2(0, 40), "+%d" % gain, Color("fff3c4") if not gold else Color("ffd34d"), 34 if not gold else 44)
@@ -1047,9 +1057,14 @@ func _cutin() -> void :
 
 func _fever() -> void :
 	fever_until = now() + 8.0
+	_v10_fever_on = true
 	charge = 1.0
 	stage.react("big")
-	Sfx.play("fever")
+	if V10Registry.wired("audio"):
+		V10Music.fever(true)
+		V10SfxBank.play("fever_ignite")
+	else:
+		Sfx.play("fever")
 	var rib: = Common.ribbon(self, V6Txt.s("play.fever"), Rect2(0, 0, 400, V8_BAND_H), "gold", 30)
 	remove_child(rib)
 	v8_band(rib, 1.0, true, 1)
@@ -1095,6 +1110,10 @@ func _on_fail() -> void :
 	fails += 1
 	stage.react("fail")
 	Sfx.play("deny", 0.7)
+	if V10Registry.wired("audio"):
+		_v10_fever_on = false
+		V10Music.fever(false)
+		V10Music.sting("defeat")
 	Fx.shake(tray_box, 10, 0.4)
 	Sfx.say(partner, "lose")
 	_v8_modal_open()
@@ -2335,7 +2354,12 @@ func _victory(stars: int, reward: int, secs: float, first: bool) -> void :
 		main.fly_gems(global_position + plate.position + rr.position + Vector2(46, 42), 8)
 	if rank_box:
 		await _animate_rank(rank_box)
-	Sfx.music("menu")
+	if V10Registry.wired("audio"):
+		_v10_fever_on = false
+		V10Music.fever(false)
+		V10Music.sting("victory")
+	else:
+		Sfx.music("menu")
 	if first_unlock_summon:
 		await get_tree().create_timer(1.6).timeout
 		if is_inside_tree():
@@ -2447,6 +2471,16 @@ func _v8_photo_row(root: Control, stars: int, secs: float, plate_end: float, by:
 		var jb: JButton = b
 		jb.position = Vector2(x0, row_y)
 		x0 += jb.size.x + V8_RES_GAP
+	if V10Registry.wired("challenge"):
+		var ch_item: Dictionary = V10ChallengeScreen.victory_more_item(self, secs, stars)
+		if not ch_item.is_empty():
+			var cb: = JButton.make(String(ch_item.get("label", "Бросить вызов")), "glass", Rect2(x0, row_y, 176, 56), null, 18)
+			cb.name = "ChallengeThrow"
+			var ch_act: Callable = ch_item.get("action", Callable())
+			cb.pressed.connect(func() -> void:
+				if ch_act.is_valid():
+					ch_act.call())
+			root.add_child(cb)
 
 # 0.8: the in-panel album chip spans the content column like the rank and league rows (V8_RES_PAD … pw − PAD):
 # the star sits inside its left cap, the label after it, the claim badge on the right edge
@@ -3053,6 +3087,7 @@ func _v9_win_dev() -> void :
 
 # ── 0.10 hooks (docs/INTEGRATION_0.10.md §3.8): one result per table for V10Hooks.game_ended, the win window ──
 var _v10_end_sent: = false
+var _v10_fever_on: = false
 
 func _v10_mode() -> String:
 	return "path" if mode == "" else mode

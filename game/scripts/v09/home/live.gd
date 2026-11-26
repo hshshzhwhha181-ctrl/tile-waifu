@@ -76,33 +76,52 @@ var _cool_i: = 0
 
 
 static func rig10_wanted(h: String) -> bool:
-	return h == "mc" and G.equipped("mc") == "" and (ResourceLoader.exists(RIG10_SCN) or ResourceLoader.exists(RIG10_TSCN))
+	var eq: = G.equipped(h)
+	if h == "mc" and eq == "" and (ResourceLoader.exists(RIG10_SCN) or ResourceLoader.exists(RIG10_TSCN)):
+		return true
+	return V10RigCatalog.has_rig(h, eq)
 
 
-static func build_rig10(parent: Control, sz: Vector2, show_bg: bool = true) -> V10LiveRig:
-	var pth: = RIG10_SCN if ResourceLoader.exists(RIG10_SCN) else RIG10_TSCN
-	if not ResourceLoader.exists(pth):
-		return null
-	var packed = load(pth)
-	if not (packed is PackedScene):
-		return null
-	var rig: V10LiveRig = (packed as PackedScene).instantiate() as V10LiveRig
-	if rig == null:
-		return null
-	rig.name = "V10LiveRig"
-	rig.show_background = show_bg
-	rig.handle_input = false
+static func build_rig10(parent: Control, sz: Vector2, show_bg: bool = true, h: String = "") -> V10LiveRig:
+	var hid_: = h if h != "" else str(G.S.get("partner", "mc"))
+	var eq: = G.equipped(hid_)
 	var fxl: = G.fx_level()
-	rig.motion = 1.0 if fxl == "full" else (0.75 if fxl == "mid" else 0.5)
-	rig.auto_gestures = fxl != "min"
-	var ky: = sz.y / 1280.0
-	var k: = 0.645 * ky
-	rig.scale = Vector2.ONE * k
-	rig.position = Vector2(sz.x * 0.5 - 581.0 * k, sz.y + 12.0 * ky - 1400.0 * k)
-	parent.add_child(rig)
-	rig.appear()
-	V10Voice.bind_rig(rig, "mc")
-	return rig
+	if hid_ == "mc" and eq == "" and (ResourceLoader.exists(RIG10_SCN) or ResourceLoader.exists(RIG10_TSCN)):
+		var pth: = RIG10_SCN if ResourceLoader.exists(RIG10_SCN) else RIG10_TSCN
+		var packed = load(pth)
+		if packed is PackedScene:
+			var rig: V10LiveRig = (packed as PackedScene).instantiate() as V10LiveRig
+			if rig != null:
+				rig.name = "V10LiveRig"
+				rig.show_background = show_bg
+				rig.handle_input = false
+				rig.motion = 1.0 if fxl == "full" else (0.75 if fxl == "mid" else 0.5)
+				rig.auto_gestures = fxl != "min"
+				var ky: = sz.y / 1280.0
+				var k: = 0.645 * ky
+				rig.scale = Vector2.ONE * k
+				rig.position = Vector2(sz.x * 0.5 - 581.0 * k, sz.y + 12.0 * ky - 1400.0 * k)
+				parent.add_child(rig)
+				var mc_e: = V10RigCatalog.get_rig("mc_gown")
+				var sh_cfg: Dictionary = (mc_e.get("shaders", {}) as Dictionary).get("sheen", {})
+				if not sh_cfg.is_empty():
+					var sh: = V10RigSheen.attach(rig, sh_cfg)
+					if sh != null:
+						sh.enabled = fxl != "min" and not bool(G.S.get("a11y_calm", false))
+				rig.appear()
+				V10Voice.bind_rig(rig, "mc")
+				return rig
+	var rig2: V10LiveRig = V10RigCatalog.mount(parent, hid_, eq, Rect2(Vector2.ZERO, sz), {
+		"show_background": show_bg,
+		"handle_input": false,
+		"calm": fxl == "min" or bool(G.S.get("a11y_calm", false)),
+	})
+	if rig2 != null:
+		rig2.name = "V10LiveRig"
+		rig2.auto_gestures = fxl != "min"
+		rig2.appear()
+		V10Voice.bind_rig(rig2, hid_)
+	return rig2
 
 
 static func video_wanted(h: String) -> bool:

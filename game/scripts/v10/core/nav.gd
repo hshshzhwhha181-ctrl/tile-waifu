@@ -320,10 +320,60 @@ static func settings_bday(main, p: Control) -> void:
 	p.add_child(b)
 
 
+# Настройки → «Аккаунт» (auth W4)
+static func settings_account(main, p: Control) -> void:
+	var extra: = 84.0
+	var y0: = SETTINGS_TAIL_Y + V10Clarity.SETTINGS_EXTRA + 168.0
+	for c in p.get_children():
+		if c is Control and (c as Control).position.y >= y0 - 2.0 and c.name != "PanelArt":
+			(c as Control).position.y += extra
+	p.size.y += extra
+	var root = p.get_meta("root") if p.has_meta("root") else null
+	if root is Control and p.position.y + p.size.y > (root as Control).size.y - 10.0:
+		p.position.y = maxf(20.0, (root as Control).size.y - 10.0 - p.size.y)
+	var l: = UI.label("Аккаунт", 26, UI.INK, Color.WHITE, 3, "body", 900)
+	l.position = Vector2(34, y0 + 2)
+	p.add_child(l)
+	var d: = UI.label("Вход, привязка и перенос профиля", 17, Color("8a5a7a"))
+	d.position = Vector2(34, y0 + 42)
+	p.add_child(d)
+	var b: = JButton.make("Открыть", "glass", Rect2(470, y0 + 8, 158, 64), null, 22)
+	b.name = "AccountBtn"
+	b.pressed.connect(func() -> void:
+		Common.close_popup(p)
+		V10AuthFlow.open_account(main))
+	p.add_child(b)
+
+
+# Настройки → «Как играть» (tutorial/help W4)
+static func settings_help(main, p: Control) -> void:
+	var extra: = 84.0
+	var y0: = SETTINGS_TAIL_Y + V10Clarity.SETTINGS_EXTRA + 252.0
+	for c in p.get_children():
+		if c is Control and (c as Control).position.y >= y0 - 2.0 and c.name != "PanelArt":
+			(c as Control).position.y += extra
+	p.size.y += extra
+	var root = p.get_meta("root") if p.has_meta("root") else null
+	if root is Control and p.position.y + p.size.y > (root as Control).size.y - 10.0:
+		p.position.y = maxf(20.0, (root as Control).size.y - 10.0 - p.size.y)
+	var l: = UI.label("Как играть", 26, UI.INK, Color.WHITE, 3, "body", 900)
+	l.position = Vector2(34, y0 + 2)
+	p.add_child(l)
+	var d: = UI.label("Правила стола, подсказки и режимы", 17, Color("8a5a7a"))
+	d.position = Vector2(34, y0 + 42)
+	p.add_child(d)
+	var b: = JButton.make("Открыть", "glass", Rect2(470, y0 + 8, 158, 64), null, 22)
+	b.name = "HowToBtn"
+	b.pressed.connect(func() -> void:
+		Common.close_popup(p)
+		V10Help.open_how_to(main))
+	p.add_child(b)
+
+
 # Настройки → «О игре · шрифты и лицензии» (fonts D2): lists all OFL families + tap for full OFL text
 static func settings_fonts(main, p: Control) -> void:
 	var extra: = 84.0
-	var y0: = SETTINGS_TAIL_Y + V10Clarity.SETTINGS_EXTRA + 168.0
+	var y0: = SETTINGS_TAIL_Y + V10Clarity.SETTINGS_EXTRA + 336.0
 	for c in p.get_children():
 		if c is Control and (c as Control).position.y >= y0 - 2.0 and c.name != "PanelArt":
 			(c as Control).position.y += extra

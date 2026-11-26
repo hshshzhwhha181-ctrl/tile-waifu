@@ -742,6 +742,10 @@ func _ui_screen() -> void:
 
 	# Button to «Вызов по коду» navigates cleanly
 	sc.open_challenge()
+	var t_nav: = 0
+	while main.busy and t_nav < 60:
+		t_nav += 1
+		await get_tree().create_timer(0.05).timeout
 	await get_tree().process_frame
 	await get_tree().process_frame
 	check("button to Вызов по коду opens challenge screen", String(main.screen_id) == "challenge" and main.screen is V10ChallengeScreen)
