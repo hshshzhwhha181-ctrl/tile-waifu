@@ -236,10 +236,13 @@ func _make_board() -> void :
 	gold_total = board.tiles.filter( func(t): return t.gold).size() / 2
 	board.fit_into(board_rect)
 	board.slot_pos.clear()
+	# 0.10 M0: the board reads slot_pos in global coordinates (tile_layer.to_local) and the screen sits in the
+	# content column, not at the viewport origin (tablets, cut-outs): convert, or tray tiles land off their slots
 	for r in slot_rects:
-		board.slot_pos.append((r as Rect2).get_center())
+		board.slot_pos.append(get_global_transform() * (r as Rect2).get_center())
 	board.slot_size = (slot_rects[0] as Rect2).size.x * 0.92
-	board.matched.connect(_on_match)
+	# matched gives a viewport point; _on_match (and its overrides) draw in this screen's own coordinates
+	board.matched.connect( func(mid: Vector2, combo: int, gold: bool, shard: String): _on_match(V10Layout.local_of(self, mid), combo, gold, shard))
 	board.denied.connect(_on_deny)
 	board.cleared.connect(_on_clear)
 	board.failed.connect(_on_fail)
@@ -703,7 +706,7 @@ func _tutorial() -> void :
 		if target == null:
 			break
 		var n0: = board.history.size() + board.tiles.filter( func(t): return not t.alive).size()
-		f.position = target.get_global_transform_with_canvas().origin
+		f.position = V10Layout.local_of(self, target.get_global_transform_with_canvas().origin)
 		f.scale = Vector2(1.6, 1.6)
 		while is_inside_tree() and board.history.size() + board.tiles.filter( func(t): return not t.alive).size() == n0:
 			await get_tree().create_timer(0.1).timeout

@@ -22,9 +22,16 @@ whole screen, i.e. pulled 25 % taller on 9:20 phones (she looked thin and squash
 * **Safe areas**: `V10Layout.safe_insets()` reads `DisplayServer.get_display_safe_area()` on mobile (the APK draws
   edge to edge in immersive mode: `EdgeToEdge.enable` + `LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES`, so the
   camera hole is inside our viewport). Desktop / xvfb: none, unless `--safe=T,B[,L,R]` (window px) simulates one.
+* **Viewport points vs screen points.** A screen's origin is the column's corner, not the viewport's (tablets: x 120
+  / 40; phones with a cut-out: y = the inset). Tile canvas positions, `TrayBoard.matched` / `special` points, input
+  events and `get_global_rect()` are viewport points: anything drawn in a screen (or its fx layer) at such a point
+  goes through `V10Layout.local_of(node, p)`, and a screen point handed to main (`fly_gems`) or to the board
+  (`slot_pos`) through `V10Layout.to_canvas(node, p)`. `play.gd` converts the `matched` point once before
+  `_on_match` (so overrides and `V7Combo`, `V6HeroStage.absorb`, `_shift_serve` get screen points); `V9UltCast` keeps
+  its aim / fx layers in viewport coordinates (`_canvas_space`) and takes the board rect there (`_br()`).
 * **Tall phones** use the extra height instead of leaving dead bands: the title logo block moves down, the summon
   lantern stage moves into the middle (`summon.gd stage_dy`), the victory bust grows (`play.gd`), lists simply
-  show more rows; the lobby video is cropped («cover», focus on her face/chest) instead of stretched.
+  show more rows; the lobby video is cropped («cover», focus on her face and upper body) instead of stretched.
 
 ## Files
 
@@ -41,7 +48,13 @@ phones, bleeding night dim + flash), `screens/levels.gd` (map plate + mirrored s
 `screens/play.gd` (result dim bleeds, bust grows on tall phones), `v06/story/story_scene.gd` (insets, ≤ 820 box),
 `v07/room/room.gd` + `room_scene.gd` (bleed), `v07/album/album_view.gd` (column + insets, modal sides),
 `v08/hud/header.gd` (spans the viewport), `v08/profile/profile_ui.gd` (bleed), `v09/home/live.gd` (lobby video
-«cover» + tap mapping through the video rect), `v09/ult/cutin.gd` (strip and dim reach the edges).
+«cover» + tap mapping through the video rect; hearts, «+5 ♥» and her bubble in home coordinates), `v09/ult/cutin.gd`
+(strip and dim reach the edges), `v07/room/room_scene.gd` (date scene: insets, ≤ 820 box, like the story).
+Viewport point → screen point fixes (review): `screens/play.gd` (tray `slot_pos`, `matched`, 1-1 finger),
+`v09/ult/ult_cast.gd` (aim / beam / marks, strip), `v06/special/specials.gd`, `v07/integrator/combo.gd`,
+`v07/passives/passive_run.gd`, `v06/heroines/hero_stage.gd` + `duel.gd`, `v06/modes/mode_play.gd`,
+`v07/room/room.gd`, `screens/collection.gd`, `screens/home.gd`, `screens/shop.gd`, `screens/levels.gd` (drag band),
+`v07/album/album_view.gd`, `v07/event/event_screen.gd`.
 
 ## Runner
 
@@ -49,19 +62,26 @@ phones, bleeding night dim + flash), `screens/levels.gd` (map plate + mirrored s
 # one resolution (any WxH), all views, lint; exits 0 on «LAYOUT OK»
 xvfb-run -a godot --path game --rendering-driver opengl3 --audio-driver Dummy --resolution 1080x2400 -- \
   --layout_shots=/abs/out --save=user://layout_shots_save.json --save_wipe=1 --story_off=1 \
-  [--safe=110,0 --notch=1] [--layout_only=home,shop,victory] [--layout_dump=1]
+  [--safe=110,0 --notch=1] [--layout_only=home,shop,victory] [--layout_dump=1] [--layout_fx=min]
 # every target resolution + sheets (720x1280 1080x1920 1080x2340@110,0 1080x2400 1216x2688 1440x3200@150,60 1536x2048 1600x2560)
 bash game/scripts/v10/responsive/layout_shots.sh /abs/out [WxH[@T,B] ...]
 # math + live placement check
 xvfb-run -a godot --path game ... --resolution 1536x2048 -- --layout_selftest=1 --save=user://layout_shots_save.json --save_wipe=1
 ```
 
-Views: `title_fresh`, `card` (player card), `title`, `intro` (story), `home` (lobby video), `home_outfit` (SSR painting), `settings`, `tasks`, `visits`,
-`calendar`, `album`, `profile`, `levels`, `tutorial` (1-1), `play`, `cutin` (SSR ult), `victory`, `summon`,
-`pull_lantern`, `pull_reveal`, `collection`, `shop`, `shop_gems`, `modes`, `climb`, `etude`, `blitz`, `duel`, `room`,
-`event`, `tourney`, `tourney_week`, `tourney_play`, `letters`.
+Views: `title_fresh`, `card` (player card), `title`, `intro` (story), `room_scene` (date scene), `home` (lobby video),
+`home_outfit` (SSR painting), `settings`, `tasks`, `visits`, `calendar`, `album`, `home_say` (her line on the lobby
+video), `home_outfit_say`, `profile`, `levels`, `tutorial` (1-1), `play`, `cutin` (SSR ult), `play_match` (a tile
+into the tray, then its pair), `victory`, `summon`, `pull_lantern`, `pull_reveal`, `collection`, `shop`, `shop_gems`,
+`modes`, `climb`, `etude`, `blitz`, `duel`, `room`, `event`, `tourney`, `tourney_week`, `tourney_play`, `letters` (38).
 Lint: `LAYOUT WARN <view>: <node> leaves the viewport | centre under the cut-out | centre in the bottom inset`
 for every visible tap target (JButton / tap-stop Control) outside scroll lists and hand-scrolled maps.
+Probes (`LAYOUT PROBE … ok` or `LAYOUT WARN`): the tray tile lands on its slot and the match ring sits on the pair
+(`play_match`), the 1-1 finger points at its tile (`tutorial`), her speech bubble keeps off her eyes (`home_say`,
+`home_outfit_say`). They catch a viewport point drawn as a screen point (off by the column's offset); run them on a
+tablet and with `--safe=` to see it.
+`--layout_selftest=1`: V10Layout math at every listed resolution + the live column, chrome and
+`local_of` / `to_canvas` round trip (`LAYOUT_SELFTEST 174/174` with this list).
 
 ## Rules for new screens (hooks for the other 0.10 lanes)
 
@@ -75,7 +95,10 @@ for every visible tap target (JButton / tap-stop Control) outside scroll lists a
    like a screen can take `main.CR` as its rect (see `V7AlbumView.open`).
 4. Heroine art / video: never `STRETCH_SCALE` or `expand` into a rect of another aspect — `V10Layout.cover_rect`
    or `contain_rect` (keep aspect), or `Common.card_art` / `blurbg.gdshader` (cover in the shader).
-5. Add a new screen to `V10LayoutShots._screens()` (one line: view name, screen id, args) so the runner shoots it
+5. A viewport point (tile canvas position, board signal, input event, `get_global_rect()`) drawn in a screen goes
+   through `V10Layout.local_of(layer, p)`; a screen point handed to main or the board through `V10Layout.to_canvas`.
+   Never assume the screen sits at (0, 0).
+6. Add a new screen to `V10LayoutShots._screens()` (one line: view name, screen id, args) so the runner shoots it
    at every resolution. V10Registry (spec §2.8) can call `V10LayoutShots` with its list later.
 
 ## Known limits

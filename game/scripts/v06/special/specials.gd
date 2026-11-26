@@ -193,7 +193,12 @@ func _gems(n: int, pos: Vector2) -> void :
 	if "gained" in play:
 		play.gained += n
 	if play.main and play.main.has_method("fly_gems"):
-		play.main.fly_gems(pos, clampi(n / 15, 2, 8))
+		play.main.fly_gems(V10Layout.to_canvas(play, pos), clampi(n / 15, 2, 8))
+
+
+# a viewport point (board signals, tile transforms) in the play screen's coordinates, where _fx() draws
+func _loc(p: Vector2) -> Vector2:
+	return V10Layout.local_of(play, p)
 
 func _need() -> int:
 	return int(play.SKILL_NEED) if "SKILL_NEED" in play else 8
@@ -300,12 +305,20 @@ func _card(kind: String) -> void :
 
 
 func _on_special(kind: String, d: Dictionary) -> void :
+	# 0.10 M0: the board gives viewport points; effects here draw in the play screen's coordinates (it sits in the
+	# content column, not at the viewport origin)
+	if d.has("pos") or d.has("at"):
+		d = d.duplicate()
+		if d.has("pos"):
+			d.pos = _loc(d.pos)
+		if d.has("at"):
+			d.at = (d.at as Array).map(_loc)
 	match kind:
 		"gift":
 			_open_box(d.pos)
 		"blocked":
 			var t: Tile = d.tile
-			var p: Vector2 = board.tile_layer.get_global_transform_with_canvas() * t.position
+			var p: Vector2 = _loc(board.tile_layer.get_global_transform_with_canvas() * t.position)
 			var s: Dictionary = board.spec.get(t, {})
 			var txt: = "Нужен ключ" if d.kind == "lock" else "Ещё %d %s" % [int(s.get("n", 0)), V8PlayRules.plural(int(s.get("n", 0)), "пара", "пары", "пар")]
 			Fx.float_text(_fx(), p + Vector2(0, -30), txt, Color("ffe7a6"), 24, Color("3f1a3a"))
@@ -343,6 +356,7 @@ func _on_matched(mid: Vector2, combo: int, gold: bool, shard: String) -> void :
 	# 3-pair challenge (spec §B: from_ult pairs do not charge the ult)
 	if play and play.get("v9_from_ult") == true:
 		return
+	mid = _loc(mid)
 	if star_until > 0.0:
 		Fx.burst(_fx(), mid, "sparkle", 18, Color(1.0, 0.95, 0.6), 1.2)
 	if ch_until > 0.0:
@@ -567,7 +581,7 @@ func _fire_event() -> void :
 				_starfall(10.0, 2.0, true)
 				return
 			for t in prs[0]:
-				var p: Vector2 = board.tile_layer.get_global_transform_with_canvas() * t.position
+				var p: Vector2 = _loc(board.tile_layer.get_global_transform_with_canvas() * t.position)
 				_drop_from_sky(p)
 			await get_tree().create_timer(0.55).timeout
 			if is_instance_valid(board):

@@ -275,6 +275,11 @@ func _on_tray() -> void :
 func _canvas_pos(t: Tile) -> Vector2:
 	return board.tile_layer.get_global_transform_with_canvas() * t.position
 
+# 0.10 M0: the same point in the play screen's fx layer, where the effects and floats are drawn (the screen sits in
+# the content column, not at the viewport origin)
+func _fx_pos(t: Tile) -> Vector2:
+	return V10Layout.local_of(play.fx_layer if play.fx_layer else play, _canvas_pos(t))
+
 func _takeable(t: Tile) -> bool:
 	if not board.on_board(t) or t.pending or t.flipping:
 		return false
@@ -298,7 +303,7 @@ func _hana_relay(t: Tile) -> void :
 		return
 	relays += 1
 	since_relay = 0
-	var from: = _canvas_pos(best)
+	var from: = _fx_pos(best)
 	Fx.ring(play.fx_layer, from, col, 1.2, 0.35)
 	Fx.burst(play.fx_layer, from, "sparkle", 10, col.lightened(0.3), 0.8)
 	_pulse("Эстафета!", from + Vector2(0, -30))
@@ -309,7 +314,7 @@ func _hana_relay(t: Tile) -> void :
 
 func _rin_return(t: Tile) -> void :
 	cups -= 1
-	var from: = _canvas_pos(t)
+	var from: = _fx_pos(t)
 	board.tray.erase(t)
 	board.history.erase(t)
 	board.display.erase(t)
@@ -347,7 +352,7 @@ func _yue_reveal() -> void :
 	if best.ice > 0:
 		best.ice = 0
 		best._update_ice()
-	var at: = _canvas_pos(best)
+	var at: = _fx_pos(best)
 	Fx.ring(play.fx_layer, at, Color(0.8, 0.88, 1.0), 1.4, 0.5)
 	Fx.burst(play.fx_layer, at, "sparkle", 14, Color(0.8, 0.88, 1.0), 0.9)
 	_pulse("Лунный взгляд", at + Vector2(0, -40))
@@ -382,7 +387,7 @@ func _nova_hack() -> void :
 	hacked.append(best)
 	best.z_index = 120
 	board.reveal_free()
-	var at: = _canvas_pos(best)
+	var at: = _fx_pos(best)
 	Fx.ring(play.fx_layer, at, col, 1.4, 0.45)
 	Fx.burst(play.fx_layer, at, "sparkle", 14, col, 0.9)
 	Sfx.play("select", 1.5, -4)

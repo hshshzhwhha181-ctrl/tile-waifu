@@ -103,7 +103,7 @@ func _build() -> void :
 	else:
 		hero.tapped.connect( func():
 			hero.react("happy")
-			Fx.burst(stage, hero.head_global(), "heart", 8)
+			Fx.burst(stage, V10Layout.local_of(stage, hero.head_global()), "heart", 8)
 			Sfx.say(cur, "aff"))
 	UI.slide_in(hero, Vector2(-60, 0), 0.0, 0.5)
 
@@ -310,7 +310,10 @@ func _preview(it: Dictionary) -> void :
 	add_child(root)
 	preview_root = root
 	var dim: = ColorRect.new()
-	dim.size = size
+	# 0.10 M0: the dim reaches the viewport edges past the content column (tablets, cut-outs)
+	var dbr: = V10Layout.bleed_rect(root)
+	dim.position = dbr.position
+	dim.size = dbr.size
 	dim.color = Color(0.1, 0.03, 0.1, 0.85)
 	root.add_child(dim)
 	# 0.8: the rarity frame art, drawn at most 1.4× its 344×512 source

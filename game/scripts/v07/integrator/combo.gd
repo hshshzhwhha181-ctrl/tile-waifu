@@ -744,7 +744,8 @@ func _milestone(n: int, at: Vector2) -> void :
 		ic.position = at
 		ic.z_index = 46
 		play.fx_layer.add_child(ic)
-		var to: Vector2 = target.get_global_rect().get_center()
+		# 0.10 M0: the HUD target's viewport point in the fx layer's coordinates (the screen sits in the content column)
+		var to: Vector2 = V10Layout.local_of(play.fx_layer, target.get_global_rect().get_center())
 		var tw: = ic.create_tween()
 		tw.tween_property(ic, "position", at + Vector2(0, -40), 0.18).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 		tw.tween_property(ic, "position", to, 0.45).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)

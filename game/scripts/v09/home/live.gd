@@ -77,7 +77,7 @@ static func video_wanted(h: String) -> bool:
 
 # the lobby loop over its own first frame; returns the player (null when the stream does not load)
 const VIDEO_SIZE: = Vector2(720, 1280)
-# what stays in view when the loop is cropped to cover a screen of another shape (her face and chest)
+# what stays in view when the loop is cropped to cover a screen of another shape (her face and upper body)
 const VIDEO_FOCUS: = Vector2(0.5, 0.4)
 
 
@@ -218,8 +218,14 @@ func zone_point(zone: String) -> Vector2:
 		"body":
 			var b: Rect2 = geom.body
 			return from_art(Vector2(float(geom.cx), b.position.y + b.size.y * 0.75))
-	# the room: right of her, under the cards
-	return Vector2(size.x - 70.0, size.y * 0.62)
+	# the room: right of her, under the cards (a viewport point like the others)
+	return get_global_transform() * Vector2(size.x - 70.0, size.y * 0.62)
+
+
+# 0.10 M0: from_art / tap points are viewport points; effects and the bubble are drawn in the home screen, which sits
+# in the content column (tablets, cut-outs), so they are converted to its coordinates
+func _home_pt(p: Vector2) -> Vector2:
+	return V10Layout.local_of(home, p)
 
 
 # ------------------------------------------------------------------ input
@@ -273,7 +279,7 @@ func _cool_ack() -> void:
 	else:
 		V9Feel.haptic("tap")
 		if not b and V9Feel.can_fx():
-			Fx.burst(home, from_art(geom.head), "petal", maxi(1, int(round(3 * V9Feel.fx_scale()))))
+			Fx.burst(home, _home_pt(from_art(geom.head)), "petal", maxi(1, int(round(3 * V9Feel.fx_scale()))))
 
 
 # a bubble / portrait still springing in (its own scale tween) is not pressed: V9Feel would keep that mid-tween
@@ -292,13 +298,13 @@ func _react(d: Dictionary, p: Vector2) -> void:
 		V9Feel.haptic("tap")
 		V9Feel.sound("flip", 1.15, -9)
 		if V9Feel.can_fx():
-			Fx.burst(home, p, "petal", maxi(2, int(round(7 * fs))))
+			Fx.burst(home, _home_pt(p), "petal", maxi(2, int(round(7 * fs))))
 	else:
 		_bump(0.7 if zone == "spam" else 1.0)
 		V9Feel.haptic("pet")
 		V9Feel.sound("pop", 1.08 + randf() * 0.1, -5)
 		if V9Feel.can_fx() and zone != "spam":
-			Fx.burst(home, p, "heart", maxi(2, int(round(6 * fs))))
+			Fx.burst(home, _home_pt(p), "heart", maxi(2, int(round(6 * fs))))
 	if zone != "bg" or not entry.is_empty():
 		show_emotion(emo)
 	if not entry.is_empty():
@@ -315,13 +321,13 @@ func _gain(p: Vector2) -> void:
 		if home.get("aff_root"):
 			UI.punch(home.aff_root, 0.12)
 	V9Feel.sound("sparkle", 1.2, -6)
-	var at: = from_art(geom.head)
+	var at: = _home_pt(from_art(geom.head))
 	# «+5 ♥» rises from the affection plate it fills (beside her head it ran over the words of her bubble)
 	var ar = home.get("aff_root")
 	var ft: = at + Vector2(110, -10)
 	if ar is Control and is_instance_valid(ar):
 		var r: Rect2 = (ar as Control).get_global_rect()
-		ft = Vector2(r.position.x + r.size.x * 0.72, r.position.y - 8.0)
+		ft = _home_pt(Vector2(r.position.x + r.size.x * 0.72, r.position.y - 8.0))
 	Fx.float_text(home, ft, "+%d ♥" % V9Touch.AFF, Color("ffd0e0"), 40)
 	if V9Feel.can_fx():
 		Fx.burst(home, at + Vector2(0, -50), "heart", maxi(3, int(round(14 * V9Feel.fx_scale()))))
@@ -425,7 +431,7 @@ func say(text: String, emo: = "", voice: = "", talk: = true) -> void:
 	if bubble and is_instance_valid(bubble):
 		bubble.queue_free()
 	var with_av: = mode != "rig"
-	var head: = from_art(geom.head)
+	var head: = _home_pt(from_art(geom.head))
 	# 0.10 W1: the tea house moves the bubble right of its lanterns (home.v10_bubble_x)
 	var bx = home.get("v10_bubble_x")
 	var pos: = Vector2(float(bx) if bx != null else BUBBLE_X, 176.0)
@@ -433,7 +439,7 @@ func say(text: String, emo: = "", voice: = "", talk: = true) -> void:
 	# 0.9: anchored by its bottom edge above her face, so extra lines grow upward (never lower than the clock plate
 	# allows: the video frames her head high, so its bubble may start at 176). When a long line would still reach her
 	# eyes (bottom past head − 0.45 r), it hangs just under her chin with the tail pointing up instead.
-	var hr: float = (from_art(geom.head + Vector2(0, float(geom.head_r))) - head).y
+	var hr: float = (_home_pt(from_art(geom.head + Vector2(0, float(geom.head_r)))) - head).y
 	var h: = _bubble_h(text, with_av)
 	var top: = 176.0 if mode == "video" else BUBBLE_TOP
 	pos.y = maxf(top, head.y - hr - 30.0 - h)

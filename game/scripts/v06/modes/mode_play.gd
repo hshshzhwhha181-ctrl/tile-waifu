@@ -300,7 +300,10 @@ func _floor_overlay(f: int, gems: int, chest: bool, mile_gems: int, record: bool
 	root.z_index = 60
 	add_child(root)
 	var dim: = ColorRect.new()
-	dim.size = size
+	# 0.10 M0: the dim reaches the viewport edges past the content column (tablets, cut-outs)
+	var dbr: = V10Layout.bleed_rect(root)
+	dim.position = dbr.position
+	dim.size = dbr.size
 	dim.color = Color(0.08, 0.03, 0.14, 0.0)
 	dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.add_child(dim)
@@ -325,7 +328,7 @@ func _floor_overlay(f: int, gems: int, chest: bool, mile_gems: int, record: bool
 	if chest:
 		Fx.burst(root, Vector2(W * 0.5, 190), "confetti", 70, Color.WHITE, 1.2)
 		Sfx.play("reveal_ssr", 1.1, -2)
-	main.fly_gems(Vector2(W * 0.5, 190), 6)
+	main.fly_gems(V10Layout.to_canvas(self, Vector2(W * 0.5, 190)), 6)
 	var hl: = UI.center_label(UI.title("Выбери благословение", 34, Color.WHITE, Color("3f2a7a")), Rect2(0, 252, W, 50))
 	root.add_child(hl)
 	var offer: = V6ModesData.bless_offer(run)
@@ -546,7 +549,7 @@ func _etude_clear() -> void :
 	v8_res_close(ctx, "mc", "Следующий этюд" if not last else "К этюдам", go_next,
 		"Ещё раз", func(): main.go("arena", {"mode": "etude", "etude": etude_i, "partner": partner, "retry": randi()}))
 	if gems > 0:
-		main.fly_gems(Vector2(W * 0.5, 480), 6)
+		main.fly_gems(V10Layout.to_canvas(self, Vector2(W * 0.5, 480)), 6)
 	v8_res_light_stars(ctx, row, stars)
 
 
@@ -870,7 +873,7 @@ func _shift_end() -> void :
 	v8_res_close(ctx, partner, "Новая смена", func(): main.go("arena", {"mode": "shift", "partner": partner, "retry": randi()}),
 		"К режимам", func(): main.go("modes"))
 	if tips > 0:
-		main.fly_gems(Vector2(W * 0.5, 420), 8)
+		main.fly_gems(V10Layout.to_canvas(self, Vector2(W * 0.5, 420)), 8)
 
 
 func _process(dt: float) -> void :
@@ -1002,7 +1005,7 @@ func dev_act(a: String) -> void :
 					for t in board.free_tiles():
 						if G.face_cat(t.face) == int(s.cat):
 							board.last_face = t.face
-							_shift_serve(t.get_global_transform_with_canvas().origin)
+							_shift_serve(V10Layout.local_of(self, t.get_global_transform_with_canvas().origin))
 							break
 					break
 		_:

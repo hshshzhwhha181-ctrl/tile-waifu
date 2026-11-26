@@ -165,6 +165,23 @@ static func bleed_x(n: Control) -> void:
 	n.size.x = r.size.x
 
 
+# a viewport point (what get_global_transform_with_canvas(), get_global_rect(), input events and signals like
+# TrayBoard.matched give) in `n`'s local coordinates. Screens sit in the content column, not at the viewport origin
+# (tablets: x 120 / 40; phones with a cut-out: y = the inset), so an effect drawn into a screen or one of its layers
+# at a viewport point must be converted, and a screen-local point must go back through `to_canvas` before it is
+# handed to main (main.fly_gems, toasts) or compared with an input position.
+static func local_of(n: CanvasItem, canvas_pt: Vector2) -> Vector2:
+	if n == null or not n.is_inside_tree():
+		return canvas_pt
+	return n.get_global_transform_with_canvas().affine_inverse() * canvas_pt
+
+
+static func to_canvas(n: CanvasItem, local_pt: Vector2) -> Vector2:
+	if n == null or not n.is_inside_tree():
+		return local_pt
+	return n.get_global_transform_with_canvas() * local_pt
+
+
 static func dump(vs: Vector2) -> String:
 	var ins: = safe_insets(vs)
 	return "vp=%dx%d win=%s px=%.3f safe=t%.0f b%.0f l%.0f r%.0f content=%s" % [vs.x, vs.y,
