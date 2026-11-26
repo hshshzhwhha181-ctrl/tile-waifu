@@ -46,6 +46,10 @@ static func st(S = null) -> Dictionary:
 	return d
 
 
+static func ensure(S = null) -> Dictionary:
+	return st(S)
+
+
 static func fix(d: Dictionary) -> void:
 	for k in DEFAULTS:
 		if not d.has(k) or typeof(d[k]) != typeof(DEFAULTS[k]) and not (DEFAULTS[k] is int and d[k] is float):
@@ -64,12 +68,10 @@ static func fix(d: Dictionary) -> void:
 # ── день и неделя (МСК, день начинается в 04:00 — как у всей игры) ─────────────────────────────────────────────
 
 static func day_key() -> String:
-	if _has_class("V10Meta"):
-		var v = _call_static("V10Meta", "day_key")
-		if v is String and String(v).length() >= 10:
-			return v
-	var u: = int(Time.get_unix_time_from_system()) + 3 * 3600 - 4 * 3600
-	return Time.get_date_string_from_unix_time(u)
+	var dk: = V10Meta.day_key()
+	if dk.length() >= 10:
+		return dk
+	return "2027-01-01"
 
 
 static func _has_class(cls: String) -> bool:

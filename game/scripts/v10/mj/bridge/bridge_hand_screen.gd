@@ -84,7 +84,11 @@ var _hint_until: = 0.0
 var _hint_ids: Array = []
 
 
-func setup(m, a: Dictionary) -> void:
+func build(m, a: Dictionary = {}) -> void:
+	setup(m, a)
+
+
+func setup(m, a: Dictionary = {}) -> void:
 	main = m
 	args = a
 	demo = bool(a.get("demo", false))
@@ -92,8 +96,9 @@ func setup(m, a: Dictionary) -> void:
 	level = clampi(int(a.get("level", save_d.get("hand_level", 1))), 1, V10MjBridgeLevels.COUNT)
 	var partner: String = String(G.S.get("partner", "")) if G.S is Dictionary else ""
 	hero = V10MjBridgeLook.hero_ok(String(a.get("hero", partner if partner != "" else V10MjBridgeInfo.INFO_HAND.host)))
-	if a.get("look", {}) is Dictionary and (a.look as Dictionary).has("face_tint"):
-		V10MjBridgeTile.look = {"face_tint": a.look.face_tint}
+	var lk_d = a.get("look", {})
+	if lk_d is Dictionary and (lk_d as Dictionary).has("face_tint"):
+		V10MjBridgeTile.look = {"face_tint": (lk_d as Dictionary).face_tint}
 	if is_inside_tree():
 		_build()
 
@@ -109,7 +114,10 @@ func _ready() -> void:
 
 func _build() -> void:
 	vw = get_viewport_rect().size
-	size = vw
+	if vw.x <= 0.0:
+		vw = Vector2(720, 1280)
+	if anchor_right == 0.0:
+		size = vw
 	var extra: = maxf(0.0, vw.y - 1280.0)
 	band_h = 120.0 + minf(extra, 330.0)
 	var spare: = extra - minf(extra, 330.0)
@@ -117,8 +125,9 @@ func _build() -> void:
 	rules = V10MjBridgeHand.make(lv)
 	add_child(V10MjBridgeLook.backdrop(hero))
 	var fw: = SLOT_PITCH * 7.0 + 24.0
-	hand_frame = Rect2((vw.x - fw) * 0.5, band_h + 4.0, fw, HAND_H - 8.0)
-	field_r = Rect2(16, band_h + HAND_H + spare * 0.5, vw.x - 32, vw.y - HELP_ZONE - spare * 0.5 - (band_h + HAND_H + spare * 0.5))
+	hand_frame = Rect2((vw.x - fw) * 0.5, band_h + 14.0, fw, HAND_H - 8.0)
+	var f_top: = band_h + HAND_H + 10.0 + spare * 0.5
+	field_r = Rect2(16, f_top, vw.x - 32, vw.y - HELP_ZONE - spare * 0.5 - f_top)
 	edge_r = Rect2(field_r.position.x, field_r.end.y - EDGE_H, field_r.size.x, EDGE_H)
 	pyr_r = Rect2(field_r.position.x, field_r.position.y + 8.0, field_r.size.x, field_r.size.y - EDGE_H - 16.0)
 	help_r = Rect2(0, vw.y - HELP_ZONE, vw.x, HELP_ZONE - 32.0)
@@ -385,7 +394,7 @@ func _build_presence() -> void:
 	move_child(lite, fx_layer.get_index())
 	var wr: = _window_rect()
 	# фраза — в её полосе слева от окна (под строкой «Наборы»), на 9:20 — над столом
-	var line: = Rect2(100, 96, wr.position.x - 120.0, maxf(24.0, band_h - 100.0))
+	var line: = Rect2(100, 74, wr.position.x - 120.0, 44.0)
 	if band_h > 200.0:
 		line = Rect2(24, band_h - 96.0, wr.position.x - 44.0, 88.0)
 	lite.layout(Rect2(0, 0, vw.x, band_h), wr, line)
@@ -409,7 +418,8 @@ func sacred_rects() -> Array:
 
 func _start() -> void:
 	t0 = Time.get_ticks_msec() / 1000.0
-	presence.on("start", {})
+	if presence == lite:
+		lite.on("start", {})
 	if bool(args.get("instant", false)) or V9Feel.level() == "min":
 		input_on = true
 	else:
@@ -925,8 +935,12 @@ func _start_sheet() -> void:
 	dn.position = Vector2(34, 122)
 	p.add_child(dn)
 	var sr: = V10MjBridgeLook.stars_row(V10MjBridgeSave.hand_stars_of(save_d, level), 3, 34.0)
-	sr.position = Vector2(vw.x - 32.0 - sr.size.x, 72)
+	sr.position = Vector2(vw.x - 116.0 - sr.size.x, 72)
 	p.add_child(sr)
+	var hb: = V10MjBridgeLook.icon_button("help", Vector2(vw.x - 96.0, 20.0))
+	hb.name = "HelpBtn"
+	hb.pressed.connect(func(): _help_sheet(true, false))
+	p.add_child(hb)
 	for k in V10MjBridgeInfo.HOW_HAND.size():
 		var row: Array = V10MjBridgeInfo.HOW_HAND[k]
 		var ic: = V10MjBridgeIcon.new(row[0], T.gold300)
@@ -955,6 +969,10 @@ func _pause_sheet() -> void:
 	var h: = V10MjBridgeLook.label("Пауза", 32, T.paper100, "title", 600)
 	h.position = Vector2(32, 32)
 	p.add_child(h)
+	var hb: = V10MjBridgeLook.icon_button("help", Vector2(vw.x - 96.0, 20.0))
+	hb.name = "HelpBtn"
+	hb.pressed.connect(func(): _help_sheet(false, was))
+	p.add_child(hb)
 	for k in V10MjBridgeInfo.HOW_HAND.size():
 		var row: Array = V10MjBridgeInfo.HOW_HAND[k]
 		var ic: = V10MjBridgeIcon.new(row[0], T.gold300)
@@ -980,6 +998,41 @@ func _pause_sheet() -> void:
 	p.add_child(quit)
 
 
+func open_help() -> void:
+	_help_sheet(false, input_on)
+
+
+func _help_sheet(from_start: bool, prev_input: bool = true) -> void:
+	input_on = false
+	var p: = V10MjBridgeLook.sheet(sheet_layer, vw, 590.0)
+	var h: = V10MjBridgeLook.label("Как играть", 36, T.paper100, "title", 700)
+	h.position = Vector2(32, 26)
+	p.add_child(h)
+	for k in V10MjBridgeInfo.HOW_HAND.size():
+		var row: Array = V10MjBridgeInfo.HOW_HAND[k]
+		var ic: = V10MjBridgeIcon.new(String(row[0]), T.gold300)
+		ic.position = Vector2(32, 90 + k * 56)
+		ic.size = Vector2(44, 44)
+		p.add_child(ic)
+		var l: = V10MjBridgeLook.label(String(row[1]), 20, T.paper300, "body", 700)
+		l.position = Vector2(92, 98 + k * 56)
+		p.add_child(l)
+	for s_i in V10MjBridgeInfo.STARS_HOW.size():
+		var sl: = V10MjBridgeLook.label(String(V10MjBridgeInfo.STARS_HOW[s_i]), 18, T.gold300, "body", 700)
+		sl.position = Vector2(32, 276 + s_i * 34)
+		p.add_child(sl)
+	var ok_b: = V10MjBridgeLook.primary("Понятно")
+	ok_b.name = "OkBtn"
+	ok_b.position = Vector2(vw.x * 0.5 - 280.0, 446)
+	ok_b.pressed.connect(func():
+		V10MjBridgeLook.close_sheet(sheet_layer)
+		if from_start:
+			_start_sheet()
+		else:
+			input_on = prev_input)
+	p.add_child(ok_b)
+
+
 func _lose_sheet() -> void:
 	var p: = V10MjBridgeLook.sheet(sheet_layer, vw, 440.0)
 	var h: = V10MjBridgeLook.label("Почти!", 44, T.paper100, "title", 700)
@@ -1001,7 +1054,8 @@ func _lose_sheet() -> void:
 				if (n as V10MjBridgeTile).kind == w:
 					_reset_node(n, false)
 					break
-			presence.on("start", {})
+			if presence == lite:
+				lite.on("start", {})
 			input_on = true)
 	else:
 		prim = V10MjBridgeLook.primary("Ещё раз")

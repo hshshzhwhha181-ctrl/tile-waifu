@@ -379,8 +379,10 @@ static func parse_day(s: String) -> Dictionary:
 
 
 static func today() -> Dictionary:
-	var d: = Time.get_date_dict_from_system()
-	return {"year": int(d.year), "month": int(d.month), "day": int(d.day)}
+	var p: = parse_day(V10Meta.cal_key())
+	if not p.is_empty():
+		return p
+	return {"year": 2027, "month": 1, "day": 1}
 
 
 static func days_in_month(y: int, m: int) -> int:

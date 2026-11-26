@@ -41,6 +41,10 @@ static func st(S = null) -> Dictionary:
 	return d
 
 
+static func ensure(S = null) -> Dictionary:
+	return st(S)
+
+
 static func fresh() -> Dictionary:
 	return st({})
 

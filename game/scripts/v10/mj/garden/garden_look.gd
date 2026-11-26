@@ -9,20 +9,20 @@ extends RefCounted
 # в полосе), фишки бликуют теплее (свет лампы для материала), за окном дождь (частицы стола — «rain»).
 
 const TOK: = {
-	"night900": Color("121014"), "night800": Color("1B171C"), "night700": Color("26212A"), "night600": Color("332C36"),
-	"paper100": Color("F5EAD8"), "paper300": Color("DDD2C4"), "paper500": Color("B3A89C"), "paper700": Color("7E756D"),
-	"gold300": Color("F1D9A0"), "gold500": Color("E8C47E"), "gold700": Color("A87B3A"),
-	"rose500": Color("D796A5"), "rose700": Color("9A4F66"), "jade300": Color("A9D9C4"), "jade500": Color("5B9580"),
-	"ember": Color("E07A7A"),
+	"night900": V10DS.NIGHT_900, "night800": V10DS.NIGHT_800, "night700": V10DS.NIGHT_700, "night600": V10DS.NIGHT_600,
+	"paper100": V10DS.PAPER_100, "paper300": V10DS.PAPER_300, "paper500": V10DS.PAPER_500, "paper700": V10DS.PAPER_700,
+	"gold300": V10DS.GOLD_300, "gold500": V10DS.GOLD_500, "gold700": V10DS.GOLD_700,
+	"rose500": V10DS.ROSE_500, "rose700": V10DS.ROSE_700, "jade300": V10DS.JADE_300, "jade500": V10DS.JADE_500,
+	"ember": V10DS.EMBER,
 }
 
-# акцент героини: accent / glow / deep (≤ 10 % пикселей)
+# акцент героини: accent / glow / deep (≤ 10 % пикселей) — алиас к V10DS.HEROES
 const ACCENT: = {
-	"mc": [Color("ff8fb8"), Color("ffd0e0"), Color("6a1f45")],
-	"rin": [Color("4fbf9f"), Color("bff0e0"), Color("16514a")],
-	"hana": [Color("ffb35c"), Color("ffe0b8"), Color("7a3a0c")],
-	"yue": [Color("c8b6ff"), Color("ece6ff"), Color("3f2f7a")],
-	"nova": [Color("4fe3ff"), Color("c8f6ff"), Color("0f3a5a")],
+	"mc": [V10DS.HEROES.mc.accent, V10DS.HEROES.mc.glow, V10DS.HEROES.mc.deep],
+	"rin": [V10DS.HEROES.rin.accent, V10DS.HEROES.rin.glow, V10DS.HEROES.rin.deep],
+	"hana": [V10DS.HEROES.hana.accent, V10DS.HEROES.hana.glow, V10DS.HEROES.hana.deep],
+	"yue": [V10DS.HEROES.yue.accent, V10DS.HEROES.yue.glow, V10DS.HEROES.yue.deep],
+	"nova": [V10DS.HEROES.nova.accent, V10DS.HEROES.nova.glow, V10DS.HEROES.nova.deep],
 }
 
 const NIGHT_LAMP: = Color("ffc98a")

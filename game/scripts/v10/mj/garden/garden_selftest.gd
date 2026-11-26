@@ -131,7 +131,95 @@ func _selftest() -> void:
 
 
 func _t_extra() -> void:
-	pass
+	check(V10MjGardenLook.TOK.night900 == V10DS.NIGHT_900 and V10MjGardenLook.ACCENT.yue[0] == V10DS.HEROES.yue.accent, "токены V10DS")
+	check(String(V10MjGardenInfo.INFO.get("title", "")) == "Сад" and (V10MjGardenInfo.INFO.get("HOW", []) as Array).size() == 3, "INFO title + HOW")
+	var raw_time: = 0
+	var da: = DirAccess.open("res://scripts/v10/mj/garden")
+	if da:
+		da.list_dir_begin()
+		var fn: = da.get_next()
+		while fn != "":
+			if fn.ends_with(".gd") and fn != "garden_selftest.gd":
+				var src: = FileAccess.get_file_as_string("res://scripts/v10/mj/garden/" + fn)
+				for pat in ["Time." + "get_unix_time_from_system", "Time." + "get_date_string_from_system", "Time." + "get_date_dict_from_system"]:
+					if src.find(pat) >= 0:
+						raw_time += 1
+			fn = da.get_next()
+	check(raw_time == 0, "ноль прямых Time.*_from_system в garden/*.gd")
+
+	var S_card: = {}
+	var card: = V10MjGardenCard.new().setup(S_card)
+	add_child(card)
+	check(card.help_btn.size.x >= 80 and card.play_btn.size.x >= 440 and card.play_btn.size.y >= 104, "карточка полки: ? >=80, Играть >=440x104")
+	card.night_btn.pressed.emit()
+	check(bool(card.save_d.night) == true, "карточка: тумблер Ночной стол")
+	card.queue_free()
+
+	var S_run: = {}
+	for sz in [Vector2i(720, 1280), Vector2i(720, 1600)]:
+		var vp: = SubViewport.new()
+		vp.size = sz
+		vp.render_target_update_mode = SubViewport.UPDATE_DISABLED
+		add_child(vp)
+		var sc: = V10MjGardenScreen.new()
+		vp.add_child(sc)
+		sc.setup(null, {"hero": "yue", "seed": 777, "day": "2026-11-26", "save_root": S_run if sz.y == 1280 else null,
+			"demo": sz.y != 1280, "instant": true, "fx_min": true, "mute": true, "resume": false})
+		await get_tree().process_frame
+		await get_tree().process_frame
+		check(sc.tappables().size() <= 6 and sc.words_in_play() <= 8, "%dx%d: бюджет тапов/слов" % [sz.x, sz.y])
+		check(sc.lite.sacred_hits() == 0 and sc.use_hint(), "%dx%d: святая зона чиста + подсказка ∞" % [sz.x, sz.y])
+		sc.set_night(true)
+		check(sc.night and not sc.sound.music_on and sc.sound.chimes == "wind", "%dx%d: Ночной стол выключает музыку" % [sz.x, sz.y])
+		if sz.y == 1280:
+			var guard: = 0
+			while sc.rules.wave < 2 and guard < 80:
+				guard += 1
+				var h_ids: = sc.rules.hint()
+				var pick_id: int = h_ids[0] if not h_ids.is_empty() else (sc.rules.frees()[0] if not sc.rules.frees().is_empty() else -1)
+				if pick_id < 0:
+					break
+				sc.board.tap(pick_id)
+			check(sc.rules.wave >= 2 and sc.lite.sacred_hits() == 0, "переход на волну 2 + святая зона при выходе")
+			sc.trigger_record()
+			check(sc.silhouette.plays == 1 and sc.lite.sacred_hits() == 0, "силуэт рекорда недели за сукном")
+			sc._pause_sheet()
+			await get_tree().process_frame
+			var hb: Button = sc.sheet_layer.find_child("HelpBtn", true, false)
+			check(hb != null and hb.size.x >= 80, "пауза: кнопка ? >= 80")
+			hb.pressed.emit()
+			await get_tree().process_frame
+			var okb: Button = sc.sheet_layer.find_child("OkBtn", true, false)
+			check(okb != null and okb.size.x >= 440, "лист помощи Как играть открыт")
+			okb.pressed.emit()
+			await get_tree().process_frame
+			var got: = [null]
+			sc.finished.connect(func(r): got[0] = r)
+			var exb: Button = sc.sheet_layer.find_child("ExitBtn", true, false)
+			exb.pressed.emit()
+			await get_tree().process_frame
+			var res: Dictionary = got[0] if got[0] is Dictionary else {}
+			var req: = ["mode", "win", "score", "stars", "time_s", "pairs", "hero", "seed", "level", "rewards"]
+			var has_all: = true
+			for k in req:
+				if not res.has(k):
+					has_all = false
+			check(has_all and String(res.get("mode", "")) == "garden" and int(res.get("rewards", {}).get("coins", 0)) >= 5, "finished(result) 10-ключевая схема + монеты волны")
+		vp.queue_free()
+		await get_tree().process_frame
+
+	# проверка продолжения сохранённого стола посреди волны
+	var vp_r: = SubViewport.new()
+	vp_r.size = Vector2i(720, 1280)
+	vp_r.render_target_update_mode = SubViewport.UPDATE_DISABLED
+	add_child(vp_r)
+	var sc_r: = V10MjGardenScreen.new()
+	vp_r.add_child(sc_r)
+	sc_r.build(null, {"hero": "yue", "save_root": S_run, "instant": true, "fx_min": true, "mute": true, "resume": true})
+	await get_tree().process_frame
+	check(sc_r.rules.wave >= 2, "восстановление стола посреди волны (%d)" % sc_r.rules.wave)
+	vp_r.queue_free()
+	await get_tree().process_frame
 
 
 # 1. правила на маленьком ручном столе: свобода, пара, перелив ровно 3 домой, серия и множитель

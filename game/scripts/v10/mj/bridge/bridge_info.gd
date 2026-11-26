@@ -9,38 +9,6 @@ extends RefCounted
 # pt — типичная длина в минутах; screen — экран партии (setup(main, args) + сигнал finished(result));
 # icon — иконка карточки кодом (V10MjBridgeIcon.mode_icon) и готовый PNG в assets/v10/mj/bridge/.
 
-const INFO: = {
-	"id": "bridge_daily",
-	"name": "Задача дня",
-	"shelf": "today",
-	"line": "Какую фишку сбросить?",
-	"host": "mc",
-	"gate": {"level": 22},
-	"pt": 1,
-	"screen": "res://scripts/v10/mj/bridge/bridge_daily_screen.gd",
-	"pt_scene": "res://scripts/v10/mj/bridge/bridge_demo.tscn",
-	"icon": "res://assets/v10/mj/bridge/icon_daily.png",
-	"music": "mode_riichi",
-}
-
-const INFO_HAND: = {
-	"id": "bridge_hand",
-	"name": "Собери руку",
-	"shelf": "table",
-	"line": "Четыре набора и пара",
-	"host": "hana",
-	"gate": {"level": 26},
-	"pt": 4,
-	"screen": "res://scripts/v10/mj/bridge/bridge_hand_screen.gd",
-	"pt_scene": "res://scripts/v10/mj/bridge/bridge_demo.tscn",
-	"icon": "res://assets/v10/mj/bridge/icon_hand.png",
-	"music": "mode_riichi",
-	"levels": 60,
-}
-
-const CARDS: = [INFO, INFO_HAND]
-
-# «Как играть»: по три строки с иконками (UX_RULES §4.1 п.9)
 const HOW_DAILY: = [
 	["tap", "Выбери фишку в руке"],
 	["drop", "Сбрось её — рука станет ближе к готовой"],
@@ -51,6 +19,47 @@ const HOW_HAND: = [
 	["set", "Тройка или ряд складываются сами"],
 	["full", "Цель — 4 набора и пара за 14 мест"],
 ]
+const HOW: = HOW_DAILY
+
+const INFO: = {
+	"id": "bridge_daily",
+	"name": "Задача дня",
+	"title": "Задача дня",
+	"shelf": "trials",
+	"today_row": true,
+	"line": "Какую фишку сбросить?",
+	"host": "mc",
+	"gate": {"level": 22},
+	"pt": 1,
+	"screen": "res://scripts/v10/mj/bridge/bridge_daily_screen.gd",
+	"pt_scene": "res://scripts/v10/mj/bridge/bridge_demo.tscn",
+	"save": "v10_mj_bridge",
+	"selftest": "res://scripts/v10/mj/bridge/bridge_selftest.tscn",
+	"icon": "res://assets/v10/mj/bridge/icon_daily.png",
+	"music": "mode_riichi",
+	"HOW": HOW_DAILY,
+}
+
+const INFO_HAND: = {
+	"id": "bridge_hand",
+	"name": "Собери руку",
+	"title": "Собери руку",
+	"shelf": "table",
+	"line": "Четыре набора и пара",
+	"host": "hana",
+	"gate": {"level": 26},
+	"pt": 4,
+	"screen": "res://scripts/v10/mj/bridge/bridge_hand_screen.gd",
+	"pt_scene": "res://scripts/v10/mj/bridge/bridge_demo.tscn",
+	"save": "v10_mj_bridge",
+	"selftest": "res://scripts/v10/mj/bridge/bridge_selftest.tscn",
+	"icon": "res://assets/v10/mj/bridge/icon_hand.png",
+	"music": "mode_riichi",
+	"levels": 60,
+	"HOW": HOW_HAND,
+}
+
+const CARDS: = [INFO, INFO_HAND]
 
 # звёзды «Собери руку» (по строке, «Подробнее»)
 const STARS_HOW: = [

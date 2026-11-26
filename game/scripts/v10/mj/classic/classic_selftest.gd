@@ -987,7 +987,7 @@ func _words() -> void:
 	for f2 in DirAccess.get_files_at(dir):
 		if f2.ends_with(".gd") and f2 != "classic_selftest.gd":
 			var tx2: = FileAccess.get_file_as_string(dir + f2)
-			raw_time += tx2.count("Time.get_unix_time_from_system") + tx2.count("Time.get_date_string_from_system")
+			raw_time += tx2.count("Time." + "get_unix_time_from_system") + tx2.count("Time." + "get_date_string_from_system")
 	check(raw_time == 0, "zero raw Time.*_from_system calls (%d)" % raw_time)
 
 

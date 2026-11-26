@@ -29,6 +29,11 @@ func _draw() -> void:
 			draw_line(P.call(30, 13), P.call(30, 35), col, w * 1.2, true)
 		"back":
 			draw_polyline(PackedVector2Array([P.call(28, 12), P.call(16, 24), P.call(28, 36)]), col, w * 1.2, true)
+		"help":
+			draw_arc(P.call(24, 24), 15.0 * s, 0, TAU, 32, col, w, true)
+			draw_arc(P.call(24, 20), 4.6 * s, PI, TAU + PI * 0.42, 16, col, w, true)
+			draw_line(P.call(24, 24.5), P.call(24, 28), col, w, true)
+			draw_circle(P.call(24, 33.5), w * 0.65, col)
 		"star":
 			var pts: = PackedVector2Array()
 			for k in 10:

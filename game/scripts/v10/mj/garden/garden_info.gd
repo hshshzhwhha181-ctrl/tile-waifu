@@ -13,6 +13,7 @@ extends RefCounted
 const INFO: = {
 	"id": "garden",
 	"name": "Сад",
+	"title": "Сад",
 	"shelf": "solitaire",
 	"line": "Снимай пары волна за волной",
 	"host": "yue",
@@ -25,6 +26,11 @@ const INFO: = {
 	"selftest": "res://scripts/v10/mj/garden/garden_selftest.tscn",
 	"music": {"instruments": "дождь, колокольчики", "bpm": 0, "rhythm": false},
 	"replaces": "zen",
+	"HOW": [
+		["tap", "Тапни свободную фишку — она уйдёт в лоток"],
+		["pair", "Две одинаковые в лотке — пара снята"],
+		["spill", "Лоток полон — три фишки вернутся на стол"],
+	],
 }
 
 # «Как играть»: три строки с иконками (UX_RULES §4.1 п.9)

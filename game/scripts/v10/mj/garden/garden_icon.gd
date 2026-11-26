@@ -6,10 +6,10 @@ extends Control
 #   rain · stream · bamboo (звук фона)
 
 var kind: = "pause"
-var col: = Color("F1D9A0")
+var col: = V10DS.GOLD_300
 
 
-func _init(k: = "pause", c: = Color("F1D9A0")) -> void:
+func _init(k: = "pause", c: = V10DS.GOLD_300) -> void:
 	kind = k
 	col = c
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -30,6 +30,13 @@ func _draw() -> void:
 		"pause":
 			draw_line(P.call(18, 13), P.call(18, 35), col, w * 1.2, true)
 			draw_line(P.call(30, 13), P.call(30, 35), col, w * 1.2, true)
+		"help":
+			draw_arc(P.call(24, 24), 15.0 * s, 0, TAU, 32, col, w, true)
+			draw_arc(P.call(24, 20), 4.6 * s, PI, TAU + PI * 0.42, 16, col, w, true)
+			draw_line(P.call(24, 24.5), P.call(24, 28), col, w, true)
+			draw_circle(P.call(24, 33.5), w * 0.65, col)
+		"back":
+			draw_polyline(PackedVector2Array([P.call(29, 12), P.call(17, 24), P.call(29, 36)]), col, w, true)
 		"hint":
 			# лампа: колба, цоколь, лучики
 			draw_arc(P.call(24, 20), 9.5 * s, PI * 0.78, PI * 2.22, 28, col, w, true)

@@ -169,7 +169,7 @@ func _t_save_sound_words() -> void:
 		while fn != "":
 			if fn.ends_with(".gd") and fn != "cube_selftest.gd":
 				var src: = FileAccess.get_file_as_string(DIR_PATH + "/" + fn)
-				for pat in ["Time.get_unix_time_from_system", "Time.get_date_string_from_system", "Time.get_date_dict_from_system"]:
+				for pat in ["Time." + "get_unix_time_from_system", "Time." + "get_date_string_from_system", "Time." + "get_date_dict_from_system"]:
 					if src.find(pat) >= 0:
 						raw_time += 1
 			fn = da.get_next()

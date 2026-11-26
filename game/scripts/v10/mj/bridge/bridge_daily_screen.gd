@@ -64,7 +64,11 @@ var share_text: = ""
 var toast: Label
 
 
-func setup(m, a: Dictionary) -> void:
+func build(m, a: Dictionary = {}) -> void:
+	setup(m, a)
+
+
+func setup(m, a: Dictionary = {}) -> void:
 	main = m
 	args = a
 	demo = bool(a.get("demo", false))
@@ -78,8 +82,9 @@ func setup(m, a: Dictionary) -> void:
 		V10MjBridgeDaily.norm(item)
 	hero = V10MjBridgeLook.hero_ok(String(a.get("hero", V10MjBridgeInfo.INFO.host)))
 	school = bool(a.get("school", V10MjBridgeSave.school_hint(save_d, item) if not item.is_empty() else false))
-	if a.get("look", {}) is Dictionary and (a.look as Dictionary).has("face_tint"):
-		V10MjBridgeTile.look = {"face_tint": a.look.face_tint}
+	var lk_d = a.get("look", {})
+	if lk_d is Dictionary and (lk_d as Dictionary).has("face_tint"):
+		V10MjBridgeTile.look = {"face_tint": (lk_d as Dictionary).face_tint}
 	if is_inside_tree():
 		_build()
 
@@ -95,7 +100,10 @@ func _ready() -> void:
 
 func _build() -> void:
 	vw = get_viewport_rect().size
-	size = vw
+	if vw.x <= 0.0:
+		vw = Vector2(720, 1280)
+	if anchor_right == 0.0:
+		size = vw
 	var extra: = maxf(0.0, vw.y - 1280.0)
 	band_h = 120.0 + minf(extra, 330.0)
 	var spare: = extra - minf(extra, 330.0)
@@ -116,7 +124,8 @@ func _build() -> void:
 	sheet_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	sheet_layer.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(sheet_layer)
-	presence.on("start", {})
+	if presence == lite:
+		lite.on("start", {})
 	var prev = (save_d.days as Dictionary).get(day) if not demo else null
 	if prev is Dictionary and not bool(args.get("replay", false)):
 		# задача сегодня уже решена — сразу итог (без награды)
@@ -131,7 +140,7 @@ func _build_empty() -> void:
 	add_child(l)
 	var b: = V10MjBridgeLook.primary("Готово")
 	b.position = Vector2(vw.x * 0.5 - 280, vw.y - 184)
-	b.pressed.connect(func(): finished.emit({"mode": "bridge_daily", "win": false, "rewards": V10MjBridgeSave.NO_REWARD.duplicate(), "action": "exit"}))
+	b.pressed.connect(func(): finished.emit({"mode": "bridge_daily", "win": false, "score": 0, "stars": 0, "time_s": 0, "pairs": 0, "hero": hero, "seed": 0, "level": 0, "rewards": V10MjBridgeSave.NO_REWARD.duplicate(), "action": "exit"}))
 	add_child(b)
 
 
@@ -140,6 +149,10 @@ func _build_band() -> void:
 	back.name = "Back"
 	back.pressed.connect(_exit)
 	add_child(back)
+	var hb: = V10MjBridgeLook.icon_button("help", Vector2(vw.x - 206.0, 18.0))
+	hb.name = "HelpBtn"
+	hb.pressed.connect(open_help)
+	add_child(hb)
 	title_lbl = V10MjBridgeLook.label("Задача %d" % int(item.n), 32, T.paper100, "title", 700)
 	title_lbl.position = Vector2(100, 34)
 	add_child(title_lbl)
@@ -496,7 +509,7 @@ func _record() -> void:
 	var a: = V10MjBridgeDaily.analysis_of(item)
 	result = {
 		"mode": "bridge_daily", "win": ok, "score": int(a.n) if ok else 0, "stars": stars,
-		"time_s": int(Time.get_ticks_msec() / 1000.0 - t0), "pairs": 0, "hero": hero, "seed": int(item.n),
+		"time_s": int(Time.get_ticks_msec() / 1000.0 - t0), "pairs": 0, "hero": hero, "seed": int(item.n), "level": int(item.n),
 		"rewards": rec.get("rewards", V10MjBridgeSave.NO_REWARD.duplicate()),
 		"day": day, "n": int(item.n), "tries": tries, "shown": shown, "pick": pick, "best": a.best,
 		"share": share_text, "streak": int(rec.get("streak", 0)), "solved": int(rec.get("solved", 0)),
@@ -523,7 +536,7 @@ func _restore(prev: Dictionary) -> void:
 	lite.say(V10MjBridgeDaily.explain(item, pick if ok else -1, ok), 0.0, true)
 	share_text = V10MjBridgeDaily.share(item, tries if ok else 0, shown or not ok)
 	result = {"mode": "bridge_daily", "win": ok, "score": 0, "stars": V10MjBridgeSave.daily_stars(ok, tries, shown),
-		"time_s": 0, "pairs": 0, "hero": hero, "seed": int(item.n), "rewards": V10MjBridgeSave.NO_REWARD.duplicate(),
+		"time_s": 0, "pairs": 0, "hero": hero, "seed": int(item.n), "level": int(item.n), "rewards": V10MjBridgeSave.NO_REWARD.duplicate(),
 		"day": day, "n": int(item.n), "tries": tries, "shown": shown, "pick": pick, "best": a.best, "share": share_text,
 		"streak": int(save_d.streak), "solved": int(save_d.solved), "riichi_opened": false,
 		"riichi_open": bool(save_d.riichi_open), "fan_complete": false, "month": day.substr(0, 7),
@@ -692,11 +705,34 @@ func _share() -> void:
 	tw.tween_property(toast, "modulate:a", 0.0, 0.2)
 
 
+func open_help() -> void:
+	if answered:
+		return
+	var p: = V10MjBridgeLook.sheet(sheet_layer, vw, 460.0)
+	var h: = V10MjBridgeLook.label("Как играть", 36, T.paper100, "title", 700)
+	h.position = Vector2(32, 26)
+	p.add_child(h)
+	for k in V10MjBridgeInfo.HOW_DAILY.size():
+		var row: Array = V10MjBridgeInfo.HOW_DAILY[k]
+		var ic: = V10MjBridgeIcon.new(String(row[0]), T.gold300)
+		ic.position = Vector2(32, 92 + k * 60)
+		ic.size = Vector2(44, 44)
+		p.add_child(ic)
+		var l: = V10MjBridgeLook.label(String(row[1]), 20, T.paper300, "body", 700)
+		l.position = Vector2(92, 100 + k * 60)
+		p.add_child(l)
+	var ok_b: = V10MjBridgeLook.primary("Понятно")
+	ok_b.name = "OkBtn"
+	ok_b.position = Vector2(vw.x * 0.5 - 280.0, 316)
+	ok_b.pressed.connect(func(): V10MjBridgeLook.close_sheet(sheet_layer))
+	p.add_child(ok_b)
+
+
 func _exit() -> void:
 	if answered and not result.is_empty():
 		result["action"] = "exit"
 		finished.emit(result)
 		return
 	finished.emit({"mode": "bridge_daily", "win": false, "score": 0, "stars": 0, "time_s": int(Time.get_ticks_msec() / 1000.0 - t0),
-		"pairs": 0, "hero": hero, "seed": int(item.get("n", 0)), "rewards": V10MjBridgeSave.NO_REWARD.duplicate(),
+		"pairs": 0, "hero": hero, "seed": int(item.get("n", 0)), "level": int(item.get("n", 0)), "rewards": V10MjBridgeSave.NO_REWARD.duplicate(),
 		"day": day, "action": "exit"})

@@ -229,7 +229,7 @@ func _t_save_ults_words() -> void:
 		if not f.ends_with(".gd") or f == "connect_selftest.gd":
 			continue
 		var txt: = FileAccess.get_file_as_string(dir + f)
-		raw_time += txt.count("Time.get_unix_time_from_system") + txt.count("Time.get_date_string_from_system")
+		raw_time += txt.count("Time." + "get_unix_time_from_system") + txt.count("Time." + "get_date_string_from_system")
 		for ln in txt.split("\n"):
 			if ln.strip_edges().begins_with("#"):
 				continue
