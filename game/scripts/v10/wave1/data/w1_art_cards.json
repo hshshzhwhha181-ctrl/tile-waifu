@@ -1,0 +1,1015 @@
+{
+	"outfits": {
+		"tb_base": {
+			"file": "res://assets/v10/wave1/outfits/tb_base.webp",
+			"size": [
+				850,
+				1280
+			],
+			"face_rect": [
+				347,
+				114,
+				341,
+				341
+			],
+			"alt_rect": [
+				274,
+				46,
+				487,
+				609
+			],
+			"face_c": [
+				517.3,
+				267.8
+			],
+			"face_w": 133.1
+		},
+		"tb_post": {
+			"file": "res://assets/v10/wave1/outfits/tb_post.webp",
+			"size": [
+				850,
+				1280
+			],
+			"face_rect": [
+				358,
+				128,
+				232,
+				232
+			],
+			"alt_rect": [
+				315,
+				82,
+				319,
+				398
+			],
+			"face_c": [
+				474.2,
+				232.5
+			],
+			"face_w": 90.6
+		},
+		"tb_crimson": {
+			"file": "res://assets/v10/wave1/outfits/tb_crimson.webp",
+			"size": [
+				850,
+				1280
+			],
+			"face_rect": [
+				544,
+				205,
+				195,
+				195
+			],
+			"alt_rect": [
+				512,
+				166,
+				259,
+				324
+			],
+			"face_c": [
+				641.7,
+				292.8
+			],
+			"face_w": 76.2
+		},
+		"me_base": {
+			"file": "res://assets/v10/wave1/outfits/me_base.webp",
+			"size": [
+				850,
+				1280
+			],
+			"face_rect": [
+				89,
+				9,
+				282,
+				282
+			],
+			"alt_rect": [
+				15,
+				0,
+				430,
+				537
+			],
+			"face_c": [
+				230.2,
+				135.6
+			],
+			"face_w": 110.0
+		},
+		"me_parlor": {
+			"file": "res://assets/v10/wave1/outfits/me_parlor.webp",
+			"size": [
+				850,
+				1280
+			],
+			"face_rect": [
+				102,
+				19,
+				262,
+				262
+			],
+			"alt_rect": [
+				24,
+				0,
+				419,
+				523
+			],
+			"face_c": [
+				232.8,
+				136.7
+			],
+			"face_w": 102.5
+		},
+		"me_gala": {
+			"file": "res://assets/v10/wave1/outfits/me_gala.webp",
+			"size": [
+				850,
+				1280
+			],
+			"face_rect": [
+				104,
+				10,
+				291,
+				291
+			],
+			"alt_rect": [
+				32,
+				0,
+				435,
+				543
+			],
+			"face_c": [
+				249.4,
+				141.2
+			],
+			"face_w": 113.8
+		},
+		"ko_base": {
+			"file": "res://assets/v10/wave1/outfits/ko_base.webp",
+			"size": [
+				850,
+				1280
+			],
+			"face_rect": [
+				421,
+				88,
+				256,
+				256
+			],
+			"alt_rect": [
+				376,
+				37,
+				347,
+				433
+			],
+			"face_c": [
+				549.4,
+				203.3
+			],
+			"face_w": 100.0
+		},
+		"ko_matsuri": {
+			"file": "res://assets/v10/wave1/outfits/ko_matsuri.webp",
+			"size": [
+				850,
+				1280
+			],
+			"face_rect": [
+				412,
+				83,
+				288,
+				288
+			],
+			"alt_rect": [
+				376,
+				25,
+				360,
+				450
+			],
+			"face_c": [
+				556.2,
+				212.7
+			],
+			"face_w": 112.5
+		},
+		"ko_kyubi": {
+			"file": "res://assets/v10/wave1/outfits/ko_kyubi.webp",
+			"size": [
+				850,
+				1280
+			],
+			"face_rect": [
+				415,
+				78,
+				270,
+				270
+			],
+			"alt_rect": [
+				374,
+				24,
+				353,
+				441
+			],
+			"face_c": [
+				549.7,
+				200.0
+			],
+			"face_w": 105.6
+		},
+		"ko_vow": {
+			"file": "res://assets/v10/wave1/outfits/ko_vow.webp",
+			"size": [
+				850,
+				1280
+			],
+			"face_rect": [
+				413,
+				88,
+				246,
+				246
+			],
+			"alt_rect": [
+				362,
+				39,
+				349,
+				436
+			],
+			"face_c": [
+				535.6,
+				198.8
+			],
+			"face_w": 96.2
+		},
+		"sh_base": {
+			"file": "res://assets/v10/wave1/outfits/sh_base.webp",
+			"size": [
+				850,
+				1280
+			],
+			"face_rect": [
+				327,
+				81,
+				250,
+				250
+			],
+			"alt_rect": [
+				266,
+				31,
+				371,
+				464
+			],
+			"face_c": [
+				452.2,
+				193.6
+			],
+			"face_w": 97.5
+		},
+		"sh_oasis": {
+			"file": "res://assets/v10/wave1/outfits/sh_oasis.webp",
+			"size": [
+				850,
+				1280
+			],
+			"face_rect": [
+				330,
+				78,
+				256,
+				256
+			],
+			"alt_rect": [
+				273,
+				27,
+				371,
+				463
+			],
+			"face_c": [
+				458.1,
+				193.3
+			],
+			"face_w": 100.0
+		},
+		"sh_sun": {
+			"file": "res://assets/v10/wave1/outfits/sh_sun.webp",
+			"size": [
+				850,
+				1280
+			],
+			"face_rect": [
+				282,
+				78,
+				248,
+				248
+			],
+			"alt_rect": [
+				235,
+				28,
+				342,
+				428
+			],
+			"face_c": [
+				406.4,
+				189.5
+			],
+			"face_w": 96.9
+		},
+		"sh_night": {
+			"file": "res://assets/v10/wave1/outfits/sh_night.webp",
+			"size": [
+				850,
+				1280
+			],
+			"face_rect": [
+				248,
+				204,
+				299,
+				299
+			],
+			"alt_rect": [
+				193,
+				144,
+				409,
+				511
+			],
+			"face_c": [
+				397.7,
+				338.9
+			],
+			"face_w": 116.9
+		},
+		"zl_base": {
+			"file": "res://assets/v10/wave1/outfits/zl_base.webp",
+			"size": [
+				850,
+				1280
+			],
+			"face_rect": [
+				321,
+				84,
+				205,
+				205
+			],
+			"alt_rect": [
+				247,
+				43,
+				354,
+				442
+			],
+			"face_c": [
+				423.1,
+				175.9
+			],
+			"face_w": 80.0
+		},
+		"zl_fair": {
+			"file": "res://assets/v10/wave1/outfits/zl_fair.webp",
+			"size": [
+				850,
+				1280
+			],
+			"face_rect": [
+				339,
+				78,
+				224,
+				224
+			],
+			"alt_rect": [
+				268,
+				33,
+				365,
+				457
+			],
+			"face_c": [
+				451.1,
+				178.9
+			],
+			"face_w": 87.5
+		},
+		"zl_ember": {
+			"file": "res://assets/v10/wave1/outfits/zl_ember.webp",
+			"size": [
+				850,
+				1280
+			],
+			"face_rect": [
+				315,
+				76,
+				232,
+				232
+			],
+			"alt_rect": [
+				249,
+				30,
+				364,
+				455
+			],
+			"face_c": [
+				430.6,
+				180.2
+			],
+			"face_w": 90.6
+		},
+		"zl_vow": {
+			"file": "res://assets/v10/wave1/outfits/zl_vow.webp",
+			"size": [
+				850,
+				1280
+			],
+			"face_rect": [
+				314,
+				77,
+				224,
+				224
+			],
+			"alt_rect": [
+				245,
+				32,
+				362,
+				453
+			],
+			"face_c": [
+				425.9,
+				177.5
+			],
+			"face_w": 87.5
+		}
+	},
+	"emotions": {
+		"tsubame_happy": {
+			"file": "res://assets/v10/wave1/emotions/tsubame_happy.webp",
+			"size": [
+				600,
+				800
+			],
+			"face": [
+				0.62,
+				0.3756
+			],
+			"face_w": 154.5
+		},
+		"tsubame_surprised": {
+			"file": "res://assets/v10/wave1/emotions/tsubame_surprised.webp",
+			"size": [
+				600,
+				800
+			],
+			"face": [
+				0.6182,
+				0.3841
+			],
+			"face_w": 145.7
+		},
+		"tsubame_pout": {
+			"file": "res://assets/v10/wave1/emotions/tsubame_pout.webp",
+			"size": [
+				600,
+				800
+			],
+			"face": [
+				0.618,
+				0.3769
+			],
+			"face_w": 147.9
+		},
+		"tsubame_shy": {
+			"file": "res://assets/v10/wave1/emotions/tsubame_shy.webp",
+			"size": [
+				600,
+				800
+			],
+			"face": [
+				0.4998,
+				0.3986
+			],
+			"face_w": 158.3
+		},
+		"miel_happy": {
+			"file": "res://assets/v10/wave1/emotions/miel_happy.webp",
+			"size": [
+				600,
+				800
+			],
+			"face": [
+				0.5497,
+				0.2991
+			],
+			"face_w": 176.9
+		},
+		"miel_surprised": {
+			"file": "res://assets/v10/wave1/emotions/miel_surprised.webp",
+			"size": [
+				599,
+				800
+			],
+			"face": [
+				0.571,
+				0.3012
+			],
+			"face_w": 162.5
+		},
+		"miel_pout": {
+			"file": "res://assets/v10/wave1/emotions/miel_pout.webp",
+			"size": [
+				599,
+				800
+			],
+			"face": [
+				0.5369,
+				0.292
+			],
+			"face_w": 164.8
+		},
+		"miel_shy": {
+			"file": "res://assets/v10/wave1/emotions/miel_shy.webp",
+			"size": [
+				600,
+				800
+			],
+			"face": [
+				0.5862,
+				0.3242
+			],
+			"face_w": 179.0
+		},
+		"kohaku_sad": {
+			"file": "res://assets/v10/wave1/emotions/kohaku_sad.webp",
+			"size": [
+				599,
+				800
+			],
+			"face": [
+				0.499,
+				0.3366
+			],
+			"face_w": 151.3
+		},
+		"kohaku_surprised": {
+			"file": "res://assets/v10/wave1/emotions/kohaku_surprised.webp",
+			"size": [
+				599,
+				800
+			],
+			"face": [
+				0.5072,
+				0.3737
+			],
+			"face_w": 153.3
+		},
+		"kohaku_pout": {
+			"file": "res://assets/v10/wave1/emotions/kohaku_pout.webp",
+			"size": [
+				600,
+				800
+			],
+			"face": [
+				0.4996,
+				0.3526
+			],
+			"face_w": 155.4
+		},
+		"kohaku_shy": {
+			"file": "res://assets/v10/wave1/emotions/kohaku_shy.webp",
+			"size": [
+				600,
+				800
+			],
+			"face": [
+				0.4873,
+				0.3526
+			],
+			"face_w": 170.1
+		},
+		"shirin_surprised": {
+			"file": "res://assets/v10/wave1/emotions/shirin_surprised.webp",
+			"size": [
+				600,
+				800
+			],
+			"face": [
+				0.6064,
+				0.3788
+			],
+			"face_w": 148.7
+		},
+		"shirin_shy": {
+			"file": "res://assets/v10/wave1/emotions/shirin_shy.webp",
+			"size": [
+				600,
+				800
+			],
+			"face": [
+				0.5471,
+				0.3896
+			],
+			"face_w": 150.1
+		},
+		"zlata_happy": {
+			"file": "res://assets/v10/wave1/emotions/zlata_happy.webp",
+			"size": [
+				600,
+				800
+			],
+			"face": [
+				0.5245,
+				0.3837
+			],
+			"face_w": 133.8
+		},
+		"zlata_sad": {
+			"file": "res://assets/v10/wave1/emotions/zlata_sad.webp",
+			"size": [
+				600,
+				800
+			],
+			"face": [
+				0.5012,
+				0.4069
+			],
+			"face_w": 140.5
+		},
+		"zlata_surprised": {
+			"file": "res://assets/v10/wave1/emotions/zlata_surprised.webp",
+			"size": [
+				600,
+				800
+			],
+			"face": [
+				0.5165,
+				0.4018
+			],
+			"face_w": 148.2
+		},
+		"zlata_shy": {
+			"file": "res://assets/v10/wave1/emotions/zlata_shy.webp",
+			"size": [
+				600,
+				800
+			],
+			"face": [
+				0.5128,
+				0.4087
+			],
+			"face_w": 150.2
+		}
+	},
+	"poses": {
+		"tsubame_idle": {
+			"file": "res://assets/v10/wave1/poses/tsubame_idle.webp",
+			"size": [
+				850,
+				1280
+			],
+			"face_rect": [
+				347,
+				114,
+				341,
+				341
+			],
+			"face_c": [
+				517.3,
+				267.8
+			],
+			"face_w": 133.1
+		},
+		"tsubame_select": {
+			"file": "res://assets/v10/wave1/poses/tsubame_select.webp",
+			"size": [
+				850,
+				1280
+			],
+			"face_rect": [
+				481,
+				500,
+				240,
+				240
+			],
+			"face_c": [
+				600.9,
+				608.4
+			],
+			"face_w": 93.8
+		},
+		"tsubame_shy": {
+			"file": "res://assets/v10/wave1/poses/tsubame_shy.webp",
+			"size": [
+				850,
+				1280
+			],
+			"face_rect": [
+				498,
+				244,
+				195,
+				195
+			],
+			"face_c": [
+				595.2,
+				332.0
+			],
+			"face_w": 76.2
+		},
+		"tsubame_win": {
+			"file": "res://assets/v10/wave1/poses/tsubame_win.webp",
+			"size": [
+				1280,
+				1280
+			],
+			"face_rect": [
+				720,
+				327,
+				331,
+				331
+			],
+			"face_c": [
+				885.6,
+				475.9
+			],
+			"face_w": 129.4
+		},
+		"miel_idle": {
+			"file": "res://assets/v10/wave1/poses/miel_idle.webp",
+			"size": [
+				850,
+				1280
+			],
+			"face_rect": [
+				89,
+				9,
+				282,
+				282
+			],
+			"face_c": [
+				230.2,
+				135.6
+			],
+			"face_w": 110.0
+		},
+		"miel_lose": {
+			"file": "res://assets/v10/wave1/poses/miel_lose.webp",
+			"size": [
+				1280,
+				1280
+			],
+			"face_rect": [
+				286,
+				54,
+				312,
+				312
+			],
+			"face_c": [
+				442.3,
+				194.8
+			],
+			"face_w": 121.9
+		},
+		"miel_select": {
+			"file": "res://assets/v10/wave1/poses/miel_select.webp",
+			"size": [
+				850,
+				1280
+			],
+			"face_rect": [
+				94,
+				16,
+				272,
+				272
+			],
+			"face_c": [
+				230.2,
+				138.8
+			],
+			"face_w": 106.2
+		},
+		"miel_tease": {
+			"file": "res://assets/v10/wave1/poses/miel_tease.webp",
+			"size": [
+				850,
+				1280
+			],
+			"face_rect": [
+				94,
+				17,
+				285,
+				285
+			],
+			"face_c": [
+				236.7,
+				144.8
+			],
+			"face_w": 111.2
+		},
+		"kohaku_idle": {
+			"file": "res://assets/v10/wave1/poses/kohaku_idle.webp",
+			"size": [
+				850,
+				1280
+			],
+			"face_rect": [
+				421,
+				88,
+				256,
+				256
+			],
+			"face_c": [
+				549.4,
+				203.3
+			],
+			"face_w": 100.0
+		},
+		"kohaku_select": {
+			"file": "res://assets/v10/wave1/poses/kohaku_select.webp",
+			"size": [
+				850,
+				1280
+			],
+			"face_rect": [
+				443,
+				73,
+				298,
+				298
+			],
+			"face_c": [
+				592.2,
+				206.9
+			],
+			"face_w": 116.2
+		},
+		"kohaku_shy": {
+			"file": "res://assets/v10/wave1/poses/kohaku_shy.webp",
+			"size": [
+				850,
+				1280
+			],
+			"face_rect": [
+				402,
+				86,
+				288,
+				288
+			],
+			"face_c": [
+				545.8,
+				215.8
+			],
+			"face_w": 112.5
+		},
+		"kohaku_win": {
+			"file": "res://assets/v10/wave1/poses/kohaku_win.webp",
+			"size": [
+				850,
+				1280
+			],
+			"face_rect": [
+				361,
+				109,
+				254,
+				254
+			],
+			"face_c": [
+				487.8,
+				223.6
+			],
+			"face_w": 99.4
+		},
+		"shirin_idle": {
+			"file": "res://assets/v10/wave1/poses/shirin_idle.webp",
+			"size": [
+				850,
+				1280
+			],
+			"face_rect": [
+				327,
+				81,
+				250,
+				250
+			],
+			"face_c": [
+				452.2,
+				193.6
+			],
+			"face_w": 97.5
+		},
+		"shirin_select": {
+			"file": "res://assets/v10/wave1/poses/shirin_select.webp",
+			"size": [
+				850,
+				1280
+			],
+			"face_rect": [
+				330,
+				76,
+				262,
+				262
+			],
+			"face_c": [
+				461.2,
+				194.1
+			],
+			"face_w": 102.5
+		},
+		"shirin_shy": {
+			"file": "res://assets/v10/wave1/poses/shirin_shy.webp",
+			"size": [
+				850,
+				1280
+			],
+			"face_rect": [
+				330,
+				81,
+				256,
+				256
+			],
+			"face_c": [
+				457.7,
+				196.6
+			],
+			"face_w": 100.0
+		},
+		"zlata_idle": {
+			"file": "res://assets/v10/wave1/poses/zlata_idle.webp",
+			"size": [
+				850,
+				1280
+			],
+			"face_rect": [
+				321,
+				84,
+				205,
+				205
+			],
+			"face_c": [
+				423.1,
+				175.9
+			],
+			"face_w": 80.0
+		},
+		"zlata_lose": {
+			"file": "res://assets/v10/wave1/poses/zlata_lose.webp",
+			"size": [
+				850,
+				1280
+			],
+			"face_rect": [
+				314,
+				79,
+				221,
+				221
+			],
+			"face_c": [
+				424.4,
+				178.0
+			],
+			"face_w": 86.2
+		},
+		"zlata_select": {
+			"file": "res://assets/v10/wave1/poses/zlata_select.webp",
+			"size": [
+				850,
+				1280
+			],
+			"face_rect": [
+				375,
+				75,
+				232,
+				232
+			],
+			"face_c": [
+				491.4,
+				179.2
+			],
+			"face_w": 90.6
+		},
+		"zlata_win": {
+			"file": "res://assets/v10/wave1/poses/zlata_win.webp",
+			"size": [
+				850,
+				1280
+			],
+			"face_rect": [
+				307,
+				55,
+				253,
+				253
+			],
+			"face_c": [
+				433.3,
+				168.4
+			],
+			"face_w": 98.8
+		}
+	},
+	"_meta": {
+		"generator": "game/scripts/v10/wave1/tools/w1_art_cards.py",
+		"outfits": "face_rect / alt_rect in px of the 850×1280 webp (V9Ults semantics: face_rect = head-and-shoulders square, face centre at 45 % of it; alt_rect = 4:5 head-to-waist modest crop); face_c / face_w = face centre (eyes-to-mouth middle) and cheek-to-cheek width in px",
+		"poses": "face_rect in px of the pose webp (same rule); <hero>_idle is the base FINAL card",
+		"emotions": "face = face centre as a fraction of the file (V8Art.EMO_FACE), face_w = face width in file px (V8Art.EMO_FACE_W, 1.75 × eye distance)",
+		"pending": [],
+		"emotions_missing": [
+			"tsubame_sad",
+			"miel_sad",
+			"kohaku_happy",
+			"shirin_happy",
+			"shirin_sad",
+			"shirin_pout",
+			"zlata_pout"
+		],
+		"emotions_auto": []
+	}
+}

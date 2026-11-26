@@ -1,0 +1,59 @@
+hero	outfit	slot	higgsfield_job_or_media	note
+tsubame	tb_base	card	media:05b016ca-ed34-4a22-845b-01820f8c299e	final card (archive A art/final_w1/FINAL_tsubame.png), upload of the approved final
+miel	me_base	card	media:c8717907-1726-4267-a3bc-aa5dae8e5100	final card (archive A art/final_w1/FINAL_miel.png), upload of the approved final
+kohaku	ko_base	card	media:80c42b7e-0c4a-46f0-b5c1-0979190acad5	final card (archive A art/final_w1/FINAL_kohaku.png), upload of the approved final
+shirin	sh_base	card	media:f2a54025-c35a-4303-9cae-b371df2d319e	final card (archive A art/final_w1/FINAL_shirin.png), upload of the approved final
+zlata	zl_base	card	media:31d25f6c-5115-4c43-834c-419134a0a39f	final card (archive A art/final_w1/FINAL_zlata.png), upload of the approved final
+tsubame	tb_base	select	job:9d13f405-05ea-4519-9e5e-fa3e756c5860	gpt_image_2_6 xhigh 2k, approved (double audit, master dataset)
+tsubame	tb_base	shy	job:cf4d1e8c-b267-4e26-b9d9-fa57ac15c534	gpt_image_2_6 xhigh 2k, approved (double audit, master dataset)
+tsubame	tb_base	win	job:46992297-d476-4df4-b34b-688fc830d1e5	gpt_image_2_6 xhigh 2k, approved (double audit, master dataset)
+tsubame	tb_post	card	job:231b3c8f-f332-456f-affb-96a21fcc8b0d	gpt_image_2_6 xhigh 2k, approved (double audit, master dataset)
+tsubame	tb_crimson	card	job:28412e04-046c-4c2d-aa34-7490d0eea2ef	gpt_image_2_6 xhigh 2k, approved (double audit, master dataset)
+miel	me_base	select	job:8d294f9e-3298-40f4-9c1b-06953f0c2e4c	gpt_image_2_6 xhigh 2k, approved (double audit, master dataset)
+miel	me_base	lose	job:56ef2052-1ffc-4305-981d-727998ad222f	gpt_image_2_6 xhigh 2k, approved (double audit, master dataset)
+miel	me_parlor	card	job:17718be1-a49a-42d3-b174-00b8142a131e	gpt_image_2_6 xhigh 2k, approved (double audit, master dataset)
+kohaku	ko_base	select	job:6e4f1741-74ca-4d4c-a073-b6f7c6c9a713	gpt_image_2_6 xhigh 2k, approved (double audit, master dataset)
+kohaku	ko_matsuri	card	job:d9cb12ca-1d02-432a-91db-a45e8132fec5	gpt_image_2_6 xhigh 2k, approved (double audit, master dataset)
+kohaku	ko_kyubi	card	job:35ae2ff8-8a8d-4c41-ba8d-516885d0c962	gpt_image_2_6 xhigh 2k, approved (double audit, master dataset)
+kohaku	ko_vow	card	job:dcfa7bb7-1c6c-4599-b74a-7882a6707a41	gpt_image_2_6 xhigh 2k, approved (double audit, master dataset)
+shirin	sh_base	select	job:39f935a5-1536-4c0a-86e1-23f0a84834d3	gpt_image_2_6 xhigh 2k, approved (double audit, master dataset)
+shirin	sh_base	shy	job:7bd6569b-ab5e-492a-9d2e-ccccd6a9014b	gpt_image_2_6 xhigh 2k, approved (double audit, master dataset)
+shirin	sh_oasis	card	job:5293d28f-050d-4ac9-b65d-0dabb28bbf39	gpt_image_2_6 xhigh 2k, approved (double audit, master dataset)
+shirin	sh_night	card	job:4b3666a7-da74-4c93-b6a0-b91bfc85ee0f	gpt_image_2_6 xhigh 2k, approved (double audit, master dataset)
+zlata	zl_base	select	job:77bd6c70-6dcb-4a75-83f9-c25d2b7edc31	gpt_image_2_6 xhigh 2k, approved (double audit, master dataset)
+zlata	zl_base	win	job:a8b69581-ce0a-4561-bbec-8ee4279e8acf	gpt_image_2_6 xhigh 2k, approved (double audit, master dataset)
+zlata	zl_fair	card	job:cc225df6-78fb-4bc8-95c2-a00fd88f168c	gpt_image_2_6 xhigh 2k, approved (double audit, master dataset)
+zlata	zl_ember	card	job:108aa153-3211-4f85-b953-82e7db2dcaec	gpt_image_2_6 xhigh 2k, approved (double audit, master dataset)
+zlata	zl_vow	card	job:f01fcf7f-3786-4a62-ae83-fce91457fccc	gpt_image_2_6 xhigh 2k, approved (double audit, master dataset)
+miel	me_base	tease	job:e64ec358-6e85-4a5b-8446-e025067630c6	gpt_image_2_6 xhigh 2k, approved (double audit, master dataset)
+miel	me_gala	card	job:06837c24-5ae9-4d0e-bfc4-7e11abd3e4ca	gpt_image_2_6 xhigh 2k, approved (double audit, master dataset)
+kohaku	ko_base	win	job:a0ab7492-ea48-4c6d-bbd0-73b4906fbbcf	gpt_image_2_6 xhigh 2k, approved (double audit, master dataset)
+kohaku	ko_base	shy	job:83be8c1f-b8af-4e10-9b8f-d298256003e9	gpt_image_2_6 xhigh 2k, approved (double audit, master dataset)
+zlata	zl_base	lose	job:cdaab45b-edd5-4b6e-916f-c9124d4d97c4	gpt_image_2_6 xhigh 2k, approved (double audit, master dataset)
+tsubame	tb_base	emotion_happy	job:f58d6021-dbb9-4f9b-a842-237989eef663	gpt_image_2_6 xhigh 1k + element, 2026-11-24
+tsubame	tb_base	emotion_sad	job:9b2e7bfd-4160-4bea-9cee-efbcb33ea62a	gpt_image_2_6 xhigh 1k + element, 2026-11-24
+tsubame	tb_base	emotion_surprised	job:ea2ed104-9226-4bf9-8903-ece0d0b31af6	gpt_image_2_6 xhigh 1k + element, 2026-11-24
+tsubame	tb_base	emotion_pout	job:2eebf880-9a42-4cf2-a7da-b614b8b02a0a	gpt_image_2_6 xhigh 1k + element, 2026-11-24
+tsubame	tb_base	emotion_shy	job:b0804a3a-dc86-47f6-b100-c98711d7e9fc	gpt_image_2_6 xhigh 1k + element, 2026-11-24
+miel	me_base	emotion_happy	job:33b0cad6-0458-481d-a71f-679c6143c5b3	gpt_image_2_6 xhigh 1k + element, 2026-11-24
+miel	me_base	emotion_sad	job:9beaef91-f0e9-4292-af34-3e78bb99f93e	gpt_image_2_6 xhigh 1k + element, 2026-11-24
+miel	me_base	emotion_surprised	job:f4501457-3eff-4dd7-98e7-1ab613c9e2c4	gpt_image_2_6 xhigh 1k + element, 2026-11-24
+miel	me_base	emotion_pout	job:1a0b901e-6739-4091-9358-833018c6ad22	gpt_image_2_6 xhigh 1k + element, 2026-11-24
+miel	me_base	emotion_shy	job:18623092-50be-46a0-a0c8-08f858929231	gpt_image_2_6 xhigh 1k + element, 2026-11-24
+kohaku	ko_base	emotion_happy	job:523d1b20-bd45-44ef-bf49-123d0d0549a0	gpt_image_2_6 xhigh 1k + element, 2026-11-24
+kohaku	ko_base	emotion_sad	job:762c48f1-c56a-47f0-bc18-ce167995cffb	gpt_image_2_6 xhigh 1k + element, 2026-11-24
+kohaku	ko_base	emotion_surprised	job:f0bbd673-886e-4e37-8e61-38f9b4fd3e27	gpt_image_2_6 xhigh 1k + element, 2026-11-24
+kohaku	ko_base	emotion_pout	job:6c69d92e-99a7-4aa1-b6b7-92b8d83b6942	gpt_image_2_6 xhigh 1k + element, 2026-11-24
+kohaku	ko_base	emotion_shy	job:24d2a24e-ec3e-4d1d-b7a8-f9c2676a5574	gpt_image_2_6 xhigh 1k + element, 2026-11-24
+shirin	sh_base	emotion_happy	job:1f51d9df-0e0a-474c-8438-f2e430b730c6	gpt_image_2_6 xhigh 1k + element, 2026-11-24
+shirin	sh_base	emotion_sad	job:9f2aae06-d996-4894-a8d5-1ebee6135593	gpt_image_2_6 xhigh 1k + element, 2026-11-24
+shirin	sh_base	emotion_surprised	job:22bfa5cf-9648-47e4-9811-dce13605882c	gpt_image_2_6 xhigh 1k + element, 2026-11-24
+shirin	sh_base	emotion_pout	job:1f8bf656-8e0a-4a47-a790-0724ff7aee92	gpt_image_2_6 xhigh 1k + element, 2026-11-24
+shirin	sh_base	emotion_shy	job:9dba8e7e-e96f-4f65-9158-780dd1abd628	gpt_image_2_6 xhigh 1k + element, 2026-11-24
+zlata	zl_base	emotion_happy	job:f9127456-a92a-4abb-959a-9fa0170ed331	gpt_image_2_6 xhigh 1k + element, 2026-11-24
+zlata	zl_base	emotion_sad	job:6f9c839f-877b-4585-be7d-e92d9a1bcba0	gpt_image_2_6 xhigh 1k + element, 2026-11-24
+zlata	zl_base	emotion_surprised	job:6d0fc631-cdc5-4dc6-bfc4-259e92be7f56	gpt_image_2_6 xhigh 1k + element, 2026-11-24
+zlata	zl_base	emotion_pout	job:476fd351-006d-43d7-89a1-3acccb58e148	gpt_image_2_6 xhigh 1k + element, 2026-11-24
+zlata	zl_base	emotion_shy	job:cbad1457-7535-4af2-b68b-ac888f95d98f	gpt_image_2_6 xhigh 1k + element, 2026-11-24
+shirin	sh_sun	card_candidate_0	job:1b463d24-efbd-481f-93e8-47f87dc1f9d3	gpt_image_2_6 xhigh 2k + element, 2026-11-24
+shirin	sh_sun	card_candidate_1	job:cb5fc126-1d50-4173-a234-e66cedcbb5d0	gpt_image_2_6 xhigh 2k + element, 2026-11-24
