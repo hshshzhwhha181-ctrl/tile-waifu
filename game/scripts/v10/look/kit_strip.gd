@@ -1,23 +1,29 @@
 class_name V10KitStrip
 extends Control
 
-# V10KitStrip — the «Набор богини» ribbon of the wardrobe (D1): Рамка · Акцент · Тема фишек · Стол · HUD · Стинг ·
-# Шрифт. What the kit rank does not open is a grey chip with «у S» / «у SSR» (no lock icons, UX §6.4). A tap shows a
-# 1,2 с mini preview of the element; «Сделать партнёром» lives on the wardrobe screen and calls V10Look.wave().
+# V10KitStrip — the «Набор героини» ribbon of the wardrobe (D1): Рамка · Акцент · Фишки · Стол · Интерфейс · Стинг ·
+# Шрифт. Only what the kit opens is a chip; everything it does not open folds into ONE silhouette teaser of the next
+# rank («Фишки и стол · Откроется: наряд «…»», UX §6.4 / §10 В-8: no lock walls, ≤ 1 closed teaser). Captions are
+# Caption 18 (UX §6.3); chip widths follow their captions so «Интерфейс» never clips. A tap on a chip shows a 1,2 с
+# mini preview; «Сделать партнёром» lives on the wardrobe screen and calls V10Look.wave().
 #
 #   V10KitStrip.make(hero, outfit, width) -> V10KitStrip     height 132
-#   signal element_tapped(element, open)
+#   signal element_tapped(element, open)                     the teaser emits ("next", false)
 
 signal element_tapped(element: String, open: bool)
 
 const H: = 132.0
 const CHIP_H: = 116.0
 const PREVIEW_T: = 1.2
+const CAPTION: = 18
+const GAP: = 6.0
+const PAD: = 6.0
 
 var hero: = "mc"
 var outfit: = ""
 var look: = {}
 var chips: = {}
+var teaser: Control
 
 
 static func make(h: String, o: String, w: float) -> V10KitStrip:
@@ -32,37 +38,93 @@ static func make(h: String, o: String, w: float) -> V10KitStrip:
 
 func _build() -> void:
 	look = V10Look.resolve(hero, outfit)
-	var n: = V10KitData.ELEMENTS.size()
-	var gap: = 8.0
-	var cw: = (size.x - gap * (n - 1)) / n
-	var i: = 0
+	var open_els: = []
 	for el in V10KitData.ELEMENTS:
-		var open: bool = look.open[el]
+		if look.open[el]:
+			open_els.append(el)
+	var nxt: = V10KitData.next_teaser(hero, outfit)
+	var closed_n: = V10KitData.ELEMENTS.size() - open_els.size()
+	# widths: every chip at least its caption + padding, the rest of the ribbon shared evenly; the teaser takes the
+	# slots of the elements it stands for
+	var f: = V10Fonts.font("ui_body", 800)
+	var slots: = V10KitData.ELEMENTS.size()
+	var base_w: = (size.x - GAP * (slots - 1)) / slots
+	var widths: = []
+	var need: = 0.0
+	for el in open_els:
+		var wv: = maxf(base_w, V10Fonts.width(f, String(V10KitData.ELEMENT_SHORT[el]), CAPTION) + PAD * 2.0 + 4.0)
+		widths.append(wv)
+		need += wv
+	var teaser_w: = 0.0
+	if closed_n > 0 and not nxt.is_empty():
+		teaser_w = base_w * closed_n + GAP * (closed_n - 1)
+		need += teaser_w
+	var n_items: = open_els.size() + (1 if teaser_w > 0.0 else 0)
+	var spare: = size.x - GAP * (n_items - 1) - need
+	if spare < 0.0:
+		# shrink every chip and the teaser in proportion (the selftest checks that no caption clips)
+		var k: = (need + spare) / need
+		for i in widths.size():
+			widths[i] = float(widths[i]) * k
+		teaser_w *= k
+	elif spare > 0.0 and teaser_w == 0.0:
+		for i in widths.size():
+			widths[i] = float(widths[i]) + spare / widths.size()
+	else:
+		teaser_w += spare
+	var x: = 0.0
+	for i in open_els.size():
+		var el: String = open_els[i]
+		var cw: float = widths[i]
 		var chip: = _Chip.new()
 		chip.name = "Chip_" + el
-		chip.position = Vector2(i * (cw + gap), 0)
+		chip.position = Vector2(x, 0)
 		chip.size = Vector2(cw, CHIP_H)
-		chip.open = open
+		chip.open = true
 		chip.accent = look.accent.col
 		add_child(chip)
 		chips[el] = chip
-		var cap: = V10HudSkin.label(String(V10KitData.ELEMENT_SHORT[el]), 15, V10HudSkin.tok("paper_300") if open else V10HudSkin.tok("paper_700"))
-		cap.position = Vector2(4, CHIP_H - 30)
-		cap.size = Vector2(cw - 8, 22)
+		var cap: = V10HudSkin.label(String(V10KitData.ELEMENT_SHORT[el]), CAPTION, V10HudSkin.tok("paper_300"))
+		cap.position = Vector2(PAD * 0.5, CHIP_H - 34)
+		cap.size = Vector2(cw - PAD, 26)
 		cap.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		chip.add_child(cap)
-		var art: = _art(el, Vector2(cw - 20, 58), open)
+		var art: = _art(el, Vector2(cw - 20, 58), true)
 		if art:
 			art.position = Vector2(10, 12)
 			chip.add_child(art)
-		if not open:
-			var lk: = V10HudSkin.label(V10KitData.lock_text(el), 18, V10HudSkin.tok("paper_500"))
-			lk.position = Vector2(0, 26)
-			lk.size = Vector2(cw, 30)
-			lk.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-			chip.add_child(lk)
-		chip.gui_input.connect(_on_chip.bind(el, chip))
-		i += 1
+		chip.set_meta("ux_role", "option")
+		V10HudSkin.tappable(chip, _on_chip.bind(el, chip))
+		x += cw + GAP
+	if teaser_w > 0.0:
+		teaser = _teaser(nxt, Rect2(x, 0, teaser_w, CHIP_H))
+
+
+# the one closed teaser: a silhouette in paper.700, the next rank's elements and how they open (UX §6.4)
+func _teaser(nxt: Dictionary, r: Rect2) -> Control:
+	var t: = _Chip.new()
+	t.name = "Teaser_" + String(nxt.rank)
+	t.position = r.position
+	t.size = r.size
+	t.open = false
+	add_child(t)
+	var title: = V10HudSkin.label(String(nxt.title), CAPTION, V10HudSkin.tok("paper_300"))
+	title.position = Vector2(14, 26)
+	title.size = Vector2(r.size.x - 28, 28)
+	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	title.max_lines_visible = 2
+	t.add_child(title)
+	var how: = V10HudSkin.label(String(nxt.how), CAPTION, V10HudSkin.tok("paper_500"))
+	how.position = Vector2(14, CHIP_H - 40)
+	how.size = Vector2(r.size.x - 28, 28)
+	t.add_child(how)
+	if r.size.x < 240.0:
+		# narrow (an S kit on a small strip): the title wraps to two lines above the condition
+		title.position.y = 10
+		title.size.y = 56
+	t.set_meta("ux_role", "option")
+	V10HudSkin.tappable(t, func(): element_tapped.emit("next", false), false)
+	return t
 
 
 func _art(el: String, sz: Vector2, open: bool) -> Control:
@@ -127,22 +189,17 @@ func _art(el: String, sz: Vector2, open: bool) -> Control:
 	return null
 
 
-func _on_chip(ev: InputEvent, el: String, chip: Control) -> void:
-	if not (ev is InputEventMouseButton and ev.button_index == MOUSE_BUTTON_LEFT and not ev.pressed):
-		return
-	var open: bool = look.open[el]
-	if get_tree().root.get_node_or_null("G"):
-		if open:
-			V9Feel.press(chip)
-		else:
-			V9Feel.deny(chip)
-	element_tapped.emit(el, open)
-	if open:
-		_mini_preview(chip)
+func _on_chip(el: String, chip: Control) -> void:
+	element_tapped.emit(el, true)
+	_mini_preview(chip)
 
 
 # 1,2 с: the chip lifts, scales ×1,35 and glows in the accent, then settles back
 func _mini_preview(chip: Control) -> void:
+	# the preview owns the scale from here: stop the V9Feel release spring so two tweens never fight
+	var spring = chip.get_meta("v9_feel_tw", null)
+	if spring is Tween and (spring as Tween).is_valid():
+		(spring as Tween).kill()
 	chip.pivot_offset = chip.size * 0.5
 	chip.z_index = 5
 	var tw: = create_tween()
@@ -162,6 +219,10 @@ class _Chip extends Control:
 	func _draw() -> void:
 		var sb: = StyleBoxFlat.new()
 		sb.bg_color = V10HudSkin.tok("night_800") if open else Color(V10HudSkin.tok("night_800"), 0.55)
+		if not open:
+			# silhouette of what is not in this kit: a thin paper.700 edge, no lock icon
+			sb.border_color = Color(V10HudSkin.tok("paper_700"), 0.6)
+			sb.set_border_width_all(1)
 		sb.set_corner_radius_all(4)
 		sb.anti_aliasing = true
 		draw_style_box(sb, Rect2(Vector2.ZERO, size))

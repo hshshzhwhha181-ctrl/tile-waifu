@@ -50,6 +50,7 @@ static func run(host: Node) -> int:
 	await _skin_runtime(host)
 	_fonts()
 	_cos_card()
+	await _ui(host)
 	V10Look.dev_reveal = {}
 	if V10Look._hub and is_instance_valid(V10Look._hub) and not V10Look._hub.is_inside_tree():
 		V10Look._hub.free()
@@ -138,6 +139,15 @@ static func _kit() -> void:
 	own = V10Look.owned_elements(S)
 	check("zlata" in own.hud and "s_lacquer" in own.tile, "--skin=zlata reveals her kit for review")
 	V10Look.dev_reveal = {}
+	# G.skin_look() runs per board (and per tile in specials): the all-auto path skips the ownership scan
+	S = _save("mc", "o_dragon", ["o_dragon"])
+	V10Look.migrate(S)
+	var t0: = Time.get_ticks_usec()
+	for i in 100:
+		V10Look.tile_look(S)
+	var ms: = (Time.get_ticks_usec() - t0) / 1000.0
+	check(ms < 150.0, "tile_look x100 on an all-auto save: %.1f ms (< 150)" % ms)
+	print("LOOK perf: tile_look x100 = %.1f ms" % ms)
 
 
 # ------------------------------------------------------------------------------------------------- D3 tiles
@@ -409,7 +419,7 @@ static func _cos_card() -> void:
 	for e in V10LookCos.all("", true):
 		if String(e.kind) in ["title", "badge"] + V10LookCos.LOOK_KINDS:
 			check(not bool(e.get("sold", false)), "%s never sold" % e.id)
-	check(V10LookCos.kit_line("zlata") == "Набор: рамка · акцент · тема фишек · стол · HUD · стинг · шрифт", "banner kit line for SSR")
+	check(V10LookCos.kit_line("zlata") == "Набор: рамка · акцент · тема фишек · стол · интерфейс · стинг · шрифт", "banner kit line for SSR")
 	check(V10LookCos.kit_line("mc") == "Набор: рамка · акцент", "kit line for A")
 	# card payload with the look
 	var S: = _save("yue", "y_queen", ["y_queen"])
@@ -430,3 +440,242 @@ static func _cos_card() -> void:
 	var q2: = V10LookCard.sim(rng, 3)
 	q2.tile = "s_lacquer"
 	check(V10LookCard.validate(q2) != "", "sim with an SSR theme is rejected")
+
+
+# ------------------------------------------------------------------------------------------------- UX_RULES on the lane's screens
+
+static func _labels(n: Node, out: Array) -> Array:
+	if n is Label:
+		out.append(n)
+	for c in n.get_children():
+		_labels(c, out)
+	return out
+
+
+static func _with_meta(n: Node, key: String, val, out: Array) -> Array:
+	if n.has_meta(key) and (val == null or n.get_meta(key) == val):
+		out.append(n)
+	for c in n.get_children():
+		_with_meta(c, key, val, out)
+	return out
+
+
+# Caption 18 is the minimum; 15 only as an uppercase overline (UX §6.3, §10 В-2)
+static func _type_ok(root: Node) -> String:
+	for l in _labels(root, []):
+		var lb: Label = l
+		if lb.text.strip_edges() == "" or lb.label_settings == null:
+			continue
+		var fs: = lb.label_settings.font_size
+		if fs < 18 and not (fs >= 15 and lb.uppercase):
+			return "«%s» %d px" % [lb.text, fs]
+	return ""
+
+
+static func _words_ok(root: Node) -> String:
+	for l in _labels(root, []):
+		var t: = String((l as Label).text)
+		for w in ["HUD", "Богин", "богин", "Гарант", "гарант"]:
+			if t.contains(w):
+				return t
+	return ""
+
+
+static func _tap(c: Control, from: Vector2, to: Vector2) -> void:
+	var d: = InputEventMouseButton.new()
+	d.button_index = MOUSE_BUTTON_LEFT
+	d.pressed = true
+	d.position = from
+	d.global_position = c.global_position + from
+	c.gui_input.emit(d)
+	var u: = InputEventMouseButton.new()
+	u.button_index = MOUSE_BUTTON_LEFT
+	u.pressed = false
+	u.position = to
+	u.global_position = c.global_position + to
+	c.gui_input.emit(u)
+
+
+static func _ui(host: Node) -> void:
+	V10HudSkin.use("five_winds")
+	# a screen that re-titles its header label keeps ONE look link (else one change cross-fades N ghosts)
+	var hubc: = V10Look.hub().look_changed
+	var n0: = hubc.get_connections().size()
+	var tl: = Label.new()
+	host.add_child(tl)
+	V10LookFonts.title(tl, "Чайная", 600)
+	V10LookFonts.title(tl, "Героини", 600)
+	check(hubc.get_connections().size() == n0 + 1, "re-titled label: one look link (%d)" % (hubc.get_connections().size() - n0))
+	tl.free()
+	check(hubc.get_connections().size() == n0, "title label gone -> its look link is gone")
+	# player-facing names: «Интерфейс», never «HUD» (UX §3.2, §4.1); «героиня», never «богиня» (§4.2)
+	var bad_names: = []
+	for d in [V10KitData.ELEMENT_NAMES, V10KitData.ELEMENT_SHORT, V10StylePicker.SLOT_NAMES]:
+		for k in d:
+			if String(d[k]).contains("HUD"):
+				bad_names.append(d[k])
+	check(bad_names.is_empty() and not V10LookCos.kit_line("zlata").contains("HUD"), "no «HUD» in visible names %s" % str(bad_names))
+	# button roles (UX §3.4 П-1) and the still specimen
+	var roles: = {"play": "primary", "cash": "secondary", "secondary": "secondary", "quiet": "tertiary"}
+	var role_ok: = true
+	for cls in roles:
+		var b: = V10HudSkin.button(cls, "Кнопка", Rect2(0, 0, 300, 104))
+		role_ok = role_ok and String(b.get_meta("ux_role", "")) == roles[cls]
+		b.free()
+	check(role_ok, "every skin button carries ux_role by its class")
+	var spec: = V10HudSkin.button("play", "Играть", Rect2(0, 0, 300, 56), Callable(), true)
+	host.add_child(spec)
+	check(not spec.has_meta("ux_role") and _all_ignore(spec) and spec.get_tree() != null, "preview specimen: no ux_role, never catches taps")
+	var live: = V10HudSkin.button("play", "Играть", Rect2(0, 0, 300, 104))
+	host.add_child(live)
+	await host.get_tree().create_timer(0.5).timeout
+	check(spec.scale == Vector2.ONE and live.scale.x < 1.0, "preview specimen does not breathe (the real «Игра» does)")
+	spec.free()
+	live.free()
+	# tap vs drag (chips in a ScrollContainer scroll by touch; a drag never picks)
+	var chip: = Control.new()
+	chip.size = Vector2(120, 140)
+	host.add_child(chip)
+	var hits: = [0]
+	V10HudSkin.tappable(chip, func(): hits[0] += 1)
+	check(chip.mouse_filter == Control.MOUSE_FILTER_PASS, "tappable chips pass input to a parent scroll")
+	_tap(chip, Vector2(60, 70), Vector2(62, 72))
+	check(hits[0] == 1, "a tap picks")
+	_tap(chip, Vector2(60, 70), Vector2(20, 70))
+	check(hits[0] == 1, "a sideways drag (scroll) does not pick")
+	chip.free()
+	# decorate: one resize link however often a node is re-dressed; the match header has no ornament
+	V10HudSkin.use("zlata")
+	var node: = Control.new()
+	node.size = Vector2(300, 80)
+	host.add_child(node)
+	for i in 3:
+		V10HudSkin.decorate(node, "plate_m")
+	check(node.resized.get_connections().size() == 1, "decorate x3 -> one resize connection (%d)" % node.resized.get_connections().size())
+	node.size = Vector2(320, 90)
+	var bgn: Control = node.get_node_or_null("V10Skin_plate_m")
+	check(bgn != null and bgn.size == node.size, "decorated background follows the node size")
+	node.free()
+	var hm: = Control.new()
+	host.add_child(hm)
+	var hd: = V10HudSkin.header(hm, "", 720, 0.0, true)
+	var hbg: = hd.get_node_or_null("V10Skin_header")
+	check(hbg != null and not (hbg is V10HudSkin._Cover) and not (hbg.get_child_count() > 0 and hbg.get_child(0) is NinePatchRect), "zlata match header: plain lacquer, no ornament strip")
+	hm.free()
+	V10HudSkin.use("five_winds")
+	# kit strip: open elements are chips, the rest is ONE silhouette teaser (UX §6.4, В-8); captions ≥ 18 px
+	for c in [["mc", "o_base", 2], ["mc", "o_dragon", 4], ["yue", "y_queen", 4], ["zlata", "zl_base", 7]]:
+		V10Look.dev_reveal["zlata"] = true
+		var ks: = V10KitStrip.make(c[0], c[1], 672)
+		host.add_child(ks)
+		var teasers: = 0
+		for ch in ks.get_children():
+			if String(ch.name).begins_with("Teaser_"):
+				teasers += 1
+		check(ks.chips.size() == int(c[2]) and teasers == (0 if int(c[2]) == 7 else 1), "kit strip %s/%s: %d chips + %d teaser" % [c[0], c[1], ks.chips.size(), teasers])
+		check(_type_ok(ks) == "", "kit strip %s: text ≥ 18 px (%s)" % [c[0], _type_ok(ks)])
+		check(_words_ok(ks) == "", "kit strip %s: no «HUD»/«богиня» (%s)" % [c[0], _words_ok(ks)])
+		var clipped: = ""
+		for l in _labels(ks, []):
+			var lb: Label = l
+			if lb.autowrap_mode == TextServer.AUTOWRAP_OFF and V10Fonts.width(lb.label_settings.font, lb.text, lb.label_settings.font_size) > lb.size.x + 0.5:
+				clipped = lb.text
+		check(clipped == "", "kit strip %s: no caption clipped (%s)" % [c[0], clipped])
+		var right: = 0.0
+		for ch in ks.get_children():
+			right = maxf(right, (ch as Control).position.x + (ch as Control).size.x)
+		check(right <= 672.5, "kit strip %s fits its width (%.1f)" % [c[0], right])
+		ks.free()
+		V10Look.dev_reveal = {}
+	var ksm: = V10KitStrip.make("mc", "o_base", 672)
+	var tz: Control = ksm.teaser
+	var tz_txt: = ""
+	for l in _labels(tz, []):
+		tz_txt += (l as Label).text + " "
+	check(tz_txt.contains("Откроется: наряд «Императрица дракона»"), "A teaser says how the S kit opens (%s)" % tz_txt)
+	ksm.free()
+	# style picker: one primary («Сохранить»), the specimen is not a second one; text ≥ 18 px; rows survive a pick
+	var S: = _save("mc", "o_dragon", ["o_dragon", "s_night", "s_mint", "r_agent", "y_queen"])
+	var sp: = V10StylePicker.make(S, Vector2(720, 1280))
+	host.add_child(sp)
+	check(_with_meta(sp, "ux_role", "primary", []).size() == 1, "style picker: exactly one primary (%d)" % _with_meta(sp, "ux_role", "primary", []).size())
+	check(_type_ok(sp) == "", "style picker: text ≥ 18 px (%s)" % _type_ok(sp))
+	check(_words_ok(sp) == "", "style picker: no «HUD» (%s)" % _words_ok(sp))
+	var save_b: Control = sp.get_node("Save")
+	var low: = 0.0
+	for slot in sp.rows:
+		var row: Control = sp.rows[slot]
+		low = maxf(low, row.position.y + 28.0 + V10StylePicker.CHIP.y)
+	check(low <= save_b.position.y, "style picker rows clear «Сохранить» at 720×1280 (%.0f ≤ %.0f)" % [low, save_b.position.y])
+	var row_t: ScrollContainer = sp.rows.tile.get_node("Scroll_tile")
+	var first: Control = sp.cards.tile[sp.cards.tile.keys()[2]]
+	_tap(first, Vector2(60, 70), Vector2(60, 70))
+	check(sp.rows.tile.get_node_or_null("Scroll_tile") == row_t and first.on, "a pick keeps the row (no rebuild, scroll kept) and marks the card")
+	sp.free()
+	# tile picker: every owned theme + the teaser reachable through the scroll at 720×1280
+	S = _save("rin", "r_agent", ["r_agent", "o_dragon", "s_night", "s_neon", "h_gym", "y_queen", "n_ssr", "s_mint", "s_lemon"])
+	V10Look.dev_reveal["zlata"] = true
+	var tp: = V10TilePicker.make(S, Vector2(720, 1280))
+	host.add_child(tp)
+	var cells: = 0
+	var reach: = true
+	for ch in tp.grid.get_children():
+		cells += 1
+		var cc: Control = ch
+		if cc.position.y + cc.size.y > tp.grid.custom_minimum_size.y:
+			reach = false
+	check(cells == V10TileTheme.THEMES.size() and reach and tp.scroll.size.y < tp.grid.custom_minimum_size.y, "tile picker: %d cells, all inside the scroll" % cells)
+	check(_type_ok(tp) == "", "tile picker: text ≥ 18 px (%s)" % _type_ok(tp))
+	tp.free()
+	V10Look.dev_reveal = {}
+	# try-on: the bar ends the preview however it leaves; 80 px hit zones; the card never carries a try-on
+	var scr: = Control.new()
+	scr.size = Vector2(720, 1280)
+	host.add_child(scr)
+	V10Look.dev_reveal["zlata"] = true
+	var bar: = V10PreviewBar.open(scr, "zlata", "zl_base")
+	check(V10Look.previewing() and V10HudSkin.active == "zlata", "try-on bar starts the preview")
+	var hz: = true
+	for bn in ["Back", "ToBanner"]:
+		hz = hz and (bar.get_node(bn) as Control).size.y >= 80.0
+	check(hz, "try-on buttons: 80 px hit zones")
+	var grp: = String(bar.get_node("Back").get_meta("ux_group", "")) == "tryon" and String(bar.get_node("ToBanner").get_meta("ux_group", "")) == "tryon"
+	check(grp and bar.position.y >= 88.0 and bar.position.y + bar.size.y <= 240.0,
+		"try-on bar: one control (ux_group tryon) inside the lanterns' zone 88–240 (%.0f–%.0f)" % [bar.position.y, bar.position.y + bar.size.y])
+	S = _save("yue", "y_queen", ["y_queen"])
+	var p_prev: = V10LookCard.payload(S)
+	check(String(p_prev.tile) == "s_night" and String(p_prev.get("kit", "")) == "yue", "card payload ignores a running try-on")
+	scr.free()
+	check(not V10Look.previewing() and V10HudSkin.active == "five_winds", "screen torn down -> try-on ends, own kit back")
+	V10Look.dev_reveal = {}
+	# the card says «Героини», not «Богини» (UX §4.2)
+	var cv: = V10LookCard.view(V10LookCard.payload(S, {"league": 2}), Rect2(0, 0, 660, 880), "other")
+	host.add_child(cv)
+	check(_words_ok(cv) == "", "card view: no «Богини» (%s)" % _words_ok(cv))
+	cv.free()
+	# «Новый стиль стола»: every block lands on its own resting scale and alpha
+	var root: = Control.new()
+	root.size = Vector2(720, 1280)
+	host.add_child(root)
+	var home: = Control.new()
+	home.size = root.size
+	root.add_child(home)
+	var mir: = ColorRect.new()
+	mir.size = Vector2(100, 100)
+	mir.position = Vector2(300, 600)
+	mir.scale = Vector2(-1, 1)
+	mir.modulate.a = 0.5
+	home.add_child(mir)
+	var a: = V10SkinAssemble.play(root, home, "zlata", Callable(), Callable(), "full")
+	check(_with_meta(a, "ux_role", "primary", []).size() == 1 and _with_meta(a, "ux_role", "secondary", []).size() == 1, "«Новый стиль стола»: Оставить primary, Вернуть secondary")
+	await host.get_tree().create_timer(0.7).timeout
+	check(mir.scale.is_equal_approx(Vector2(-1, 1)) and absf(mir.modulate.a - 0.5) < 0.01, "assembly keeps a block's own scale and alpha")
+	var answers: = [0]
+	a.decided.connect(func(_k: bool): answers[0] += 1)
+	a._close(true)
+	a._close(false)
+	check(answers[0] == 1, "«Новый стиль стола»: one answer, a second tap during the fade is ignored (%d)" % answers[0])
+	a.free()
+	root.free()
+	V10HudSkin.use("five_winds")
+	V10HudSkin.reset_sting()

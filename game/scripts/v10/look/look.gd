@@ -9,7 +9,9 @@ extends Node
 #        {hero, outfit, rank, frame, accent{name,col,glow,deep,particles}, tile, table, hud, sting, font, palette,
 #         open{element: bool}, src{element: "kit"|"base"|"choice"|"preview"}}
 #        ctx: {ranked: bool}. Ranked keeps the kit but faces stay standard and the table static (tile_look()).
-#   V10Look.current(S = null, ctx = {}) -> Dictionary   partner + outfit + the S.look choices (+ preview)
+#   V10Look.current(S = null, ctx = {}) -> Dictionary   partner + outfit + the S.look choices (+ preview);
+#                                                       ctx.no_preview: the player's own kit even during a try-on
+#                                                       (card payload, anything other players see)
 #   V10Look.owned_elements(S) -> {frame: [], tile: [], table: [], hud: []}
 #   V10Look.set_choice(S, slot, value) -> String       slot frame|tile|table|hud, value auto|base|<id>; "" = ok
 #   V10Look.migrate(S) -> bool                         S.skin -> look.tile, profile.frame -> look.frame (idempotent)
@@ -130,7 +132,7 @@ static func current(S = null, ctx: = {}) -> Dictionary:
 		S = _gS()
 	var p: = partner_of(S)
 	var src_ctx: = ctx.duplicate()
-	var prev: = not _preview.is_empty()
+	var prev: = not _preview.is_empty() and not bool(ctx.get("no_preview", false))
 	if prev:
 		p = [String(_preview.hero), String(_preview.get("outfit", ""))]
 	var r: = resolve(p[0], p[1], src_ctx)
@@ -141,7 +143,12 @@ static func current(S = null, ctx: = {}) -> Dictionary:
 		r["preview"] = true
 		return r
 	var lk: = look_of(S)
-	var own: = owned_elements(S)
+	# ownership is only needed for a hand pick (the common all-auto save skips it: G.skin_look() runs per board)
+	var own: = {}
+	for slot in SLOTS:
+		if lk[slot] != AUTO and lk[slot] != BASE:
+			own = owned_elements(S)
+			break
 	for slot in SLOTS:
 		var v: String = lk[slot]
 		if v == AUTO:
@@ -182,7 +189,7 @@ static func tile_look(S = null, ctx: = {}) -> Dictionary:
 
 # ------------------------------------------------------------------------------------------------- ownership
 
-static func hero_owned(S: Dictionary, h: String) -> bool:
+static func hero_owned(S: Dictionary, h: String, ctx = null) -> bool:
 	if dev_reveal.has(h):
 		return true
 	var k: = V10KitData.kit(h)
@@ -190,8 +197,9 @@ static func hero_owned(S: Dictionary, h: String) -> bool:
 		return false
 	if bool(k.get("hidden", false)) and not V10ProfileCos.released(h):
 		return false
-	var ctx: = V10ProfileCos.ctx_from_save(S)
-	return ctx.heroes.has(h)
+	if not (ctx is Dictionary):
+		ctx = V10ProfileCos.ctx_from_save(S)
+	return (ctx as Dictionary).heroes.has(h)
 
 
 static func _owns_item(S: Dictionary, id: String) -> bool:
@@ -203,8 +211,9 @@ static func _owns_item(S: Dictionary, id: String) -> bool:
 # outfits that lift a kit), legacy skins they already own, the base of every slot.
 static func owned_elements(S: Dictionary) -> Dictionary:
 	var out: = {"frame": [], "tile": [], "table": [], "hud": []}
+	var ctx: = V10ProfileCos.ctx_from_save(S)   # once, not once per kit
 	for h in V10KitData.KITS:
-		if not hero_owned(S, h):
+		if not hero_owned(S, h, ctx):
 			continue
 		var k: Dictionary = V10KitData.KITS[h]
 		var r0: = resolve(h, "")
@@ -222,7 +231,6 @@ static func owned_elements(S: Dictionary) -> Dictionary:
 		if V10TileTheme.THEMES[id].get("legacy", false) and (_owns_item(S, id) or id == "s_sakura"):
 			_push(out.tile, id)
 	# frames owned through V10ProfileCos (laurels, shop, seasons…) are pickable too
-	var ctx: = V10ProfileCos.ctx_from_save(S)
 	for id in V10ProfileCos.unlocked("frame", ctx):
 		_push(out.frame, String(id))
 	for s in out:

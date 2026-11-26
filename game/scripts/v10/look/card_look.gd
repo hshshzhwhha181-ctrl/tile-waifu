@@ -15,7 +15,8 @@ const SIM_TILES: = ["s_sakura", "s_mint", "s_lemon"]
 
 static func payload(S: Dictionary, extra: = {}) -> Dictionary:
 	var p: = V10CardPayload.mine(S, extra)
-	var cur: = V10Look.current(S)
+	# what others see is the player's own kit: a banner try-on running right now never reaches the card
+	var cur: = V10Look.current(S, {"no_preview": true})
 	var prof = S.get("profile", {})
 	var pf: = String(prof.get("frame", "")) if prof is Dictionary else ""
 	if (pf == "" or pf == V10ProfileCos.DEFAULT.frame) and V10ProfileCos.has(String(cur.frame), "frame") \
@@ -61,7 +62,26 @@ static func sim(rng: RandomNumberGenerator, tier: int, nick: = "") -> Dictionary
 static func view(p: Dictionary, rect: Rect2, mode: = "other", opts: = {}) -> V10CardView:
 	var cv: = V10CardView.make(p, rect, mode, opts)
 	swap_thumbs(cv, String(p.get("tile", "s_sakura")))
+	ui_words(cv)
 	return cv
+
+
+# UX §4.2: «Богиня» is never a UI word («Героиня»). V10CardView (v10-profile) still captions its counter «Богини»;
+# until that branch renames it at the source this keeps the card clean. No-op once the source is fixed.
+const UI_RENAMES: = {"Богини": "Героини", "Богиня": "Героиня"}
+
+
+static func ui_words(root: Node) -> int:
+	var n: = 0
+	var stack: = [root]
+	while not stack.is_empty():
+		var node: Node = stack.pop_back()
+		for ch in node.get_children():
+			stack.append(ch)
+		if node is Label and UI_RENAMES.has(String((node as Label).text)):
+			(node as Label).text = UI_RENAMES[String((node as Label).text)]
+			n += 1
+	return n
 
 
 # replace V10CardView.TileBack (0.9 colours only) with the v10 theme miniature, same rect

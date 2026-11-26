@@ -65,10 +65,21 @@ static func title(l: Label, text: String, max_w: float, moment: = "screen_title"
 	l.set_meta(META, true)
 	l.set_meta("v10_moment", moment)
 	l.set_meta("v10_max_w", max_w)
+	# one link per label however often a screen re-titles it (N links would cross-fade N ghosts on one change)
+	if l.has_meta("v10_title_cb"):
+		return
 	var hub: = V10Look.hub()
 	var cb: = func(look: Dictionary): _on_look(l, look)
 	hub.look_changed.connect(cb)
-	l.tree_exiting.connect(func(): if hub.look_changed.is_connected(cb): hub.look_changed.disconnect(cb), CONNECT_ONE_SHOT)
+	l.set_meta("v10_title_cb", true)
+	l.tree_exiting.connect(func(): _unfollow(l, hub, cb), CONNECT_ONE_SHOT)
+
+
+static func _unfollow(l: Label, hub: V10Look, cb: Callable) -> void:
+	if hub.look_changed.is_connected(cb):
+		hub.look_changed.disconnect(cb)
+	if is_instance_valid(l):
+		l.remove_meta("v10_title_cb")
 
 
 static func _on_look(l: Label, look: Dictionary) -> void:
