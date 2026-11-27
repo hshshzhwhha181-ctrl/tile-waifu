@@ -1,0 +1,724 @@
+#!/usr/bin/env python3
+"""tw_test.py - cross-platform QA runner for Tile Waifu (replaces godot_qa.ps1).
+
+One entry point for everything the project treats as a test gate:
+
+  * every Godot selftest suite (core --*_selftest flags, v10 registry modules, a few screen-driven ones)
+  * server/e2e_test.mjs   (node, skipped with a reason if node / node:sqlite is unavailable)
+  * ux_lint.py            (static contract linter)
+
+Results are parsed from the marker lines the suites print (SELFTEST n/m, OK, FAIL ...), compared with
+tools/baseline.json and the run exits non-zero only on a REGRESSION against that baseline.
+
+Typical use:
+  python tools/tw_test.py --list
+  python tools/tw_test.py --fast                      # agent subset, a few minutes
+  python tools/tw_test.py                             # everything (+ regression check)
+  python tools/tw_test.py -s mj_riichi,economy -j 2   # chosen suites
+  python tools/tw_test.py --update-baseline           # rewrite tools/baseline.json from this run
+  python tools/tw_test.py --import                    # headless asset import (first run in a clean checkout)
+  python tools/tw_test.py --shot home --out /tmp/home.png
+
+Godot binary: --godot PATH, or $GODOT_BIN, or godot4 / godot on PATH.
+Godot 4.5.1 aborts at teardown on Linux (rc 134, "corrupted size vs. prev_size") and on Windows
+(rc 0xC0000005) AFTER all output is written; a suite is judged by its marker line, not by that rc.
+See tools/README.md.
+"""
+from __future__ import annotations
+
+import argparse
+import concurrent.futures as cf
+import json
+import os
+import re
+import shutil
+import signal
+import subprocess
+import sys
+import tempfile
+import threading
+import time
+from dataclasses import dataclass, field
+from pathlib import Path
+
+REPO = Path(__file__).resolve().parent.parent
+GAME = REPO / "game"
+BASELINE_PATH = REPO / "tools" / "baseline.json"
+UX_LINT = REPO / ".agents" / "skills" / "tw-godot-qa" / "scripts" / "ux_lint.py"
+E2E = REPO / "server" / "e2e_test.mjs"
+REGISTRY_LIST = GAME / "scripts" / "v10" / "core" / "registry_list.gd"
+
+# return codes that mean "engine aborted/crashed while tearing down"; accepted only with a green marker
+TEARDOWN_RCS = {134, -6, 139, -11, 0xC0000005, -1073741819, 3221225477}
+WIN = os.name == "nt"
+
+
+# --------------------------------------------------------------------------------------------------
+# catalog
+# --------------------------------------------------------------------------------------------------
+@dataclass
+class Suite:
+    id: str
+    kind: str = "godot"            # godot | node | python
+    group: str = "v10"             # core | v10 | extra | server | lint
+    marker: str = ""               # substring of the result line (last matching line wins)
+    scene: str = ""                # res:// scene to run (empty = main.tscn)
+    script: str = ""               # res:// script run with -s
+    args: list = field(default_factory=list)
+    fast_args: list | None = None  # replaces args in --fast runs (cheaper Monte-Carlo counts)
+    render: bool = False           # needs a display (xvfb-run on Linux without DISPLAY) + opengl3
+    res: str = ""                  # --resolution for render suites
+    timeout: int = 300             # seconds
+    fast: bool = False             # member of the --fast subset
+    soft: str = ""                 # regex of failure lines that are timing noise (perf budgets on software GL): warn only
+    note: str = ""
+
+
+def S(id, marker, scene="", args=(), fast_args=None, render=False, res="", timeout=300, fast=True,
+      group="v10", script="", note="", soft=""):
+    return Suite(id=id, marker=marker, scene=scene, script=script, args=list(args),
+                 fast_args=None if fast_args is None else list(fast_args), render=render, res=res,
+                 timeout=timeout, fast=fast, group=group, note=note, soft=soft)
+
+
+SV = "res://scripts/v10/"
+CATALOG: list[Suite] = [
+    # ---- core: run on main.tscn through user args ------------------------------------------------
+    S("contract", "CONTRACT_SELFTEST", args=["--contract_selftest=1"], group="core"),
+    S("board", "SELFTEST", args=["--selftest=1"], group="core", timeout=300),
+    S("event", "EVENT SELFTEST", args=["--event_selftest=1"], group="core"),
+    S("league", "LEAGUE", args=["--league_selftest=1"], group="core"),
+    S("profile", "PROFILE", args=["--profile_selftest=1"], group="core"),
+    S("recovery", "RECOVERY", args=["--recovery_selftest=1"], group="core"),
+    S("ults", "ULTS", args=["--ults_selftest=1"], group="core"),
+    S("letters", "LETTERS", args=["--letters_selftest=1"], group="core"),
+    # ---- v10 registry modules (docs/INTEGRATION_0.10.md; ids == V10RegistryList ids) -----------------
+    S("responsive", "LAYOUT_SELFTEST", render=True, res="1536x2048", timeout=600,
+      args=["--layout_selftest=1", "--save=user://layout_shots_save.json", "--save_wipe=1"]),
+    S("economy", "ECON_SELFTEST", SV + "economy/econ_selftest.tscn", ["--econ_selftest=1"],
+      fast_args=["--econ_selftest=1", "--econ_mc=0.1"]),
+    S("stamina", "STAMINA_SELFTEST", SV + "economy/stamina_selftest.tscn", ["--stamina_selftest=1"]),
+    S("meta", "META_SELFTEST", SV + "meta/meta_runner.tscn",
+      ["--meta_selftest=1", "--save=user://meta_runner.json", "--save_wipe=1"]),
+    S("hud2", "HUD2 SELFTEST", SV + "hud2/hud2_demo.tscn", ["--hud2_selftest=1"]),
+    S("fonts", "FONTS SELFTEST", SV + "fonts/fonts_runner.tscn", ["--fonts_selftest=1"]),
+    S("profile2", "PROFILE2_SELFTEST", SV + "profile/profile2_selftest.tscn", ["--profile2_selftest=1"]),
+    S("look", "LOOK_SELFTEST", SV + "look/look_runner.tscn", ["--look_selftest=1"]),
+    S("shop", "SHOP_SELFTEST", SV + "shop/shop_demo.tscn", ["--shop_selftest=1"]),
+    S("auth", "AUTH_SELFTEST", SV + "auth/auth_dev.tscn",
+      ["--auth_selftest=1", "--save=user://auth_selftest_save.json", "--save_wipe=1"]),
+    S("clarity", "V10 CLARITY SELFTEST", SV + "clarity/clarity_selftest.tscn"),
+    S("tutorial", "V10TUT", SV + "tutorial/tut_selftest.tscn",
+      ["--save=user://tut_test.json", "--save_wipe=1", "--tut_static=1"]),
+    S("juice", "JUICE SELFTEST", SV + "juice/demo/juice_demo.tscn", ["--juice_selftest=1"]),
+    S("levels", "LEVELS SELFTEST", SV + "levels/levels_selftest.tscn", ["--levels_selftest=1"],
+      fast_args=["--levels_selftest=1", "--levels_n=200"]),
+    S("path", "PATH SELFTEST", SV + "path/path_demo.tscn", ["--path_selftest=1"], soft=r"map builds in <\d+ ms"),
+    S("salon", "SALON_SELFTEST", SV + "salon/salon_runner.tscn", ["--salon_selftest=1"], fast=False),
+    S("rituals", "RIT_SELFTEST", SV + "rituals/rituals_runner.tscn",
+      ["--rit=selftest", "--save=user://rit_runner.json", "--save_wipe=1"]),
+    S("chat", "CHAT SELFTEST", script=SV + "chat/chat_selftest_cli.gd"),
+    S("phone", "PHONE SELFTEST", SV + "phone/phone_runner.tscn",
+      ["--save=user://phone_st.json", "--save_wipe=1", "--phone_selftest=1"], render=True, res="720x1280"),
+    S("gacha", "GACHA_SELFTEST", SV + "gacha/gacha_demo.tscn", ["--gacha_selftest=1"],
+      fast_args=["--gacha_selftest=1", "--mc=0.5"]),
+    S("rig", "RIG_SELFTEST", SV + "rig/rig_selftest.tscn"),
+    S("voice", "V10VOICE OK", SV + "voice/v10_voice_selftest.tscn"),
+    S("audio", "V10AUDIO", SV + "audio/v10_audio_selftest.tscn"),
+    S("hudfx", "HUDFX SELFTEST", SV + "hudfx/hudfx_selftest.tscn", ["--hudfx_selftest=1"]),
+    S("tower", "TOWER_SELFTEST", SV + "tower/tower_selftest.tscn", ["--tower_selftest=1"],
+      fast_args=["--mods_selftest=1", "--pagoda_selftest=1", "--journey_selftest=1", "--tower_tables=1",
+                 "--tower_rules=1", "--tower_hygiene=1"], timeout=600),
+    S("mj_stage", "MJ_STAGE", SV + "mj/stage/stage_selftest.tscn", ["--mj_stage_selftest=1"]),
+    S("mj_look", "MJ_LOOK", SV + "mj/look/look_selftest.tscn", ["--mj_look_selftest=1"], render=True, res="720x1280",
+      soft=r"^FAIL perf\.", note="perf.144_le_16ms is a frame-time budget: fails on software GL (xvfb), ok on a GPU", fast=False),
+    S("mj_triples", "MJ_TRIPLES", SV + "mj/triples/triples_selftest.tscn", ["--mj_triples_selftest=1"]),
+    S("mj_riichi", "MJ_RIICHI", SV + "mj/riichi/riichi_selftest.tscn", ["--mj_riichi_selftest=1"],
+      fast_args=["--mj_riichi_selftest=1", "--games=20"], timeout=900, fast=False),
+    S("mj_sanma", "MJ_SANMA", SV + "mj/sanma/sanma_selftest.tscn", ["--mj_sanma_selftest=1"],
+      fast_args=["--mj_sanma_selftest=1", "--games=20"], timeout=900, fast=False),
+    S("mj_koikoi", "MJ_KOIKOI", SV + "mj/koikoi/koikoi_selftest.tscn", ["--mj_koikoi_selftest=1"],
+      fast_args=["--mj_koikoi_selftest=1", "--games=100"], timeout=600),
+    S("mj_classic", "MJ_CLASSIC", SV + "mj/classic/classic_selftest.tscn", ["--mj_classic_selftest=1"], fast=False),
+    S("mj_connect", "MJ_CONNECT", SV + "mj/connect/connect_selftest.tscn", ["--mj_connect_selftest=1"], fast=False),
+    S("mj_cube", "MJ_CUBE", SV + "mj/cube/cube_selftest.tscn", ["--mj_cube_selftest=1"]),
+    S("mj_garden", "MJ_GARDEN", SV + "mj/garden/garden_selftest.tscn", ["--mj_garden_selftest=1"]),
+    S("mj_bridge", "MJ_BRIDGE", SV + "mj/bridge/bridge_selftest.tscn", ["--mj_bridge_selftest=1"], fast=False),
+    S("palm", "HAND_SELFTEST", SV + "palm/hand_selftest.tscn", ["--hand_selftest=1"],
+      fast_args=["--hand_selftest=1", "--hand_real=24"]),
+    S("duels", "DUEL_SELFTEST", SV + "duels/duel_selftest.tscn",
+      ["--duel_selftest=1", "--save=user://duel_selftest.json", "--save_wipe=1"], fast=False),
+    S("challenge", "CHALLENGE_SELFTEST", SV + "duels/challenge/challenge_selftest.tscn",
+      ["--challenge_selftest=1", "--save=user://ch_selftest.json", "--save_wipe=1"], fast=False),
+    S("wave1", "WAVE1_SELFTEST", SV + "wave1/wave1_selftest.tscn", ["--wave1_selftest=1"]),
+    S("adventure", "ADVENTURE_SELFTEST", SV + "adventure/adventure_selftest.tscn", ["--adventure_selftest=1"]),
+    S("online", "ONLINE_SELFTEST", SV + "online/online_selftest.tscn"),
+    S("events", "EVENTS_SELFTEST", SV + "events/events_selftest.tscn"),
+    # ---- extra: older suites that are not in the v10 registry ---------------------------------------
+    S("spec", "SPECIAL SELFTEST", "res://scripts/v06/special/spec_selftest.tscn", group="extra"),
+    S("summon", "SUMMON_SELFTEST", group="extra", render=True, res="720x1280",
+      args=["--unlock=10", "--screen=summon", "--shots={shots}", "--at=1.5", "--act=selftest"],
+      note="runs on the summon screen; needs a display because the dev shot hook saves a PNG"),
+    S("ult_rin", "ULT SELFTEST rin", group="extra",
+      args=["--screen=play", "--level=3", "--partner=rin", "--v9_ult_selftest=1"]),
+]
+BY_ID = {s.id: s for s in CATALOG}
+
+# external (non-Godot) gates
+EXTERNAL: list[Suite] = [
+    Suite(id="server_e2e", kind="node", group="server", marker="E2E_OK", timeout=180, fast=True),
+    Suite(id="ux_lint", kind="python", group="lint", marker="UX_LINT RESULT", timeout=120, fast=True),
+]
+for _s in EXTERNAL:
+    BY_ID[_s.id] = _s
+ALL_SUITES = CATALOG + EXTERNAL
+
+
+# --------------------------------------------------------------------------------------------------
+# result model
+# --------------------------------------------------------------------------------------------------
+@dataclass
+class Result:
+    id: str
+    status: str = "error"          # pass | fail | timeout | skip | error
+    ok: int | None = None
+    total: int | None = None
+    marker_line: str = ""
+    failures: list = field(default_factory=list)   # normalised failure ids
+    script_errors: int = 0
+    soft: list = field(default_factory=list)       # timing-noise failures that do not turn the suite red
+    rc: int | None = None
+    secs: float = 0.0
+    reason: str = ""
+    log: str = ""
+    verdict: str = ""              # filled by compare(): ok | known-fail | REGRESSION | improved | new
+
+
+def norm_fail(line: str) -> str:
+    """Stable id for a failure line: strip timestamps/ordinals that change between runs."""
+    t = ANSI_RE.sub("", line).strip()
+    t = re.sub(r"\(\d+\)\s*$", "", t)           # trailing "(58)" seed / index
+    t = re.sub(r"\[[^\]]*\]", "[..]", t)         # lists whose order/content jitters ("type sizes [44, 18]")
+    t = re.sub(r"\b\d+\.\d+\b", "N", t)         # measured floats (17.53 ms)
+    t = re.sub(r"\b\d{4,}\b", "N", t)          # long numbers (seeds, ms)
+    return t[:160]
+
+
+RATIO_RE = re.compile(r"(\d+)\s*/\s*(\d+)")
+FAIL_RE = re.compile(r"\bFAIL(?:ED|URE)?\b")
+ANSI_RE = re.compile(r"\x1b\[[0-9;]*[A-Za-z]")
+
+
+def parse_output(suite: Suite, text: str, rc: int | None, timed_out: bool) -> Result:
+    r = Result(id=suite.id, rc=rc)
+    text = ANSI_RE.sub("", text)
+    lines = [ln.rstrip("\r") for ln in text.split("\n")]
+    marker_line = ""
+    low = suite.marker.lower()
+    for ln in lines:
+        if low in ln.lower():
+            marker_line = ln.strip()
+    r.marker_line = marker_line
+    # failure ids: FAIL lines and SCRIPT ERROR lines. The marker summary line itself ("X 12/13") is not a
+    # failure line unless it says FAIL.
+    fails = []
+    for ln in lines:
+        s = ln.strip()
+        if FAIL_RE.search(s) and not s.startswith("at:"):
+            fails.append(norm_fail(s))
+    serr = [norm_fail(ln) for ln in lines if ln.lstrip().startswith("SCRIPT ERROR:")]
+    r.script_errors = len(serr)
+    if suite.soft:
+        soft_re = re.compile(suite.soft)
+        r.soft = sorted({f for f in fails if soft_re.search(f)})
+        fails = [f for f in fails if not soft_re.search(f)]
+    n_soft = sum(1 for ln in lines if suite.soft and FAIL_RE.search(ln) and re.search(suite.soft, norm_fail(ln)))
+    r.failures = sorted(set(fails) | set(serr))
+    if marker_line:
+        tail = marker_line[marker_line.lower().find(low) + len(low):]
+        m = RATIO_RE.search(tail)
+        if m:
+            r.ok, r.total = int(m.group(1)), int(m.group(2))
+    if timed_out:
+        r.status, r.reason = "timeout", "no exit within the limit"
+        return r
+    if not marker_line:
+        r.status, r.reason = "error", f"no marker line '{suite.marker}'"
+        return r
+    bad_ratio = r.ok is not None and (r.total - r.ok > n_soft or r.total == 0)
+    rc_ok = rc == 0 or (rc in TEARDOWN_RCS and not serr)
+    if bad_ratio or r.failures or not rc_ok:
+        r.status = "fail"
+        if not rc_ok:
+            r.reason = f"rc={rc}"
+    else:
+        r.status = "pass"
+    return r
+
+
+# --------------------------------------------------------------------------------------------------
+# process plumbing
+# --------------------------------------------------------------------------------------------------
+def find_godot(explicit: str | None) -> str | None:
+    for c in (explicit, os.environ.get("GODOT_BIN")):
+        if c and Path(c).exists():
+            return str(c)
+    for n in ("godot4", "godot", "Godot_v4.5.1-stable_linux.x86_64", "Godot_v4.5.1-stable_win64_console.exe"):
+        p = shutil.which(n)
+        if p:
+            return p
+    return None
+
+
+def clean_env(tmp: Path) -> dict:
+    """Per-run isolated user dir so parallel suites never share user:// saves or caches."""
+    env = dict(os.environ)
+    h = tmp / "home"
+    h.mkdir(parents=True, exist_ok=True)
+    hs = str(h)
+    env.update(HOME=hs, USERPROFILE=hs, APPDATA=hs, LOCALAPPDATA=hs, XDG_DATA_HOME=hs + "/.local/share",
+               XDG_CONFIG_HOME=hs + "/.config", XDG_CACHE_HOME=hs + "/.cache")
+    return env
+
+
+def have_display() -> bool:
+    return WIN or sys.platform == "darwin" or bool(os.environ.get("DISPLAY"))
+
+
+def kill_tree(p: subprocess.Popen):
+    try:
+        if WIN:
+            subprocess.run(["taskkill", "/F", "/T", "/PID", str(p.pid)], capture_output=True)
+        else:
+            os.killpg(os.getpgid(p.pid), signal.SIGKILL)
+    except Exception:
+        try:
+            p.kill()
+        except Exception:
+            pass
+
+
+def run_cmd(cmd: list, env: dict, timeout: float, cwd: Path | None = None):
+    t0 = time.time()
+    kw = {}
+    if not WIN:
+        kw["start_new_session"] = True
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env, cwd=cwd, **kw)
+    timed_out = False
+    try:
+        out, _ = p.communicate(timeout=timeout)
+    except subprocess.TimeoutExpired:
+        timed_out = True
+        kill_tree(p)
+        try:
+            out, _ = p.communicate(timeout=10)
+        except Exception:
+            out = b""
+    return p.returncode, out.decode("utf-8", "replace"), timed_out, time.time() - t0
+
+
+def godot_cmd(godot: str, suite: Suite, fast: bool, shots: Path, extra_godot: list) -> list:
+    cmd = []
+    if suite.render and not have_display() and shutil.which("xvfb-run"):
+        cmd += ["xvfb-run", "-a", "-s", "-screen 0 1600x2700x24"]
+    cmd.append(godot)
+    if suite.render:
+        cmd += ["--rendering-driver", "opengl3"]
+        if suite.res:
+            cmd += ["--resolution", suite.res]
+    else:
+        cmd += ["--headless"]
+    cmd += ["--audio-driver", "Dummy", "--path", str(GAME)] + extra_godot
+    if suite.script:
+        cmd += ["-s", suite.script]
+    elif suite.scene:
+        cmd.append(suite.scene)
+    ua = suite.fast_args if (fast and suite.fast_args is not None) else suite.args
+    if ua:
+        cmd.append("--")
+        cmd += [a.replace("{shots}", str(shots).replace("\\", "/")) for a in ua]
+    return cmd
+
+
+def run_suite(suite: Suite, godot: str | None, fast: bool, tscale: float, logdir: Path, extra_godot: list) -> Result:
+    timeout = suite.timeout * tscale
+    with tempfile.TemporaryDirectory(prefix=f"tw_{suite.id}_") as td:
+        tmp = Path(td)
+        env = clean_env(tmp)
+        shots = tmp / "shots"
+        shots.mkdir()
+        if suite.kind == "godot":
+            if not godot:
+                return Result(suite.id, "skip", reason="no Godot binary (set --godot / GODOT_BIN)")
+            if suite.render and not have_display() and not shutil.which("xvfb-run"):
+                return Result(suite.id, "skip", reason="needs a display and xvfb-run is not installed")
+            cmd = godot_cmd(godot, suite, fast, shots, extra_godot)
+        elif suite.kind == "node":
+            node = shutil.which("node")
+            if not node:
+                return Result(suite.id, "skip", reason="node not found")
+            cmd = [node, str(E2E)]
+        else:
+            if not UX_LINT.exists():
+                return Result(suite.id, "error", reason=f"missing {UX_LINT.relative_to(REPO)}")
+            cmd = [sys.executable, str(UX_LINT)]
+        # node's e2e spawns a server with its own temp db; keep cwd at the repo root for the lint paths
+        rc, out, timed_out, secs = run_cmd(cmd, env, timeout, cwd=REPO)
+    if suite.kind == "node":
+        res = parse_node(suite, out, rc, timed_out)
+    elif suite.kind == "python":
+        res = parse_lint(suite, out, rc, timed_out)
+    else:
+        res = parse_output(suite, out, rc, timed_out)
+    res.secs = round(secs, 1)
+    logdir.mkdir(parents=True, exist_ok=True)
+    lp = logdir / f"{suite.id}.log"
+    lp.write_text("CMD: " + " ".join(map(str, cmd)) + f"\nRC: {rc}\n\n" + out, encoding="utf-8")
+    res.log = str(lp)
+    return res
+
+
+def parse_node(suite: Suite, out: str, rc, timed_out) -> Result:
+    r = Result(suite.id, rc=rc)
+    if timed_out:
+        r.status, r.reason = "timeout", "no exit within the limit"
+        return r
+    if "ERR_UNKNOWN_BUILTIN_MODULE" in out and "sqlite" in out:
+        r.status, r.reason = "skip", "node build lacks node:sqlite (server needs node >= 22.5, engines says 24)"
+        return r
+    m = re.search(r"(\d+) passed, (\d+) failed", out)
+    if m:
+        r.ok, r.total = int(m.group(1)), int(m.group(1)) + int(m.group(2))
+    r.failures = sorted({norm_fail(ln) for ln in out.split("\n") if ln.strip().startswith("FAIL")})
+    r.marker_line = "E2E_OK" if "E2E_OK" in out else (m.group(0) if m else "")
+    r.status = "pass" if (rc == 0 and "E2E_OK" in out and not r.failures) else "fail"
+    return r
+
+
+def parse_lint(suite: Suite, out: str, rc, timed_out) -> Result:
+    r = Result(suite.id, rc=rc)
+    if timed_out:
+        r.status, r.reason = "timeout", "no exit within the limit"
+        return r
+    m = re.search(r"UX_LINT RESULT: (\w+) \((\d+) violations?\)", out)
+    r.marker_line = m.group(0) if m else ""
+    n = int(m.group(2)) if m else 0
+    # failures = the violation table rows with a non-zero count, so baseline can name them
+    r.failures = sorted({f"{row[0]} x{row[1]}" for row in re.findall(r"\|\s*([A-Z_]+)\s*\|\s*([1-9]\d*)\s*\|", out)})
+    if not m:
+        r.status, r.reason = "error", "no 'UX_LINT RESULT' line"
+    else:
+        r.status = "pass" if (rc == 0 and n == 0) else "fail"
+    return r
+
+
+# --------------------------------------------------------------------------------------------------
+# baseline
+# --------------------------------------------------------------------------------------------------
+def load_baseline(path: Path | None = None) -> dict:
+    path = path or BASELINE_PATH
+    if path.exists():
+        return json.loads(path.read_text(encoding="utf-8"))
+    return {"version": 1, "suites": {}}
+
+
+def baseline_entry(r: Result) -> dict:
+    e = {"status": r.status, "secs": r.secs}
+    if r.ok is not None:
+        e["ok"], e["total"] = r.ok, r.total
+    if r.failures:
+        e["expected_fail"] = r.failures
+    if r.marker_line:
+        e["marker"] = r.marker_line[:120]
+    return e
+
+
+def compare(r: Result, base: dict, fast: bool) -> None:
+    mode = "fast" if fast else "full"
+    entries = base.get("suites", {}).get(r.id, {})
+    entry = entries.get(mode)
+    counts_comparable = True
+    if entry is None and fast:
+        # fast counts differ from full counts: compare status / known failures against the full entry only
+        entry = entries.get("full")
+        counts_comparable = False
+    if r.status == "skip":
+        r.verdict = "skip"
+        return
+    if entry is None:
+        r.verdict = "new" if r.status == "pass" else "REGRESSION"
+        r.reason = r.reason or ("not in baseline" if r.status == "pass" else "new suite is red")
+        return
+    exp = set(entry.get("expected_fail", []))
+    new_fail = sorted(set(r.failures) - exp)
+    if entry["status"] == "pass" and r.status != "pass":
+        r.verdict, r.reason = "REGRESSION", f"was pass, now {r.status}" + (f" ({r.reason})" if r.reason else "")
+        return
+    if entry["status"] != "pass" and r.status in ("timeout", "error"):
+        r.verdict, r.reason = "REGRESSION", f"baseline {entry['status']} but now {r.status} ({r.reason})"
+        return
+    if new_fail:
+        r.verdict, r.reason = "REGRESSION", f"new failure(s): {new_fail[:3]}"
+        return
+    if counts_comparable and r.ok is not None and entry.get("ok") is not None:
+        if r.total is not None and r.total < entry["total"]:
+            r.verdict, r.reason = "REGRESSION", f"total shrank {entry['total']} -> {r.total} (checks removed?)"
+            return
+        if r.ok < entry["ok"]:
+            r.verdict, r.reason = "REGRESSION", f"ok dropped {entry['ok']} -> {r.ok}"
+            return
+        if r.ok > entry["ok"] or (r.total or 0) > entry["total"]:
+            r.verdict = "improved"
+            return
+    if r.status == "pass" and entry["status"] != "pass":
+        r.verdict = "improved"
+    elif r.status == "pass":
+        r.verdict = "ok"
+    else:
+        r.verdict = "known-fail"
+
+
+# --------------------------------------------------------------------------------------------------
+# drift check: registry modules that the catalog does not know
+# --------------------------------------------------------------------------------------------------
+def registry_ids() -> list[str]:
+    if not REGISTRY_LIST.exists():
+        return []
+    txt = REGISTRY_LIST.read_text(encoding="utf-8")
+    ids = []
+    parts = re.split(r'(?=R\.module\(")', txt)
+    for p in parts:
+        m = re.match(r'R\.module\("(\w+)"', p)
+        if m and '"selftest"' in p:
+            ids.append(m.group(1))
+    return ids
+
+
+def check_drift() -> list[str]:
+    cat = {s.id for s in CATALOG}
+    alias = {"profile": "profile2"}  # registry id 'profile' runs profile2_selftest.tscn
+    return [rid for rid in registry_ids() if alias.get(rid, rid) not in cat]
+
+
+# --------------------------------------------------------------------------------------------------
+# helper commands
+# --------------------------------------------------------------------------------------------------
+def do_import(godot: str, timeout: int) -> int:
+    with tempfile.TemporaryDirectory(prefix="tw_import_") as td:
+        env = clean_env(Path(td))
+        rc, out, to, secs = run_cmd([godot, "--headless", "--audio-driver", "Dummy", "--path", str(GAME), "--import"],
+                                    env, timeout)
+    bad = to or "SCRIPT ERROR:" in out or rc not in (0, *TEARDOWN_RCS)
+    print(f"[tw_test] import {'FAILED' if bad else 'OK'} ({secs:.0f}s, rc={rc})")
+    if bad:
+        print(out[-3000:])
+    return 1 if bad else 0
+
+
+def do_shot(godot: str, screen: str, out_png: Path, res: str, at: float, act: str, timeout: int) -> int:
+    with tempfile.TemporaryDirectory(prefix="tw_shot_") as td:
+        tmp = Path(td)
+        env = clean_env(tmp)
+        shots = tmp / "shots"
+        shots.mkdir()
+        cmd = []
+        if not have_display() and shutil.which("xvfb-run"):
+            cmd += ["xvfb-run", "-a", "-s", "-screen 0 1600x2700x24"]
+        cmd += [godot, "--rendering-driver", "opengl3", "--audio-driver", "Dummy", "--resolution", res,
+                "--path", str(GAME), "--", "--splash=1" if screen in ("splash", "title") else f"--screen={screen}",
+                "--shots=" + str(shots).replace("\\", "/"), "--name=capture", f"--at={at}", "--unlock=50",
+                "--save=user://qa_shot_save.json", "--save_wipe=1", "--story_off=1"]
+        if act:
+            cmd.append(f"--act={act}")
+        rc, out, to, secs = run_cmd(cmd, env, timeout)
+        png = shots / "capture_0.png"
+        if png.exists():
+            out_png.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy(png, out_png)
+            print(f"[tw_test] screenshot OK: {out_png} ({png.stat().st_size // 1024} KB, {secs:.0f}s)")
+            return 0
+    print(f"[tw_test] screenshot FAILED (rc={rc})\n{out[-2000:]}")
+    return 1
+
+
+# --------------------------------------------------------------------------------------------------
+# main
+# --------------------------------------------------------------------------------------------------
+MAX_DEFAULT_JOBS = 4  # see tools/README.md "Parallelism": j=cores was fastest without flakes; j=6 on 4 cores flaked a timing check
+
+
+def default_jobs() -> int:
+    return max(1, min(MAX_DEFAULT_JOBS, os.cpu_count() or 1))
+
+
+def select(args) -> list[Suite]:
+    if args.suites:
+        out = []
+        for tok in args.suites.split(","):
+            t = tok.strip().lower().removeprefix("--").split("=")[0]
+            if t in ("all", ""):
+                out += ALL_SUITES
+            elif t in ("core", "v10", "extra", "server", "lint"):
+                out += [s for s in ALL_SUITES if s.group == t]
+            else:
+                cand = t[:-len("_selftest")] if t.endswith("_selftest") else t
+                if cand not in BY_ID:
+                    raise SystemExit(f"unknown suite '{tok}'. --list shows ids.")
+                out.append(BY_ID[cand])
+        seen, res = set(), []
+        for s in out:
+            if s.id not in seen:
+                seen.add(s.id)
+                res.append(s)
+        return res
+    sel = [s for s in ALL_SUITES if s.fast] if args.fast else list(ALL_SUITES)
+    if args.skip:
+        skip = {x.strip() for x in args.skip.split(",")}
+        sel = [s for s in sel if s.id not in skip and s.group not in skip]
+    return sel
+
+
+def main(argv=None) -> int:
+    ap = argparse.ArgumentParser(description="Tile Waifu QA runner (selftests + server e2e + ux lint)")
+    ap.add_argument("-s", "--suites", help="comma list of suite ids / groups (core,v10,extra,server,lint) / all")
+    ap.add_argument("--fast", action="store_true", help="agent subset with cheap Monte-Carlo counts")
+    ap.add_argument("--skip", help="comma list of ids/groups to leave out")
+    ap.add_argument("-j", "--jobs", type=int, default=0, help=f"parallel workers (default {default_jobs()} here)")
+    ap.add_argument("--godot", help="Godot 4.5.1 binary (else $GODOT_BIN, else PATH)")
+    ap.add_argument("--timeout-scale", type=float, default=1.0, help="multiply every suite timeout")
+    ap.add_argument("--list", action="store_true", help="list suites and exit")
+    ap.add_argument("--baseline", help="baseline file to compare with / update (default tools/baseline.json)")
+    ap.add_argument("--no-baseline", action="store_true", help="do not compare with tools/baseline.json (fail on any red)")
+    ap.add_argument("--update-baseline", action="store_true", help="write this run's results into tools/baseline.json")
+    ap.add_argument("--strict", action="store_true", help="fail on known failures too (same as --no-baseline)")
+    ap.add_argument("--json", help="write full results to this file")
+    ap.add_argument("--logs", help="directory for per-suite logs (default: <tmp>/tw_test_logs)")
+    ap.add_argument("--import", dest="do_import", action="store_true", help="run headless asset import and exit")
+    ap.add_argument("--clean-import", action="store_true", help="git checkout tracked *.import churn and exit")
+    ap.add_argument("--shot", help="capture screen <name> to --out and exit")
+    ap.add_argument("--out", help="png path for --shot")
+    ap.add_argument("--res", default="450x1000")
+    ap.add_argument("--at", type=float, default=2.0)
+    ap.add_argument("--act", default="")
+    ap.add_argument("--check-drift", action="store_true", help="verify the catalog covers every V10Registry selftest")
+    ap.add_argument("--godot-arg", action="append", default=[], help="extra engine arg (before --), repeatable")
+    args = ap.parse_args(argv)
+
+    if args.list:
+        print(f"{'ID':<12} {'GROUP':<7} {'FAST':<5} {'RENDER':<6} {'TIMEOUT':>7}  MARKER")
+        for s in ALL_SUITES:
+            print(f"{s.id:<12} {s.group:<7} {'yes' if s.fast else '':<5} {'yes' if s.render else '':<6} {s.timeout:>7}  {s.marker}")
+        print(f"\n{len(ALL_SUITES)} suites ({len(CATALOG)} godot, {len(EXTERNAL)} external); "
+              f"fast subset: {sum(1 for s in ALL_SUITES if s.fast)}")
+        return 0
+    if args.check_drift:
+        miss = check_drift()
+        print("registry modules missing from tools/tw_test.py:", miss or "none")
+        return 1 if miss else 0
+    if args.clean_import:
+        d = subprocess.run(["git", "-C", str(REPO), "diff", "--name-only", "--", "*.import"],
+                           capture_output=True, text=True).stdout.split()
+        if d:
+            subprocess.run(["git", "-C", str(REPO), "checkout", "--", "*.import"], check=True)
+        print(f"[tw_test] restored {len(d)} tracked *.import file(s)")
+        return 0
+
+    godot = find_godot(args.godot)
+    if args.do_import:
+        if not godot:
+            print("Godot binary not found", file=sys.stderr)
+            return 2
+        return do_import(godot, int(600 * args.timeout_scale))
+    if args.shot:
+        if not godot or not args.out:
+            print("--shot needs a Godot binary and --out", file=sys.stderr)
+            return 2
+        return do_shot(godot, args.shot, Path(args.out), args.res, args.at, args.act, int(300 * args.timeout_scale))
+
+    suites = select(args)
+    if any(s.kind == "godot" for s in suites):
+        if not godot:
+            print("Godot binary not found: pass --godot PATH or set GODOT_BIN", file=sys.stderr)
+            return 2
+        if not (GAME / ".godot" / "global_script_class_cache.cfg").exists():
+            print("[tw_test] game/.godot missing: running the asset import first (one-off, ~2 min)")
+            if do_import(godot, int(900 * args.timeout_scale)) != 0:
+                return 2
+
+    jobs = args.jobs or default_jobs()
+    bpath = Path(args.baseline) if args.baseline else BASELINE_PATH
+    base = load_baseline(bpath)
+    logdir = Path(args.logs) if args.logs else Path(tempfile.gettempdir()) / "tw_test_logs"
+    mode = "fast" if args.fast else "full"
+
+    def weight(s: Suite) -> float:  # longest first, using recorded timings, so the pool finishes together
+        return -float(base.get("suites", {}).get(s.id, {}).get(mode, {}).get("secs", s.timeout / 10))
+
+    order = sorted(suites, key=weight)
+    print(f"[tw_test] {len(order)} suite(s), mode={mode}, jobs={jobs}, godot={godot}", flush=True)
+    results: dict[str, Result] = {}
+    lock = threading.Lock()
+    t0 = time.time()
+
+    def work(s: Suite) -> Result:
+        r = run_suite(s, godot, args.fast, args.timeout_scale, logdir, args.godot_arg)
+        with lock:
+            results[s.id] = r
+            cnt = f" {r.ok}/{r.total}" if r.ok is not None else ""
+            print(f"  [{len(results):>2}/{len(order)}] {s.id:<11} {r.status.upper():<7}{cnt:<12} {r.secs:>6.1f}s  {r.reason}", flush=True)
+        return r
+
+    with cf.ThreadPoolExecutor(max_workers=jobs) as ex:
+        list(ex.map(work, order))
+    wall = time.time() - t0
+
+    for s in suites:
+        compare(results[s.id], base, args.fast)
+
+    print(f"\n{'suite':<12} {'status':<8} {'ok/total':<12} {'secs':>6}  {'verdict':<11} marker / reason")
+    print("-" * 110)
+    for s in suites:
+        r = results[s.id]
+        cnt = f"{r.ok}/{r.total}" if r.ok is not None else "-"
+        print(f"{s.id:<12} {r.status:<8} {cnt:<12} {r.secs:>6.1f}  {r.verdict:<11} {(r.reason or r.marker_line)[:70]}")
+    rs = [results[s.id] for s in suites]
+    reg = [r for r in rs if r.verdict == "REGRESSION"]
+    n_pass = sum(1 for r in rs if r.status == "pass")
+    n_skip = sum(1 for r in rs if r.status == "skip")
+    known = [r.id for r in rs if r.verdict == "known-fail"]
+    improved = [r.id for r in rs if r.verdict == "improved"]
+    print(f"\n[tw_test] {n_pass}/{len(rs)} pass, {n_skip} skipped, known-fail {known or 'none'}, "
+          f"improved {improved or 'none'}, wall {wall:.0f}s (j={jobs}); logs: {logdir}")
+
+    if args.json:
+        Path(args.json).write_text(json.dumps({"mode": mode, "jobs": jobs, "wall": round(wall, 1),
+                                               "results": [r.__dict__ for r in rs]},
+                                              ensure_ascii=False, indent=1), encoding="utf-8")
+    if args.update_baseline:
+        base.setdefault("suites", {})
+        base["version"] = 1
+        base["godot"] = "4.5.1-stable"
+        base["updated"] = time.strftime("%Y-%m-%d")
+        for r in rs:
+            if r.status != "skip":
+                base["suites"].setdefault(r.id, {})[mode] = baseline_entry(r)
+        bpath.write_text(json.dumps(base, ensure_ascii=False, indent=1, sort_keys=True) + "\n", encoding="utf-8")
+        print(f"[tw_test] baseline updated: {bpath} ({mode})")
+        return 0
+    if args.no_baseline or args.strict:
+        bad = [r.id for r in rs if r.status not in ("pass", "skip")]
+        if bad:
+            print("[tw_test] FAIL (strict):", ", ".join(bad))
+            return 1
+        return 0
+    if reg:
+        print("[tw_test] REGRESSION vs baseline:")
+        for r in reg:
+            print(f"   {r.id}: {r.reason}   (log {r.log})")
+        return 1
+    print("[tw_test] no regression vs baseline")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

@@ -15,7 +15,7 @@ Use the bundled scripts in `./scripts/` instead of ad-hoc Godot command lines so
 
 | Script | Purpose |
 | :--- | :--- |
-| [godot_qa.ps1](./scripts/godot_qa.ps1) | PowerShell 5.1-safe 1-command runner for `--import`, `--*_selftest` suites, 20:9 / 16:9 screenshots, and tracked `*.import` cleanup. |
+| [`tools/tw_test.py`](../../../tools/tw_test.py) | Cross-platform (Linux / macOS / Windows) runner: `--import`, every Godot selftest suite + server e2e + ux_lint, regression check vs `tools/baseline.json`, `--shot` screenshots, `--clean-import`. Replaces `godot_qa.ps1` (now a thin shim). |
 | [gd_outline.py](./scripts/gd_outline.py) | Fast GDScript symbol indexer (`class_name`, `extends`, `class`, `signal`, `enum`, `const`, `func` with exact line numbers + `--search`). |
 | [ux_lint.py](./scripts/ux_lint.py) | Static pre-commit gate for `game/scripts/v10/**/*.gd` (`%` next to digits, `₽` in strings, `G.add_aff` in `salon/`, raw `res://assets/hero/%s.png`). |
 
@@ -55,43 +55,23 @@ Checked rules:
 
 ---
 
-## 3. Run Godot Import, Selftests & Screenshots (`godot_qa.ps1`)
+## 3. Run Godot Import, Selftests & Screenshots (`tools/tw_test.py`)
 
-`godot_qa.ps1` auto-discovers `Godot_v4.5.1-stable_win64_console.exe` (under `..\tw-tools\godot\` or `$env:GODOT_BIN`), creates a per-run temporary `APPDATA`/`LOCALAPPDATA` folder so parallel workers never collide on `user://` saves or shader caches, and treats Windows Godot 4.5.1's known post-`quit(0)` teardown `0xC0000005` (`-1073741819`) as green **only** when the test's pass marker matched and zero `SCRIPT ERROR:` lines occurred.
+One Python runner for all platforms (docs: [`tools/README.md`](../../../tools/README.md)). It gives every Godot process an isolated
+HOME/APPDATA (so parallel workers never share `user://`), runs suites in parallel, judges each suite by its **marker line**
+(the engine's teardown abort, rc 134 / `0xC0000005`, is accepted only when the marker is green and there is no `SCRIPT ERROR:`),
+and compares the result with `tools/baseline.json`: exit 0 = no regression, 1 = regression.
 
-### A. Headless Asset Import & `.import` Cleanup
-
-```powershell
-# Re-import new/updated assets in isolated temp APPDATA
-powershell -ExecutionPolicy Bypass -File .agents/skills/tw-godot-qa/scripts/godot_qa.ps1 -Import
-
-# Restore tracked *.import churn without touching untracked new *.import files
-powershell -ExecutionPolicy Bypass -File .agents/skills/tw-godot-qa/scripts/godot_qa.ps1 -CleanImport
+```bash
+export GODOT_BIN=/path/to/Godot_v4.5.1-stable_linux.x86_64      # or --godot PATH, or godot4 on PATH
+python tools/tw_test.py --import          # one-off headless asset import (also done automatically if game/.godot is missing)
+python tools/tw_test.py --fast            # agent subset, ~4 min on 4 cores
+python tools/tw_test.py                   # every suite (~11 min on 4 cores)
+python tools/tw_test.py -s contract,mj_riichi,server_e2e
+python tools/tw_test.py --list            # ids, groups, markers, timeouts
+python tools/tw_test.py --shot v10pvp --out /tmp/pvp.png --res 450x1000 --at 2.5
+python tools/tw_test.py --clean-import    # git checkout tracked *.import churn
 ```
 
-### B. Run Selftests (`-Tests`)
-
-Accepts short names (`contract`, `online`, `mj_triples`, `wave1`, `audio`), flag names (`--online_selftest`, `contract_selftest`), `"core"`, or `"all"` (add `-Fast` for fast Monte-Carlo counts):
-
-```powershell
-# Run targeted selftests and print summary table
-powershell -ExecutionPolicy Bypass -File .agents/skills/tw-godot-qa/scripts/godot_qa.ps1 -Tests "contract_selftest,online_selftest,mj_triples_selftest"
-
-# Run full suite (core + v10 modules) in fast mode
-powershell -ExecutionPolicy Bypass -File .agents/skills/tw-godot-qa/scripts/godot_qa.ps1 -Tests "all" -Fast
-
-# List all registered test IDs and scenes
-powershell -ExecutionPolicy Bypass -File .agents/skills/tw-godot-qa/scripts/godot_qa.ps1 -ListTests
-```
-
-### C. Capture 20:9 & 16:9 Screenshots (`-Shot`)
-
-Verify responsive layout on both tall **20:9** (`450x1000` / `720x1600`) and standard **9:16** (`720x1280`):
-
-```powershell
-# Tall 20:9 phone capture
-powershell -ExecutionPolicy Bypass -File .agents/skills/tw-godot-qa/scripts/godot_qa.ps1 -Shot "v10pvp" -Out "C:\temp\pvp_20x9.png" -Res "450x1000"
-
-# Standard 9:16 capture (custom settle delay -At 2.5)
-powershell -ExecutionPolicy Bypass -File .agents/skills/tw-godot-qa/scripts/godot_qa.ps1 -Shot "mj_triples" -Out "C:\temp\triples_9x16.png" -Res "720x1280" -At 2.5
-```
+Rendering suites (`responsive`, `phone`, `mj_look`, `summon`) need a display: on Linux without `$DISPLAY` the runner wraps them in `xvfb-run`.
+`godot_qa.ps1` is kept only as a shim that forwards to the Python runner.

@@ -1,0 +1,1111 @@
+{
+ "godot": "4.5.1-stable",
+ "suites": {
+  "adventure": {
+   "fast": {
+    "marker": "ADVENTURE_SELFTEST 147/147",
+    "ok": 147,
+    "secs": 6.5,
+    "status": "pass",
+    "total": 147
+   },
+   "full": {
+    "marker": "ADVENTURE_SELFTEST 147/147",
+    "ok": 147,
+    "secs": 6.0,
+    "status": "pass",
+    "total": 147
+   }
+  },
+  "audio": {
+   "fast": {
+    "marker": "V10AUDIO OK 339/339",
+    "ok": 339,
+    "secs": 26.4,
+    "status": "pass",
+    "total": 339
+   },
+   "full": {
+    "marker": "V10AUDIO OK 339/339",
+    "ok": 339,
+    "secs": 26.1,
+    "status": "pass",
+    "total": 339
+   }
+  },
+  "auth": {
+   "fast": {
+    "marker": "AUTH_SELFTEST 102/102",
+    "ok": 102,
+    "secs": 12.3,
+    "status": "pass",
+    "total": 102
+   },
+   "full": {
+    "marker": "AUTH_SELFTEST 102/102",
+    "ok": 102,
+    "secs": 11.6,
+    "status": "pass",
+    "total": 102
+   }
+  },
+  "board": {
+   "fast": {
+    "marker": "SELFTEST 240/240 boards solved",
+    "ok": 240,
+    "secs": 28.0,
+    "status": "pass",
+    "total": 240
+   },
+   "full": {
+    "marker": "SELFTEST 240/240 boards solved",
+    "ok": 240,
+    "secs": 23.8,
+    "status": "pass",
+    "total": 240
+   }
+  },
+  "challenge": {
+   "fast": {
+    "expected_fail": [
+     "FAIL ui: card, other version: ≤ 4 type sizes [..]",
+     "FAIL ui: card: ≤ 4 type sizes [..]",
+     "FAIL ui: home, empty: ≤ 4 type sizes [..]",
+     "FAIL ui: home, list: ≤ 4 type sizes [..]",
+     "FAIL ui: result sheet, win: ≤ 4 type sizes [..]",
+     "FAIL ui: throw sheet: ≤ 4 type sizes [..]"
+    ],
+    "marker": "CHALLENGE_SELFTEST 285/291",
+    "ok": 285,
+    "secs": 45.5,
+    "status": "fail",
+    "total": 291
+   },
+   "full": {
+    "expected_fail": [
+     "FAIL ui: card, other version: ≤ 4 type sizes [..]",
+     "FAIL ui: card: ≤ 4 type sizes [..]",
+     "FAIL ui: home, empty: ≤ 4 type sizes [..]",
+     "FAIL ui: home, list: ≤ 4 type sizes [..]",
+     "FAIL ui: result sheet, win: ≤ 4 type sizes [..]",
+     "FAIL ui: throw sheet: ≤ 4 type sizes [..]"
+    ],
+    "marker": "CHALLENGE_SELFTEST 285/291",
+    "ok": 285,
+    "secs": 44.9,
+    "status": "fail",
+    "total": 291
+   }
+  },
+  "chat": {
+   "fast": {
+    "marker": "CHAT SELFTEST 133/133",
+    "ok": 133,
+    "secs": 5.6,
+    "status": "pass",
+    "total": 133
+   },
+   "full": {
+    "marker": "CHAT SELFTEST 133/133",
+    "ok": 133,
+    "secs": 5.5,
+    "status": "pass",
+    "total": 133
+   }
+  },
+  "clarity": {
+   "fast": {
+    "marker": "V10 CLARITY SELFTEST 4672/4672",
+    "ok": 4672,
+    "secs": 5.8,
+    "status": "pass",
+    "total": 4672
+   },
+   "full": {
+    "marker": "V10 CLARITY SELFTEST 4672/4672",
+    "ok": 4672,
+    "secs": 5.5,
+    "status": "pass",
+    "total": 4672
+   }
+  },
+  "contract": {
+   "fast": {
+    "marker": "CONTRACT_SELFTEST 35/35",
+    "ok": 35,
+    "secs": 19.0,
+    "status": "pass",
+    "total": 35
+   },
+   "full": {
+    "marker": "CONTRACT_SELFTEST 35/35",
+    "ok": 35,
+    "secs": 16.7,
+    "status": "pass",
+    "total": 35
+   }
+  },
+  "duels": {
+   "fast": {
+    "marker": "DUEL_SELFTEST 175/175",
+    "ok": 175,
+    "secs": 78.1,
+    "status": "pass",
+    "total": 175
+   },
+   "full": {
+    "marker": "DUEL_SELFTEST 175/175",
+    "ok": 175,
+    "secs": 78.3,
+    "status": "pass",
+    "total": 175
+   }
+  },
+  "economy": {
+   "fast": {
+    "marker": "ECON_SELFTEST 384/384 (3.0 s)",
+    "ok": 384,
+    "secs": 8.6,
+    "status": "pass",
+    "total": 384
+   },
+   "full": {
+    "marker": "ECON_SELFTEST 384/384 (29.0 s)",
+    "ok": 384,
+    "secs": 34.5,
+    "status": "pass",
+    "total": 384
+   }
+  },
+  "event": {
+   "fast": {
+    "marker": "EVENT SELFTEST 84/84 boards solved · week par 1118/1082/1352 · bots at week end: top 2263, 5th 1948, 15th 612",
+    "ok": 84,
+    "secs": 19.0,
+    "status": "pass",
+    "total": 84
+   },
+   "full": {
+    "marker": "EVENT SELFTEST 84/84 boards solved · week par 1118/1082/1352 · bots at week end: top 2469, 5th 2245, 15th 744",
+    "ok": 84,
+    "secs": 16.0,
+    "status": "pass",
+    "total": 84
+   }
+  },
+  "events": {
+   "fast": {
+    "marker": "EVENTS_SELFTEST 63/63",
+    "ok": 63,
+    "secs": 6.8,
+    "status": "pass",
+    "total": 63
+   },
+   "full": {
+    "marker": "EVENTS_SELFTEST 63/63",
+    "ok": 63,
+    "secs": 6.9,
+    "status": "pass",
+    "total": 63
+   }
+  },
+  "fonts": {
+   "fast": {
+    "marker": "FONTS SELFTEST: 276 ok, 0 failed (fonts 690432 bytes)",
+    "secs": 5.3,
+    "status": "pass"
+   },
+   "full": {
+    "marker": "FONTS SELFTEST: 276 ok, 0 failed (fonts 690432 bytes)",
+    "secs": 5.5,
+    "status": "pass"
+   }
+  },
+  "gacha": {
+   "fast": {
+    "marker": "GACHA_SELFTEST 115/115",
+    "ok": 115,
+    "secs": 11.5,
+    "status": "pass",
+    "total": 115
+   },
+   "full": {
+    "marker": "GACHA_SELFTEST 115/115",
+    "ok": 115,
+    "secs": 13.4,
+    "status": "pass",
+    "total": 115
+   }
+  },
+  "hud2": {
+   "fast": {
+    "marker": "HUD2 SELFTEST 854/854 OK",
+    "ok": 854,
+    "secs": 8.8,
+    "status": "pass",
+    "total": 854
+   },
+   "full": {
+    "marker": "HUD2 SELFTEST 854/854 OK",
+    "ok": 854,
+    "secs": 8.6,
+    "status": "pass",
+    "total": 854
+   }
+  },
+  "hudfx": {
+   "fast": {
+    "marker": "HUDFX SELFTEST 1129/1129",
+    "ok": 1129,
+    "secs": 16.0,
+    "status": "pass",
+    "total": 1129
+   },
+   "full": {
+    "marker": "HUDFX SELFTEST 1129/1129",
+    "ok": 1129,
+    "secs": 15.6,
+    "status": "pass",
+    "total": 1129
+   }
+  },
+  "juice": {
+   "fast": {
+    "marker": "JUICE SELFTEST 56/56",
+    "ok": 56,
+    "secs": 9.1,
+    "status": "pass",
+    "total": 56
+   },
+   "full": {
+    "marker": "JUICE SELFTEST 56/56",
+    "ok": 56,
+    "secs": 9.0,
+    "status": "pass",
+    "total": 56
+   }
+  },
+  "league": {
+   "fast": {
+    "marker": "LEAGUE SELFTEST 1131/1131",
+    "ok": 1131,
+    "secs": 15.9,
+    "status": "pass",
+    "total": 1131
+   },
+   "full": {
+    "marker": "LEAGUE SELFTEST 1131/1131",
+    "ok": 1131,
+    "secs": 14.1,
+    "status": "pass",
+    "total": 1131
+   }
+  },
+  "letters": {
+   "fast": {
+    "expected_fail": [
+     "LETTERS FAIL: kohaku combo: 2+ variants",
+     "LETTERS FAIL: kohaku comeback: 2+ variants",
+     "LETTERS FAIL: kohaku first_win: 2+ variants",
+     "LETTERS FAIL: kohaku rank: 2+ variants",
+     "LETTERS FAIL: kohaku sign / ps",
+     "LETTERS FAIL: miel combo: 2+ variants",
+     "LETTERS FAIL: miel comeback: 2+ variants",
+     "LETTERS FAIL: miel first_win: 2+ variants",
+     "LETTERS FAIL: miel rank: 2+ variants",
+     "LETTERS FAIL: miel sign / ps",
+     "LETTERS FAIL: shirin combo: 2+ variants",
+     "LETTERS FAIL: shirin comeback: 2+ variants",
+     "LETTERS FAIL: shirin first_win: 2+ variants",
+     "LETTERS FAIL: shirin rank: 2+ variants",
+     "LETTERS FAIL: shirin sign / ps",
+     "LETTERS FAIL: tsubame combo: 2+ variants",
+     "LETTERS FAIL: tsubame comeback: 2+ variants",
+     "LETTERS FAIL: tsubame first_win: 2+ variants",
+     "LETTERS FAIL: tsubame rank: 2+ variants",
+     "LETTERS FAIL: tsubame sign / ps",
+     "LETTERS FAIL: zlata combo: 2+ variants",
+     "LETTERS FAIL: zlata comeback: 2+ variants",
+     "LETTERS FAIL: zlata first_win: 2+ variants",
+     "LETTERS FAIL: zlata rank: 2+ variants",
+     "LETTERS FAIL: zlata sign / ps",
+     "SCRIPT ERROR: Invalid access to property or key 'hand' on a base object of type 'Dictionary'."
+    ],
+    "marker": "LETTERS SELFTEST 4330/4355",
+    "ok": 4330,
+    "secs": 13.3,
+    "status": "fail",
+    "total": 4355
+   },
+   "full": {
+    "expected_fail": [
+     "LETTERS FAIL: kohaku combo: 2+ variants",
+     "LETTERS FAIL: kohaku comeback: 2+ variants",
+     "LETTERS FAIL: kohaku first_win: 2+ variants",
+     "LETTERS FAIL: kohaku rank: 2+ variants",
+     "LETTERS FAIL: kohaku sign / ps",
+     "LETTERS FAIL: miel combo: 2+ variants",
+     "LETTERS FAIL: miel comeback: 2+ variants",
+     "LETTERS FAIL: miel first_win: 2+ variants",
+     "LETTERS FAIL: miel rank: 2+ variants",
+     "LETTERS FAIL: miel sign / ps",
+     "LETTERS FAIL: shirin combo: 2+ variants",
+     "LETTERS FAIL: shirin comeback: 2+ variants",
+     "LETTERS FAIL: shirin first_win: 2+ variants",
+     "LETTERS FAIL: shirin rank: 2+ variants",
+     "LETTERS FAIL: shirin sign / ps",
+     "LETTERS FAIL: tsubame combo: 2+ variants",
+     "LETTERS FAIL: tsubame comeback: 2+ variants",
+     "LETTERS FAIL: tsubame first_win: 2+ variants",
+     "LETTERS FAIL: tsubame rank: 2+ variants",
+     "LETTERS FAIL: tsubame sign / ps",
+     "LETTERS FAIL: zlata combo: 2+ variants",
+     "LETTERS FAIL: zlata comeback: 2+ variants",
+     "LETTERS FAIL: zlata first_win: 2+ variants",
+     "LETTERS FAIL: zlata rank: 2+ variants",
+     "LETTERS FAIL: zlata sign / ps",
+     "SCRIPT ERROR: Invalid access to property or key 'hand' on a base object of type 'Dictionary'."
+    ],
+    "marker": "LETTERS SELFTEST 4330/4355",
+    "ok": 4330,
+    "secs": 13.2,
+    "status": "fail",
+    "total": 4355
+   }
+  },
+  "levels": {
+   "fast": {
+    "marker": "LEVELS SELFTEST OK 200 levels: certificate 200/200 solvable",
+    "ok": 200,
+    "secs": 18.6,
+    "status": "pass",
+    "total": 200
+   },
+   "full": {
+    "marker": "LEVELS SELFTEST OK 1000 levels: certificate 1000/1000 solvable",
+    "ok": 1000,
+    "secs": 78.9,
+    "status": "pass",
+    "total": 1000
+   }
+  },
+  "look": {
+   "fast": {
+    "marker": "LOOK_SELFTEST 760/760 OK",
+    "ok": 760,
+    "secs": 8.6,
+    "status": "pass",
+    "total": 760
+   },
+   "full": {
+    "marker": "LOOK_SELFTEST 760/760 OK",
+    "ok": 760,
+    "secs": 8.6,
+    "status": "pass",
+    "total": 760
+   }
+  },
+  "meta": {
+   "fast": {
+    "marker": "META_SELFTEST 190/190 (meta 23/23, bond 13/13, notify 25/25, entry 7/7, lint 31/31, save 14/14, winbar 22/22, more 8/8, ",
+    "ok": 190,
+    "secs": 6.1,
+    "status": "pass",
+    "total": 190
+   },
+   "full": {
+    "marker": "META_SELFTEST 190/190 (meta 23/23, bond 13/13, notify 25/25, entry 7/7, lint 31/31, save 14/14, winbar 22/22, more 8/8, ",
+    "ok": 190,
+    "secs": 5.9,
+    "status": "pass",
+    "total": 190
+   }
+  },
+  "mj_bridge": {
+   "fast": {
+    "marker": "MJ_BRIDGE 23/23 (41395 ms)",
+    "ok": 23,
+    "secs": 47.1,
+    "status": "pass",
+    "total": 23
+   },
+   "full": {
+    "marker": "MJ_BRIDGE 23/23 (40440 ms)",
+    "ok": 23,
+    "secs": 46.4,
+    "status": "pass",
+    "total": 23
+   }
+  },
+  "mj_classic": {
+   "fast": {
+    "marker": "MJ_CLASSIC 269/269",
+    "ok": 269,
+    "secs": 62.5,
+    "status": "pass",
+    "total": 269
+   },
+   "full": {
+    "marker": "MJ_CLASSIC 269/269",
+    "ok": 269,
+    "secs": 63.1,
+    "status": "pass",
+    "total": 269
+   }
+  },
+  "mj_connect": {
+   "fast": {
+    "marker": "MJ_CONNECT 111/111 (25800 ms)",
+    "ok": 111,
+    "secs": 31.7,
+    "status": "pass",
+    "total": 111
+   },
+   "full": {
+    "marker": "MJ_CONNECT 111/111 (25963 ms)",
+    "ok": 111,
+    "secs": 31.7,
+    "status": "pass",
+    "total": 111
+   }
+  },
+  "mj_cube": {
+   "fast": {
+    "marker": "MJ_CUBE 34/34 (4365 ms)",
+    "ok": 34,
+    "secs": 10.3,
+    "status": "pass",
+    "total": 34
+   },
+   "full": {
+    "marker": "MJ_CUBE 34/34 (4082 ms)",
+    "ok": 34,
+    "secs": 9.3,
+    "status": "pass",
+    "total": 34
+   }
+  },
+  "mj_garden": {
+   "fast": {
+    "marker": "MJ_GARDEN 88/88 (13154 ms)",
+    "ok": 88,
+    "secs": 19.3,
+    "status": "pass",
+    "total": 88
+   },
+   "full": {
+    "marker": "MJ_GARDEN 88/88 (13203 ms)",
+    "ok": 88,
+    "secs": 18.9,
+    "status": "pass",
+    "total": 88
+   }
+  },
+  "mj_koikoi": {
+   "fast": {
+    "marker": "MJ_KOIKOI 138/138 (2.3 s)",
+    "ok": 138,
+    "secs": 8.5,
+    "status": "pass",
+    "total": 138
+   },
+   "full": {
+    "marker": "MJ_KOIKOI 138/138 (15.0 s)",
+    "ok": 138,
+    "secs": 20.3,
+    "status": "pass",
+    "total": 138
+   }
+  },
+  "mj_look": {
+   "fast": {
+    "marker": "MJ_LOOK 620/621",
+    "ok": 620,
+    "secs": 21.5,
+    "status": "pass",
+    "total": 621
+   },
+   "full": {
+    "marker": "MJ_LOOK 620/621",
+    "ok": 620,
+    "secs": 18.7,
+    "status": "pass",
+    "total": 621
+   }
+  },
+  "mj_riichi": {
+   "fast": {
+    "marker": "MJ_RIICHI 97/97",
+    "ok": 97,
+    "secs": 60.7,
+    "status": "pass",
+    "total": 97
+   },
+   "full": {
+    "marker": "MJ_RIICHI 97/97",
+    "ok": 97,
+    "secs": 378.4,
+    "status": "pass",
+    "total": 97
+   }
+  },
+  "mj_sanma": {
+   "fast": {
+    "marker": "MJ_SANMA 70/70 (28.1 s)",
+    "ok": 70,
+    "secs": 33.7,
+    "status": "pass",
+    "total": 70
+   },
+   "full": {
+    "marker": "MJ_SANMA 70/70 (185.2 s)",
+    "ok": 70,
+    "secs": 190.8,
+    "status": "pass",
+    "total": 70
+   }
+  },
+  "mj_stage": {
+   "fast": {
+    "marker": "MJ_STAGE 125/125",
+    "ok": 125,
+    "secs": 30.5,
+    "status": "pass",
+    "total": 125
+   },
+   "full": {
+    "marker": "MJ_STAGE 125/125",
+    "ok": 125,
+    "secs": 30.4,
+    "status": "pass",
+    "total": 125
+   }
+  },
+  "mj_triples": {
+   "fast": {
+    "marker": "MJ_TRIPLES 2736/2736 (15529 ms)",
+    "ok": 2736,
+    "secs": 21.2,
+    "status": "pass",
+    "total": 2736
+   },
+   "full": {
+    "marker": "MJ_TRIPLES 2736/2736 (15106 ms)",
+    "ok": 2736,
+    "secs": 20.7,
+    "status": "pass",
+    "total": 2736
+   }
+  },
+  "online": {
+   "fast": {
+    "marker": "ONLINE_SELFTEST 83/83 PASS",
+    "ok": 83,
+    "secs": 18.3,
+    "status": "pass",
+    "total": 83
+   },
+   "full": {
+    "marker": "ONLINE_SELFTEST 83/83 PASS",
+    "ok": 83,
+    "secs": 18.0,
+    "status": "pass",
+    "total": 83
+   }
+  },
+  "palm": {
+   "fast": {
+    "marker": "HAND_SELFTEST 163/163 (17.9 s)",
+    "ok": 163,
+    "secs": 23.6,
+    "status": "pass",
+    "total": 163
+   },
+   "full": {
+    "marker": "HAND_SELFTEST 163/163 (31.5 s)",
+    "ok": 163,
+    "secs": 36.9,
+    "status": "pass",
+    "total": 163
+   }
+  },
+  "path": {
+   "fast": {
+    "marker": "PATH SELFTEST 141/141 (levels 30/30, peaks 12/12, legend 10/10, boosters 24/24, wind 7/7, jam 4/4, ui 26/26, ux 28/28) 1",
+    "ok": 141,
+    "secs": 7.8,
+    "status": "pass",
+    "total": 141
+   },
+   "full": {
+    "marker": "PATH SELFTEST 141/141 (levels 30/30, peaks 12/12, legend 10/10, boosters 24/24, wind 7/7, jam 4/4, ui 26/26, ux 28/28) 1",
+    "ok": 141,
+    "secs": 7.6,
+    "status": "pass",
+    "total": 141
+   }
+  },
+  "phone": {
+   "fast": {
+    "marker": "PHONE SELFTEST 50/50",
+    "ok": 50,
+    "secs": 9.8,
+    "status": "pass",
+    "total": 50
+   },
+   "full": {
+    "marker": "PHONE SELFTEST 50/50",
+    "ok": 50,
+    "secs": 10.2,
+    "status": "pass",
+    "total": 50
+   }
+  },
+  "profile": {
+   "fast": {
+    "marker": "PROFILE SELFTEST 13/13",
+    "ok": 13,
+    "secs": 15.6,
+    "status": "pass",
+    "total": 13
+   },
+   "full": {
+    "marker": "PROFILE SELFTEST 13/13",
+    "ok": 13,
+    "secs": 14.3,
+    "status": "pass",
+    "total": 13
+   }
+  },
+  "profile2": {
+   "fast": {
+    "expected_fail": [
+     "FAIL unreleased goddess frame hidden",
+     "FAIL unreleased goddess frame invalid",
+     "SCRIPT ERROR: Cannot call method 'get_width' on a null value.",
+     "SCRIPT ERROR: Invalid access to property or key 'material' on a base object of type 'Nil'."
+    ],
+    "marker": "PROFILE2_SELFTEST 110/112",
+    "ok": 110,
+    "secs": 8.2,
+    "status": "fail",
+    "total": 112
+   },
+   "full": {
+    "expected_fail": [
+     "FAIL unreleased goddess frame hidden",
+     "FAIL unreleased goddess frame invalid",
+     "SCRIPT ERROR: Cannot call method 'get_width' on a null value.",
+     "SCRIPT ERROR: Invalid access to property or key 'material' on a base object of type 'Nil'."
+    ],
+    "marker": "PROFILE2_SELFTEST 110/112",
+    "ok": 110,
+    "secs": 8.4,
+    "status": "fail",
+    "total": 112
+   }
+  },
+  "recovery": {
+   "fast": {
+    "marker": "RECOVERY SELFTEST 66/66",
+    "ok": 66,
+    "secs": 13.6,
+    "status": "pass",
+    "total": 66
+   },
+   "full": {
+    "marker": "RECOVERY SELFTEST 66/66",
+    "ok": 66,
+    "secs": 13.5,
+    "status": "pass",
+    "total": 66
+   }
+  },
+  "responsive": {
+   "fast": {
+    "marker": "LAYOUT_SELFTEST 174/174",
+    "ok": 174,
+    "secs": 17.3,
+    "status": "pass",
+    "total": 174
+   },
+   "full": {
+    "marker": "LAYOUT_SELFTEST 174/174",
+    "ok": 174,
+    "secs": 16.8,
+    "status": "pass",
+    "total": 174
+   }
+  },
+  "rig": {
+   "fast": {
+    "marker": "RIG_SELFTEST 214/214",
+    "ok": 214,
+    "secs": 6.8,
+    "status": "pass",
+    "total": 214
+   },
+   "full": {
+    "marker": "RIG_SELFTEST 214/214",
+    "ok": 214,
+    "secs": 6.7,
+    "status": "pass",
+    "total": 214
+   }
+  },
+  "rituals": {
+   "fast": {
+    "marker": "RIT_SELFTEST 144/144",
+    "ok": 144,
+    "secs": 5.7,
+    "status": "pass",
+    "total": 144
+   },
+   "full": {
+    "marker": "RIT_SELFTEST 144/144",
+    "ok": 144,
+    "secs": 5.7,
+    "status": "pass",
+    "total": 144
+   }
+  },
+  "salon": {
+   "fast": {
+    "marker": "SALON_SELFTEST 348/348",
+    "ok": 348,
+    "secs": 38.8,
+    "status": "pass",
+    "total": 348
+   },
+   "full": {
+    "marker": "SALON_SELFTEST 348/348",
+    "ok": 348,
+    "secs": 39.0,
+    "status": "pass",
+    "total": 348
+   }
+  },
+  "server_e2e": {
+   "fast": {
+    "marker": "E2E_OK",
+    "ok": 60,
+    "secs": 4.3,
+    "status": "pass",
+    "total": 60
+   },
+   "full": {
+    "marker": "E2E_OK",
+    "ok": 60,
+    "secs": 5.4,
+    "status": "pass",
+    "total": 60
+   }
+  },
+  "shop": {
+   "fast": {
+    "marker": "SHOP_SELFTEST 682/682",
+    "ok": 682,
+    "secs": 8.5,
+    "status": "pass",
+    "total": 682
+   },
+   "full": {
+    "marker": "SHOP_SELFTEST 682/682",
+    "ok": 682,
+    "secs": 7.7,
+    "status": "pass",
+    "total": 682
+   }
+  },
+  "spec": {
+   "fast": {
+    "marker": "SPECIAL SELFTEST solver 288/288 solved; greedy plain 156/288, greedy with specials 156/288; kinds { \"gift\": 24 }; unstic",
+    "ok": 288,
+    "secs": 24.2,
+    "status": "pass",
+    "total": 288
+   },
+   "full": {
+    "marker": "SPECIAL SELFTEST solver 288/288 solved; greedy plain 156/288, greedy with specials 156/288; kinds { \"gift\": 24 }; unstic",
+    "ok": 288,
+    "secs": 23.7,
+    "status": "pass",
+    "total": 288
+   }
+  },
+  "stamina": {
+   "fast": {
+    "marker": "STAMINA_SELFTEST 98/98",
+    "ok": 98,
+    "secs": 5.8,
+    "status": "pass",
+    "total": 98
+   },
+   "full": {
+    "marker": "STAMINA_SELFTEST 98/98",
+    "ok": 98,
+    "secs": 5.5,
+    "status": "pass",
+    "total": 98
+   }
+  },
+  "summon": {
+   "fast": {
+    "expected_fail": [
+     "SUMMON_SELFTEST FAIL: guar replay = G.pull ",
+     "SUMMON_SELFTEST FAIL: pity replay = G.pull "
+    ],
+    "marker": "SUMMON_SELFTEST 45/56",
+    "ok": 45,
+    "secs": 18.0,
+    "status": "fail",
+    "total": 56
+   },
+   "full": {
+    "expected_fail": [
+     "SUMMON_SELFTEST FAIL: guar replay = G.pull ",
+     "SUMMON_SELFTEST FAIL: pity replay = G.pull "
+    ],
+    "marker": "SUMMON_SELFTEST 45/56",
+    "ok": 45,
+    "secs": 17.7,
+    "status": "fail",
+    "total": 56
+   }
+  },
+  "tower": {
+   "fast": {
+    "marker": "TOWER_SELFTEST 198/198 (1.8 s)",
+    "ok": 198,
+    "secs": 11.5,
+    "status": "pass",
+    "total": 198
+   },
+   "full": {
+    "expected_fail": [
+     "FAIL 720x1280 last48: <= 4 type sizes [..]",
+     "FAIL 720x1280 new: <= 4 type sizes [..]",
+     "FAIL 720x1280 result (part C window): <= 4 type sizes [..]",
+     "FAIL 720x1280 run: <= 4 type sizes [..]",
+     "FAIL 720x1280 spent: <= 4 type sizes [..]",
+     "FAIL 720x1280 table: <= 4 type sizes [..]",
+     "FAIL 720x1280 table_unranked: <= 4 type sizes [..]",
+     "FAIL 720x1600 last48: <= 4 type sizes [..]",
+     "FAIL 720x1600 new: <= 4 type sizes [..]",
+     "FAIL 720x1600 result (part C window): <= 4 type sizes [..]",
+     "FAIL 720x1600 run: <= 4 type sizes [..]",
+     "FAIL 720x1600 spent: <= 4 type sizes [..]",
+     "FAIL 720x1600 table: <= 4 type sizes [..]",
+     "FAIL 720x1600 table_unranked: <= 4 type sizes [..]",
+     "FAIL [..] 720x1280 last48: <= 4 type sizes [..]",
+     "FAIL [..] 720x1280 new: <= 4 type sizes [..]",
+     "FAIL [..] 720x1280 result (part C window): <= 4 type sizes [..]",
+     "FAIL [..] 720x1280 run: <= 4 type sizes [..]",
+     "FAIL [..] 720x1280 spent: <= 4 type sizes [..]",
+     "FAIL [..] 720x1280 table: <= 4 type sizes [..]",
+     "FAIL [..] 720x1280 table_unranked: <= 4 type sizes [..]",
+     "FAIL [..] 720x1600 last48: <= 4 type sizes [..]",
+     "FAIL [..] 720x1600 new: <= 4 type sizes [..]",
+     "FAIL [..] 720x1600 result (part C window): <= 4 type sizes [..]",
+     "FAIL [..] 720x1600 run: <= 4 type sizes [..]",
+     "FAIL [..] 720x1600 spent: <= 4 type sizes [..]",
+     "FAIL [..] 720x1600 table: <= 4 type sizes [..]",
+     "FAIL [..] 720x1600 table_unranked: <= 4 type sizes [..]",
+     "FAIL [..] fresh@720x1280: ≤ 4 type sizes + overline ([..])",
+     "FAIL [..] fresh@720x1600: ≤ 4 type sizes + overline ([..])",
+     "FAIL [..] heat12@720x1280: ≤ 4 type sizes + overline ([..])",
+     "FAIL [..] heat12@720x1600: ≤ 4 type sizes + overline ([..])",
+     "FAIL [..] heat18@720x1280: ≤ 4 type sizes + overline ([..])",
+     "FAIL [..] heat18@720x1600: ≤ 4 type sizes + overline ([..])",
+     "FAIL [..] partner@720x1280: ≤ 4 type sizes + overline ([..])",
+     "FAIL [..] partner@720x1600: ≤ 4 type sizes + overline ([..])",
+     "FAIL [..] rec_h0@720x1280: ≤ 4 type sizes + overline ([..])",
+     "FAIL [..] rec_h0@720x1600: ≤ 4 type sizes + overline ([..])",
+     "FAIL [..] rec_h16@720x1280: ≤ 4 type sizes + overline ([..])",
+     "FAIL [..] rec_h16@720x1600: ≤ 4 type sizes + overline ([..])",
+     "FAIL [..] rec_h8@720x1280: ≤ 4 type sizes + overline ([..])",
+     "FAIL [..] rec_h8@720x1600: ≤ 4 type sizes + overline ([..])",
+     "FAIL [..] records_heroines@720x1280: ≤ 4 type sizes + overline ([..])",
+     "FAIL [..] records_heroines@720x1600: ≤ 4 type sizes + overline ([..])",
+     "FAIL [..] records_week@720x1280: ≤ 4 type sizes + overline ([..])",
+     "FAIL [..] records_week@720x1600: ≤ 4 type sizes + overline ([..])",
+     "FAIL [..] run7@720x1280: ≤ 4 type sizes + overline ([..])",
+     "FAIL [..] run7@720x1600: ≤ 4 type sizes + overline ([..])",
+     "FAIL [..] scroll@720x1280: ≤ 4 type sizes + overline ([..])",
+     "FAIL [..] scroll@720x1600: ≤ 4 type sizes + overline ([..])",
+     "FAIL [..] scroll_grey@720x1280: ≤ 4 type sizes + overline ([..])",
+     "FAIL [..] scroll_grey@720x1600: ≤ 4 type sizes + overline ([..])",
+     "FAIL fresh@720x1280: ≤ 4 type sizes + overline ([..])",
+     "FAIL fresh@720x1600: ≤ 4 type sizes + overline ([..])",
+     "FAIL heat12@720x1280: ≤ 4 type sizes + overline ([..])",
+     "FAIL heat12@720x1600: ≤ 4 type sizes + overline ([..])",
+     "FAIL heat18@720x1280: ≤ 4 type sizes + overline ([..])",
+     "FAIL heat18@720x1600: ≤ 4 type sizes + overline ([..])",
+     "FAIL partner@720x1280: ≤ 4 type sizes + overline ([..])",
+     "FAIL partner@720x1600: ≤ 4 type sizes + overline ([..])",
+     "FAIL rec_h0@720x1280: ≤ 4 type sizes + overline ([..])",
+     "FAIL rec_h0@720x1600: ≤ 4 type sizes + overline ([..])",
+     "FAIL rec_h16@720x1280: ≤ 4 type sizes + overline ([..])",
+     "FAIL rec_h16@720x1600: ≤ 4 type sizes + overline ([..])",
+     "FAIL rec_h8@720x1280: ≤ 4 type sizes + overline ([..])",
+     "FAIL rec_h8@720x1600: ≤ 4 type sizes + overline ([..])",
+     "FAIL records_heroines@720x1280: ≤ 4 type sizes + overline ([..])",
+     "FAIL records_heroines@720x1600: ≤ 4 type sizes + overline ([..])",
+     "FAIL records_week@720x1280: ≤ 4 type sizes + overline ([..])",
+     "FAIL records_week@720x1600: ≤ 4 type sizes + overline ([..])",
+     "FAIL run7@720x1280: ≤ 4 type sizes + overline ([..])",
+     "FAIL run7@720x1600: ≤ 4 type sizes + overline ([..])",
+     "FAIL scroll@720x1280: ≤ 4 type sizes + overline ([..])",
+     "FAIL scroll@720x1600: ≤ 4 type sizes + overline ([..])",
+     "FAIL scroll_grey@720x1280: ≤ 4 type sizes + overline ([..])",
+     "FAIL scroll_grey@720x1600: ≤ 4 type sizes + overline ([..])"
+    ],
+    "marker": "TOWER_SELFTEST 6842/6880 (275.5 s)",
+    "ok": 6842,
+    "secs": 353.4,
+    "status": "fail",
+    "total": 6880
+   }
+  },
+  "tutorial": {
+   "fast": {
+    "marker": "V10TUT 2757/2757 (code 61/61, lint 2412/2412, gates 39/39, geom 100/100, help 85/85, logic 60/60)",
+    "ok": 2757,
+    "secs": 9.1,
+    "status": "pass",
+    "total": 2757
+   },
+   "full": {
+    "marker": "V10TUT 2757/2757 (code 61/61, lint 2412/2412, gates 39/39, geom 100/100, help 85/85, logic 60/60)",
+    "ok": 2757,
+    "secs": 8.8,
+    "status": "pass",
+    "total": 2757
+   }
+  },
+  "ult_rin": {
+   "fast": {
+    "marker": "ULT SELFTEST rin 22/22",
+    "ok": 22,
+    "secs": 18.3,
+    "status": "pass",
+    "total": 22
+   },
+   "full": {
+    "marker": "ULT SELFTEST rin 22/22",
+    "ok": 22,
+    "secs": 18.1,
+    "status": "pass",
+    "total": 22
+   }
+  },
+  "ults": {
+   "fast": {
+    "expected_fail": [
+     "SCRIPT ERROR: Invalid access to property or key 'tsubame' on a base object of type 'Dictionary'.",
+     "ULTS FAIL: ULTS has ko_base",
+     "ULTS FAIL: ULTS has ko_kyubi",
+     "ULTS FAIL: ULTS has ko_matsuri",
+     "ULTS FAIL: ULTS has ko_vow",
+     "ULTS FAIL: ULTS has me_base",
+     "ULTS FAIL: ULTS has me_gala",
+     "ULTS FAIL: ULTS has me_parlor",
+     "ULTS FAIL: ULTS has sh_base",
+     "ULTS FAIL: ULTS has sh_night",
+     "ULTS FAIL: ULTS has sh_oasis",
+     "ULTS FAIL: ULTS has sh_sun",
+     "ULTS FAIL: ULTS has tb_base",
+     "ULTS FAIL: ULTS has tb_crimson",
+     "ULTS FAIL: ULTS has tb_post",
+     "ULTS FAIL: ULTS has zl_base",
+     "ULTS FAIL: ULTS has zl_ember",
+     "ULTS FAIL: ULTS has zl_fair",
+     "ULTS FAIL: ULTS has zl_vow",
+     "ULTS FAIL: core for tsubame",
+     "ULTS FAIL: targets per §2 { \"mc\": \"pair\", \"rin\": \"none\", \"hana\": \"swipe\", \"yue\": \"row\", \"nova\": \"tier\", \"tsubame\": \"pair\", \"miel\": \"pair\", \"kohaku\": \"pair\", \"sh"
+    ],
+    "marker": "ULTS SELFTEST 662/682",
+    "ok": 662,
+    "secs": 13.4,
+    "status": "fail",
+    "total": 682
+   },
+   "full": {
+    "expected_fail": [
+     "SCRIPT ERROR: Invalid access to property or key 'tsubame' on a base object of type 'Dictionary'.",
+     "ULTS FAIL: ULTS has ko_base",
+     "ULTS FAIL: ULTS has ko_kyubi",
+     "ULTS FAIL: ULTS has ko_matsuri",
+     "ULTS FAIL: ULTS has ko_vow",
+     "ULTS FAIL: ULTS has me_base",
+     "ULTS FAIL: ULTS has me_gala",
+     "ULTS FAIL: ULTS has me_parlor",
+     "ULTS FAIL: ULTS has sh_base",
+     "ULTS FAIL: ULTS has sh_night",
+     "ULTS FAIL: ULTS has sh_oasis",
+     "ULTS FAIL: ULTS has sh_sun",
+     "ULTS FAIL: ULTS has tb_base",
+     "ULTS FAIL: ULTS has tb_crimson",
+     "ULTS FAIL: ULTS has tb_post",
+     "ULTS FAIL: ULTS has zl_base",
+     "ULTS FAIL: ULTS has zl_ember",
+     "ULTS FAIL: ULTS has zl_fair",
+     "ULTS FAIL: ULTS has zl_vow",
+     "ULTS FAIL: core for tsubame",
+     "ULTS FAIL: targets per §2 { \"mc\": \"pair\", \"rin\": \"none\", \"hana\": \"swipe\", \"yue\": \"row\", \"nova\": \"tier\", \"tsubame\": \"pair\", \"miel\": \"pair\", \"kohaku\": \"pair\", \"sh"
+    ],
+    "marker": "ULTS SELFTEST 662/682",
+    "ok": 662,
+    "secs": 13.2,
+    "status": "fail",
+    "total": 682
+   }
+  },
+  "ux_lint": {
+   "fast": {
+    "marker": "UX_LINT RESULT: OK (0 violations)",
+    "secs": 2.0,
+    "status": "pass"
+   },
+   "full": {
+    "marker": "UX_LINT RESULT: OK (0 violations)",
+    "secs": 2.0,
+    "status": "pass"
+   }
+  },
+  "voice": {
+   "fast": {
+    "marker": "V10VOICE OK 1972/1972",
+    "ok": 1972,
+    "secs": 5.6,
+    "status": "pass",
+    "total": 1972
+   },
+   "full": {
+    "marker": "V10VOICE OK 1972/1972",
+    "ok": 1972,
+    "secs": 5.6,
+    "status": "pass",
+    "total": 1972
+   }
+  },
+  "wave1": {
+   "fast": {
+    "marker": "WAVE1_SELFTEST 221/221",
+    "ok": 221,
+    "secs": 8.1,
+    "status": "pass",
+    "total": 221
+   },
+   "full": {
+    "marker": "WAVE1_SELFTEST 221/221",
+    "ok": 221,
+    "secs": 7.6,
+    "status": "pass",
+    "total": 221
+   }
+  }
+ },
+ "updated": "2026-11-27",
+ "version": 1
+}

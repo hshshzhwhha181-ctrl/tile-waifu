@@ -1,0 +1,81 @@
+name: qa
+
+# Godot selftests + server e2e + ux lint through tools/tw_test.py, compared with tools/baseline.json.
+# Fails only on REGRESSION vs the frozen baseline (known failures such as letters / summon stay expected).
+
+on:
+  push:
+    branches: [v10-integration, main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "fast = agent subset, full = every suite"
+        default: fast
+        type: choice
+        options: [fast, full]
+
+env:
+  GODOT_VERSION: "4.5.1"
+
+concurrency:
+  group: qa-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  qa:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: System packages (xvfb + GL for the rendering suites)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends xvfb libgl1 libgl1-mesa-dri libxcursor1 libxinerama1 \
+            libxi6 libxrandr2 libxkbcommon0 libasound2t64 libfontconfig1 unzip
+
+      - name: Godot ${{ env.GODOT_VERSION }}
+        run: |
+          mkdir -p "$HOME/godot"
+          curl -fsSL -o "$HOME/godot/g.zip" \
+            "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          unzip -q -o "$HOME/godot/g.zip" -d "$HOME/godot"
+          chmod +x "$HOME/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64"
+          echo "GODOT_BIN=$HOME/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64" >> "$GITHUB_ENV"
+
+      - name: Cache Godot import
+        uses: actions/cache@v4
+        with:
+          path: game/.godot
+          key: godot-import-${{ env.GODOT_VERSION }}-${{ hashFiles('game/project.godot', 'game/**/*.import') }}
+          restore-keys: godot-import-${{ env.GODOT_VERSION }}-
+
+      - name: Import assets
+        run: python tools/tw_test.py --import
+
+      - name: Tests (${{ github.event.inputs.mode || (github.event_name == 'pull_request' && 'fast' || 'full') }})
+        run: |
+          MODE="${{ github.event.inputs.mode || (github.event_name == 'pull_request' && 'fast' || 'full') }}"
+          FLAG=""
+          if [ "$MODE" = "fast" ]; then FLAG="--fast"; fi
+          # xvfb-run is applied by the runner itself for the rendering suites; -j 4 is the measured sweet spot
+          python tools/tw_test.py $FLAG -j 4 --json qa-results.json --logs qa-logs
+
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qa-logs
+          path: |
+            qa-results.json
+            qa-logs/
+          retention-days: 14
