@@ -15,9 +15,9 @@ dest_files=["res://.godot/imported/banner_shirin.png-0b40ec6784b01b773140e9a22a8
 
 [params]
 
-compress/mode=0
+compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.82
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1

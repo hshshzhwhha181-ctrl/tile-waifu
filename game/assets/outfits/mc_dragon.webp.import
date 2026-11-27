@@ -15,9 +15,9 @@ dest_files=["res://.godot/imported/mc_dragon.webp-b9d2e8c5cd4fcdb2e185bd4df3a901
 
 [params]
 
-compress/mode=0
+compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=1.0
+compress/lossy_quality=0.82
 compress/uastc_level=2
 compress/rdo_quality_loss=0
 compress/hdr_compression=0
