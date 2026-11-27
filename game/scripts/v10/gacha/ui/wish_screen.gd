@@ -15,6 +15,12 @@ extends "res://scripts/screens/summon.gd"
 
 const NAV_H: = 132.0
 const SPINE_Y: = 224.0          # top of the page content under the header (the 0.9 tab spine is gone)
+# 0.12 «Желания 2.0»: the lantern-altar backdrop (the file is optional: without it the 0.9 summon night stays), the big
+# SSR counter sheet, the strip of the five Wave-1 goddesses
+const ALTAR_BG: = "res://assets/v10/hf_ui/gacha_altar_bg.webp"
+const SHEET_H: = 232.0
+const STRIP_H: = 78.0
+const W1_STRIP: = ["tsubame", "miel", "kohaku", "shirin", "zlata"]
 
 var gacha: V10Gacha2
 var bank: V10GachaBank
@@ -58,8 +64,43 @@ func build(m, args: Dictionary) -> void:
 			if String(blist[i].id) == String(args.bid):
 				bsel = i
 	super.build(m, args)
+	_altar_layer()
 	if (gacha.first_needed() and not dev_no_first) or dev_first_force:
 		_open_first_pick()
+
+
+# the lantern altar behind every page and behind the ritual (the pull sequence dims it), with a few soft golden motes
+func _altar_layer() -> void:
+	var tex: = V10GUI.tex_or_null(ALTAR_BG) if ResourceLoader.exists(ALTAR_BG) else null
+	var br: = V10Layout.bleed_rect(self)
+	if tex != null:
+		var bg: = V10GUI.cover(tex, br, Vector2(0.5, 0.55))
+		bg.name = "AltarBg"
+		bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		add_child(bg)
+		move_child(bg, 1)
+	if not V9Feel.can_fx():
+		return
+	var n: = Fx.scaled(28)
+	if n <= 0:
+		return
+	var p: = Fx.particles("glow", n, 6.0)
+	p.name = "AltarMotes"
+	p.material = Fx.add_mat()
+	p.position = Vector2(W * 0.5, H + 20.0)
+	p.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
+	p.emission_rect_extents = Vector2(W * 0.55, 10.0)
+	p.direction = Vector2(0, -1)
+	p.spread = 14.0
+	p.gravity = Vector2.ZERO
+	p.initial_velocity_min = 36.0
+	p.initial_velocity_max = 96.0
+	p.scale_amount_min = 0.05
+	p.scale_amount_max = 0.14
+	p.color = Color(V10GUI.GOLD_300, 0.5)
+	p.preprocess = 4.0
+	add_child(p)
+	move_child(p, mini(2, get_child_count() - 1))
 
 
 func _bind_v09_banner() -> void:
@@ -94,6 +135,7 @@ func _build_banner() -> void:
 	set_meta("v8_back", main.back)
 	_title_block()
 	_sheet()
+	_w1_strip()
 	_dots()
 	_buttons()
 
@@ -128,7 +170,7 @@ func _art_layer() -> void:
 
 func _card_rect() -> Rect2:
 	var top: = SPINE_Y + 36.0
-	var bottom: = H - NAV_H - 360.0
+	var bottom: = H - NAV_H - 360.0 - (SHEET_H - 196.0) - 52.0
 	# the card never takes more than 58 % of the width (the title column keeps ≥ 40 %) and centres in the free band
 	var h: = clampf(bottom - top, 380.0, 640.0)
 	var w: = minf(h * 0.75, W * 0.58)
@@ -216,7 +258,7 @@ func _dots() -> void:
 	if blist.size() < 2:
 		return
 	var by: = H - NAV_H - 24.0 - 112.0
-	var y: = by - 214.0 - 22.0
+	var y: = by - SHEET_H - 4.0
 	for i in blist.size():
 		var d: = Panel.new()
 		var on: = i == bsel
@@ -345,21 +387,88 @@ static func newbie_sub(ssr_done: bool) -> String:
 func _sheet() -> void:
 	var k: = _kind()
 	var by: = H - NAV_H - 24.0 - 112.0
-	var r: = Rect2(24, by - 214, W - 48, 196)
-	var sh: = V10GUI.sheet(r, 0.86)
+	var r: = Rect2(24, by - 18.0 - SHEET_H, W - 48, SHEET_H)
+	var sh: = V10GUI.sheet(r, 0.88)
+	sh.name = "Sheet"
 	banner_root.add_child(sh)
 	var left: = gacha.pity_left(cur_b)
 	var gold: = left <= 10
-	# line 1: «Ещё 23 желания до SSR» (gold from 10 and below) with a thin bar
-	var unit: = V10GachaBank.plural(left, "желание", "желания", "желаний")
-	var l1: = V10GUI.lbl("Ещё %d %s до SSR" % [left, unit], 24, V10GUI.GOLD_300 if gold else V10GUI.PAPER_100, "body", 900)
-	l1.position = Vector2(20, 14)
-	sh.add_child(l1)
 	var hard: = V10Rates.HARD
 	if k == "newbie" and not bool(G.S.get("newbie_ssr", false)):
 		hard = mini(hard, gacha.pity(cur_b) + left)
-	var bar: = V10GUI.line_bar(Rect2(20, 52, r.size.x * 0.56, 3), 1.0 - float(left) / float(hard), V10GUI.GOLD_500 if gold else V10GUI.JADE_300)
-	sh.add_child(bar)
+	var frac: = clampf(1.0 - float(left) / float(maxi(1, hard)), 0.0, 1.0)
+	# the big counter: «До SSR: 23» — the number is the hero of the sheet
+	var cap: = V10GUI.lbl("До SSR:", 26, V10GUI.PAPER_100, "body", 900)
+	cap.name = "SsrCounterCap"
+	cap.position = Vector2(20, 30)
+	sh.add_child(cap)
+	var cap_w: = cap.get_minimum_size().x
+	var num: = V10GUI.lbl(str(left), 66, V10GUI.GOLD_300 if gold else V10GUI.GOLD_500, "title", 900, Color(0.16, 0.09, 0.03, 0.95), 5)
+	num.name = "SsrCounterNum"
+	num.position = Vector2(20 + cap_w + 12, -8)
+	sh.add_child(num)
+	var num_w: = num.get_minimum_size().x
+	var unit: = V10GachaBank.plural(left, "желание", "желания", "желаний")
+	var ul: = V10GUI.lbl(unit, 21, V10GUI.PAPER_300, "body", 800)
+	ul.position = Vector2(20 + cap_w + 12 + num_w + 10, 40)
+	sh.add_child(ul)
+	if gold:
+		UI.punch(num, 0.06, 0.5)
+	# the gold bar (14 px) with the tick where the chance starts to rise (wish 46)
+	var bar_w: = r.size.x * 0.56
+	var track: = Panel.new()
+	track.name = "SsrBarTrack"
+	var tsb: = StyleBoxFlat.new()
+	tsb.bg_color = Color(V10GUI.NIGHT_900, 0.9)
+	tsb.border_color = Color(V10GUI.GOLD_700, 0.9)
+	tsb.set_border_width_all(2)
+	tsb.set_corner_radius_all(8)
+	track.add_theme_stylebox_override("panel", tsb)
+	track.position = Vector2(20, 80)
+	track.size = Vector2(bar_w, 16)
+	track.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	sh.add_child(track)
+	if frac > 0.0:
+		var fill: = Panel.new()
+		fill.name = "SsrBarFill"
+		var fsb: = StyleBoxFlat.new()
+		fsb.bg_color = V10GUI.GOLD_300 if gold else V10GUI.GOLD_500
+		fsb.set_corner_radius_all(6)
+		fsb.shadow_color = Color(V10GUI.GOLD_500, 0.55)
+		fsb.shadow_size = 6
+		fill.add_theme_stylebox_override("panel", fsb)
+		fill.position = Vector2(2, 2)
+		fill.size = Vector2(maxf(12.0, (bar_w - 4.0) * frac), 12)
+		fill.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		track.add_child(fill)
+	if k != "newbie":
+		var tick: = ColorRect.new()
+		tick.name = "SoftTick"
+		tick.color = Color(V10GUI.ROSE_300, 0.95)
+		tick.position = Vector2(20.0 + bar_w * float(V10Rates.SOFT_FROM) / float(V10Rates.HARD), 76)
+		tick.size = Vector2(2, 24)
+		tick.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		sh.add_child(tick)
+	# the badge: bright once the chance rises (from the 46th wish), a quiet outline before
+	var active: = gacha.pity(cur_b) >= V10Rates.SOFT_FROM - 1
+	var btxt: = "16+ · Повышенный шанс"
+	var bf: = UI.font("body", 900)
+	var bw: = bf.get_string_size(btxt, HORIZONTAL_ALIGNMENT_LEFT, -1, 17).x + 34.0
+	var badge: = Panel.new()
+	badge.name = "BoostBadge"
+	var bsb: = StyleBoxFlat.new()
+	bsb.bg_color = Color(V10GUI.GOLD_500, 0.95) if active else Color(V10GUI.NIGHT_900, 0.7)
+	bsb.border_color = V10GUI.GOLD_300 if active else Color(V10GUI.GOLD_700, 0.9)
+	bsb.set_border_width_all(2)
+	bsb.set_corner_radius_all(16)
+	badge.add_theme_stylebox_override("panel", bsb)
+	badge.position = Vector2(20, 104)
+	badge.size = Vector2(bw, 32)
+	badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	sh.add_child(badge)
+	var bl: = V10GUI.lbl(btxt, 17, V10GUI.NIGHT_900 if active else V10GUI.GOLD_300, "body", 900)
+	UI.center_label(bl, Rect2(0, 0, bw, 32))
+	badge.add_child(bl)
 	# line 2: the promise in plain words (UX_RULES §4.2, §9 P0-5)
 	var l2t: = ""
 	match k:
@@ -373,7 +482,7 @@ func _sheet() -> void:
 		var l2: = V10GUI.lbl(l2t, 18, V10GUI.GOLD_300 if gacha.guar(cur_b) and k == "phase" else V10GUI.PAPER_300, "body", 700)
 		l2.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		l2.size = Vector2(r.size.x * 0.6, 10)
-		l2.position = Vector2(20, 66)
+		l2.position = Vector2(20, 140)
 		sh.add_child(l2)
 	# candelabra + «Свечи: 137/200» on the right; at 200 the line becomes the quiet «Зажечь Свечу ›»
 	var cw: = r.size.x * 0.36
@@ -392,9 +501,54 @@ func _sheet() -> void:
 		UI.center_label(cl, Rect2(r.size.x - cw - 12, 100, cw, 26))
 		sh.add_child(cl)
 	# «ⓘ Шансы» (UX_RULES §5.3.5, С-5): next to the random purchase, one tap to V10OddsScreen
-	odds_link = V10GUI.link("ⓘ Шансы", Vector2(8, r.size.y - 84), func(): _open_odds(), V10GUI.GOLD_500, 18)
+	odds_link = V10GUI.link("ⓘ Шансы", Vector2(8, r.size.y - 82), func(): _open_odds(), V10GUI.GOLD_500, 18)
 	sh.add_child(odds_link)
 	UI.slide_in(sh, Vector2(0, 24), 0.08, 0.24)
+
+
+# the five goddesses of Wave 1 on the wishes page: a quiet gold strip with their medallions (tap → her page in «Героини»)
+func _w1_strip() -> void:
+	if not V10Wave1.released():
+		return
+	var by: = H - NAV_H - 24.0 - 112.0
+	var r: = Rect2(24, by - 18.0 - SHEET_H - STRIP_H - 10.0, 332, STRIP_H)
+	var sp: = V10GUI.sheet(r, 0.8)
+	sp.name = "W1Strip"
+	banner_root.add_child(sp)
+	var ov: = V10GUI.overline("Новые богини · Волна 1", V10GUI.GOLD_500)
+	ov.position = Vector2(14, 5)
+	sp.add_child(ov)
+	var md: = 46.0
+	for i in W1_STRIP.size():
+		var h: String = W1_STRIP[i]
+		if not G.HEROES.has(h):
+			continue
+		var rk: = String(V10W1Gacha.HERO_RANK.get(h, "A"))
+		var col: = V10Rank.color(rk)
+		var mx: = 14.0 + i * (md + 10.0)
+		var pal: = "gold" if rk == "SSR" else ("lav" if rk == "S" else "mint")
+		var av: Control = V8Art.emotion_avatar(h, "happy", Rect2(mx, 26, md, md), pal)
+		av.name = "W1Medal_" + h
+		sp.add_child(av)
+		if not G.hero_unlocked(h):
+			var pic: Node = av.get_node_or_null("Pic")
+			if pic is Control and (pic as Control).material is ShaderMaterial:
+				((pic as Control).material as ShaderMaterial).set_shader_parameter("gray", 0.5)
+		var rb: = UI.rbox("graphite", Rect2(mx + md - 24.0, 26 + md - 14.0, 28, 16), 8, 1, 2)
+		rb.borders(col.lerp(Color.WHITE, 0.3), col.darkened(0.5))
+		rb.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		sp.add_child(rb)
+		rb.add_child(UI.center_label(UI.label(rk, 11, col.lerp(Color.WHITE, 0.45), UI.DARK, 2, "body", 900), Rect2(0, -1, 28, 16)))
+		var hit: = Control.new()
+		hit.position = Vector2(mx - 3, 22)
+		hit.size = Vector2(md + 6, md + 8)
+		hit.mouse_filter = Control.MOUSE_FILTER_STOP
+		hit.gui_input.connect(func(e: InputEvent) -> void:
+			if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT:
+				V9Feel.press(av, "tap", "button")
+				main.go("collection", {"hero": h}))
+		sp.add_child(hit)
+	UI.slide_in(sp, Vector2(-20, 0), 0.1, 0.24)
 
 
 func _buttons() -> void:
@@ -566,18 +720,18 @@ func _build_top_hud() -> void:
 	top_hud.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	top_hud.visible = false
 	seq.add_child(top_hud)
-	var box: = V10GUI.sheet(Rect2(20, 18, 420, 96), 0.82)
+	var box: = V10GUI.sheet(Rect2(20, 18, 440, 112), 0.86)
 	top_hud.add_child(box)
 	var left: = int(seq_ctx.get("left", V10Rates.HARD - int(seq_ctx.get("pity", 0))))
-	pity_num = V10GUI.lbl(_left_text(left), 24, V10GUI.PAPER_100, "body", 900)
-	pity_num.position = Vector2(14, 6)
+	pity_num = V10GUI.lbl(_left_text(left), 34, V10GUI.GOLD_300, "body", 900, Color(0.12, 0.06, 0.02, 0.9), 4)
+	pity_num.position = Vector2(14, 4)
 	box.add_child(pity_num)
 	pity_bar = null
-	var bar: = V10GUI.line_bar(Rect2(14, 44, 390, 3), 1.0 - float(left) / V10Rates.HARD, V10GUI.GOLD_500)
+	var bar: = V10GUI.line_bar(Rect2(14, 56, 410, 6), 1.0 - float(left) / V10Rates.HARD, V10GUI.GOLD_500)
 	bar.name = "Bar"
 	box.add_child(bar)
 	guar_lbl = V10GUI.lbl("", 18, V10GUI.PAPER_300, "body", 800)
-	guar_lbl.position = Vector2(14, 56)
+	guar_lbl.position = Vector2(14, 70)
 	box.add_child(guar_lbl)
 	if _kind() == "newbie":
 		guar_lbl.text = "SSR-наряд — до 50-го желания" if not bool(seq_ctx.get("newbie_ssr", true)) else "120 кристаллов вместо 150"
@@ -595,7 +749,7 @@ func _show_top_hud() -> void:
 
 
 func _left_text(left: int) -> String:
-	return "Ещё %d %s до SSR" % [left, V10GachaBank.plural(left, "желание", "желания", "желаний")]
+	return "До SSR: %d" % left
 
 
 func _set_guar(g: bool) -> void:
@@ -629,6 +783,31 @@ func _show_caption(best: String) -> void:
 	super._show_caption(best)
 	if is_instance_valid(lantern_cap) and lantern_cap.get_child_count() >= 2:
 		(lantern_cap.get_child(1) as Label).text = LANTERN_SUB.get(best, "")
+
+
+# the ×10 moment (the lantern opens): a golden ritual flash, a second low boom and a petal storm over the 0.9 reveal
+func _deal_cards(res: Array, from: = Vector2(-1, -1)) -> void:
+	if res.size() >= 10 and _alive() and seq != null:
+		_ritual_burst(from if from.x >= 0.0 else Vector2(W * 0.5, H * 0.4), String(V9Summon.best_rar(res)))
+	super._deal_cards(res, from)
+
+
+func _ritual_burst(at: Vector2, best: String) -> void:
+	var gold: = Color(1.0, 0.82, 0.38)
+	Sfx.play("summon_boom", 0.72 if best == "SSR" else 0.86, -2.0)
+	_flash(gold, 0.62 if best == "SSR" else 0.42)
+	if V9Feel.can_fx():
+		Fx.flash_glow(seq, at, gold, 9.0, 0.7)
+		Fx.burst(seq, at, "petal", 56, Color(1, 0.82, 0.9), 2.4)
+		Fx.burst(seq, at, "sparkle", 64, gold, 2.2)
+		var halo: = Common.rays(seq, at, 1500, Color(1.0, 0.86, 0.46, 0.5), 16, 0.05, 0.9)
+		halo.modulate.a = 0.0
+		var ht: = halo.create_tween()
+		ht.tween_property(halo, "modulate:a", 1.0, 0.25)
+		ht.tween_property(halo, "modulate:a", 0.0, 0.9)
+		ht.tween_callback(halo.queue_free)
+	if V9Feel.can_shake():
+		Fx.shake(seq, 9, 0.5)
 
 
 # ---------------------------------------------------------------- cards: A/S/SSR, ✦ and Лепестки

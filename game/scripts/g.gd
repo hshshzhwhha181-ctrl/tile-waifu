@@ -42,14 +42,14 @@ var loaded_from: = ""
 var save_ok: = true
 var _main_ok: = false
 
-const HEROES: = {
+var HEROES: = {
 	"mc": {"name": "Маджонг-тян", "title": "Хозяйка салона, 26 лет", "age": "26 лет", "job": "хозяйка салона «Пять ветров»", "color": Color("ff8fb8")}, 
 	"rin": {"name": "Рин", "title": "Мастер чая, 27 лет", "age": "27 лет", "job": "мастер чая, хозяйка «Ледяного павильона»", "color": Color("4fbf9f")}, 
 	"hana": {"name": "Хана", "title": "Тренер, 24 года", "age": "24 года", "job": "тренер спорткомплекса и капитан фонарной эстафеты", "color": Color("ffb35c")}, 
 	"yue": {"name": "Юэ", "title": "Царица луны, на вид 27", "age": "на вид 27", "job": "правительница Лунного дворца", "color": Color("c8b6ff")}, 
 	"nova": {"name": "Нова", "title": "Белый хакер, 23 года", "age": "23 года", "job": "специалист по кибербезопасности и гонщица", "color": Color("4fe3ff")}, 
 }
-const HERO_ORDER: = ["mc", "rin", "hana", "yue", "nova"]
+var HERO_ORDER: = ["mc", "rin", "hana", "yue", "nova"]
 
 
 var ITEMS: = [
@@ -443,7 +443,7 @@ const SKIN_LOOK: = {
 	"s_gold": {"side": Color("a8741c"), "rim": Color("ffe08a"), "tint": Color(1.04, 1.0, 0.92)}, 
 }
 
-const BASE_OUTFITS: = ["o_base", "r_base", "h_base", "y_base", "n_base"]
+var BASE_OUTFITS: = ["o_base", "r_base", "h_base", "y_base", "n_base"]
 
 
 func equipped(h: String) -> String:
@@ -468,7 +468,7 @@ func skin_look(ranked: bool = false) -> Dictionary:
 const SHARDS_NEED: = 5
 
 
-const PERKS: = {
+var PERKS: = {
 	"mc": "+1 бесплатная подсказка", 
 	"rin": "+1 бесплатная отмена", 
 	"hana": "Окно комбо +1 секунда", 
@@ -476,7 +476,7 @@ const PERKS: = {
 	"nova": "+1 перемешивание и +10% кристаллов", 
 }
 
-const SKILLS: = {
+var SKILLS: = {
 	"mc": {"name": "Подсказка сердца", "desc": "сама убирает одну пару"}, 
 	"rin": {"name": "Чайная пауза", "desc": "возвращает весь лоток на стол"}, 
 	"hana": {"name": "Рывок", "desc": "убирает две пары подряд"}, 
@@ -561,6 +561,10 @@ func _ready() -> void :
 				DirAccess.remove_absolute(ProjectSettings.globalize_path(p))
 	# 0.10: every module registers its save keys / migrators before the save is read (scripts/v10/core)
 	V10Registry.load_all()
+	# 0.12 wave 1: the five goddesses (tsubame, miel, kohaku, shirin, zlata) join G once released (V10Wave1), before
+	# the save is read, so a saved partner / avatar of hers survives _ensure_profile(). Idempotent, no duplicates.
+	if V10Wave1.released():
+		V10Wave1.apply(self)
 	load_game()
 	if "--recovery_selftest=1" in args:
 		_recovery_selftest.call_deferred()
@@ -803,6 +807,7 @@ func _migrate() -> void :
 	if not (str(S.get("ult_cutin", "")) in ULT_CUTINS):
 		S.ult_cutin = "full"
 	_sync_v6_fx()
+	V10W1Core.sanitize_save(S, HEROES)
 	_ensure_profile()
 	S.profile_done = bool(S.get("profile_done", false))
 	if not (S.get("stats") is Dictionary):
@@ -946,7 +951,7 @@ func item_img(it: Dictionary) -> String:
 
 func item_tex(it: Dictionary) -> Texture2D:
 	if it.has("img"):
-		return load("res://assets/outfits/%s.webp" % item_img(it))
+		return load(V10W1Core.outfit_webp(item_img(it)))
 	if it.has("tile"):
 		return tile_tex(it.tile)
 	if it.has("bg"):
@@ -977,7 +982,7 @@ func rar_color(r: String) -> Color:
 func art_tex(it: Dictionary) -> Texture2D:
 
 	if S.get("modest", false) and (it.get("bold", false) or not bool(it.get("sfw", true))) and it.has("alt"):
-		return load("res://assets/outfits/%s.webp" % it.alt)
+		return load(V10W1Core.outfit_webp(String(it.alt)))
 	return item_tex(it)
 
 # 0.10 (spec §2.5): the daily day starts at 04:00 phone time and never rolls back (V10Meta, the one clock)

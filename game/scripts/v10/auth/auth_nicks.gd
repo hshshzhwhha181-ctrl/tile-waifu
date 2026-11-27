@@ -24,7 +24,7 @@ static func suggest(n: = 5, rng: RandomNumberGenerator = null) -> Array:
 	if rng == null:
 		rng = RandomNumberGenerator.new()
 		rng.randomize()
-	var heroes: Array = G.HERO_ORDER.duplicate()
+	var heroes: Array = G.HERO_ORDER.filter(func(h): return not IDEAS.get(h, []).is_empty())
 	# shuffle (Fisher–Yates with our rng: deterministic under a seed)
 	for i in range(heroes.size() - 1, 0, -1):
 		var j: = rng.randi_range(0, i)

@@ -534,7 +534,7 @@ static func avatar(hero: String, r: Rect2, ring_pal: = "gold") -> Control:
 	c.size = r.size
 	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	c.add_child(UI.rbox(ring_pal, Rect2(Vector2.ZERO, r.size), r.size.x * 0.5, 3, 8))
-	var t: = UI.tex(load("res://assets/hero/%s.png" % hero), Rect2(Vector2(5, 5), r.size - Vector2(10, 10)), false)
+	var t: = UI.tex(load(V10W1Core.hero_png(hero)), Rect2(Vector2(5, 5), r.size - Vector2(10, 10)), false)
 	var m: = ShaderMaterial.new()
 	m.shader = preload("res://shaders/card.gdshader")
 	m.set_shader_parameter("size", t.size)

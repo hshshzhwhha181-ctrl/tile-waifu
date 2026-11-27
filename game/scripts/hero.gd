@@ -2,7 +2,7 @@ class_name Hero
 extends Node2D
 
 
-const RIGS: = {
+static var RIGS: = {
 	# mc / hana: measured on the adult redraw (assets/hero/<id>.png 848×1264, debug overlays of every point).
 	# "av" = round-avatar crop on the face: Vector3(focus x px, focus y px, zoom) — the face centre raised by 0.15
 	# face width, ≈2 face widths across the circle (rigs without "av" use head_c + 15 px at zoom 4.6).
@@ -50,7 +50,7 @@ func setup(id: String, h: float) -> Hero:
 	hero_id = id
 	height = h
 	var rig: Dictionary = RIGS[id]
-	var tex: Texture2D = load("res://assets/hero/%s.png" % id)
+	var tex: Texture2D = load(V10W1Core.hero_png(id))
 	var sc: = h / 1160.0
 	shadow = Sprite2D.new()
 	shadow.texture = G.fx("glow")

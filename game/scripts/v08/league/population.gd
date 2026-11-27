@@ -134,10 +134,10 @@ static func _generate() -> void:
 		if seen.has(nk.to_lower()):
 			nk = "%s%d" % [nk.substr(0, 12), i]
 		seen[nk.to_lower()] = true
-		var hero: String = G.HERO_ORDER[rng.randi() % G.HERO_ORDER.size()]
+		var hero: String = V10W1Core.FOUNDERS[rng.randi() % V10W1Core.FOUNDERS.size()]
 		var outs: = AVATARS.filter(func(x): return String(x).begins_with(hero + "_"))
 		var av: String = outs[rng.randi() % outs.size()]
-		var fav: = hero if rng.randf() < 0.7 else String(G.HERO_ORDER[rng.randi() % G.HERO_ORDER.size()])
+		var fav: = hero if rng.randf() < 0.7 else String(V10W1Core.FOUNDERS[rng.randi() % V10W1Core.FOUNDERS.size()])
 		var skill: = rng.randf()
 		var qr: Array = Q_RANGE[tier]
 		var q: = lerpf(float(qr[0]), float(qr[1]), clampf(pow(skill, 1.5) * 0.7 + rng.randf() * 0.3, 0.0, 1.0))
@@ -517,5 +517,5 @@ static func my_avatar_img() -> String:
 # Round portrait in the gold avatar frame (V8Art.avatar). top = the Dragon/Celestial frame (V8Art.top_tier).
 # `_ring` is kept for old callers and ignored.
 static func avatar_view(img: String, hero: String, r: Rect2, _ring: = 3.0, top: = false) -> Control:
-	var src: = img if ResourceLoader.exists("res://assets/outfits/%s.webp" % img) else (hero if G.HEROES.has(hero) else "mc")
+	var src: = img if ResourceLoader.exists(V10W1Core.outfit_webp(img)) else (hero if G.HEROES.has(hero) else "mc")
 	return V8Art.avatar(null, src, r, top)

@@ -110,6 +110,10 @@ func pool() -> Dictionary:
 	for it in items:
 		if it.get("start", false) or it.get("nogacha", false) or it.get("hidden", false) or it.get("limited", false):
 			continue
+		# 0.12 wave 1: a goddess of wave 1 drops only by her own rules (A/S base outfits now, Zlata banner-only until her
+		# standard entry, vows never) — V10Wave1.droppable
+		if V10W1Gacha.is_w1(String(it.id)) and not V10Wave1.droppable(String(it.id), func(i): return bank.owns(String(i)), V10GClock.now()):
+			continue
 		_pool[rar10(String(it.rar))].append(it)
 	return _pool
 

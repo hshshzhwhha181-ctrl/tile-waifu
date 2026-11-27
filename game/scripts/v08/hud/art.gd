@@ -278,19 +278,19 @@ static func _portrait(src, r: Rect2) -> TextureRect:
 		t = src
 	elif src is String or src is StringName:
 		var s: = String(src)
-		if Hero.RIGS.has(s) and ResourceLoader.exists("res://assets/hero/%s.png" % s):
-			t = load("res://assets/hero/%s.png" % s)
+		if Hero.RIGS.has(s) and ResourceLoader.exists(V10W1Core.hero_png(s)):
+			t = load(V10W1Core.hero_png(s))
 			focus = Hero.av_focus(s)
 			zoom = Hero.av_zoom(s)
 		else:
 			# retired art (o_tutor, HEROINES.md §6) never shows, even from an old save or a stored league avatar
 			if RETIRED_IMG.has(s):
 				s = RETIRED_IMG[s]
-			var p: = "res://assets/outfits/%s.webp" % s
+			var p: = V10W1Core.outfit_webp(s)
 			if not ResourceLoader.exists(p):
 				p = "res://assets/outfits/mc_base.webp"
 			t = load(p)
-			var fc: Array = V8Population.face(s)
+			var fc: Array = V10W1Core.outfit_face(s) if V10W1Core.is_wave1_img(s) else V8Population.face(s)
 			focus = Vector2(fc[0], fc[1])
 			zoom = float(fc[2])
 	if t == null:
@@ -357,7 +357,7 @@ const EMO_ALIAS: = {"big": "happy", "smug": "happy", "win": "happy", "joy": "hap
 const SHY_LEVEL: = 7
 
 # Face centre of every emotion file as a fraction of the image (x, y), measured on the art: the eyes-to-mouth middle.
-const EMO_FACE: = {
+static var EMO_FACE: = {
 	# mc / hana: the adult redraw, eyes and mouth measured per file (same formula as rig_face; an open mouth counts at
 	# its closed-lip line so a gasp does not drop the face point)
 	"mc": {"happy": [0.528, 0.259], "sad": [0.506, 0.26], "surprised": [0.522, 0.234], "pout": [0.5, 0.264], "shy": [0.517, 0.274]},
@@ -369,10 +369,10 @@ const EMO_FACE: = {
 # face width (cheek to cheek at the eyes) in px: emotion art / rigged base art — the ratio keeps a swap the same size.
 # A hero entry is one width for all her files, or a per-emotion dictionary (mc / hana: 1.75 × the eye distance,
 # cross-checked against eyes-to-mouth, measured on every file of the redraw).
-const EMO_FACE_W: = {"mc": {"happy": 157.0, "sad": 152.0, "surprised": 147.0, "pout": 148.0, "shy": 154.0},
+static var EMO_FACE_W: = {"mc": {"happy": 157.0, "sad": 152.0, "surprised": 147.0, "pout": 148.0, "shy": 154.0},
 	"hana": {"happy": 138.0, "sad": 145.0, "surprised": 136.0, "pout": 132.0, "shy": 136.0},
 	"rin": 188.0, "yue": 170.0, "nova": 180.0}
-const RIG_FACE_W: = {"mc": 95.0, "hana": 89.0, "rin": 76.0, "yue": 80.0, "nova": 86.0}
+static var RIG_FACE_W: = {"mc": 95.0, "hana": 89.0, "rin": 76.0, "yue": 80.0, "nova": 86.0}
 
 const BUST_SHADER: = "shader_type canvas_item;\nvarying vec4 vcol;\nuniform float fade = 0.16;\nuniform float flash = 0.0;\n" + \
 	"void vertex() { vcol = COLOR; }\nvoid fragment() {\n\tvec4 c = texture(TEXTURE, UV);\n" + \
@@ -382,6 +382,8 @@ const BUST_SHADER: = "shader_type canvas_item;\nvarying vec4 vcol;\nuniform floa
 static func emo_hero(hero: String) -> String:
 	if Hero.RIGS.has(hero):
 		return hero
+	if V10W1Core.is_wave1_img(hero):
+		return V10W1Core.hero_of_img(hero)
 	var p: = hero.get_slice("_", 0)
 	return p if Hero.RIGS.has(p) else hero
 
@@ -393,7 +395,7 @@ static func emo_name(kind: String) -> String:
 
 
 static func emotion_path(hero: String, emo: String) -> String:
-	return EMO_ROOT + "%s_%s.webp" % [emo_hero(hero), emo_name(emo)]
+	return V10W1Core.emotion_webp(emo_hero(hero), emo_name(emo))
 
 
 static func has_emotion(hero: String, emo: String) -> bool:
@@ -406,7 +408,7 @@ static func emotion(hero: String, emo: String) -> Texture2D:
 	var h: = emo_hero(hero)
 	if not Hero.RIGS.has(h):
 		h = "mc"
-	return tex("res://assets/hero/%s.png" % h)
+	return tex(V10W1Core.hero_png(h))
 
 
 static func win_emotion(hero: String) -> String:
