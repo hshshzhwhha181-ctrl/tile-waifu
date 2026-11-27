@@ -240,8 +240,11 @@ func _build_strip() -> void:
 	back.bottom = Color(NIGHT_900, 0.0)
 	strip.add_child(back)
 	# поясной кадр
-	var tex: Texture2D = load("res://assets/hero/%s.png" % hero) if ResourceLoader.exists("res://assets/hero/%s.png" % hero) else null
-	var fr: Dictionary = V10MjKoikoiLines.FRAME.get(hero, V10MjKoikoiLines.FRAME.rin)
+	var hp: = V10W1Core.hero_png(hero)
+	if not ResourceLoader.exists(hp):
+		hp = "res://assets/hero/mc.png"
+	var tex: Texture2D = load(hp) if ResourceLoader.exists(hp) else null
+	var fr: Dictionary = V10W1Mj.koikoi_frame(hero) if V10W1Core.is_wave1_hero(hero) else V10MjKoikoiLines.FRAME.get(hero, V10MjKoikoiLines.FRAME.rin)
 	var ph: = strip_h() + 6.0
 	var pw: = minf(ph * 1.22, 470.0)
 	var rw: = 600.0
@@ -1152,7 +1155,9 @@ func _show_result() -> void:
 	dim.size = ov.size
 	ov.add_child(dim)
 	# она в полный рост справа (обложка журнала)
-	var hp: = "res://assets/hero/%s.png" % hero
+	var hp: = V10W1Core.hero_png(hero)
+	if not ResourceLoader.exists(hp):
+		hp = "res://assets/hero/mc.png"
 	if ResourceLoader.exists(hp):
 		var hr: = TextureRect.new()
 		hr.texture = load(hp)

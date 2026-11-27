@@ -1,14 +1,15 @@
 class_name V10Welcome7Screen
 extends Control
 
-# Screen "v10welcome7" — «7 Дней · Подарок хозяйки» (0.12.0). 7 daily gifts, SSR outfit on day 7.
+# Screen "v10welcome7" — «7 Дней · Подарок хозяйки» (0.13.0). 7 daily gifts, SSR outfit «Королева лунной ночи» on day 7.
 # Save: G.S["v10_welcome7"] = {days_claimed, last_day_key, start_day_key}. One claim per calendar day (V10Meta.day_key).
 
 const SAVE_KEY: = "v10_welcome7"
 const DAYS: = 7
-const SSR_ID: = "o_dragon"
+const SSR_ID: = "y_queen"
 const SSR_FALLBACK_GEMS: = 1600
-const DRAGON_ART: = "res://assets/outfits/mc_dragon.webp"
+const SSR_ART: = "res://assets/outfits/yue_queen.webp"
+const DRAGON_ART: = SSR_ART
 
 const REWARDS: Array[Dictionary] = [
 	{"day": 1, "title": "10 Билетов\nжеланий", "icon": "ticket", "tickets": 10},
@@ -17,7 +18,7 @@ const REWARDS: Array[Dictionary] = [
 	{"day": 4, "title": "500 кристаллов", "icon": "crystal", "gems": 500},
 	{"day": 5, "title": "5 Билетов\nжеланий", "icon": "ticket", "tickets": 5},
 	{"day": 6, "title": "Подарок «Нефритовая\nзаколка» (+300 ♥)", "icon": "pin", "gift": "gift_jade_pin"},
-	{"day": 7, "title": "SSR-наряд\n«Императрица дракона»", "icon": "ssr", "outfit": "o_dragon", "fallback_gems": 1600},
+	{"day": 7, "title": "SSR-наряд\n«Королева лунной ночи»", "icon": "ssr", "outfit": "y_queen", "fallback_gems": 1600},
 ]
 
 var main
@@ -102,7 +103,7 @@ static func claim_today() -> Dictionary:
 			lines.append("Наряд уже есть: +%d кристаллов" % int(r.fallback_gems))
 		else:
 			G.give_new(str(r.outfit))
-			lines.append("SSR-наряд «Императрица дракона»!")
+			lines.append("SSR-наряд «Королева лунной ночи»!")
 	st["days_claimed"] = day
 	st["last_day_key"] = V10Meta.day_key()
 	G.save()
@@ -214,7 +215,7 @@ func _build_banner() -> void:
 	bn.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_content.add_child(bn)
 	var art_x: = maxf(256.0, bn.size.x * 0.39)
-	var tex: Texture2D = V10VipBoudoirScreen._load_tex(DRAGON_ART)
+	var tex: Texture2D = V10VipBoudoirScreen._load_tex(SSR_ART)
 	if tex != null:
 		var art: = Common.card_art(tex, Rect2(art_x, 6, bn.size.x - art_x - 6.0, bn.size.y - 12.0), Vector2(0.5, 0.17), 1.0, 18.0)
 		(art.material as ShaderMaterial).set_shader_parameter("bottom_shade", 0.14)
@@ -250,11 +251,11 @@ func _build_banner() -> void:
 	bl.label_settings.line_spacing = -2.0
 	bl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	badge.add_child(bl)
-	var nm1: = Common.fit_line(UI.label("Маджонг-тян", 28, Color("#FFF3D6"), Color(0.1, 0.02, 0.08), 5, "body", 900), left_w, 20)
+	var nm1: = Common.fit_line(UI.label("Юэ · Царица луны", 28, Color("#FFF3D6"), Color(0.1, 0.02, 0.08), 5, "body", 900), left_w, 20)
 	nm1.position = Vector2(18, 92)
 	nm1.size.y = 36
 	bn.add_child(nm1)
-	var nm2: = Common.fit_line(UI.label("«Императрица дракона»", 22, Color("#F8D686"), Color(0.1, 0.02, 0.08), 4, "body", 800), left_w, 17)
+	var nm2: = Common.fit_line(UI.label("«Королева лунной ночи»", 22, Color("#F8D686"), Color(0.1, 0.02, 0.08), 4, "body", 800), left_w, 16)
 	nm2.position = Vector2(18, 128)
 	nm2.size.y = 30
 	bn.add_child(nm2)
@@ -334,7 +335,7 @@ func _make_card(day: int, r: Rect2) -> void:
 	var ic: = _make_reward_icon(str(rw.icon), grand)
 	ic.position = Vector2(r.size.x - ic.size.x - 10.0, 8.0) if not grand else Vector2(r.size.x - ic.size.x - 18.0, (r.size.y - ic.size.y) * 0.5)
 	card.add_child(ic)
-	var tl: = UI.label(str(rw.title), 21 if not grand else 30, Color("#FFF6E4"), Color(0.08, 0.02, 0.1), 4, "body", 800)
+	var tl: = UI.label(str(rw.title), 21 if not grand else 28, Color("#FFF6E4"), Color(0.08, 0.02, 0.1), 4, "body", 800)
 	tl.position = Vector2(16, 102 if not grand else 70)
 	var tw_max: = r.size.x - 32.0 if not grand else r.size.x - 196.0
 	tl.size = Vector2(tw_max, 78 if not grand else 120)
@@ -386,7 +387,9 @@ func _do_claim() -> void:
 		return
 	var day: = int(res.day)
 	Sfx.play("reveal_ssr" if day == DAYS else "win", 1.0, -4.0)
-	Sfx.say("mc", "ssr" if day == DAYS else "win")
+	Sfx.say("yue" if day == DAYS else "mc", "ssr" if day == DAYS else "win")
+	if day == DAYS:
+		V10UltVideo.play(self, "yue", SSR_ID, "Затмение")
 	if main != null and main.has_method("refresh_currency"):
 		main.refresh_currency(true)
 	_refresh()

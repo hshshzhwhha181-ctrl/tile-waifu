@@ -107,8 +107,10 @@ static func resolve_still_path(h: String, outf: String = "", vpath: String = "")
 			return wp
 	if V8Art.has_emotion(h, "happy"):
 		return V8Art.emotion_path(h, "happy")
-	var hp: = "res://assets/hero/%s.png" % h
-	return hp if ResourceLoader.exists(hp) else "res://assets/outfits/mc_base.webp"
+	var hp: = V10W1Core.hero_png(h)
+	if ResourceLoader.exists(hp):
+		return hp
+	return "res://assets/hero/mc.png" if ResourceLoader.exists("res://assets/hero/mc.png") else "res://assets/outfits/mc_base.webp"
 
 
 # the wave-1 goddess an ult belongs to: the hero id, or the owner of a wave-1 outfit id ("" for everyone else)

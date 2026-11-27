@@ -18,6 +18,7 @@ var focus_i: = -1
 var detail: Control
 var pick_btn: JButton
 var confirm: = false
+var _locking: = false
 var title_l: Label
 var sub_l: Label
 var tiles: = []
@@ -27,13 +28,41 @@ const TILE_UV: = [Vector2(0.233, 0.48), Vector2(0.502, 0.48), Vector2(0.767, 0.4
 
 
 static func open(parent: Control, g: V10Gacha2, cb: Callable) -> V10FirstPickView:
+	var prev: = parent.get_node_or_null("FirstPickView")
+	if prev != null:
+		if prev is Control:
+			(prev as Control).mouse_filter = Control.MOUSE_FILTER_IGNORE
+		parent.remove_child(prev)
+		prev.queue_free()
 	var v: = V10FirstPickView.new()
+	v.name = "FirstPickView"
+	v.set_meta("popup", true)
+	v.set_meta("v8_back", v._on_back)
 	v.size = parent.get_viewport_rect().size
 	v.gacha = g
 	v.on_done = cb
 	parent.add_child(v)
 	v._build()
 	return v
+
+
+func _silence_inputs() -> void:
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	for ch in find_children("*", "Control", true, false):
+		(ch as Control).mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+
+func _on_back() -> void:
+	if _locking:
+		return
+	if focus_i >= 0:
+		_unfocus()
+		return
+	_locking = true
+	_silence_inputs()
+	if is_instance_valid(get_parent()):
+		get_parent().remove_child(self)
+	queue_free()
 
 
 func _build() -> void:
@@ -207,12 +236,14 @@ func _card(it: Dictionary, r: Rect2) -> Control:
 	c.add_child(nm)
 	var idx: = cards.size()
 	c.gui_input.connect(func(e):
-		if e is InputEventMouseButton and e.pressed and focus_i < 0:
+		if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT and not _locking and focus_i < 0:
 			_focus(idx))
 	return c
 
 
 func _focus(i: int) -> void:
+	if _locking or focus_i >= 0 or i < 0 or i >= cards.size():
+		return
 	focus_i = i
 	confirm = false
 	var c: Control = cards[i]
@@ -265,7 +296,8 @@ func _detail(it: Dictionary) -> void:
 	var ul: = V10GUI.lbl("Приём «%s» — особый ход героини" % ult if ult != "" else "", 20, V10GUI.PAPER_300, "body", 700)
 	UI.center_label(ul, Rect2(0, y + 84, W, 30))
 	detail.add_child(ul)
-	var by: = H - 150.0
+	var ins_bot: = float(V10Hud2Util.safe_insets(size).get("bottom", 0.0))
+	var by: = H - ins_bot - 144.0
 	pick_btn = JButton.make("Выбрать её", "pink", Rect2(24, by, W - 48, 104), null, 32)
 	pick_btn.set_meta("ux_role", "primary")
 	pick_btn.pressed.connect(_choose)
@@ -283,24 +315,36 @@ func _detail(it: Dictionary) -> void:
 		UI.slide_in(n, Vector2(0, 16), 0.04 * [ol, t, ul, back, tryb, pick_btn].find(n), 0.24)
 
 
-# style preview: until the kits land (M5) the tile theme of the outfit flashes over the table, nothing is given
+# style preview: enters Home try-on immediately and frees FirstPickView so overlay never blocks input
 func _try_style(it: Dictionary) -> void:
-	var c: Control = cards[focus_i]
-	V9Feel.press(c, "select", "button")
+	if _locking:
+		return
+	var main = get_tree().current_scene if is_inside_tree() else null
+	if main != null and "SCREENS" in main and main.SCREENS.has("home"):
+		if bool(main.get("busy")):
+			return
+		_locking = true
+		_silence_inputs()
+		Sfx.play("sparkle", 1.2, -6.0)
+		V10Look.preview(String(it.hero), String(it.id))
+		if is_instance_valid(get_parent()):
+			get_parent().remove_child(self)
+		queue_free()
+		main.go("home", {"tryon": true})
+		return
+	if focus_i >= 0 and focus_i < cards.size():
+		var c: Control = cards[focus_i]
+		V9Feel.press(c, "select", "button")
 	var tint: = Color(G.HEROES[it.hero].color)
 	for tile in tiles:
 		var tl: Sprite2D = tile
 		tl.create_tween().tween_property(tl, "modulate", Color(tint.r, tint.g, tint.b, 1.0), 0.3)
 		Fx.burst(self, tl.position, "petal", 8, tint.lerp(Color.WHITE, 0.4), 0.8)
 	Sfx.play("sparkle", 1.2, -6.0)
-	var main = get_tree().current_scene if is_inside_tree() else null
-	if main != null and "SCREENS" in main and main.SCREENS.has("home"):
-		V10Look.preview(String(it.hero), String(it.id))
-		main.go("home", {"tryon": true})
 
 
 func _unfocus() -> void:
-	if focus_i < 0:
+	if _locking or focus_i < 0:
 		return
 	var c: Control = cards[focus_i]
 	var fi: = focus_i
@@ -325,23 +369,32 @@ func _unfocus() -> void:
 
 
 func _choose() -> void:
-	if focus_i < 0:
+	if _locking or focus_i < 0 or focus_i >= opts.size():
 		return
 	if not confirm:
 		confirm = true
-		pick_btn.lbl.text = "Выбор окончательный — её?"
+		if is_instance_valid(pick_btn) and pick_btn.lbl != null:
+			pick_btn.lbl.text = "Выбор окончательный — её?"
 		V9Feel.press(pick_btn, "select", "button")
 		return
+	_locking = true
 	var it: Dictionary = opts[focus_i]
 	var r: = gacha.choose_first(String(it.id))
 	if r.is_empty():
+		_locking = false
 		return
-	V9Feel.big(pick_btn)
+	set_meta("closable", false)
+	_silence_inputs()
+	if is_instance_valid(pick_btn):
+		V9Feel.big(pick_btn)
 	V10GUI.hanko(self, Vector2(W * 0.5 + 150, H * 0.36 + 200), "ТВОЯ", 140, -8.0)
 	var cb: = on_done
 	var t: = create_tween()
 	t.tween_interval(0.9)
 	t.tween_property(self, "modulate:a", 0.0, 0.3)
 	t.tween_callback(func():
-		cb.call(r)
+		if is_instance_valid(get_parent()):
+			get_parent().remove_child(self)
+		if cb.is_valid():
+			cb.call(r)
 		queue_free())

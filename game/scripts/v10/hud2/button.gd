@@ -1,12 +1,12 @@
 class_name V10Button
 extends Control
 
-# V10Button — luxury AAA lacquer buttons in HUD v2 metrics (Wave 2 overhaul).
-#   "play"      crimson-sakura lacquer gradient, double gold bevel border, subtle top glass sheen,
-#               flanking gold diamonds, luminous ivory Display text with crisp wine backdrop; ZERO idle jitter
-#   "cash"      obsidian-plum lacquer, double gold rim, luminous gold Numerals 28
-#   "secondary" deep plum lacquer, warm gold bevel border, UI 22 paper.100 + gold arrow_r
-#   "quiet"     icon only (48, or 32 inside the top bar) in an 80x80 hit zone
+# V10Button — crisp vector lacquer buttons in HUD v2 metrics ("Тишина и лак").
+#   "play"      refined dusty-rose / velvet-sakura pill (ROSE_500 subtle gradient + 1px champagne-gold top sheen),
+#               crisp NIGHT_900 Playfair Display text, NO AI swirls, NO heavy outline
+#   "cash"      matte obsidian lacquer (NIGHT_700), crisp 1.5px GOLD_500 hairline border, radius 6, PAPER_100 numerals
+#   "secondary" matte NIGHT_800 at alpha 0.92, single 1px top gold hairline (GOLD_700 at alpha 0.45), radius 6
+#   "quiet"     clean icon in subtle translucent circle inside an 80x80 hit zone
 
 signal pressed
 
@@ -36,21 +36,9 @@ var _l: Label
 var _ov: Label
 var _down: = false
 
-const HF_RED_PATH: = "res://assets/v10/hf_ui/btn_lacquer_red.png"
-const HF_BUY_PATH: = "res://assets/v10/hf_ui/btn_lacquer_buy.png"
-static var _tex_red: Texture2D
-static var _tex_buy: Texture2D
-static var _tex_loaded: = false
-
-
-static func _hf_tex(is_buy: bool) -> Texture2D:
-	if not _tex_loaded:
-		_tex_loaded = true
-		if ResourceLoader.exists(HF_RED_PATH):
-			_tex_red = load(HF_RED_PATH) as Texture2D
-		if ResourceLoader.exists(HF_BUY_PATH):
-			_tex_buy = load(HF_BUY_PATH) as Texture2D
-	return _tex_buy if is_buy else _tex_red
+static func _hf_tex(_is_buy: bool) -> Texture2D:
+	# Disabled: HUD v2 buttons are crisp vector lacquer, never AI swirl textures.
+	return null
 
 
 static func draw_hf_pill(ci: CanvasItem, tex: Texture2D, r: Rect2, src: Rect2, src_cap: float, mod: Color) -> void:
@@ -160,13 +148,13 @@ func _init() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	_l = Label.new()
-	_l.label_settings = V10Type.settings("ui", 22, V10DS.PAPER_100, true)
+	_l.label_settings = V10Type.settings("ui", 22, V10DS.PAPER_100, false)
 	_l.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_l.clip_text = true
 	_l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	add_child(_l)
 	_ov = Label.new()
-	_ov.label_settings = V10Type.settings("overline", 18, V10DS.GOLD_300, true)
+	_ov.label_settings = V10Type.settings("overline", 15, V10DS.GOLD_500, true)
 	_ov.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_ov)
 
@@ -194,97 +182,108 @@ func _relayout() -> void:
 	pivot_offset = btn_size * 0.5
 	match kind:
 		"play", "primary":
-			V10Type.fit(_l, text, "button_play", btn_size.x - 88.0, 1, V10DS.BTN_PLAY_TEXT, true)
+			V10Type.fit(_l, text, "button_play", btn_size.x - 64.0, 1, V10DS.NIGHT_900, false)
 			_l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-			_l.position = Vector2(44, 0)
-			_l.size = Vector2(btn_size.x - 88.0, btn_size.y)
+			_l.position = Vector2(32.0, 0.0)
+			_l.size = Vector2(btn_size.x - 64.0, btn_size.y)
 		"cash":
-			_l.label_settings = V10Type.settings("num", 28, V10DS.GOLD_300, true)
+			_l.label_settings = V10Type.settings("num", 28, V10DS.PAPER_100, false)
 			_l.text = text
 			_l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-			_l.position = Vector2(12, 0)
+			_l.position = Vector2(12.0, 0.0)
 			_l.size = Vector2(btn_size.x - 24.0, btn_size.y)
 		"secondary":
-			V10Type.fit(_l, text, "button_ui", btn_size.x - 64.0, 1, V10DS.PAPER_100, true)
+			V10Type.fit(_l, text, "button_ui", btn_size.x - 64.0, 1, V10DS.PAPER_100, false)
 			var tw: = minf(btn_size.x - 64.0, V10Type.text_w(text, "ui", _l.label_settings.font_size))
 			_l.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 			_l.size = Vector2(tw + 6.0, btn_size.y)
-			_l.position = Vector2((btn_size.x - tw - 42.0) * 0.5, 0)
+			_l.position = Vector2((btn_size.x - tw - 36.0) * 0.5, 0.0)
 		_:
 			_l.text = ""
 	_ov.visible = overline != ""
 	if overline != "":
-		_ov.label_settings = V10Type.settings("overline", 18, V10DS.GOLD_300, true)
+		_ov.label_settings = V10Type.settings("overline", 15, V10DS.GOLD_500, true)
 		_ov.text = overline.to_upper()
 		_ov.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		_ov.position = Vector2(0, -30)
-		_ov.size = Vector2(btn_size.x, 24)
+		_ov.position = Vector2(0.0, -26.0)
+		_ov.size = Vector2(btn_size.x, 22.0)
 	queue_redraw()
-
-
-func _draw_diamond(c: Vector2, r: float, col: Color) -> void:
-	draw_colored_polygon(PackedVector2Array([
-		c + Vector2(0, -r), c + Vector2(r, 0), c + Vector2(0, r), c + Vector2(-r, 0)
-	]), col)
 
 
 func _draw() -> void:
 	var r: = Rect2(Vector2.ZERO, btn_size)
 	match kind:
 		"play", "primary":
-			var tred: = _hf_tex(false)
-			if tred != null:
-				draw_hf_pill(self, tred, r, Rect2(6.0, 48.0, 668.0, 105.0), 112.0, V10DS.PAPER_500 if _down else Color.WHITE)
-			else:
-				var rad: = minf(26.0, btn_size.y * 0.32)
-				var ct: = V10DS.BTN_PLAY_DOWN_TOP if _down else V10DS.BTN_PLAY_TOP
-				var cm: = V10DS.BTN_PLAY_DOWN_BOT if _down else V10DS.BTN_PLAY_MID
-				var cb: = V10DS.BTN_PLAY_DOWN_BOT if _down else V10DS.BTN_PLAY_BOT
-				lacquer(self, r, rad, ct, cm, cb, 0.85 if _down else 1.0, V10DS.BTN_PLAY_GLOW, 0.18 if _down else 0.30)
-				var dc: = Color(V10DS.PLATE_SPARK, 0.75 if _down else 0.95)
-				var yc: = btn_size.y * 0.5
-				_draw_diamond(Vector2(26.0, yc), 5.5, dc)
-				_draw_diamond(Vector2(btn_size.x - 26.0, yc), 5.5, dc)
-			# Crisp dark wine outline/drop behind ivory label (keeps Label outline_size == 0 for hud2_selftest)
-			if is_instance_valid(_l) and _l.text != "" and _l.label_settings != null:
-				var f: Font = _l.label_settings.font
-				var fs: int = _l.label_settings.font_size
-				var tw: = f.get_string_size(_l.text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
-				if tw <= _l.size.x + 2.0:
-					var bx: = _l.position.x + (_l.size.x - tw) * 0.5
-					var by: = _l.position.y + (_l.size.y - f.get_height(fs)) * 0.5 + f.get_ascent(fs)
-					var oc: = Color(V10DS.BTN_PLAY_OUTLINE, 0.86)
-					for off in [Vector2(-1.8, 0), Vector2(1.8, 0), Vector2(0, -1.8), Vector2(0, 1.8), Vector2(0, 3.2)]:
-						draw_string(f, Vector2(bx, by) + off, _l.text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, oc)
-			# Decorative flanking gold hairlines on overline
-			if overline != "":
-				var ow: = V10Type.text_w(overline.to_upper(), "overline", 18)
-				var mid: = btn_size.x * 0.5
-				var g0: = maxf(16.0, mid - ow * 0.5 - 48.0)
-				var g1: = mid - ow * 0.5 - 12.0
-				if g1 - g0 > 12.0:
-					V10Plate.hairline(self, g0, g1, -18.0, Color(V10DS.GOLD_500, 0.72))
-					V10Plate.hairline(self, mid + ow * 0.5 + 12.0, minf(btn_size.x - 16.0, mid + ow * 0.5 + 48.0), -18.0, Color(V10DS.GOLD_500, 0.72))
+			var rad: = btn_size.y * 0.5
+			# gentle grounding shadow under the pill
+			draw_colored_polygon(rr_pts(Rect2(r.position + Vector2(0.0, 3.0), r.size), rad, 12), Color(V10DS.NIGHT_900, 0.34))
+			# refined dusty-rose / velvet-sakura vertical tone gradient
+			var ct: = V10DS.ROSE_700.lightened(0.06) if _down else V10DS.ROSE_500.lightened(0.06)
+			var cm: = V10DS.ROSE_700 if _down else V10DS.ROSE_500
+			var cb: = V10DS.ROSE_700.darkened(0.08) if _down else V10DS.ROSE_500.lerp(V10DS.ROSE_700, 0.22)
+			var body_pts: = rr_pts(r, rad, 14)
+			draw_polygon(body_pts, grad_cols(body_pts, r.position.y, r.end.y, [
+				[0.0, ct],
+				[0.52, cm],
+				[1.0, cb],
+			]))
+			# soft velvet top sheen inside the pill
+			var sr: = Rect2(r.position.x + 2.0, r.position.y + 1.5, r.size.x - 4.0, r.size.y * 0.44)
+			if sr.size.x > 8.0 and sr.size.y > 4.0:
+				var sp: = rr_pts(sr, minf(rad - 2.0, sr.size.y * 0.48), 10)
+				draw_polygon(sp, grad_cols(sp, sr.position.y, sr.end.y, [
+					[0.0, Color(V10DS.PAPER_100, 0.06 if _down else 0.13)],
+					[1.0, Color(V10DS.PAPER_100, 0.0)],
+				]))
+			# 1px champagne-gold top hairline sheen + subtle bottom velvet depth
+			var inset: = minf(rad * 0.72, btn_size.x * 0.25)
+			V10Plate.hairline(self, inset, btn_size.x - inset, 1.0, Color(V10DS.PLATE_SPARK, 0.42 if _down else 0.76))
+			V10Plate.hairline(self, inset, btn_size.x - inset, btn_size.y - 1.2, Color(V10DS.ROSE_700, 0.45))
 		"cash":
-			var tbuy: = _hf_tex(true)
-			if tbuy != null:
-				draw_hf_pill(self, tbuy, r, Rect2(5.0, 47.0, 670.0, 104.0), 60.0, V10DS.PAPER_500 if _down else Color.WHITE)
-			else:
-				var ct2: = V10DS.NIGHT_600 if _down else V10DS.BTN_CASH_TOP
-				var cb2: = V10DS.NIGHT_700 if _down else V10DS.BTN_CASH_BOT
-				lacquer(self, r, 12.0, ct2, ct2.lerp(cb2, 0.5), cb2, 0.95, V10DS.PAPER_100, 0.14)
+			var rad2: = 6.0
+			var bg: = V10DS.NIGHT_600 if _down else V10DS.NIGHT_700
+			var pts2: = rr_pts(r, rad2, 8)
+			draw_polygon(pts2, grad_cols(pts2, r.position.y, r.end.y, [
+				[0.0, bg.lightened(0.03)],
+				[1.0, bg],
+			]))
+			# subtle lacquer top gradient
+			var lh2: = r.size.y * 0.42
+			var lac2: = Color(V10DS.PAPER_100, 0.05)
+			var clr2: = Color(V10DS.PAPER_100, 0.0)
+			draw_polygon(PackedVector2Array([
+				Vector2(rad2 * 0.5, 1.5), Vector2(r.size.x - rad2 * 0.5, 1.5),
+				Vector2(r.size.x - 2.0, lh2), Vector2(2.0, lh2),
+			]), PackedColorArray([lac2, lac2, clr2, clr2]))
+			# crisp 1.5px GOLD_500 hairline border
+			var bp: = rr_pts(r.grow(-0.75), maxf(2.0, rad2 - 0.75), 8)
+			bp.append(bp[0])
+			draw_polyline(bp, V10DS.GOLD_300 if _down else V10DS.GOLD_500, 1.5, true)
 		"secondary":
-			var st: = V10DS.BTN_SEC_DOWN_TOP if _down else V10DS.BTN_SEC_TOP
-			var sb_bot: = V10DS.BTN_SEC_DOWN_BOT if _down else V10DS.BTN_SEC_BOT
-			lacquer(self, r, 16.0, st, st.lerp(sb_bot, 0.55), sb_bot, 0.9 if _down else 0.85, V10DS.PAPER_100, 0.14)
+			var rad3: = 6.0
+			var bg3: = Color(V10DS.NIGHT_600, 0.96) if _down else Color(V10DS.NIGHT_800, 0.92)
+			draw_colored_polygon(rr_pts(r, rad3, 8), bg3)
+			# subtle lacquer top tone + 1px bottom tone
+			var lh3: = r.size.y * 0.40
+			var lac3: = Color(V10DS.PAPER_100, 0.05)
+			var clr3: = Color(V10DS.PAPER_100, 0.0)
+			draw_polygon(PackedVector2Array([
+				Vector2(rad3 * 0.5, 1.0), Vector2(r.size.x - rad3 * 0.5, 1.0),
+				Vector2(r.size.x - 1.5, lh3), Vector2(1.5, lh3),
+			]), PackedColorArray([lac3, lac3, clr3, clr3]))
+			draw_line(Vector2(rad3, r.size.y - 1.0), Vector2(r.size.x - rad3, r.size.y - 1.0), Color(V10DS.NIGHT_900, 0.65), 1.0)
+			# single 1px top gold hairline (GOLD_700 at alpha 0.45)
+			V10Plate.hairline(self, 12.0, btn_size.x - 12.0, 0.8, Color(V10DS.GOLD_500 if _down else V10DS.GOLD_700, 0.65 if _down else 0.45))
 			if text != "":
 				var tw2: = _l.size.x
-				V10Icons.draw(self, "arrow_r", Vector2(_l.position.x + tw2 + 20.0, btn_size.y * 0.5), 24, V10DS.GOLD_300)
+				V10Icons.draw(self, "arrow_r", Vector2(_l.position.x + tw2 + 18.0, btn_size.y * 0.5), 24, V10DS.GOLD_300)
 		"quiet":
-			if _down:
-				draw_circle(btn_size * 0.5, minf(btn_size.x, btn_size.y) * 0.42, Color(V10DS.NIGHT_600, 0.6), true, -1.0, true)
+			var ctr: = btn_size * 0.5
+			var dr: = minf(btn_size.x, btn_size.y) * 0.36
+			draw_circle(ctr, dr, Color(V10DS.NIGHT_600, 0.72) if _down else Color(V10DS.NIGHT_800, 0.44), true, -1.0, true)
+			draw_arc(ctr, dr, 0.0, TAU, 48, Color(V10DS.GOLD_500, 0.60) if _down else Color(V10DS.GOLD_700, 0.34), 1.0, true)
 			if icon != "":
-				V10Icons.draw(self, icon, btn_size * 0.5, icon_px, icon_color)
+				V10Icons.draw(self, icon, ctr, icon_px, icon_color)
 
 
 func _tap_feedback(denied: = false) -> void:

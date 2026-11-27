@@ -58,24 +58,13 @@ func build(m, args: Dictionary) -> void:
 	bg.size = br.size
 	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(bg)
-	var vip_bg_p: = "res://assets/v10/salon_vip/boudoir_mc.webp"
-	if ResourceLoader.exists(vip_bg_p):
-		var vbg: = TextureRect.new()
-		vbg.texture = load(vip_bg_p)
-		vbg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		vbg.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
-		vbg.position = br.position
-		vbg.size = br.size
-		vbg.modulate = Color(0.55, 0.38, 0.48, 0.38)
-		vbg.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		add_child(vbg)
 	_top_pad = _safe_top()
 	_header_h = _top_pad + 112.0
 	_build_map()
 	_build_header()
-	if main != null and ResourceLoader.exists("res://assets/v10/salon_vip/boudoir_mc.webp"):
+	if _vip_strip_h() > 0.0:
 		var vb: = _vip_boudoir_banner(minf(W, 1000.0))
-		vb.position = Vector2(0, _header_h + 2.0)
+		vb.position = Vector2(0, _header_h + 6.0)
 		add_child(vb)
 	_build_bottom()
 	toast_box = Control.new()
@@ -180,8 +169,7 @@ func _fill() -> void:
 		c.queue_free()
 	zones.clear()
 	var zw: = minf(W, 1000.0)
-	var vip_extra: = 132.0 if (main != null and ResourceLoader.exists("res://assets/v10/salon_vip/boudoir_mc.webp")) else 0.0
-	_spacer(_header_h + 8.0 + vip_extra)
+	_spacer(_header_h + 10.0 + _vip_strip_h())
 	# the one locked teaser on top: the next locked zone, else arc 2
 	var ids: Array = V10SalonData.zone_ids()
 	var shown: = []
@@ -221,59 +209,77 @@ func _spacer(h: float) -> void:
 	list.add_child(s)
 
 
+func _vip_strip_h() -> float:
+	if main != null and ResourceLoader.exists("res://assets/v10/salon_vip/boudoir_mc.webp"):
+		return 68.0
+	return 0.0
+
+
 func _vip_boudoir_banner(zw: float) -> Control:
-	var c: = Control.new()
-	c.size = Vector2(W, 122)
-	c.custom_minimum_size = Vector2(W, 122)
-	c.mouse_filter = Control.MOUSE_FILTER_STOP
+	# Sleek minimal 1-line lacquer strip (height = 56px, HUD_V2 surface, zero clipping)
+	var strip_h: = 56.0
 	var bw: = zw - 48.0
 	var bx: = (W - zw) * 0.5 + 24.0
-	var frame: = Panel.new()
-	frame.position = Vector2(bx, 2)
-	frame.size = Vector2(bw, 116)
-	frame.clip_contents = true
-	frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var sb: = StyleBoxFlat.new()
-	sb.bg_color = Color(0.14, 0.05, 0.16, 0.98)
-	sb.border_color = V10SalonUI.GOLD_300
-	sb.set_border_width_all(2)
-	sb.set_corner_radius_all(18)
-	sb.shadow_color = Color(0.0, 0.0, 0.0, 0.65)
-	sb.shadow_size = 10
-	frame.add_theme_stylebox_override("panel", sb)
-	c.add_child(frame)
-	var thumbs: Array[String] = ["boudoir_mc.webp", "teabar_rin.webp", "moonbath_yue.webp", "penthouse_nova.webp"]
-	var tw: = bw / float(thumbs.size())
-	for i in thumbs.size():
-		var tp: String = "res://assets/v10/salon_vip/" + thumbs[i]
-		if ResourceLoader.exists(tp):
-			var tr: = TextureRect.new()
-			tr.texture = load(tp)
-			tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-			tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
-			tr.position = Vector2(float(i) * tw, 0)
-			tr.size = Vector2(tw + 2.0, 116)
-			tr.mouse_filter = Control.MOUSE_FILTER_IGNORE
-			frame.add_child(tr)
-	var shade: = ColorRect.new()
-	shade.color = Color(0.07, 0.02, 0.11, 0.50)
-	shade.size = Vector2(bw, 116)
-	shade.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	frame.add_child(shade)
-	var ov: = V10SalonUI.label("VIP · 4 БУДУАРА ГЕРОИНЬ 16+", 18, V10SalonUI.GOLD_300, "body", 800, 0.9)
-	ov.position = Vector2(20, 12)
-	frame.add_child(ov)
-	var title: = V10SalonUI.label("VIP-Будуары Салона ›", 32, V10SalonUI.PAPER_100, "italic", 600, 0.95)
-	title.position = Vector2(20, 36)
-	frame.add_child(title)
-	var sub: = V10SalonUI.label("Алый будуар · Бар Рин · Купальни Юэ · Пентхаус Новы", 18, V10SalonUI.PAPER_300, "body", 700, 0.85)
-	sub.position = Vector2(20, 82)
-	frame.add_child(sub)
-	c.gui_input.connect(func(e: InputEvent) -> void:
+	var c: = Control.new()
+	c.size = Vector2(W, strip_h + 4.0)
+	c.custom_minimum_size = Vector2(W, strip_h + 4.0)
+	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var strip: = Control.new()
+	strip.position = Vector2(bx, 2.0)
+	strip.size = Vector2(bw, strip_h)
+	strip.pivot_offset = Vector2(bw * 0.5, strip_h * 0.5)
+	strip.mouse_filter = Control.MOUSE_FILTER_STOP
+	strip.draw.connect(func() -> void:
+		var r: = Rect2(Vector2.ZERO, strip.size)
+		strip.draw_style_box(V10SalonUI.panel_box(Color(V10SalonUI.NIGHT_800, 0.92), 6.0), r)
+		# subtle top lacquer sheen
+		var lh: = strip_h * 0.44
+		var lac: = Color(V10SalonUI.PAPER_100, 0.05)
+		var clr: = Color(V10SalonUI.PAPER_100, 0.0)
+		strip.draw_polygon(PackedVector2Array([
+			Vector2(4.0, 1.0), Vector2(bw - 4.0, 1.0),
+			Vector2(bw - 2.0, lh), Vector2(2.0, lh),
+		]), PackedColorArray([lac, lac, clr, clr]))
+		# 1px bottom tone
+		strip.draw_line(Vector2(6.0, strip_h - 1.0), Vector2(bw - 6.0, strip_h - 1.0), Color(V10SalonUI.NIGHT_900, 0.65), 1.0)
+		# single 1px top gold hairline, faded smoothly at both ends
+		var gcol: = Color(V10SalonUI.GOLD_700, 0.58)
+		var g0: = Color(gcol, 0.0)
+		strip.draw_polyline_colors(PackedVector2Array([
+			Vector2(12.0, 0.8), Vector2(36.0, 0.8), Vector2(bw - 36.0, 0.8), Vector2(bw - 12.0, 0.8),
+		]), PackedColorArray([g0, gcol, gcol, g0]), 1.0, true)
+		# small gold diamond ornament on the left
+		var dc: = Vector2(22.0, strip_h * 0.5)
+		strip.draw_colored_polygon(PackedVector2Array([
+			dc + Vector2(0.0, -4.5), dc + Vector2(4.5, 0.0), dc + Vector2(0.0, 4.5), dc + Vector2(-4.5, 0.0),
+		]), V10SalonUI.GOLD_500)
+		# crisp right chevron
+		var cc: = Vector2(bw - 22.0, strip_h * 0.5)
+		strip.draw_polyline(PackedVector2Array([
+			cc + Vector2(-4.0, -6.5), cc + Vector2(3.5, 0.0), cc + Vector2(-4.0, 6.5),
+		]), V10SalonUI.GOLD_300, 2.0, true))
+	var t_main: = "VIP-Будуары богинь"
+	var t_accent: = " · 10 комнат"
+	var mw: = V10SalonUI.text_w(t_main, 18, "body", 800)
+	var lbl_main: = V10SalonUI.label(t_main, 18, V10SalonUI.PAPER_100, "body", 800)
+	lbl_main.position = Vector2(38.0, 0.0)
+	lbl_main.size = Vector2(mw + 8.0, strip_h)
+	lbl_main.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	strip.add_child(lbl_main)
+	var lbl_acc: = V10SalonUI.label(t_accent, 18, V10SalonUI.GOLD_300, "body", 800)
+	lbl_acc.position = Vector2(38.0 + mw, 0.0)
+	lbl_acc.size = Vector2(maxf(80.0, bw - (38.0 + mw) - 38.0), strip_h)
+	lbl_acc.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	lbl_acc.clip_text = true
+	lbl_acc.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	strip.add_child(lbl_acc)
+	strip.gui_input.connect(func(e: InputEvent) -> void:
 		if (e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT) or (e is InputEventScreenTouch and e.pressed):
-			c.accept_event()
+			strip.accept_event()
+			V9Feel.press(strip, "tap")
 			if main != null and main.has_method("go"):
 				main.go("v10boudoir", {}))
+	c.add_child(strip)
 	return c
 
 
@@ -366,9 +372,10 @@ func _scroll_to(zid: String, animate: = true) -> void:
 		_check_visible()
 		return
 	var row: Control = zones[zid].get_parent()
-	# the zone sits between the header and the bottom bar
-	var free_h: = H - _header_h - _bottom_h
-	var target: = row.position.y - _header_h - maxf(0.0, (free_h - row.size.y) * 0.5)
+	# the zone sits cleanly between the header (+ VIP strip) and the bottom bar
+	var top_bound: = _header_h + _vip_strip_h() + 6.0
+	var free_h: = H - top_bound - _bottom_h
+	var target: = row.position.y - top_bound - maxf(0.0, (free_h - row.size.y) * 0.5)
 	target = clampf(target, 0.0, maxf(0.0, list.size.y - H))
 	if animate:
 		var t: = create_tween()
@@ -494,17 +501,17 @@ func _show_intro() -> void:
 	# her line as Voice text over the map (no bubble box, UX §6.3), with a soft shade behind it
 	intro_plate = Control.new()
 	intro_plate.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	intro_plate.position = Vector2(0, H - _bottom_h - 150)
-	intro_plate.size = Vector2(W, 150)
+	intro_plate.position = Vector2(0, H - _bottom_h - 118)
+	intro_plate.size = Vector2(W, 118)
 	intro_plate.z_index = 20
-	var sh: = _vgrad(Rect2(0, 0, W, 150), Color(V10SalonUI.NIGHT_900, 0.0), Color(V10SalonUI.NIGHT_900, 0.92), 0.45)
+	var sh: = _vgrad(Rect2(0, 0, W, 118), Color(V10SalonUI.NIGHT_900, 0.0), Color(V10SalonUI.NIGHT_900, 0.94), 0.42)
 	intro_plate.add_child(sh)
 	var who: = V10SalonUI.label("Маджонг-тян", 18, V10SalonUI.ROSE_300, "body", 800, 0.6)
-	who.position = Vector2(32, 36)
+	who.position = Vector2(32, 14)
 	intro_plate.add_child(who)
 	var l: = V10SalonUI.label(V10Salon.intro_text(), 30, V10SalonUI.PAPER_100, "italic", 500, 0.8)
-	l.position = Vector2(32, 62)
-	l.size = Vector2(W - 64, 84)
+	l.position = Vector2(32, 38)
+	l.size = Vector2(W - 64, 76)
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	l.visible_ratio = 0.0
 	intro_plate.add_child(l)

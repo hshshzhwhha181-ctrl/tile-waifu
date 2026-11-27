@@ -14,12 +14,13 @@ extends "res://scripts/screens/summon.gd"
 # Integrator: main.SCREENS["summon"] → this script (one line, hook H1 in README); dev acts: see dev_act().
 
 const NAV_H: = 132.0
-const SPINE_Y: = 224.0          # top of the page content under the header (the 0.9 tab spine is gone)
+const SPINE_Y: = 112.0          # top of the page content right below the 88 px HUD_V2 header
 # 0.12 «Желания 2.0»: the lantern-altar backdrop (the file is optional: without it the 0.9 summon night stays), the big
 # SSR counter sheet, the strip of the five Wave-1 goddesses
 const ALTAR_BG: = "res://assets/v10/hf_ui/gacha_altar_bg.webp"
-const SHEET_H: = 232.0
-const STRIP_H: = 78.0
+const SHEET_H: = 216.0
+const STRIP_H: = 74.0
+const BTN_H: = 108.0
 const W1_STRIP: = ["tsubame", "miel", "kohaku", "shirin", "zlata"]
 
 var gacha: V10Gacha2
@@ -30,11 +31,15 @@ var cur_b: Dictionary = {}
 var page: Control
 var candles_node: V10Candelabra
 var odds_link: Control
+var prev_btn: Control
+var next_btn: Control
 var _drag_from: = Vector2.ZERO
 var _dragging: = false
 var _pull_res: Array = []          # v2 results of the running pull (same order as seq_res)
 var _candles_before: = 0
 var first_view: Control
+var odds_view: V10OddsScreen
+var spark_view: V10SparkSheet
 var dev_no_first: = false
 var dev_first_force: = false
 var confirm: V10PullConfirm        # the open purchase confirmation (UX_RULES §5.2.6), if any
@@ -71,10 +76,10 @@ func build(m, args: Dictionary) -> void:
 
 # the lantern altar behind every page and behind the ritual (the pull sequence dims it), with a few soft golden motes
 func _altar_layer() -> void:
-	var tex: = V10GUI.tex_or_null(ALTAR_BG) if ResourceLoader.exists(ALTAR_BG) else null
+	var tex: = _load_tex(ALTAR_BG) if ResourceLoader.exists(ALTAR_BG) else null
 	var br: = V10Layout.bleed_rect(self)
 	if tex != null:
-		var bg: = V10GUI.cover(tex, br, Vector2(0.5, 0.55))
+		var bg: = _cover_art(tex, br, Vector2(0.5, 0.55))
 		bg.name = "AltarBg"
 		bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		add_child(bg)
@@ -103,6 +108,47 @@ func _altar_layer() -> void:
 	move_child(p, mini(2, get_child_count() - 1))
 
 
+static func _disable_tree_input(n: Node) -> void:
+	if n == null or not is_instance_valid(n):
+		return
+	if n is Control:
+		(n as Control).mouse_filter = Control.MOUSE_FILTER_IGNORE
+	for ch in n.find_children("*", "Control", true, false):
+		(ch as Control).mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+
+func _clear_old_banners() -> void:
+	for ch in get_children():
+		if ch != banner_root and ch.has_meta("wish_banner_root"):
+			_disable_tree_input(ch)
+			remove_child(ch)
+			ch.queue_free()
+
+
+func _modal_open(m: Control) -> bool:
+	return m != null and is_instance_valid(m) and m.is_inside_tree() and not m.is_queued_for_deletion() and m.mouse_filter != Control.MOUSE_FILTER_IGNORE
+
+
+func _has_open_modal() -> bool:
+	return _modal_open(confirm) or _modal_open(odds_view) or _modal_open(spark_view) or _modal_open(first_view)
+
+
+func _btn_y() -> float:
+	return H - NAV_H - 20.0 - BTN_H
+
+
+func _sheet_y() -> float:
+	return _btn_y() - 14.0 - SHEET_H
+
+
+func _dots_y() -> float:
+	return _sheet_y() - 22.0
+
+
+func _strip_y() -> float:
+	return _sheet_y() - 34.0 - STRIP_H
+
+
 func _bind_v09_banner() -> void:
 	# the 0.9 sequence reads G.BANNERS[banner_i] (voice line, colour); point it at a non-newbie banner of her
 	var hero: = String(cur_b.get("hero", "mc"))
@@ -114,13 +160,21 @@ func _bind_v09_banner() -> void:
 
 # ---------------------------------------------------------------- banner page
 func _build_banner() -> void:
-	if banner_root:
+	_dragging = false
+	if banner_root and is_instance_valid(banner_root):
+		_disable_tree_input(banner_root)
+		if is_instance_valid(banner_root.get_parent()):
+			banner_root.get_parent().remove_child(banner_root)
 		banner_root.queue_free()
+		banner_root = null
+	_clear_old_banners()
 	blist = gacha.banners()
 	bsel = clampi(bsel, 0, blist.size() - 1)
 	cur_b = blist[bsel]
 	_bind_v09_banner()
 	banner_root = Control.new()
+	banner_root.name = "BannerRoot"
+	banner_root.set_meta("wish_banner_root", true)
 	banner_root.size = size
 	banner_root.mouse_filter = Control.MOUSE_FILTER_PASS
 	banner_root.gui_input.connect(_page_input)
@@ -128,12 +182,12 @@ func _build_banner() -> void:
 	circle.visible = false
 	page = banner_root
 	_art_layer()
-	# one entry to the odds: «ⓘ Шансы» next to the wish buttons (С-5); the header keeps only «‹» until the
-	# HUD v2 header puts «ⓘ Шансы» in its right slot (README, hook H1)
+	# one entry to the odds: «ⓘ Шансы» next to the wish buttons (С-5); the header keeps «‹» + currency chips
 	var hdr: = V8Header.make(banner_root, main, "Желания", main.back)
 	hdr.show_money(["tickets", "gems"])
 	set_meta("v8_back", main.back)
 	_title_block()
+	_chevrons()
 	_sheet()
 	_w1_strip()
 	_dots()
@@ -163,6 +217,32 @@ static func _load_tex(p: String) -> Texture2D:
 	return null
 
 
+# Clean full-bleed cover container: clip_contents = true + STRETCH_KEEP_ASPECT_COVERED, zero stretch or bleed on 20:9 / 9:16
+static func _cover_art(tex: Texture2D, rect: Rect2, focus: = Vector2(0.5, 0.4)) -> Control:
+	var clip: = Control.new()
+	clip.position = rect.position
+	clip.size = rect.size
+	clip.clip_contents = true
+	clip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if tex == null:
+		return clip
+	var ts: = Vector2(maxf(1.0, float(tex.get_width())), maxf(1.0, float(tex.get_height())))
+	var k: = maxf(rect.size.x / ts.x, rect.size.y / ts.y)
+	var sz: = ts * k
+	var t: = TextureRect.new()
+	t.name = "Img"
+	t.texture = tex
+	t.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	t.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	t.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	t.size = sz
+	t.position = Vector2((rect.size.x - sz.x) * clampf(focus.x, 0.0, 1.0), (rect.size.y - sz.y) * clampf(focus.y, 0.0, 1.0))
+	t.pivot_offset = sz * 0.5
+	t.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	clip.add_child(t)
+	return clip
+
+
 func _art_layer() -> void:
 	var k: = _kind()
 	var bg_path: = String(cur_b.get("art", ""))
@@ -170,30 +250,41 @@ func _art_layer() -> void:
 	if k == "phase" and tex == null:
 		bg_path = "res://assets/v10/gacha/key_new_moon.webp" if String(cur_b.get("half", "A")) == "A" else "res://assets/v10/gacha/key_full_moon.webp"
 		tex = _load_tex(bg_path)
-	var focus: = Vector2(0.6, 0.35) if k == "newbie" else Vector2(0.5, 0.4)
-	# the heroine's face never sits under the bar and the header (UX_RULES §2.2): her key art starts below them
-	var top: = 0.0 if k == "phase" else (SPINE_Y - 40.0 if k == "newbie" else 0.0)
+	var focus: = Vector2(0.58, 0.28) if k == "newbie" else Vector2(0.5, 0.36)
 	var br: = V10Layout.bleed_rect(self)
-	var bg: = V10GUI.cover(tex, Rect2(Vector2(br.position.x, top), Vector2(br.size.x, br.end.y - top)), focus)
+	# Newbie key art starts right below the 88 px header with a dark header cap so her face stays clear and zero seam shows
+	var top: = 88.0 if k == "newbie" else br.position.y
+	if k == "newbie":
+		var hdr_cap: = ColorRect.new()
+		hdr_cap.position = br.position
+		hdr_cap.size = Vector2(br.size.x, maxf(0.0, top - br.position.y + 4.0))
+		hdr_cap.color = V10GUI.NIGHT_900
+		hdr_cap.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		banner_root.add_child(hdr_cap)
+	var bg: = _cover_art(tex, Rect2(Vector2(br.position.x, top), Vector2(br.size.x, br.end.y - top)), focus)
+	bg.name = "BannerArt"
 	banner_root.add_child(bg)
 	if k == "phase":
 		_phase_cards()
 	# magazine shades: night from the left (typography) and from the bottom (sheet and buttons), top under the bar
-	banner_root.add_child(V10GUI.shade(Rect2(0, 0, W * 0.75, H), Color(V10GUI.NIGHT_900, 0.78), Color(V10GUI.NIGHT_900, 0.0)))
-	banner_root.add_child(V10GUI.shade(Rect2(0, H * 0.5, W, H * 0.5), Color(V10GUI.NIGHT_900, 0.0), Color(V10GUI.NIGHT_900, 0.97), true))
-	banner_root.add_child(V10GUI.shade(Rect2(0, 0, W, 300), Color(V10GUI.NIGHT_900, 0.85), Color(V10GUI.NIGHT_900, 0.0), true))
-	UI.pop_in(bg.get_node_or_null("Img") if bg.get_node_or_null("Img") else bg, 0.0, 0.97)
+	banner_root.add_child(V10GUI.shade(Rect2(br.position.x, br.position.y, br.size.x * 0.72, br.size.y), Color(V10GUI.NIGHT_900, 0.76), Color(V10GUI.NIGHT_900, 0.0)))
+	banner_root.add_child(V10GUI.shade(Rect2(br.position.x, H * 0.48, br.size.x, br.end.y - H * 0.48), Color(V10GUI.NIGHT_900, 0.0), Color(V10GUI.NIGHT_900, 0.96), true))
+	banner_root.add_child(V10GUI.shade(Rect2(br.position.x, br.position.y, br.size.x, 220.0 - br.position.y), Color(V10GUI.NIGHT_900, 0.86), Color(V10GUI.NIGHT_900, 0.0), true))
+	var img_node: Control = bg.get_node_or_null("Img")
+	UI.pop_in(img_node if img_node else bg, 0.0, 0.985)
 
 
 func _card_rect() -> Rect2:
-	var top: = SPINE_Y + 36.0
-	var bottom: = H - NAV_H - 360.0 - (SHEET_H - 196.0) - 52.0
-	# the card never takes more than 58 % of the width (the title column keeps ≥ 40 %) and centres in the free band
-	var h: = clampf(bottom - top, 380.0, 640.0)
-	var w: = minf(h * 0.75, W * 0.58)
-	h = w / 0.75
-	var y: = top + maxf(0.0, (bottom - top - h) * 0.4)
-	return Rect2(W - w - 18.0, y, w, h)
+	var ssr: Array = cur_b.get("ssr", [])
+	var two: = ssr.size() >= 2
+	var top: = SPINE_Y + 24.0
+	var bottom: = (_strip_y() - 72.0) if V10Wave1.released() else (_sheet_y() - 96.0)
+	var avail_h: = maxf(340.0, bottom - top)
+	var max_w: = (294.0 if H > 1400.0 else 276.0) if two else (342.0 if H > 1400.0 else 312.0)
+	var w: = minf(avail_h * 0.75, max_w)
+	var h: = w / 0.75
+	var y: = top + maxf(0.0, (avail_h - h) * 0.34)
+	return Rect2(W - w - 22.0, y, w, h)
 
 
 # phase A: one framed card; phase B: two fanned cards, the target in front (tap the back one to switch target)
@@ -214,20 +305,23 @@ func _phase_cards() -> void:
 	banner_root.add_child(glow)
 	if ssr.size() >= 2:
 		var other: = String(ssr[1]) if tgt == String(ssr[0]) else String(ssr[0])
-		var br: = Rect2(r.position + Vector2(-r.size.x * 0.34, r.size.y * 0.06), r.size * 0.84)
-		var back: = _framed_card(other, br, -7.0, true)
+		var br: = Rect2(r.position + Vector2(-74.0, 26.0), r.size * 0.86)
+		var back: = _framed_card(other, br, -6.0, true)
 		back.mouse_filter = Control.MOUSE_FILTER_STOP
 		back.gui_input.connect(func(e):
-			if e is InputEventMouseButton and e.pressed:
+			if (e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT) or (e is InputEventScreenTouch and e.pressed):
+				if seq != null or _has_open_modal():
+					return
+				back.accept_event()
 				_set_target(other, back))
 		back.set_meta("ux_role", "secondary")
-	var front: = _framed_card(tgt, r, 3.0, false)
+	var front: = _framed_card(tgt, r, 2.5, false)
 	# one infinite UI animation on the screen: the card breathes (UX_RULES §6.7)
 	if V9Feel.can_fx():
 		var bt: = front.create_tween().set_loops()
 		bt.tween_property(front, "scale", Vector2(1.012, 1.012), 1.6).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 		bt.tween_property(front, "scale", Vector2.ONE, 1.6).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	UI.pop_in(front, 0.05, 0.9)
+	UI.pop_in(front, 0.05, 0.92)
 
 
 func _framed_card(id: String, r: Rect2, rot: float, dim: bool) -> Control:
@@ -239,15 +333,30 @@ func _framed_card(id: String, r: Rect2, rot: float, dim: bool) -> Control:
 	c.rotation = deg_to_rad(rot)
 	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	banner_root.add_child(c)
-	var pad: = r.size.x * 0.035
+	var pad: = roundf(r.size.x * 0.036)
+	var inner_sz: = r.size - Vector2(pad, pad) * 2.0
+	var clip: = Control.new()
+	clip.position = Vector2(pad, pad)
+	clip.size = inner_sz
+	clip.clip_contents = true
+	clip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	c.add_child(clip)
+	var fill_bg: = ColorRect.new()
+	fill_bg.size = inner_sz
+	fill_bg.color = V10GUI.NIGHT_800
+	fill_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	clip.add_child(fill_bg)
 	if not it.is_empty():
-		var art: = Common.card_art(G.art_tex(it), Rect2(Vector2(pad, pad), r.size - Vector2(pad, pad) * 2), Vector2(0.5, 0.3), 1.0, 10.0)
-		(art.material as ShaderMaterial).set_shader_parameter("holo", 0.18 if not dim else 0.0)
-		(art.material as ShaderMaterial).set_shader_parameter("bottom_shade", 0.35)
-		c.add_child(art)
-	var fr: = V10GUI.icon(V10GUI.tex_or_null("res://assets/v10/gacha/banner_frame.png"), Rect2(Vector2.ZERO, r.size))
-	fr.stretch_mode = TextureRect.STRETCH_SCALE
-	c.add_child(fr)
+		var art: = _cover_art(G.art_tex(it), Rect2(Vector2.ZERO, inner_sz), Vector2(0.5, 0.28))
+		clip.add_child(art)
+		clip.add_child(V10GUI.shade(Rect2(0, inner_sz.y * 0.65, inner_sz.x, inner_sz.y * 0.35), Color(V10GUI.NIGHT_900, 0.0), Color(V10GUI.NIGHT_900, 0.42), true))
+	var fr_tex: = V10GUI.tex_or_null("res://assets/v10/gacha/banner_frame.png")
+	if fr_tex != null:
+		var fr: = V10GUI.icon(fr_tex, Rect2(Vector2.ZERO, r.size))
+		fr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		fr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+		fr.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		c.add_child(fr)
 	if dim:
 		c.modulate = Color(0.62, 0.6, 0.68)
 	return c
@@ -269,67 +378,121 @@ func _item_title(id: String) -> String:
 	return "%s · %s" % [G.HEROES[it.hero].name, it.name] if it.has("hero") else String(it.name)
 
 
-# page dots (HUD_V2 §8.4): up to 3 banners, the current one in gold; banners change by swipe. Not tappable, no
-# words: the overline of each page says which banner it is (the old name spine cost 6 words and 3 taps on a hub).
+# Subtle 56x56 dark-glass night.800 + hairline gold chevrons («‹» / «›») so mobile players can browse banners effortlessly
+func _chevrons() -> void:
+	prev_btn = null
+	next_btn = null
+	if blist.size() < 2:
+		return
+	var anchor_bottom: = _strip_y() if V10Wave1.released() else _dots_y()
+	var cy: = clampf(anchor_bottom - 68.0, 504.0, H * 0.50)
+	for dir in [-1, 1]:
+		var btn: = Panel.new()
+		btn.name = "BannerPrev" if dir < 0 else "BannerNext"
+		btn.size = Vector2(56, 56)
+		btn.pivot_offset = Vector2(28, 28)
+		btn.position = Vector2(16.0 if dir < 0 else W - 72.0, cy)
+		btn.mouse_filter = Control.MOUSE_FILTER_STOP
+		btn.set_meta("ux_role", "tertiary")
+		var sb: = StyleBoxFlat.new()
+		sb.bg_color = Color(V10GUI.NIGHT_800, 0.88)
+		sb.border_color = Color(V10GUI.GOLD_500, 0.52)
+		sb.set_border_width_all(1)
+		sb.set_corner_radius_all(14)
+		sb.shadow_color = Color(V10GUI.NIGHT_900, 0.42)
+		sb.shadow_size = 6
+		sb.shadow_offset = Vector2(0, 2)
+		btn.add_theme_stylebox_override("panel", sb)
+		var gl: = V10GUI.lbl("‹" if dir < 0 else "›", 30, V10GUI.GOLD_300, "body", 800)
+		UI.center_label(gl, Rect2(-1.0 if dir < 0 else 1.0, -2.0, 56, 56))
+		btn.add_child(gl)
+		var step_dir: int = dir
+		btn.gui_input.connect(func(e: InputEvent) -> void:
+			if (e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT) or (e is InputEventScreenTouch and e.pressed):
+				btn.accept_event()
+				if seq != null or _has_open_modal() or blist.size() < 2:
+					return
+				V9Feel.press(btn, "tap", "button")
+				_switch((bsel + step_dir + blist.size()) % blist.size(), step_dir))
+		banner_root.add_child(btn)
+		if dir < 0:
+			prev_btn = btn
+		else:
+			next_btn = btn
+
+
+# page dots (HUD_V2 §8.4, 05_summon.webp): centred above the counter sheet, current banner in gold
 func _dots() -> void:
 	if blist.size() < 2:
 		return
-	var by: = H - NAV_H - 24.0 - 112.0
-	var y: = by - SHEET_H - 4.0
+	var y: = _dots_y()
+	var gap: = 10.0
+	var total_w: = 22.0 + float(blist.size() - 1) * (8.0 + gap)
+	var x: = (W - total_w) * 0.5
 	for i in blist.size():
 		var d: = Panel.new()
 		var on: = i == bsel
+		var dw: = 22.0 if on else 8.0
 		var sb: = StyleBoxFlat.new()
 		sb.bg_color = V10GUI.GOLD_300 if on else Color(V10GUI.PAPER_500, 0.55)
 		sb.set_corner_radius_all(4)
 		d.add_theme_stylebox_override("panel", sb)
-		d.size = Vector2(8, 8)
-		d.position = Vector2(32 + i * 16, y)
+		d.size = Vector2(dw, 8)
+		d.position = Vector2(x, y)
 		d.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		d.name = "Dot%d" % i
 		banner_root.add_child(d)
+		x += dw + gap
 
 
 func _switch(i: int, dir: = 0) -> void:
-	if i < 0 or i >= blist.size() or i == bsel:
+	if seq != null or i < 0 or i >= blist.size() or i == bsel:
 		return
 	if dir == 0:
 		dir = signi(i - bsel)
+	_clear_old_banners()
 	bsel = i
 	var old: = banner_root
 	banner_root = null
 	_build_banner()
-	# «Тушь»/«Шёлк»: the old page slides out, the new one fades in from the swipe side (240 ms, QUINT OUT)
+	# «Тушь»/«Шёлк»: the old page slides out with inputs silenced, the new one fades in from the swipe side (220 ms, QUINT OUT)
 	if is_instance_valid(old):
-		old.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_disable_tree_input(old)
 		var t: = old.create_tween().set_parallel()
-		t.tween_property(old, "position:x", -dir * W * 0.25, 0.24).set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_OUT)
-		t.tween_property(old, "modulate:a", 0.0, 0.24)
-		t.chain().tween_callback(old.queue_free)
+		t.tween_property(old, "position:x", -dir * W * 0.25, 0.22).set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_OUT)
+		t.tween_property(old, "modulate:a", 0.0, 0.22)
+		t.chain().tween_callback(func():
+			if is_instance_valid(old):
+				if is_instance_valid(old.get_parent()):
+					old.get_parent().remove_child(old)
+				old.queue_free())
 	banner_root.position.x = dir * W * 0.12
 	banner_root.modulate.a = 0.0
 	var tn: = banner_root.create_tween().set_parallel()
-	tn.tween_property(banner_root, "position:x", 0.0, 0.24).set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_OUT)
-	tn.tween_property(banner_root, "modulate:a", 1.0, 0.24)
+	tn.tween_property(banner_root, "position:x", 0.0, 0.22).set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_OUT)
+	tn.tween_property(banner_root, "modulate:a", 1.0, 0.22)
 	Sfx.play("whoosh", 1.25, -10.0)
 
 
 func _page_input(e: InputEvent) -> void:
-	if e is InputEventMouseButton:
+	if seq != null or _has_open_modal():
+		_dragging = false
+		return
+	if e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT:
 		if e.pressed:
 			_drag_from = e.position
 			_dragging = true
 		elif _dragging:
 			_dragging = false
 			var d: Vector2 = e.position - _drag_from
-			if absf(d.x) > 90.0 and absf(d.x) > absf(d.y) * 1.5:
-				_switch(bsel + (1 if d.x < 0 else -1))
+			if absf(d.x) > 72.0 and absf(d.x) > absf(d.y) * 1.4:
+				_switch(bsel + (1 if d.x < 0 else -1), 1 if d.x < 0 else -1)
 
 
 func _title_block() -> void:
 	var k: = _kind()
 	var x: = 32.0
-	var y: = SPINE_Y + 40.0
+	var y: = SPINE_Y + 24.0
 	var col: = V10GUI.GOLD_500
 	var over: = ""
 	var title: = String(cur_b.get("name", ""))
@@ -353,9 +516,10 @@ func _title_block() -> void:
 	ol.position = Vector2(x, y)
 	V10GUI.shadowed(ol, 0.9)
 	banner_root.add_child(ol)
-	# the newbie heroine's face sits at x ≈ 430–530: the column stays left of it with the 48 px margin (Г-1)
-	var maxw: = (_card_rect().position.x - 44.0) if k == "phase" else (340.0 if k == "newbie" else W * 0.62)
-	var fs: = 56
+	var ssr_cnt: = (cur_b.get("ssr", []) as Array).size()
+	var card_left: = (_card_rect().position.x - (74.0 if ssr_cnt >= 2 else 0.0)) if k == "phase" else W
+	var maxw: = maxf(248.0, card_left - x - 18.0) if k == "phase" else (340.0 if k == "newbie" else W * 0.62)
+	var fs: = 52
 	while fs > 26 and UI.longest_word_w(title, fs, "title", 700) > maxw - 10.0:
 		fs -= 2
 	var tl: = V10GUI.h1(title, fs)
@@ -403,8 +567,7 @@ static func newbie_sub(ssr_done: bool) -> String:
 
 func _sheet() -> void:
 	var k: = _kind()
-	var by: = H - NAV_H - 24.0 - 112.0
-	var r: = Rect2(24, by - 18.0 - SHEET_H, W - 48, SHEET_H)
+	var r: = Rect2(24, _sheet_y(), W - 48, SHEET_H)
 	var sh: = V10GUI.sheet(r, 0.88)
 	sh.name = "Sheet"
 	banner_root.add_child(sh)
@@ -415,19 +578,19 @@ func _sheet() -> void:
 		hard = mini(hard, gacha.pity(cur_b) + left)
 	var frac: = clampf(1.0 - float(left) / float(maxi(1, hard)), 0.0, 1.0)
 	# the big counter: «До SSR: 23» — the number is the hero of the sheet
-	var cap: = V10GUI.lbl("До SSR:", 26, V10GUI.PAPER_100, "body", 900)
+	var cap: = V10GUI.lbl("До SSR:", 24, V10GUI.PAPER_100, "body", 900)
 	cap.name = "SsrCounterCap"
-	cap.position = Vector2(20, 30)
+	cap.position = Vector2(20, 24)
 	sh.add_child(cap)
 	var cap_w: = cap.get_minimum_size().x
-	var num: = V10GUI.lbl(str(left), 66, V10GUI.GOLD_300 if gold else V10GUI.GOLD_500, "title", 900, Color(0.16, 0.09, 0.03, 0.95), 5)
+	var num: = V10GUI.lbl(str(left), 60, V10GUI.GOLD_300 if gold else V10GUI.GOLD_500, "title", 900, Color(0.16, 0.09, 0.03, 0.95), 5)
 	num.name = "SsrCounterNum"
-	num.position = Vector2(20 + cap_w + 12, -8)
+	num.position = Vector2(20 + cap_w + 10, -8)
 	sh.add_child(num)
 	var num_w: = num.get_minimum_size().x
 	var unit: = V10GachaBank.plural(left, "желание", "желания", "желаний")
-	var ul: = V10GUI.lbl(unit, 21, V10GUI.PAPER_300, "body", 800)
-	ul.position = Vector2(20 + cap_w + 12 + num_w + 10, 40)
+	var ul: = V10GUI.lbl(unit, 20, V10GUI.PAPER_300, "body", 800)
+	ul.position = Vector2(20 + cap_w + 10 + num_w + 10, 32)
 	sh.add_child(ul)
 	if gold:
 		UI.punch(num, 0.06, 0.5)
@@ -439,10 +602,10 @@ func _sheet() -> void:
 	tsb.bg_color = Color(V10GUI.NIGHT_900, 0.9)
 	tsb.border_color = Color(V10GUI.GOLD_700, 0.9)
 	tsb.set_border_width_all(2)
-	tsb.set_corner_radius_all(8)
+	tsb.set_corner_radius_all(7)
 	track.add_theme_stylebox_override("panel", tsb)
-	track.position = Vector2(20, 80)
-	track.size = Vector2(bar_w, 16)
+	track.position = Vector2(20, 72)
+	track.size = Vector2(bar_w, 14)
 	track.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	sh.add_child(track)
 	if frac > 0.0:
@@ -450,41 +613,41 @@ func _sheet() -> void:
 		fill.name = "SsrBarFill"
 		var fsb: = StyleBoxFlat.new()
 		fsb.bg_color = V10GUI.GOLD_300 if gold else V10GUI.GOLD_500
-		fsb.set_corner_radius_all(6)
+		fsb.set_corner_radius_all(5)
 		fsb.shadow_color = Color(V10GUI.GOLD_500, 0.55)
 		fsb.shadow_size = 6
 		fill.add_theme_stylebox_override("panel", fsb)
 		fill.position = Vector2(2, 2)
-		fill.size = Vector2(maxf(12.0, (bar_w - 4.0) * frac), 12)
+		fill.size = Vector2(maxf(10.0, (bar_w - 4.0) * frac), 10)
 		fill.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		track.add_child(fill)
 	if k != "newbie":
 		var tick: = ColorRect.new()
 		tick.name = "SoftTick"
 		tick.color = Color(V10GUI.ROSE_300, 0.95)
-		tick.position = Vector2(20.0 + bar_w * float(V10Rates.SOFT_FROM) / float(V10Rates.HARD), 76)
-		tick.size = Vector2(2, 24)
+		tick.position = Vector2(20.0 + bar_w * float(V10Rates.SOFT_FROM) / float(V10Rates.HARD), 68)
+		tick.size = Vector2(2, 22)
 		tick.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		sh.add_child(tick)
 	# the badge: bright once the chance rises (from the 46th wish), a quiet outline before
 	var active: = gacha.pity(cur_b) >= V10Rates.SOFT_FROM - 1
 	var btxt: = "16+ · Повышенный шанс"
 	var bf: = UI.font("body", 900)
-	var bw: = bf.get_string_size(btxt, HORIZONTAL_ALIGNMENT_LEFT, -1, 17).x + 34.0
+	var bw: = bf.get_string_size(btxt, HORIZONTAL_ALIGNMENT_LEFT, -1, 17).x + 32.0
 	var badge: = Panel.new()
 	badge.name = "BoostBadge"
 	var bsb: = StyleBoxFlat.new()
 	bsb.bg_color = Color(V10GUI.GOLD_500, 0.95) if active else Color(V10GUI.NIGHT_900, 0.7)
 	bsb.border_color = V10GUI.GOLD_300 if active else Color(V10GUI.GOLD_700, 0.9)
-	bsb.set_border_width_all(2)
-	bsb.set_corner_radius_all(16)
+	bsb.set_border_width_all(1 if not active else 2)
+	bsb.set_corner_radius_all(15)
 	badge.add_theme_stylebox_override("panel", bsb)
-	badge.position = Vector2(20, 104)
-	badge.size = Vector2(bw, 32)
+	badge.position = Vector2(20, 94)
+	badge.size = Vector2(bw, 30)
 	badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	sh.add_child(badge)
 	var bl: = V10GUI.lbl(btxt, 17, V10GUI.NIGHT_900 if active else V10GUI.GOLD_300, "body", 900)
-	UI.center_label(bl, Rect2(0, 0, bw, 32))
+	UI.center_label(bl, Rect2(0, 0, bw, 30))
 	badge.add_child(bl)
 	# line 2: the promise in plain words (UX_RULES §4.2, §9 P0-5)
 	var l2t: = ""
@@ -498,27 +661,29 @@ func _sheet() -> void:
 	if l2t != "":
 		var l2: = V10GUI.lbl(l2t, 18, V10GUI.GOLD_300 if gacha.guar(cur_b) and k == "phase" else V10GUI.PAPER_300, "body", 700)
 		l2.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		l2.size = Vector2(r.size.x * 0.6, 10)
-		l2.position = Vector2(20, 140)
+		l2.size = Vector2(r.size.x * 0.58, 10)
+		l2.position = Vector2(20, 132)
 		sh.add_child(l2)
-	# candelabra + «Свечи: 137/200» on the right; at 200 the line becomes the quiet «Зажечь Свечу ›»
+	# candelabra + «Свечи: 137/200» on the right; at 200 the line becomes «Зажечь Свечу ›»; «ⓘ Шансы» cleanly below it
 	var cw: = r.size.x * 0.36
 	candles_node = V10Candelabra.new()
-	candles_node.size = Vector2(cw, 96)
+	candles_node.size = Vector2(cw, 90)
 	candles_node.position = Vector2(r.size.x - cw - 12, 4)
 	candles_node.set_count(int(G.S.candles))
 	sh.add_child(candles_node)
 	if gacha.can_spark():
-		var sl: = V10GUI.link("Зажечь Свечу ›", Vector2(0, 100), func(): _open_spark(), V10GUI.GOLD_300, 18)
+		var sl: = V10GUI.link("Зажечь Свечу ›", Vector2(0, 86), func(): _open_spark(), V10GUI.GOLD_300, 18)
 		sl.position.x = r.size.x - 12 - cw * 0.5 - sl.size.x * 0.5
 		sl.name = "SparkLink"
 		sh.add_child(sl)
 	else:
 		var cl: = V10GUI.lbl("Свечи: %d/%d" % [mini(int(G.S.candles), V10Rates.SPARK), V10Rates.SPARK], 18, V10GUI.PAPER_300, "body", 800)
-		UI.center_label(cl, Rect2(r.size.x - cw - 12, 100, cw, 26))
+		UI.center_label(cl, Rect2(r.size.x - cw - 12, 96, cw, 26))
 		sh.add_child(cl)
-	# «ⓘ Шансы» (UX_RULES §5.3.5, С-5): next to the random purchase, one tap to V10OddsScreen
-	odds_link = V10GUI.link("ⓘ Шансы", Vector2(8, r.size.y - 82), func(): _open_odds(), V10GUI.GOLD_500, 18)
+	# «ⓘ Шансы» (UX_RULES §5.3.5, С-5): right-hand slot of the sheet so it never overlaps 2-line promises on the left
+	odds_link = V10GUI.link("ⓘ Шансы", Vector2(0, r.size.y - 80), func(): _open_odds(), V10GUI.GOLD_500, 18)
+	odds_link.position.x = r.size.x - 12 - cw * 0.5 - odds_link.size.x * 0.5
+	odds_link.name = "OddsLink"
 	sh.add_child(odds_link)
 	UI.slide_in(sh, Vector2(0, 24), 0.08, 0.24)
 
@@ -527,41 +692,53 @@ func _sheet() -> void:
 func _w1_strip() -> void:
 	if not V10Wave1.released():
 		return
-	var by: = H - NAV_H - 24.0 - 112.0
-	var r: = Rect2(24, by - 18.0 - SHEET_H - STRIP_H - 10.0, 332, STRIP_H)
-	var sp: = V10GUI.sheet(r, 0.8)
+	var r: = Rect2(24, _strip_y(), 320, STRIP_H)
+	var sp: = V10GUI.sheet(r, 0.86)
 	sp.name = "W1Strip"
 	banner_root.add_child(sp)
 	var ov: = V10GUI.overline("Новые богини · Волна 1", V10GUI.GOLD_500)
-	ov.position = Vector2(14, 5)
+	ov.position = Vector2(14, 4)
 	sp.add_child(ov)
-	var md: = 46.0
+	var md: = 44.0
+	var step_x: = (r.size.x - 28.0 - md * W1_STRIP.size()) / maxf(1.0, float(W1_STRIP.size() - 1)) + md
 	for i in W1_STRIP.size():
 		var h: String = W1_STRIP[i]
 		if not G.HEROES.has(h):
 			continue
 		var rk: = String(V10W1Gacha.HERO_RANK.get(h, "A"))
 		var col: = V10Rank.color(rk)
-		var mx: = 14.0 + i * (md + 10.0)
+		var mx: = 14.0 + i * step_x
 		var pal: = "gold" if rk == "SSR" else ("lav" if rk == "S" else "mint")
-		var av: Control = V8Art.emotion_avatar(h, "happy", Rect2(mx, 26, md, md), pal)
+		var av: Control = V8Art.emotion_avatar(h, "happy", Rect2(mx, 24, md, md), pal)
 		av.name = "W1Medal_" + h
 		sp.add_child(av)
 		if not G.hero_unlocked(h):
 			var pic: Node = av.get_node_or_null("Pic")
 			if pic is Control and (pic as Control).material is ShaderMaterial:
-				((pic as Control).material as ShaderMaterial).set_shader_parameter("gray", 0.5)
-		var rb: = UI.rbox("graphite", Rect2(mx + md - 24.0, 26 + md - 14.0, 28, 16), 8, 1, 2)
-		rb.borders(col.lerp(Color.WHITE, 0.3), col.darkened(0.5))
+				((pic as Control).material as ShaderMaterial).set_shader_parameter("gray", 0.45)
+		var rb: = Panel.new()
+		var rsb: = StyleBoxFlat.new()
+		rsb.bg_color = Color(V10GUI.NIGHT_900, 0.92)
+		rsb.border_color = Color(col, 0.85)
+		rsb.set_border_width_all(1)
+		rsb.set_corner_radius_all(7)
+		rb.add_theme_stylebox_override("panel", rsb)
+		rb.position = Vector2(mx + md - 24.0, 24 + md - 14.0)
+		rb.size = Vector2(28, 15)
 		rb.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		sp.add_child(rb)
-		rb.add_child(UI.center_label(UI.label(rk, 11, col.lerp(Color.WHITE, 0.45), UI.DARK, 2, "body", 900), Rect2(0, -1, 28, 16)))
+		var rl: = V10GUI.lbl(rk, 11, col.lerp(Color.WHITE, 0.35), "body", 900)
+		UI.center_label(rl, Rect2(0, -1, 28, 15))
+		rb.add_child(rl)
 		var hit: = Control.new()
-		hit.position = Vector2(mx - 3, 22)
-		hit.size = Vector2(md + 6, md + 8)
+		hit.position = Vector2(mx - 3, 20)
+		hit.size = Vector2(md + 6, md + 10)
 		hit.mouse_filter = Control.MOUSE_FILTER_STOP
 		hit.gui_input.connect(func(e: InputEvent) -> void:
-			if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT:
+			if (e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT) or (e is InputEventScreenTouch and e.pressed):
+				hit.accept_event()
+				if seq != null or _has_open_modal():
+					return
 				V9Feel.press(av, "tap", "button")
 				main.go("collection", {"hero": h}))
 		sp.add_child(hit)
@@ -569,16 +746,16 @@ func _w1_strip() -> void:
 
 
 func _buttons() -> void:
-	var by: = H - NAV_H - 24.0 - 112.0
+	var by: = _btn_y()
 	var k: = _kind()
 	if k != "newbie":
-		pull1_btn = _pull_button(1, Rect2(24, by, 216, 112), "Загадать ×1", "glass")
+		pull1_btn = _pull_button(1, Rect2(24, by, 216, BTN_H), "Загадать ×1", "glass")
 		pull1_btn.set_meta("ux_role", "secondary")
 		banner_root.add_child(pull1_btn)
 		UI.slide_in(pull1_btn, Vector2(0, 40), 0.1, 0.24)
 	# the primary is ≥ 440 × 104 (UX_RULES §6.1); one blik on the screen (its shine), no pulse: the breathing
 	# banner card is the screen's one infinite animation
-	var r10: = Rect2(W - 24 - 440, by, 440, 112) if k != "newbie" else Rect2(24, by, W - 48, 112)
+	var r10: = Rect2(W - 24 - 440, by, 440, BTN_H) if k != "newbie" else Rect2(24, by, W - 48, BTN_H)
 	pull10_btn = _pull_button(10, r10, "Загадать ×10", "pink")
 	pull10_btn.set_meta("ux_role", "primary")
 	banner_root.add_child(pull10_btn)
@@ -643,7 +820,7 @@ func _can_pull(n: int) -> bool:
 
 
 func _pull(n: int) -> void:
-	if seq != null or (confirm != null and is_instance_valid(confirm) and not confirm.is_queued_for_deletion() and confirm.mouse_filter != Control.MOUSE_FILTER_IGNORE):
+	if seq != null or _has_open_modal():
 		return
 	if not gacha.can_pull(cur_b, n):
 		V9Feel.deny(pull1_btn if n == 1 and is_instance_valid(pull1_btn) else pull10_btn)
@@ -664,6 +841,8 @@ func _pull(n: int) -> void:
 	if V10PullConfirm.needed(sp, G.S):
 		confirm = V10PullConfirm.open(_overlay(), {"n": n, "sp": sp, "banner_name": String(cur_b.get("name", "")),
 			"title": "Загадать ×%d" % n}, func(): _pull_go(n), func(): _open_odds())
+		confirm.set_meta("popup", true)
+		confirm.set_meta("v8_back", confirm.close)
 		return
 	_pull_go(n)
 
@@ -679,6 +858,7 @@ func demo_confirm() -> bool:
 func _pull_go(n: int) -> void:
 	if seq != null or not gacha.can_pull(cur_b, n):
 		return
+	_clear_old_banners()
 	var ctx: = {"pity": gacha.pity(cur_b), "guar": gacha.guar(cur_b), "newbie_left": gacha.newbie_left(),
 		"newbie_ssr": bool(G.S.get("newbie_ssr", false)), "skip": V9Summon.can_skip(int(G.S.pulls)),
 		"left": gacha.pity_left(cur_b)}
@@ -708,6 +888,7 @@ static func to09(r: Dictionary) -> Dictionary:
 
 
 func _sequence(res: Array, ctx: = {}) -> void:
+	_clear_old_banners()
 	super._sequence(res, ctx)
 	# the 0.9 sequence set its pity/guarantee tracks from the 0.9 counters before its first await: replace them
 	var p: = int(ctx.get("pity", 0))
@@ -1070,18 +1251,35 @@ func _results(res: Array) -> void:
 
 
 func _close_seq() -> void:
+	if seq != null and is_instance_valid(seq):
+		_disable_tree_input(seq)
+		if is_instance_valid(seq.get_parent()):
+			seq.get_parent().remove_child(seq)
+		seq.queue_free()
+		seq = null
+	if showcase != null and is_instance_valid(showcase):
+		_disable_tree_input(showcase)
+		if is_instance_valid(showcase.get_parent()):
+			showcase.get_parent().remove_child(showcase)
+		showcase.queue_free()
+		showcase = null
 	super._close_seq()
 	circle.visible = false
 	var st: = V10Banners.state(G.S)
 	if bool(st.get("guest_done", false)) and not bool(st.get("guest_seen", false)):
 		st["guest_seen"] = true
 		G.save()
-		V10GuestScene.open(self, main)
+		var gs: = V10GuestScene.open(self, main)
+		gs.set_meta("popup", true)
+		gs.set_meta("v8_back", gs.close)
 
 
 # ---------------------------------------------------------------- odds, spark, first pick
 func _open_odds() -> void:
-	V10OddsScreen.open(_overlay(), gacha, cur_b)
+	if _modal_open(odds_view):
+		return
+	odds_view = V10OddsScreen.open(_overlay(), gacha, cur_b)
+	odds_view.set_meta("popup", true)
 
 
 func _overlay() -> Control:
@@ -1089,18 +1287,27 @@ func _overlay() -> Control:
 
 
 func _open_spark() -> void:
-	V10SparkSheet.open(_overlay(), gacha, func(id: String):
+	if seq != null or _has_open_modal():
+		return
+	spark_view = V10SparkSheet.open(_overlay(), gacha, func(id: String):
 		var r: = gacha.spark(id)
 		if r.is_empty():
 			return
 		G.save()
-		await _ceremony(to09(r)))
+		if is_inside_tree():
+			await _ceremony(to09(r)))
+	spark_view.set_meta("popup", true)
+	spark_view.set_meta("v8_back", spark_view.close)
 
 
 # a showcase outside the pull sequence (Свеча, первая SSR): the chrome steps aside like during a pull
 func _ceremony(r09: Dictionary) -> void:
+	if not is_inside_tree():
+		return
 	main.show_chrome(false, false)
 	await _showcase(r09)
+	if not is_inside_tree():
+		return
 	main.show_chrome(true, true)
 	main.refresh_currency()
 	_build_banner()
@@ -1110,8 +1317,11 @@ func _open_first_pick() -> void:
 	first_view = V10FirstPickView.open(_overlay(), gacha, func(r: Dictionary):
 		G.set_meta("first_ssr_session", true)
 		G.save()
+		if not is_inside_tree():
+			return
 		await _ceremony(to09(r))
-		_ask_partner(r))
+		if is_inside_tree():
+			_ask_partner(r))
 
 
 func _ask_partner(r: Dictionary) -> void:
@@ -1133,8 +1343,10 @@ func _ask_partner(r: Dictionary) -> void:
 			main.toast("%s — твой партнёр" % nm, "heart")
 		if main and main.has_method("go"):
 			main.go("collection", {"hero": hero})
-	V10AskSheet.open(_overlay(), "Сделать партнёром?", "%s в наряде «%s» будет встречать тебя в Чайной и выходить с тобой за стол." % [nm, it.name],
+	var ask: = V10AskSheet.open(_overlay(), "Сделать партнёром?", "%s в наряде «%s» будет встречать тебя в Чайной и выходить с тобой за стол." % [nm, it.name],
 		"Сделать партнёром", "Позже", yes_cb, Callable(), G.art_tex(it))
+	ask.set_meta("popup", true)
+	ask.set_meta("v8_back", ask.close)
 
 
 # ---------------------------------------------------------------- dev / playtest

@@ -119,7 +119,9 @@ static func partner() -> String:
 
 
 static func portrait(h: String) -> Texture2D:
-	var p: = "res://assets/hero/%s.png" % h
+	var p: = V10W1Core.hero_png(h)
+	if not ResourceLoader.exists(p):
+		p = "res://assets/hero/mc.png"
 	return load(p) if ResourceLoader.exists(p) else null
 
 

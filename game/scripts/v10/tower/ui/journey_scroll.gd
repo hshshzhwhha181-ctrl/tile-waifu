@@ -229,7 +229,9 @@ func _apply() -> void:
 		_run_line.text = " · ".join(parts)
 	# the boss silhouette: her art, inked, with the back light of her accent
 	var tex: Texture2D = null
-	var p: = "res://assets/hero/%s.png" % boss
+	var p: = V10W1Core.hero_png(boss)
+	if not ResourceLoader.exists(p):
+		p = "res://assets/hero/mc.png"
 	if ResourceLoader.exists(p):
 		tex = load(p) as Texture2D
 	_sil.texture = tex

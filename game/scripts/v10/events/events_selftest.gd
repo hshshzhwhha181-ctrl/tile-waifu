@@ -22,6 +22,8 @@ func _check(cond: bool, what: String) -> void:
 
 func _ready() -> void:
 	run_all()
+	await get_tree().process_frame
+	await get_tree().process_frame
 	get_tree().quit(0 if ok == total else 1)
 
 
@@ -44,6 +46,7 @@ func run_all() -> int:
 	_test_welcome7()
 	_test_wheel()
 	_test_dates()
+	_test_oaths()
 	_test_ui()
 	V10Meta.clear_now()
 	V10Meta.clear_tz()
@@ -77,10 +80,11 @@ func _test_welcome7() -> void:
 	_set_day(5)
 	V10Welcome7Screen.claim_today()
 	_check(V10AffCurve.gift_count("gift_jade_pin") == 1, "w7: day 6 = Jade Hairpin gift")
-	_check(not G.owns("o_dragon"), "w7: SSR not given before day 7")
+	_check(V10Welcome7Screen.SSR_ID == "y_queen" and V10Welcome7Screen.SSR_ID != "o_dragon", "w7: SSR_ID is y_queen (no conflict with Starter Pack o_dragon)")
+	_check(not G.owns("y_queen"), "w7: SSR not given before day 7")
 	_set_day(6)
 	var r7: = V10Welcome7Screen.claim_today()
-	_check(bool(r7.ok) and int(r7.day) == 7 and G.owns("o_dragon") and not bool(r7.converted), "w7: day 7 = SSR outfit Dragon Empress")
+	_check(bool(r7.ok) and int(r7.day) == 7 and G.owns("y_queen") and not G.owns("o_dragon") and not bool(r7.converted), "w7: day 7 = SSR outfit Moon Night Queen (y_queen)")
 	_check(not V10Welcome7Screen.is_active() and V10Welcome7Screen.days_claimed() == 7, "w7: all 7 claimed -> inactive")
 	_set_day(7)
 	_check(not V10Welcome7Screen.can_claim_today() and not bool(V10Welcome7Screen.claim_today().ok), "w7: nothing to claim after day 7")
@@ -88,7 +92,7 @@ func _test_welcome7() -> void:
 	_check(str(st.start_day_key) != "" and str(st.last_day_key) != "", "w7: save has start_day_key and last_day_key")
 	# SSR already owned -> 1600 crystals
 	_fresh()
-	G.S.owned["o_dragon"] = true
+	G.S.owned["y_queen"] = true
 	V10Welcome7Screen.state()["days_claimed"] = 6
 	var gg: = V10Money.bal("gems")
 	var rc: = V10Welcome7Screen.claim_today()
@@ -198,6 +202,28 @@ func _test_dates() -> void:
 	_check(V10VipDate.reward_available("kohaku"), "dates: reward resets the next day")
 
 
+func _test_oaths() -> void:
+	_fresh()
+	_check(not V10VipBoudoirScreen.is_oath("yue") and V10VipBoudoirScreen.oath_count() == 0, "oath: fresh state has 0 oaths")
+	# Affection < 4 and insufficient crystals -> refused
+	G.S["gems"] = 100
+	V10Money.attach(G.S)
+	var r_poor: = V10VipBoudoirScreen.pledge_oath("yue")
+	_check(not bool(r_poor.ok) and String(r_poor.reason) == "gems" and not V10VipBoudoirScreen.is_oath("yue"), "oath: <500 gems and aff < 4 refused")
+	# Affection < 4 with >= 500 crystals -> spends 500 gems via V10Money
+	V10Money.grant({"gems": 600}, "test")
+	var g_before: = V10Money.bal("gems")
+	var r_paid: = V10VipBoudoirScreen.pledge_oath("yue")
+	_check(bool(r_paid.ok) and not bool(r_paid.free) and V10Money.bal("gems") == g_before - 500 and V10VipBoudoirScreen.is_oath("yue") and V10VipBoudoirScreen.oath_count() == 1, "oath: paid oath spends 500 gems and stores v10_oaths")
+	var r_dup: = V10VipBoudoirScreen.pledge_oath("yue")
+	_check(not bool(r_dup.ok) and String(r_dup.reason) == "already" and V10Money.bal("gems") == g_before - 500, "oath: duplicate oath does not re-spend")
+	# Affection >= 4 -> free oath (0 gems spent)
+	G.S["aff"]["kohaku"] = 4000
+	var g_before2: = V10Money.bal("gems")
+	var r_free: = V10VipBoudoirScreen.pledge_oath("kohaku")
+	_check(bool(r_free.ok) and bool(r_free.free) and V10Money.bal("gems") == g_before2 and V10VipBoudoirScreen.is_oath("kohaku") and V10VipBoudoirScreen.oath_count() == 2, "oath: aff >= 4 pledges for free")
+
+
 func _test_ui() -> void:
 	_fresh()
 	G.S["aff"]["kohaku"] = 4000
@@ -211,6 +237,9 @@ func _test_ui() -> void:
 	_check(has_scroll and scr._tab_btns.size() == 10 and scr._idx == 4, "ui: boudoir has 10 tabs in a ScrollContainer, opens on the requested goddess")
 	_check(scr._cg_tex != null and scr._cg_tex.visible and scr._cg_tex.texture != null, "ui: boudoir shows the heroine 16+ CG")
 	_check(scr._date_btn != null and scr._date_btn.get_parent() != null, "ui: boudoir has the Date 16+ button")
+	_check(scr._oath_btn != null and scr._ult_btn != null and scr._oath_lbl.text == "Принести Обет", "ui: boudoir has Oath & Ult 16+ buttons, free at aff >= 4")
+	scr._on_oath_tap()
+	_check(V10VipBoudoirScreen.is_oath("kohaku") and scr._oath_crest != null and scr._oath_crest.visible and scr._oath_lbl.text.contains("+10 к силе"), "ui: tapping Oath pledges, shows OathCrest and +10 bonus")
 	scr._open_date()
 	var win: V10VipDateWindow = scr._date_win
 	_check(win != null and win.phase == "select" and win.lv == 6, "ui: date window opens on the highest unlocked level")

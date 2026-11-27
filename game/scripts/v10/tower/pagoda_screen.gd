@@ -321,13 +321,17 @@ func _set_portrait(p: V10Plate, h: String) -> void:
 
 # a round heroine portrait (the base art, focus on her face), 1 px gold.700 ring; falls back to the ring icon
 static func portrait(h: String, d: float) -> Control:
-	var path: = "res://assets/hero/%s.png" % h
+	var fh: = h
+	var path: = V10W1Core.hero_png(h)
+	if not ResourceLoader.exists(path):
+		path = "res://assets/hero/mc.png"
+		fh = "mc"
 	var root: = Control.new()
 	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.size = Vector2(d, d)
 	if ResourceLoader.exists(path):
 		var t: Texture2D = load(path)
-		var art: = Common.card_art(t, Rect2(Vector2.ZERO, Vector2(d, d)), Hero.av_focus(h), Hero.av_zoom(h), d * 0.5)
+		var art: = Common.card_art(t, Rect2(Vector2.ZERO, Vector2(d, d)), Hero.av_focus(fh), Hero.av_zoom(fh), d * 0.5)
 		(art.material as ShaderMaterial).set_shader_parameter("bottom_shade", 0.0)
 		art.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		root.add_child(art)

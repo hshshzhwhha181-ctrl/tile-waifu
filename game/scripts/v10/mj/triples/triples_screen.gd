@@ -89,11 +89,15 @@ func _ready() -> void:
 # ── сборка ───────────────────────────────────────────────────────────────────
 
 func _build() -> void:
-	vw = get_viewport_rect().size
-	size = vw
+	var vps: = get_viewport_rect().size
+	vw = size if (size.x > 10.0 and size.y > 10.0) else vps
+	if vw.x <= 0.0 or vw.y <= 0.0:
+		vw = Vector2(720, 1280)
+	if anchor_right == 0.0:
+		size = vw
 	var extra: = maxf(0.0, vw.y - 1280.0)
-	band_h = 120.0 + minf(extra, 330.0)
-	var spare: = extra - minf(extra, 330.0)
+	band_h = 120.0 + minf(extra * 0.72, 240.0)
+	var spare: = maxf(0.0, extra - minf(extra * 0.72, 240.0))
 	cfg.bg = V10MjTriplesLook.HERO_TABLE.get(hero, "default")
 	lv = V10MjTriplesGen.build(level)
 	need = V10MjTriplesUlts.need(G.aff_level(hero) if G.S is Dictionary and G.S.has("aff") else 1)
@@ -126,26 +130,76 @@ func _build() -> void:
 		_start()
 
 
+func _stage_bg_path() -> String:
+	var key: String = String(V10MjTriplesLook.HERO_TABLE.get(hero, "default"))
+	if key == "default" or key == "":
+		key = "menu"
+	var p: = "res://assets/bg/%s.webp" % key
+	if ResourceLoader.exists(p):
+		return p
+	return "res://assets/bg/bg_palace.webp"
+
+
 func _build_bg() -> void:
-	var bg: = TextureRect.new()
-	bg.name = "Bg"
+	var br: = V10Layout.bleed_rect(self)
+	var full: = br.merge(Rect2(Vector2.ZERO, vw))
+	var root: = Control.new()
+	root.name = "Bg"
+	root.position = full.position
+	root.size = full.size
+	root.clip_contents = true
+	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(root)
+	# solid warm base so no pixel is ever uninitialized on tall/notched displays
+	var base: = ColorRect.new()
+	base.color = T.night900
+	base.size = full.size
+	base.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	root.add_child(base)
+	# scenic parlor / festival / teahouse backdrop filling 0..vw.x, 0..vw.y including full band_h header
+	var bg_path: = _stage_bg_path()
+	if ResourceLoader.exists(bg_path):
+		var tex: = load(bg_path) as Texture2D
+		if tex != null:
+			var tr: = TextureRect.new()
+			tr.name = "StageArt"
+			tr.texture = tex
+			tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+			tr.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+			tr.size = full.size
+			tr.modulate = Color(0.88, 0.84, 0.94, 0.72)
+			tr.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			root.add_child(tr)
+	# harmonized hero-accent atmospheric veil: warm & open across top header band, deeper behind tiles
+	var veil: = TextureRect.new()
+	veil.name = "StageVeil"
 	var g: = Gradient.new()
 	var a: Array = V10MjTriplesLook.accent(hero)
-	g.set_color(0, Color(a[2]).darkened(0.55).lerp(T.night900, 0.35))
-	g.set_color(1, T.night900)
-	g.add_point(0.22, T.night800)
+	var deep: Color = Color(a[2]).darkened(0.35).lerp(T.night800, 0.45)
+	g.set_color(0, Color(deep.r, deep.g, deep.b, 0.40))
+	g.set_color(1, Color(T.night900.r, T.night900.g, T.night900.b, 0.84))
+	g.add_point(0.28, Color(T.night800.r, T.night800.g, T.night800.b, 0.56))
+	g.add_point(0.55, Color(T.night900.r, T.night900.g, T.night900.b, 0.74))
 	var gt: = GradientTexture2D.new()
 	gt.gradient = g
-	gt.fill_from = Vector2(0.8, 0.0)
-	gt.fill_to = Vector2(0.4, 1.0)
-	gt.width = 64
+	gt.fill_from = Vector2(0.5, 0.0)
+	gt.fill_to = Vector2(0.5, 1.0)
+	gt.width = 32
 	gt.height = 128
-	bg.texture = gt
-	bg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	bg.stretch_mode = TextureRect.STRETCH_SCALE
-	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
-	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(bg)
+	veil.texture = gt
+	veil.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	veil.stretch_mode = TextureRect.STRETCH_SCALE
+	veil.size = full.size
+	veil.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	root.add_child(veil)
+	# subtle top-band gold horizon hairline separating scenic header from the tray & table
+	var sep: = ColorRect.new()
+	sep.color = Color(T.gold500, 0.24)
+	sep.position = Vector2(0.0, band_h - full.position.y)
+	sep.size = Vector2(full.size.x, 1.5)
+	sep.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	root.add_child(sep)
 
 
 func _tray_cells(slots: int) -> Array:
@@ -156,6 +210,23 @@ func _tray_cells(slots: int) -> Array:
 	for k in slots:
 		out.append(tray_center + Vector2(well.position.x + 6.0 + pitch * (k + 0.5), well.get_center().y))
 	return out
+
+
+func _sync_cells_clip() -> void:
+	if cells_ctl == null or tray_fit.is_empty():
+		return
+	var well: Rect2 = tray_fit.well
+	var pad_x: = 4.0
+	var pad_y: = 4.0
+	var clip_pos: = tray_center + well.position + Vector2(pad_x, pad_y)
+	var clip_sz: = Vector2(maxf(20.0, well.size.x - pad_x * 2.0), maxf(20.0, well.size.y - pad_y * 2.0))
+	cells_ctl.anchor_left = 0.0
+	cells_ctl.anchor_top = 0.0
+	cells_ctl.anchor_right = 0.0
+	cells_ctl.anchor_bottom = 0.0
+	cells_ctl.position = clip_pos
+	cells_ctl.size = clip_sz
+	cells_ctl.clip_contents = true
 
 
 func _build_tray() -> void:
@@ -171,7 +242,7 @@ func _build_tray() -> void:
 	cells_ctl = Control.new()
 	cells_ctl.name = "Cells"
 	cells_ctl.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	cells_ctl.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_sync_cells_clip()
 	cells_ctl.draw.connect(_draw_cells)
 	add_child(cells_ctl)
 	combo_lbl = V10MjTriplesLook.label("", 60, T.gold300, "italic", 700)
@@ -186,39 +257,53 @@ func _build_tray() -> void:
 
 
 func _draw_cells() -> void:
-	if board == null:
+	if board == null or cells_ctl == null:
 		return
 	var n: = board.cells.size()
+	if n <= 0:
+		return
 	var used: = board.rules.tray.size()
-	var cw: float = tray_fit.pitch - 6.0
-	var ch: float = cw * Tile.TH / Tile.TW
+	var max_w: = (cells_ctl.size.x - 4.0) / float(n) - 4.0
+	var cw: = minf(float(tray_fit.pitch) - 8.0, max_w)
+	var ch: = minf(cw * Tile.TH / Tile.TW, cells_ctl.size.y - 6.0)
+	var safe_box: = Rect2(Vector2(2.0, 2.0), Vector2(maxf(8.0, cells_ctl.size.x - 4.0), maxf(8.0, cells_ctl.size.y - 4.0)))
 	for k in n:
-		var c: Vector2 = board.cells[k]
-		var r: = Rect2(c - Vector2(cw, ch) * 0.5, Vector2(cw, ch))
-		cells_ctl.draw_rect(r, Color(T.night900, 0.28), true)
+		var c: Vector2 = board.cells[k] - cells_ctl.position
+		var raw: = Rect2(c - Vector2(cw, ch) * 0.5, Vector2(cw, ch))
+		var r: = raw.intersection(safe_box)
+		if r.size.x <= 2.0 or r.size.y <= 2.0:
+			continue
+		var sb: = StyleBoxFlat.new()
+		sb.set_corner_radius_all(6)
 		var last: = k == n - 1
 		if last:
 			# последняя ячейка — ember: тихо всегда, ярко и с пульсом, когда она последняя свободная (6/7)
 			var hot: = used >= n - 1
-			var a: = 0.3
+			var a: = 0.36
 			if hot:
 				var p: = absf(sin(_last_cell_pulse * PI))
-				a = 0.6 + 0.35 * p
-				cells_ctl.draw_rect(r, Color(T.ember, 0.14 + 0.16 * p), true)
-			cells_ctl.draw_rect(r.grow(1.0), Color(T.ember, a), false, 3.0 if hot else 1.5)
+				a = 0.65 + 0.30 * p
+				sb.bg_color = Color(T.ember, 0.16 + 0.16 * p)
+			else:
+				sb.bg_color = Color(T.night900, 0.32).lerp(Color(T.ember, 0.25), 0.18)
+			sb.border_color = Color(T.ember, a)
+			sb.set_border_width_all(2 if hot else 1)
 		else:
-			cells_ctl.draw_rect(r, Color(T.paper100, 0.06), false, 1.0)
+			sb.bg_color = Color(T.night900, 0.32)
+			sb.border_color = Color(T.gold500, 0.14)
+			sb.set_border_width_all(1)
+		cells_ctl.draw_style_box(sb, r)
 
 
-func _build_board(spare: float) -> void:
+func _build_board(_spare: float) -> void:
 	board = V10MjTriplesBoard.new()
 	board.name = "Board"
 	board.accent = V10MjTriplesLook.accent(hero)[0]
 	board.fx_min = V9Feel.level() == "min" or bool(args.get("fx_min", false))
 	add_child(board)
 	board.setup(lv, args.get("look", {}).get("tiles", {}) if args.get("look", {}) is Dictionary else {})
-	var top: = band_h + TRAY_ZONE + spare * 0.5
-	var bot: = vw.y - HELP_ZONE - spare * 0.5
+	var top: = band_h + TRAY_ZONE + 6.0
+	var bot: = vw.y - HELP_ZONE - 6.0
 	var r: = Rect2(16, top, vw.x - 32, bot - top)
 	board.fit_into(V6BoardTable.inset(r), 1.3)
 	V6BoardTable.attach(board, r)
@@ -234,28 +319,89 @@ func _build_board(spare: float) -> void:
 
 
 func _build_band() -> void:
-	var pause: = _icon_button("pause", Vector2(12, 18), "")
+	var wr: = _window_rect()
+	var hud_w: = maxf(240.0, wr.position.x - 24.0)
+	var hud_plate: = Panel.new()
+	hud_plate.name = "BandPlate"
+	hud_plate.position = Vector2(12.0, 14.0)
+	hud_plate.size = Vector2(hud_w, 86.0)
+	hud_plate.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var hsb: = StyleBoxFlat.new()
+	hsb.bg_color = Color(0.10, 0.06, 0.13, 0.72)
+	hsb.border_color = Color(T.gold500, 0.42)
+	hsb.set_border_width_all(1)
+	hsb.set_corner_radius_all(22)
+	hsb.shadow_color = Color(0.0, 0.0, 0.0, 0.35)
+	hsb.shadow_size = 6
+	hsb.shadow_offset = Vector2(0, 2)
+	hud_plate.add_theme_stylebox_override("panel", hsb)
+	add_child(hud_plate)
+	var pause: = _icon_button("pause", Vector2(14, 17), "")
 	pause.name = "Pause"
 	pause.pressed.connect(_pause_sheet)
 	add_child(pause)
+	var lbl_w: = maxf(140.0, hud_w - 104.0)
 	left_lbl = V10MjTriplesLook.label("", 22, T.paper100, "body", 800)
-	left_lbl.position = Vector2(104, 28)
-	left_lbl.size = Vector2(330, 32)
+	left_lbl.position = Vector2(100, 26)
+	left_lbl.size = Vector2(lbl_w, 32)
 	add_child(left_lbl)
 	bar = Control.new()
-	bar.position = Vector2(104, 70)
-	bar.size = Vector2(minf(300.0, vw.x - 104.0 - 180.0), 4)
+	bar.position = Vector2(100, 66)
+	bar.size = Vector2(minf(300.0, lbl_w - 8.0), 8)
 	bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	bar.draw.connect(func():
 		var p: = 1.0 - float(board.rules.board_count()) / maxf(1.0, float(lv.n))
-		bar.draw_rect(Rect2(Vector2.ZERO, bar.size), Color(T.paper100, 0.12))
-		bar.draw_rect(Rect2(Vector2.ZERO, Vector2(bar.size.x * p, bar.size.y)), T.jade500))
+		var track: = StyleBoxFlat.new()
+		track.bg_color = Color(T.paper100, 0.14)
+		track.set_corner_radius_all(4)
+		bar.draw_style_box(track, Rect2(Vector2.ZERO, bar.size))
+		if p > 0.005:
+			var fill: = StyleBoxFlat.new()
+			fill.bg_color = T.jade500
+			fill.set_corner_radius_all(4)
+			bar.draw_style_box(fill, Rect2(Vector2.ZERO, Vector2(maxf(8.0, bar.size.x * p), bar.size.y))))
 	add_child(bar)
+	if band_h > 180.0:
+		var deco: = _StageFlourish.new(V10MjTriplesLook.accent(hero)[0])
+		deco.name = "StageFlourish"
+		deco.position = Vector2(16.0, 114.0)
+		deco.size = Vector2(maxf(140.0, wr.position.x - 32.0), maxf(40.0, band_h - 126.0))
+		add_child(deco)
 	banner = V10MjTriplesLook.label("", 44, T.paper100, "title", 700)
 	banner.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	banner.size = Vector2(vw.x, 60)
 	banner.modulate.a = 0.0
 	add_child(banner)
+
+
+class _StageFlourish extends Control:
+	var acc: Color
+
+	func _init(c: Color) -> void:
+		acc = c
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+	func _draw() -> void:
+		var w: = size.x
+		var h: = size.y
+		if w < 40.0 or h < 30.0:
+			return
+		var gold: = Color(V10MjTriplesLook.TOK.gold500, 0.22)
+		var soft: = Color(acc, 0.14)
+		# delicate corner gold brackets & diamond accent framing the open parlor stage view
+		var pad: = 8.0
+		var arm: = 22.0
+		draw_line(Vector2(pad, pad), Vector2(pad + arm, pad), gold, 1.5, true)
+		draw_line(Vector2(pad, pad), Vector2(pad, pad + arm), gold, 1.5, true)
+		draw_line(Vector2(pad, h - pad), Vector2(pad + arm, h - pad), gold, 1.5, true)
+		draw_line(Vector2(pad, h - pad), Vector2(pad, h - pad - arm), gold, 1.5, true)
+		var cx: = w * 0.5
+		var cy: = h - pad
+		draw_line(Vector2(pad + arm + 8.0, cy), Vector2(cx - 10.0, cy), Color(gold, 0.14), 1.0, true)
+		draw_line(Vector2(cx + 10.0, cy), Vector2(w - pad, cy), Color(gold, 0.14), 1.0, true)
+		var dm: = PackedVector2Array([Vector2(cx, cy - 5.0), Vector2(cx + 5.0, cy), Vector2(cx, cy + 5.0), Vector2(cx - 5.0, cy)])
+		draw_colored_polygon(dm, Color(V10MjTriplesLook.TOK.gold300, 0.35))
+		draw_arc(Vector2(pad + 18.0, pad + 18.0), 10.0, 0.0, TAU, 24, soft, 1.2, true)
 
 
 func _window_rect() -> Rect2:
@@ -580,6 +726,9 @@ func _rebuild_frame() -> void:
 	for c in tray_frame.get_children():
 		c.queue_free()
 	tray_frame.add_child(V10MjTriplesLook.make_frame(tray_def, tray_fit))
+	_sync_cells_clip()
+	if cells_ctl != null:
+		cells_ctl.queue_redraw()
 
 
 func _try_ult() -> void:

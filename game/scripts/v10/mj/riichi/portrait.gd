@@ -48,7 +48,12 @@ static func face_tex(hero_id: String, f: String) -> Texture2D:
 	var key: = hero_id + ":" + f
 	if _tex.has(key):
 		return _tex[key]
-	var path: = "res://assets/hero/%s.png" % hero_id if f == "neutral" else "res://assets/v08/emotions/%s_%s.webp" % [hero_id, f]
+	if V10W1Core.is_wave1_hero(hero_id):
+		var w1_at: = V10W1Mj.riichi_face_tex(hero_id, f, NEUTRAL_R, EMO_R)
+		if w1_at != null:
+			_tex[key] = w1_at
+			return w1_at
+	var path: = V10W1Core.hero_png(hero_id) if f == "neutral" else V10W1Core.emotion_webp(hero_id, f)
 	if not ResourceLoader.exists(path):
 		path = "res://assets/hero/mc.png"
 		f = "neutral"

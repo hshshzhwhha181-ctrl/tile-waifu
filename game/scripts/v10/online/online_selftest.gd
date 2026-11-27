@@ -305,6 +305,27 @@ func _pvp_match_tests() -> void:
 	_check(pvp.emotes_seen == 1, "emote received")
 	var bub: Control = pvp.fx_layer.get_node_or_null("EmoteBubble")
 	_check(bub != null and bub.position.y >= pvp.opp_bar.position.y + pvp.opp_bar.size.y + 8.0, "opponent emote bubble sits cleanly below opp_bar")
+	var opp_por: Control = bub.get_node_or_null("StickerPortrait") if bub != null else null
+	var opp_pic: TextureRect = opp_por.get_node_or_null("Pic") as TextureRect if opp_por != null else null
+	_check(opp_por != null and opp_pic != null and opp_pic.texture != null, "opponent emote bubble renders portrait sticker")
+	pvp.send_emote("heart")
+	var my_bub: Control = pvp.fx_layer.get_node_or_null("EmoteBubbleMe")
+	var my_por: Control = my_bub.get_node_or_null("StickerPortrait") if my_bub != null else null
+	var my_pic: TextureRect = my_por.get_node_or_null("Pic") as TextureRect if my_por != null else null
+	_check(my_bub != null and my_por != null and my_pic != null and my_pic.texture != null, "player emote bubble renders portrait sticker")
+	_check(V10PvpOnlineScreen.emote_emotion("laugh") == "happy" and V10PvpOnlineScreen.emote_emotion("angry") == "pout" and V10PvpOnlineScreen.emote_emotion("heart") == "shy" and V10PvpOnlineScreen.emote_emotion("cool") == "surprised", "emote -> emotion mapping")
+	var em_tex_ok: = true
+	for hid in ["mc", "rin", "zlata", "kohaku"]:
+		for eid in V10Online.EMOTES:
+			var t: Texture2D = V10PvpOnlineScreen.emote_portrait_tex(hid, eid)
+			if t == null or t.get_width() <= 0 or t.get_height() <= 0:
+				em_tex_ok = false
+	var fb_t: Texture2D = V10PvpOnlineScreen.emote_portrait_tex("unknown_hero_xyz", "laugh")
+	_check(em_tex_ok and fb_t != null and fb_t.get_width() > 0, "emote portrait helper resolves valid textures for founders (mc, rin) + Wave-1 (zlata, kohaku) + fallback")
+	var b3_em: = _labels_inside(pvp, Rect2(Vector2.ZERO, vs))
+	_check(b3_em.is_empty(), "emote bubbles & match HUD labels inside 20:9 %s" % str(b3_em))
+	var md_chk: Control = pvp.match_root.get_node_or_null("MatchDock")
+	_check(pvp.arena_frame != null and md_chk != null and pvp.board_rect.end.y <= md_chk.position.y + 4.0 and pvp.board_rect.size.y <= vs.x * 1.18, "arena frame tightened cleanly above dock without excessive vertical void")
 	pvp._on_opp_progress({"tiles_left": 10, "score": 3000, "combo": 4})
 	_check(pvp.opp_left == 10, "opponent progress applied")
 	pvp.surrender()
@@ -395,6 +416,7 @@ func _shots() -> void:
 	await get_tree().create_timer(2.5).timeout
 	pvp.charge = 4
 	pvp._refresh_match_hud()
+	pvp.send_emote("heart")
 	pvp._on_emote("cool")
 	await get_tree().create_timer(0.4).timeout
 	await _snap("online_pvp_match")

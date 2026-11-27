@@ -200,40 +200,91 @@ func _sync_tags() -> void:
 	_layout_tags()
 
 
-# Tags hang from their objects; plaques that would overlap (or leave the card, or cover the title) are pushed
-# to the nearest free spot and the thread stretches to the pin — readable at any width.
+# Tags hang cleanly from their diamond pin via a single golden silk thread; plaques NEVER overlap or touch
+# (at least 16px vertical clearance, 14px horizontal clearance, and safe screen edge margins).
 func _layout_tags() -> void:
 	var order: = []
 	for t in z.tasks:
 		if tags.has(t.id):
 			order.append(t)
 	order.sort_custom(func(a, b): return a.anchor.y < b.anchor.y)
-	var placed: = []
-	var top_min: = 96.0
+	var placed: Array[Rect2] = []
+	var edge_x: = 20.0
+	var top_min: = 112.0
+	var bot_margin: = 18.0
+	var pad_x: = 7.0  # 14px minimum horizontal gap between plaque edges
+	var pad_y: = 8.0  # 16px minimum vertical gap between plaque edges
+	var step_y: = V10SalonTag.H + pad_y * 2.0 + 2.0
 	for t in order:
 		var tag: V10SalonTag = tags[t.id]
 		var pinp: = Vector2(t.anchor.x * size.x, t.anchor.y * size.y)
-		var base: = pinp - Vector2(tag.size.x * 0.5, V10SalonTag.THREAD + 12.0)
+		# Hang the plaque cleanly below its pin so the vertical golden silk thread reads clearly
+		var base: = pinp - Vector2(tag.size.x * 0.5, 0.0)
 		var w: = tag.size.x
-		var cands: = [Vector2.ZERO]
-		for k in [1, 2, 3]:
-			cands.append_array([Vector2(0, 62 * k), Vector2(0, -62 * k), Vector2(w * 0.5 * k + 8, 0), Vector2(-w * 0.5 * k - 8, 0),
-				Vector2(w * 0.4 * k, 62 * k), Vector2(-w * 0.4 * k, 62 * k)])
-		var best: = base
+		var min_y: = top_min - V10SalonTag.THREAD
+		var max_y: = maxf(min_y, size.y - V10SalonTag.THREAD - V10SalonTag.H - bot_margin)
+		var cands: Array[Vector2] = [Vector2.ZERO]
+		for k in [1, 2, 3, 4, 5]:
+			var dy: = step_y * float(k)
+			var dx: = (w * 0.52 + 16.0) * float(k)
+			cands.append_array([
+				Vector2(0.0, dy), Vector2(0.0, -dy),
+				Vector2(dx, 0.0), Vector2(-dx, 0.0),
+				Vector2(dx * 0.65, dy), Vector2(-dx * 0.65, dy),
+				Vector2(dx * 0.65, -dy), Vector2(-dx * 0.65, -dy),
+			])
+		var best: = Vector2(
+			clampf(base.x, edge_x, maxf(edge_x, size.x - w - edge_x)),
+			clampf(base.y, min_y, max_y))
+		var best_rect: = Rect2(
+			best + Vector2(w * 0.5 - tag._w * 0.5 - pad_x, V10SalonTag.THREAD - pad_y),
+			Vector2(tag._w + pad_x * 2.0, V10SalonTag.H + pad_y * 2.0))
+		var found: = false
+		var best_score: = INF
 		for c in cands:
 			var p: Vector2 = base + c
-			p.x = clampf(p.x, 8.0, size.x - w - 8.0)
-			p.y = clampf(p.y, top_min - V10SalonTag.THREAD, size.y - tag.size.y)
-			var r: = Rect2(p + Vector2(w * 0.5 - tag._w * 0.5, V10SalonTag.THREAD), Vector2(tag._w, V10SalonTag.H)).grow(5)
+			p.x = clampf(p.x, edge_x, maxf(edge_x, size.x - w - edge_x))
+			p.y = clampf(p.y, min_y, max_y)
+			var r: = Rect2(
+				p + Vector2(w * 0.5 - tag._w * 0.5 - pad_x, V10SalonTag.THREAD - pad_y),
+				Vector2(tag._w + pad_x * 2.0, V10SalonTag.H + pad_y * 2.0))
 			var hit: = false
 			for q in placed:
 				if r.intersects(q):
 					hit = true
 					break
 			if not hit:
-				best = p
-				placed.append(r)
-				break
+				var plaque_c: = Vector2(p.x + w * 0.5, p.y + V10SalonTag.THREAD)
+				var dist: = plaque_c.distance_to(pinp + Vector2(0.0, V10SalonTag.THREAD))
+				if dist < best_score:
+					best_score = dist
+					best = p
+					best_rect = r
+					found = true
+		if not found:
+			# Fallback scan across clean vertical bands so plaques never stack even on tight layouts
+			var scan_y: = min_y
+			while scan_y <= max_y:
+				for frac in [0.5, 0.25, 0.75, 0.0, 1.0]:
+					var sx: = lerpf(edge_x, maxf(edge_x, size.x - w - edge_x), frac)
+					var p2: = Vector2(sx, scan_y)
+					var r2: = Rect2(
+						p2 + Vector2(w * 0.5 - tag._w * 0.5 - pad_x, V10SalonTag.THREAD - pad_y),
+						Vector2(tag._w + pad_x * 2.0, V10SalonTag.H + pad_y * 2.0))
+					var hit2: = false
+					for q2 in placed:
+						if r2.intersects(q2):
+							hit2 = true
+							break
+					if not hit2:
+						best = p2
+						best_rect = r2
+						found = true
+						break
+				if found:
+					break
+				scan_y += step_y * 0.5
+		placed.append(best_rect)
 		tag.place(pinp, best)
 
 

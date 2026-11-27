@@ -356,22 +356,16 @@ const EMO_ALIAS: = {"big": "happy", "smug": "happy", "win": "happy", "joy": "hap
 # affection level from which a win makes her shy instead of plainly happy (room scenes open at 2 / 4 / 7 / 10)
 const SHY_LEVEL: = 7
 
-# Face centre of every emotion file as a fraction of the image (x, y), measured on the art: the eyes-to-mouth middle.
+# Face centre of every emotion file as a fraction of the image (x, y), measured on the v4 unified cutouts: (300, 224) on 600x800.
 static var EMO_FACE: = {
-	# mc / hana: the adult redraw, eyes and mouth measured per file (same formula as rig_face; an open mouth counts at
-	# its closed-lip line so a gasp does not drop the face point)
-	"mc": {"happy": [0.528, 0.259], "sad": [0.506, 0.26], "surprised": [0.522, 0.234], "pout": [0.5, 0.264], "shy": [0.517, 0.274]},
-	"hana": {"happy": [0.528, 0.2675], "sad": [0.589, 0.288], "surprised": [0.549, 0.261], "pout": [0.571, 0.28], "shy": [0.556, 0.304]},
-	"rin": {"happy": [0.5, 0.31], "sad": [0.5, 0.35], "surprised": [0.5, 0.31], "pout": [0.5, 0.34], "shy": [0.53, 0.35]},
-	"yue": {"happy": [0.46, 0.27], "sad": [0.5, 0.28], "surprised": [0.48, 0.21], "pout": [0.5, 0.32], "shy": [0.5, 0.31]},
-	"nova": {"happy": [0.52, 0.27], "sad": [0.5, 0.33], "surprised": [0.5, 0.33], "pout": [0.5, 0.3], "shy": [0.52, 0.35]},
+	"mc": {"happy": [0.5, 0.28], "sad": [0.5, 0.28], "surprised": [0.5, 0.28], "pout": [0.5, 0.28], "shy": [0.5, 0.28]},
+	"hana": {"happy": [0.5, 0.28], "sad": [0.5, 0.28], "surprised": [0.5, 0.28], "pout": [0.5, 0.28], "shy": [0.5, 0.28]},
+	"rin": {"happy": [0.5, 0.28], "sad": [0.5, 0.28], "surprised": [0.5, 0.28], "pout": [0.5, 0.28], "shy": [0.5, 0.28]},
+	"yue": {"happy": [0.5, 0.28], "sad": [0.5, 0.28], "surprised": [0.5, 0.28], "pout": [0.5, 0.28], "shy": [0.5, 0.28]},
+	"nova": {"happy": [0.5, 0.28], "sad": [0.5, 0.28], "surprised": [0.5, 0.28], "pout": [0.5, 0.28], "shy": [0.5, 0.28]},
 }
-# face width (cheek to cheek at the eyes) in px: emotion art / rigged base art — the ratio keeps a swap the same size.
-# A hero entry is one width for all her files, or a per-emotion dictionary (mc / hana: 1.75 × the eye distance,
-# cross-checked against eyes-to-mouth, measured on every file of the redraw).
-static var EMO_FACE_W: = {"mc": {"happy": 157.0, "sad": 152.0, "surprised": 147.0, "pout": 148.0, "shy": 154.0},
-	"hana": {"happy": 138.0, "sad": 145.0, "surprised": 136.0, "pout": 132.0, "shy": 136.0},
-	"rin": 188.0, "yue": 170.0, "nova": 180.0}
+# face width (cheek to cheek at the eyes) in px: unified v4 cutouts scaled to 168 px face width.
+static var EMO_FACE_W: = {"mc": 168.0, "hana": 168.0, "rin": 168.0, "yue": 168.0, "nova": 168.0}
 static var RIG_FACE_W: = {"mc": 95.0, "hana": 89.0, "rin": 76.0, "yue": 80.0, "nova": 86.0}
 
 const BUST_SHADER: = "shader_type canvas_item;\nvarying vec4 vcol;\nuniform float fade = 0.16;\nuniform float flash = 0.0;\n" + \

@@ -52,7 +52,8 @@ static func _equipped(hero: String) -> String:
 
 static func outfit_art(hero: String, outfit_id: String) -> Dictionary:
 	var h: = hero if hero in HEROES else "mc"
-	var out: = {"kind": "cutout", "path": "res://assets/hero/%s.png" % h, "img": String(BASE_IMG[h]), "swapped": false,
+	var hp: = V10W1Core.hero_png(h)
+	var out: = {"kind": "cutout", "path": hp if ResourceLoader.exists(hp) else "res://assets/hero/mc.png", "img": String(BASE_IMG[h]), "swapped": false,
 		"outfit": outfit_id}
 	var gg: = U.g()
 	if outfit_id == "" or gg == null or not (gg.ITEM as Dictionary).has(outfit_id):

@@ -11,6 +11,13 @@ const BANNER_ART: = "res://assets/v10/hf_ui/banner_pvp_online.webp"
 const CHARGE_PAIRS: = 4
 const SLOTS_N: = 5
 const EMOTE_TEXT: = {"laugh": "Ха-ха!", "angry": "Грр!", "heart": "Обожаю!", "cool": "Круто!"}
+const EMOTE_EMO: = {"laugh": "happy", "angry": "pout", "heart": "shy", "cool": "surprised"}
+const EMOTE_ACCENT: = {
+	"laugh": Color("#F5C84C"),
+	"angry": Color("#EE6A7A"),
+	"heart": Color("#F288B5"),
+	"cool": Color("#7FD6FF"),
+}
 const TAB_TITLES: = ["Быстрый бой", "Комната", "Топ игроков"]
 
 var main = null
@@ -34,6 +41,8 @@ var code_edit: LineEdit
 var _search_t: = 0.0
 
 var match_root: Control
+var arena_frame: Control = null
+var arena_band: = Rect2()
 var board: TrayBoard = null
 var board_rect: = Rect2()
 var slot_rects: Array = []
@@ -660,31 +669,65 @@ func _build_match() -> void:
 		var r: = Rect2(x0 + i * (sw + gap), ty, sw, sw * 1.12)
 		slot_rects.append(r)
 		match_root.add_child(U.panel(r, Color(0.05, 0.03, 0.08, 0.92), Color(0.75, 0.62, 0.38, 0.55), 10))
-	# dock
+	# dock & clean arena framing (tightly proportioned lacquer-gold table over the palace backdrop)
 	var dh: = 176.0
 	var dy: = H - dh - 12.0 - safe_b
-	var by: = ty + sw * 1.12 + 22.0
-	board_rect = Rect2(18, by, W - 36, maxf(240.0, dy - by - 12.0))
-	match_root.add_child(U.panel(board_rect.grow(5.0), Color(0.06, 0.14, 0.11, 0.85), Color("#D4AC5E"), 18))
+	var avail_top: = ty + sw * 1.12 + 20.0
+	var avail_bot: = dy - 16.0
+	var avail_h: = maxf(240.0, avail_bot - avail_top)
+	arena_band = Rect2(18.0, avail_top, W - 36.0, avail_h)
+	var target_h: = minf(avail_h, W * 1.10)
+	var by: = avail_top + (avail_h - target_h) * 0.48
+	board_rect = Rect2(18.0, by, W - 36.0, target_h)
+	arena_frame = Control.new()
+	arena_frame.name = "ArenaFrame"
+	arena_frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	match_root.add_child(arena_frame)
+	_rebuild_arena_frame(board_rect)
 	var dock_p: = U.panel(Rect2(12, dy, W - 24, dh), U.PLUM, U.GOLD, 22)
 	dock_p.name = "MatchDock"
 	match_root.add_child(dock_p)
-	charge_lbl = U.label("", Rect2(28, dy + 10, 320, 32), 21, U.GOLD_HI, HORIZONTAL_ALIGNMENT_LEFT, 900)
+	charge_lbl = U.label("", Rect2(26, dy + 10, 316, 32), 21, U.GOLD_HI, HORIZONTAL_ALIGNMENT_LEFT, 900)
 	match_root.add_child(charge_lbl)
-	charge_bar = U.bar(Rect2(28, dy + 46, 316, 22), 0.0, Color("#8FD8FF"))
+	charge_bar = U.bar(Rect2(26, dy + 46, 310, 22), 0.0, Color("#8FD8FF"))
 	match_root.add_child(charge_bar)
-	sab_btns["ice"] = U.button("Лёд", Rect2(28, dy + 82, 150, 72), func() -> void: use_sabotage("ice"), Color("#1F5E8C"), Color("#E6F7FF"), 26, Color("#8FD8FF"))
-	sab_btns["fog"] = U.button("Туман", Rect2(194, dy + 82, 150, 72), func() -> void: use_sabotage("fog"), Color("#5B2E86"), Color("#F1E4FF"), 26, Color("#C9A2FF"))
+	sab_btns["ice"] = U.button("Лёд", Rect2(26, dy + 82, 148, 72), func() -> void: use_sabotage("ice"), Color("#1F5E8C"), Color("#E6F7FF"), 25, Color("#8FD8FF"))
+	sab_btns["fog"] = U.button("Туман", Rect2(188, dy + 82, 148, 72), func() -> void: use_sabotage("fog"), Color("#5B2E86"), Color("#F1E4FF"), 25, Color("#C9A2FF"))
 	match_root.add_child(sab_btns.ice)
 	match_root.add_child(sab_btns.fog)
-	var ex: = 366.0
-	var ew: = (W - 28.0 - ex - 12.0) * 0.5
+	var ex: = 352.0
+	var ew: = (W - 24.0 - ex - 10.0) * 0.5
+	var my_h: = _my_hero()
 	var i2: = 0
 	for id in V10Online.EMOTES:
 		var eid: String = id
-		var r2: = Rect2(ex + float(i2 % 2) * (ew + 12.0), dy + 14 + float(i2 / 2) * 80.0, ew, 68)
-		match_root.add_child(U.button(EMOTE_TEXT[eid], r2, func() -> void: send_emote(eid), U.PLUM_LO, U.CREAM, 22, Color(U.GOLD, 0.6)))
+		var r2: = Rect2(ex + float(i2 % 2) * (ew + 10.0), dy + 14.0 + float(i2 / 2) * 80.0, ew, 68.0)
+		match_root.add_child(_make_emote_btn(eid, r2, my_h))
 		i2 += 1
+
+
+func _rebuild_arena_frame(r: Rect2) -> void:
+	if arena_frame == null or not is_instance_valid(arena_frame):
+		return
+	for c in arena_frame.get_children():
+		c.queue_free()
+	var outer: = U.panel(r, Color(0.11, 0.045, 0.14, 0.58), V10DS.GOLD_500, 22, 2)
+	outer.name = "OuterRim"
+	arena_frame.add_child(outer)
+	var inner_r: = r.grow(-5.0)
+	if inner_r.size.x > 20.0 and inner_r.size.y > 20.0:
+		var inner: = Panel.new()
+		inner.name = "InnerHair"
+		inner.position = inner_r.position
+		inner.size = inner_r.size
+		inner.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var sb: = StyleBoxFlat.new()
+		sb.bg_color = Color(0.0, 0.0, 0.0, 0.0)
+		sb.border_color = Color(V10DS.GOLD_300, 0.36)
+		sb.set_border_width_all(1)
+		sb.set_corner_radius_all(17)
+		inner.add_theme_stylebox_override("panel", sb)
+		arena_frame.add_child(inner)
 
 
 func _spawn_board(cfg: Dictionary) -> void:
@@ -694,8 +737,23 @@ func _spawn_board(cfg: Dictionary) -> void:
 	board = TrayBoard.new()
 	board.slots = SLOTS_N
 	match_root.add_child(board)
+	if arena_frame != null and is_instance_valid(arena_frame):
+		match_root.move_child(board, arena_frame.get_index() + 1)
 	board.setup(cfg)
 	board.fit_into(board_rect)
+	var tbl: Node = board.get_node_or_null("V6Table")
+	var actual_r: Rect2
+	if tbl != null and tbl.get("frame_rect") is Rect2 and (tbl.get("frame_rect") as Rect2).size.x > 10.0:
+		actual_r = tbl.get("frame_rect") as Rect2
+	else:
+		actual_r = Rect2(board.position + board.bounds.position * board.scale.x, board.bounds.size * board.scale.x).grow(18.0)
+	var pad_r: = actual_r.grow(10.0)
+	var c_top: = maxf(arena_band.position.y - 4.0, pad_r.position.y)
+	var c_bot: = minf(arena_band.end.y + 4.0, pad_r.end.y)
+	var c_left: = maxf(10.0, pad_r.position.x)
+	var c_right: = minf(W - 10.0, pad_r.end.x)
+	board_rect = Rect2(c_left, c_top, maxf(120.0, c_right - c_left), maxf(120.0, c_bot - c_top))
+	_rebuild_arena_frame(board_rect)
 	board.slot_pos.clear()
 	for r in slot_rects:
 		board.slot_pos.append(get_global_transform_with_canvas() * (r as Rect2).get_center())
@@ -805,38 +863,257 @@ func apply_sabotage(kind: String) -> void:
 	Sfx.play("deny", 1.0, -4)
 
 
+static func emote_emotion(emote_id: String) -> String:
+	return String(EMOTE_EMO.get(emote_id, "happy"))
+
+
+static func emote_portrait_path(hero_id: String, emote_id: String) -> String:
+	var h: = V8Art.emo_hero(hero_id) if hero_id != "" else "mc"
+	var emo: = emote_emotion(emote_id)
+	if V8Art.has_emotion(h, emo):
+		var p: = V8Art.emotion_path(h, emo)
+		if ResourceLoader.exists(p):
+			return p
+	var w1_emo: = "res://assets/v10/wave1/emotions/%s_%s.webp" % [h, emo]
+	if ResourceLoader.exists(w1_emo):
+		return w1_emo
+	var hero_p: = V10W1Core.hero_png(h)
+	if ResourceLoader.exists(hero_p):
+		return hero_p
+	return "res://assets/hero/mc.png"
+
+
+static func emote_portrait_tex(hero_id: String, emote_id: String) -> Texture2D:
+	var p: = emote_portrait_path(hero_id, emote_id)
+	if ResourceLoader.exists(p):
+		var t: = load(p) as Texture2D
+		if t != null:
+			return t
+	return load("res://assets/hero/mc.png") as Texture2D
+
+
+static func _emote_face_crop(hero_id: String, emote_id: String, path: String, tex: Texture2D) -> Array:
+	var h: = V8Art.emo_hero(hero_id) if hero_id != "" else "mc"
+	var emo: = emote_emotion(emote_id)
+	if "/emotions/" in path and tex != null:
+		var f: Array = []
+		var ef_h = V8Art.EMO_FACE.get(h, null)
+		if ef_h is Dictionary and (ef_h as Dictionary).has(emo):
+			f = (ef_h as Dictionary)[emo]
+		else:
+			var w1_f = V10W1Core.emo_face().get(h, null)
+			if w1_f is Dictionary and (w1_f as Dictionary).has(emo):
+				f = (w1_f as Dictionary)[emo]
+		if f.size() < 2:
+			f = [0.5, 0.28]
+		var fw: = 160.0
+		var efw_h = V8Art.EMO_FACE_W.get(h, null)
+		if efw_h is Dictionary:
+			fw = float((efw_h as Dictionary).get(emo, 160.0))
+		elif efw_h is float or efw_h is int:
+			fw = float(efw_h)
+		else:
+			var w1_fw = V10W1Core.emo_face_w().get(h, null)
+			if w1_fw is Dictionary and (w1_fw as Dictionary).has(emo):
+				fw = float((w1_fw as Dictionary)[emo])
+		var tw: = maxf(1.0, float(tex.get_width()))
+		var th: = maxf(1.0, float(tex.get_height()))
+		var zoom: = clampf(tw / maxf(40.0, fw * 1.75), 1.15, 3.6)
+		var focus: = Vector2(float(f[0]), clampf(float(f[1]) + (fw * 0.06) / th, 0.12, 0.72))
+		return [focus, zoom]
+	if Hero.RIGS.has(h):
+		return [Hero.av_focus(h), Hero.av_zoom(h)]
+	return [Vector2(0.5, 0.18), 4.2]
+
+
+static func make_emote_portrait(hero_id: String, emote_id: String, sz: float, rim_col: Color) -> Control:
+	var root: = Control.new()
+	root.name = "StickerPortrait"
+	root.size = Vector2(sz, sz)
+	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var rad: = int(roundf(sz * 0.5))
+	var acc: Color = EMOTE_ACCENT.get(emote_id, V10DS.GOLD_500)
+	var disc: = Panel.new()
+	disc.size = Vector2(sz, sz)
+	disc.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var dsb: = StyleBoxFlat.new()
+	dsb.bg_color = Color(0.18, 0.08, 0.24, 0.98).lerp(acc, 0.22)
+	dsb.border_color = rim_col
+	dsb.set_border_width_all(3 if sz >= 64.0 else 2)
+	dsb.set_corner_radius_all(rad)
+	dsb.shadow_color = Color(0.0, 0.0, 0.0, 0.35)
+	dsb.shadow_size = 4 if sz >= 64.0 else 2
+	dsb.shadow_offset = Vector2(0, 2)
+	disc.add_theme_stylebox_override("panel", dsb)
+	root.add_child(disc)
+	var path: = emote_portrait_path(hero_id, emote_id)
+	var tex: = emote_portrait_tex(hero_id, emote_id)
+	if tex != null:
+		var inset: = 3.0 if sz >= 64.0 else 2.0
+		var inner: = Rect2(Vector2(inset, inset), Vector2(sz - inset * 2.0, sz - inset * 2.0))
+		var crop: = _emote_face_crop(hero_id, emote_id, path, tex)
+		var art: = Common.card_art(tex, inner, crop[0] as Vector2, float(crop[1]), inner.size.x * 0.5)
+		if art.material is ShaderMaterial:
+			(art.material as ShaderMaterial).set_shader_parameter("bottom_shade", 0.0)
+		art.name = "Pic"
+		art.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		root.add_child(art)
+	var ring: = Panel.new()
+	ring.size = Vector2(sz, sz)
+	ring.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var rsb: = StyleBoxFlat.new()
+	rsb.bg_color = Color(0.0, 0.0, 0.0, 0.0)
+	rsb.border_color = Color(V10DS.GOLD_300, 0.85)
+	rsb.set_border_width_all(2 if sz >= 64.0 else 1)
+	rsb.set_corner_radius_all(rad)
+	ring.add_theme_stylebox_override("panel", rsb)
+	root.add_child(ring)
+	root.set_meta("portrait_path", path)
+	return root
+
+
+static func _hero_display_name(hero_id: String) -> String:
+	var h: = V8Art.emo_hero(hero_id) if hero_id != "" else "mc"
+	if G.HEROES.has(h):
+		return String(G.HEROES[h].get("name", ""))
+	if V10W1Core.HEROES.has(h):
+		return String(V10W1Core.HEROES[h].get("name", ""))
+	if V10DS.HEROES.has(h):
+		return String(V10DS.HEROES[h].get("name", ""))
+	return ""
+
+
+func _my_hero() -> String:
+	var h: = ""
+	if G.S is Dictionary:
+		h = String(G.S.get("partner", ""))
+	if h == "":
+		h = V10OnlineCfg.avatar()
+	return V10OnlineCfg.valid_avatar(h, "mc")
+
+
+func _opp_hero() -> String:
+	var h: = String(opp.get("hero", ""))
+	if h == "":
+		h = String(opp.get("avatar", ""))
+	if h == "":
+		h = "rin"
+	return V10OnlineCfg.valid_avatar(h, "rin")
+
+
+func _make_emote_btn(eid: String, r2: Rect2, hero_id: String) -> Panel:
+	var acc: Color = EMOTE_ACCENT.get(eid, V10DS.GOLD_500)
+	var p: = U.panel(r2, Color(0.11, 0.045, 0.16, 0.96), Color(V10DS.GOLD_500, 0.72), 20, 2)
+	p.name = "EmoteBtn_" + eid
+	p.mouse_filter = Control.MOUSE_FILTER_STOP
+	p.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	p.set_meta("no_haptic", true)
+	var por_sz: = 48.0
+	var por: = make_emote_portrait(hero_id, eid, por_sz, acc.lerp(V10DS.GOLD_500, 0.45))
+	por.position = Vector2(8.0, (r2.size.y - por_sz) * 0.5)
+	p.add_child(por)
+	var l: = U.label(String(EMOTE_TEXT.get(eid, eid)), Rect2(60.0, 0.0, r2.size.x - 66.0, r2.size.y), 20, U.CREAM, HORIZONTAL_ALIGNMENT_LEFT, 900, 3)
+	p.add_child(l)
+	p.set_meta("label", l)
+	p.gui_input.connect(func(e: InputEvent) -> void:
+		var tap: bool = (e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT) or (e is InputEventScreenTouch and e.pressed)
+		if tap:
+			p.accept_event()
+			var tw: = p.create_tween()
+			p.pivot_offset = p.size * 0.5
+			tw.tween_property(p, "scale", Vector2(0.93, 0.93), 0.06)
+			tw.tween_property(p, "scale", Vector2.ONE, 0.12).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+			U.haptic("tap")
+			Sfx.play("tap", 1.0, -6)
+			send_emote(eid))
+	return p
+
+
 func send_emote(id: String) -> void:
 	if phase != "match":
 		return
 	net.send_emote(id)
 	var my_y: = (my_bar.position.y + my_bar.size.y + 10.0) if (my_bar != null and is_instance_valid(my_bar)) else (162.0 + safe_t)
-	_bubble(Vector2(26, my_y), EMOTE_TEXT.get(id, "!"), false)
+	_bubble(Vector2(18.0, my_y), id, false, _my_hero())
 
 
 func _on_emote(id: String) -> void:
 	emotes_seen += 1
 	if phase == "match":
 		var opp_y: = (opp_bar.position.y + opp_bar.size.y + 10.0) if (opp_bar != null and is_instance_valid(opp_bar)) else (162.0 + safe_t)
-		var opp_x: = (opp_bar.position.x + opp_bar.size.x - 200.0) if (opp_bar != null and is_instance_valid(opp_bar)) else (W - 226.0)
-		_bubble(Vector2(opp_x, opp_y), EMOTE_TEXT.get(id, "!"), true)
+		var bw: = 258.0
+		var opp_x: = (opp_bar.position.x + opp_bar.size.x - bw) if (opp_bar != null and is_instance_valid(opp_bar)) else (W - 18.0 - bw)
+		_bubble(Vector2(opp_x, opp_y), id, true, _opp_hero())
 
 
-func _bubble(pos: Vector2, txt: String, theirs: bool) -> void:
-	var p: = U.panel(Rect2(pos, Vector2(200, 56)), Color("#FFF4E0"), Color("#E0648C") if theirs else U.GOLD, 24, 3)
-	p.name = "EmoteBubble"
+func _bubble(pos: Vector2, emote_id: String, theirs: bool, hero_id: String = "") -> Control:
+	var h: = hero_id if hero_id != "" else (_opp_hero() if theirs else _my_hero())
+	var caption: String = String(EMOTE_TEXT.get(emote_id, emote_id))
+	var acc: Color = EMOTE_ACCENT.get(emote_id, Color("#E0648C") if theirs else V10DS.GOLD_500)
+	var bw: = 258.0
+	var bh: = 92.0
+	var px: = clampf(pos.x, 12.0, maxf(12.0, W - 12.0 - bw))
+	var bname: = "EmoteBubble" if theirs else "EmoteBubbleMe"
+	var prev: = fx_layer.get_node_or_null(bname)
+	if prev != null and is_instance_valid(prev):
+		fx_layer.remove_child(prev)
+		prev.queue_free()
+	var bg_col: = Color("#FFF0F5") if theirs else Color("#FFF6E5")
+	var rim_col: = Color("#E0648C") if theirs else V10DS.GOLD_500
+	var p: = U.panel(Rect2(Vector2(px, pos.y), Vector2(bw, bh)), bg_col, rim_col, 26, 3)
+	p.name = bname
 	p.z_index = 240
-	var l: = U.label(txt, Rect2(8, 0, 184, 56), 24, Color("#3A1838"), HORIZONTAL_ALIGNMENT_CENTER, 900)
-	l.label_settings = l.label_settings.duplicate()
-	l.label_settings.outline_size = 0
-	p.add_child(l)
+	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	# subtle gold filigree inner rim
+	var hair: = Panel.new()
+	hair.position = Vector2(4, 4)
+	hair.size = Vector2(bw - 8.0, bh - 8.0)
+	hair.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var hsb: = StyleBoxFlat.new()
+	hsb.bg_color = Color(0.0, 0.0, 0.0, 0.0)
+	hsb.border_color = Color(V10DS.GOLD_500, 0.45)
+	hsb.set_border_width_all(1)
+	hsb.set_corner_radius_all(22)
+	hair.add_theme_stylebox_override("panel", hsb)
+	p.add_child(hair)
+	# expressive 74px circular gold-framed heroine portrait
+	var por_sz: = 74.0
+	var por: = make_emote_portrait(h, emote_id, por_sz, rim_col)
+	por.position = Vector2(bw - por_sz - 10.0, (bh - por_sz) * 0.5) if theirs else Vector2(10.0, (bh - por_sz) * 0.5)
+	p.add_child(por)
+	# accent pill + bold Russian caption + heroine name subline
+	var tx: = 14.0 if theirs else (por_sz + 18.0)
+	var tw_w: = bw - por_sz - 30.0
+	var tag_bar: = Panel.new()
+	tag_bar.position = Vector2(tx + tw_w * 0.5 - 24.0, 12.0)
+	tag_bar.size = Vector2(48.0, 4.0)
+	tag_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var tsb: = StyleBoxFlat.new()
+	tsb.bg_color = acc
+	tsb.set_corner_radius_all(2)
+	tag_bar.add_theme_stylebox_override("panel", tsb)
+	p.add_child(tag_bar)
+	var cap_l: = U.label(caption, Rect2(tx, 18.0, tw_w, 40.0), 25, Color("#3A1838"), HORIZONTAL_ALIGNMENT_CENTER, 900, 0)
+	p.add_child(cap_l)
+	var hname: = _hero_display_name(h)
+	if hname != "":
+		var sub_l: = U.label(hname, Rect2(tx, 54.0, tw_w, 26.0), 16, Color("#7A4362"), HORIZONTAL_ALIGNMENT_CENTER, 800, 0)
+		p.add_child(sub_l)
+	p.set_meta("hero_id", h)
+	p.set_meta("emote_id", emote_id)
+	p.set_meta("portrait_path", String(por.get_meta("portrait_path", "")))
 	fx_layer.add_child(p)
-	p.pivot_offset = Vector2(100, 28)
-	p.scale = Vector2(0.4, 0.4)
+	p.pivot_offset = Vector2(bw - 46.0, bh * 0.5) if theirs else Vector2(46.0, bh * 0.5)
+	p.scale = Vector2(0.28, 0.28)
+	p.rotation = 0.08 if theirs else -0.08
 	var tw: = p.create_tween()
-	tw.tween_property(p, "scale", Vector2.ONE, 0.18).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	tw.tween_interval(1.6)
-	tw.tween_property(p, "modulate:a", 0.0, 0.3)
+	tw.tween_property(p, "scale", Vector2(1.06, 1.06), 0.18).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tw.parallel().tween_property(p, "rotation", 0.0, 0.20).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tw.tween_property(p, "scale", Vector2.ONE, 0.10).set_trans(Tween.TRANS_SINE)
+	tw.tween_interval(1.9)
+	tw.tween_property(p, "modulate:a", 0.0, 0.28)
 	tw.tween_callback(p.queue_free)
+	return p
 
 
 func surrender() -> void:
@@ -915,6 +1192,7 @@ func _back_to_lobby() -> void:
 	if match_root != null and is_instance_valid(match_root):
 		match_root.queue_free()
 	match_root = null
+	arena_frame = null
 	board = null
 	if net != null:
 		net.pvp_close()

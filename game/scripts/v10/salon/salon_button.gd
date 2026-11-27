@@ -106,15 +106,69 @@ func tap() -> void:
 	pressed.emit()
 
 
+static func _rr_pts(r: Rect2, rad: float, segs: = 10) -> PackedVector2Array:
+	var rr: = clampf(rad, 0.0, minf(r.size.x, r.size.y) * 0.5)
+	var pts: = PackedVector2Array()
+	var corners: = [
+		[Vector2(r.end.x - rr, r.position.y + rr), -PI * 0.5, 0.0],
+		[Vector2(r.end.x - rr, r.end.y - rr), 0.0, PI * 0.5],
+		[Vector2(r.position.x + rr, r.end.y - rr), PI * 0.5, PI],
+		[Vector2(r.position.x + rr, r.position.y + rr), PI, PI * 1.5],
+	]
+	for c in corners:
+		var ctr: Vector2 = c[0]
+		var a0: float = c[1]
+		var a1: float = c[2]
+		for i in segs + 1:
+			var a: = lerpf(a0, a1, float(i) / float(segs))
+			pts.append(ctr + Vector2(cos(a), sin(a)) * rr)
+	return pts
+
+
+static func _grad_cols(pts: PackedVector2Array, y0: float, y1: float, c_top: Color, c_mid: Color, c_bot: Color) -> PackedColorArray:
+	var out: = PackedColorArray()
+	var span: = maxf(0.001, y1 - y0)
+	for p in pts:
+		var t: = clampf((p.y - y0) / span, 0.0, 1.0)
+		out.append(c_top.lerp(c_mid, t * 2.0) if t <= 0.5 else c_mid.lerp(c_bot, (t - 0.5) * 2.0))
+	return out
+
+
+func _draw_hairline(x0: float, x1: float, y: float, col: Color) -> void:
+	var f: = minf(24.0, (x1 - x0) * 0.3)
+	var c0: = Color(col, 0.0)
+	draw_polyline_colors(
+		PackedVector2Array([Vector2(x0, y), Vector2(x0 + f, y), Vector2(x1 - f, y), Vector2(x1, y)]),
+		PackedColorArray([c0, col, col, c0]), 1.0, true)
+
+
 func _draw() -> void:
 	var r: = Rect2(Vector2.ZERO, size)
 	match kind:
 		"game":
-			var col: = accent if not disabled else V10SalonUI.NIGHT_600
-			draw_style_box(V10SalonUI.panel_box(col, size.y * 0.5), r)
+			var rad: = size.y * 0.5
+			# gentle grounding shadow under the pill
+			draw_colored_polygon(_rr_pts(Rect2(r.position + Vector2(0.0, 3.0), r.size), rad, 12), Color(V10SalonUI.NIGHT_900, 0.36))
+			var body_pts: = _rr_pts(r, rad, 14)
+			if disabled:
+				draw_polygon(body_pts, _grad_cols(body_pts, 0.0, size.y, V10SalonUI.NIGHT_600, V10SalonUI.NIGHT_600.lerp(V10SalonUI.NIGHT_700, 0.5), V10SalonUI.NIGHT_700))
+			else:
+				var ct: = accent.lightened(0.06) if not _down else V10SalonUI.ROSE_700.lightened(0.06)
+				var cm: = accent if not _down else V10SalonUI.ROSE_700
+				var cb: = accent.lerp(V10SalonUI.ROSE_700, 0.24) if not _down else V10SalonUI.ROSE_700.darkened(0.08)
+				draw_polygon(body_pts, _grad_cols(body_pts, 0.0, size.y, ct, cm, cb))
+				# subtle inner velvet top sheen
+				var sr: = Rect2(2.0, 1.5, size.x - 4.0, size.y * 0.44)
+				if sr.size.x > 8.0 and sr.size.y > 4.0:
+					var sp: = _rr_pts(sr, minf(rad - 2.0, sr.size.y * 0.48), 10)
+					draw_polygon(sp, _grad_cols(sp, sr.position.y, sr.end.y, Color(V10SalonUI.PAPER_100, 0.06 if _down else 0.13), Color(V10SalonUI.PAPER_100, 0.03), Color(V10SalonUI.PAPER_100, 0.0)))
+				# 1px champagne-gold top hairline sheen + subtle velvet bottom depth
+				var inset: = minf(rad * 0.72, size.x * 0.25)
+				_draw_hairline(inset, size.x - inset, 1.0, Color(V10SalonUI.GOLD_300, 0.40 if _down else 0.74))
+				_draw_hairline(inset, size.x - inset, size.y - 1.2, Color(V10SalonUI.ROSE_700, 0.45))
 			if _glint >= 0.0 and not disabled:
 				var x: = lerpf(-size.y, size.x + size.y, _glint)
-				var a: = sin(_glint * PI) * 0.13
+				var a: = sin(_glint * PI) * 0.12
 				var pts: = PackedVector2Array([Vector2(x, 0), Vector2(x + 26, 0), Vector2(x - size.y * 0.5 + 26, size.y), Vector2(x - size.y * 0.5, size.y)])
 				var clip: = []
 				for p in pts:
@@ -122,8 +176,14 @@ func _draw() -> void:
 				draw_colored_polygon(PackedVector2Array(clip), Color(1, 1, 1, a))
 			_draw_label(V10SalonUI.NIGHT_900 if not disabled else V10SalonUI.PAPER_500, 32, "display", 700)
 		"second":
-			draw_style_box(V10SalonUI.panel_box(Color(V10SalonUI.NIGHT_700, 0.92), 4.0, Color(V10SalonUI.GOLD_700, 0.6), 1), r)
-			# disabled still carries information («Ещё 4 звезды»): paper.500 keeps ≥ 4.5:1 on night.700
+			draw_colored_polygon(_rr_pts(r, 6.0, 8), Color(V10SalonUI.NIGHT_600 if _down else V10SalonUI.NIGHT_800, 0.92))
+			var lh2: = size.y * 0.42
+			var lac2: = Color(V10SalonUI.PAPER_100, 0.05)
+			var clr2: = Color(V10SalonUI.PAPER_100, 0.0)
+			draw_polygon(PackedVector2Array([Vector2(4.0, 1.0), Vector2(size.x - 4.0, 1.0), Vector2(size.x - 1.5, lh2), Vector2(1.5, lh2)]), PackedColorArray([lac2, lac2, clr2, clr2]))
+			draw_line(Vector2(6.0, size.y - 1.0), Vector2(size.x - 6.0, size.y - 1.0), Color(V10SalonUI.NIGHT_900, 0.65), 1.0)
+			_draw_hairline(12.0, size.x - 12.0, 0.8, Color(V10SalonUI.GOLD_500 if _down else V10SalonUI.GOLD_700, 0.65 if _down else 0.50))
+			# disabled still carries information («Ещё 4 звезды»): paper.500 keeps ≥ 4.5:1 on night.800
 			_draw_label(V10SalonUI.PAPER_100 if not disabled else V10SalonUI.PAPER_500, 22, "body", 800)
 		"chip":
 			# the pill is at most 64 tall; a taller control is the 80 px hit zone around it (UX §6.1)

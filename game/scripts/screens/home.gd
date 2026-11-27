@@ -43,12 +43,16 @@ var _frame_pill: Panel
 var _frame_lbl: Label
 var _frame_bar: Control
 var _crop_catcher: Control
+var _voice_node: Control
+var _chips_bottom: = 340.0
 const FRAME_NAMES: = ["Полный рост", "Ближе", "Портрет"]
 
 func build(m, _args: Dictionary) -> void :
 	main = m
 	W = size.x
 	H = size.y
+	if not child_entered_tree.is_connected(_on_home_child_entered):
+		child_entered_tree.connect(_on_home_child_entered)
 	main.show_chrome(true, true)
 	Sfx.music("menu")
 	if "--letters_selftest=1" in OS.get_cmdline_user_args():
@@ -489,17 +493,131 @@ func _say(text: String) -> void :
 	if live and is_instance_valid(live):
 		live.say(text, "", "", false)
 		return
-	if toast_left_ms() > 0:
+	if toast_left_ms() > 0 or text == "":
 		return
-	if bubble:
-		bubble.queue_free()
-	var head: = V10Layout.local_of(self, hero.head_global())
-	bubble = Common.bubble(self, text, Vector2(114, maxf(head.y - 250, 186.0)), 300, false)
-	var b: = bubble
-	var t: Tween = b.create_tween()
-	t.tween_interval(3.8)
-	t.tween_property(b, "modulate:a", 0.0, 0.3)
-	t.tween_callback(b.queue_free)
+	_show_editorial_voice(text, 4.0)
+
+
+func _on_home_child_entered(node: Node) -> void:
+	if not (node is Control) or node.name != "V9Bubble":
+		return
+	var ctrl: Control = node
+	var txt: = ""
+	for c in ctrl.get_children():
+		if c is Label and (c as Label).text.strip_edges() != "":
+			txt = (c as Label).text.strip_edges()
+	# Immediately hide the legacy opaque dialogue box before any frame draws
+	ctrl.visible = false
+	if ctrl.has_meta("av"):
+		ctrl.remove_meta("av")
+	if txt != "":
+		_show_editorial_voice(txt, -1.0, ctrl)
+
+
+func _clear_voice_node() -> void:
+	if _voice_node and is_instance_valid(_voice_node):
+		var old: = _voice_node
+		_voice_node = null
+		old.visible = false
+		old.queue_free()
+
+
+func _show_editorial_voice(text: String, dur: float = 4.0, linked_bubble: Control = null) -> void:
+	_clear_voice_node()
+	if text == "":
+		return
+	var root: = Control.new()
+	root.name = "V10EditorialVoice"
+	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	root.z_index = 12
+	var max_w: = clampf(W * 0.48, 280.0, 344.0)
+	var f: Font = V10Fonts.font("hand")
+	var fs: = 34
+	var msz: = f.get_multiline_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, max_w, fs, -1,
+		TextServer.BREAK_MANDATORY | TextServer.BREAK_WORD_BOUND | TextServer.BREAK_ADAPTIVE)
+	var tw: = clampf(msz.x + 8.0, 120.0, max_w)
+	var th: = maxf(44.0, msz.y + 8.0)
+	# Clean upper-left open air beside her shoulder/head (inside moon window, below chips, never on face or chest)
+	var y_min: = maxf(_chips_bottom + 24.0, 228.0)
+	var y_target: = clampf(maxf(y_min, H * 0.275), y_min, maxf(y_min, H * 0.355))
+	root.position = Vector2(56.0, y_target)
+	root.size = Vector2(tw, th + 16.0)
+	# Ultra-soft feathered radial ink mist behind the calligraphy (NO box, NO edge, pure transparent outer alpha)
+	var veil: = TextureRect.new()
+	veil.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var gt: = GradientTexture2D.new()
+	gt.fill = GradientTexture2D.FILL_RADIAL
+	gt.fill_from = Vector2(0.46, 0.5)
+	gt.fill_to = Vector2(0.96, 0.5)
+	gt.width = 128
+	gt.height = 128
+	var g: = Gradient.new()
+	g.offsets = PackedFloat32Array([0.0, 0.52, 1.0])
+	g.colors = PackedColorArray([
+		Color(V10DS.NIGHT_900, 0.30),
+		Color(V10DS.NIGHT_900, 0.14),
+		Color(V10DS.NIGHT_900, 0.0),
+	])
+	gt.gradient = g
+	veil.texture = gt
+	veil.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	veil.stretch_mode = TextureRect.STRETCH_SCALE
+	veil.position = Vector2(-42.0, -24.0)
+	veil.size = Vector2(tw + 84.0, th + 54.0)
+	root.add_child(veil)
+	# Editorial handwritten light cream text with soft drop shadow (matching 03_home.webp)
+	var lbl: = Label.new()
+	lbl.text = text
+	lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	lbl.vertical_alignment = VERTICAL_ALIGNMENT_TOP
+	lbl.position = Vector2.ZERO
+	lbl.size = Vector2(tw, th + 8.0)
+	lbl.rotation = -0.028
+	var ls: = LabelSettings.new()
+	ls.font = f
+	ls.font_size = fs
+	ls.font_color = V10DS.PAPER_100
+	ls.outline_size = 0
+	ls.shadow_color = Color(V10DS.NIGHT_900, 0.84)
+	ls.shadow_offset = Vector2(0.0, 2.0)
+	ls.shadow_size = 8
+	ls.line_spacing = 2.0
+	lbl.label_settings = ls
+	lbl.visible_ratio = 0.0
+	root.add_child(lbl)
+	# Delicate calligraphic flourish underline under the speech line (like 03_home.webp)
+	var sw: = minf(tw * 0.55, 136.0)
+	var fl: = Control.new()
+	fl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	fl.position = Vector2(18.0, th + 2.0)
+	fl.size = Vector2(sw, 10.0)
+	fl.rotation = -0.028
+	fl.draw.connect(func() -> void:
+		var c0: = Color(V10DS.PAPER_100, 0.0)
+		var c1: = Color(V10DS.PAPER_100, 0.62)
+		fl.draw_polyline_colors(PackedVector2Array([
+			Vector2(0.0, 5.0), Vector2(sw * 0.30, 2.8), Vector2(sw * 0.72, 2.0), Vector2(sw, 3.6),
+		]), PackedColorArray([c0, c1, c1, c0]), 1.6, true))
+	root.add_child(fl)
+	add_child(root)
+	_voice_node = root
+	root.modulate.a = 0.0
+	var tw_in: = root.create_tween().set_parallel()
+	tw_in.tween_property(root, "modulate:a", 1.0, 0.22).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	tw_in.tween_property(lbl, "visible_ratio", 1.0, clampf(0.28 + text.length() * 0.008, 0.30, 0.55)).set_trans(Tween.TRANS_SINE)
+	if linked_bubble != null and is_instance_valid(linked_bubble):
+		linked_bubble.tree_exiting.connect(func() -> void:
+			if is_instance_valid(root):
+				var tw_out: = root.create_tween()
+				tw_out.tween_property(root, "modulate:a", 0.0, 0.22)
+				tw_out.tween_callback(root.queue_free), CONNECT_ONE_SHOT)
+	elif dur > 0.0:
+		var tw_life: = root.create_tween()
+		tw_life.tween_interval(dur)
+		tw_life.tween_property(root, "modulate:a", 0.0, 0.28)
+		tw_life.tween_callback(root.queue_free)
 
 # 0.8 (main.toast): home toasts live in the speech-bubble band between the left icon column and the right cards,
 # so they never cover the league / event cards; the bubble steps aside while a toast is up
@@ -512,6 +630,7 @@ func v8_toast_shown(dur: float) -> void :
 	# 0.12: a toast and her speech bubble share the band over the action row — the bubble goes at once (no fade
 	# under the toast) and no new bubble rises while the toast is up (V9HomeLive.say waits for toast_left_ms())
 	_toast_until_ms = Time.get_ticks_msec() + int(dur * 1000.0) + 250
+	_clear_voice_node()
 	if bubble and is_instance_valid(bubble):
 		var b: = bubble
 		bubble = null
@@ -803,9 +922,9 @@ func _build_v10(mail_new: bool) -> void :
 	var mute_btn: = Panel.new()
 	mute_btn.name = "MuteBtn"
 	var msb: = StyleBoxFlat.new()
-	msb.bg_color = Color(0.11, 0.06, 0.16, 0.82)
-	msb.border_color = Color(0.92, 0.78, 0.48, 0.72)
-	msb.set_border_width_all(2)
+	msb.bg_color = Color(V10DS.NIGHT_800, 0.86)
+	msb.border_color = Color(V10DS.GOLD_700, 0.58)
+	msb.set_border_width_all(1)
 	msb.set_corner_radius_all(30)
 	mute_btn.add_theme_stylebox_override("panel", msb)
 	var ph_r: Rect2 = L.phone
@@ -855,13 +974,10 @@ func _build_v10(mail_new: bool) -> void :
 				refresh_badges())
 
 
-# ── 0.12: quick heroine switcher (‹ › lacquer arrows, «Наряд» chip) + gold pills «Колесо Удачи» / «7 Дней · SSR» ─────
-# The arrows sit on both screen edges below the middle (clear of her face, the lanterns and the action dock); one
-# tap makes the next / previous unlocked heroine the partner and rebuilds the tea house at once (she greets you).
-# The chip cycles her owned outfits. The pills sit under the lanterns on the left edge, never over them, with a dot
-# when the wheel spin / the 7-day gift is ready; they open v10wheel / v10welcome7 when those screens are registered.
+# ── 0.12: quick heroine switcher (‹ › arrows, «Наряд» chip) + slim HUD_V2 dark-lacquer chips («Колесо Удачи» / «7 Дней · SSR») ─
 func _build_quick_ui(L: Dictionary) -> void:
 	var vw: = get_viewport_rect().size.x
+	var cx: float = float(L.get("cx", 0.0))
 	var pr: Rect2 = L.get("partner", Rect2(24, H - 300, 200, 80))
 	var ay: = pr.position.y - 196.0
 	var hs: = _switch_heroes()
@@ -875,22 +991,30 @@ func _build_quick_ui(L: Dictionary) -> void:
 			home2.add_child(b)
 	var outs: = _outfit_cycle(str(G.S.partner))
 	if outs.size() > 1:
-		var ob: = JButton.make("Наряд ›", "gold", Rect2(vw - 150.0, ay + 76.0, 140, 48), null, 18, 24.0, false)
+		var ob: = _LacquerChip.make("Наряд ›", Vector2(132.0, 38.0), false)
+		ob.position = Vector2(vw - 148.0, ay + 76.0)
 		ob.name = "OutfitNext"
 		ob.set_meta("ux_role", "tertiary")
 		ob.pressed.connect(_switch_outfit)
 		home2.add_child(ob)
-	# pills under the lanterns (left edge)
+	# Slim HUD_V2 dark-lacquer chips positioned cleanly BELOW the lantern captions with ≥ 18px clearance
 	var low: = (L.avatar as Rect2).end.y + 8.0
-	for lt in home2.lantern_tr:
-		var c: Control = lt
+	for i in home2.lantern_tr.size():
+		var c: Control = home2.lantern_tr[i]
 		if c.visible:
 			low = maxf(low, c.position.y + c.size.y)
-	var py: = low + 10.0
+			if i < home2.lantern_ls.size():
+				var cl: Control = home2.lantern_ls[i]
+				if cl.visible:
+					low = maxf(low, cl.position.y + cl.size.y)
+	var py: = low + 18.0
+	var chip_h: = 38.0
+	var chip_step: = 46.0
 	var pills: = [["v10wheel", "Колесо Удачи", _wheel_ready()], ["v10welcome7", "7 Дней · SSR", _welcome7_ready()]]
 	for i in pills.size():
 		var pd: Array = pills[i]
-		var pb: = JButton.make(String(pd[1]), "gold", Rect2(20.0, py + i * 56.0, 206, 46), null, 18, 23.0, false)
+		var pb: = _LacquerChip.make(String(pd[1]), Vector2(188.0, chip_h), bool(pd[2]))
+		pb.position = Vector2(cx + 24.0, py + i * chip_step)
 		pb.name = "Pill_" + String(pd[0])
 		pb.set_meta("ux_role", "tertiary")
 		var sid: String = pd[0]
@@ -899,9 +1023,9 @@ func _build_quick_ui(L: Dictionary) -> void:
 				main.go(sid, {"from": "home"})
 			else:
 				main.toast("Скоро в чайной", "star"))
-		if bool(pd[2]):
-			pb.badge("•")
 		home2.add_child(pb)
+	var cr_y: float = float(main.CR.position.y) if main != null else 0.0
+	_chips_bottom = py + float(pills.size() - 1) * chip_step + chip_h - cr_y
 
 
 func _switch_heroes() -> Array:
@@ -1109,51 +1233,52 @@ func _apply_lobby_crop(animate: bool) -> void:
 func _build_framing_ui(L: Dictionary, ph_r: Rect2) -> void:
 	var lc: = _ensure_lobby_crop()
 	var cx: float = float(L.get("cx", 0.0))
-	var pill_w: = 220.0
-	var pill_h: = 48.0
+	var pill_w: = 208.0
+	var pill_h: = 38.0
 	var pill: = Panel.new()
 	pill.name = "FramePill"
 	var psb: = StyleBoxFlat.new()
-	psb.bg_color = Color(0.13, 0.07, 0.18, 0.88)
-	psb.border_color = Color(0.95, 0.80, 0.46, 0.90)
-	psb.set_border_width_all(2)
-	psb.set_corner_radius_all(24)
-	psb.shadow_color = Color(0.0, 0.0, 0.0, 0.45)
-	psb.shadow_size = 6
+	psb.bg_color = Color(V10DS.NIGHT_800, 0.84)
+	psb.border_color = Color(V10DS.GOLD_700, 0.34)
+	psb.set_border_width_all(1)
+	psb.set_corner_radius_all(6)
 	pill.add_theme_stylebox_override("panel", psb)
-	pill.position = Vector2(cx + 720.0 - pill_w - 16.0, ph_r.position.y + 82.0)
+	pill.position = Vector2(cx + 720.0 - pill_w - 20.0, ph_r.position.y + 84.0)
 	pill.size = Vector2(pill_w, pill_h)
 	pill.mouse_filter = Control.MOUSE_FILTER_STOP
 	pill.set_meta("ux_role", "tertiary")
+	pill.draw.connect(func() -> void:
+		V10Plate.hairline(pill, 10.0, pill_w - 10.0, 0.8, Color(V10DS.GOLD_700, 0.56)))
 	home2.add_child(pill)
 	_frame_pill = pill
 	var glyph: = _FrameGlyph.new()
-	glyph.position = Vector2(10, 9)
-	glyph.size = Vector2(30, 30)
+	glyph.position = Vector2(9.0, 7.0)
+	glyph.size = Vector2(24.0, 24.0)
 	pill.add_child(glyph)
-	var lbl: = UI.label(FRAME_NAMES[clampi(int(lc.get("preset", 0)), 0, 2)], 17, Color("fff3d4"), Color(0.08, 0.03, 0.12, 0.95), 3, "body", 900)
-	lbl.position = Vector2(42, 0)
-	lbl.size = Vector2(124, pill_h)
+	var lbl: = V10Type.label(FRAME_NAMES[clampi(int(lc.get("preset", 0)), 0, 2)], "ui", 18, V10DS.PAPER_300, false)
+	lbl.position = Vector2(36.0, 0.0)
+	lbl.size = Vector2(130.0, pill_h)
 	lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	pill.add_child(lbl)
 	_frame_lbl = lbl
 	var sep: = ColorRect.new()
-	sep.color = Color(0.95, 0.80, 0.46, 0.45)
-	sep.position = Vector2(pill_w - 48.0, 9.0)
-	sep.size = Vector2(1.5, pill_h - 18.0)
+	sep.color = Color(V10DS.GOLD_700, 0.38)
+	sep.position = Vector2(pill_w - 38.0, 8.0)
+	sep.size = Vector2(1.0, pill_h - 16.0)
 	sep.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	pill.add_child(sep)
-	var pan_lbl: = UI.center_label(UI.label("✥", 22, Color("ffe394"), Color(0.08, 0.03, 0.12), 3, "body", 900), Rect2(pill_w - 46.0, -1.0, 44.0, pill_h))
-	pan_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	pill.add_child(pan_lbl)
+	var pan_glyph: = _PanGlyph.new()
+	pan_glyph.position = Vector2(pill_w - 30.0, 8.0)
+	pan_glyph.size = Vector2(22.0, 22.0)
+	pill.add_child(pan_glyph)
 	pill.gui_input.connect(func(e: InputEvent) -> void:
 		if (e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT) or (e is InputEventScreenTouch and e.pressed):
 			var lx: float = (e as InputEventMouseButton).position.x if e is InputEventMouseButton else (e as InputEventScreenTouch).position.x
 			pill.accept_event()
 			V9Feel.press(pill, "tap")
-			if lx >= pill_w - 50.0:
+			if lx >= pill_w - 40.0:
 				_toggle_crop_edit(not _crop_editing)
 			else:
 				_cycle_lobby_preset())
@@ -1185,13 +1310,13 @@ func _toggle_crop_edit(on: bool) -> void:
 	var bar: = Panel.new()
 	bar.name = "LobbyCropBar"
 	var bsb: = StyleBoxFlat.new()
-	bsb.bg_color = Color(0.11, 0.05, 0.16, 0.94)
-	bsb.border_color = Color("f8df95")
-	bsb.set_border_width_all(2)
-	bsb.set_corner_radius_all(20)
+	bsb.bg_color = Color(V10DS.NIGHT_800, 0.92)
+	bsb.border_color = Color(V10DS.GOLD_700, 0.50)
+	bsb.set_border_width_all(1)
+	bsb.set_corner_radius_all(6)
 	bar.add_theme_stylebox_override("panel", bsb)
-	bar.position = _frame_pill.position + Vector2(-44.0, 56.0)
-	bar.size = Vector2(264.0, 48.0)
+	bar.position = _frame_pill.position + Vector2(-76.0, 46.0)
+	bar.size = Vector2(264.0, 44.0)
 	bar.mouse_filter = Control.MOUSE_FILTER_STOP
 	home2.add_child(bar)
 	_frame_bar = bar
@@ -1202,11 +1327,15 @@ func _toggle_crop_edit(on: bool) -> void:
 		var bw: float = widths[i]
 		var cb: Callable = acts[i][1]
 		var hit: = Control.new()
-		hit.position = Vector2(bx, 4.0)
+		hit.position = Vector2(bx, 2.0)
 		hit.size = Vector2(bw, 40.0)
 		hit.mouse_filter = Control.MOUSE_FILTER_STOP
-		var col: = Color("ffe6a0") if i == 3 else Color("fff6ea")
-		hit.add_child(UI.center_label(UI.label(acts[i][0], 17 if bw > 50.0 else 24, col, UI.DARK, 3, "body", 900), Rect2(0, 0, bw, 40.0)))
+		var col: = V10DS.GOLD_300 if i == 3 else V10DS.PAPER_100
+		var hl: = V10Type.label(acts[i][0], "ui", 18 if bw > 50.0 else 22, col, false)
+		hl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		hl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		hl.size = Vector2(bw, 40.0)
+		hit.add_child(hl)
 		hit.gui_input.connect(func(e: InputEvent) -> void:
 			if (e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT) or (e is InputEventScreenTouch and e.pressed):
 				hit.accept_event()
@@ -1288,6 +1417,71 @@ func _on_crop_input(e: InputEvent) -> void:
 		_crop_catcher.accept_event()
 
 
+class _LacquerChip:
+	extends Control
+
+	signal pressed
+
+	var text: = ""
+	var ready_dot: = false
+	var _down: = false
+	var _lbl: Label
+
+	static func make(t: String, sz: Vector2, is_ready: bool) -> _LacquerChip:
+		var c: = _LacquerChip.new()
+		c.text = t
+		c.ready_dot = is_ready
+		c.size = sz
+		c.custom_minimum_size = sz
+		c.pivot_offset = sz * 0.5
+		c.mouse_filter = Control.MOUSE_FILTER_STOP
+		c._lbl = V10Type.label(t, "ui", 18, V10DS.PAPER_100, false)
+		c._lbl.position = Vector2(14.0, 0.0)
+		c._lbl.size = Vector2(sz.x - (34.0 if is_ready else 22.0), sz.y)
+		c._lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		c._lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+		c.add_child(c._lbl)
+		return c
+
+	func _draw() -> void:
+		var r: = Rect2(Vector2.ZERO, size)
+		var rad: = 6.0
+		var bg: = Color(V10DS.NIGHT_600, 0.92) if _down else Color(V10DS.NIGHT_800, 0.86)
+		draw_colored_polygon(V10Button.rr_pts(r, rad, 8), bg)
+		# subtle top lacquer tone + 1px dark bottom tone
+		var lh: = size.y * 0.44
+		var lac: = Color(V10DS.PAPER_100, 0.05)
+		var clr: = Color(V10DS.PAPER_100, 0.0)
+		draw_polygon(PackedVector2Array([
+			Vector2(4.0, 1.0), Vector2(size.x - 4.0, 1.0),
+			Vector2(size.x - 1.5, lh), Vector2(1.5, lh),
+		]), PackedColorArray([lac, lac, clr, clr]))
+		draw_line(Vector2(rad, size.y - 1.0), Vector2(size.x - rad, size.y - 1.0), Color(V10DS.NIGHT_900, 0.62), 1.0)
+		# single 1px top gold hairline
+		V10Plate.hairline(self, 10.0, size.x - 10.0, 0.8, Color(V10DS.GOLD_500 if _down else V10DS.GOLD_700, 0.72 if _down else 0.56))
+		# small crisp 6px rose-gold readiness dot tucked neatly inside the chip
+		if ready_dot:
+			var dc: = Vector2(size.x - 16.0, size.y * 0.5)
+			draw_circle(dc, 5.5, Color(V10DS.GOLD_300, 0.24), true, -1.0, true)
+			draw_circle(dc, 3.0, V10DS.ROSE_300, true, -1.0, true)
+
+	func _gui_input(e: InputEvent) -> void:
+		if (e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT) or e is InputEventScreenTouch:
+			if e.pressed:
+				_down = true
+				scale = Vector2.ONE * 0.96
+				queue_redraw()
+			elif _down:
+				_down = false
+				var tw: = create_tween()
+				tw.tween_property(self, "scale", Vector2.ONE, 0.14).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+				queue_redraw()
+				if Rect2(Vector2.ZERO, size).grow(14).has_point(e.position):
+					V9Feel.sound("tap", 1.0, -5.0)
+					pressed.emit()
+			accept_event()
+
+
 class _FrameGlyph:
 	extends Control
 
@@ -1295,14 +1489,33 @@ class _FrameGlyph:
 		mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 	func _draw() -> void:
-		var col: = Color("ffe394")
+		var col: = Color(V10DS.GOLD_300, 0.90)
 		var c: = size * 0.5
-		# Four gilded viewfinder corner brackets + inner portrait dot
-		var r: = 10.0
-		var l: = 5.0
+		# Four refined viewfinder corner brackets + inner portrait dot
+		var r: = 8.0
+		var l: = 4.2
 		for sx in [-1.0, 1.0]:
 			for sy in [-1.0, 1.0]:
 				var p: = c + Vector2(sx * r, sy * r)
-				draw_line(p, p + Vector2(-sx * l, 0), col, 2.2, true)
-				draw_line(p, p + Vector2(0, -sy * l), col, 2.2, true)
-		draw_arc(c, 4.2, 0, TAU, 24, col, 1.8, true)
+				draw_line(p, p + Vector2(-sx * l, 0.0), col, 1.8, true)
+				draw_line(p, p + Vector2(0.0, -sy * l), col, 1.8, true)
+		draw_arc(c, 3.2, 0.0, TAU, 24, col, 1.5, true)
+
+
+class _PanGlyph:
+	extends Control
+
+	func _init() -> void:
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+	func _draw() -> void:
+		var col: = Color(V10DS.GOLD_500, 0.88)
+		var c: = size * 0.5
+		var arm: = 6.8
+		var tip: = 2.6
+		draw_line(c + Vector2(-arm, 0.0), c + Vector2(arm, 0.0), col, 1.6, true)
+		draw_line(c + Vector2(0.0, -arm), c + Vector2(0.0, arm), col, 1.6, true)
+		for d: Vector2 in [Vector2(1.0, 0.0), Vector2(-1.0, 0.0), Vector2(0.0, 1.0), Vector2(0.0, -1.0)]:
+			var p: Vector2 = c + d * arm
+			var perp: Vector2 = Vector2(-d.y, d.x)
+			draw_polyline(PackedVector2Array([p - d * tip + perp * tip, p, p - d * tip - perp * tip]), col, 1.5, true)

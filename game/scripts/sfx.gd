@@ -201,9 +201,25 @@ func say(hero: String, kind: String) -> String:
 	# Wave-1 heroines keep their own Russian lines (never fall back to "mc").
 	if V10W1Core.is_wave1_hero(hero):
 		var wsrc: Dictionary = V10W1HomeLines.BARKS
-		if not wsrc.has(hero) or not wsrc[hero].has(kind):
+		if not wsrc.has(hero):
 			return ""
-		var warr: Array = wsrc[hero][kind]
+		var mapped_kind: String = kind
+		match kind:
+			"match", "fever", "yaku", "riichi", "hint":
+				mapped_kind = "combo"
+			"gacha", "rankup":
+				mapped_kind = "ssr"
+			"lose":
+				mapped_kind = "greet"
+			"greet", "combo", "win", "aff", "ssr", "outfit":
+				mapped_kind = kind
+			_:
+				mapped_kind = "greet"
+		var warr: Array = wsrc[hero].get(kind, [])
+		if warr.is_empty():
+			warr = wsrc[hero].get(mapped_kind, [])
+		if warr.is_empty():
+			warr = wsrc[hero].get("greet", [])
 		if warr.is_empty():
 			return ""
 		if kind == "greet" and not _greet_returning():
@@ -217,9 +233,18 @@ func say(hero: String, kind: String) -> String:
 		last_voice[wkey] = wi
 		var wdur: = 1.2
 		if G.S.get("sound", true) and G.S.get("voice", true):
-			var wmp3: = "res://assets/voice/%s_%s%d.mp3" % [hero, kind, wi + 1]
-			var wogg: = V10W1Audio.voice_path(hero, kind, wi)
-			var wpath: = wmp3 if ResourceLoader.exists(wmp3) else (wogg if ResourceLoader.exists(wogg) else "")
+			var wpath: = ""
+			var candidates: Array[String] = [
+				"res://assets/voice/%s_%s%d.mp3" % [hero, kind, wi + 1],
+				V10W1Audio.voice_path(hero, kind, wi),
+				V10W1Audio.voice_path(hero, kind, 0),
+			]
+			if mapped_kind != kind:
+				candidates.append(V10W1Audio.voice_path(hero, mapped_kind, 0))
+			for cp in candidates:
+				if ResourceLoader.exists(cp):
+					wpath = cp
+					break
 			if wpath != "":
 				var wst: AudioStream = _stream(wpath)
 				if wst != null:

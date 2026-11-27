@@ -180,7 +180,7 @@ static func _hero_name(h: String) -> String:
 
 static func _art(h: String) -> Texture2D:
 	for k in [h, "mc"]:
-		var p: = "res://assets/hero/%s.png" % k
+		var p: = V10W1Core.hero_png(k)
 		if ResourceLoader.exists(p):
 			return load(p)
 	return null

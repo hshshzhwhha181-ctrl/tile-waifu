@@ -657,7 +657,9 @@ class _RivalShow:
 
 	func setup(hero: String, w: float, h: float) -> void:
 		size = Vector2(w, h)
-		var p: = "res://assets/hero/%s.png" % hero
+		var p: = V10W1Core.hero_png(hero)
+		if not ResourceLoader.exists(p):
+			p = "res://assets/hero/mc.png"
 		if ResourceLoader.exists(p):
 			var t: = load(p) as Texture2D
 			if t != null:

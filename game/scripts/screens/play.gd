@@ -80,6 +80,13 @@ var first_pairs_bonus: = 0
 var ult: V9UltCast
 var v9_from_ult: = false
 var v10_fx_hud: V10MatchFxHud
+var v10_showcase: V10ComboShowcase
+var _top_bar: Control
+var _top_progress: = 0.0
+var _top_total: = 0
+var _level_prefix_lbl: Label
+var _tray_y: = 792.0
+var _tray_h: = 104.0
 
 func build(m, args: Dictionary) -> void :
 	main = m
@@ -153,8 +160,8 @@ func build(m, args: Dictionary) -> void :
 	Common.backdrop(self, cfg.bg, size, 1.6 if cfg.bg != "play" else 0.0, 0.85, cfg.tint, Vector2(0.5, 0.5))
 	Fx.ambient(self, cfg.fx, size)
 	Common.vignette(self, size, Color(0.25, 0.08, 0.18), 0.55)
+	_compute_match_layout()
 	_build_hud()
-	board_rect = Rect2(10, 318, W - 20, H - 318 - 208)
 	_make_board()
 	V10Hooks.emit_game_started({"mode": _v10_mode(), "level": lvl, "hero": partner, "seed": int(cfg.get("seed", 0)), "cfg": cfg})  # 0.10 hook
 	_apply_perk()
@@ -169,11 +176,13 @@ func build(m, args: Dictionary) -> void :
 		if v7combo.pill_sub:
 			v7combo.pill_sub.self_modulate = Color(1, 1, 1, 0)
 	add_child(v7combo)
-	v10_fx_hud = V10MatchFxHud.new().setup(self, 254.0 if mode != "duel" else 298.0)
+	var fx_y: = 298.0 if mode == "duel" else (_tray_y + _tray_h + 6.0)
+	v10_fx_hud = V10MatchFxHud.new().setup(self, fx_y)
 	add_child(v10_fx_hud)
 	if v10_fx_hud.badge_lbl:
 		combo_lbl = v10_fx_hud.badge_lbl
 	_build_bottom()
+	_build_showcase()
 	if mode == "duel":
 		duel = V6Duel.new()
 		add_child(duel)
@@ -262,6 +271,8 @@ func _make_board() -> void :
 	board.setup(cfg)
 	gold_total = board.tiles.filter( func(t): return t.gold).size() / 2
 	board.fit_into(board_rect)
+	if v10_showcase and is_instance_valid(v10_showcase):
+		v10_showcase.board_override = board_rect
 	board.slot_pos.clear()
 	# 0.10 M0: the board reads slot_pos in global coordinates (tile_layer.to_local) and the screen sits in the
 	# content column, not at the viewport origin (tablets, cut-outs): convert, or tray tiles land off their slots
@@ -346,66 +357,179 @@ func _apply_perk() -> void :
 		"small": hint_n += 1
 	hint_n += int(cfg.get("extra_hints", 0))
 	V7Passives.attach(self)
-	if mode != "duel":
-		for c in get_children():
-			if c is V7PassiveRun and c.chip:
-				c.chip.position = Vector2(W - 76.0, 68.0)
+	for c in get_children():
+		if c is V7PassiveRun and c.chip:
+			c.chip.visible = false
+			c.chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+
+func _compute_match_layout() -> void :
+	if mode == "duel":
+		_tray_y = 172.0
+		_tray_h = 128.0
+		board_rect = Rect2(24.0, 318.0, W - 48.0, H - 318.0 - clampf(H * 0.25, 290.0, 420.0))
+	else:
+		_tray_h = 104.0
+		_tray_y = 792.0 + clampf((H - 1280.0) * 0.16, 0.0, 56.0)
+		board_rect = Rect2(24.0, 100.0, W - 48.0, _tray_y - 112.0)
 
 
 func _build_hud() -> void :
-	var home_b: = _v8_round_btn(V8Art.nav("home"), Rect2(12, 22, 70, 70), 0.62, func(): main.leave_match())
-	home_b.set_meta("tut_id", "match.pause")
+	var bar_h: = 88.0
+	_top_bar = Control.new()
+	_top_bar.name = "TopBarHudV2"
+	_top_bar.position = Vector2.ZERO
+	_top_bar.size = Vector2(W, bar_h)
+	_top_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_top_bar.z_index = 20
+	var right_reserve: = 252.0 if mode == "duel" else (284.0 if cfg.has("shard") else 208.0)
+	_top_bar.draw.connect(func() -> void:
+		_top_bar.draw_rect(Rect2(0.0, 0.0, W, bar_h), Color(V10DS.NIGHT_900, 0.88))
+		V10Plate.hairline(_top_bar, 16.0, W - 16.0, bar_h - 0.5, Color(V10DS.GOLD_700, 0.55))
+		var pw: = W - right_reserve - 88.0
+		var pr: = Rect2(88.0, 62.0, maxf(120.0, pw), 2.0)
+		_top_bar.draw_rect(pr, Color(V10DS.NIGHT_600, 0.85))
+		if _top_progress > 0.0:
+			_top_bar.draw_rect(Rect2(pr.position, Vector2(pr.size.x * clampf(_top_progress, 0.0, 1.0), pr.size.y)), V10DS.GOLD_300)
+	)
+	add_child(_top_bar)
 
-	var gp_w: = (W - 92.0 - 258.0) if mode == "duel" else (W - 92.0 - 154.0)
-	var gp: = UI.rbox("cream", Rect2(92, 16, gp_w, 104), 26, 4, 12)
-	add_child(gp)
-	var t1: = UI.label(("%s · %s" % [cfg.get("code", str(lvl + 1)), cfg.name]) if mode == "" else cfg.name, 18, Color("ffd98a"), Color(0.1, 0.05, 0.2), 3, "body", 900)
-	t1.position = Vector2(16, 6)
-	t1.size = Vector2(gp.size.x - 30, 26)
-	t1.clip_text = true
-	gp.add_child(t1)
-	if int(cfg.get("hard", 0)) > 0 and mode == "":
-		var hard: = int(cfg.hard)
-		var ht: = UI.rbox("red" if hard == 1 else "lav", Rect2(gp.size.x - 150, -14, 140, 30), 14, 2, 6)
-		if hard == 2:
-			ht.colors(Color("b07cff"), Color("6a3fd0"))
-		gp.add_child(ht)
-		ht.add_child(UI.center_label(UI.label(G.HARD_NAMES[hard].to_upper(), 16, Color.WHITE, Color(0.2, 0.0, 0.1), 3, "body", 900), Rect2(0, 0, 140, 30)))
-	var gl: = UI.label(V6Txt.s("play.goal"), 16, Color("9a6a8a"), Color.WHITE, 2, "body", 900)
-	gl.position = Vector2(16, 32)
-	gp.add_child(gl)
-	gp.add_child(UI.tex(G.tile_tex(0), Rect2(14, 58, 40, 40)))
-	tiles_lbl = UI.label("0", 26, UI.INK, Color.WHITE, 4, "body", 900)
-	tiles_lbl.position = Vector2(60, 60)
-	gp.add_child(tiles_lbl)
+	# Keep home_b as a JButton at (12, 22) so tower_play.gd still intercepts it cleanly
+	var home_b: = JButton.make("", "graphite", Rect2(12, 22, 54, 54), null, 18, 27.0, false)
+	if home_b.box:
+		home_b.box.visible = false
+	home_b.draw.connect(func() -> void:
+		var c: = Vector2(27.0, 27.0)
+		home_b.draw_circle(c, 25.0, Color(V10DS.NIGHT_800, 0.86), true, -1.0, true)
+		home_b.draw_arc(c, 25.0, 0.0, TAU, 48, Color(V10DS.GOLD_700, 0.45), 1.0, true)
+		V10Icons.draw(home_b, "pause", c, 24.0, V10DS.PAPER_300))
+	home_b.pressed.connect(func(): main.leave_match())
+	home_b.z_index = 22
+	home_b.set_meta("tut_id", "match.pause")
+	add_child(home_b)
+
+	var code_str: String = String(cfg.get("code", str(lvl + 1))) if mode == "" else String(cfg.get("name", ""))
+	if mode == "" and int(cfg.get("hard", 0)) > 0:
+		code_str += " · " + G.HARD_NAMES[int(cfg.hard)]
+	var prefix_txt: = "%s · Осталось" % code_str
+	var max_pw: = W - right_reserve - 156.0
+	_level_prefix_lbl = Label.new()
+	_level_prefix_lbl.text = prefix_txt
+	_level_prefix_lbl.label_settings = V10Type.settings("ui", 22, V10DS.PAPER_100, false)
+	_level_prefix_lbl.position = Vector2(88.0, 18.0)
+	_level_prefix_lbl.size = Vector2(minf(max_pw, V10Type.text_w(prefix_txt, "ui", 22) + 4.0), 36.0)
+	_level_prefix_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_level_prefix_lbl.clip_text = true
+	_level_prefix_lbl.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	_level_prefix_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_level_prefix_lbl.z_index = 22
+	add_child(_level_prefix_lbl)
+
+	tiles_lbl = Label.new()
+	tiles_lbl.text = "0"
+	tiles_lbl.label_settings = V10Type.settings("num", 22, V10DS.GOLD_300, false)
+	tiles_lbl.position = Vector2(_level_prefix_lbl.position.x + _level_prefix_lbl.size.x + 8.0, 18.0)
+	tiles_lbl.size = Vector2(56.0, 36.0)
+	tiles_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	tiles_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	tiles_lbl.z_index = 22
+	add_child(tiles_lbl)
+
+	# Quiet top-bar sound toggle (keeps bottom-left dock as 3 clean circles matching 01_match.webp)
+	var snd_pos: = Rect2(134.0, 96.0, 42.0, 42.0) if mode == "duel" else Rect2(W - 194.0, 23.0, 42.0, 42.0)
+	btn_sound = JButton.make("", "graphite", snd_pos, null, 18, 21.0, false)
+	if btn_sound.box:
+		btn_sound.box.visible = false
+	btn_sound.set_meta("muted", not _v8_sound_on())
+	btn_sound.draw.connect(func() -> void:
+		var c: = Vector2(21.0, 21.0)
+		var muted: = bool(btn_sound.get_meta("muted", false))
+		btn_sound.draw_circle(c, 19.5, Color(V10DS.NIGHT_800, 0.80), true, -1.0, true)
+		btn_sound.draw_arc(c, 19.5, 0.0, TAU, 36, Color(V10DS.GOLD_700, 0.35), 1.0, true)
+		V10Icons.draw(btn_sound, "sound", c, 20.0, V10DS.PAPER_700 if muted else V10DS.PAPER_300)
+		if muted:
+			btn_sound.draw_line(Vector2(11.0, 31.0), Vector2(31.0, 11.0), V10DS.EMBER, 2.0, true))
+	btn_sound.pressed.connect(_v8_toggle_sound)
+	btn_sound.z_index = 22
+	add_child(btn_sound)
+
+	# Right-side currency / mode target slot (hidden in tower mode when gems_lbl's parent is hidden)
+	var gem_rect: = Rect2(14.0, 96.0, 112.0, 42.0) if mode == "duel" else Rect2(W - 144.0, 22.0, 128.0, 44.0)
+	var gem_slot: = Control.new()
+	gem_slot.name = "CurrencySlot"
+	gem_slot.position = gem_rect.position
+	gem_slot.size = gem_rect.size
+	gem_slot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	gem_slot.z_index = 22
+	gem_slot.draw.connect(func() -> void:
+		var gr: = Rect2(Vector2.ZERO, gem_slot.size)
+		gem_slot.draw_colored_polygon(V10Button.rr_pts(gr, 4.0, 6), Color(V10DS.NIGHT_800, 0.88))
+		gem_slot.draw_line(Vector2(4.0, gr.size.y - 1.0), Vector2(gr.size.x - 4.0, gr.size.y - 1.0), Color(V10DS.NIGHT_900, 0.65), 1.0)
+		V10Plate.hairline(gem_slot, 8.0, gr.size.x - 8.0, 0.5, Color(V10DS.GOLD_700, 0.45)))
+	add_child(gem_slot)
+
+	if mode in ["blitz", "zen"]:
+		timer_lbl = Label.new()
+		timer_lbl.text = "2:00" if mode == "blitz" else "∞"
+		timer_lbl.label_settings = V10Type.settings("num", 18, V10DS.GOLD_300, false)
+		timer_lbl.position = Vector2(10.0, 0.0)
+		timer_lbl.size = Vector2(54.0, gem_rect.size.y)
+		timer_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		gem_slot.add_child(timer_lbl)
+		score_lbl = Label.new()
+		score_lbl.text = "0"
+		score_lbl.label_settings = V10Type.settings("num", 18, V10DS.PAPER_100, false)
+		score_lbl.position = Vector2(64.0, 0.0)
+		score_lbl.size = Vector2(gem_rect.size.x - 74.0, gem_rect.size.y)
+		score_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		score_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		gem_slot.add_child(score_lbl)
+		gems_lbl = Label.new()
+		gems_lbl.visible = false
+		gem_slot.add_child(gems_lbl)
+	else:
+		var gem_ic: = V8Art.rect(V8Art.cur("gem"), Rect2(10.0, (gem_rect.size.y - 26.0) * 0.5, 26.0, 26.0))
+		gem_slot.add_child(gem_ic)
+		gems_lbl = Label.new()
+		gems_lbl.text = UI.fmt(G.S.gems)
+		gems_lbl.label_settings = V10Type.settings("num", 20, V10DS.PAPER_100, false)
+		gems_lbl.position = Vector2(40.0, 0.0)
+		gems_lbl.size = Vector2(gem_rect.size.x - 50.0, gem_rect.size.y)
+		gems_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		gems_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		gems_lbl.pivot_offset = Vector2(36.0, gem_rect.size.y * 0.5)
+		gem_slot.add_child(gems_lbl)
+
 	if cfg.has("shard"):
 		var sh: String = cfg.shard
-		gp.add_child(Common.avatar(sh, Rect2(gp.size.x - 168, 46, 54, 54), "gold"))
-		shard_lbl = UI.label("0/1", 24, Color("c58a2c"), Color.WHITE, 4, "body", 900)
-		shard_lbl.position = Vector2(gp.size.x - 108, 56)
-		gp.add_child(shard_lbl)
-		var sl: = UI.label(V6Txt.s("play.shard"), 16, Color("9a6a8a"), Color.WHITE, 2, "body", 900)
-		sl.position = Vector2(gp.size.x - 108, 32)
-		gp.add_child(sl)
-	if mode in ["blitz", "zen"]:
-		timer_lbl = UI.label("2:00" if mode == "blitz" else "∞", 26, Color("ffd98a"), UI.DARK, 4, "body", 900)
-		timer_lbl.position = Vector2(gp.size.x - 170, 52)
-		gp.add_child(timer_lbl)
-		score_lbl = UI.label("0", 26, Color.WHITE, UI.DARK, 4, "body", 900)
-		score_lbl.position = Vector2(gp.size.x - 90, 52)
-		gp.add_child(score_lbl)
+		var sh_slot: = Control.new()
+		sh_slot.name = "ShardTargetSlot"
+		sh_slot.position = Vector2(W - 278.0, 29.0) if mode != "duel" else Vector2(14.0, 142.0)
+		sh_slot.size = Vector2(76.0, 28.0)
+		sh_slot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		sh_slot.z_index = 22
+		add_child(sh_slot)
+		sh_slot.add_child(Common.avatar(sh, Rect2(0, 2, 24, 24), "gold"))
+		shard_lbl = Label.new()
+		shard_lbl.text = "0/1"
+		shard_lbl.label_settings = V10Type.settings("num", 18, V10DS.GOLD_300, false)
+		shard_lbl.position = Vector2(28.0, 0.0)
+		shard_lbl.size = Vector2(48.0, 28.0)
+		shard_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		sh_slot.add_child(shard_lbl)
 
-	# 0.11: Heroine & Ultimate moved to the BOTTOM under the thumb (V10BottomUltStage, 136x136 gold medallion + УЛЬТА!)
+	# 0.11 / HUD_V2: Large frameless living heroine showcase across the bottom zone (hair bleeds freely across x=0..W)
 	ult = V9UltCast.new().setup(self)
 	add_child(ult)
 	SKILL_NEED = ult.need()
 	skill_charge = ult.start_charge()
-	stage = V10BottomUltStage.new().setup_bottom(partner, Rect2(W - 252.0, H - 198.0, 242.0, 188.0), {"tag": "Симпатия %d" % G.aff_level(partner)})
+	var stage_y: = (board_rect.end.y + 4.0) if mode == "duel" else (_tray_y + _tray_h + 4.0)
+	stage = V10BottomUltStage.new().setup_bottom(partner, Rect2(0.0, stage_y, W, H - stage_y), {})
 	stage.z_index = 26
 	add_child(stage)
 	if ult.mod != "":
 		stage.set_ult_badge(ult.mod, G.HEROES[partner].color, String(V9Ults.MODS[ult.mod].desc))
-	stage.pressed.connect( func():
+	stage.pressed.connect(func():
 		if ult.busy:
 			V9Feel.deny(stage)
 			return
@@ -422,48 +546,36 @@ func _build_hud() -> void :
 	stage.set_meta("tut_id", "match.hero")
 	if not (mode in ["duel", "v7tourney", "duel_ranked"]) and V10Comeback.rested() > 0:
 		_v10_rested_bar = V10RestedBar.new()
-		_v10_rested_bar.position = Vector2(12.0, 98.0)
+		_v10_rested_bar.position = Vector2(88.0, 68.0)
+		_v10_rested_bar.z_index = 22
 		add_child(_v10_rested_bar)
 		_v10_rested_bar.set_value(V10Comeback.rested())
 
-	var gem_rect: = Rect2(14, 132, 112, 44) if mode == "duel" else Rect2(W - 140.0, 18.0, 128.0, 44.0)
-	var gem: = UI.rbox("plum", gem_rect, 22, 2, 8)
-	gem.set_param("border_top", Color("ffe7a6")).set_param("border_bottom", Color("c58a2c"))
-	add_child(gem)
-	gem.add_child(V8Art.rect(V8Art.cur("gem"), Rect2(2, 2, 40, 40)))
-	gems_lbl = UI.label(UI.fmt(G.S.gems), 19, Color.WHITE, Color(0.2, 0.05, 0.2), 3, "body", 900)
-	gems_lbl.position = Vector2(46, 0)
-	gems_lbl.size = Vector2(gem_rect.size.x - 52.0, 44)
-	gems_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	gems_lbl.pivot_offset = Vector2(30, 22)
-	gem.add_child(gems_lbl)
-
 	var ns: = _slot_count()
 	var gap: = 10.0
-	var tray_y: = 172.0 if mode == "duel" else 130.0
-	var tray_h: = 128.0 if mode == "duel" else 120.0
-	var slot_h: = 108.0 if mode == "duel" else 102.0
-	var tray_room: = (W - 12.0 - 258.0) if mode == "duel" else (W - 28.0)
-	var sw: = minf(104.0, (tray_room - 28.0 - (ns - 1) * gap) / ns)
-	var tw: = ns * sw + (ns - 1) * gap + 28.0
+	var tray_room: = (W - 12.0 - 258.0) if mode == "duel" else (W - 48.0)
+	var sw: = minf(92.0, (tray_room - 24.0 - (ns - 1) * gap) / ns)
+	var tw: = ns * sw + (ns - 1) * gap + 24.0
 	var tray_x: = (12.0 + (tray_room - tw) * 0.5) if mode == "duel" else ((W - tw) * 0.5)
-	tray_box = UI.rbox("plum", Rect2(tray_x, tray_y, tw, tray_h), 28, 4, 12)
-	tray_box.set_param("border_top", Color("ffe7a6")).set_param("border_bottom", Color("c58a2c"))
+	var slot_h: = _tray_h - 14.0
+	tray_box = UI.rbox("plum", Rect2(tray_x, _tray_y, tw, _tray_h), 12, 2, 4)
+	tray_box.colors(Color(V10DS.NIGHT_800, 0.92), Color(V10DS.NIGHT_900, 0.95))
+	tray_box.borders(Color(V10DS.GOLD_700, 0.50), Color(V10DS.GOLD_700, 0.25))
+	tray_box.set_param("gloss", 0.04)
+	tray_box.set_param("shadow_color", Color(0, 0, 0, 0))
 	tray_box.set_meta("tut_id", "match.tray")
-	V6HudStyle.tray(tray_box, V7Album.table_for(cfg.get("bg", "")))
 	add_child(tray_box)
 	slot_rects.clear()
 	for i in ns:
-		var r: = Rect2(14 + i * (sw + gap), (tray_h - slot_h) * 0.5, sw, slot_h)
-		var sl: = UI.rbox("plum", r, 18, 2, 4)
-		sl.colors(Color(0, 0, 0, 0.35), Color(0, 0, 0, 0.22)).set_param("shadow_color", Color(0, 0, 0, 0))
-		sl.borders(Color(1, 1, 1, 0.12), Color(1, 1, 1, 0.25))
-		V6HudStyle.slot(sl, i)
+		var r: = Rect2(12.0 + i * (sw + gap), (_tray_h - slot_h) * 0.5, sw, slot_h)
+		var sl: = UI.rbox("plum", r, 8, 1, 2)
+		sl.colors(Color(0, 0, 0, 0.34), Color(0, 0, 0, 0.22)).set_param("shadow_color", Color(0, 0, 0, 0))
+		sl.borders(Color(V10DS.GOLD_700, 0.28), Color(V10DS.GOLD_700, 0.12))
 		tray_box.add_child(sl)
 		slot_rects.append(Rect2(tray_box.position + r.position, r.size))
 
 	var mb: = Control.new()
-	mb.position = Vector2(tray_box.position.x, tray_box.position.y + tray_h + 4.0)
+	mb.position = Vector2(tray_box.position.x, tray_box.position.y + _tray_h + 4.0)
 	add_child(mb)
 	combo_lbl = UI.label("", 18, Color("ffe7a6"), Color(0.25, 0.05, 0.2), 4, "body", 900)
 	combo_lbl.position = Vector2(0, -6)
@@ -471,7 +583,7 @@ func _build_hud() -> void :
 	combo_lbl.pivot_offset = Vector2(40, 13)
 	combo_lbl.visible = false
 	mb.add_child(combo_lbl)
-	var bar_bg: = UI.rbox("plum", Rect2(140, 0, tw - 140, 16), 8, 1, 2)
+	var bar_bg: = UI.rbox("plum", Rect2(140, 0, maxf(40.0, tw - 140), 16), 8, 1, 2)
 	bar_bg.colors(Color(0, 0, 0, 0.35), Color(0, 0, 0, 0.25)).set_param("shadow_color", Color(0, 0, 0, 0))
 	mb.add_child(bar_bg)
 	meter_w = bar_bg.size.x - 4
@@ -481,39 +593,86 @@ func _build_hud() -> void :
 	mb.visible = false
 
 func _build_bottom() -> void :
-	# 0.11: Compact left-to-center booster dock [Sound (68) | Отмена | Подсказка | Мешать (98 each)],
-	# leaving the bottom-right 252 px clear for the 136x136 Heroine Ultimate Medallion!
-	var x_snd: = 12.0
-	var gap: = 20.0
-	var bw: = 98.0
-	var x0: = x_snd + 68.0 + 16.0
-	var xs: = [x0, x0 + bw + gap, x0 + (bw + gap) * 2.0]
-	btn_undo = _action("undo", V6Txt.s("play.undo"), xs[0], "rose")
+	# HUD_V2: 3 sleek dark-glass circles stacked neatly on the bottom-left beside the large heroine (01_match.webp)
+	var bottom_top: = stage.position.y if stage else (_tray_y + _tray_h + 4.0)
+	var bottom_h: = H - bottom_top
+	var step_y: = clampf(bottom_h * 0.22, 82.0, 94.0)
+	var y0: = bottom_top + maxf(24.0, (bottom_h - step_y * 2.0 - 72.0) * 0.56)
+	btn_undo = _action_circle("undo", V6Txt.s("play.undo"), 24.0, y0)
 	btn_undo.pressed.connect(_undo)
-	btn_hint = _action("hint", V6Txt.s("play.hint"), xs[1], "gold")
+	btn_hint = _action_circle("hint", V6Txt.s("play.hint"), 24.0, y0 + step_y)
 	btn_hint.set_meta("tut_id", "match.hint")
 	btn_hint.pressed.connect(_hint)
-	btn_shuffle = _action("shuffle", V6Txt.s("play.shuffle"), xs[2], "mint")
+	btn_shuffle = _action_circle("shuffle", V6Txt.s("play.shuffle"), 24.0, y0 + step_y * 2.0)
 	btn_shuffle.pressed.connect(_shuffle)
-	btn_undo.set_gate( func(): return _help_ok("undo"), _undo)
-	btn_hint.set_gate( func(): return _help_ok("hint"), _hint)
-	btn_shuffle.set_gate( func(): return _help_ok("shuffle"), _shuffle)
-	btn_sound = _v8_round_btn(V8Art.icon("sound" if _v8_sound_on() else "sound_off"), Rect2(x_snd, H - 156.0, 68.0, 68.0), 0.6, _v8_toggle_sound)
+	btn_undo.set_gate(func(): return _help_ok("undo"), _undo)
+	btn_hint.set_gate(func(): return _help_ok("hint"), _hint)
+	btn_shuffle.set_gate(func(): return _help_ok("shuffle"), _shuffle)
 
-func _action(icon: String, text: String, x: float, pal: String) -> JButton:
-	var b: = JButton.make("", "graphite", Rect2(x, H - 174.0, 98.0, 98.0), null, 20, 49.0)
-	b.box.set_param("border", 4.0).set_param("gloss", 0.12)
-	var ic: = V8Art.rect(V8Art.icon(icon), Rect2(20, 17, 58, 58))
-	ic.name = "Icon"
-	b.add_child(ic)
-	var cap: = UI.center_label(UI.label(text, 15, UI.INK, UI.DARK, 4, "body", 900), Rect2(-7, 98, 112, 28))
-	cap.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-	cap.clip_text = true
+func _action_circle(icon: String, text: String, x: float, y: float) -> JButton:
+	var b: = JButton.make("", "graphite", Rect2(x, y, 144.0, 72.0), null, 18, 36.0, false)
+	if b.box:
+		b.box.visible = false
+	b.z_index = 28
+	b.draw.connect(func() -> void:
+		var c: = Vector2(34.0, 36.0)
+		var a: = 0.44 if b.disabled else 1.0
+		b.draw_circle(c, 31.0, Color(V10DS.NIGHT_800, 0.85 * a), true, -1.0, true)
+		b.draw_arc(c, 31.0, 0.0, TAU, 48, Color(V10DS.GOLD_700, 0.45 * a), 1.0, true)
+		V10Icons.draw(b, icon, c, 28.0, Color(V10DS.PAPER_300, a)))
+	var num: = Label.new()
+	num.name = "Num"
+	num.text = "0"
+	var num_ls: = V10Type.settings("num", 22, V10DS.PAPER_100, true).duplicate()
+	num_ls.shadow_color = Color(0.05, 0.02, 0.08, 0.92)
+	num_ls.shadow_size = 6
+	num_ls.shadow_offset = Vector2(0, 1)
+	num.label_settings = num_ls
+	num.position = Vector2(74.0, 0.0)
+	num.size = Vector2(64.0, 72.0)
+	num.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	num.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	b.add_child(num)
+	# Keep hidden-alpha Cap label intact for duel_selftest / demo_play / mode_play compatibility
+	var cap: = UI.label(text, 15, UI.INK, UI.DARK, 0, "body", 900)
 	cap.name = "Cap"
 	cap.set_meta("base", text)
+	cap.position = Vector2(0, 72)
+	cap.size = Vector2(144, 20)
+	cap.modulate.a = 0.0
+	cap.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	b.add_child(cap)
 	add_child(b)
 	return b
+
+func _build_showcase() -> void :
+	v10_showcase = V10ComboShowcase.new()
+	v10_showcase.name = "V10ComboShowcase"
+	v10_showcase.z_index = 55
+	v10_showcase.board_override = board_rect
+	v10_showcase.hero = partner
+	v10_showcase.outfit = G.equipped(partner)
+	v10_showcase.ranked = mode in ["duel", "v7tourney", "duel_ranked"]
+	v10_showcase.tutorial_level = (lvl + 1) if tut else 0
+	if not bool(G.S.get("cutins", true)):
+		v10_showcase.mode = "off"
+	elif v10_showcase.ranked:
+		v10_showcase.mode = "short"
+	else:
+		v10_showcase.mode = "full"
+	v10_showcase.input_paused.connect(func(on: bool) -> void:
+		if board and is_instance_valid(board) and not _v8_over and not _v8_modal and not (ult and ult.busy):
+			board.input_on = (not on) and board.board_count() > 0 and board.tray.size() < board.slots)
+	v10_showcase.started.connect(func(_t: int) -> void:
+		if stage and is_instance_valid(stage):
+			stage.create_tween().tween_property(stage, "modulate:a", 0.18, 0.14))
+	v10_showcase.finished.connect(func(_t: int, _sk: bool) -> void:
+		if stage and is_instance_valid(stage):
+			stage.create_tween().tween_property(stage, "modulate:a", 1.0, 0.20)
+		if board and is_instance_valid(board) and not _v8_over and not _v8_modal and not (ult and ult.busy):
+			if board.board_count() > 0 and board.tray.size() < board.slots:
+				board.input_on = true)
+	add_child(v10_showcase)
 
 # a round graphite button with one 0.8 glyph (home, sound): `k` is the glyph's share of the button
 func _v8_round_btn(t: Texture2D, r: Rect2, k: float, cb: Callable) -> JButton:
@@ -553,16 +712,27 @@ func _v8_toggle_sound() -> void :
 			if V10Registry.wired("audio"):
 				V10Music.stop(0.15)
 	if btn_sound and is_instance_valid(btn_sound):
-		(btn_sound.get_node("Icon") as TextureRect).texture = V8Art.icon("sound" if on else "sound_off")
+		btn_sound.set_meta("muted", not on)
+		btn_sound.queue_redraw()
 
 func _set_badge(b: JButton, n: int) -> void :
 	var cap: Label = b.get_node("Cap")
 	cap.text = "%s · %d" % [cap.get_meta("base"), n] if n > 0 else V6Txt.s("play.price") % cap.get_meta("base")
-	cap.label_settings.font_size = 15
-	Common.fit_line(cap, 112.0, 13)
+	var num: Label = b.get_node_or_null("Num")
+	if num:
+		num.text = str(n) if n > 0 else ("+" if mode == "" else "0")
+		num.label_settings = V10Type.settings("num", 22, V10DS.GOLD_300 if n == 0 and mode == "" else (V10DS.PAPER_100 if n > 0 else V10DS.PAPER_700), true)
+	b.queue_redraw()
 
 func _refresh() -> void :
-	tiles_lbl.text = str(board.board_count())
+	var left_cnt: = board.board_count()
+	tiles_lbl.text = str(left_cnt)
+	if _level_prefix_lbl and is_instance_valid(_level_prefix_lbl):
+		tiles_lbl.position.x = _level_prefix_lbl.position.x + _level_prefix_lbl.size.x + 8.0
+	_top_total = maxi(_top_total, maxi(1, left_cnt))
+	_top_progress = 1.0 - float(left_cnt) / maxf(1.0, float(_top_total))
+	if _top_bar and is_instance_valid(_top_bar):
+		_top_bar.queue_redraw()
 	if stage:
 		stage.set_charge(SKILL_NEED if skill_ready else skill_charge, SKILL_NEED)
 	gems_lbl.text = UI.fmt(G.S.gems)
@@ -576,6 +746,7 @@ func _refresh() -> void :
 	for b in [btn_hint, btn_undo, btn_shuffle]:
 		if b.disabled != riichi:
 			b.disabled = riichi
+		b.queue_redraw()
 	_check_riichi()
 	var danger: = board.tray.size() >= maxi(3, board.slots - 1)
 	if danger and not _v6_danger and stage:
@@ -584,7 +755,7 @@ func _refresh() -> void :
 			talk_cd = 4.0
 			stage.say("tray_warn")
 	_v6_danger = danger
-	tray_box.borders(Color("ff8a9a") if danger else Color("ffe7a6"), Color("e8455f") if danger else Color("c58a2c"))
+	tray_box.borders(Color(V10DS.EMBER, 0.95) if danger else Color(V10DS.GOLD_700, 0.50), Color(V10DS.EMBER, 0.65) if danger else Color(V10DS.GOLD_700, 0.25))
 	if V10Registry.wired("audio") and board != null:
 		V10Music.set_tension(float(board.tray.size()) / maxf(1.0, float(board.slots)))
 
@@ -665,34 +836,47 @@ func _intro() -> void :
 
 
 func _tip(text: String) -> void :
-	# 0.11: sized to fit left of the bottom-right Heroine Ult Medallion so her Ult stays 100% visible!
-	var card_w: = W - 278.0
-	var tw_: = maxf(120.0, card_w - 94.0 - 22.0)
-	var th: float = UI.font("body", 800).get_multiline_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, tw_, 17).y
-	var h: = maxf(98.0, 36.0 + th + 14.0)
-	var tc: = UI.rbox("cream", Rect2(12, H - 186 - h, card_w, h), 22, 3, 8)
+	# HUD_V2: sleek auto-fading 4-second editorial caption that never blocks the large heroine or helper circles
+	var cap_w: = minf(360.0, W - 48.0)
+	var inner_w: = cap_w - 24.0
+	var th: float = V10Type.font("ui").get_multiline_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, inner_w, 16).y
+	var h: = clampf(th + 36.0, 56.0, 132.0)
+	var top_y: = ((board_rect.end.y + 4.0) if mode == "duel" else (_tray_y + _tray_h + 8.0))
+	var tc: = Control.new()
+	tc.name = "EditorialTip"
+	tc.position = Vector2(24.0, top_y)
+	tc.size = Vector2(cap_w, h)
 	tc.add_to_group("v6_tip")
 	tc.z_index = 35
-	v8_bottom_card(tc)
-	tc.set_param("border_top", Color("e8c9a0")).set_param("border_bottom", Color("a8697a"))
+	tc.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	tc.draw.connect(func() -> void:
+		var cr: = Rect2(Vector2.ZERO, tc.size)
+		tc.draw_colored_polygon(V10Button.rr_pts(cr, 4.0, 6), Color(V10DS.NIGHT_900, 0.72))
+		V10Plate.hairline(tc, 10.0, cr.size.x - 10.0, 0.5, Color(V10DS.GOLD_700, 0.42)))
 	add_child(tc)
-	tc.add_child(Common.avatar("mc", Rect2(8, (h - 76.0) * 0.5, 76, 76), "gold"))
-	var inner_w: = maxf(120.0, tc.size.x - 94.0 - 22.0)
-	var nm: = UI.label(V6Txt.s("play.perk_tip") % [G.HEROES[partner].name, G.PERKS[partner]], 15, Color("b8406c"), Color.WHITE, 3, "body", 900)
-	nm.position = Vector2(94, 8)
-	Common.fit_line(nm, inner_w, 13)
-	nm.size.y = 22
+	var perk_str: = V6Txt.s("play.perk_tip") % [G.HEROES[partner].name, G.PERKS[partner]]
+	var nm: = Label.new()
+	nm.text = perk_str
+	nm.label_settings = V10Type.settings("ui", 14, V10DS.GOLD_300, false)
+	nm.position = Vector2(12.0, 6.0)
+	nm.size = Vector2(inner_w, 20.0)
+	nm.clip_text = true
+	nm.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	nm.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	tc.add_child(nm)
-	var l: = UI.label(text, 17, UI.INK)
+	var l: = Label.new()
+	l.text = text
+	l.label_settings = V10Type.settings("ui", 16, V10DS.PAPER_100, false)
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	l.custom_minimum_size = Vector2(inner_w, 0)
-	l.position = Vector2(94, 32)
-	l.size = Vector2(inner_w, h - 40)
+	l.position = Vector2(12.0, 26.0)
+	l.size = Vector2(inner_w, h - 32.0)
+	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	tc.add_child(l)
-	UI.slide_in(tc, Vector2(0, 40), 0.0, 0.35)
+	tc.modulate.a = 0.0
 	var t: Tween = tc.create_tween()
-	t.tween_interval(2.1)
-	t.tween_property(tc, "modulate:a", 0.0, 0.4)
+	t.tween_property(tc, "modulate:a", 1.0, 0.22)
+	t.tween_interval(3.4)
+	t.tween_property(tc, "modulate:a", 0.0, 0.40)
 	t.tween_callback(tc.queue_free)
 
 
@@ -789,6 +973,9 @@ static func pairs_text(n: int) -> String:
 	return pl(n, "пара", "пары", "пар")
 
 func _bubble(text: String) -> void :
+	var ed: = get_node_or_null("EditorialTip")
+	if ed and is_instance_valid(ed):
+		ed.queue_free()
 	stage.say_text(text)
 
 var _speak_t: = -99.0
@@ -812,7 +999,7 @@ func now() -> float:
 	return G.time
 
 func _process(dt: float) -> void :
-	var ult_freeze: = (ult != null and ult.busy) or V9Cutin.any_playing() or V10UltVideo.any_playing()
+	var ult_freeze: = (ult != null and ult.busy) or V9Cutin.any_playing() or V10UltVideo.any_playing() or (v10_showcase != null and v10_showcase._paused_now)
 	if ult_freeze:
 		# Pause combo expiry and fever timers frame-by-frame while an Ultimate or Cutin is playing
 		if board and board.combo > 0:
@@ -937,11 +1124,16 @@ func _on_match(mid: Vector2, combo: int, gold: bool, shard: String) -> void :
 			Sfx.play("sparkle", 0.8)
 	else:
 		charge = min(1.0, charge + 0.06)
+	var showcase_shown: = 0
+	if not from_ult and combo >= 5 and v10_showcase and is_instance_valid(v10_showcase):
+		if v10_showcase.sprite_path(partner, G.equipped(partner), 1) != "":
+			v10_showcase.board_override = board_rect
+			showcase_shown = v10_showcase.on_combo(combo)
 	if combo >= 5 and not fever and not fever_pending:
-		if combo == 5 and G.S.get("cutins", true) and not G.S.get("modest", false):
+		if combo == 5 and showcase_shown == 0 and G.S.get("cutins", true) and not G.S.get("modest", false):
 			_cutin()
 		_fever()
-	elif talk_cd <= 0.0 and combo >= 3:
+	elif talk_cd <= 0.0 and combo >= 3 and showcase_shown == 0:
 		talk_cd = 4.0
 		_speak("combo")
 	else:
@@ -958,6 +1150,11 @@ func _on_match(mid: Vector2, combo: int, gold: bool, shard: String) -> void :
 			v10_fx_hud._burst_node.visible = false
 			v10_fx_hud._burst_node.queue_free()
 			v10_fx_hud._burst_node = null
+		if showcase_shown > 0 or (v10_showcase != null and v10_showcase.active):
+			if v10_fx_hud._swoop_node and is_instance_valid(v10_fx_hud._swoop_node):
+				v10_fx_hud._swoop_node.visible = false
+				v10_fx_hud._swoop_node.queue_free()
+				v10_fx_hud._swoop_node = null
 	_refresh()
 
 func _shard_found(h: String, mid: Vector2) -> void :
@@ -1106,12 +1303,22 @@ func _fever() -> void :
 	v8_band(rib, 1.15, true, 1)
 	if rib.is_inside_tree():
 		UI.pop_in(rib, 0.0, 0.6)
+	var sc_fev: = 0
+	if v10_showcase and is_instance_valid(v10_showcase) and not v10_showcase.active and last_combo != 5:
+		if v10_showcase.sprite_path(partner, G.equipped(partner), 1) != "":
+			v10_showcase.board_override = board_rect
+			sc_fev = v10_showcase.fever_start()
 	if v10_fx_hud:
 		v10_fx_hud.on_fever()
 		if v10_fx_hud._burst_node and is_instance_valid(v10_fx_hud._burst_node):
 			v10_fx_hud._burst_node.visible = false
 			v10_fx_hud._burst_node.queue_free()
 			v10_fx_hud._burst_node = null
+		if sc_fev > 0 or (v10_showcase != null and v10_showcase.active):
+			if v10_fx_hud._swoop_node and is_instance_valid(v10_fx_hud._swoop_node):
+				v10_fx_hud._swoop_node.visible = false
+				v10_fx_hud._swoop_node.queue_free()
+				v10_fx_hud._swoop_node = null
 	# the frame of V7Combo carries the fever (no full-screen vignette or embers over the tiles)
 
 func _on_deny(_t: Tile) -> void :
@@ -1450,17 +1657,18 @@ func v8_note(text: String, col: = Color("ffe7a6"), secs: = 4.0) -> Control:
 	if _v8_over:
 		return null
 	get_tree().call_group("v8_note", "queue_free")
+	var note_y: = V8_NOTE_RECT.position.y if mode == "duel" else (_tray_y + _tray_h + 6.0)
 	var f: = UI.font("body", 900)
 	var fs: = 17
 	# ≥ 16 px of side padding inside the plate (the rim is 2 px): text never touches the rims
 	while fs > 16 and f.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x + 36.0 > V8_NOTE_RECT.size.x:
 		fs -= 1
 	var w: = clampf(f.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x + 36.0, 120.0, V8_NOTE_RECT.size.x)
-	var chip: = UI.rbox("plum", Rect2(V8_NOTE_RECT.end.x - w, V8_NOTE_RECT.position.y, w, V8_NOTE_RECT.size.y), 20, 2, 8)
+	var chip: = UI.rbox("plum", Rect2(24.0 if mode != "duel" else (V8_NOTE_RECT.end.x - w), note_y, w, V8_NOTE_RECT.size.y), 6, 1, 2)
 	chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	chip.add_to_group("v6_chip")
 	chip.add_to_group("v8_note")
-	chip.borders(Color("ffe7a6"), Color("c58a2c"))
+	chip.colors(Color(V10DS.NIGHT_800, 0.90), Color(V10DS.NIGHT_900, 0.92)).borders(Color(V10DS.GOLD_700, 0.45), Color(V10DS.GOLD_700, 0.25))
 	add_child(chip)
 	# the combo pill owns this slot while it runs: the note waits hidden under it (V7Combo._hide_notes)
 	if v7combo and v7combo.shown and not v7combo.stopped:
@@ -1572,6 +1780,10 @@ func _use_skill() -> void :
 	if ult.blocked() != "":
 		await ult.begin()
 		return
+	if v10_showcase and is_instance_valid(v10_showcase):
+		if v10_showcase.active:
+			v10_showcase.skip()
+		v10_showcase.hold()
 	var saved_force: = ult.force_mode
 	if saved_force == "" and G.ult_cutin() != "off":
 		var vid: = V10UltVideo.play(self, partner, G.equipped(partner), ult.ult_name())
@@ -1589,6 +1801,8 @@ func _use_skill() -> void :
 	await ult.begin()
 	if ult:
 		ult.force_mode = saved_force
+	if v10_showcase and is_instance_valid(v10_showcase):
+		v10_showcase.release()
 	if is_inside_tree():
 		_refresh()
 
@@ -1754,23 +1968,29 @@ func _check_riichi_force() -> void :
 # 0.9: the riichi offer takes the sound button's slot at the left end of the button row (a round gold-rim badge
 # the size of the helps), so it never overlaps a booster; the sound toggle comes back once riichi is declared
 func _riichi_make() -> void :
-	var d: = 82.0
-	var rx: = 8.0
-	riichi_btn = JButton.make("", "graphite", Rect2(rx, H - 164.0, d, d), null, 18, d * 0.5)
-	riichi_btn.box.set_param("border", 4.0).set_param("gloss", 0.16)
-	riichi_btn.box.colors(Color("c23a4e"), Color("5a0f1e")).borders(Color("ffe7a6"), Color("c58a2c"))
+	var bw: = 156.0
+	var bh: = 44.0
+	var ry: = _tray_y - bh - 8.0
+	riichi_btn = JButton.make("", "graphite", Rect2(W - bw - 24.0, ry, bw, bh), null, 18, 8.0, false)
+	if riichi_btn.box:
+		riichi_btn.box.visible = false
+	riichi_btn.draw.connect(func() -> void:
+		var r: = Rect2(Vector2.ZERO, riichi_btn.size)
+		riichi_btn.draw_colored_polygon(V10Button.rr_pts(r, 6.0, 6), Color(V10DS.BTN_PLAY_BOT, 0.92))
+		V10Plate.hairline(riichi_btn, 10.0, r.size.x - 10.0, 0.5, Color(V10DS.GOLD_300, 0.85)))
 	var rt: String = V6Txt.s("play.riichi").to_lower()
 	rt = rt.left(1).to_upper() + rt.substr(1)
-	var rl: = UI.center_label(UI.label(rt, 18, Color("fff2d2"), Color("3a0812"), 4, "body", 900), Rect2(0, d * 0.5 - 26, d, 26))
+	var rl: = Label.new()
+	rl.text = "%s · %s" % [rt, V6Txt.s("play.riichi_sub")]
+	rl.label_settings = V10Type.settings("ui", 18, V10DS.GOLD_300, false)
+	rl.position = Vector2(8.0, 0.0)
+	rl.size = Vector2(bw - 16.0, bh)
+	rl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	rl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	rl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	riichi_btn.add_child(rl)
-	var rs: = UI.center_label(UI.label(V6Txt.s("play.riichi_sub"), 14, Color("ffe7a6"), Color("3a0812"), 3, "body", 900), Rect2(0, d * 0.5, d, 22))
-	rs.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	riichi_btn.add_child(rs)
 	riichi_btn.z_index = 40
 	add_child(riichi_btn)
-	if btn_sound:
-		btn_sound.visible = false
 
 func _declare_riichi() -> void :
 	if riichi:
@@ -1778,8 +1998,6 @@ func _declare_riichi() -> void :
 	riichi = true
 	riichi_btn.queue_free()
 	riichi_btn = null
-	if btn_sound:
-		btn_sound.visible = true
 	Sfx.play("fever", 1.15)
 	var rib: = Common.ribbon(self, V6Txt.s("play.riichi"), Rect2(0, 0, 400, V8_BAND_H), "red", 34)
 	remove_child(rib)
@@ -1961,6 +2179,8 @@ var _v8_modal_hidden: = []
 func _v8_modal_open() -> void :
 	_v8_modal = true
 	_v8_fold_fortune()
+	if v10_showcase and is_instance_valid(v10_showcase) and v10_showcase.active:
+		v10_showcase.skip()
 	if v7combo:
 		v7combo.stop()
 	if v10_fx_hud:
@@ -1997,6 +2217,8 @@ func _v8_end_overlays() -> void :
 	for b in [btn_hint, btn_undo, btn_shuffle, btn_sound]:
 		if b:
 			b.visible = false
+	if v10_showcase and is_instance_valid(v10_showcase) and v10_showcase.active:
+		v10_showcase.skip()
 	if v7combo:
 		v7combo.stop()
 	if v10_fx_hud:

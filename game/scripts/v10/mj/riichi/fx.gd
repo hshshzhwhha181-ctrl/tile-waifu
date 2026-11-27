@@ -266,7 +266,11 @@ func win_cutin(hero: String, col: Color, title: String, small: String, who: Stri
 		band.draw_line(Vector2(0, h * 0.5), Vector2(size.x, h * 0.36), Color("e8c47e", 0.8), 2.0)
 		band.draw_line(Vector2(0, h * 0.72), Vector2(size.x, h * 0.58), Color("e8c47e", 0.8), 2.0))
 	c.add_child(band)
-	var ap: = art if art != "" else "res://assets/hero/%s.png" % hero
+	var ap: = art if art != "" else V10W1Core.hero_png(hero)
+	if not ResourceLoader.exists(ap):
+		ap = V10W1Core.hero_png(hero)
+	if not ResourceLoader.exists(ap):
+		ap = "res://assets/hero/mc.png"
 	if ResourceLoader.exists(ap):
 		var tr: = TextureRect.new()
 		tr.texture = load(ap)

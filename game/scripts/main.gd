@@ -167,28 +167,33 @@ func _splash() -> void :
 		hero.interactive = false
 		sp.add_child(hero)
 		UI.slide_in(hero, Vector2(0, 120), 0.4, 0.9)
-	# 0.8: she is cropped at the knee by a soft dark fade that is solid under the «Играть» plate and the version
-	# line, so no legs or shoes show below the CTA (or below the profile-card modal over this screen)
-	var fade_top: = (H - safe_bottom - 580.0) if use_cg else (H - 470.0)
-	var ff: = Common.floor_fade(sp, fade_top, H - 290.0, Color(0.08, 0.03, 0.12), 0.96)
+	# HUD_V2 lower-third lacquer fade: keeps intro_mc_table.webp vivid while framing the logo & dusty-rose CTA pill
+	var fade_top: = (H - safe_bottom - 448.0) if use_cg else (H - 470.0)
+	var fade_bot: = (H - safe_bottom - 156.0) if use_cg else (H - 290.0)
+	var fade_a: = 0.90 if use_cg else 0.95
+	var ff: = Common.floor_fade(sp, fade_top, fade_bot, V10DS.NIGHT_900, fade_a)
 	ff.name = "TitleFade"
 	var fb: = ColorRect.new()
-	fb.color = Color(0.08, 0.03, 0.12, 0.96)
-	fb.position = Vector2(0, H - 290.0)
-	fb.size = Vector2(W, 290.0)
+	fb.color = Color(V10DS.NIGHT_900, fade_a)
+	fb.position = Vector2(0, fade_bot)
+	fb.size = Vector2(W, H - fade_bot)
 	fb.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	sp.add_child(fb)
-	# 0.10 M0: the logo block starts below a camera cut-out; on 16+ full-bleed CG splash it sits in the lower-third
-	# above «Играть» so Маджонг-тян's face and portrait stay 100% unobstructed.
-	var lw: = 430.0 if use_cg else 540.0
-	var lh: = 244.0 if use_cg else 306.0
-	var ly: = (H - safe_bottom - 562.0) if use_cg else (safe_top + H * 0.04 + maxf(0.0, H - 1280.0) * 0.12)
+	# 0.10 M0: the logo block starts below a camera cut-out; on 16+ full-bleed CG splash it sits compactly in the
+	# lower-third above «Играть» so Маджонг-тян's face and table pose stay unobstructed.
+	var lw: = 380.0 if use_cg else 540.0
+	var lh: = 216.0 if use_cg else 306.0
+	var ly: = (H - safe_bottom - 418.0) if use_cg else (safe_top + H * 0.04 + maxf(0.0, H - 1280.0) * 0.12)
 	var logo: = V8Art.rect(V8Art.misc("logo"), Rect2(W * 0.5 - lw * 0.5, ly, lw, lh))
 	logo.pivot_offset = Vector2(lw * 0.5, lh * 0.5)
 	sp.add_child(logo)
 	UI.pop_in(logo, 0.15, 0.4)
-	var tag_y: = (ly + lh - 4.0) if use_cg else (ly + H * 0.01 + 300.0)
-	var tag: = UI.center_label(UI.label(V6Txt.s("title.tag"), 21 if use_cg else 22, Color("ffe7c4"), UI.DARK, 4, "body", 900), Rect2(0, tag_y, W, 32))
+	var tag_y: = (ly + lh - 8.0) if use_cg else (ly + H * 0.01 + 300.0)
+	var tag: = V10Type.label(V6Txt.s("title.tag"), "ui", 18 if use_cg else 22, V10DS.PAPER_300, true)
+	tag.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	tag.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	tag.position = Vector2(0, tag_y)
+	tag.size = Vector2(W, 30)
 	sp.add_child(tag)
 	UI.slide_in(tag, Vector2(0, 20), 0.5)
 	var fades: Array = [logo, tag]
@@ -199,21 +204,50 @@ func _splash() -> void :
 		sp.add_child(chip)
 		UI.slide_in(chip, Vector2(0, 16), 0.6)
 		fades.append(chip)
-	# 0.8: the «Играть» plate is art (btn/play_title, the word is part of the picture); 560×196 drawn at 0.82
-	var plate: = V8Art.rect(V8Art.btn("play_title"), Rect2(W * 0.5 - 230, H - safe_bottom - 286, 460, 161))
+	# HUD_V2 §2.5 dusty-rose stadium pill («Играть», matching 03_home & 04_victory) with thin champagne-gold rim
+	var pill_w: = 440.0
+	var pill_h: = 100.0
+	var plate: = Panel.new()
+	plate.name = "PlayPill"
+	plate.position = Vector2((W - pill_w) * 0.5, H - safe_bottom - 168.0)
+	plate.size = Vector2(pill_w, pill_h)
 	plate.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var psb: = StyleBoxFlat.new()
+	psb.bg_color = V10DS.ROSE_500
+	psb.border_color = Color(V10DS.GOLD_300, 0.72)
+	psb.set_border_width_all(1)
+	psb.set_corner_radius_all(int(pill_h * 0.5))
+	psb.shadow_color = Color(V10DS.NIGHT_900, 0.52)
+	psb.shadow_size = 12
+	psb.shadow_offset = Vector2(0, 4)
+	plate.add_theme_stylebox_override("panel", psb)
 	sp.add_child(plate)
-	# the word as text too (invisible, under the art): screen readers and the playtest look the button up by it
-	var ptl: = UI.center_label(UI.label(V6Txt.s("title.tap"), 40, Color("3a2410"), Color(1.0, 0.95, 0.8, 0.55), 2, "body", 900), Rect2(0, 0, 460, 161))
-	ptl.self_modulate = Color(1, 1, 1, 0)
+	var gleam: = ColorRect.new()
+	gleam.color = Color(V10DS.PAPER_100, 0.28)
+	gleam.position = Vector2(52.0, 2.0)
+	gleam.size = Vector2(pill_w - 104.0, 1.0)
+	gleam.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	plate.add_child(gleam)
+	var ptl: = Label.new()
 	ptl.name = "PlayText"
+	ptl.text = V6Txt.s("title.tap")
+	ptl.label_settings = V10Type.settings("display", 32, V10DS.NIGHT_900)
+	ptl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	ptl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	ptl.position = Vector2.ZERO
+	ptl.size = Vector2(pill_w, pill_h)
+	ptl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	plate.add_child(ptl)
-	plate.pivot_offset = Vector2(230, 80)
-	UI.pop_in(plate, 0.7, 0.7)
+	plate.pivot_offset = Vector2(pill_w * 0.5, pill_h * 0.5)
+	UI.pop_in(plate, 0.65, 0.92)
 	var pt: = plate.create_tween().set_loops()
-	pt.tween_property(plate, "scale", Vector2(1.04, 1.04), 0.8).set_trans(Tween.TRANS_SINE)
-	pt.tween_property(plate, "scale", Vector2.ONE, 0.8).set_trans(Tween.TRANS_SINE)
-	var ver: = UI.center_label(UI.label(V6Txt.s("title.version") % G.version(), 16, Color(1, 1, 1, 0.65), UI.DARK, 2, "body", 800), Rect2(0, H - safe_bottom - 56, W, 26))
+	pt.tween_property(plate, "scale", Vector2(1.015, 1.015), 1.6).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	pt.tween_property(plate, "scale", Vector2(0.99, 0.99), 1.6).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	var ver: = V10Type.label(V6Txt.s("title.version") % G.version(), "ui", 18, Color(V10DS.PAPER_500, 0.72))
+	ver.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	ver.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	ver.position = Vector2(0, H - safe_bottom - 44.0)
+	ver.size = Vector2(W, 26)
 	sp.add_child(ver)
 	fades.append_array([plate, ver])
 	Sfx.music("menu")
@@ -719,7 +753,10 @@ func _build_profile_chip() -> void :
 
 # Round heroine portrait without a frame (collection.gd heroine row). The player's own avatar uses V8Art.avatar.
 func _avatar(hero: String, r: Rect2) -> TextureRect:
-	var t: = UI.tex(load("res://assets/hero/%s.png" % hero), r, false)
+	var hp: = V10W1Core.hero_png(hero)
+	if not ResourceLoader.exists(hp):
+		hp = "res://assets/hero/mc.png"
+	var t: = UI.tex(load(hp), r, false)
 	var m: = ShaderMaterial.new()
 	m.shader = preload("res://shaders/card.gdshader")
 	m.set_shader_parameter("size", r.size)
@@ -957,7 +994,12 @@ func go(id: String, args: = {}, animate: = true, remember: = true) -> void :
 	var from_args: Dictionary = screen.get_meta("v8_args", {}) if screen and is_instance_valid(screen) else {}
 	await V6Story.before_go(self, id, args)
 	for p in overlay.get_children():
-		if p.has_meta("popup") or p.has_meta("v8_back"):
+		if p.has_meta("v8_toast"):
+			continue
+		if p.has_meta("popup") or p.has_meta("v8_back") or p.has_meta("v10_sheet") or p is V10FirstPickView or p is V10PullConfirm or p is V10OddsScreen or p is V10SparkSheet or p is V10AskSheet or p is V10GuestScene or (p is Control and (p as Control).mouse_filter != Control.MOUSE_FILTER_IGNORE):
+			if p is Control:
+				(p as Control).mouse_filter = Control.MOUSE_FILTER_IGNORE
+			overlay.remove_child(p)
 			p.queue_free()
 	busy = true
 	if id == "home":

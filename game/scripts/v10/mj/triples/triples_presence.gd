@@ -138,7 +138,9 @@ func _load_art() -> void:
 	var sh: = V9Ults.shown(id)
 	var path: String = sh.get("img", "")
 	if path == "" or not ResourceLoader.exists(path):
-		path = "res://assets/hero/%s.png" % hero
+		path = V10W1Core.hero_png(hero)
+	if not ResourceLoader.exists(path):
+		path = "res://assets/hero/mc.png"
 	_art_tex = load(path) if ResourceLoader.exists(path) else null
 	if _art_tex == null:
 		return

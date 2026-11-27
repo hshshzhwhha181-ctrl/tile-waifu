@@ -43,7 +43,8 @@ static func art_path(p: Dictionary) -> String:
 	var own: = "res://assets/v10/mj/koikoi/book/%s.webp" % p.id
 	if ResourceLoader.exists(own):
 		return own
-	return "res://assets/hero/%s.png" % p.hero
+	var hp: = V10W1Core.hero_png(String(p.hero))
+	return hp if ResourceLoader.exists(hp) else "res://assets/hero/mc.png"
 
 static func filled(d: Dictionary) -> int:
 	var n: = 0
