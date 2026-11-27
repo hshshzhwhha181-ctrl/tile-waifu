@@ -221,7 +221,7 @@ static func claim(hero: String, lv: int, spark: int) -> Dictionary:
 	st["total"] = int(st.total) + 1
 	var d: = level_def(lv)
 	var lines: Array = []
-	G.add_aff(hero, AFF_REWARD)
+	V10AffCurve.add_date_aff(hero, AFF_REWARD)
 	lines.append("+%d симпатии" % AFF_REWARD)
 	if int(d.gems) > 0:
 		V10Money.grant({"gems": int(d.gems)}, "boudoir_date")

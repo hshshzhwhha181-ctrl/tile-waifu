@@ -6,6 +6,9 @@ extends "res://scripts/screens/modes.gd"
 # Пасьянсы · За столом · Испытания и соперницы. A shelf shows open modes plus at most ONE teaser (P0-8).
 
 const SHELVES: = [
+	["Онлайн-Арена · PvP 1×1", [
+		["pvp_online", "Онлайн-Дуэль · PvP 1×1"],
+	]],
 	["Приключение · Битвы с монстрами", [
 		["adventure", "Битва с монстрами"],
 	]],
@@ -65,6 +68,7 @@ const ART: = {
 	"challenge": [HF + "banner_tsubame.png", Vector2(0.5, 0.35), 1.0, "letters"],
 	"blitz": [HF + "banner_shirin.png", Vector2(0.5, 0.35), 1.0, "hint"],
 	"tourney": ["res://assets/v08/ui/bg/tourney.webp", Vector2(0.5, 0.5), 1.0, "trophy"],
+	"pvp_online": [HF + "banner_pvp_online.webp", Vector2(0.5, 0.45), 1.0, "trophy"],
 	"adventure": ["res://assets/v10/adventure/paper_oni.png", Vector2(0.5, 0.32), 1.0, "trophy"],
 	"salon_vip": ["res://assets/v10/salon_vip/boudoir_mc.webp", Vector2(0.5, 0.42), 1.0, "heart"],
 	"default": [HF + "banner_path.png", Vector2(0.5, 0.35), 1.0, "nav:play"],
@@ -319,7 +323,7 @@ func _caption(text: String, y: float, accent: Color) -> float:
 func _mode_is_open(id: String) -> bool:
 	var u: = int(G.S.get("unlocked", 1))
 	match id:
-		"adventure", "salon_vip":
+		"pvp_online", "adventure", "salon_vip":
 			return true
 		"classic":
 			return u >= 10
@@ -359,7 +363,7 @@ func _mode_is_open(id: String) -> bool:
 
 func _lock_v10(id: String) -> String:
 	match id:
-		"adventure":
+		"pvp_online", "adventure", "salon_vip":
 			return ""
 		"classic":
 			return "Откроется на уровне 10"
@@ -396,11 +400,15 @@ func _lock_v10(id: String) -> String:
 
 func _status_v10(id: String) -> String:
 	match id:
+		"pvp_online":
+			var on_d = G.S.get("v10_online", {})
+			var elo: int = int(on_d.get("elo", 1000)) if on_d is Dictionary else 1000
+			return "Рейтинг %d ELO · Саботаж · Комната друга" % elo
 		"adventure":
 			var ai: Dictionary = V10AdventureData.hub_card_info()
 			return String(ai.get("subtitle", "Сразись с ёкай-боссами"))
 		"salon_vip":
-			return "4 будуара · Подарки симпатии 16+"
+			return "8 будуаров · Свидания и подарки 16+"
 		"classic":
 			return "Свободная · День · Память"
 		"triples":
@@ -452,6 +460,8 @@ func _open_v10(id: String) -> void:
 		return
 	var hero: String = G.S.partner if G.hero_unlocked(G.S.partner) else "mc"
 	match id:
+		"pvp_online":
+			main.go("v10pvp", {"from": "tables"})
 		"adventure":
 			var ai2: Dictionary = V10AdventureData.hub_card_info()
 			main.go("adventure", {"stage": int(ai2.get("stage", 0)), "hero": hero})

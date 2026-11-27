@@ -7,6 +7,7 @@ extends Control
 # VFX, result with the ELO change. Runs over the real WebSocket (V10Online) or the local sparring bot offline.
 
 const U: = preload("res://scripts/v10/online/online_ui.gd")
+const BANNER_ART: = "res://assets/v10/hf_ui/banner_pvp_online.webp"
 const CHARGE_PAIRS: = 4
 const SLOTS_N: = 5
 const EMOTE_TEXT: = {"laugh": "Ха-ха!", "angry": "Грр!", "heart": "Обожаю!", "cool": "Круто!"}
@@ -199,31 +200,103 @@ func select_tab(i: int) -> void:
 
 
 func _page_quick() -> void:
-	var ph: = page.size.y - 24.0
-	var card: = Rect2(16, 0, W - 32, minf(ph, 900.0))
-	page.add_child(U.panel(card, U.PLUM, U.GOLD, 22))
-	page.add_child(U.label("Быстрый бой · подбор по ELO", Rect2(36, 16, W - 72, 44), 27, U.GOLD_HI, HORIZONTAL_ALIGNMENT_CENTER, 900))
-	# VS showcase
-	var vy: = 76.0
-	page.add_child(Common.avatar(V10OnlineCfg.avatar(), Rect2(70, vy, 170, 170)))
-	page.add_child(Common.avatar("rin", Rect2(W - 240, vy, 170, 170), "pink"))
-	var vs_l: = U.label("VS", Rect2(W * 0.5 - 70, vy + 40, 140, 90), 28, U.GOLD_HI, HORIZONTAL_ALIGNMENT_CENTER, 900)
-	vs_l.label_settings = vs_l.label_settings.duplicate()
-	vs_l.label_settings.font_size = 64
-	page.add_child(vs_l)
-	page.add_child(U.label("Ты", Rect2(70, vy + 176, 170, 34), 22, U.CREAM, HORIZONTAL_ALIGNMENT_CENTER))
-	page.add_child(U.label("Соперник", Rect2(W - 240, vy + 176, 170, 34), 22, U.CREAM, HORIZONTAL_ALIGNMENT_CENTER))
-	var y: = vy + 228.0
+	var ban_r: = Rect2(26, 12, W - 52, 176)
+	var vy: = ban_r.end.y + 18.0
+	var av_sz: = 164.0
 	var lines: = [
 		"Одна доска на двоих — кто первым разберёт её, тот победил.",
 		"Каждые 4 пары заряжают саботаж: Лёд или Туман на доску соперника.",
 		"Нет живого игрока за 6 секунд — выйдет умный спарринг-соперник.",
 	]
+	var rules_y: = vy + av_sz + 48.0
+	var btn_sz: = Vector2(460, 92)
+	var by: = rules_y + float(lines.size()) * 68.0 + 18.0
+	var card: = Rect2(16, 0, W - 32, by + btn_sz.y + 28.0)
+	page.add_child(U.panel(card, U.PLUM, U.GOLD, 22))
+	# gold-trimmed top banner strip with Higgsfield artwork + subtle bottom shade
+	var ban_clip: = Panel.new()
+	ban_clip.name = "QuickBanner"
+	ban_clip.position = ban_r.position
+	ban_clip.size = ban_r.size
+	ban_clip.clip_children = CanvasItem.CLIP_CHILDREN_AND_DRAW
+	ban_clip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var bsb: = StyleBoxFlat.new()
+	bsb.bg_color = U.PLUM_HI
+	bsb.set_corner_radius_all(16)
+	ban_clip.add_theme_stylebox_override("panel", bsb)
+	if ResourceLoader.exists(BANNER_ART):
+		var btex: = load(BANNER_ART) as Texture2D
+		if btex != null:
+			var tr: = TextureRect.new()
+			tr.texture = btex
+			var tw: = maxf(1.0, float(btex.get_width()))
+			var th: = maxf(1.0, float(btex.get_height()))
+			var sc: = maxf(ban_r.size.x / tw, ban_r.size.y / th)
+			var dw: = tw * sc
+			var dh: = th * sc
+			tr.position = Vector2((ban_r.size.x - dw) * 0.5, -(dh - ban_r.size.y) * 0.46)
+			tr.size = Vector2(dw, dh)
+			tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			tr.stretch_mode = TextureRect.STRETCH_SCALE
+			tr.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+			tr.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			ban_clip.add_child(tr)
+	var shade: = _BannerShade.new()
+	shade.size = ban_r.size
+	ban_clip.add_child(shade)
+	page.add_child(ban_clip)
+	var ban_trim: = Panel.new()
+	ban_trim.position = ban_r.position
+	ban_trim.size = ban_r.size
+	ban_trim.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var tsb: = StyleBoxFlat.new()
+	tsb.bg_color = Color(0, 0, 0, 0)
+	tsb.border_color = U.GOLD
+	tsb.set_border_width_all(2)
+	tsb.set_corner_radius_all(16)
+	ban_trim.add_theme_stylebox_override("panel", tsb)
+	page.add_child(ban_trim)
+	page.add_child(U.label("Быстрый бой · подбор по ELO", Rect2(36, ban_r.end.y - 48.0, W - 72, 42), 26, U.GOLD_HI, HORIZONTAL_ALIGNMENT_CENTER, 900))
+	# VS showcase
+	page.add_child(Common.avatar(V10OnlineCfg.avatar(), Rect2(74, vy, av_sz, av_sz)))
+	page.add_child(Common.avatar("rin", Rect2(W - 74 - av_sz, vy, av_sz, av_sz), "pink"))
+	var vs_l: = U.label("VS", Rect2(W * 0.5 - 70, vy + 36, 140, 90), 28, U.GOLD_HI, HORIZONTAL_ALIGNMENT_CENTER, 900)
+	vs_l.label_settings = vs_l.label_settings.duplicate()
+	vs_l.label_settings.font_size = 62
+	page.add_child(vs_l)
+	page.add_child(U.label("Ты", Rect2(74, vy + av_sz + 6.0, av_sz, 32), 22, U.CREAM, HORIZONTAL_ALIGNMENT_CENTER))
+	page.add_child(U.label("Соперник", Rect2(W - 74 - av_sz, vy + av_sz + 6.0, av_sz, 32), 22, U.CREAM, HORIZONTAL_ALIGNMENT_CENTER))
+	var y: = rules_y
 	for s in lines:
-		page.add_child(U.para("◆  " + s, Rect2(44, y, W - 88, 64), 22, U.CREAM))
-		y += 70.0
-	var by: = minf(card.end.y - 124.0, y + 24.0)
-	page.add_child(U.button("Найти соперника", Rect2(56, by, W - 112, 96), start_matchmaking, Color("#8E3B2E"), U.GOLD_HI, 28, U.GOLD_HI))
+		page.add_child(U.para("◆  " + s, Rect2(44, y, W - 88, 62), 22, U.CREAM))
+		y += 68.0
+	var cta: = V10Button.make("play", "Найти соперника", btn_sz)
+	cta.name = "FindMatchBtn"
+	cta.position = Vector2((W - btn_sz.x) * 0.5, by)
+	cta.size = btn_sz
+	cta.set_meta("ux_role", "primary")
+	cta.pressed.connect(func() -> void:
+		Sfx.play("tap", 1.0, -6)
+		start_matchmaking())
+	page.add_child(cta)
+
+
+class _BannerShade extends Control:
+	func _init() -> void:
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+	func _draw() -> void:
+		var w: = size.x
+		var h: = size.y
+		var y0: = h * 0.36
+		var ym: = h * 0.72
+		var c0: = Color(0.08, 0.02, 0.12, 0.0)
+		var cm: = Color(0.08, 0.02, 0.12, 0.54)
+		var c1: = Color(0.08, 0.02, 0.12, 0.90)
+		draw_polygon(PackedVector2Array([Vector2(0, y0), Vector2(w, y0), Vector2(w, ym), Vector2(0, ym)]),
+			PackedColorArray([c0, c0, cm, cm]))
+		draw_polygon(PackedVector2Array([Vector2(0, ym), Vector2(w, ym), Vector2(w, h), Vector2(0, h)]),
+			PackedColorArray([cm, cm, c1, c1]))
 
 
 func _page_room() -> void:

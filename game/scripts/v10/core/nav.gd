@@ -353,7 +353,10 @@ static func settings_account(main, p: Control) -> void:
 	b.name = "AccountBtn"
 	b.pressed.connect(func() -> void:
 		Common.close_popup(p)
-		V10AuthFlow.open_account(main))
+		if main.SCREENS.has("v10account"):
+			main.go("v10account", {"from": main.screen_id})
+		else:
+			V10AuthFlow.open_account(main))
 	p.add_child(b)
 
 

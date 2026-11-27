@@ -583,7 +583,7 @@ func say(text: String, emo: = "", voice: = "", talk: = true) -> void:
 		if h2L is Dictionary and (h2L as Dictionary).has("play") and hm != null:
 			play_top = float(((h2L as Dictionary)["play"] as Rect2).position.y) - float(hm.CR.position.y)
 		pos.x = clampf((home.size.x - w) * 0.5, 24.0, maxf(24.0, home.size.x - w - 24.0))
-		pos.y = clampf(play_top - h - 28.0, 260.0, maxf(260.0, home.size.y - h - 220.0))
+		pos.y = clampf(play_top - h - 74.0, 260.0, maxf(260.0, home.size.y - h - 266.0))
 		tail_up = true
 	else:
 		var top: = 176.0 if mode == "video" else BUBBLE_TOP

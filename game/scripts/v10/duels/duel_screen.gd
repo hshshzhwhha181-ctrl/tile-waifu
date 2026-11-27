@@ -209,6 +209,7 @@ func refresh() -> void:
 	# 0.12: «Онлайн PvP · Живые игроки ›» over the fight button: the live arena (v10pvp) beside the AI duels
 	var pvp: = _PvpEntry.new()
 	pvp.name = "PvpOnline"
+	pvp.btn_size = Vector2(560.0, 80.0)
 	pvp.size = Vector2(560.0, 80.0)
 	pvp.position = Vector2((COL_W - 560.0) * 0.5, btn_primary.position.y - 12.0 - 80.0)
 	var pl: = _lbl(BTN_PVP, "ui", 22, V10DS.NIGHT_900, 560.0 - 120.0, 1)

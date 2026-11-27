@@ -284,6 +284,15 @@ static func register_all() -> void:
 	R.module("wave1", {"step": 4, "selftest": {"scene": "res://scripts/v10/wave1/wave1_selftest.tscn",
 		"args": ["--wave1_selftest=1"], "marker": "WAVE1_SELFTEST"}})
 	V10AdventureReg.register()
+	V10OnlineReg.register()
+	R.module("events", {"step": 4, "selftest": {"scene": "res://scripts/v10/events/events_selftest.tscn",
+		"args": [], "marker": "EVENTS_SELFTEST"},
+		"screens": {
+			"v10welcome7": "res://scripts/v10/events/welcome7_screen.gd",
+			"v10wheel": "res://scripts/v10/events/lucky_wheel_screen.gd",
+		},
+		"nav": {"v10welcome7": ["home"], "v10wheel": ["home"]},
+		"save": {"v10_welcome7": {}, "v10_wheel": {}, "v10_dates": {}}})
 	R.module("stamina", {"step": 4, "selftest": {"scene": "res://scripts/v10/economy/stamina_selftest.tscn",
 		"args": ["--stamina_selftest=1"], "marker": "STAMINA_SELFTEST"},
 		"save": {"v10_stamina": V10Stamina.defaults(), "v10_gifts": V10AffCurve.defaults()},

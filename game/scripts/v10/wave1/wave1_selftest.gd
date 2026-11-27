@@ -93,9 +93,12 @@ func _test_facade_and_idempotency() -> void:
 	V10Wave1.set_banners_enabled(true)
 	_ck(V10Wave1.banners_enabled() and V10Wave1.banners(base_b).has("w1"), "set_banners_enabled(true) splices wave-1 banners")
 
-	# Save sanitization when unreleased
+	# Save sanitization when unreleased (pass founders-only hero table)
+	var founders_only: = {}
+	for fh in V10Wave1.FOUNDERS:
+		founders_only[fh] = g.HEROES[fh]
 	var fake_save: = {"partner": "zlata", "level_partner": "tsubame", "profile": {"avatar": "kohaku"}}
-	var reset_n: = V10W1Core.sanitize_save(fake_save, g.HEROES)
+	var reset_n: = V10W1Core.sanitize_save(fake_save, founders_only)
 	_ck(reset_n == 3 and fake_save.partner == "mc" and fake_save.level_partner == "mc" and fake_save.profile.avatar == "mc", "sanitize_save resets wave-1 pointers when off")
 
 	# Overlay merge into mutable copies

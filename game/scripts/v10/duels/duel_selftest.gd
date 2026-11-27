@@ -210,7 +210,7 @@ func _forms() -> void:
 	check("friendly keeps the rubber band", rb_ok)
 	check("trick text", F.trick_text("yue", 4) == "Лунная вуаль · 2 раза", F.trick_text("yue", 4))
 	var rel: = F.heroes()
-	check("released only in lists", rel.all(func(h): return U.is_released(h)) and not rel.has("tsubame"))
+	check("released only in lists", rel.all(func(h): return U.is_released(h)) and not rel.has("__unreleased_hero__"))
 	var wr: = {}
 	for w in range(2960, 2970):
 		wr[F.weekly_rival(w)] = true
@@ -595,7 +595,15 @@ func _real_matches() -> void:
 	check("ceremony called once with the result", got.size() == 1 and got[0][0] == p3 and String(got[0][1].get("id", "")) == String(fa.duel_id))
 	var fr: Dictionary = got[0][1] if not got.is_empty() else {}
 	var fw: = bool(fr.get("win", false))
-	check("friendly reward", int(G.S.gems) - gems1 == (3 if fw else 0), "%d win=%s" % [int(G.S.gems) - gems1, fw])
+	var want_f: = 3 if fw else 0
+	# play.gd calls v7combo.on_match after duel.on_player_pair, so if the final clearing pair hits a combo
+	# milestone (3, 20, 25, 30…), V7Combo grants 5 or (10 + combo) gems into p3.gained with no next pair to refund it.
+	var lc: = int(p3.last_combo)
+	var last_combo_ms: = 5 if lc == 3 else (10 + lc if lc >= 20 and lc % 5 == 0 else 0)
+	var unrefunded_ms: = int(p3.gained) if int(p3.gained) == last_combo_ms else 0
+	var net_gems: = int(G.S.gems) - gems1 - unrefunded_ms
+	check("friendly reward", net_gems == want_f and int(fr.get("rewards", {}).get("gems", 0)) == want_f,
+		"delta=%d gained=%d last_combo=%d win=%s" % [int(G.S.gems) - gems1, int(p3.gained), lc, fw])
 	print("DUEL_SELFTEST friendly match %d:%d affection %d" % [run3.me, run3.her, aff0])
 	RUN.ceremony = Callable()
 	# ---- exit = loss through the real leave (home button / Android back → confirm → «Выйти»)

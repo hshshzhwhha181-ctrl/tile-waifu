@@ -184,51 +184,72 @@ func _build_header() -> void:
 
 
 func _build_banner() -> void:
+	var bn_rect: = Rect2(18, 4, W - 36, 360)
 	var bn: = Panel.new()
-	bn.position = Vector2(18, 4)
-	bn.size = Vector2(W - 36, 360)
-	bn.clip_contents = true
+	bn.position = bn_rect.position
+	bn.size = bn_rect.size
 	var sb: = StyleBoxFlat.new()
-	sb.bg_color = Color("#2A0B1E")
-	sb.border_color = Color("#F6D484")
-	sb.set_border_width_all(3)
+	sb.bg_color = Color("#24081A")
 	sb.set_corner_radius_all(28)
+	sb.shadow_color = Color(0, 0, 0, 0.45)
+	sb.shadow_size = 10
 	bn.add_theme_stylebox_override("panel", sb)
 	bn.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_content.add_child(bn)
+	var art_x: = maxf(256.0, bn.size.x * 0.39)
 	var tex: Texture2D = V10VipBoudoirScreen._load_tex(DRAGON_ART)
 	if tex != null:
-		var tr: = TextureRect.new()
-		tr.texture = tex
-		tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
-		tr.position = Vector2(bn.size.x * 0.46, -10)
-		tr.size = Vector2(bn.size.x * 0.54, bn.size.y + 20)
-		tr.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		bn.add_child(tr)
-	var shade: = ColorRect.new()
-	shade.color = Color(0.1, 0.02, 0.07, 0.55)
-	shade.size = Vector2(bn.size.x * 0.48, bn.size.y)
+		var art: = Common.card_art(tex, Rect2(art_x, 6, bn.size.x - art_x - 6.0, bn.size.y - 12.0), Vector2(0.5, 0.17), 1.0, 18.0)
+		(art.material as ShaderMaterial).set_shader_parameter("bottom_shade", 0.14)
+		art.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		bn.add_child(art)
+	var grad: = Gradient.new()
+	grad.offsets = PackedFloat32Array([0.0, 0.14, 0.44, 0.74, 1.0])
+	grad.colors = PackedColorArray([
+		Color("#24081A"),
+		Color(0.141, 0.031, 0.102, 0.96),
+		Color(0.141, 0.031, 0.102, 0.66),
+		Color(0.141, 0.031, 0.102, 0.18),
+		Color(0.141, 0.031, 0.102, 0.0),
+	])
+	var gtex: = GradientTexture2D.new()
+	gtex.gradient = grad
+	gtex.fill_from = Vector2(0.0, 0.5)
+	gtex.fill_to = Vector2(1.0, 0.5)
+	gtex.width = 256
+	gtex.height = 8
+	var shade: = TextureRect.new()
+	shade.texture = gtex
+	shade.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	shade.stretch_mode = TextureRect.STRETCH_SCALE
+	shade.position = Vector2(art_x - 6.0, 3.0)
+	shade.size = Vector2(minf(280.0, bn.size.x - art_x - 22.0), bn.size.y - 6.0)
 	shade.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	bn.add_child(shade)
-	var badge: = V10VipBoudoirScreen._pill(Rect2(16, 18, 330, 74), Color(0.62, 0.1, 0.24, 0.98), Color("#FFE49C"), 20)
+	var left_w: = minf(320.0, bn.size.x * 0.48)
+	var badge: = V10VipBoudoirScreen._pill(Rect2(16, 16, 308, 66), Color(0.64, 0.10, 0.24, 0.98), Color("#FFE49C"), 18)
 	bn.add_child(badge)
-	var bl: = UI.center_label(UI.label("БЕСПЛАТНЫЙ SSR\nНА 7-Й ДЕНЬ", 25, Color("#FFF7E6"), Color(0.25, 0.03, 0.1), 4, "body", 900), Rect2(0, 0, 330, 74))
+	var bl: = UI.center_label(UI.label("БЕСПЛАТНЫЙ SSR\nНА 7-Й ДЕНЬ", 21, Color("#FFF7E6"), Color(0.25, 0.03, 0.1), 4, "body", 900), Rect2(0, 0, 308, 66))
+	bl.label_settings.line_spacing = -2.0
 	bl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	badge.add_child(bl)
-	var nm: = UI.label("Маджонг-тян\n«Императрица дракона»", 28, Color("#FFF1CF"), Color(0.1, 0.02, 0.08), 5, "body", 900)
-	nm.position = Vector2(20, 112)
-	nm.size = Vector2(bn.size.x * 0.5, 80)
-	bn.add_child(nm)
+	var nm1: = Common.fit_line(UI.label("Маджонг-тян", 28, Color("#FFF3D6"), Color(0.1, 0.02, 0.08), 5, "body", 900), left_w, 20)
+	nm1.position = Vector2(18, 92)
+	nm1.size.y = 36
+	bn.add_child(nm1)
+	var nm2: = Common.fit_line(UI.label("«Императрица дракона»", 22, Color("#F8D686"), Color(0.1, 0.02, 0.08), 4, "body", 800), left_w, 17)
+	nm2.position = Vector2(18, 128)
+	nm2.size.y = 30
+	bn.add_child(nm2)
 	var shown: = days_claimed() if not can_claim_today() else days_claimed() + 1
-	_day_lbl = UI.label("День %d из %d" % [clampi(shown, 1, DAYS), DAYS], 36, Color("#FFD36E"), Color(0.2, 0.03, 0.1), 6, "body", 900)
-	_day_lbl.position = Vector2(20, 214)
-	_day_lbl.size = Vector2(bn.size.x * 0.5, 48)
+	_day_lbl = Common.fit_line(UI.label("День %d из %d" % [clampi(shown, 1, DAYS), DAYS], 34, Color("#FFD36E"), Color(0.2, 0.03, 0.1), 6, "body", 900), left_w, 24)
+	_day_lbl.position = Vector2(18, 168)
+	_day_lbl.size.y = 44
 	bn.add_child(_day_lbl)
 	var dc: = days_claimed()
 	for i in DAYS:
 		var d: = Panel.new()
-		d.position = Vector2(24 + i * 36, 282)
+		d.position = Vector2(18 + i * 36, 224)
 		d.size = Vector2(26, 26)
 		var ds: = StyleBoxFlat.new()
 		ds.bg_color = Color("#FFD36E") if i < dc else Color(0.2, 0.1, 0.2, 0.9)
@@ -238,10 +259,23 @@ func _build_banner() -> void:
 		d.add_theme_stylebox_override("panel", ds)
 		d.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		bn.add_child(d)
-	var sub: = UI.label("Заходи каждый день — награды сыплются сами", 17, Color("#F4D48A"), Color(0.08, 0.02, 0.12), 3, "body", 700)
-	sub.position = Vector2(20, 322)
-	sub.size = Vector2(bn.size.x - 40, 26)
+	var sub: = UI.label("Заходи каждый день —\nнаграды сыплются сами", 18, Color("#F4D48A"), Color(0.08, 0.02, 0.12), 4, "body", 800)
+	sub.label_settings.line_spacing = -1.0
+	Common.fit_words(sub, left_w, 2, 15)
+	sub.position = Vector2(18, 266)
+	sub.size.y = 58
 	bn.add_child(sub)
+	var rim: = Panel.new()
+	rim.position = bn_rect.position
+	rim.size = bn_rect.size
+	var rsb: = StyleBoxFlat.new()
+	rsb.draw_center = false
+	rsb.border_color = Color("#F6D484")
+	rsb.set_border_width_all(3)
+	rsb.set_corner_radius_all(28)
+	rim.add_theme_stylebox_override("panel", rsb)
+	rim.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_content.add_child(rim)
 
 
 func _build_cards() -> void:
@@ -273,37 +307,29 @@ func _make_card(day: int, r: Rect2) -> void:
 	_content.add_child(card)
 	_cards[day] = card
 	if stt == "today":
-		var gl: = ColorRect.new()
-		gl.color = Color(1.0, 0.8, 0.3, 0.16)
-		gl.size = r.size
-		gl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var gl: = _flat_panel(Rect2(Vector2.ZERO, r.size), Color(1.0, 0.8, 0.3, 0.16), 24)
 		card.add_child(gl)
 		_glow.append(gl)
 	var dl: = UI.label("ДЕНЬ %d" % day, 22 if not grand else 28, Color("#FFD36E"), Color(0.1, 0.02, 0.08), 4, "body", 900)
 	dl.position = Vector2(16, 10)
 	dl.size = Vector2(150, 34)
 	card.add_child(dl)
-	var ic: = _Icon.new()
-	ic.kind = str(rw.icon)
-	ic.size = Vector2(80, 80) if not grand else Vector2(130, 130)
-	ic.position = Vector2(r.size.x - ic.size.x - 14, 14) if not grand else Vector2(r.size.x - 150, 20)
-	ic.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var ic: = _make_reward_icon(str(rw.icon), grand)
+	ic.position = Vector2(r.size.x - ic.size.x - 10.0, 8.0) if not grand else Vector2(r.size.x - ic.size.x - 18.0, (r.size.y - ic.size.y) * 0.5)
 	card.add_child(ic)
 	var tl: = UI.label(str(rw.title), 21 if not grand else 30, Color("#FFF6E4"), Color(0.08, 0.02, 0.1), 4, "body", 800)
-	tl.position = Vector2(16, 100 if not grand else 70)
-	tl.size = Vector2(r.size.x - 32 if not grand else r.size.x - 180, 80 if not grand else 120)
-	V10VipBoudoirScreen.wrap_size(tl, Vector2(r.size.x - 32 if not grand else r.size.x - 180, 80 if not grand else 120))
+	tl.position = Vector2(16, 102 if not grand else 70)
+	var tw_max: = r.size.x - 32.0 if not grand else r.size.x - 196.0
+	tl.size = Vector2(tw_max, 78 if not grand else 120)
+	V10VipBoudoirScreen.wrap_size(tl, Vector2(tw_max, 78 if not grand else 120))
 	card.add_child(tl)
 	if grand:
 		var tag: = UI.label("GRAND SSR · бесплатно", 22, Color("#FF9EBE"), Color(0.1, 0.02, 0.08), 4, "body", 900)
 		tag.position = Vector2(16, 196)
-		tag.size = Vector2(r.size.x - 32, 34)
+		tag.size = Vector2(r.size.x - 196.0, 34)
 		card.add_child(tag)
 	if stt == "claimed":
-		var dim: = ColorRect.new()
-		dim.color = Color(0.05, 0.02, 0.08, 0.55)
-		dim.size = r.size
-		dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var dim: = _flat_panel(Rect2(Vector2.ZERO, r.size), Color(0.05, 0.02, 0.08, 0.55), 24)
 		card.add_child(dim)
 		var seal: = V10VipBoudoirScreen._pill(Rect2(r.size.x * 0.5 - 90, r.size.y * 0.5 - 28, 180, 56), Color(0.7, 0.08, 0.16, 0.92), Color("#FFE9A6"), 12)
 		seal.name = "Seal"
@@ -367,41 +393,74 @@ func _back() -> void:
 		main.back()
 
 
-class _Icon extends Control:
-	var kind: = "crystal"
+static func _flat_panel(r: Rect2, col: Color, rad: int) -> Panel:
+	var p: = Panel.new()
+	p.position = r.position
+	p.size = r.size
+	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var sb: = StyleBoxFlat.new()
+	sb.bg_color = col
+	sb.set_corner_radius_all(rad)
+	p.add_theme_stylebox_override("panel", sb)
+	return p
 
-	func _draw() -> void:
-		var c: = size * 0.5
-		var s: = minf(size.x, size.y) * 0.5
-		var gold: = Color("#FFD36E")
-		var line: = Color("#FFF2C0")
-		match kind:
-			"crystal":
-				var pts: = PackedVector2Array([c + Vector2(0, -s), c + Vector2(s * 0.8, -s * 0.2), c + Vector2(0, s), c + Vector2(-s * 0.8, -s * 0.2)])
-				draw_colored_polygon(pts, Color("#FF6FA8"))
-				draw_polyline(PackedVector2Array([pts[0], pts[1], pts[2], pts[3], pts[0]]), line, 3.0)
-				draw_line(c + Vector2(-s * 0.8, -s * 0.2), c + Vector2(s * 0.8, -s * 0.2), line, 2.0)
-			"ticket":
-				var r: = Rect2(c - Vector2(s, s * 0.6), Vector2(s * 2, s * 1.2))
-				draw_rect(r, Color("#E24A6E"))
-				draw_rect(r, line, false, 3.0)
-				draw_circle(Vector2(r.position.x, c.y), s * 0.18, Color("#150711"))
-				draw_circle(Vector2(r.end.x, c.y), s * 0.18, Color("#150711"))
-				draw_string(ThemeDB.fallback_font, Vector2(c.x - s * 0.3, c.y + s * 0.22), "♥", HORIZONTAL_ALIGNMENT_LEFT, -1, int(s * 0.7), gold)
-			"tea":
-				draw_circle(c + Vector2(0, s * 0.1), s * 0.7, Color("#F4EAD8"))
-				draw_circle(c + Vector2(0, s * 0.05), s * 0.52, Color("#7FBF6A"))
-				draw_arc(c + Vector2(s * 0.75, 0), s * 0.28, -1.4, 1.4, 12, gold, 4.0)
-			"fan":
-				for i in 7:
-					var a: = -2.5 + float(i) * 0.33
-					draw_line(c + Vector2(0, s * 0.8), c + Vector2(cos(a), sin(a)) * s * 1.05 + Vector2(0, s * 0.8), Color("#FF8FB8") if i % 2 == 0 else gold, 9.0)
-			"pin":
-				draw_line(c + Vector2(-s * 0.8, s * 0.8), c + Vector2(s * 0.6, -s * 0.6), Color("#7FE0B8"), 8.0)
-				draw_circle(c + Vector2(s * 0.7, -s * 0.7), s * 0.28, Color("#3FD09A"))
-				draw_arc(c + Vector2(s * 0.7, -s * 0.7), s * 0.28, 0, TAU, 16, line, 2.5)
-			_:
-				var pts2: = PackedVector2Array([c + Vector2(0, -s), c + Vector2(s * 0.28, -s * 0.3), c + Vector2(s, -s * 0.2), c + Vector2(s * 0.45, s * 0.25), c + Vector2(s * 0.6, s), c + Vector2(0, s * 0.55), c + Vector2(-s * 0.6, s), c + Vector2(-s * 0.45, s * 0.25), c + Vector2(-s, -s * 0.2), c + Vector2(-s * 0.28, -s * 0.3)])
-				draw_colored_polygon(pts2, gold)
-				draw_polyline(pts2, line, 3.0)
-				draw_string(ThemeDB.fallback_font, Vector2(c.x - s * 0.55, c.y + s * 0.2), "SSR", HORIZONTAL_ALIGNMENT_LEFT, -1, int(s * 0.55), Color("#8A1030"))
+
+func _make_reward_icon(kind: String, grand: bool) -> Control:
+	var box: = Control.new()
+	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if grand:
+		box.size = Vector2(152, 196)
+		var aura: = Sprite2D.new()
+		aura.texture = G.fx("glow")
+		aura.material = Fx.add_mat()
+		aura.position = Vector2(76, 86)
+		aura.scale = Vector2.ONE * 2.25
+		aura.modulate = Color(1.0, 0.84, 0.36, 0.62)
+		box.add_child(aura)
+		var pulse: = _flat_panel(Rect2(4, 14, 144, 144), Color(1.0, 0.84, 0.38, 0.22), 72)
+		box.add_child(pulse)
+		_glow.append(pulse)
+		var med: = V10VipBoudoirScreen._pill(Rect2(12, 22, 128, 128), Color(0.42, 0.10, 0.20, 0.96), Color("#FFE49C"), 64)
+		med.get_theme_stylebox("panel").set_border_width_all(3)
+		box.add_child(med)
+		box.add_child(V8Art.star_rect(true, Rect2(22, 30, 108, 108)))
+		var badge: = V10VipBoudoirScreen._pill(Rect2(34, 138, 84, 30), Color(0.68, 0.10, 0.24, 0.98), Color("#FFE9A6"), 15)
+		badge.add_child(UI.center_label(UI.label("SSR", 18, Color("#FFF7E4"), Color(0.22, 0.02, 0.08), 4, "body", 900), Rect2(0, -1, 84, 30)))
+		box.add_child(badge)
+		return box
+	if kind == "tea":
+		box.size = Vector2(124, 88)
+		var tg: = Sprite2D.new()
+		tg.texture = G.fx("glow")
+		tg.material = Fx.add_mat()
+		tg.position = Vector2(62, 44)
+		tg.scale = Vector2.ONE * 1.25
+		tg.modulate = Color(1.0, 0.82, 0.44, 0.28)
+		box.add_child(tg)
+		box.add_child(V8Art.rect(V8Art.icon("visits"), Rect2(0, 4, 78, 78)))
+		box.add_child(V8Art.rect(V8Art.cur("gem"), Rect2(60, 24, 60, 60)))
+		return box
+	box.size = Vector2(88, 88)
+	var glow: = Sprite2D.new()
+	glow.texture = G.fx("glow")
+	glow.material = Fx.add_mat()
+	glow.position = Vector2(44, 44)
+	glow.scale = Vector2.ONE * 1.15
+	match kind:
+		"ticket":
+			glow.modulate = Color(1.0, 0.80, 0.42, 0.28)
+			box.add_child(glow)
+			box.add_child(V8Art.rect(V8Art.cur("ticket"), Rect2(0, 0, 88, 88)))
+		"crystal":
+			glow.modulate = Color(1.0, 0.62, 0.84, 0.30)
+			box.add_child(glow)
+			box.add_child(V8Art.rect(V8Art.cur("gem"), Rect2(1, 1, 86, 86)))
+		"fan", "pin":
+			glow.modulate = Color(1.0, 0.68, 0.80, 0.30)
+			box.add_child(glow)
+			box.add_child(V8Art.rect(V8Art.icon("gift"), Rect2(3, 3, 82, 82)))
+		_:
+			glow.modulate = Color(1.0, 0.84, 0.38, 0.32)
+			box.add_child(glow)
+			box.add_child(V8Art.star_rect(true, Rect2(2, 2, 84, 84)))
+	return box

@@ -863,7 +863,7 @@ func _build_v10(mail_new: bool) -> void :
 func _build_quick_ui(L: Dictionary) -> void:
 	var vw: = get_viewport_rect().size.x
 	var pr: Rect2 = L.get("partner", Rect2(24, H - 300, 200, 80))
-	var ay: = pr.position.y - 150.0
+	var ay: = pr.position.y - 196.0
 	var hs: = _switch_heroes()
 	if hs.size() > 1:
 		for dir in [-1, 1]:

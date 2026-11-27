@@ -10,17 +10,26 @@ const PAID_MAX: = 5
 const WHEEL_TEX: = "res://assets/v10/hf_ui/wheel_fortune_bg.webp"
 const WHEEL_PX: = 560.0
 
-# Clockwise from the top; sector i is centred at i * 45 degrees.
+# Clockwise from the top; golden spokes lie at i * 45 deg, so sector i is centred at (i + 0.5) * 45 deg.
 const SECTORS: Array[Dictionary] = [
-	{"label": "300 крист.", "gems": 300, "w": 3},
-	{"label": "2 Билета", "tickets": 2, "w": 5},
-	{"label": "+80 Чая", "tea": 80, "w": 30},
-	{"label": "Шёлковый веер ♥", "gift": "gift_silk_fan", "w": 6},
-	{"label": "150 крист.", "gems": 150, "w": 15},
-	{"label": "1 500 монет", "coins": 1500, "w": 36},
-	{"label": "Нефритовая заколка ♥", "gift": "gift_jade_pin", "w": 2},
-	{"label": "ДЖЕКПОТ · 800 крист.", "gems": 800, "w": 1, "jackpot": true},
+	{"label": "300 крист.", "short": "300\nкрист.", "gems": 300, "w": 3},
+	{"label": "2 Билета", "short": "2\nБилета", "tickets": 2, "w": 5},
+	{"label": "+80 Чая", "short": "+80\nЧая", "tea": 80, "w": 30},
+	{"label": "Шёлковый веер ♥", "short": "Веер\n♥", "gift": "gift_silk_fan", "w": 6},
+	{"label": "150 крист.", "short": "150\nкрист.", "gems": 150, "w": 15},
+	{"label": "1 500 монет", "short": "1 500\nмонет", "coins": 1500, "w": 36},
+	{"label": "Нефритовая заколка ♥", "short": "Заколка\n♥", "gift": "gift_jade_pin", "w": 2},
+	{"label": "ДЖЕКПОТ · 800 крист.", "short": "800\nДЖЕКПОТ", "gems": 800, "w": 1, "jackpot": true},
 ]
+
+
+static func sector_angle_deg(idx: int) -> float:
+	return (float(idx) + 0.5) * 45.0
+
+
+static func sector_short_label(idx: int) -> String:
+	var d: Dictionary = SECTORS[posmod(idx, SECTORS.size())]
+	return str(d.get("short", d.get("label", "")))
 
 
 static func state() -> Dictionary:
@@ -146,7 +155,14 @@ func build(m, _args: Dictionary) -> void:
 	base.size = br.size
 	base.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(base)
-	Common.vignette(self, size, Color(0.34, 0.04, 0.1), 0.55).mouse_filter = Control.MOUSE_FILTER_IGNORE
+	Common.backdrop(self, "bg_palace", size, 2.2, 0.42).mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var scrim: = ColorRect.new()
+	scrim.color = Color(0.15, 0.02, 0.08, 0.44)
+	scrim.position = br.position
+	scrim.size = br.size
+	scrim.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(scrim)
+	Common.vignette(self, size, Color(0.34, 0.04, 0.1), 0.52).mouse_filter = Control.MOUSE_FILTER_IGNORE
 	Fx.ambient(self, "petals", size)
 	var back_b: = V10VipBoudoirScreen._pill(Rect2(16, 18, 56, 52), Color(0.13, 0.06, 0.19, 0.9), Color("#E8C47E"), 16)
 	back_b.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -160,10 +176,18 @@ func build(m, _args: Dictionary) -> void:
 	_info = UI.center_label(UI.label("", 22, Color("#F4D48A"), Color(0.08, 0.02, 0.12), 4, "body", 800), Rect2(20, 92, W - 40, 34))
 	add_child(_info)
 	_center = Vector2(W * 0.5, clampf(H * 0.37, 440.0, 620.0))
+	var aura: = Sprite2D.new()
+	aura.texture = G.fx("glow")
+	aura.material = Fx.add_mat()
+	aura.position = _center
+	aura.scale = Vector2.ONE * 7.2
+	aura.modulate = Color(1.0, 0.78, 0.36, 0.24)
+	add_child(aura)
 	_wheel = _Wheel.new()
 	_wheel.size = Vector2(WHEEL_PX, WHEEL_PX)
 	_wheel.position = _center - _wheel.size * 0.5
 	_wheel.pivot_offset = _wheel.size * 0.5
+	_wheel.rotation_degrees = 360.0 - sector_angle_deg(7)
 	_wheel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_wheel)
 	_wheel.setup()
@@ -225,9 +249,8 @@ func _on_spin() -> void:
 	if main != null and main.has_method("refresh_currency"):
 		main.refresh_currency(true)
 	var idx: = int(res.sector)
-	var off: = randf_range(-17.0, 17.0)
 	var cur: = _wheel.rotation_degrees
-	var target: = floorf(cur / 360.0) * 360.0 + 360.0 * 6.0 - (float(idx) * 45.0 + 22.5) + off
+	var target: = (floorf(cur / 360.0) + 6.0) * 360.0 - sector_angle_deg(idx)
 	_last_tick = _sector_under()
 	Sfx.play("whoosh", 1.0, -6.0)
 	var tw: = create_tween()
@@ -259,7 +282,12 @@ func _on_stopped(res: Dictionary) -> void:
 	Fx.burst(_fx, _center, "sparkle", 48 if jackpot else 26)
 	Fx.burst(_fx, _center, "heart", 12)
 	Fx.flash_glow(_fx, _center, Color(1, 0.85, 0.5), 4.0 if jackpot else 2.4, 0.6)
-	Fx.float_text(_fx, _center + Vector2(0, -80), "+ " + str(res.label), Color("#FFE9A6"), 40)
+	var fl: = Fx.float_text(_fx, _center + Vector2(0, -80), "+ " + str(res.label), Color("#FFE9A6"), 36)
+	Common.fit_line(fl, W - 48.0, 22)
+	fl.position.x = 24.0
+	fl.size.x = W - 48.0
+	fl.pivot_offset.x = (W - 48.0) * 0.5
+	fl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	if main != null and main.has_method("refresh_currency"):
 		main.refresh_currency(true)
 	_refresh()
@@ -280,21 +308,38 @@ class _Wheel extends Control:
 			tr.texture = _art
 			tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 			tr.stretch_mode = TextureRect.STRETCH_SCALE
+			tr.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 			tr.size = size
 			tr.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			add_child(tr)
+		var R: = size.x * 0.5
+		var mid_r: = R * 0.58
+		var bw: = 96.0
+		var bh: = 52.0
 		for i in SECTORS.size():
 			var arm: = Control.new()
 			arm.position = size * 0.5
-			arm.rotation = deg_to_rad(float(i) * 45.0 + 22.5)
+			arm.rotation = deg_to_rad(V10LuckyWheelScreen.sector_angle_deg(i))
 			arm.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			add_child(arm)
-			var lb: = UI.label(str(SECTORS[i].label), 21, Color("#FFF8E8"), Color(0.2, 0.0, 0.05, 0.95), 5, "body", 900)
-			lb.position = Vector2(-65, -236)
-			lb.size = Vector2(130, 92)
+			var txt: = V10LuckyWheelScreen.sector_short_label(i)
+			var lb: = UI.label(txt, 17, Color("#FFFFFF"), Color(0.13, 0.01, 0.05, 0.98), 5, "body", 900)
+			var ls: LabelSettings = lb.label_settings
+			ls.line_spacing = -2.0
+			var fs: int = ls.font_size
+			while fs > 14:
+				var widest: = 0.0
+				for ln in txt.split("\n"):
+					widest = maxf(widest, ls.font.get_string_size(ln, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x + 6.0)
+				if widest <= 88.0:
+					break
+				fs -= 1
+			ls.font_size = fs
+			lb.position = Vector2(-bw * 0.5, -mid_r - bh * 0.5)
+			lb.size = Vector2(bw, bh)
 			lb.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			lb.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-			V10VipBoudoirScreen.wrap_size(lb, Vector2(130, 92))
+			lb.autowrap_mode = TextServer.AUTOWRAP_OFF
 			lb.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			arm.add_child(lb)
 

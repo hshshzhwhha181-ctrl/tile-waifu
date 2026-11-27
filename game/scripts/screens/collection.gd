@@ -144,7 +144,8 @@ func _build() -> void :
 
 	_hero_row()
 
-	var floor_y: = H - 132 - 250
+	var strip_y: = H - 132.0 - 236.0
+	var floor_y: = H - 132.0 - 250.0
 	var ped: = Sprite2D.new()
 	ped.texture = G.fx("glow")
 	ped.material = Fx.add_mat()
@@ -161,7 +162,7 @@ func _build() -> void :
 	# Full-color, full-size portrait showcase for ANY selected outfit (owned OR locked!)
 	if not sel_it.is_empty():
 		var fr_w: = W - 320.0
-		var fr_h: = minf(floor_y - BODY_Y - 10.0, 780.0)
+		var fr_h: = maxf(320.0, strip_y - 24.0 - BODY_Y)
 		var fr_wrap: = Control.new()
 		fr_wrap.name = "PortraitFrame"
 		fr_wrap.position = Vector2(14, BODY_Y)
@@ -271,13 +272,25 @@ func _build() -> void :
 		UI.slide_in(hero, Vector2(-60, 0), 0.0, 0.5)
 
 	# Right Heroine & Outfit Action Card (0.12: V10AffCurve progress + next 16+ rubezh, «Будуар ♥», Wave-1 ready)
+	var card_w: = 284.0
 	var card_h: = minf(572.0, floor_y - BODY_Y - 8.0)
-	var ic: = UI.rbox("glass", Rect2(W - 300, BODY_Y, 284, card_h), 28, 4, 12)
+	var ic: = UI.rbox("glass", Rect2(W - 300, BODY_Y, card_w, card_h), 28, 4, 12)
 	ic.name = "HeroCard"
 	stage.add_child(ic)
-	var nm: = UI.title(G.HEROES[cur].name, 30, Color("fff6e8"), UI.DARK)
+	var max_nw: = card_w - 88.0
+	var nm: = UI.title(G.HEROES[cur].name, 28, Color("fff6e8"), UI.DARK)
 	nm.position = Vector2(18, 12)
-	Common.fit_line(nm, 176.0 if W1_NEW.has(cur) else 248.0, 22)
+	var nm_ls: LabelSettings = nm.label_settings
+	var nm_pad: = float(nm_ls.outline_size)
+	for fs in [28, 24, 22, 20]:
+		var f: Font = UI.font_for("title", fs, 900)
+		nm_ls.font = f
+		nm_ls.font_size = fs
+		if f.get_string_size(nm.text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x + nm_pad <= max_nw:
+			break
+	nm.size = Vector2(max_nw, 42.0)
+	nm.clip_text = true
+	nm.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	ic.add_child(nm)
 	var h_rank: = _hero_rank(cur)
 	var rk_col: Color = V10Rank.color(h_rank)
@@ -396,7 +409,7 @@ func _build() -> void :
 	ic.add_child(bd_btn)
 	UI.slide_in(ic, Vector2(60, 0), 0.1)
 
-	var strip: = UI.rbox("cream", Rect2(14, H - 132 - 236, W - 28, 226), 28, 4, 12)
+	var strip: = UI.rbox("cream", Rect2(14, strip_y, W - 28, 226), 28, 4, 12)
 	strip.set_param("pattern", 1.0)
 	stage.add_child(strip)
 	var n_own: = G.ITEMS.filter( func(x): return x.get("hero", "") == cur and G.owns(x.id)).size()

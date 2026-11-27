@@ -252,6 +252,12 @@ static func grant_gift(gift_id: String, count: int = 1) -> int:
 	return int(inv[gift_id])
 
 
+static func add_date_aff(hero: String, aff: int) -> void:
+	if hero == "" or aff <= 0:
+		return
+	G.add_aff(hero, aff)
+
+
 static func _apply_gift_xp(hero: String, aff: int) -> int:
 	if hero == "" or aff <= 0:
 		return 0
