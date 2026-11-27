@@ -106,7 +106,7 @@ func _lbl(parent: Control, text: String, pos: Vector2, fsize: = 18, color: = UI.
 
 
 func _identity() -> void :
-	var c: = _section(206, "plum")
+	var c: = _section(318, "plum")
 	var p: = G.profile()
 	var av: String = str(p.get("avatar", "mc"))
 	# 0.8 art: the round portrait in the gold avatar frame (V8Art.avatar; the ornate frame from Дракон up)
@@ -143,6 +143,33 @@ func _identity() -> void :
 		since = "%s.%s.%s" % [dp[2], dp[1], dp[0]]
 	var sl: = _lbl(c, V8ProfileUI.s("profile.since") % [str(p.get("id", "")), since], Vector2(x + 2, 172), 16, Color(0.75, 0.7, 0.65, 0.8), cw - x - 24)
 	sl.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	_account_row(c)
+
+
+# 0.12: «Аккаунт и Облако» — the gold entry to sign-in / cloud save (v10account), with a mini status of the cloud
+# link and the online PvP rating from G.S.v10_online
+func _account_row(c: Control) -> void:
+	var on = G.S.get("v10_online", {})
+	var o: Dictionary = on if on is Dictionary else {}
+	var prov: = str(o.get("provider", o.get("auth_provider", "")))
+	var linked: = prov != "" or bool(o.get("linked", false)) or str(o.get("token", "")) != ""
+	var elo: = int(o.get("elo", o.get("pvp_elo", 1000)))
+	var ab: = JButton.make("Аккаунт и Облако · Яндекс / Google / VK / TG ›", "gold", Rect2(16, 208, cw - 32, 66), null, 21)
+	ab.name = "AccountBtn"
+	ab.pressed.connect(func():
+		if main.SCREENS.has("v10account"):
+			main.go("v10account", {"from": "profile"})
+		else:
+			main.toast("Вход и облако откроются с обновлением сервера", "star"))
+	c.add_child(ab)
+	var dot: = UI.rbox("mint" if linked else "graphite", Rect2(28, 288, 14, 14), 7, 2, 2)
+	dot.colors(Color(0.45, 0.85, 0.6) if linked else Color(0.55, 0.5, 0.55), Color(0.2, 0.55, 0.38) if linked else Color(0.3, 0.27, 0.3))
+	dot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	c.add_child(dot)
+	var cloud: = ("Облако: %s" % prov.capitalize()) if linked and prov != "" else ("Облако подключено" if linked else "Облако: не подключено")
+	var st: = _lbl(c, "%s · PvP ELO %d" % [cloud, elo], Vector2(50, 280), 18, Color(0.95, 0.86, 0.62) if linked else UI.MUTED, cw - 74)
+	st.name = "CloudStatus"
+	st.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 
 
 func _fit(l: Label, kind: String, big: int, small: int) -> void :

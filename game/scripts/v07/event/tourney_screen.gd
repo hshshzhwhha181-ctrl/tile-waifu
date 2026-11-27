@@ -61,8 +61,10 @@ func _dev() -> Dictionary:
 
 func _tabs() -> void :
 	var r: = Rect2(16, Y_TABS, W - 32, 64)
-	var seg: = UI.rbox("glass", r, 32, 2, 6)
-	seg.borders(Color(1, 0.9, 0.7, 0.4), Color(0, 0, 0, 0.4))
+	# 0.12 imperial: royal plum velvet segment under an antique gold rim, the open tab a gold lacquer pill
+	var seg: = UI.rbox("plum", r, 32, 2, 6)
+	seg.colors(Color(0.2, 0.09, 0.27, 0.95), Color(0.1, 0.04, 0.14, 0.97))
+	seg.borders(Color(0.902, 0.765, 0.471, 0.85), Color(0.42, 0.27, 0.09, 0.9))
 	add_child(seg)
 	var bw: = (r.size.x - 8) * 0.5
 	for i in 2:
@@ -73,8 +75,9 @@ func _tabs() -> void :
 		c.size = Vector2(bw, 64)
 		c.mouse_filter = Control.MOUSE_FILTER_STOP
 		seg.add_child(c)
-		var pill: = UI.rbox("pink", Rect2(0, 4, bw, 56), 28, 3, 4)
-		pill.borders(Color("ffe7a6"), Color("c58a2c"))
+		var pill: = UI.rbox("gold", Rect2(0, 4, bw, 56), 28, 3, 4)
+		pill.colors(Color(1.0, 0.91, 0.6), Color(0.8, 0.54, 0.17))
+		pill.borders(Color(1.0, 0.97, 0.82), Color(0.5, 0.3, 0.06))
 		pill.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		pill.name = "Pill"
 		c.add_child(pill)
@@ -95,9 +98,9 @@ func _paint_tabs() -> void :
 		var on: bool = id == tab
 		(c.get_node("Pill") as Control).visible = on
 		var l: Label = c.get_node("L")
-		l.label_settings.font_color = Color.WHITE if on else UI.INK
-		l.label_settings.outline_color = UI.PAL.pink[2] if on else UI.DARK
-		l.label_settings.outline_size = 5 if on else 3
+		l.label_settings.font_color = Color(0.25, 0.11, 0.02) if on else Color(0.96, 0.9, 0.8)
+		l.label_settings.outline_color = Color(1.0, 0.96, 0.82, 0.7) if on else Color(0.08, 0.02, 0.11)
+		l.label_settings.outline_size = 2 if on else 3
 
 func _show(id: String, animate: bool) -> void :
 	tab = id
@@ -206,7 +209,7 @@ func _tables(t: Dictionary) -> void :
 		var cfg: = V7Ladder.table_cfg(k, int(t.start))
 		var r: = Rect2(16 + k * (bw + 10), y, bw, TABLE_H)
 		var c: = UI.rbox("plum", r, 24, 3, 8)
-		c.colors(Color(0.14, 0.08, 0.16, 0.96), Color(0.08, 0.04, 0.1, 0.97)).borders(Color("ffe7a6"), Color("c58a2c"))
+		c.colors(Color(0.2, 0.09, 0.26, 0.96), Color(0.1, 0.04, 0.14, 0.97)).borders(Color("ffe7a6"), Color("c58a2c"))
 		c.mouse_filter = Control.MOUSE_FILTER_STOP
 		c.pivot_offset = r.size * 0.5
 		page.add_child(c)
@@ -241,7 +244,8 @@ func _tables(t: Dictionary) -> void :
 		table_btns.append(c)
 
 func _frame(top: float, bottom: float, title: String) -> void :
-	var frame: = UI.rbox("glass", Rect2(16, top, W - 32, bottom - top), 26, 3, 8)
+	var frame: = UI.rbox("plum", Rect2(16, top, W - 32, bottom - top), 26, 3, 8)
+	frame.colors(Color(0.13, 0.06, 0.17, 0.82), Color(0.07, 0.03, 0.1, 0.9))
 	frame.borders(Color("ffe7a6"), Color("c58a2c"))
 	page.add_child(frame)
 	var hd: = UI.label(title, 17, Color("bfb3a8"), UI.DARK, 2, "body", 900)
@@ -312,10 +316,14 @@ func _row(r: Dictionary, place: int, z: String, value: String, tier: int, ctx: D
 	c.size = Vector2(rw, ROW_H)
 	c.mouse_filter = Control.MOUSE_FILTER_PASS
 	var me: bool = r.me
-	var bg: = UI.rbox("pink" if me else "plum", Rect2(0, 0, rw, ROW_H), 20, 2 if me else 1, 4)
-	if not me:
-		bg.colors(Color(0.16, 0.14, 0.17, 0.85), Color(0.1, 0.09, 0.11, 0.9))
-		bg.borders(Color("a9d9c4") if z == "up" else (Color("e3a3b2") if z == "down" else Color(1, 1, 1, 0.08)), Color(0, 0, 0, 0.3))
+	var bg: = UI.rbox("plum", Rect2(0, 0, rw, ROW_H), 20, 2 if me else 1, 4)
+	# 0.12 imperial: rows on plum velvet; my own row a brighter royal plum under a gold rim (no pastel pink)
+	if me:
+		bg.colors(Color(0.42, 0.14, 0.34, 0.96), Color(0.24, 0.06, 0.2, 0.97))
+		bg.borders(Color(1.0, 0.9, 0.6), Color(0.66, 0.44, 0.14))
+	else:
+		bg.colors(Color(0.15, 0.09, 0.18, 0.86), Color(0.09, 0.05, 0.11, 0.9))
+		bg.borders(Color("a9d9c4") if z == "up" else (Color(0.86, 0.42, 0.44) if z == "down" else Color(0.9, 0.76, 0.47, 0.16)), Color(0, 0, 0, 0.3))
 	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	c.add_child(bg)
 	var pc: = Color("ffd34d") if place == 1 else (Color("e9e4ff") if place == 2 else (Color("d99a6c") if place == 3 else Color("ddd2c4")))

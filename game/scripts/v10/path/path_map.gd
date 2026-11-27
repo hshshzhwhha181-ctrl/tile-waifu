@@ -553,7 +553,11 @@ func _build_header() -> void:
 	hdr.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	hdr.name = "ArcPlate"
 	add_child(hdr)
-	var shade: = Common.edge_shade(self, Rect2(0, 0, W, TOP_INSET + HDR_H + 60), 1, Color(0.075, 0.05, 0.09), 0.96, 0.55)
+	# 0.12: the night under the arc plate stays solid down to the plate's bottom rim (+10 px safe gap), then fades over
+	# 70 px — nodes, chests and their «★ 0/25» badges scrolling up pass under the plate instead of peeking out beside it
+	var shade_h: = TOP_INSET + HDR_H + 80.0
+	var shade: = Common.edge_shade(self, Rect2(0, 0, W, shade_h), 1, Color(0.075, 0.05, 0.09), 0.98, (TOP_INSET + 6.0 + HDR_H + 10.0) / shade_h)
+	shade.name = "HdrShade"
 	move_child(shade, hdr.get_index())
 	var w: = hdr.size.x
 	var cov: = Rules.cover(arc)

@@ -489,6 +489,8 @@ func _say(text: String) -> void :
 	if live and is_instance_valid(live):
 		live.say(text, "", "", false)
 		return
+	if toast_left_ms() > 0:
+		return
 	if bubble:
 		bubble.queue_free()
 	var head: = V10Layout.local_of(self, hero.head_global())
@@ -507,12 +509,24 @@ func v8_toast_rect() -> Rect2:
 	return Rect2(32.0, py - 112.0, W - 64.0, 80.0)
 
 func v8_toast_shown(dur: float) -> void :
+	# 0.12: a toast and her speech bubble share the band over the action row — the bubble goes at once (no fade
+	# under the toast) and no new bubble rises while the toast is up (V9HomeLive.say waits for toast_left_ms())
+	_toast_until_ms = Time.get_ticks_msec() + int(dur * 1000.0) + 250
 	if bubble and is_instance_valid(bubble):
 		var b: = bubble
 		bubble = null
-		var t: Tween = b.create_tween()
-		t.tween_property(b, "modulate:a", 0.0, 0.12)
-		t.tween_callback(b.queue_free)
+		b.visible = false
+		b.queue_free()
+	if live and is_instance_valid(live) and live.bubble and is_instance_valid(live.bubble):
+		live.bubble.visible = false
+		live.bubble.queue_free()
+		live.bubble = null
+
+var _toast_until_ms: = 0
+
+# ms left of the toast now shown over home (0 = none)
+func toast_left_ms() -> int:
+	return maxi(0, _toast_until_ms - Time.get_ticks_msec())
 
 # a touch on her head (main.run_demo, dev «pet»): the same reaction as a real tap there
 func on_hero_tap() -> void :
@@ -823,6 +837,8 @@ func _build_v10(mail_new: bool) -> void :
 	st_pill.set_meta("ux_role", "tertiary")
 	home2.add_child(st_pill)
 	_build_framing_ui(L, ph_r)
+	if not V10Look.previewing():
+		_build_quick_ui(L)
 	var sm_disc: = V10ShopHub.model()
 	if sm_disc != null and sm_disc.econ.shop.month_days_left() > 0:
 		var md: = V10MonthDisc.make(sm_disc, false)
@@ -837,6 +853,111 @@ func _build_v10(mail_new: bool) -> void :
 		pb_bar.closed.connect(func(to_b: bool):
 			if not to_b and is_inside_tree():
 				refresh_badges())
+
+
+# ── 0.12: quick heroine switcher (‹ › lacquer arrows, «Наряд» chip) + gold pills «Колесо Удачи» / «7 Дней · SSR» ─────
+# The arrows sit on both screen edges below the middle (clear of her face, the lanterns and the action dock); one
+# tap makes the next / previous unlocked heroine the partner and rebuilds the tea house at once (she greets you).
+# The chip cycles her owned outfits. The pills sit under the lanterns on the left edge, never over them, with a dot
+# when the wheel spin / the 7-day gift is ready; they open v10wheel / v10welcome7 when those screens are registered.
+func _build_quick_ui(L: Dictionary) -> void:
+	var vw: = get_viewport_rect().size.x
+	var pr: Rect2 = L.get("partner", Rect2(24, H - 300, 200, 80))
+	var ay: = pr.position.y - 150.0
+	var hs: = _switch_heroes()
+	if hs.size() > 1:
+		for dir in [-1, 1]:
+			var b: = JButton.make("‹" if dir < 0 else "›", "plum", Rect2(10.0 if dir < 0 else vw - 74.0, ay, 64, 64), null, 34, 32.0, false)
+			b.name = "HeroPrev" if dir < 0 else "HeroNext"
+			b.set_meta("ux_role", "tertiary")
+			var d: int = dir
+			b.pressed.connect(func(): _switch_hero(d))
+			home2.add_child(b)
+	var outs: = _outfit_cycle(str(G.S.partner))
+	if outs.size() > 1:
+		var ob: = JButton.make("Наряд ›", "gold", Rect2(vw - 150.0, ay + 76.0, 140, 48), null, 18, 24.0, false)
+		ob.name = "OutfitNext"
+		ob.set_meta("ux_role", "tertiary")
+		ob.pressed.connect(_switch_outfit)
+		home2.add_child(ob)
+	# pills under the lanterns (left edge)
+	var low: = (L.avatar as Rect2).end.y + 8.0
+	for lt in home2.lantern_tr:
+		var c: Control = lt
+		if c.visible:
+			low = maxf(low, c.position.y + c.size.y)
+	var py: = low + 10.0
+	var pills: = [["v10wheel", "Колесо Удачи", _wheel_ready()], ["v10welcome7", "7 Дней · SSR", _welcome7_ready()]]
+	for i in pills.size():
+		var pd: Array = pills[i]
+		var pb: = JButton.make(String(pd[1]), "gold", Rect2(20.0, py + i * 56.0, 206, 46), null, 18, 23.0, false)
+		pb.name = "Pill_" + String(pd[0])
+		pb.set_meta("ux_role", "tertiary")
+		var sid: String = pd[0]
+		pb.pressed.connect(func():
+			if main.SCREENS.has(sid):
+				main.go(sid, {"from": "home"})
+			else:
+				main.toast("Скоро в чайной", "star"))
+		if bool(pd[2]):
+			pb.badge("•")
+		home2.add_child(pb)
+
+
+func _switch_heroes() -> Array:
+	var out: = []
+	for h in G.HEROES:
+		if G.hero_unlocked(str(h)) and Hero.RIGS.has(str(h)):
+			out.append(str(h))
+	return out
+
+
+func _switch_hero(dir: int) -> void:
+	var hs: = _switch_heroes()
+	if hs.size() < 2:
+		return
+	var i: = maxi(0, hs.find(str(G.S.partner)))
+	G.S.partner = hs[(i + dir + hs.size()) % hs.size()]
+	G.save()
+	main.go("home")
+
+
+# "" (base look) + her owned outfits, in catalogue order
+func _outfit_cycle(h: String) -> Array:
+	var out: = [""]
+	for id in G.ITEM:
+		var it = G.ITEM[id]
+		if it is Dictionary and str(it.get("hero", "")) == h and G.owns(str(id)) and not (str(id) in G.BASE_OUTFITS):
+			out.append(str(id))
+	return out
+
+
+func _switch_outfit() -> void:
+	var h: = str(G.S.partner)
+	var outs: = _outfit_cycle(h)
+	if outs.size() < 2:
+		return
+	var i: = maxi(0, outs.find(G.equipped(h)))
+	G.S.outfit[h] = outs[(i + 1) % outs.size()]
+	G.save()
+	main.go("home")
+
+
+static func _day_key() -> String:
+	return V10Meta.day_key()
+
+
+func _wheel_ready() -> bool:
+	var w = G.S.get("v10_wheel", {})
+	return not (w is Dictionary) or str((w as Dictionary).get("last_day", (w as Dictionary).get("day", ""))) != _day_key()
+
+
+func _welcome7_ready() -> bool:
+	var w = G.S.get("v10_welcome7", {})
+	if not (w is Dictionary):
+		return true
+	var wd: Dictionary = w
+	return int(wd.get("claimed", wd.get("day", 0))) < 7 and str(wd.get("last_day", "")) != _day_key()
 
 
 # V9HomeLive calls this after a touch added affection: the partner plate shows the new number

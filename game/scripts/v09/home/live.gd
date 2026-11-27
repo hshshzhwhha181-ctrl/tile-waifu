@@ -71,6 +71,7 @@ var idle_t: = 0.0
 var next_micro: = 8.0
 var idle_lines: = 0
 var bubble: Control
+var _say_wait: = 0
 var fps_lbl: Label
 var zones_dbg: = false
 var _t: = 0.0
@@ -547,6 +548,16 @@ func _end_patch() -> void:
 func say(text: String, emo: = "", voice: = "", talk: = true) -> void:
 	if text == "":
 		return
+	# 0.12: never over a toast — the line waits until the toast is gone (only the latest waiting line is said)
+	if home and home.has_method("toast_left_ms"):
+		var left: = int(home.call("toast_left_ms"))
+		if left > 0 and is_inside_tree():
+			_say_wait += 1
+			var ticket: = _say_wait
+			get_tree().create_timer(float(left) / 1000.0 + 0.05).timeout.connect(func():
+				if is_instance_valid(self) and ticket == _say_wait:
+					say(text, emo, voice, talk))
+			return
 	if bubble and is_instance_valid(bubble):
 		bubble.queue_free()
 	var with_av: = not (mode in ["rig", "rig10"])
