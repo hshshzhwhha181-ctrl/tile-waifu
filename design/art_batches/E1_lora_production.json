@@ -1,0 +1,2494 @@
+{
+ "schema_version": 1,
+ "package": "P53",
+ "title": "Production run LoRA v2: 24 table backgrounds, 10 salon zones, 12 koikoi months, tiles and FX",
+ "week": 2,
+ "section": "Environments (LoRA v2)",
+ "status": "ready_for_owner_approval",
+ "in_plan_ceiling": true,
+ "blocked_by": [],
+ "depends_on": [
+  "E0"
+ ],
+ "owner_gate": "E0 gates G1-G5 passed and the owner picked the checkpoint; box rented by the owner (M3)",
+ "budget": {
+  "currency": "higgsfield_credits",
+  "nominal_cr": 267.9,
+  "hard_stop_cr": 308.09,
+  "hard_stop_rule": "nominal + 15%: above that the run stops and the owner is asked",
+  "assumptions": [
+   "box 1.5 h x 134 cr/h = 201 cr",
+   "0.085 cr per image (measured on v1)",
+   "model load 7 cr x 3 sessions"
+  ]
+ },
+ "candidates_policy": "8 candidates per background (46 x 8 = 368), 16 per tile set (64), 12 per FX (108): 540 images at 0.085 cr; 3 sessions with a model load each",
+ "selection": {
+  "keep_per_task": 1,
+  "gate": "palette (image_stats.py) + AD pass; 46 finalists go to E2",
+  "criteria": [
+   "palette: dark saturated, pink/lavender share not above the base model's 0.1 on backgrounds",
+   "no text, glyphs, signs with letters; no characters; center free for the board (backgrounds)",
+   "tile frames: same material language across the four sets, passes the contrast rule of GDD 7.2",
+   "FX on pure black (additive-blend ready), no hard border, no text"
+  ]
+ },
+ "pilot": {
+  "task_ids": [
+   "E1.table_teahouse_spring_night",
+   "E1.salon_mc",
+   "E1.tiles_lacquer",
+   "E1.fx_sakura_burst"
+  ],
+  "candidates_per_task": 2,
+  "max_cr": 0.68,
+  "go_rule": "2 candidates each inside session A/B/C budget; box time is not a pilot cost: owner stays at the box for this run"
+ },
+ "tool_note": "LoRA tw_master_v2 on the rented H200 box via gen.py (9 steps, guidance 0, trigger 'twmaster2 style'). This is not a Higgsfield gpt call.",
+ "guards": [
+  "Before each launch: estimate_*_cost -> quote_ref; abort the task when the quote is above max_credits.",
+  "Actual spend goes to design/art_batches/SPEND_LOG.csv; more than 15% over the batch nominal = stop and ask the owner.",
+  "Every output lands in assets/incoming, then double anatomy audit -> metadata scrub -> watermark pass -> manifest `approve`.",
+  "Prompts are untested: run the pilot tasks first (2-3 frames), look at them, only then release the rest."
+ ],
+ "notes": [],
+ "batch_id": "E1",
+ "tasks": [
+  {
+   "id": "E1.box_rental",
+   "seed": 574356,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "infra",
+   "kind": "gpu_box",
+   "media": "gpu",
+   "tool": "gpu_rent",
+   "model": "H200",
+   "prompt": "Rent one H200 for the production run; stop it right after the last session.",
+   "candidates": 1,
+   "unit_cost_cr": 201.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "gpu": {
+    "type": "H200",
+    "count": 1,
+    "max_credits_per_hour": 134,
+    "expected_hours": 1.5
+   },
+   "quota_cr": 201.0,
+   "max_credits": 201.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/box_rental",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.model_load_A",
+   "seed": 731827,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_A",
+   "kind": "model_load",
+   "media": "gpu",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "Load tw_master_v2 into VRAM for session A (fixed cost).",
+   "candidates": 1,
+   "unit_cost_cr": 7.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "session": "A",
+   "quota_cr": 7.0,
+   "max_credits": 7.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/model_load_A",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.table_teahouse_spring_day",
+   "seed": 947411,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_A",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, environments, tea house courtyard in daylight with lacquered pillars and paper screens, cherry blossoms drifting, daytime, empty calm center for a game board, rich saturated painted anime gacha background, luminous warm daylight, clear colors, thin warm-colored lineart, soft painterly shading, empty scene, no characters, clean image with no lettering",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "9:16",
+    "resolution": "native",
+    "width": 768,
+    "height": 1344
+   },
+   "candidates": 8,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "A",
+   "quality": "native",
+   "quota_cr": 0.68,
+   "max_credits": 0.68,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/table_teahouse_spring_day",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.table_teahouse_spring_night",
+   "seed": 265483,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_A",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, environments, Chinese-style tea house veranda with a lacquered pavilion, sliding screens and hanging lanterns, cherry blossoms drifting, night, empty calm center for a game board, rich saturated painted anime gacha background, deep night palette with glowing practical lights, volumetric light shafts, warm and cool color contrast, glossy wet reflections, thin warm-colored lineart, soft painterly shading, empty scene, no characters, clean image with no lettering",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "9:16",
+    "resolution": "native",
+    "width": 768,
+    "height": 1344
+   },
+   "candidates": 8,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "A",
+   "quality": "native",
+   "quota_cr": 0.68,
+   "max_credits": 0.68,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/table_teahouse_spring_night",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.table_teahouse_summer_day",
+   "seed": 433977,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_A",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, environments, tea house courtyard in daylight with lacquered pillars and paper screens, lush green leaves and fireflies, daytime, empty calm center for a game board, rich saturated painted anime gacha background, luminous warm daylight, clear colors, thin warm-colored lineart, soft painterly shading, empty scene, no characters, clean image with no lettering",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "9:16",
+    "resolution": "native",
+    "width": 768,
+    "height": 1344
+   },
+   "candidates": 8,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "A",
+   "quality": "native",
+   "quota_cr": 0.68,
+   "max_credits": 0.68,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/table_teahouse_summer_day",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.table_teahouse_summer_night",
+   "seed": 438271,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_A",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, environments, Chinese-style tea house veranda with a lacquered pavilion, sliding screens and hanging lanterns, lush green leaves and fireflies, night, empty calm center for a game board, rich saturated painted anime gacha background, deep night palette with glowing practical lights, volumetric light shafts, warm and cool color contrast, glossy wet reflections, thin warm-colored lineart, soft painterly shading, empty scene, no characters, clean image with no lettering",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "9:16",
+    "resolution": "native",
+    "width": 768,
+    "height": 1344
+   },
+   "candidates": 8,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "A",
+   "quality": "native",
+   "quota_cr": 0.68,
+   "max_credits": 0.68,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/table_teahouse_summer_night",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.table_teahouse_autumn_day",
+   "seed": 688715,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_A",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, environments, tea house courtyard in daylight with lacquered pillars and paper screens, red maple leaves falling, daytime, empty calm center for a game board, rich saturated painted anime gacha background, luminous warm daylight, clear colors, thin warm-colored lineart, soft painterly shading, empty scene, no characters, clean image with no lettering",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "9:16",
+    "resolution": "native",
+    "width": 768,
+    "height": 1344
+   },
+   "candidates": 8,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "A",
+   "quality": "native",
+   "quota_cr": 0.68,
+   "max_credits": 0.68,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/table_teahouse_autumn_day",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.table_teahouse_autumn_night",
+   "seed": 811256,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_A",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, environments, Chinese-style tea house veranda with a lacquered pavilion, sliding screens and hanging lanterns, red maple leaves falling, night, empty calm center for a game board, rich saturated painted anime gacha background, deep night palette with glowing practical lights, volumetric light shafts, warm and cool color contrast, glossy wet reflections, thin warm-colored lineart, soft painterly shading, empty scene, no characters, clean image with no lettering",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "9:16",
+    "resolution": "native",
+    "width": 768,
+    "height": 1344
+   },
+   "candidates": 8,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "A",
+   "quality": "native",
+   "quota_cr": 0.68,
+   "max_credits": 0.68,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/table_teahouse_autumn_night",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.table_teahouse_winter_day",
+   "seed": 849848,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_A",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, environments, tea house courtyard in daylight with lacquered pillars and paper screens, light snow falling, daytime, empty calm center for a game board, rich saturated painted anime gacha background, luminous warm daylight, clear colors, thin warm-colored lineart, soft painterly shading, empty scene, no characters, clean image with no lettering",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "9:16",
+    "resolution": "native",
+    "width": 768,
+    "height": 1344
+   },
+   "candidates": 8,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "A",
+   "quality": "native",
+   "quota_cr": 0.68,
+   "max_credits": 0.68,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/table_teahouse_winter_day",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.table_teahouse_winter_night",
+   "seed": 187749,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_A",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, environments, Chinese-style tea house veranda with a lacquered pavilion, sliding screens and hanging lanterns, light snow falling, night, empty calm center for a game board, rich saturated painted anime gacha background, deep night palette with glowing practical lights, volumetric light shafts, warm and cool color contrast, glossy wet reflections, thin warm-colored lineart, soft painterly shading, empty scene, no characters, clean image with no lettering",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "9:16",
+    "resolution": "native",
+    "width": 768,
+    "height": 1344
+   },
+   "candidates": 8,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "A",
+   "quality": "native",
+   "quota_cr": 0.68,
+   "max_credits": 0.68,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/table_teahouse_winter_night",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.table_bamboo_spring_day",
+   "seed": 524069,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_A",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, environments, sunlit bamboo garden with a stone path and a pond, cherry blossoms drifting, daytime, empty calm center for a game board, rich saturated painted anime gacha background, luminous warm daylight, clear colors, thin warm-colored lineart, soft painterly shading, empty scene, no characters, clean image with no lettering",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "9:16",
+    "resolution": "native",
+    "width": 768,
+    "height": 1344
+   },
+   "candidates": 8,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "A",
+   "quality": "native",
+   "quota_cr": 0.68,
+   "max_credits": 0.68,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/table_bamboo_spring_day",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.table_bamboo_spring_night",
+   "seed": 493857,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_A",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, environments, bamboo garden path with stone lanterns and a small pond, cherry blossoms drifting, night, empty calm center for a game board, rich saturated painted anime gacha background, deep night palette with glowing practical lights, volumetric light shafts, warm and cool color contrast, glossy wet reflections, thin warm-colored lineart, soft painterly shading, empty scene, no characters, clean image with no lettering",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "9:16",
+    "resolution": "native",
+    "width": 768,
+    "height": 1344
+   },
+   "candidates": 8,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "A",
+   "quality": "native",
+   "quota_cr": 0.68,
+   "max_credits": 0.68,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/table_bamboo_spring_night",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.table_bamboo_summer_day",
+   "seed": 805007,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_A",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, environments, sunlit bamboo garden with a stone path and a pond, lush green leaves and fireflies, daytime, empty calm center for a game board, rich saturated painted anime gacha background, luminous warm daylight, clear colors, thin warm-colored lineart, soft painterly shading, empty scene, no characters, clean image with no lettering",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "9:16",
+    "resolution": "native",
+    "width": 768,
+    "height": 1344
+   },
+   "candidates": 8,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "A",
+   "quality": "native",
+   "quota_cr": 0.68,
+   "max_credits": 0.68,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/table_bamboo_summer_day",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.table_bamboo_summer_night",
+   "seed": 726133,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_A",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, environments, bamboo garden path with stone lanterns and a small pond, lush green leaves and fireflies, night, empty calm center for a game board, rich saturated painted anime gacha background, deep night palette with glowing practical lights, volumetric light shafts, warm and cool color contrast, glossy wet reflections, thin warm-colored lineart, soft painterly shading, empty scene, no characters, clean image with no lettering",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "9:16",
+    "resolution": "native",
+    "width": 768,
+    "height": 1344
+   },
+   "candidates": 8,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "A",
+   "quality": "native",
+   "quota_cr": 0.68,
+   "max_credits": 0.68,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/table_bamboo_summer_night",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.table_bamboo_autumn_day",
+   "seed": 959485,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_A",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, environments, sunlit bamboo garden with a stone path and a pond, red maple leaves falling, daytime, empty calm center for a game board, rich saturated painted anime gacha background, luminous warm daylight, clear colors, thin warm-colored lineart, soft painterly shading, empty scene, no characters, clean image with no lettering",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "9:16",
+    "resolution": "native",
+    "width": 768,
+    "height": 1344
+   },
+   "candidates": 8,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "A",
+   "quality": "native",
+   "quota_cr": 0.68,
+   "max_credits": 0.68,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/table_bamboo_autumn_day",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.table_bamboo_autumn_night",
+   "seed": 317010,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_A",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, environments, bamboo garden path with stone lanterns and a small pond, red maple leaves falling, night, empty calm center for a game board, rich saturated painted anime gacha background, deep night palette with glowing practical lights, volumetric light shafts, warm and cool color contrast, glossy wet reflections, thin warm-colored lineart, soft painterly shading, empty scene, no characters, clean image with no lettering",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "9:16",
+    "resolution": "native",
+    "width": 768,
+    "height": 1344
+   },
+   "candidates": 8,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "A",
+   "quality": "native",
+   "quota_cr": 0.68,
+   "max_credits": 0.68,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/table_bamboo_autumn_night",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.table_bamboo_winter_day",
+   "seed": 262958,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_A",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, environments, sunlit bamboo garden with a stone path and a pond, light snow falling, daytime, empty calm center for a game board, rich saturated painted anime gacha background, luminous warm daylight, clear colors, thin warm-colored lineart, soft painterly shading, empty scene, no characters, clean image with no lettering",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "9:16",
+    "resolution": "native",
+    "width": 768,
+    "height": 1344
+   },
+   "candidates": 8,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "A",
+   "quality": "native",
+   "quota_cr": 0.68,
+   "max_credits": 0.68,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/table_bamboo_winter_day",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.table_bamboo_winter_night",
+   "seed": 975311,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_A",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, environments, bamboo garden path with stone lanterns and a small pond, light snow falling, night, empty calm center for a game board, rich saturated painted anime gacha background, deep night palette with glowing practical lights, volumetric light shafts, warm and cool color contrast, glossy wet reflections, thin warm-colored lineart, soft painterly shading, empty scene, no characters, clean image with no lettering",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "9:16",
+    "resolution": "native",
+    "width": 768,
+    "height": 1344
+   },
+   "candidates": 8,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "A",
+   "quality": "native",
+   "quota_cr": 0.68,
+   "max_credits": 0.68,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/table_bamboo_winter_night",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.table_city_spring_day",
+   "seed": 562003,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_A",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, environments, sunlit city lane with blank awnings and warm shop fronts, cherry blossoms drifting, daytime, empty calm center for a game board, rich saturated painted anime gacha background, luminous warm daylight, clear colors, thin warm-colored lineart, soft painterly shading, empty scene, no characters, clean image with no lettering",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "9:16",
+    "resolution": "native",
+    "width": 768,
+    "height": 1344
+   },
+   "candidates": 8,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "A",
+   "quality": "native",
+   "quota_cr": 0.68,
+   "max_credits": 0.68,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/table_city_spring_day",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.table_city_spring_night",
+   "seed": 725391,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_A",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, environments, night city lane with blank neon signs, wet pavement and warm shop windows, cherry blossoms drifting, night, empty calm center for a game board, rich saturated painted anime gacha background, deep night palette with glowing practical lights, volumetric light shafts, warm and cool color contrast, glossy wet reflections, thin warm-colored lineart, soft painterly shading, empty scene, no characters, clean image with no lettering",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "9:16",
+    "resolution": "native",
+    "width": 768,
+    "height": 1344
+   },
+   "candidates": 8,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "A",
+   "quality": "native",
+   "quota_cr": 0.68,
+   "max_credits": 0.68,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/table_city_spring_night",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.table_city_summer_day",
+   "seed": 417465,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_A",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, environments, sunlit city lane with blank awnings and warm shop fronts, lush green leaves and fireflies, daytime, empty calm center for a game board, rich saturated painted anime gacha background, luminous warm daylight, clear colors, thin warm-colored lineart, soft painterly shading, empty scene, no characters, clean image with no lettering",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "9:16",
+    "resolution": "native",
+    "width": 768,
+    "height": 1344
+   },
+   "candidates": 8,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "A",
+   "quality": "native",
+   "quota_cr": 0.68,
+   "max_credits": 0.68,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/table_city_summer_day",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.table_city_summer_night",
+   "seed": 917339,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_A",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, environments, night city lane with blank neon signs, wet pavement and warm shop windows, lush green leaves and fireflies, night, empty calm center for a game board, rich saturated painted anime gacha background, deep night palette with glowing practical lights, volumetric light shafts, warm and cool color contrast, glossy wet reflections, thin warm-colored lineart, soft painterly shading, empty scene, no characters, clean image with no lettering",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "9:16",
+    "resolution": "native",
+    "width": 768,
+    "height": 1344
+   },
+   "candidates": 8,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "A",
+   "quality": "native",
+   "quota_cr": 0.68,
+   "max_credits": 0.68,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/table_city_summer_night",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.table_city_autumn_day",
+   "seed": 997323,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_A",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, environments, sunlit city lane with blank awnings and warm shop fronts, red maple leaves falling, daytime, empty calm center for a game board, rich saturated painted anime gacha background, luminous warm daylight, clear colors, thin warm-colored lineart, soft painterly shading, empty scene, no characters, clean image with no lettering",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "9:16",
+    "resolution": "native",
+    "width": 768,
+    "height": 1344
+   },
+   "candidates": 8,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "A",
+   "quality": "native",
+   "quota_cr": 0.68,
+   "max_credits": 0.68,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/table_city_autumn_day",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.table_city_autumn_night",
+   "seed": 314428,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_A",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, environments, night city lane with blank neon signs, wet pavement and warm shop windows, red maple leaves falling, night, empty calm center for a game board, rich saturated painted anime gacha background, deep night palette with glowing practical lights, volumetric light shafts, warm and cool color contrast, glossy wet reflections, thin warm-colored lineart, soft painterly shading, empty scene, no characters, clean image with no lettering",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "9:16",
+    "resolution": "native",
+    "width": 768,
+    "height": 1344
+   },
+   "candidates": 8,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "A",
+   "quality": "native",
+   "quota_cr": 0.68,
+   "max_credits": 0.68,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/table_city_autumn_night",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.table_city_winter_day",
+   "seed": 872568,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_A",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, environments, sunlit city lane with blank awnings and warm shop fronts, light snow falling, daytime, empty calm center for a game board, rich saturated painted anime gacha background, luminous warm daylight, clear colors, thin warm-colored lineart, soft painterly shading, empty scene, no characters, clean image with no lettering",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "9:16",
+    "resolution": "native",
+    "width": 768,
+    "height": 1344
+   },
+   "candidates": 8,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "A",
+   "quality": "native",
+   "quota_cr": 0.68,
+   "max_credits": 0.68,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/table_city_winter_day",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.table_city_winter_night",
+   "seed": 915937,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_A",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, environments, night city lane with blank neon signs, wet pavement and warm shop windows, light snow falling, night, empty calm center for a game board, rich saturated painted anime gacha background, deep night palette with glowing practical lights, volumetric light shafts, warm and cool color contrast, glossy wet reflections, thin warm-colored lineart, soft painterly shading, empty scene, no characters, clean image with no lettering",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "9:16",
+    "resolution": "native",
+    "width": 768,
+    "height": 1344
+   },
+   "candidates": 8,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "A",
+   "quality": "native",
+   "quota_cr": 0.68,
+   "max_credits": 0.68,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/table_city_winter_night",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.model_load_B",
+   "seed": 568297,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_B",
+   "kind": "model_load",
+   "media": "gpu",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "Load tw_master_v2 into VRAM for session B (fixed cost).",
+   "candidates": 1,
+   "unit_cost_cr": 7.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "session": "B",
+   "quota_cr": 7.0,
+   "max_credits": 7.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/model_load_B",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.salon_mc",
+   "seed": 492705,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_B",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, environments, mahjong salon parlor with carved cherry wood, a green felt table and pink paper lanterns, warm lantern light, the zone of one heroine, no characters, rich saturated painted anime gacha background, deep night palette with glowing practical lights, volumetric light shafts, warm and cool color contrast, glossy wet reflections, thin warm-colored lineart, soft painterly shading, empty scene, no characters, clean image with no lettering",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "9:16",
+    "resolution": "native",
+    "width": 768,
+    "height": 1344
+   },
+   "candidates": 8,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "B",
+   "quality": "native",
+   "quota_cr": 0.68,
+   "max_credits": 0.68,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/salon_mc",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.salon_rin",
+   "seed": 891902,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_B",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, environments, tea study library with celadon tea sets, bookshelves and a green-shaded lamp, warm lantern light, the zone of one heroine, no characters, rich saturated painted anime gacha background, deep night palette with glowing practical lights, volumetric light shafts, warm and cool color contrast, glossy wet reflections, thin warm-colored lineart, soft painterly shading, empty scene, no characters, clean image with no lettering",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "9:16",
+    "resolution": "native",
+    "width": 768,
+    "height": 1344
+   },
+   "candidates": 8,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "B",
+   "quality": "native",
+   "quota_cr": 0.68,
+   "max_credits": 0.68,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/salon_rin",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.salon_hana",
+   "seed": 101921,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_B",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, environments, sunlit training courtyard with sunflowers, a running track edge and a bench, warm lantern light, the zone of one heroine, no characters, rich saturated painted anime gacha background, deep night palette with glowing practical lights, volumetric light shafts, warm and cool color contrast, glossy wet reflections, thin warm-colored lineart, soft painterly shading, empty scene, no characters, clean image with no lettering",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "9:16",
+    "resolution": "native",
+    "width": 768,
+    "height": 1344
+   },
+   "candidates": 8,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "B",
+   "quality": "native",
+   "quota_cr": 0.68,
+   "max_credits": 0.68,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/salon_hana",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.salon_yue",
+   "seed": 175114,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_B",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, environments, moon palace balcony with crescent windows, pale silk curtains and a silver moon, warm lantern light, the zone of one heroine, no characters, rich saturated painted anime gacha background, deep night palette with glowing practical lights, volumetric light shafts, warm and cool color contrast, glossy wet reflections, thin warm-colored lineart, soft painterly shading, empty scene, no characters, clean image with no lettering",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "9:16",
+    "resolution": "native",
+    "width": 768,
+    "height": 1344
+   },
+   "candidates": 8,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "B",
+   "quality": "native",
+   "quota_cr": 0.68,
+   "max_credits": 0.68,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/salon_yue",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.salon_nova",
+   "seed": 290510,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_B",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, environments, neon loft workshop with blank holo-screens and cables, cyan and pink light, warm lantern light, the zone of one heroine, no characters, rich saturated painted anime gacha background, deep night palette with glowing practical lights, volumetric light shafts, warm and cool color contrast, glossy wet reflections, thin warm-colored lineart, soft painterly shading, empty scene, no characters, clean image with no lettering",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "9:16",
+    "resolution": "native",
+    "width": 768,
+    "height": 1344
+   },
+   "candidates": 8,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "B",
+   "quality": "native",
+   "quota_cr": 0.68,
+   "max_credits": 0.68,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/salon_nova",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.salon_tsubame",
+   "seed": 231254,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_B",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, environments, tiled rooftop at dusk with chimneys, hanging scarves and a distant lantern bridge, warm lantern light, the zone of one heroine, no characters, rich saturated painted anime gacha background, deep night palette with glowing practical lights, volumetric light shafts, warm and cool color contrast, glossy wet reflections, thin warm-colored lineart, soft painterly shading, empty scene, no characters, clean image with no lettering",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "9:16",
+    "resolution": "native",
+    "width": 768,
+    "height": 1344
+   },
+   "candidates": 8,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "B",
+   "quality": "native",
+   "quota_cr": 0.68,
+   "max_credits": 0.68,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/salon_tsubame",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.salon_miel",
+   "seed": 292989,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_B",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, environments, cozy pastry parlor with display shelves, blank cake stands and warm honey light, warm lantern light, the zone of one heroine, no characters, rich saturated painted anime gacha background, deep night palette with glowing practical lights, volumetric light shafts, warm and cool color contrast, glossy wet reflections, thin warm-colored lineart, soft painterly shading, empty scene, no characters, clean image with no lettering",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "9:16",
+    "resolution": "native",
+    "width": 768,
+    "height": 1344
+   },
+   "candidates": 8,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "B",
+   "quality": "native",
+   "quota_cr": 0.68,
+   "max_credits": 0.68,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/salon_miel",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.salon_kohaku",
+   "seed": 644795,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_B",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, environments, shrine stairway with a row of red torii gates and fox-shaped lanterns, warm lantern light, the zone of one heroine, no characters, rich saturated painted anime gacha background, deep night palette with glowing practical lights, volumetric light shafts, warm and cool color contrast, glossy wet reflections, thin warm-colored lineart, soft painterly shading, empty scene, no characters, clean image with no lettering",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "9:16",
+    "resolution": "native",
+    "width": 768,
+    "height": 1344
+   },
+   "candidates": 8,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "B",
+   "quality": "native",
+   "quota_cr": 0.68,
+   "max_credits": 0.68,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/salon_kohaku",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.salon_shirin",
+   "seed": 495295,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_B",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, environments, desert bazaar tent with hanging lamps, rugs and brass trays, warm lantern light, the zone of one heroine, no characters, rich saturated painted anime gacha background, deep night palette with glowing practical lights, volumetric light shafts, warm and cool color contrast, glossy wet reflections, thin warm-colored lineart, soft painterly shading, empty scene, no characters, clean image with no lettering",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "9:16",
+    "resolution": "native",
+    "width": 768,
+    "height": 1344
+   },
+   "candidates": 8,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "B",
+   "quality": "native",
+   "quota_cr": 0.68,
+   "max_credits": 0.68,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/salon_shirin",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.salon_zlata",
+   "seed": 759275,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_B",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, environments, wooden fairy-tale terem hall with embroidered cloths, a warm stove and carved beams, warm lantern light, the zone of one heroine, no characters, rich saturated painted anime gacha background, deep night palette with glowing practical lights, volumetric light shafts, warm and cool color contrast, glossy wet reflections, thin warm-colored lineart, soft painterly shading, empty scene, no characters, clean image with no lettering",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "9:16",
+    "resolution": "native",
+    "width": 768,
+    "height": 1344
+   },
+   "candidates": 8,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "B",
+   "quality": "native",
+   "quota_cr": 0.68,
+   "max_credits": 0.68,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/salon_zlata",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.koikoi_01_pine",
+   "seed": 699743,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_B",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, environments, pine branches in snow at dawn, seasonal mood of the month, empty center, rich saturated painted anime gacha background, deep night palette with glowing practical lights, volumetric light shafts, warm and cool color contrast, glossy wet reflections, thin warm-colored lineart, soft painterly shading, empty scene, no characters, clean image with no lettering",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "9:16",
+    "resolution": "native",
+    "width": 768,
+    "height": 1344
+   },
+   "candidates": 8,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "B",
+   "quality": "native",
+   "quota_cr": 0.68,
+   "max_credits": 0.68,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/koikoi_01_pine",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.koikoi_02_plum",
+   "seed": 791858,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_B",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, environments, blooming plum tree by a stone wall, seasonal mood of the month, empty center, rich saturated painted anime gacha background, deep night palette with glowing practical lights, volumetric light shafts, warm and cool color contrast, glossy wet reflections, thin warm-colored lineart, soft painterly shading, empty scene, no characters, clean image with no lettering",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "9:16",
+    "resolution": "native",
+    "width": 768,
+    "height": 1344
+   },
+   "candidates": 8,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "B",
+   "quality": "native",
+   "quota_cr": 0.68,
+   "max_credits": 0.68,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/koikoi_02_plum",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.koikoi_03_cherry",
+   "seed": 452338,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_B",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, environments, cherry trees in full bloom with a curtain of petals, seasonal mood of the month, empty center, rich saturated painted anime gacha background, deep night palette with glowing practical lights, volumetric light shafts, warm and cool color contrast, glossy wet reflections, thin warm-colored lineart, soft painterly shading, empty scene, no characters, clean image with no lettering",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "9:16",
+    "resolution": "native",
+    "width": 768,
+    "height": 1344
+   },
+   "candidates": 8,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "B",
+   "quality": "native",
+   "quota_cr": 0.68,
+   "max_credits": 0.68,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/koikoi_03_cherry",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.koikoi_04_wisteria",
+   "seed": 120929,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_B",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, environments, hanging wisteria over a wooden arbor, seasonal mood of the month, empty center, rich saturated painted anime gacha background, deep night palette with glowing practical lights, volumetric light shafts, warm and cool color contrast, glossy wet reflections, thin warm-colored lineart, soft painterly shading, empty scene, no characters, clean image with no lettering",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "9:16",
+    "resolution": "native",
+    "width": 768,
+    "height": 1344
+   },
+   "candidates": 8,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "B",
+   "quality": "native",
+   "quota_cr": 0.68,
+   "max_credits": 0.68,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/koikoi_04_wisteria",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.koikoi_05_iris",
+   "seed": 368667,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_B",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, environments, iris pond with a small wooden bridge, seasonal mood of the month, empty center, rich saturated painted anime gacha background, deep night palette with glowing practical lights, volumetric light shafts, warm and cool color contrast, glossy wet reflections, thin warm-colored lineart, soft painterly shading, empty scene, no characters, clean image with no lettering",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "9:16",
+    "resolution": "native",
+    "width": 768,
+    "height": 1344
+   },
+   "candidates": 8,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "B",
+   "quality": "native",
+   "quota_cr": 0.68,
+   "max_credits": 0.68,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/koikoi_05_iris",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.koikoi_06_peony",
+   "seed": 734549,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_B",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, environments, peony garden with stone paths, seasonal mood of the month, empty center, rich saturated painted anime gacha background, deep night palette with glowing practical lights, volumetric light shafts, warm and cool color contrast, glossy wet reflections, thin warm-colored lineart, soft painterly shading, empty scene, no characters, clean image with no lettering",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "9:16",
+    "resolution": "native",
+    "width": 768,
+    "height": 1344
+   },
+   "candidates": 8,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "B",
+   "quality": "native",
+   "quota_cr": 0.68,
+   "max_credits": 0.68,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/koikoi_06_peony",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.koikoi_07_bush_clover",
+   "seed": 560731,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_B",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, environments, bush clover field under a pale evening sky, seasonal mood of the month, empty center, rich saturated painted anime gacha background, deep night palette with glowing practical lights, volumetric light shafts, warm and cool color contrast, glossy wet reflections, thin warm-colored lineart, soft painterly shading, empty scene, no characters, clean image with no lettering",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "9:16",
+    "resolution": "native",
+    "width": 768,
+    "height": 1344
+   },
+   "candidates": 8,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "B",
+   "quality": "native",
+   "quota_cr": 0.68,
+   "max_credits": 0.68,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/koikoi_07_bush_clover",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.koikoi_08_pampas_moon",
+   "seed": 120952,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_B",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, environments, pampas grass hill under a large full moon, seasonal mood of the month, empty center, rich saturated painted anime gacha background, deep night palette with glowing practical lights, volumetric light shafts, warm and cool color contrast, glossy wet reflections, thin warm-colored lineart, soft painterly shading, empty scene, no characters, clean image with no lettering",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "9:16",
+    "resolution": "native",
+    "width": 768,
+    "height": 1344
+   },
+   "candidates": 8,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "B",
+   "quality": "native",
+   "quota_cr": 0.68,
+   "max_credits": 0.68,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/koikoi_08_pampas_moon",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.koikoi_09_chrysanthemum",
+   "seed": 553280,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_B",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, environments, chrysanthemum garden with a low fence and lanterns, seasonal mood of the month, empty center, rich saturated painted anime gacha background, deep night palette with glowing practical lights, volumetric light shafts, warm and cool color contrast, glossy wet reflections, thin warm-colored lineart, soft painterly shading, empty scene, no characters, clean image with no lettering",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "9:16",
+    "resolution": "native",
+    "width": 768,
+    "height": 1344
+   },
+   "candidates": 8,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "B",
+   "quality": "native",
+   "quota_cr": 0.68,
+   "max_credits": 0.68,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/koikoi_09_chrysanthemum",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.koikoi_10_maple",
+   "seed": 350741,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_B",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, environments, maple valley with a stream and red leaves, seasonal mood of the month, empty center, rich saturated painted anime gacha background, deep night palette with glowing practical lights, volumetric light shafts, warm and cool color contrast, glossy wet reflections, thin warm-colored lineart, soft painterly shading, empty scene, no characters, clean image with no lettering",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "9:16",
+    "resolution": "native",
+    "width": 768,
+    "height": 1344
+   },
+   "candidates": 8,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "B",
+   "quality": "native",
+   "quota_cr": 0.68,
+   "max_credits": 0.68,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/koikoi_10_maple",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.koikoi_11_willow_rain",
+   "seed": 585080,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_B",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, environments, willow tree by a river in gentle rain, seasonal mood of the month, empty center, rich saturated painted anime gacha background, deep night palette with glowing practical lights, volumetric light shafts, warm and cool color contrast, glossy wet reflections, thin warm-colored lineart, soft painterly shading, empty scene, no characters, clean image with no lettering",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "9:16",
+    "resolution": "native",
+    "width": 768,
+    "height": 1344
+   },
+   "candidates": 8,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "B",
+   "quality": "native",
+   "quota_cr": 0.68,
+   "max_credits": 0.68,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/koikoi_11_willow_rain",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.koikoi_12_paulownia",
+   "seed": 410034,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_B",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, environments, paulownia tree with golden leaves and a distant shrine roof, seasonal mood of the month, empty center, rich saturated painted anime gacha background, deep night palette with glowing practical lights, volumetric light shafts, warm and cool color contrast, glossy wet reflections, thin warm-colored lineart, soft painterly shading, empty scene, no characters, clean image with no lettering",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "9:16",
+    "resolution": "native",
+    "width": 768,
+    "height": 1344
+   },
+   "candidates": 8,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "B",
+   "quality": "native",
+   "quota_cr": 0.68,
+   "max_credits": 0.68,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/koikoi_12_paulownia",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.model_load_C",
+   "seed": 850591,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_C",
+   "kind": "model_load",
+   "media": "gpu",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "Load tw_master_v2 into VRAM for session C (fixed cost).",
+   "candidates": 1,
+   "unit_cost_cr": 7.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "session": "C",
+   "quota_cr": 7.0,
+   "max_credits": 7.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/model_load_C",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.tiles_bamboo",
+   "seed": 537449,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_C",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, tiles_fx, tile set 'Bamboo': pale green jade-bamboo tile frame and back with fine bamboo leaf pattern, blank face, front view, centered, glossy painted anime gacha game art, ivory bone and black lacquer tiles with crisp specular highlights, thin warm-colored lineart, soft painterly shading, saturated jewel palette with a deep dark ground, no numerals, no letters, no logos, no people",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "1:1",
+    "resolution": "native",
+    "width": 1024,
+    "height": 1024
+   },
+   "candidates": 16,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "C",
+   "quality": "native",
+   "quota_cr": 1.36,
+   "max_credits": 1.36,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/tiles_bamboo",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.tiles_lacquer",
+   "seed": 264886,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_C",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, tiles_fx, tile set 'Lacquer': black lacquer tile frame and back with gold hairline, blank ivory face, front view, centered, glossy painted anime gacha game art, ivory bone and black lacquer tiles with crisp specular highlights, thin warm-colored lineart, soft painterly shading, saturated jewel palette with a deep dark ground, no numerals, no letters, no logos, no people",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "1:1",
+    "resolution": "native",
+    "width": 1024,
+    "height": 1024
+   },
+   "candidates": 16,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "C",
+   "quality": "native",
+   "quota_cr": 1.36,
+   "max_credits": 1.36,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/tiles_lacquer",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.tiles_jade",
+   "seed": 411411,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_C",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, tiles_fx, tile set 'Jade': translucent green jade tile frame and back with carved border, blank face, front view, centered, glossy painted anime gacha game art, ivory bone and black lacquer tiles with crisp specular highlights, thin warm-colored lineart, soft painterly shading, saturated jewel palette with a deep dark ground, no numerals, no letters, no logos, no people",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "1:1",
+    "resolution": "native",
+    "width": 1024,
+    "height": 1024
+   },
+   "candidates": 16,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "C",
+   "quality": "native",
+   "quota_cr": 1.36,
+   "max_credits": 1.36,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/tiles_jade",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.tiles_night",
+   "seed": 980910,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_C",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, tiles_fx, tile set 'Night': deep indigo tile frame and back with silver star dust border, blank face, front view, centered, glossy painted anime gacha game art, ivory bone and black lacquer tiles with crisp specular highlights, thin warm-colored lineart, soft painterly shading, saturated jewel palette with a deep dark ground, no numerals, no letters, no logos, no people",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "1:1",
+    "resolution": "native",
+    "width": 1024,
+    "height": 1024
+   },
+   "candidates": 16,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "C",
+   "quality": "native",
+   "quota_cr": 1.36,
+   "max_credits": 1.36,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/tiles_night",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.fx_sakura_burst",
+   "seed": 187989,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_C",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, tiles_fx, burst of pink cherry petals radiating from the center, glowing painted anime game effect on a pure black background for additive blending, saturated jewel colors, thin warm-colored lineart, soft painterly shading, centered, no characters, no numerals, no letters, no logos",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "1:1",
+    "resolution": "native",
+    "width": 1024,
+    "height": 1024
+   },
+   "candidates": 12,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "C",
+   "quality": "native",
+   "quota_cr": 1.02,
+   "max_credits": 1.02,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/fx_sakura_burst",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.fx_gold_sparkle_ring",
+   "seed": 855203,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_C",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, tiles_fx, expanding ring of gold sparkles, glowing painted anime game effect on a pure black background for additive blending, saturated jewel colors, thin warm-colored lineart, soft painterly shading, centered, no characters, no numerals, no letters, no logos",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "1:1",
+    "resolution": "native",
+    "width": 1024,
+    "height": 1024
+   },
+   "candidates": 12,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "C",
+   "quality": "native",
+   "quota_cr": 1.02,
+   "max_credits": 1.02,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/fx_gold_sparkle_ring",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.fx_lantern_glow",
+   "seed": 142472,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_C",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, tiles_fx, soft glowing paper lantern bokeh cluster, glowing painted anime game effect on a pure black background for additive blending, saturated jewel colors, thin warm-colored lineart, soft painterly shading, centered, no characters, no numerals, no letters, no logos",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "1:1",
+    "resolution": "native",
+    "width": 1024,
+    "height": 1024
+   },
+   "candidates": 12,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "C",
+   "quality": "native",
+   "quota_cr": 1.02,
+   "max_credits": 1.02,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/fx_lantern_glow",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.fx_combo_t1_edge",
+   "seed": 813693,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_C",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, tiles_fx, thin curved light streak sweeping from the edge, glowing painted anime game effect on a pure black background for additive blending, saturated jewel colors, thin warm-colored lineart, soft painterly shading, centered, no characters, no numerals, no letters, no logos",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "1:1",
+    "resolution": "native",
+    "width": 1024,
+    "height": 1024
+   },
+   "candidates": 12,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "C",
+   "quality": "native",
+   "quota_cr": 1.02,
+   "max_credits": 1.02,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/fx_combo_t1_edge",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.fx_combo_t2_wave",
+   "seed": 481372,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_C",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, tiles_fx, wide shimmering energy wave sweeping across, glowing painted anime game effect on a pure black background for additive blending, saturated jewel colors, thin warm-colored lineart, soft painterly shading, centered, no characters, no numerals, no letters, no logos",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "1:1",
+    "resolution": "native",
+    "width": 1024,
+    "height": 1024
+   },
+   "candidates": 12,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "C",
+   "quality": "native",
+   "quota_cr": 1.02,
+   "max_credits": 1.02,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/fx_combo_t2_wave",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.fx_combo_t3_burst",
+   "seed": 138252,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_C",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, tiles_fx, large radial firework burst with petals, glowing painted anime game effect on a pure black background for additive blending, saturated jewel colors, thin warm-colored lineart, soft painterly shading, centered, no characters, no numerals, no letters, no logos",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "1:1",
+    "resolution": "native",
+    "width": 1024,
+    "height": 1024
+   },
+   "candidates": 12,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "C",
+   "quality": "native",
+   "quota_cr": 1.02,
+   "max_credits": 1.02,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/fx_combo_t3_burst",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.fx_ult_charge_ring",
+   "seed": 400306,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_C",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, tiles_fx, circular charging ring of light with small runes-free glow marks, glowing painted anime game effect on a pure black background for additive blending, saturated jewel colors, thin warm-colored lineart, soft painterly shading, centered, no characters, no numerals, no letters, no logos",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "1:1",
+    "resolution": "native",
+    "width": 1024,
+    "height": 1024
+   },
+   "candidates": 12,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "C",
+   "quality": "native",
+   "quota_cr": 1.02,
+   "max_credits": 1.02,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/fx_ult_charge_ring",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.fx_match_pop",
+   "seed": 777383,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_C",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, tiles_fx, small crisp pop of stars at a point, glowing painted anime game effect on a pure black background for additive blending, saturated jewel colors, thin warm-colored lineart, soft painterly shading, centered, no characters, no numerals, no letters, no logos",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "1:1",
+    "resolution": "native",
+    "width": 1024,
+    "height": 1024
+   },
+   "candidates": 12,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "C",
+   "quality": "native",
+   "quota_cr": 1.02,
+   "max_credits": 1.02,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/fx_match_pop",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E1.fx_rain_streaks",
+   "seed": 501872,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "session_C",
+   "kind": "lora_image",
+   "media": "image",
+   "tool": "gen.py",
+   "model": "tw_master_v2",
+   "prompt": "twmaster2 style, tiles_fx, falling rain streaks with soft glow, glowing painted anime game effect on a pure black background for additive blending, saturated jewel colors, thin warm-colored lineart, soft painterly shading, centered, no characters, no numerals, no letters, no logos",
+   "lora": {
+    "name": "tw_master_v2",
+    "trigger": "twmaster2 style",
+    "weight": 1.0,
+    "checkpoint": "s3000 or s4000 (owner picks after E0 gates)",
+    "steps": 9,
+    "guidance": 0.0
+   },
+   "size": {
+    "aspect": "1:1",
+    "resolution": "native",
+    "width": 1024,
+    "height": 1024
+   },
+   "candidates": 12,
+   "unit_cost_cr": 0.085,
+   "unit_cost_basis": "assumed",
+   "session": "C",
+   "quality": "native",
+   "quota_cr": 1.02,
+   "max_credits": 1.02,
+   "element_ids": [],
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E1/fx_rain_streaks",
+    "name": "cand_{n:02d}"
+   }
+  }
+ ],
+ "totals": {
+  "tasks": 63,
+  "task_quota_sum_cr": 267.9,
+  "candidates": 540
+ },
+ "style_tail_id": null
+}

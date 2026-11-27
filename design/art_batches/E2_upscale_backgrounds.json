@@ -1,0 +1,1485 @@
+{
+ "schema_version": 1,
+ "package": "P53",
+ "title": "Finalists upscale: 46 backgrounds",
+ "week": 2,
+ "section": "Environments (LoRA v2)",
+ "status": "ready_for_owner_approval",
+ "in_plan_ceiling": true,
+ "blocked_by": [],
+ "depends_on": [
+  "E1"
+ ],
+ "owner_gate": "AD picked one finalist per background in E1 (46 files)",
+ "budget": {
+  "currency": "higgsfield_credits",
+  "nominal_cr": 92,
+  "hard_stop_cr": 105.8,
+  "hard_stop_rule": "nominal + 15%: above that the run stops and the owner is asked",
+  "assumptions": [
+   "upscale_image ~2 cr per frame (assumption, not a quote)"
+  ]
+ },
+ "candidates_policy": "one upscale per finalist",
+ "selection": {
+  "keep_per_task": 1,
+  "gate": "AD pass",
+  "criteria": [
+   "no new artifacts or smeared lineart after upscale",
+   "no text appears",
+   "palette unchanged vs the E1 pick"
+  ]
+ },
+ "pilot": {
+  "task_ids": [
+   "E2.table_teahouse_spring_day",
+   "E2.salon_mc"
+  ],
+  "candidates_per_task": 1,
+  "max_cr": 4.0,
+  "go_rule": "estimate_image_cost-style quote on 2 frames first"
+ },
+ "tool_note": "Higgsfield upscale_image (price per frame is NOT quoted; 2 cr is an assumption). Run estimate first and re-plan if it differs.",
+ "guards": [
+  "Before each launch: estimate_*_cost -> quote_ref; abort the task when the quote is above max_credits.",
+  "Actual spend goes to design/art_batches/SPEND_LOG.csv; more than 15% over the batch nominal = stop and ask the owner.",
+  "Every output lands in assets/incoming, then double anatomy audit -> metadata scrub -> watermark pass -> manifest `approve`.",
+  "Prompts are untested: run the pilot tasks first (2-3 frames), look at them, only then release the rest."
+ ],
+ "notes": [],
+ "batch_id": "E2",
+ "tasks": [
+  {
+   "id": "E2.table_teahouse_spring_day",
+   "seed": 492112,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "post",
+   "kind": "upscale",
+   "media": "post",
+   "tool": "upscale_image",
+   "model": "higgsfield_upscale",
+   "prompt": "Upscale the AD-approved finalist of E1.table_teahouse_spring_day (2x). No prompt change; keep the painted look.",
+   "candidates": 1,
+   "unit_cost_cr": 2.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "2x",
+    "width": 0,
+    "height": 0
+   },
+   "depends_on_task": "E1.table_teahouse_spring_day",
+   "quota_cr": 2.0,
+   "max_credits": 2.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E2/table_teahouse_spring_day",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E2.table_teahouse_spring_night",
+   "seed": 189799,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "post",
+   "kind": "upscale",
+   "media": "post",
+   "tool": "upscale_image",
+   "model": "higgsfield_upscale",
+   "prompt": "Upscale the AD-approved finalist of E1.table_teahouse_spring_night (2x). No prompt change; keep the painted look.",
+   "candidates": 1,
+   "unit_cost_cr": 2.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "2x",
+    "width": 0,
+    "height": 0
+   },
+   "depends_on_task": "E1.table_teahouse_spring_night",
+   "quota_cr": 2.0,
+   "max_credits": 2.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E2/table_teahouse_spring_night",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E2.table_teahouse_summer_day",
+   "seed": 750906,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "post",
+   "kind": "upscale",
+   "media": "post",
+   "tool": "upscale_image",
+   "model": "higgsfield_upscale",
+   "prompt": "Upscale the AD-approved finalist of E1.table_teahouse_summer_day (2x). No prompt change; keep the painted look.",
+   "candidates": 1,
+   "unit_cost_cr": 2.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "2x",
+    "width": 0,
+    "height": 0
+   },
+   "depends_on_task": "E1.table_teahouse_summer_day",
+   "quota_cr": 2.0,
+   "max_credits": 2.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E2/table_teahouse_summer_day",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E2.table_teahouse_summer_night",
+   "seed": 525779,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "post",
+   "kind": "upscale",
+   "media": "post",
+   "tool": "upscale_image",
+   "model": "higgsfield_upscale",
+   "prompt": "Upscale the AD-approved finalist of E1.table_teahouse_summer_night (2x). No prompt change; keep the painted look.",
+   "candidates": 1,
+   "unit_cost_cr": 2.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "2x",
+    "width": 0,
+    "height": 0
+   },
+   "depends_on_task": "E1.table_teahouse_summer_night",
+   "quota_cr": 2.0,
+   "max_credits": 2.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E2/table_teahouse_summer_night",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E2.table_teahouse_autumn_day",
+   "seed": 681896,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "post",
+   "kind": "upscale",
+   "media": "post",
+   "tool": "upscale_image",
+   "model": "higgsfield_upscale",
+   "prompt": "Upscale the AD-approved finalist of E1.table_teahouse_autumn_day (2x). No prompt change; keep the painted look.",
+   "candidates": 1,
+   "unit_cost_cr": 2.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "2x",
+    "width": 0,
+    "height": 0
+   },
+   "depends_on_task": "E1.table_teahouse_autumn_day",
+   "quota_cr": 2.0,
+   "max_credits": 2.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E2/table_teahouse_autumn_day",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E2.table_teahouse_autumn_night",
+   "seed": 943476,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "post",
+   "kind": "upscale",
+   "media": "post",
+   "tool": "upscale_image",
+   "model": "higgsfield_upscale",
+   "prompt": "Upscale the AD-approved finalist of E1.table_teahouse_autumn_night (2x). No prompt change; keep the painted look.",
+   "candidates": 1,
+   "unit_cost_cr": 2.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "2x",
+    "width": 0,
+    "height": 0
+   },
+   "depends_on_task": "E1.table_teahouse_autumn_night",
+   "quota_cr": 2.0,
+   "max_credits": 2.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E2/table_teahouse_autumn_night",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E2.table_teahouse_winter_day",
+   "seed": 382011,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "post",
+   "kind": "upscale",
+   "media": "post",
+   "tool": "upscale_image",
+   "model": "higgsfield_upscale",
+   "prompt": "Upscale the AD-approved finalist of E1.table_teahouse_winter_day (2x). No prompt change; keep the painted look.",
+   "candidates": 1,
+   "unit_cost_cr": 2.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "2x",
+    "width": 0,
+    "height": 0
+   },
+   "depends_on_task": "E1.table_teahouse_winter_day",
+   "quota_cr": 2.0,
+   "max_credits": 2.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E2/table_teahouse_winter_day",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E2.table_teahouse_winter_night",
+   "seed": 526345,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "post",
+   "kind": "upscale",
+   "media": "post",
+   "tool": "upscale_image",
+   "model": "higgsfield_upscale",
+   "prompt": "Upscale the AD-approved finalist of E1.table_teahouse_winter_night (2x). No prompt change; keep the painted look.",
+   "candidates": 1,
+   "unit_cost_cr": 2.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "2x",
+    "width": 0,
+    "height": 0
+   },
+   "depends_on_task": "E1.table_teahouse_winter_night",
+   "quota_cr": 2.0,
+   "max_credits": 2.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E2/table_teahouse_winter_night",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E2.table_bamboo_spring_day",
+   "seed": 612502,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "post",
+   "kind": "upscale",
+   "media": "post",
+   "tool": "upscale_image",
+   "model": "higgsfield_upscale",
+   "prompt": "Upscale the AD-approved finalist of E1.table_bamboo_spring_day (2x). No prompt change; keep the painted look.",
+   "candidates": 1,
+   "unit_cost_cr": 2.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "2x",
+    "width": 0,
+    "height": 0
+   },
+   "depends_on_task": "E1.table_bamboo_spring_day",
+   "quota_cr": 2.0,
+   "max_credits": 2.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E2/table_bamboo_spring_day",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E2.table_bamboo_spring_night",
+   "seed": 406946,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "post",
+   "kind": "upscale",
+   "media": "post",
+   "tool": "upscale_image",
+   "model": "higgsfield_upscale",
+   "prompt": "Upscale the AD-approved finalist of E1.table_bamboo_spring_night (2x). No prompt change; keep the painted look.",
+   "candidates": 1,
+   "unit_cost_cr": 2.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "2x",
+    "width": 0,
+    "height": 0
+   },
+   "depends_on_task": "E1.table_bamboo_spring_night",
+   "quota_cr": 2.0,
+   "max_credits": 2.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E2/table_bamboo_spring_night",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E2.table_bamboo_summer_day",
+   "seed": 916892,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "post",
+   "kind": "upscale",
+   "media": "post",
+   "tool": "upscale_image",
+   "model": "higgsfield_upscale",
+   "prompt": "Upscale the AD-approved finalist of E1.table_bamboo_summer_day (2x). No prompt change; keep the painted look.",
+   "candidates": 1,
+   "unit_cost_cr": 2.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "2x",
+    "width": 0,
+    "height": 0
+   },
+   "depends_on_task": "E1.table_bamboo_summer_day",
+   "quota_cr": 2.0,
+   "max_credits": 2.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E2/table_bamboo_summer_day",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E2.table_bamboo_summer_night",
+   "seed": 747030,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "post",
+   "kind": "upscale",
+   "media": "post",
+   "tool": "upscale_image",
+   "model": "higgsfield_upscale",
+   "prompt": "Upscale the AD-approved finalist of E1.table_bamboo_summer_night (2x). No prompt change; keep the painted look.",
+   "candidates": 1,
+   "unit_cost_cr": 2.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "2x",
+    "width": 0,
+    "height": 0
+   },
+   "depends_on_task": "E1.table_bamboo_summer_night",
+   "quota_cr": 2.0,
+   "max_credits": 2.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E2/table_bamboo_summer_night",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E2.table_bamboo_autumn_day",
+   "seed": 343374,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "post",
+   "kind": "upscale",
+   "media": "post",
+   "tool": "upscale_image",
+   "model": "higgsfield_upscale",
+   "prompt": "Upscale the AD-approved finalist of E1.table_bamboo_autumn_day (2x). No prompt change; keep the painted look.",
+   "candidates": 1,
+   "unit_cost_cr": 2.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "2x",
+    "width": 0,
+    "height": 0
+   },
+   "depends_on_task": "E1.table_bamboo_autumn_day",
+   "quota_cr": 2.0,
+   "max_credits": 2.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E2/table_bamboo_autumn_day",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E2.table_bamboo_autumn_night",
+   "seed": 726321,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "post",
+   "kind": "upscale",
+   "media": "post",
+   "tool": "upscale_image",
+   "model": "higgsfield_upscale",
+   "prompt": "Upscale the AD-approved finalist of E1.table_bamboo_autumn_night (2x). No prompt change; keep the painted look.",
+   "candidates": 1,
+   "unit_cost_cr": 2.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "2x",
+    "width": 0,
+    "height": 0
+   },
+   "depends_on_task": "E1.table_bamboo_autumn_night",
+   "quota_cr": 2.0,
+   "max_credits": 2.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E2/table_bamboo_autumn_night",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E2.table_bamboo_winter_day",
+   "seed": 466109,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "post",
+   "kind": "upscale",
+   "media": "post",
+   "tool": "upscale_image",
+   "model": "higgsfield_upscale",
+   "prompt": "Upscale the AD-approved finalist of E1.table_bamboo_winter_day (2x). No prompt change; keep the painted look.",
+   "candidates": 1,
+   "unit_cost_cr": 2.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "2x",
+    "width": 0,
+    "height": 0
+   },
+   "depends_on_task": "E1.table_bamboo_winter_day",
+   "quota_cr": 2.0,
+   "max_credits": 2.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E2/table_bamboo_winter_day",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E2.table_bamboo_winter_night",
+   "seed": 481292,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "post",
+   "kind": "upscale",
+   "media": "post",
+   "tool": "upscale_image",
+   "model": "higgsfield_upscale",
+   "prompt": "Upscale the AD-approved finalist of E1.table_bamboo_winter_night (2x). No prompt change; keep the painted look.",
+   "candidates": 1,
+   "unit_cost_cr": 2.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "2x",
+    "width": 0,
+    "height": 0
+   },
+   "depends_on_task": "E1.table_bamboo_winter_night",
+   "quota_cr": 2.0,
+   "max_credits": 2.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E2/table_bamboo_winter_night",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E2.table_city_spring_day",
+   "seed": 205870,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "post",
+   "kind": "upscale",
+   "media": "post",
+   "tool": "upscale_image",
+   "model": "higgsfield_upscale",
+   "prompt": "Upscale the AD-approved finalist of E1.table_city_spring_day (2x). No prompt change; keep the painted look.",
+   "candidates": 1,
+   "unit_cost_cr": 2.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "2x",
+    "width": 0,
+    "height": 0
+   },
+   "depends_on_task": "E1.table_city_spring_day",
+   "quota_cr": 2.0,
+   "max_credits": 2.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E2/table_city_spring_day",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E2.table_city_spring_night",
+   "seed": 633276,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "post",
+   "kind": "upscale",
+   "media": "post",
+   "tool": "upscale_image",
+   "model": "higgsfield_upscale",
+   "prompt": "Upscale the AD-approved finalist of E1.table_city_spring_night (2x). No prompt change; keep the painted look.",
+   "candidates": 1,
+   "unit_cost_cr": 2.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "2x",
+    "width": 0,
+    "height": 0
+   },
+   "depends_on_task": "E1.table_city_spring_night",
+   "quota_cr": 2.0,
+   "max_credits": 2.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E2/table_city_spring_night",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E2.table_city_summer_day",
+   "seed": 606564,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "post",
+   "kind": "upscale",
+   "media": "post",
+   "tool": "upscale_image",
+   "model": "higgsfield_upscale",
+   "prompt": "Upscale the AD-approved finalist of E1.table_city_summer_day (2x). No prompt change; keep the painted look.",
+   "candidates": 1,
+   "unit_cost_cr": 2.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "2x",
+    "width": 0,
+    "height": 0
+   },
+   "depends_on_task": "E1.table_city_summer_day",
+   "quota_cr": 2.0,
+   "max_credits": 2.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E2/table_city_summer_day",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E2.table_city_summer_night",
+   "seed": 138856,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "post",
+   "kind": "upscale",
+   "media": "post",
+   "tool": "upscale_image",
+   "model": "higgsfield_upscale",
+   "prompt": "Upscale the AD-approved finalist of E1.table_city_summer_night (2x). No prompt change; keep the painted look.",
+   "candidates": 1,
+   "unit_cost_cr": 2.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "2x",
+    "width": 0,
+    "height": 0
+   },
+   "depends_on_task": "E1.table_city_summer_night",
+   "quota_cr": 2.0,
+   "max_credits": 2.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E2/table_city_summer_night",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E2.table_city_autumn_day",
+   "seed": 915062,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "post",
+   "kind": "upscale",
+   "media": "post",
+   "tool": "upscale_image",
+   "model": "higgsfield_upscale",
+   "prompt": "Upscale the AD-approved finalist of E1.table_city_autumn_day (2x). No prompt change; keep the painted look.",
+   "candidates": 1,
+   "unit_cost_cr": 2.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "2x",
+    "width": 0,
+    "height": 0
+   },
+   "depends_on_task": "E1.table_city_autumn_day",
+   "quota_cr": 2.0,
+   "max_credits": 2.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E2/table_city_autumn_day",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E2.table_city_autumn_night",
+   "seed": 434607,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "post",
+   "kind": "upscale",
+   "media": "post",
+   "tool": "upscale_image",
+   "model": "higgsfield_upscale",
+   "prompt": "Upscale the AD-approved finalist of E1.table_city_autumn_night (2x). No prompt change; keep the painted look.",
+   "candidates": 1,
+   "unit_cost_cr": 2.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "2x",
+    "width": 0,
+    "height": 0
+   },
+   "depends_on_task": "E1.table_city_autumn_night",
+   "quota_cr": 2.0,
+   "max_credits": 2.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E2/table_city_autumn_night",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E2.table_city_winter_day",
+   "seed": 322117,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "post",
+   "kind": "upscale",
+   "media": "post",
+   "tool": "upscale_image",
+   "model": "higgsfield_upscale",
+   "prompt": "Upscale the AD-approved finalist of E1.table_city_winter_day (2x). No prompt change; keep the painted look.",
+   "candidates": 1,
+   "unit_cost_cr": 2.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "2x",
+    "width": 0,
+    "height": 0
+   },
+   "depends_on_task": "E1.table_city_winter_day",
+   "quota_cr": 2.0,
+   "max_credits": 2.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E2/table_city_winter_day",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E2.table_city_winter_night",
+   "seed": 257042,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "post",
+   "kind": "upscale",
+   "media": "post",
+   "tool": "upscale_image",
+   "model": "higgsfield_upscale",
+   "prompt": "Upscale the AD-approved finalist of E1.table_city_winter_night (2x). No prompt change; keep the painted look.",
+   "candidates": 1,
+   "unit_cost_cr": 2.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "2x",
+    "width": 0,
+    "height": 0
+   },
+   "depends_on_task": "E1.table_city_winter_night",
+   "quota_cr": 2.0,
+   "max_credits": 2.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E2/table_city_winter_night",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E2.salon_mc",
+   "seed": 556098,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "post",
+   "kind": "upscale",
+   "media": "post",
+   "tool": "upscale_image",
+   "model": "higgsfield_upscale",
+   "prompt": "Upscale the AD-approved finalist of E1.salon_mc (2x). No prompt change; keep the painted look.",
+   "candidates": 1,
+   "unit_cost_cr": 2.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "2x",
+    "width": 0,
+    "height": 0
+   },
+   "depends_on_task": "E1.salon_mc",
+   "quota_cr": 2.0,
+   "max_credits": 2.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E2/salon_mc",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E2.salon_rin",
+   "seed": 969727,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "post",
+   "kind": "upscale",
+   "media": "post",
+   "tool": "upscale_image",
+   "model": "higgsfield_upscale",
+   "prompt": "Upscale the AD-approved finalist of E1.salon_rin (2x). No prompt change; keep the painted look.",
+   "candidates": 1,
+   "unit_cost_cr": 2.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "2x",
+    "width": 0,
+    "height": 0
+   },
+   "depends_on_task": "E1.salon_rin",
+   "quota_cr": 2.0,
+   "max_credits": 2.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E2/salon_rin",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E2.salon_hana",
+   "seed": 108913,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "post",
+   "kind": "upscale",
+   "media": "post",
+   "tool": "upscale_image",
+   "model": "higgsfield_upscale",
+   "prompt": "Upscale the AD-approved finalist of E1.salon_hana (2x). No prompt change; keep the painted look.",
+   "candidates": 1,
+   "unit_cost_cr": 2.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "2x",
+    "width": 0,
+    "height": 0
+   },
+   "depends_on_task": "E1.salon_hana",
+   "quota_cr": 2.0,
+   "max_credits": 2.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E2/salon_hana",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E2.salon_yue",
+   "seed": 569899,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "post",
+   "kind": "upscale",
+   "media": "post",
+   "tool": "upscale_image",
+   "model": "higgsfield_upscale",
+   "prompt": "Upscale the AD-approved finalist of E1.salon_yue (2x). No prompt change; keep the painted look.",
+   "candidates": 1,
+   "unit_cost_cr": 2.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "2x",
+    "width": 0,
+    "height": 0
+   },
+   "depends_on_task": "E1.salon_yue",
+   "quota_cr": 2.0,
+   "max_credits": 2.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E2/salon_yue",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E2.salon_nova",
+   "seed": 999614,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "post",
+   "kind": "upscale",
+   "media": "post",
+   "tool": "upscale_image",
+   "model": "higgsfield_upscale",
+   "prompt": "Upscale the AD-approved finalist of E1.salon_nova (2x). No prompt change; keep the painted look.",
+   "candidates": 1,
+   "unit_cost_cr": 2.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "2x",
+    "width": 0,
+    "height": 0
+   },
+   "depends_on_task": "E1.salon_nova",
+   "quota_cr": 2.0,
+   "max_credits": 2.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E2/salon_nova",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E2.salon_tsubame",
+   "seed": 232303,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "post",
+   "kind": "upscale",
+   "media": "post",
+   "tool": "upscale_image",
+   "model": "higgsfield_upscale",
+   "prompt": "Upscale the AD-approved finalist of E1.salon_tsubame (2x). No prompt change; keep the painted look.",
+   "candidates": 1,
+   "unit_cost_cr": 2.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "2x",
+    "width": 0,
+    "height": 0
+   },
+   "depends_on_task": "E1.salon_tsubame",
+   "quota_cr": 2.0,
+   "max_credits": 2.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E2/salon_tsubame",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E2.salon_miel",
+   "seed": 652621,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "post",
+   "kind": "upscale",
+   "media": "post",
+   "tool": "upscale_image",
+   "model": "higgsfield_upscale",
+   "prompt": "Upscale the AD-approved finalist of E1.salon_miel (2x). No prompt change; keep the painted look.",
+   "candidates": 1,
+   "unit_cost_cr": 2.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "2x",
+    "width": 0,
+    "height": 0
+   },
+   "depends_on_task": "E1.salon_miel",
+   "quota_cr": 2.0,
+   "max_credits": 2.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E2/salon_miel",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E2.salon_kohaku",
+   "seed": 363776,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "post",
+   "kind": "upscale",
+   "media": "post",
+   "tool": "upscale_image",
+   "model": "higgsfield_upscale",
+   "prompt": "Upscale the AD-approved finalist of E1.salon_kohaku (2x). No prompt change; keep the painted look.",
+   "candidates": 1,
+   "unit_cost_cr": 2.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "2x",
+    "width": 0,
+    "height": 0
+   },
+   "depends_on_task": "E1.salon_kohaku",
+   "quota_cr": 2.0,
+   "max_credits": 2.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E2/salon_kohaku",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E2.salon_shirin",
+   "seed": 606052,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "post",
+   "kind": "upscale",
+   "media": "post",
+   "tool": "upscale_image",
+   "model": "higgsfield_upscale",
+   "prompt": "Upscale the AD-approved finalist of E1.salon_shirin (2x). No prompt change; keep the painted look.",
+   "candidates": 1,
+   "unit_cost_cr": 2.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "2x",
+    "width": 0,
+    "height": 0
+   },
+   "depends_on_task": "E1.salon_shirin",
+   "quota_cr": 2.0,
+   "max_credits": 2.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E2/salon_shirin",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E2.salon_zlata",
+   "seed": 403365,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "post",
+   "kind": "upscale",
+   "media": "post",
+   "tool": "upscale_image",
+   "model": "higgsfield_upscale",
+   "prompt": "Upscale the AD-approved finalist of E1.salon_zlata (2x). No prompt change; keep the painted look.",
+   "candidates": 1,
+   "unit_cost_cr": 2.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "2x",
+    "width": 0,
+    "height": 0
+   },
+   "depends_on_task": "E1.salon_zlata",
+   "quota_cr": 2.0,
+   "max_credits": 2.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E2/salon_zlata",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E2.koikoi_01_pine",
+   "seed": 280301,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "post",
+   "kind": "upscale",
+   "media": "post",
+   "tool": "upscale_image",
+   "model": "higgsfield_upscale",
+   "prompt": "Upscale the AD-approved finalist of E1.koikoi_01_pine (2x). No prompt change; keep the painted look.",
+   "candidates": 1,
+   "unit_cost_cr": 2.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "2x",
+    "width": 0,
+    "height": 0
+   },
+   "depends_on_task": "E1.koikoi_01_pine",
+   "quota_cr": 2.0,
+   "max_credits": 2.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E2/koikoi_01_pine",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E2.koikoi_02_plum",
+   "seed": 981856,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "post",
+   "kind": "upscale",
+   "media": "post",
+   "tool": "upscale_image",
+   "model": "higgsfield_upscale",
+   "prompt": "Upscale the AD-approved finalist of E1.koikoi_02_plum (2x). No prompt change; keep the painted look.",
+   "candidates": 1,
+   "unit_cost_cr": 2.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "2x",
+    "width": 0,
+    "height": 0
+   },
+   "depends_on_task": "E1.koikoi_02_plum",
+   "quota_cr": 2.0,
+   "max_credits": 2.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E2/koikoi_02_plum",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E2.koikoi_03_cherry",
+   "seed": 783376,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "post",
+   "kind": "upscale",
+   "media": "post",
+   "tool": "upscale_image",
+   "model": "higgsfield_upscale",
+   "prompt": "Upscale the AD-approved finalist of E1.koikoi_03_cherry (2x). No prompt change; keep the painted look.",
+   "candidates": 1,
+   "unit_cost_cr": 2.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "2x",
+    "width": 0,
+    "height": 0
+   },
+   "depends_on_task": "E1.koikoi_03_cherry",
+   "quota_cr": 2.0,
+   "max_credits": 2.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E2/koikoi_03_cherry",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E2.koikoi_04_wisteria",
+   "seed": 262763,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "post",
+   "kind": "upscale",
+   "media": "post",
+   "tool": "upscale_image",
+   "model": "higgsfield_upscale",
+   "prompt": "Upscale the AD-approved finalist of E1.koikoi_04_wisteria (2x). No prompt change; keep the painted look.",
+   "candidates": 1,
+   "unit_cost_cr": 2.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "2x",
+    "width": 0,
+    "height": 0
+   },
+   "depends_on_task": "E1.koikoi_04_wisteria",
+   "quota_cr": 2.0,
+   "max_credits": 2.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E2/koikoi_04_wisteria",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E2.koikoi_05_iris",
+   "seed": 589833,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "post",
+   "kind": "upscale",
+   "media": "post",
+   "tool": "upscale_image",
+   "model": "higgsfield_upscale",
+   "prompt": "Upscale the AD-approved finalist of E1.koikoi_05_iris (2x). No prompt change; keep the painted look.",
+   "candidates": 1,
+   "unit_cost_cr": 2.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "2x",
+    "width": 0,
+    "height": 0
+   },
+   "depends_on_task": "E1.koikoi_05_iris",
+   "quota_cr": 2.0,
+   "max_credits": 2.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E2/koikoi_05_iris",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E2.koikoi_06_peony",
+   "seed": 850705,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "post",
+   "kind": "upscale",
+   "media": "post",
+   "tool": "upscale_image",
+   "model": "higgsfield_upscale",
+   "prompt": "Upscale the AD-approved finalist of E1.koikoi_06_peony (2x). No prompt change; keep the painted look.",
+   "candidates": 1,
+   "unit_cost_cr": 2.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "2x",
+    "width": 0,
+    "height": 0
+   },
+   "depends_on_task": "E1.koikoi_06_peony",
+   "quota_cr": 2.0,
+   "max_credits": 2.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E2/koikoi_06_peony",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E2.koikoi_07_bush_clover",
+   "seed": 390662,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "post",
+   "kind": "upscale",
+   "media": "post",
+   "tool": "upscale_image",
+   "model": "higgsfield_upscale",
+   "prompt": "Upscale the AD-approved finalist of E1.koikoi_07_bush_clover (2x). No prompt change; keep the painted look.",
+   "candidates": 1,
+   "unit_cost_cr": 2.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "2x",
+    "width": 0,
+    "height": 0
+   },
+   "depends_on_task": "E1.koikoi_07_bush_clover",
+   "quota_cr": 2.0,
+   "max_credits": 2.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E2/koikoi_07_bush_clover",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E2.koikoi_08_pampas_moon",
+   "seed": 818757,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "post",
+   "kind": "upscale",
+   "media": "post",
+   "tool": "upscale_image",
+   "model": "higgsfield_upscale",
+   "prompt": "Upscale the AD-approved finalist of E1.koikoi_08_pampas_moon (2x). No prompt change; keep the painted look.",
+   "candidates": 1,
+   "unit_cost_cr": 2.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "2x",
+    "width": 0,
+    "height": 0
+   },
+   "depends_on_task": "E1.koikoi_08_pampas_moon",
+   "quota_cr": 2.0,
+   "max_credits": 2.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E2/koikoi_08_pampas_moon",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E2.koikoi_09_chrysanthemum",
+   "seed": 435379,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "post",
+   "kind": "upscale",
+   "media": "post",
+   "tool": "upscale_image",
+   "model": "higgsfield_upscale",
+   "prompt": "Upscale the AD-approved finalist of E1.koikoi_09_chrysanthemum (2x). No prompt change; keep the painted look.",
+   "candidates": 1,
+   "unit_cost_cr": 2.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "2x",
+    "width": 0,
+    "height": 0
+   },
+   "depends_on_task": "E1.koikoi_09_chrysanthemum",
+   "quota_cr": 2.0,
+   "max_credits": 2.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E2/koikoi_09_chrysanthemum",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E2.koikoi_10_maple",
+   "seed": 218097,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "post",
+   "kind": "upscale",
+   "media": "post",
+   "tool": "upscale_image",
+   "model": "higgsfield_upscale",
+   "prompt": "Upscale the AD-approved finalist of E1.koikoi_10_maple (2x). No prompt change; keep the painted look.",
+   "candidates": 1,
+   "unit_cost_cr": 2.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "2x",
+    "width": 0,
+    "height": 0
+   },
+   "depends_on_task": "E1.koikoi_10_maple",
+   "quota_cr": 2.0,
+   "max_credits": 2.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E2/koikoi_10_maple",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E2.koikoi_11_willow_rain",
+   "seed": 622469,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "post",
+   "kind": "upscale",
+   "media": "post",
+   "tool": "upscale_image",
+   "model": "higgsfield_upscale",
+   "prompt": "Upscale the AD-approved finalist of E1.koikoi_11_willow_rain (2x). No prompt change; keep the painted look.",
+   "candidates": 1,
+   "unit_cost_cr": 2.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "2x",
+    "width": 0,
+    "height": 0
+   },
+   "depends_on_task": "E1.koikoi_11_willow_rain",
+   "quota_cr": 2.0,
+   "max_credits": 2.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E2/koikoi_11_willow_rain",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "E2.koikoi_12_paulownia",
+   "seed": 458545,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "post",
+   "kind": "upscale",
+   "media": "post",
+   "tool": "upscale_image",
+   "model": "higgsfield_upscale",
+   "prompt": "Upscale the AD-approved finalist of E1.koikoi_12_paulownia (2x). No prompt change; keep the painted look.",
+   "candidates": 1,
+   "unit_cost_cr": 2.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "2x",
+    "width": 0,
+    "height": 0
+   },
+   "depends_on_task": "E1.koikoi_12_paulownia",
+   "quota_cr": 2.0,
+   "max_credits": 2.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E2/koikoi_12_paulownia",
+    "name": "cand_{n:02d}"
+   }
+  }
+ ],
+ "totals": {
+  "tasks": 46,
+  "task_quota_sum_cr": 92.0,
+  "candidates": 0
+ },
+ "style_tail_id": null
+}

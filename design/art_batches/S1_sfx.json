@@ -1,0 +1,1362 @@
+{
+ "schema_version": 1,
+ "package": "P49",
+ "title": "SFX: 40 sounds x 3 variants + 2 ambient loops of 30 s",
+ "week": 3,
+ "section": "SFX",
+ "status": "ready_for_owner_approval",
+ "in_plan_ceiling": true,
+ "blocked_by": [],
+ "depends_on": [],
+ "owner_gate": "owner listens to the three variants per sound; pick one, normalise peaks to -6 dBFS (P45)",
+ "budget": {
+  "currency": "higgsfield_credits",
+  "nominal_cr": 105,
+  "hard_stop_cr": 120.75,
+  "hard_stop_rule": "nominal + 15%: above that the run stops and the owner is asked",
+  "assumptions": [
+   "0.50 cr per 2 s of audio (R2/PS)"
+  ]
+ },
+ "candidates_policy": "3 variants per sound (2 s each at 0.50 cr); ambient 3 variants x 30 s",
+ "selection": {
+  "keep_per_task": 1,
+  "gate": "peak -6 dBFS and P45 mix rules",
+  "criteria": [
+   "soft wood / lacquer / silk character, no buzzing or harsh synth",
+   "no clipping, no click at the start or end",
+   "length within 2 s (ambient 30 s seamless)",
+   "distinct from the existing 36 sounds (not a duplicate)",
+   "variants differ enough to pick from"
+  ]
+ },
+ "pilot": {
+  "task_ids": [
+   "S1.locked_deny",
+   "S1.rarity_glow_ssr",
+   "S1.win_yakuman"
+  ],
+  "candidates_per_task": 1,
+  "max_cr": 1.5,
+  "go_rule": "owner looks at the pilot frames; any red-line or drift failure -> fix the prompt before the full run"
+ },
+ "tool_note": "Mirelo 0.50 cr per 2 s (quoted in R2/PS). The GDD list has 42 new names; `summon_item_reveal` (reuse reward_pop) and `yakuman_chance` (merged into yakuman_ready) are dropped so the plan figure of 40 holds. License of the audio source for embedding is marked NOT VERIFIED in the GDD.",
+ "guards": [
+  "Before each launch: estimate_*_cost -> quote_ref; abort the task when the quote is above max_credits.",
+  "Actual spend goes to design/art_batches/SPEND_LOG.csv; more than 15% over the batch nominal = stop and ask the owner.",
+  "Every output lands in assets/incoming, then double anatomy audit -> metadata scrub -> watermark pass -> manifest `approve`.",
+  "Prompts are untested: run the pilot tasks first (2-3 frames), look at them, only then release the rest."
+ ],
+ "notes": [],
+ "batch_id": "S1",
+ "tasks": [
+  {
+   "id": "S1.summon_banner",
+   "seed": 258530,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "sfx",
+   "media": "audio",
+   "tool": "generate_audio",
+   "model": "mirelo_sfx",
+   "prompt": "Sound effect for a premium anime mahjong mobile game: soft ceremonial gong with rising shimmer, a banner unrolling. Clean, short, no music, no voice.",
+   "duration_s": 2,
+   "candidates": 3,
+   "unit_cost_cr": 0.5,
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "output": {
+    "dir": "assets/incoming/S1/summon_banner",
+    "name": "v{n}"
+   },
+   "quota_cr": 1.5,
+   "max_credits": 1.5,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "unit_cost_basis": "quoted"
+  },
+  {
+   "id": "S1.summon_card_fly",
+   "seed": 311974,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "sfx",
+   "media": "audio",
+   "tool": "generate_audio",
+   "model": "mirelo_sfx",
+   "prompt": "Sound effect for a premium anime mahjong mobile game: light whoosh of a card flying across, airy. Clean, short, no music, no voice.",
+   "duration_s": 2,
+   "candidates": 3,
+   "unit_cost_cr": 0.5,
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "output": {
+    "dir": "assets/incoming/S1/summon_card_fly",
+    "name": "v{n}"
+   },
+   "quota_cr": 1.5,
+   "max_credits": 1.5,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "unit_cost_basis": "quoted"
+  },
+  {
+   "id": "S1.rarity_glow_r",
+   "seed": 898348,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "sfx",
+   "media": "audio",
+   "tool": "generate_audio",
+   "model": "mirelo_sfx",
+   "prompt": "Sound effect for a premium anime mahjong mobile game: gentle jade chime glow, short. Clean, short, no music, no voice.",
+   "duration_s": 2,
+   "candidates": 3,
+   "unit_cost_cr": 0.5,
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "output": {
+    "dir": "assets/incoming/S1/rarity_glow_r",
+    "name": "v{n}"
+   },
+   "quota_cr": 1.5,
+   "max_credits": 1.5,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "unit_cost_basis": "quoted"
+  },
+  {
+   "id": "S1.rarity_glow_sr",
+   "seed": 907517,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "sfx",
+   "media": "audio",
+   "tool": "generate_audio",
+   "model": "mirelo_sfx",
+   "prompt": "Sound effect for a premium anime mahjong mobile game: lavender-silver bright chime glow, short. Clean, short, no music, no voice.",
+   "duration_s": 2,
+   "candidates": 3,
+   "unit_cost_cr": 0.5,
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "output": {
+    "dir": "assets/incoming/S1/rarity_glow_sr",
+    "name": "v{n}"
+   },
+   "quota_cr": 1.5,
+   "max_credits": 1.5,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "unit_cost_basis": "quoted"
+  },
+  {
+   "id": "S1.rarity_glow_ssr",
+   "seed": 901751,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "sfx",
+   "media": "audio",
+   "tool": "generate_audio",
+   "model": "mirelo_sfx",
+   "prompt": "Sound effect for a premium anime mahjong mobile game: golden resonant bell glow with a shimmer tail. Clean, short, no music, no voice.",
+   "duration_s": 2,
+   "candidates": 3,
+   "unit_cost_cr": 0.5,
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "output": {
+    "dir": "assets/incoming/S1/rarity_glow_ssr",
+    "name": "v{n}"
+   },
+   "quota_cr": 1.5,
+   "max_credits": 1.5,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "unit_cost_basis": "quoted"
+  },
+  {
+   "id": "S1.summon_outfit_reveal",
+   "seed": 132458,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "sfx",
+   "media": "audio",
+   "tool": "generate_audio",
+   "model": "mirelo_sfx",
+   "prompt": "Sound effect for a premium anime mahjong mobile game: silk fabric swish with a sparkle. Clean, short, no music, no voice.",
+   "duration_s": 2,
+   "candidates": 3,
+   "unit_cost_cr": 0.5,
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "output": {
+    "dir": "assets/incoming/S1/summon_outfit_reveal",
+    "name": "v{n}"
+   },
+   "quota_cr": 1.5,
+   "max_credits": 1.5,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "unit_cost_basis": "quoted"
+  },
+  {
+   "id": "S1.summon_skip",
+   "seed": 931108,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "sfx",
+   "media": "audio",
+   "tool": "generate_audio",
+   "model": "mirelo_sfx",
+   "prompt": "Sound effect for a premium anime mahjong mobile game: quick soft whoosh and tick. Clean, short, no music, no voice.",
+   "duration_s": 2,
+   "candidates": 3,
+   "unit_cost_cr": 0.5,
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "output": {
+    "dir": "assets/incoming/S1/summon_skip",
+    "name": "v{n}"
+   },
+   "quota_cr": 1.5,
+   "max_credits": 1.5,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "unit_cost_basis": "quoted"
+  },
+  {
+   "id": "S1.results_appear",
+   "seed": 348398,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "sfx",
+   "media": "audio",
+   "tool": "generate_audio",
+   "model": "mirelo_sfx",
+   "prompt": "Sound effect for a premium anime mahjong mobile game: paper slide and soft wooden knock. Clean, short, no music, no voice.",
+   "duration_s": 2,
+   "candidates": 3,
+   "unit_cost_cr": 0.5,
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "output": {
+    "dir": "assets/incoming/S1/results_appear",
+    "name": "v{n}"
+   },
+   "quota_cr": 1.5,
+   "max_credits": 1.5,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "unit_cost_basis": "quoted"
+  },
+  {
+   "id": "S1.results_confirm",
+   "seed": 727254,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "sfx",
+   "media": "audio",
+   "tool": "generate_audio",
+   "model": "mirelo_sfx",
+   "prompt": "Sound effect for a premium anime mahjong mobile game: warm wooden stamp with a small chime. Clean, short, no music, no voice.",
+   "duration_s": 2,
+   "candidates": 3,
+   "unit_cost_cr": 0.5,
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "output": {
+    "dir": "assets/incoming/S1/results_confirm",
+    "name": "v{n}"
+   },
+   "quota_cr": 1.5,
+   "max_credits": 1.5,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "unit_cost_basis": "quoted"
+  },
+  {
+   "id": "S1.heart_levelup_small",
+   "seed": 175227,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "sfx",
+   "media": "audio",
+   "tool": "generate_audio",
+   "model": "mirelo_sfx",
+   "prompt": "Sound effect for a premium anime mahjong mobile game: tiny heart sparkle, two rising bell notes. Clean, short, no music, no voice.",
+   "duration_s": 2,
+   "candidates": 3,
+   "unit_cost_cr": 0.5,
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "output": {
+    "dir": "assets/incoming/S1/heart_levelup_small",
+    "name": "v{n}"
+   },
+   "quota_cr": 1.5,
+   "max_credits": 1.5,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "unit_cost_basis": "quoted"
+  },
+  {
+   "id": "S1.heart_levelup_big",
+   "seed": 198096,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "sfx",
+   "media": "audio",
+   "tool": "generate_audio",
+   "model": "mirelo_sfx",
+   "prompt": "Sound effect for a premium anime mahjong mobile game: warm heart bloom, ascending arpeggio of bells. Clean, short, no music, no voice.",
+   "duration_s": 2,
+   "candidates": 3,
+   "unit_cost_cr": 0.5,
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "output": {
+    "dir": "assets/incoming/S1/heart_levelup_big",
+    "name": "v{n}"
+   },
+   "quota_cr": 1.5,
+   "max_credits": 1.5,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "unit_cost_basis": "quoted"
+  },
+  {
+   "id": "S1.gift_give",
+   "seed": 927011,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "sfx",
+   "media": "audio",
+   "tool": "generate_audio",
+   "model": "mirelo_sfx",
+   "prompt": "Sound effect for a premium anime mahjong mobile game: small box rustle and tied ribbon. Clean, short, no music, no voice.",
+   "duration_s": 2,
+   "candidates": 3,
+   "unit_cost_cr": 0.5,
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "output": {
+    "dir": "assets/incoming/S1/gift_give",
+    "name": "v{n}"
+   },
+   "quota_cr": 1.5,
+   "max_credits": 1.5,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "unit_cost_basis": "quoted"
+  },
+  {
+   "id": "S1.gift_liked",
+   "seed": 890777,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "sfx",
+   "media": "audio",
+   "tool": "generate_audio",
+   "model": "mirelo_sfx",
+   "prompt": "Sound effect for a premium anime mahjong mobile game: happy sparkle chime. Clean, short, no music, no voice.",
+   "duration_s": 2,
+   "candidates": 3,
+   "unit_cost_cr": 0.5,
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "output": {
+    "dir": "assets/incoming/S1/gift_liked",
+    "name": "v{n}"
+   },
+   "quota_cr": 1.5,
+   "max_credits": 1.5,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "unit_cost_basis": "quoted"
+  },
+  {
+   "id": "S1.vow_ring",
+   "seed": 210449,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "sfx",
+   "media": "audio",
+   "tool": "generate_audio",
+   "model": "mirelo_sfx",
+   "prompt": "Sound effect for a premium anime mahjong mobile game: pure single ring of a bell, long reverb. Clean, short, no music, no voice.",
+   "duration_s": 2,
+   "candidates": 3,
+   "unit_cost_cr": 0.5,
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "output": {
+    "dir": "assets/incoming/S1/vow_ring",
+    "name": "v{n}"
+   },
+   "quota_cr": 1.5,
+   "max_credits": 1.5,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "unit_cost_basis": "quoted"
+  },
+  {
+   "id": "S1.touch_head",
+   "seed": 978360,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "sfx",
+   "media": "audio",
+   "tool": "generate_audio",
+   "model": "mirelo_sfx",
+   "prompt": "Sound effect for a premium anime mahjong mobile game: very soft pat on hair, cloth rustle. Clean, short, no music, no voice.",
+   "duration_s": 2,
+   "candidates": 3,
+   "unit_cost_cr": 0.5,
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "output": {
+    "dir": "assets/incoming/S1/touch_head",
+    "name": "v{n}"
+   },
+   "quota_cr": 1.5,
+   "max_credits": 1.5,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "unit_cost_basis": "quoted"
+  },
+  {
+   "id": "S1.touch_hand",
+   "seed": 720043,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "sfx",
+   "media": "audio",
+   "tool": "generate_audio",
+   "model": "mirelo_sfx",
+   "prompt": "Sound effect for a premium anime mahjong mobile game: light fingertip touch, tiny tick. Clean, short, no music, no voice.",
+   "duration_s": 2,
+   "candidates": 3,
+   "unit_cost_cr": 0.5,
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "output": {
+    "dir": "assets/incoming/S1/touch_hand",
+    "name": "v{n}"
+   },
+   "quota_cr": 1.5,
+   "max_credits": 1.5,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "unit_cost_basis": "quoted"
+  },
+  {
+   "id": "S1.touch_hair_swish",
+   "seed": 132646,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "sfx",
+   "media": "audio",
+   "tool": "generate_audio",
+   "model": "mirelo_sfx",
+   "prompt": "Sound effect for a premium anime mahjong mobile game: soft hair swish. Clean, short, no music, no voice.",
+   "duration_s": 2,
+   "candidates": 3,
+   "unit_cost_cr": 0.5,
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "output": {
+    "dir": "assets/incoming/S1/touch_hair_swish",
+    "name": "v{n}"
+   },
+   "quota_cr": 1.5,
+   "max_credits": 1.5,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "unit_cost_basis": "quoted"
+  },
+  {
+   "id": "S1.touch_outfit_rustle",
+   "seed": 352704,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "sfx",
+   "media": "audio",
+   "tool": "generate_audio",
+   "model": "mirelo_sfx",
+   "prompt": "Sound effect for a premium anime mahjong mobile game: gentle silk rustle. Clean, short, no music, no voice.",
+   "duration_s": 2,
+   "candidates": 3,
+   "unit_cost_cr": 0.5,
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "output": {
+    "dir": "assets/incoming/S1/touch_outfit_rustle",
+    "name": "v{n}"
+   },
+   "quota_cr": 1.5,
+   "max_credits": 1.5,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "unit_cost_basis": "quoted"
+  },
+  {
+   "id": "S1.blush_pop",
+   "seed": 994903,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "sfx",
+   "media": "audio",
+   "tool": "generate_audio",
+   "model": "mirelo_sfx",
+   "prompt": "Sound effect for a premium anime mahjong mobile game: tiny cute pop with a soft sparkle. Clean, short, no music, no voice.",
+   "duration_s": 2,
+   "candidates": 3,
+   "unit_cost_cr": 0.5,
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "output": {
+    "dir": "assets/incoming/S1/blush_pop",
+    "name": "v{n}"
+   },
+   "quota_cr": 1.5,
+   "max_credits": 1.5,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "unit_cost_basis": "quoted"
+  },
+  {
+   "id": "S1.tray_heartbeat",
+   "seed": 555543,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "sfx",
+   "media": "audio",
+   "tool": "generate_audio",
+   "model": "mirelo_sfx",
+   "prompt": "Sound effect for a premium anime mahjong mobile game: low soft heartbeat pulse, two beats. Clean, short, no music, no voice.",
+   "duration_s": 2,
+   "candidates": 3,
+   "unit_cost_cr": 0.5,
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "output": {
+    "dir": "assets/incoming/S1/tray_heartbeat",
+    "name": "v{n}"
+   },
+   "quota_cr": 1.5,
+   "max_credits": 1.5,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "unit_cost_basis": "quoted"
+  },
+  {
+   "id": "S1.last_slot_tick",
+   "seed": 313535,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "sfx",
+   "media": "audio",
+   "tool": "generate_audio",
+   "model": "mirelo_sfx",
+   "prompt": "Sound effect for a premium anime mahjong mobile game: dry wooden tick, tense. Clean, short, no music, no voice.",
+   "duration_s": 2,
+   "candidates": 3,
+   "unit_cost_cr": 0.5,
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "output": {
+    "dir": "assets/incoming/S1/last_slot_tick",
+    "name": "v{n}"
+   },
+   "quota_cr": 1.5,
+   "max_credits": 1.5,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "unit_cost_basis": "quoted"
+  },
+  {
+   "id": "S1.hint_reveal",
+   "seed": 478850,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "sfx",
+   "media": "audio",
+   "tool": "generate_audio",
+   "model": "mirelo_sfx",
+   "prompt": "Sound effect for a premium anime mahjong mobile game: soft glow chime with a bright sparkle. Clean, short, no music, no voice.",
+   "duration_s": 2,
+   "candidates": 3,
+   "unit_cost_cr": 0.5,
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "output": {
+    "dir": "assets/incoming/S1/hint_reveal",
+    "name": "v{n}"
+   },
+   "quota_cr": 1.5,
+   "max_credits": 1.5,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "unit_cost_basis": "quoted"
+  },
+  {
+   "id": "S1.new_dora",
+   "seed": 324280,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "sfx",
+   "media": "audio",
+   "tool": "generate_audio",
+   "model": "mirelo_sfx",
+   "prompt": "Sound effect for a premium anime mahjong mobile game: bright clack of a tile flip and a small chime. Clean, short, no music, no voice.",
+   "duration_s": 2,
+   "candidates": 3,
+   "unit_cost_cr": 0.5,
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "output": {
+    "dir": "assets/incoming/S1/new_dora",
+    "name": "v{n}"
+   },
+   "quota_cr": 1.5,
+   "max_credits": 1.5,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "unit_cost_basis": "quoted"
+  },
+  {
+   "id": "S1.riichi_stick",
+   "seed": 577151,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "sfx",
+   "media": "audio",
+   "tool": "generate_audio",
+   "model": "mirelo_sfx",
+   "prompt": "Sound effect for a premium anime mahjong mobile game: thin stick placed on lacquer with a clear click. Clean, short, no music, no voice.",
+   "duration_s": 2,
+   "candidates": 3,
+   "unit_cost_cr": 0.5,
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "output": {
+    "dir": "assets/incoming/S1/riichi_stick",
+    "name": "v{n}"
+   },
+   "quota_cr": 1.5,
+   "max_credits": 1.5,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "unit_cost_basis": "quoted"
+  },
+  {
+   "id": "S1.meld_clack",
+   "seed": 631616,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "sfx",
+   "media": "audio",
+   "tool": "generate_audio",
+   "model": "mirelo_sfx",
+   "prompt": "Sound effect for a premium anime mahjong mobile game: two tiles clacking together firmly. Clean, short, no music, no voice.",
+   "duration_s": 2,
+   "candidates": 3,
+   "unit_cost_cr": 0.5,
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "output": {
+    "dir": "assets/incoming/S1/meld_clack",
+    "name": "v{n}"
+   },
+   "quota_cr": 1.5,
+   "max_credits": 1.5,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "unit_cost_basis": "quoted"
+  },
+  {
+   "id": "S1.win_mangan",
+   "seed": 871794,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "sfx",
+   "media": "audio",
+   "tool": "generate_audio",
+   "model": "mirelo_sfx",
+   "prompt": "Sound effect for a premium anime mahjong mobile game: short triumphant drum hit and bell flourish. Clean, short, no music, no voice.",
+   "duration_s": 2,
+   "candidates": 3,
+   "unit_cost_cr": 0.5,
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "output": {
+    "dir": "assets/incoming/S1/win_mangan",
+    "name": "v{n}"
+   },
+   "quota_cr": 1.5,
+   "max_credits": 1.5,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "unit_cost_basis": "quoted"
+  },
+  {
+   "id": "S1.win_baiman",
+   "seed": 616200,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "sfx",
+   "media": "audio",
+   "tool": "generate_audio",
+   "model": "mirelo_sfx",
+   "prompt": "Sound effect for a premium anime mahjong mobile game: stronger triumphant taiko and bell flourish. Clean, short, no music, no voice.",
+   "duration_s": 2,
+   "candidates": 3,
+   "unit_cost_cr": 0.5,
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "output": {
+    "dir": "assets/incoming/S1/win_baiman",
+    "name": "v{n}"
+   },
+   "quota_cr": 1.5,
+   "max_credits": 1.5,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "unit_cost_basis": "quoted"
+  },
+  {
+   "id": "S1.win_yakuman",
+   "seed": 258119,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "sfx",
+   "media": "audio",
+   "tool": "generate_audio",
+   "model": "mirelo_sfx",
+   "prompt": "Sound effect for a premium anime mahjong mobile game: grand taiko roll with gong and rising shimmer. Clean, short, no music, no voice.",
+   "duration_s": 2,
+   "candidates": 3,
+   "unit_cost_cr": 0.5,
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "output": {
+    "dir": "assets/incoming/S1/win_yakuman",
+    "name": "v{n}"
+   },
+   "quota_cr": 1.5,
+   "max_credits": 1.5,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "unit_cost_basis": "quoted"
+  },
+  {
+   "id": "S1.yakuman_ready",
+   "seed": 895040,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "sfx",
+   "media": "audio",
+   "tool": "generate_audio",
+   "model": "mirelo_sfx",
+   "prompt": "Sound effect for a premium anime mahjong mobile game: rising tension riser with a soft heartbeat that releases into sparkle. Clean, short, no music, no voice.",
+   "duration_s": 2,
+   "candidates": 3,
+   "unit_cost_cr": 0.5,
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "output": {
+    "dir": "assets/incoming/S1/yakuman_ready",
+    "name": "v{n}"
+   },
+   "quota_cr": 1.5,
+   "max_credits": 1.5,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "unit_cost_basis": "quoted"
+  },
+  {
+   "id": "S1.countdown_tick",
+   "seed": 751934,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "sfx",
+   "media": "audio",
+   "tool": "generate_audio",
+   "model": "mirelo_sfx",
+   "prompt": "Sound effect for a premium anime mahjong mobile game: crisp small wooden tick. Clean, short, no music, no voice.",
+   "duration_s": 2,
+   "candidates": 3,
+   "unit_cost_cr": 0.5,
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "output": {
+    "dir": "assets/incoming/S1/countdown_tick",
+    "name": "v{n}"
+   },
+   "quota_cr": 1.5,
+   "max_credits": 1.5,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "unit_cost_basis": "quoted"
+  },
+  {
+   "id": "S1.round_start_tiles",
+   "seed": 588897,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "sfx",
+   "media": "audio",
+   "tool": "generate_audio",
+   "model": "mirelo_sfx",
+   "prompt": "Sound effect for a premium anime mahjong mobile game: tiles being swept and stacked on a felt table. Clean, short, no music, no voice.",
+   "duration_s": 2,
+   "candidates": 3,
+   "unit_cost_cr": 0.5,
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "output": {
+    "dir": "assets/incoming/S1/round_start_tiles",
+    "name": "v{n}"
+   },
+   "quota_cr": 1.5,
+   "max_credits": 1.5,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "unit_cost_basis": "quoted"
+  },
+  {
+   "id": "S1.score_count",
+   "seed": 421064,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "sfx",
+   "media": "audio",
+   "tool": "generate_audio",
+   "model": "mirelo_sfx",
+   "prompt": "Sound effect for a premium anime mahjong mobile game: quick tally of tiny wooden beads. Clean, short, no music, no voice.",
+   "duration_s": 2,
+   "candidates": 3,
+   "unit_cost_cr": 0.5,
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "output": {
+    "dir": "assets/incoming/S1/score_count",
+    "name": "v{n}"
+   },
+   "quota_cr": 1.5,
+   "max_credits": 1.5,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "unit_cost_basis": "quoted"
+  },
+  {
+   "id": "S1.rank_change",
+   "seed": 393044,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "sfx",
+   "media": "audio",
+   "tool": "generate_audio",
+   "model": "mirelo_sfx",
+   "prompt": "Sound effect for a premium anime mahjong mobile game: soft ascending sweep with a gentle bell. Clean, short, no music, no voice.",
+   "duration_s": 2,
+   "candidates": 3,
+   "unit_cost_cr": 0.5,
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "output": {
+    "dir": "assets/incoming/S1/rank_change",
+    "name": "v{n}"
+   },
+   "quota_cr": 1.5,
+   "max_credits": 1.5,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "unit_cost_basis": "quoted"
+  },
+  {
+   "id": "S1.toggle",
+   "seed": 671178,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "sfx",
+   "media": "audio",
+   "tool": "generate_audio",
+   "model": "mirelo_sfx",
+   "prompt": "Sound effect for a premium anime mahjong mobile game: small lacquer switch click. Clean, short, no music, no voice.",
+   "duration_s": 2,
+   "candidates": 3,
+   "unit_cost_cr": 0.5,
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "output": {
+    "dir": "assets/incoming/S1/toggle",
+    "name": "v{n}"
+   },
+   "quota_cr": 1.5,
+   "max_credits": 1.5,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "unit_cost_basis": "quoted"
+  },
+  {
+   "id": "S1.slider_tick",
+   "seed": 487838,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "sfx",
+   "media": "audio",
+   "tool": "generate_audio",
+   "model": "mirelo_sfx",
+   "prompt": "Sound effect for a premium anime mahjong mobile game: very short light tick. Clean, short, no music, no voice.",
+   "duration_s": 2,
+   "candidates": 3,
+   "unit_cost_cr": 0.5,
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "output": {
+    "dir": "assets/incoming/S1/slider_tick",
+    "name": "v{n}"
+   },
+   "quota_cr": 1.5,
+   "max_credits": 1.5,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "unit_cost_basis": "quoted"
+  },
+  {
+   "id": "S1.popup_open",
+   "seed": 668988,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "sfx",
+   "media": "audio",
+   "tool": "generate_audio",
+   "model": "mirelo_sfx",
+   "prompt": "Sound effect for a premium anime mahjong mobile game: soft airy lift with a faint chime. Clean, short, no music, no voice.",
+   "duration_s": 2,
+   "candidates": 3,
+   "unit_cost_cr": 0.5,
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "output": {
+    "dir": "assets/incoming/S1/popup_open",
+    "name": "v{n}"
+   },
+   "quota_cr": 1.5,
+   "max_credits": 1.5,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "unit_cost_basis": "quoted"
+  },
+  {
+   "id": "S1.popup_close",
+   "seed": 675985,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "sfx",
+   "media": "audio",
+   "tool": "generate_audio",
+   "model": "mirelo_sfx",
+   "prompt": "Sound effect for a premium anime mahjong mobile game: soft airy drop with a faint tap. Clean, short, no music, no voice.",
+   "duration_s": 2,
+   "candidates": 3,
+   "unit_cost_cr": 0.5,
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "output": {
+    "dir": "assets/incoming/S1/popup_close",
+    "name": "v{n}"
+   },
+   "quota_cr": 1.5,
+   "max_credits": 1.5,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "unit_cost_basis": "quoted"
+  },
+  {
+   "id": "S1.locked_deny",
+   "seed": 553434,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "sfx",
+   "media": "audio",
+   "tool": "generate_audio",
+   "model": "mirelo_sfx",
+   "prompt": "Sound effect for a premium anime mahjong mobile game: soft dull wooden knock, polite no. Clean, short, no music, no voice.",
+   "duration_s": 2,
+   "candidates": 3,
+   "unit_cost_cr": 0.5,
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "output": {
+    "dir": "assets/incoming/S1/locked_deny",
+    "name": "v{n}"
+   },
+   "quota_cr": 1.5,
+   "max_credits": 1.5,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "unit_cost_basis": "quoted"
+  },
+  {
+   "id": "S1.purchase_seal",
+   "seed": 430948,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "sfx",
+   "media": "audio",
+   "tool": "generate_audio",
+   "model": "mirelo_sfx",
+   "prompt": "Sound effect for a premium anime mahjong mobile game: wax seal stamp with a warm chime. Clean, short, no music, no voice.",
+   "duration_s": 2,
+   "candidates": 3,
+   "unit_cost_cr": 0.5,
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "output": {
+    "dir": "assets/incoming/S1/purchase_seal",
+    "name": "v{n}"
+   },
+   "quota_cr": 1.5,
+   "max_credits": 1.5,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "unit_cost_basis": "quoted"
+  },
+  {
+   "id": "S1.daily_claim",
+   "seed": 443441,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "sfx",
+   "media": "audio",
+   "tool": "generate_audio",
+   "model": "mirelo_sfx",
+   "prompt": "Sound effect for a premium anime mahjong mobile game: bright coin pouch jingle with a sparkle. Clean, short, no music, no voice.",
+   "duration_s": 2,
+   "candidates": 3,
+   "unit_cost_cr": 0.5,
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "output": {
+    "dir": "assets/incoming/S1/daily_claim",
+    "name": "v{n}"
+   },
+   "quota_cr": 1.5,
+   "max_credits": 1.5,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "unit_cost_basis": "quoted"
+  },
+  {
+   "id": "S1.amb_teahouse",
+   "seed": 790466,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "ambient",
+   "media": "audio",
+   "tool": "generate_audio",
+   "model": "mirelo_sfx",
+   "prompt": "Ambient loop for a premium anime mahjong mobile game: calm tea house interior ambience: faint kettle simmer, distant wind chimes, wooden creaks, very soft crowd murmur, seamless loop. No music, no voice, no sudden sounds.",
+   "duration_s": 30,
+   "candidates": 3,
+   "unit_cost_cr": 7.5,
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "output": {
+    "dir": "assets/incoming/S1/amb_teahouse",
+    "name": "v{n}"
+   },
+   "quota_cr": 22.5,
+   "max_credits": 22.5,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "unit_cost_basis": "quoted"
+  },
+  {
+   "id": "S1.amb_rain_bamboo",
+   "seed": 176516,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "ambient",
+   "media": "audio",
+   "tool": "generate_audio",
+   "model": "mirelo_sfx",
+   "prompt": "Ambient loop for a premium anime mahjong mobile game: gentle rain on a bamboo grove with distant water drips and faint bamboo knocks, seamless loop. No music, no voice, no sudden sounds.",
+   "duration_s": 30,
+   "candidates": 3,
+   "unit_cost_cr": 7.5,
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "output": {
+    "dir": "assets/incoming/S1/amb_rain_bamboo",
+    "name": "v{n}"
+   },
+   "quota_cr": 22.5,
+   "max_credits": 22.5,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "unit_cost_basis": "quoted"
+  }
+ ],
+ "totals": {
+  "tasks": 42,
+  "task_quota_sum_cr": 105.0,
+  "candidates": 126
+ },
+ "style_tail_id": null
+}

@@ -1,0 +1,1115 @@
+{
+ "schema_version": 1,
+ "package": "P56",
+ "title": "Combo T1/T2/T3 frames for 5 heroines (cut-outs)",
+ "week": 3,
+ "section": "Heroines",
+ "status": "ready_for_owner_approval",
+ "in_plan_ceiling": true,
+ "blocked_by": [],
+ "depends_on": [
+  "H1"
+ ],
+ "owner_gate": "halo-score and face comparison with H1 after remove_background",
+ "budget": {
+  "currency": "higgsfield_credits",
+  "nominal_cr": 150,
+  "hard_stop_cr": 172.5,
+  "hard_stop_rule": "nominal + 15%: above that the run stops and the owner is asked",
+  "assumptions": [
+   "remove_background is not quoted and is not in the 150 cr plan figure: it is covered by the 20% reserve"
+  ]
+ },
+ "candidates_policy": "search: 6 candidates at 1k (1 cr); final: 2 candidates at 2k high (2 cr)",
+ "selection": {
+  "keep_per_task": 1,
+  "gate": "halo-score on the cut-out + face comparison with H1",
+  "criteria": [
+   "anatomy double audit passed: crops of hands, fingers, legs and feet show no extra or fused limbs",
+   "face reads as the canon heroine (>= 4 of 5 traits: eye shape, face width, nose/mouth, apparent age, brows) vs the element portrait",
+   "hair colour, signature items and outfit match the canon card; no drift (hair_never rules)",
+   "no text, no logos, no watermark, no garbled glyphs anywhere; mahjong tiles blank",
+   "adult proportions about 7-7.5 heads; garment opaque and in place; eye-level camera; no red-line pose",
+   "flat light-grey backdrop with no scenery (clean cut-out), no cast shadow on the backdrop",
+   "T1 reads at 0.45 alpha over the board: single strong silhouette, face in the upper third"
+  ]
+ },
+ "pilot": {
+  "task_ids": [
+   "H3.mc_t1.search",
+   "H3.nova_t3.search"
+  ],
+  "candidates_per_task": 2,
+  "max_cr": 4.0,
+  "go_rule": "owner looks at the pilot frames; any red-line or drift failure -> fix the prompt before the full run"
+ },
+ "tool_note": "Heroine = 5 founders by assumption (mc, rin, hana, yue, nova: rigs/composites exist). Swap `H3_HEROINES` in the builder to change the five; cost is unchanged.",
+ "guards": [
+  "Before each launch: estimate_*_cost -> quote_ref; abort the task when the quote is above max_credits.",
+  "Actual spend goes to design/art_batches/SPEND_LOG.csv; more than 15% over the batch nominal = stop and ask the owner.",
+  "Every output lands in assets/incoming, then double anatomy audit -> metadata scrub -> watermark pass -> manifest `approve`.",
+  "Prompts are untested: run the pilot tasks first (2-3 frames), look at them, only then release the rest."
+ ],
+ "notes": [
+  "GDD 9.3: tiers show as T1 'edge' x5, T2 'exit' x10, T3 'showcase' x20"
+ ],
+ "batch_id": "H3",
+ "tasks": [
+  {
+   "id": "H3.mc_t1.search",
+   "seed": 611166,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "1k",
+    "width": 680,
+    "height": 1024
+   },
+   "candidates": 6,
+   "unit_cost_cr": 1.0,
+   "heroine": "mc",
+   "element_ids": [
+    "7df3cc78-06be-4080-87f0-49d3c1da4ff0"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "combo_frame",
+   "prompt": "<<<7df3cc78-06be-4080-87f0-49d3c1da4ff0>>> is Mahjong-chan, an adult woman of 26, mahjong salon owner. Hair: light sakura-pink long glossy wavy hair worn in two high twin tails at the upper sides of the head, with long loose side strands and side-swept bangs. Eyes: rose-pink eyes with a soft gradient iris. Skin: fair warm peach skin with light rosy blush. Face: soft heart-shaped adult face, rounded cheeks, big warm slightly upturned eyes, wide open-mouth smile, soft brows. Signature items that must be present: pair of mint-jade looped knot hairpins with a small pink cherry blossom on each tail base; jade drop earrings; white ruffled wrist cuffs with a mint band. Body: medium height, soft athletic-soft figure, slim waist, moderate natural bust, moderate hips, soft shoulders; shapely but not exaggerated. Outfit: mint-jade high-collar cheongsam with puffed short sleeves, gold cloud embroidery, a small keyhole opening at the chest, knee-length hem with a side slit. Pose: leaning in from the side with a small wink and a tiny wave. Expression: playful wink, small smile. Framing: bust-up, cropped at the ribs, slightly off-center. Setting: isolated on a plain flat light-grey studio backdrop with no scenery and no floor, easy to cut out. 7.5 heads tall, soft feminine figure with no visible muscles, form-fitting costume with a detailed cut, fabric texture and at least three accessories, layered fabrics; she is the brightest, most saturated and sharpest element of the frame; full background scene but muted and desaturated, lowered saturation and contrast, light haze and gentle darkening, fewer details, no loud bokeh, no neon clutter; thin warm-colored lineart, lost edges in highlights, soft painterly shading on a cel-shaded base, matte skin, highlights only in the eyes and on the lips, no AI gloss; fully opaque fabric, garment stays exactly in place, adult mature face, adult everyday setting, mahjong tiles blank or absent, no text, no logos, camera at eye level",
+   "quality": "medium",
+   "tier": "T1 edge (x5): short quick reaction",
+   "quota_cr": 6.0,
+   "max_credits": 6.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H3/mc_t1.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H3.mc_t1.final",
+   "seed": 251838,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "2k",
+    "width": 1368,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "mc",
+   "element_ids": [
+    "7df3cc78-06be-4080-87f0-49d3c1da4ff0"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "combo_frame",
+   "prompt": "<<<7df3cc78-06be-4080-87f0-49d3c1da4ff0>>> is Mahjong-chan, an adult woman of 26, mahjong salon owner. Hair: light sakura-pink long glossy wavy hair worn in two high twin tails at the upper sides of the head, with long loose side strands and side-swept bangs. Eyes: rose-pink eyes with a soft gradient iris. Skin: fair warm peach skin with light rosy blush. Face: soft heart-shaped adult face, rounded cheeks, big warm slightly upturned eyes, wide open-mouth smile, soft brows. Signature items that must be present: pair of mint-jade looped knot hairpins with a small pink cherry blossom on each tail base; jade drop earrings; white ruffled wrist cuffs with a mint band. Body: medium height, soft athletic-soft figure, slim waist, moderate natural bust, moderate hips, soft shoulders; shapely but not exaggerated. Outfit: mint-jade high-collar cheongsam with puffed short sleeves, gold cloud embroidery, a small keyhole opening at the chest, knee-length hem with a side slit. Pose: leaning in from the side with a small wink and a tiny wave. Expression: playful wink, small smile. Framing: bust-up, cropped at the ribs, slightly off-center. Setting: isolated on a plain flat light-grey studio backdrop with no scenery and no floor, easy to cut out. 7.5 heads tall, soft feminine figure with no visible muscles, form-fitting costume with a detailed cut, fabric texture and at least three accessories, layered fabrics; she is the brightest, most saturated and sharpest element of the frame; full background scene but muted and desaturated, lowered saturation and contrast, light haze and gentle darkening, fewer details, no loud bokeh, no neon clutter; thin warm-colored lineart, lost edges in highlights, soft painterly shading on a cel-shaded base, matte skin, highlights only in the eyes and on the lips, no AI gloss; fully opaque fabric, garment stays exactly in place, adult mature face, adult everyday setting, mahjong tiles blank or absent, no text, no logos, camera at eye level",
+   "quality": "high",
+   "tier": "T1 edge (x5): short quick reaction",
+   "depends_on_task": "H3.mc_t1.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H3/mc_t1.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H3.mc_t2.search",
+   "seed": 372797,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "1k",
+    "width": 680,
+    "height": 1024
+   },
+   "candidates": 6,
+   "unit_cost_cr": 1.0,
+   "heroine": "mc",
+   "element_ids": [
+    "7df3cc78-06be-4080-87f0-49d3c1da4ff0"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "combo_frame",
+   "prompt": "<<<7df3cc78-06be-4080-87f0-49d3c1da4ff0>>> is Mahjong-chan, an adult woman of 26, mahjong salon owner. Hair: light sakura-pink long glossy wavy hair worn in two high twin tails at the upper sides of the head, with long loose side strands and side-swept bangs. Eyes: rose-pink eyes with a soft gradient iris. Skin: fair warm peach skin with light rosy blush. Face: soft heart-shaped adult face, rounded cheeks, big warm slightly upturned eyes, wide open-mouth smile, soft brows. Signature items that must be present: pair of mint-jade looped knot hairpins with a small pink cherry blossom on each tail base; jade drop earrings; white ruffled wrist cuffs with a mint band. Body: medium height, soft athletic-soft figure, slim waist, moderate natural bust, moderate hips, soft shoulders; shapely but not exaggerated. Outfit: mint-jade high-collar cheongsam with puffed short sleeves, gold cloud embroidery, a small keyhole opening at the chest, knee-length hem with a side slit. Pose: stepping forward in three-quarter view, one hand on her hip, the other pointing at the viewer. Expression: confident grin, eyes on the viewer. Framing: waist-up, centered. Setting: isolated on a plain flat light-grey studio backdrop with no scenery and no floor, easy to cut out. 7.5 heads tall, soft feminine figure with no visible muscles, form-fitting costume with a detailed cut, fabric texture and at least three accessories, layered fabrics; she is the brightest, most saturated and sharpest element of the frame; full background scene but muted and desaturated, lowered saturation and contrast, light haze and gentle darkening, fewer details, no loud bokeh, no neon clutter; thin warm-colored lineart, lost edges in highlights, soft painterly shading on a cel-shaded base, matte skin, highlights only in the eyes and on the lips, no AI gloss; fully opaque fabric, garment stays exactly in place, adult mature face, adult everyday setting, mahjong tiles blank or absent, no text, no logos, camera at eye level",
+   "quality": "medium",
+   "tier": "T2 exit (x10): confident step",
+   "quota_cr": 6.0,
+   "max_credits": 6.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H3/mc_t2.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H3.mc_t2.final",
+   "seed": 996483,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "2k",
+    "width": 1368,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "mc",
+   "element_ids": [
+    "7df3cc78-06be-4080-87f0-49d3c1da4ff0"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "combo_frame",
+   "prompt": "<<<7df3cc78-06be-4080-87f0-49d3c1da4ff0>>> is Mahjong-chan, an adult woman of 26, mahjong salon owner. Hair: light sakura-pink long glossy wavy hair worn in two high twin tails at the upper sides of the head, with long loose side strands and side-swept bangs. Eyes: rose-pink eyes with a soft gradient iris. Skin: fair warm peach skin with light rosy blush. Face: soft heart-shaped adult face, rounded cheeks, big warm slightly upturned eyes, wide open-mouth smile, soft brows. Signature items that must be present: pair of mint-jade looped knot hairpins with a small pink cherry blossom on each tail base; jade drop earrings; white ruffled wrist cuffs with a mint band. Body: medium height, soft athletic-soft figure, slim waist, moderate natural bust, moderate hips, soft shoulders; shapely but not exaggerated. Outfit: mint-jade high-collar cheongsam with puffed short sleeves, gold cloud embroidery, a small keyhole opening at the chest, knee-length hem with a side slit. Pose: stepping forward in three-quarter view, one hand on her hip, the other pointing at the viewer. Expression: confident grin, eyes on the viewer. Framing: waist-up, centered. Setting: isolated on a plain flat light-grey studio backdrop with no scenery and no floor, easy to cut out. 7.5 heads tall, soft feminine figure with no visible muscles, form-fitting costume with a detailed cut, fabric texture and at least three accessories, layered fabrics; she is the brightest, most saturated and sharpest element of the frame; full background scene but muted and desaturated, lowered saturation and contrast, light haze and gentle darkening, fewer details, no loud bokeh, no neon clutter; thin warm-colored lineart, lost edges in highlights, soft painterly shading on a cel-shaded base, matte skin, highlights only in the eyes and on the lips, no AI gloss; fully opaque fabric, garment stays exactly in place, adult mature face, adult everyday setting, mahjong tiles blank or absent, no text, no logos, camera at eye level",
+   "quality": "high",
+   "tier": "T2 exit (x10): confident step",
+   "depends_on_task": "H3.mc_t2.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H3/mc_t2.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H3.mc_t3.search",
+   "seed": 328291,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "1k",
+    "width": 680,
+    "height": 1024
+   },
+   "candidates": 6,
+   "unit_cost_cr": 1.0,
+   "heroine": "mc",
+   "element_ids": [
+    "7df3cc78-06be-4080-87f0-49d3c1da4ff0"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "combo_frame",
+   "prompt": "<<<7df3cc78-06be-4080-87f0-49d3c1da4ff0>>> is Mahjong-chan, an adult woman of 26, mahjong salon owner. Hair: light sakura-pink long glossy wavy hair worn in two high twin tails at the upper sides of the head, with long loose side strands and side-swept bangs. Eyes: rose-pink eyes with a soft gradient iris. Skin: fair warm peach skin with light rosy blush. Face: soft heart-shaped adult face, rounded cheeks, big warm slightly upturned eyes, wide open-mouth smile, soft brows. Signature items that must be present: pair of mint-jade looped knot hairpins with a small pink cherry blossom on each tail base; jade drop earrings; white ruffled wrist cuffs with a mint band. Body: medium height, soft athletic-soft figure, slim waist, moderate natural bust, moderate hips, soft shoulders; shapely but not exaggerated. Outfit: mint-jade high-collar cheongsam with puffed short sleeves, gold cloud embroidery, a small keyhole opening at the chest, knee-length hem with a side slit. Pose: arms open wide in a proud presenting gesture, hair and ribbons flowing in a breeze (not the hem). Expression: radiant triumphant smile, eyes on the viewer. Framing: bust-up portrait with a clear headroom, centered. Setting: isolated on a plain flat light-grey studio backdrop with no scenery and no floor, easy to cut out. 7.5 heads tall, soft feminine figure with no visible muscles, form-fitting costume with a detailed cut, fabric texture and at least three accessories, layered fabrics; she is the brightest, most saturated and sharpest element of the frame; full background scene but muted and desaturated, lowered saturation and contrast, light haze and gentle darkening, fewer details, no loud bokeh, no neon clutter; thin warm-colored lineart, lost edges in highlights, soft painterly shading on a cel-shaded base, matte skin, highlights only in the eyes and on the lips, no AI gloss; fully opaque fabric, garment stays exactly in place, adult mature face, adult everyday setting, mahjong tiles blank or absent, no text, no logos, camera at eye level",
+   "quality": "medium",
+   "tier": "T3 showcase (x20): big finish",
+   "quota_cr": 6.0,
+   "max_credits": 6.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H3/mc_t3.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H3.mc_t3.final",
+   "seed": 143703,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "2k",
+    "width": 1368,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "mc",
+   "element_ids": [
+    "7df3cc78-06be-4080-87f0-49d3c1da4ff0"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "combo_frame",
+   "prompt": "<<<7df3cc78-06be-4080-87f0-49d3c1da4ff0>>> is Mahjong-chan, an adult woman of 26, mahjong salon owner. Hair: light sakura-pink long glossy wavy hair worn in two high twin tails at the upper sides of the head, with long loose side strands and side-swept bangs. Eyes: rose-pink eyes with a soft gradient iris. Skin: fair warm peach skin with light rosy blush. Face: soft heart-shaped adult face, rounded cheeks, big warm slightly upturned eyes, wide open-mouth smile, soft brows. Signature items that must be present: pair of mint-jade looped knot hairpins with a small pink cherry blossom on each tail base; jade drop earrings; white ruffled wrist cuffs with a mint band. Body: medium height, soft athletic-soft figure, slim waist, moderate natural bust, moderate hips, soft shoulders; shapely but not exaggerated. Outfit: mint-jade high-collar cheongsam with puffed short sleeves, gold cloud embroidery, a small keyhole opening at the chest, knee-length hem with a side slit. Pose: arms open wide in a proud presenting gesture, hair and ribbons flowing in a breeze (not the hem). Expression: radiant triumphant smile, eyes on the viewer. Framing: bust-up portrait with a clear headroom, centered. Setting: isolated on a plain flat light-grey studio backdrop with no scenery and no floor, easy to cut out. 7.5 heads tall, soft feminine figure with no visible muscles, form-fitting costume with a detailed cut, fabric texture and at least three accessories, layered fabrics; she is the brightest, most saturated and sharpest element of the frame; full background scene but muted and desaturated, lowered saturation and contrast, light haze and gentle darkening, fewer details, no loud bokeh, no neon clutter; thin warm-colored lineart, lost edges in highlights, soft painterly shading on a cel-shaded base, matte skin, highlights only in the eyes and on the lips, no AI gloss; fully opaque fabric, garment stays exactly in place, adult mature face, adult everyday setting, mahjong tiles blank or absent, no text, no logos, camera at eye level",
+   "quality": "high",
+   "tier": "T3 showcase (x20): big finish",
+   "depends_on_task": "H3.mc_t3.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H3/mc_t3.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H3.rin_t1.search",
+   "seed": 409909,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "1k",
+    "width": 680,
+    "height": 1024
+   },
+   "candidates": 6,
+   "unit_cost_cr": 1.0,
+   "heroine": "rin",
+   "element_ids": [
+    "4d50001c-c2be-4758-a1e5-6d2c7d5f70be"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "combo_frame",
+   "prompt": "<<<4d50001c-c2be-4758-a1e5-6d2c7d5f70be>>> is Rin, an adult woman of 27, tea master of the Ice Pavilion. Hair: dark sage-green long glossy hair with a side parting and one thick loose braid falling over her left shoulder. Eyes: sage-green almond eyes with calm half-lowered lids. Skin: light warm beige skin. Face: long narrow adult oval face, high cheekbones, almond eyes, thin straight brows, small refined mouth, elegant long neck. Signature items that must be present: thin round gold wire glasses (worn in every image, Rin only); jade teardrop earrings; jade bangle; celadon tea bowl or tea set nearby. Body: tall slender figure, long neck and legs, slim waist, modest natural bust, moderate hips; elegant, not exaggerated. Outfit: stand-collar fitted silk blouse with a small keyhole and a high-waisted pencil skirt to the knee with opaque tights. Pose: leaning in from the side with a small wink and a tiny wave. Expression: playful wink, small smile. Framing: bust-up, cropped at the ribs, slightly off-center. Setting: isolated on a plain flat light-grey studio backdrop with no scenery and no floor, easy to cut out. 7.5 heads tall, soft feminine figure with no visible muscles, form-fitting costume with a detailed cut, fabric texture and at least three accessories, layered fabrics; she is the brightest, most saturated and sharpest element of the frame; full background scene but muted and desaturated, lowered saturation and contrast, light haze and gentle darkening, fewer details, no loud bokeh, no neon clutter; thin warm-colored lineart, lost edges in highlights, soft painterly shading on a cel-shaded base, matte skin, highlights only in the eyes and on the lips, no AI gloss; fully opaque fabric, garment stays exactly in place, adult mature face, adult everyday setting, mahjong tiles blank or absent, no text, no logos, camera at eye level",
+   "quality": "medium",
+   "tier": "T1 edge (x5): short quick reaction",
+   "quota_cr": 6.0,
+   "max_credits": 6.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H3/rin_t1.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H3.rin_t1.final",
+   "seed": 171256,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "2k",
+    "width": 1368,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "rin",
+   "element_ids": [
+    "4d50001c-c2be-4758-a1e5-6d2c7d5f70be"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "combo_frame",
+   "prompt": "<<<4d50001c-c2be-4758-a1e5-6d2c7d5f70be>>> is Rin, an adult woman of 27, tea master of the Ice Pavilion. Hair: dark sage-green long glossy hair with a side parting and one thick loose braid falling over her left shoulder. Eyes: sage-green almond eyes with calm half-lowered lids. Skin: light warm beige skin. Face: long narrow adult oval face, high cheekbones, almond eyes, thin straight brows, small refined mouth, elegant long neck. Signature items that must be present: thin round gold wire glasses (worn in every image, Rin only); jade teardrop earrings; jade bangle; celadon tea bowl or tea set nearby. Body: tall slender figure, long neck and legs, slim waist, modest natural bust, moderate hips; elegant, not exaggerated. Outfit: stand-collar fitted silk blouse with a small keyhole and a high-waisted pencil skirt to the knee with opaque tights. Pose: leaning in from the side with a small wink and a tiny wave. Expression: playful wink, small smile. Framing: bust-up, cropped at the ribs, slightly off-center. Setting: isolated on a plain flat light-grey studio backdrop with no scenery and no floor, easy to cut out. 7.5 heads tall, soft feminine figure with no visible muscles, form-fitting costume with a detailed cut, fabric texture and at least three accessories, layered fabrics; she is the brightest, most saturated and sharpest element of the frame; full background scene but muted and desaturated, lowered saturation and contrast, light haze and gentle darkening, fewer details, no loud bokeh, no neon clutter; thin warm-colored lineart, lost edges in highlights, soft painterly shading on a cel-shaded base, matte skin, highlights only in the eyes and on the lips, no AI gloss; fully opaque fabric, garment stays exactly in place, adult mature face, adult everyday setting, mahjong tiles blank or absent, no text, no logos, camera at eye level",
+   "quality": "high",
+   "tier": "T1 edge (x5): short quick reaction",
+   "depends_on_task": "H3.rin_t1.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H3/rin_t1.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H3.rin_t2.search",
+   "seed": 666614,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "1k",
+    "width": 680,
+    "height": 1024
+   },
+   "candidates": 6,
+   "unit_cost_cr": 1.0,
+   "heroine": "rin",
+   "element_ids": [
+    "4d50001c-c2be-4758-a1e5-6d2c7d5f70be"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "combo_frame",
+   "prompt": "<<<4d50001c-c2be-4758-a1e5-6d2c7d5f70be>>> is Rin, an adult woman of 27, tea master of the Ice Pavilion. Hair: dark sage-green long glossy hair with a side parting and one thick loose braid falling over her left shoulder. Eyes: sage-green almond eyes with calm half-lowered lids. Skin: light warm beige skin. Face: long narrow adult oval face, high cheekbones, almond eyes, thin straight brows, small refined mouth, elegant long neck. Signature items that must be present: thin round gold wire glasses (worn in every image, Rin only); jade teardrop earrings; jade bangle; celadon tea bowl or tea set nearby. Body: tall slender figure, long neck and legs, slim waist, modest natural bust, moderate hips; elegant, not exaggerated. Outfit: stand-collar fitted silk blouse with a small keyhole and a high-waisted pencil skirt to the knee with opaque tights. Pose: stepping forward in three-quarter view, one hand on her hip, the other pointing at the viewer. Expression: confident grin, eyes on the viewer. Framing: waist-up, centered. Setting: isolated on a plain flat light-grey studio backdrop with no scenery and no floor, easy to cut out. 7.5 heads tall, soft feminine figure with no visible muscles, form-fitting costume with a detailed cut, fabric texture and at least three accessories, layered fabrics; she is the brightest, most saturated and sharpest element of the frame; full background scene but muted and desaturated, lowered saturation and contrast, light haze and gentle darkening, fewer details, no loud bokeh, no neon clutter; thin warm-colored lineart, lost edges in highlights, soft painterly shading on a cel-shaded base, matte skin, highlights only in the eyes and on the lips, no AI gloss; fully opaque fabric, garment stays exactly in place, adult mature face, adult everyday setting, mahjong tiles blank or absent, no text, no logos, camera at eye level",
+   "quality": "medium",
+   "tier": "T2 exit (x10): confident step",
+   "quota_cr": 6.0,
+   "max_credits": 6.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H3/rin_t2.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H3.rin_t2.final",
+   "seed": 172997,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "2k",
+    "width": 1368,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "rin",
+   "element_ids": [
+    "4d50001c-c2be-4758-a1e5-6d2c7d5f70be"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "combo_frame",
+   "prompt": "<<<4d50001c-c2be-4758-a1e5-6d2c7d5f70be>>> is Rin, an adult woman of 27, tea master of the Ice Pavilion. Hair: dark sage-green long glossy hair with a side parting and one thick loose braid falling over her left shoulder. Eyes: sage-green almond eyes with calm half-lowered lids. Skin: light warm beige skin. Face: long narrow adult oval face, high cheekbones, almond eyes, thin straight brows, small refined mouth, elegant long neck. Signature items that must be present: thin round gold wire glasses (worn in every image, Rin only); jade teardrop earrings; jade bangle; celadon tea bowl or tea set nearby. Body: tall slender figure, long neck and legs, slim waist, modest natural bust, moderate hips; elegant, not exaggerated. Outfit: stand-collar fitted silk blouse with a small keyhole and a high-waisted pencil skirt to the knee with opaque tights. Pose: stepping forward in three-quarter view, one hand on her hip, the other pointing at the viewer. Expression: confident grin, eyes on the viewer. Framing: waist-up, centered. Setting: isolated on a plain flat light-grey studio backdrop with no scenery and no floor, easy to cut out. 7.5 heads tall, soft feminine figure with no visible muscles, form-fitting costume with a detailed cut, fabric texture and at least three accessories, layered fabrics; she is the brightest, most saturated and sharpest element of the frame; full background scene but muted and desaturated, lowered saturation and contrast, light haze and gentle darkening, fewer details, no loud bokeh, no neon clutter; thin warm-colored lineart, lost edges in highlights, soft painterly shading on a cel-shaded base, matte skin, highlights only in the eyes and on the lips, no AI gloss; fully opaque fabric, garment stays exactly in place, adult mature face, adult everyday setting, mahjong tiles blank or absent, no text, no logos, camera at eye level",
+   "quality": "high",
+   "tier": "T2 exit (x10): confident step",
+   "depends_on_task": "H3.rin_t2.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H3/rin_t2.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H3.rin_t3.search",
+   "seed": 608712,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "1k",
+    "width": 680,
+    "height": 1024
+   },
+   "candidates": 6,
+   "unit_cost_cr": 1.0,
+   "heroine": "rin",
+   "element_ids": [
+    "4d50001c-c2be-4758-a1e5-6d2c7d5f70be"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "combo_frame",
+   "prompt": "<<<4d50001c-c2be-4758-a1e5-6d2c7d5f70be>>> is Rin, an adult woman of 27, tea master of the Ice Pavilion. Hair: dark sage-green long glossy hair with a side parting and one thick loose braid falling over her left shoulder. Eyes: sage-green almond eyes with calm half-lowered lids. Skin: light warm beige skin. Face: long narrow adult oval face, high cheekbones, almond eyes, thin straight brows, small refined mouth, elegant long neck. Signature items that must be present: thin round gold wire glasses (worn in every image, Rin only); jade teardrop earrings; jade bangle; celadon tea bowl or tea set nearby. Body: tall slender figure, long neck and legs, slim waist, modest natural bust, moderate hips; elegant, not exaggerated. Outfit: stand-collar fitted silk blouse with a small keyhole and a high-waisted pencil skirt to the knee with opaque tights. Pose: arms open wide in a proud presenting gesture, hair and ribbons flowing in a breeze (not the hem). Expression: radiant triumphant smile, eyes on the viewer. Framing: bust-up portrait with a clear headroom, centered. Setting: isolated on a plain flat light-grey studio backdrop with no scenery and no floor, easy to cut out. 7.5 heads tall, soft feminine figure with no visible muscles, form-fitting costume with a detailed cut, fabric texture and at least three accessories, layered fabrics; she is the brightest, most saturated and sharpest element of the frame; full background scene but muted and desaturated, lowered saturation and contrast, light haze and gentle darkening, fewer details, no loud bokeh, no neon clutter; thin warm-colored lineart, lost edges in highlights, soft painterly shading on a cel-shaded base, matte skin, highlights only in the eyes and on the lips, no AI gloss; fully opaque fabric, garment stays exactly in place, adult mature face, adult everyday setting, mahjong tiles blank or absent, no text, no logos, camera at eye level",
+   "quality": "medium",
+   "tier": "T3 showcase (x20): big finish",
+   "quota_cr": 6.0,
+   "max_credits": 6.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H3/rin_t3.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H3.rin_t3.final",
+   "seed": 125521,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "2k",
+    "width": 1368,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "rin",
+   "element_ids": [
+    "4d50001c-c2be-4758-a1e5-6d2c7d5f70be"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "combo_frame",
+   "prompt": "<<<4d50001c-c2be-4758-a1e5-6d2c7d5f70be>>> is Rin, an adult woman of 27, tea master of the Ice Pavilion. Hair: dark sage-green long glossy hair with a side parting and one thick loose braid falling over her left shoulder. Eyes: sage-green almond eyes with calm half-lowered lids. Skin: light warm beige skin. Face: long narrow adult oval face, high cheekbones, almond eyes, thin straight brows, small refined mouth, elegant long neck. Signature items that must be present: thin round gold wire glasses (worn in every image, Rin only); jade teardrop earrings; jade bangle; celadon tea bowl or tea set nearby. Body: tall slender figure, long neck and legs, slim waist, modest natural bust, moderate hips; elegant, not exaggerated. Outfit: stand-collar fitted silk blouse with a small keyhole and a high-waisted pencil skirt to the knee with opaque tights. Pose: arms open wide in a proud presenting gesture, hair and ribbons flowing in a breeze (not the hem). Expression: radiant triumphant smile, eyes on the viewer. Framing: bust-up portrait with a clear headroom, centered. Setting: isolated on a plain flat light-grey studio backdrop with no scenery and no floor, easy to cut out. 7.5 heads tall, soft feminine figure with no visible muscles, form-fitting costume with a detailed cut, fabric texture and at least three accessories, layered fabrics; she is the brightest, most saturated and sharpest element of the frame; full background scene but muted and desaturated, lowered saturation and contrast, light haze and gentle darkening, fewer details, no loud bokeh, no neon clutter; thin warm-colored lineart, lost edges in highlights, soft painterly shading on a cel-shaded base, matte skin, highlights only in the eyes and on the lips, no AI gloss; fully opaque fabric, garment stays exactly in place, adult mature face, adult everyday setting, mahjong tiles blank or absent, no text, no logos, camera at eye level",
+   "quality": "high",
+   "tier": "T3 showcase (x20): big finish",
+   "depends_on_task": "H3.rin_t3.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H3/rin_t3.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H3.hana_t1.search",
+   "seed": 650673,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "1k",
+    "width": 680,
+    "height": 1024
+   },
+   "candidates": 6,
+   "unit_cost_cr": 1.0,
+   "heroine": "hana",
+   "element_ids": [
+    "ded72d02-6c3a-45e4-874a-0afdc3936c07"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "combo_frame",
+   "prompt": "<<<ded72d02-6c3a-45e4-874a-0afdc3936c07>>> is Hana, an adult woman of 24, relay team captain and gym coach. Hair: short tousled curly orange bob, chin-length with messy wavy ends. Eyes: warm amber eyes. Skin: warm light-tan skin with light freckles (one consistent skin tone in every image). Face: round-square adult face with a soft jaw, wide upturned eyes, thick expressive brows, wide toothy grin. Signature items that must be present: yellow sunflower hair clip above the right ear; light freckles across nose and cheeks; track jacket tied around the waist (most outfits); sport wristband. Body: athletic slim figure, toned legs, flat stomach, narrow shoulders, modest natural bust, moderate hips; no visible muscle definition. Outfit: zip track top opened to the collarbone, high-waisted running shorts over opaque athletic tights, white-orange sneakers. Pose: leaning in from the side with a small wink and a tiny wave. Expression: playful wink, small smile. Framing: bust-up, cropped at the ribs, slightly off-center. Setting: isolated on a plain flat light-grey studio backdrop with no scenery and no floor, easy to cut out. 7.5 heads tall, soft feminine figure with no visible muscles, form-fitting costume with a detailed cut, fabric texture and at least three accessories, layered fabrics; she is the brightest, most saturated and sharpest element of the frame; full background scene but muted and desaturated, lowered saturation and contrast, light haze and gentle darkening, fewer details, no loud bokeh, no neon clutter; thin warm-colored lineart, lost edges in highlights, soft painterly shading on a cel-shaded base, matte skin, highlights only in the eyes and on the lips, no AI gloss; fully opaque fabric, garment stays exactly in place, adult mature face, adult everyday setting, mahjong tiles blank or absent, no text, no logos, camera at eye level",
+   "quality": "medium",
+   "tier": "T1 edge (x5): short quick reaction",
+   "quota_cr": 6.0,
+   "max_credits": 6.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H3/hana_t1.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H3.hana_t1.final",
+   "seed": 517781,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "2k",
+    "width": 1368,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "hana",
+   "element_ids": [
+    "ded72d02-6c3a-45e4-874a-0afdc3936c07"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "combo_frame",
+   "prompt": "<<<ded72d02-6c3a-45e4-874a-0afdc3936c07>>> is Hana, an adult woman of 24, relay team captain and gym coach. Hair: short tousled curly orange bob, chin-length with messy wavy ends. Eyes: warm amber eyes. Skin: warm light-tan skin with light freckles (one consistent skin tone in every image). Face: round-square adult face with a soft jaw, wide upturned eyes, thick expressive brows, wide toothy grin. Signature items that must be present: yellow sunflower hair clip above the right ear; light freckles across nose and cheeks; track jacket tied around the waist (most outfits); sport wristband. Body: athletic slim figure, toned legs, flat stomach, narrow shoulders, modest natural bust, moderate hips; no visible muscle definition. Outfit: zip track top opened to the collarbone, high-waisted running shorts over opaque athletic tights, white-orange sneakers. Pose: leaning in from the side with a small wink and a tiny wave. Expression: playful wink, small smile. Framing: bust-up, cropped at the ribs, slightly off-center. Setting: isolated on a plain flat light-grey studio backdrop with no scenery and no floor, easy to cut out. 7.5 heads tall, soft feminine figure with no visible muscles, form-fitting costume with a detailed cut, fabric texture and at least three accessories, layered fabrics; she is the brightest, most saturated and sharpest element of the frame; full background scene but muted and desaturated, lowered saturation and contrast, light haze and gentle darkening, fewer details, no loud bokeh, no neon clutter; thin warm-colored lineart, lost edges in highlights, soft painterly shading on a cel-shaded base, matte skin, highlights only in the eyes and on the lips, no AI gloss; fully opaque fabric, garment stays exactly in place, adult mature face, adult everyday setting, mahjong tiles blank or absent, no text, no logos, camera at eye level",
+   "quality": "high",
+   "tier": "T1 edge (x5): short quick reaction",
+   "depends_on_task": "H3.hana_t1.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H3/hana_t1.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H3.hana_t2.search",
+   "seed": 629394,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "1k",
+    "width": 680,
+    "height": 1024
+   },
+   "candidates": 6,
+   "unit_cost_cr": 1.0,
+   "heroine": "hana",
+   "element_ids": [
+    "ded72d02-6c3a-45e4-874a-0afdc3936c07"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "combo_frame",
+   "prompt": "<<<ded72d02-6c3a-45e4-874a-0afdc3936c07>>> is Hana, an adult woman of 24, relay team captain and gym coach. Hair: short tousled curly orange bob, chin-length with messy wavy ends. Eyes: warm amber eyes. Skin: warm light-tan skin with light freckles (one consistent skin tone in every image). Face: round-square adult face with a soft jaw, wide upturned eyes, thick expressive brows, wide toothy grin. Signature items that must be present: yellow sunflower hair clip above the right ear; light freckles across nose and cheeks; track jacket tied around the waist (most outfits); sport wristband. Body: athletic slim figure, toned legs, flat stomach, narrow shoulders, modest natural bust, moderate hips; no visible muscle definition. Outfit: zip track top opened to the collarbone, high-waisted running shorts over opaque athletic tights, white-orange sneakers. Pose: stepping forward in three-quarter view, one hand on her hip, the other pointing at the viewer. Expression: confident grin, eyes on the viewer. Framing: waist-up, centered. Setting: isolated on a plain flat light-grey studio backdrop with no scenery and no floor, easy to cut out. 7.5 heads tall, soft feminine figure with no visible muscles, form-fitting costume with a detailed cut, fabric texture and at least three accessories, layered fabrics; she is the brightest, most saturated and sharpest element of the frame; full background scene but muted and desaturated, lowered saturation and contrast, light haze and gentle darkening, fewer details, no loud bokeh, no neon clutter; thin warm-colored lineart, lost edges in highlights, soft painterly shading on a cel-shaded base, matte skin, highlights only in the eyes and on the lips, no AI gloss; fully opaque fabric, garment stays exactly in place, adult mature face, adult everyday setting, mahjong tiles blank or absent, no text, no logos, camera at eye level",
+   "quality": "medium",
+   "tier": "T2 exit (x10): confident step",
+   "quota_cr": 6.0,
+   "max_credits": 6.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H3/hana_t2.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H3.hana_t2.final",
+   "seed": 214632,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "2k",
+    "width": 1368,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "hana",
+   "element_ids": [
+    "ded72d02-6c3a-45e4-874a-0afdc3936c07"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "combo_frame",
+   "prompt": "<<<ded72d02-6c3a-45e4-874a-0afdc3936c07>>> is Hana, an adult woman of 24, relay team captain and gym coach. Hair: short tousled curly orange bob, chin-length with messy wavy ends. Eyes: warm amber eyes. Skin: warm light-tan skin with light freckles (one consistent skin tone in every image). Face: round-square adult face with a soft jaw, wide upturned eyes, thick expressive brows, wide toothy grin. Signature items that must be present: yellow sunflower hair clip above the right ear; light freckles across nose and cheeks; track jacket tied around the waist (most outfits); sport wristband. Body: athletic slim figure, toned legs, flat stomach, narrow shoulders, modest natural bust, moderate hips; no visible muscle definition. Outfit: zip track top opened to the collarbone, high-waisted running shorts over opaque athletic tights, white-orange sneakers. Pose: stepping forward in three-quarter view, one hand on her hip, the other pointing at the viewer. Expression: confident grin, eyes on the viewer. Framing: waist-up, centered. Setting: isolated on a plain flat light-grey studio backdrop with no scenery and no floor, easy to cut out. 7.5 heads tall, soft feminine figure with no visible muscles, form-fitting costume with a detailed cut, fabric texture and at least three accessories, layered fabrics; she is the brightest, most saturated and sharpest element of the frame; full background scene but muted and desaturated, lowered saturation and contrast, light haze and gentle darkening, fewer details, no loud bokeh, no neon clutter; thin warm-colored lineart, lost edges in highlights, soft painterly shading on a cel-shaded base, matte skin, highlights only in the eyes and on the lips, no AI gloss; fully opaque fabric, garment stays exactly in place, adult mature face, adult everyday setting, mahjong tiles blank or absent, no text, no logos, camera at eye level",
+   "quality": "high",
+   "tier": "T2 exit (x10): confident step",
+   "depends_on_task": "H3.hana_t2.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H3/hana_t2.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H3.hana_t3.search",
+   "seed": 537420,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "1k",
+    "width": 680,
+    "height": 1024
+   },
+   "candidates": 6,
+   "unit_cost_cr": 1.0,
+   "heroine": "hana",
+   "element_ids": [
+    "ded72d02-6c3a-45e4-874a-0afdc3936c07"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "combo_frame",
+   "prompt": "<<<ded72d02-6c3a-45e4-874a-0afdc3936c07>>> is Hana, an adult woman of 24, relay team captain and gym coach. Hair: short tousled curly orange bob, chin-length with messy wavy ends. Eyes: warm amber eyes. Skin: warm light-tan skin with light freckles (one consistent skin tone in every image). Face: round-square adult face with a soft jaw, wide upturned eyes, thick expressive brows, wide toothy grin. Signature items that must be present: yellow sunflower hair clip above the right ear; light freckles across nose and cheeks; track jacket tied around the waist (most outfits); sport wristband. Body: athletic slim figure, toned legs, flat stomach, narrow shoulders, modest natural bust, moderate hips; no visible muscle definition. Outfit: zip track top opened to the collarbone, high-waisted running shorts over opaque athletic tights, white-orange sneakers. Pose: arms open wide in a proud presenting gesture, hair and ribbons flowing in a breeze (not the hem). Expression: radiant triumphant smile, eyes on the viewer. Framing: bust-up portrait with a clear headroom, centered. Setting: isolated on a plain flat light-grey studio backdrop with no scenery and no floor, easy to cut out. 7.5 heads tall, soft feminine figure with no visible muscles, form-fitting costume with a detailed cut, fabric texture and at least three accessories, layered fabrics; she is the brightest, most saturated and sharpest element of the frame; full background scene but muted and desaturated, lowered saturation and contrast, light haze and gentle darkening, fewer details, no loud bokeh, no neon clutter; thin warm-colored lineart, lost edges in highlights, soft painterly shading on a cel-shaded base, matte skin, highlights only in the eyes and on the lips, no AI gloss; fully opaque fabric, garment stays exactly in place, adult mature face, adult everyday setting, mahjong tiles blank or absent, no text, no logos, camera at eye level",
+   "quality": "medium",
+   "tier": "T3 showcase (x20): big finish",
+   "quota_cr": 6.0,
+   "max_credits": 6.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H3/hana_t3.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H3.hana_t3.final",
+   "seed": 559964,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "2k",
+    "width": 1368,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "hana",
+   "element_ids": [
+    "ded72d02-6c3a-45e4-874a-0afdc3936c07"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "combo_frame",
+   "prompt": "<<<ded72d02-6c3a-45e4-874a-0afdc3936c07>>> is Hana, an adult woman of 24, relay team captain and gym coach. Hair: short tousled curly orange bob, chin-length with messy wavy ends. Eyes: warm amber eyes. Skin: warm light-tan skin with light freckles (one consistent skin tone in every image). Face: round-square adult face with a soft jaw, wide upturned eyes, thick expressive brows, wide toothy grin. Signature items that must be present: yellow sunflower hair clip above the right ear; light freckles across nose and cheeks; track jacket tied around the waist (most outfits); sport wristband. Body: athletic slim figure, toned legs, flat stomach, narrow shoulders, modest natural bust, moderate hips; no visible muscle definition. Outfit: zip track top opened to the collarbone, high-waisted running shorts over opaque athletic tights, white-orange sneakers. Pose: arms open wide in a proud presenting gesture, hair and ribbons flowing in a breeze (not the hem). Expression: radiant triumphant smile, eyes on the viewer. Framing: bust-up portrait with a clear headroom, centered. Setting: isolated on a plain flat light-grey studio backdrop with no scenery and no floor, easy to cut out. 7.5 heads tall, soft feminine figure with no visible muscles, form-fitting costume with a detailed cut, fabric texture and at least three accessories, layered fabrics; she is the brightest, most saturated and sharpest element of the frame; full background scene but muted and desaturated, lowered saturation and contrast, light haze and gentle darkening, fewer details, no loud bokeh, no neon clutter; thin warm-colored lineart, lost edges in highlights, soft painterly shading on a cel-shaded base, matte skin, highlights only in the eyes and on the lips, no AI gloss; fully opaque fabric, garment stays exactly in place, adult mature face, adult everyday setting, mahjong tiles blank or absent, no text, no logos, camera at eye level",
+   "quality": "high",
+   "tier": "T3 showcase (x20): big finish",
+   "depends_on_task": "H3.hana_t3.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H3/hana_t3.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H3.yue_t1.search",
+   "seed": 232111,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "1k",
+    "width": 680,
+    "height": 1024
+   },
+   "candidates": 6,
+   "unit_cost_cr": 1.0,
+   "heroine": "yue",
+   "element_ids": [
+    "8edeacc2-f24b-4a41-a166-66896711f259"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "combo_frame",
+   "prompt": "<<<8edeacc2-f24b-4a41-a166-66896711f259>>> is Yue, an adult woman of 27, ruler of the Moon Palace. Hair: very long straight-to-wavy pale lavender hair down to the waist with a half-up crown section. Eyes: violet almond eyes with long lashes. Skin: pale porcelain skin. Face: long elegant adult face with slim high nose, narrow almond eyes, serene composed smile. Signature items that must be present: pair of curved pearly-gold dragon horns rising from the crown; gold crescent-moon forehead ornament; gold crescent drop earrings with lavender tassels; moon-phase folding fan (Yue only). Body: tall statuesque figure, long limbs, regal posture, slim waist, modest natural bust, moderate hips. Outfit: lavender hanfu-style gown with bare shoulders, gold moon-and-star embroidery, sash-cinched waist and long layered sleeves. Pose: leaning in from the side with a small wink and a tiny wave. Expression: playful wink, small smile. Framing: bust-up, cropped at the ribs, slightly off-center. Setting: isolated on a plain flat light-grey studio backdrop with no scenery and no floor, easy to cut out. 7.5 heads tall, soft feminine figure with no visible muscles, form-fitting costume with a detailed cut, fabric texture and at least three accessories, layered fabrics; she is the brightest, most saturated and sharpest element of the frame; full background scene but muted and desaturated, lowered saturation and contrast, light haze and gentle darkening, fewer details, no loud bokeh, no neon clutter; thin warm-colored lineart, lost edges in highlights, soft painterly shading on a cel-shaded base, matte skin, highlights only in the eyes and on the lips, no AI gloss; fully opaque fabric, garment stays exactly in place, adult mature face, adult everyday setting, mahjong tiles blank or absent, no text, no logos, camera at eye level",
+   "quality": "medium",
+   "tier": "T1 edge (x5): short quick reaction",
+   "quota_cr": 6.0,
+   "max_credits": 6.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H3/yue_t1.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H3.yue_t1.final",
+   "seed": 900589,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "2k",
+    "width": 1368,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "yue",
+   "element_ids": [
+    "8edeacc2-f24b-4a41-a166-66896711f259"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "combo_frame",
+   "prompt": "<<<8edeacc2-f24b-4a41-a166-66896711f259>>> is Yue, an adult woman of 27, ruler of the Moon Palace. Hair: very long straight-to-wavy pale lavender hair down to the waist with a half-up crown section. Eyes: violet almond eyes with long lashes. Skin: pale porcelain skin. Face: long elegant adult face with slim high nose, narrow almond eyes, serene composed smile. Signature items that must be present: pair of curved pearly-gold dragon horns rising from the crown; gold crescent-moon forehead ornament; gold crescent drop earrings with lavender tassels; moon-phase folding fan (Yue only). Body: tall statuesque figure, long limbs, regal posture, slim waist, modest natural bust, moderate hips. Outfit: lavender hanfu-style gown with bare shoulders, gold moon-and-star embroidery, sash-cinched waist and long layered sleeves. Pose: leaning in from the side with a small wink and a tiny wave. Expression: playful wink, small smile. Framing: bust-up, cropped at the ribs, slightly off-center. Setting: isolated on a plain flat light-grey studio backdrop with no scenery and no floor, easy to cut out. 7.5 heads tall, soft feminine figure with no visible muscles, form-fitting costume with a detailed cut, fabric texture and at least three accessories, layered fabrics; she is the brightest, most saturated and sharpest element of the frame; full background scene but muted and desaturated, lowered saturation and contrast, light haze and gentle darkening, fewer details, no loud bokeh, no neon clutter; thin warm-colored lineart, lost edges in highlights, soft painterly shading on a cel-shaded base, matte skin, highlights only in the eyes and on the lips, no AI gloss; fully opaque fabric, garment stays exactly in place, adult mature face, adult everyday setting, mahjong tiles blank or absent, no text, no logos, camera at eye level",
+   "quality": "high",
+   "tier": "T1 edge (x5): short quick reaction",
+   "depends_on_task": "H3.yue_t1.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H3/yue_t1.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H3.yue_t2.search",
+   "seed": 762380,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "1k",
+    "width": 680,
+    "height": 1024
+   },
+   "candidates": 6,
+   "unit_cost_cr": 1.0,
+   "heroine": "yue",
+   "element_ids": [
+    "8edeacc2-f24b-4a41-a166-66896711f259"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "combo_frame",
+   "prompt": "<<<8edeacc2-f24b-4a41-a166-66896711f259>>> is Yue, an adult woman of 27, ruler of the Moon Palace. Hair: very long straight-to-wavy pale lavender hair down to the waist with a half-up crown section. Eyes: violet almond eyes with long lashes. Skin: pale porcelain skin. Face: long elegant adult face with slim high nose, narrow almond eyes, serene composed smile. Signature items that must be present: pair of curved pearly-gold dragon horns rising from the crown; gold crescent-moon forehead ornament; gold crescent drop earrings with lavender tassels; moon-phase folding fan (Yue only). Body: tall statuesque figure, long limbs, regal posture, slim waist, modest natural bust, moderate hips. Outfit: lavender hanfu-style gown with bare shoulders, gold moon-and-star embroidery, sash-cinched waist and long layered sleeves. Pose: stepping forward in three-quarter view, one hand on her hip, the other pointing at the viewer. Expression: confident grin, eyes on the viewer. Framing: waist-up, centered. Setting: isolated on a plain flat light-grey studio backdrop with no scenery and no floor, easy to cut out. 7.5 heads tall, soft feminine figure with no visible muscles, form-fitting costume with a detailed cut, fabric texture and at least three accessories, layered fabrics; she is the brightest, most saturated and sharpest element of the frame; full background scene but muted and desaturated, lowered saturation and contrast, light haze and gentle darkening, fewer details, no loud bokeh, no neon clutter; thin warm-colored lineart, lost edges in highlights, soft painterly shading on a cel-shaded base, matte skin, highlights only in the eyes and on the lips, no AI gloss; fully opaque fabric, garment stays exactly in place, adult mature face, adult everyday setting, mahjong tiles blank or absent, no text, no logos, camera at eye level",
+   "quality": "medium",
+   "tier": "T2 exit (x10): confident step",
+   "quota_cr": 6.0,
+   "max_credits": 6.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H3/yue_t2.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H3.yue_t2.final",
+   "seed": 784656,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "2k",
+    "width": 1368,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "yue",
+   "element_ids": [
+    "8edeacc2-f24b-4a41-a166-66896711f259"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "combo_frame",
+   "prompt": "<<<8edeacc2-f24b-4a41-a166-66896711f259>>> is Yue, an adult woman of 27, ruler of the Moon Palace. Hair: very long straight-to-wavy pale lavender hair down to the waist with a half-up crown section. Eyes: violet almond eyes with long lashes. Skin: pale porcelain skin. Face: long elegant adult face with slim high nose, narrow almond eyes, serene composed smile. Signature items that must be present: pair of curved pearly-gold dragon horns rising from the crown; gold crescent-moon forehead ornament; gold crescent drop earrings with lavender tassels; moon-phase folding fan (Yue only). Body: tall statuesque figure, long limbs, regal posture, slim waist, modest natural bust, moderate hips. Outfit: lavender hanfu-style gown with bare shoulders, gold moon-and-star embroidery, sash-cinched waist and long layered sleeves. Pose: stepping forward in three-quarter view, one hand on her hip, the other pointing at the viewer. Expression: confident grin, eyes on the viewer. Framing: waist-up, centered. Setting: isolated on a plain flat light-grey studio backdrop with no scenery and no floor, easy to cut out. 7.5 heads tall, soft feminine figure with no visible muscles, form-fitting costume with a detailed cut, fabric texture and at least three accessories, layered fabrics; she is the brightest, most saturated and sharpest element of the frame; full background scene but muted and desaturated, lowered saturation and contrast, light haze and gentle darkening, fewer details, no loud bokeh, no neon clutter; thin warm-colored lineart, lost edges in highlights, soft painterly shading on a cel-shaded base, matte skin, highlights only in the eyes and on the lips, no AI gloss; fully opaque fabric, garment stays exactly in place, adult mature face, adult everyday setting, mahjong tiles blank or absent, no text, no logos, camera at eye level",
+   "quality": "high",
+   "tier": "T2 exit (x10): confident step",
+   "depends_on_task": "H3.yue_t2.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H3/yue_t2.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H3.yue_t3.search",
+   "seed": 820274,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "1k",
+    "width": 680,
+    "height": 1024
+   },
+   "candidates": 6,
+   "unit_cost_cr": 1.0,
+   "heroine": "yue",
+   "element_ids": [
+    "8edeacc2-f24b-4a41-a166-66896711f259"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "combo_frame",
+   "prompt": "<<<8edeacc2-f24b-4a41-a166-66896711f259>>> is Yue, an adult woman of 27, ruler of the Moon Palace. Hair: very long straight-to-wavy pale lavender hair down to the waist with a half-up crown section. Eyes: violet almond eyes with long lashes. Skin: pale porcelain skin. Face: long elegant adult face with slim high nose, narrow almond eyes, serene composed smile. Signature items that must be present: pair of curved pearly-gold dragon horns rising from the crown; gold crescent-moon forehead ornament; gold crescent drop earrings with lavender tassels; moon-phase folding fan (Yue only). Body: tall statuesque figure, long limbs, regal posture, slim waist, modest natural bust, moderate hips. Outfit: lavender hanfu-style gown with bare shoulders, gold moon-and-star embroidery, sash-cinched waist and long layered sleeves. Pose: arms open wide in a proud presenting gesture, hair and ribbons flowing in a breeze (not the hem). Expression: radiant triumphant smile, eyes on the viewer. Framing: bust-up portrait with a clear headroom, centered. Setting: isolated on a plain flat light-grey studio backdrop with no scenery and no floor, easy to cut out. 7.5 heads tall, soft feminine figure with no visible muscles, form-fitting costume with a detailed cut, fabric texture and at least three accessories, layered fabrics; she is the brightest, most saturated and sharpest element of the frame; full background scene but muted and desaturated, lowered saturation and contrast, light haze and gentle darkening, fewer details, no loud bokeh, no neon clutter; thin warm-colored lineart, lost edges in highlights, soft painterly shading on a cel-shaded base, matte skin, highlights only in the eyes and on the lips, no AI gloss; fully opaque fabric, garment stays exactly in place, adult mature face, adult everyday setting, mahjong tiles blank or absent, no text, no logos, camera at eye level",
+   "quality": "medium",
+   "tier": "T3 showcase (x20): big finish",
+   "quota_cr": 6.0,
+   "max_credits": 6.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H3/yue_t3.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H3.yue_t3.final",
+   "seed": 998052,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "2k",
+    "width": 1368,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "yue",
+   "element_ids": [
+    "8edeacc2-f24b-4a41-a166-66896711f259"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "combo_frame",
+   "prompt": "<<<8edeacc2-f24b-4a41-a166-66896711f259>>> is Yue, an adult woman of 27, ruler of the Moon Palace. Hair: very long straight-to-wavy pale lavender hair down to the waist with a half-up crown section. Eyes: violet almond eyes with long lashes. Skin: pale porcelain skin. Face: long elegant adult face with slim high nose, narrow almond eyes, serene composed smile. Signature items that must be present: pair of curved pearly-gold dragon horns rising from the crown; gold crescent-moon forehead ornament; gold crescent drop earrings with lavender tassels; moon-phase folding fan (Yue only). Body: tall statuesque figure, long limbs, regal posture, slim waist, modest natural bust, moderate hips. Outfit: lavender hanfu-style gown with bare shoulders, gold moon-and-star embroidery, sash-cinched waist and long layered sleeves. Pose: arms open wide in a proud presenting gesture, hair and ribbons flowing in a breeze (not the hem). Expression: radiant triumphant smile, eyes on the viewer. Framing: bust-up portrait with a clear headroom, centered. Setting: isolated on a plain flat light-grey studio backdrop with no scenery and no floor, easy to cut out. 7.5 heads tall, soft feminine figure with no visible muscles, form-fitting costume with a detailed cut, fabric texture and at least three accessories, layered fabrics; she is the brightest, most saturated and sharpest element of the frame; full background scene but muted and desaturated, lowered saturation and contrast, light haze and gentle darkening, fewer details, no loud bokeh, no neon clutter; thin warm-colored lineart, lost edges in highlights, soft painterly shading on a cel-shaded base, matte skin, highlights only in the eyes and on the lips, no AI gloss; fully opaque fabric, garment stays exactly in place, adult mature face, adult everyday setting, mahjong tiles blank or absent, no text, no logos, camera at eye level",
+   "quality": "high",
+   "tier": "T3 showcase (x20): big finish",
+   "depends_on_task": "H3.yue_t3.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H3/yue_t3.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H3.nova_t1.search",
+   "seed": 662069,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "1k",
+    "width": 680,
+    "height": 1024
+   },
+   "candidates": 6,
+   "unit_cost_cr": 1.0,
+   "heroine": "nova",
+   "element_ids": [
+    "0c657961-8e36-4535-a0c3-0059ce5df987"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "combo_frame",
+   "prompt": "<<<0c657961-8e36-4535-a0c3-0059ce5df987>>> is Nova, an adult woman of 23, white-hat hacker and street racer. Hair: chin-length asymmetric bob fading from cyan-blue at the roots to hot pink at the ends, side-swept bangs. Eyes: ice-blue eyes with a faint pink gradient under the lids and winged liner. Skin: light cool-neutral skin. Face: small sharp adult oval face with a pointed chin, cat-like upturned eyes, thin arched brows, smug smile. Signature items that must be present: neon cat-ear headphones glowing cyan and pink (Nova only); small cyan face-marks on the cheek; black choker with a metal ring; transparent visor pushed up on the forehead in some outfits. Body: lean toned figure, narrow hips, modest natural bust, slim waist, long legs. Outfit: cropped techwear jacket with neon piping over a high-collar fitted bodysuit, utility skirt with straps over two-tone tights (one leg black, one neon cyan) with laser-cut slashes at the knees and shins only, platform combat boots. Pose: leaning in from the side with a small wink and a tiny wave. Expression: playful wink, small smile. Framing: bust-up, cropped at the ribs, slightly off-center. Setting: isolated on a plain flat light-grey studio backdrop with no scenery and no floor, easy to cut out. 7.5 heads tall, soft feminine figure with no visible muscles, form-fitting costume with a detailed cut, fabric texture and at least three accessories, layered fabrics; she is the brightest, most saturated and sharpest element of the frame; full background scene but muted and desaturated, lowered saturation and contrast, light haze and gentle darkening, fewer details, no loud bokeh, no neon clutter; thin warm-colored lineart, lost edges in highlights, soft painterly shading on a cel-shaded base, matte skin, highlights only in the eyes and on the lips, no AI gloss; fully opaque fabric, garment stays exactly in place, adult mature face, adult everyday setting, mahjong tiles blank or absent, no text, no logos, camera at eye level",
+   "quality": "medium",
+   "tier": "T1 edge (x5): short quick reaction",
+   "quota_cr": 6.0,
+   "max_credits": 6.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H3/nova_t1.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H3.nova_t1.final",
+   "seed": 782968,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "2k",
+    "width": 1368,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "nova",
+   "element_ids": [
+    "0c657961-8e36-4535-a0c3-0059ce5df987"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "combo_frame",
+   "prompt": "<<<0c657961-8e36-4535-a0c3-0059ce5df987>>> is Nova, an adult woman of 23, white-hat hacker and street racer. Hair: chin-length asymmetric bob fading from cyan-blue at the roots to hot pink at the ends, side-swept bangs. Eyes: ice-blue eyes with a faint pink gradient under the lids and winged liner. Skin: light cool-neutral skin. Face: small sharp adult oval face with a pointed chin, cat-like upturned eyes, thin arched brows, smug smile. Signature items that must be present: neon cat-ear headphones glowing cyan and pink (Nova only); small cyan face-marks on the cheek; black choker with a metal ring; transparent visor pushed up on the forehead in some outfits. Body: lean toned figure, narrow hips, modest natural bust, slim waist, long legs. Outfit: cropped techwear jacket with neon piping over a high-collar fitted bodysuit, utility skirt with straps over two-tone tights (one leg black, one neon cyan) with laser-cut slashes at the knees and shins only, platform combat boots. Pose: leaning in from the side with a small wink and a tiny wave. Expression: playful wink, small smile. Framing: bust-up, cropped at the ribs, slightly off-center. Setting: isolated on a plain flat light-grey studio backdrop with no scenery and no floor, easy to cut out. 7.5 heads tall, soft feminine figure with no visible muscles, form-fitting costume with a detailed cut, fabric texture and at least three accessories, layered fabrics; she is the brightest, most saturated and sharpest element of the frame; full background scene but muted and desaturated, lowered saturation and contrast, light haze and gentle darkening, fewer details, no loud bokeh, no neon clutter; thin warm-colored lineart, lost edges in highlights, soft painterly shading on a cel-shaded base, matte skin, highlights only in the eyes and on the lips, no AI gloss; fully opaque fabric, garment stays exactly in place, adult mature face, adult everyday setting, mahjong tiles blank or absent, no text, no logos, camera at eye level",
+   "quality": "high",
+   "tier": "T1 edge (x5): short quick reaction",
+   "depends_on_task": "H3.nova_t1.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H3/nova_t1.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H3.nova_t2.search",
+   "seed": 878294,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "1k",
+    "width": 680,
+    "height": 1024
+   },
+   "candidates": 6,
+   "unit_cost_cr": 1.0,
+   "heroine": "nova",
+   "element_ids": [
+    "0c657961-8e36-4535-a0c3-0059ce5df987"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "combo_frame",
+   "prompt": "<<<0c657961-8e36-4535-a0c3-0059ce5df987>>> is Nova, an adult woman of 23, white-hat hacker and street racer. Hair: chin-length asymmetric bob fading from cyan-blue at the roots to hot pink at the ends, side-swept bangs. Eyes: ice-blue eyes with a faint pink gradient under the lids and winged liner. Skin: light cool-neutral skin. Face: small sharp adult oval face with a pointed chin, cat-like upturned eyes, thin arched brows, smug smile. Signature items that must be present: neon cat-ear headphones glowing cyan and pink (Nova only); small cyan face-marks on the cheek; black choker with a metal ring; transparent visor pushed up on the forehead in some outfits. Body: lean toned figure, narrow hips, modest natural bust, slim waist, long legs. Outfit: cropped techwear jacket with neon piping over a high-collar fitted bodysuit, utility skirt with straps over two-tone tights (one leg black, one neon cyan) with laser-cut slashes at the knees and shins only, platform combat boots. Pose: stepping forward in three-quarter view, one hand on her hip, the other pointing at the viewer. Expression: confident grin, eyes on the viewer. Framing: waist-up, centered. Setting: isolated on a plain flat light-grey studio backdrop with no scenery and no floor, easy to cut out. 7.5 heads tall, soft feminine figure with no visible muscles, form-fitting costume with a detailed cut, fabric texture and at least three accessories, layered fabrics; she is the brightest, most saturated and sharpest element of the frame; full background scene but muted and desaturated, lowered saturation and contrast, light haze and gentle darkening, fewer details, no loud bokeh, no neon clutter; thin warm-colored lineart, lost edges in highlights, soft painterly shading on a cel-shaded base, matte skin, highlights only in the eyes and on the lips, no AI gloss; fully opaque fabric, garment stays exactly in place, adult mature face, adult everyday setting, mahjong tiles blank or absent, no text, no logos, camera at eye level",
+   "quality": "medium",
+   "tier": "T2 exit (x10): confident step",
+   "quota_cr": 6.0,
+   "max_credits": 6.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H3/nova_t2.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H3.nova_t2.final",
+   "seed": 971909,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "2k",
+    "width": 1368,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "nova",
+   "element_ids": [
+    "0c657961-8e36-4535-a0c3-0059ce5df987"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "combo_frame",
+   "prompt": "<<<0c657961-8e36-4535-a0c3-0059ce5df987>>> is Nova, an adult woman of 23, white-hat hacker and street racer. Hair: chin-length asymmetric bob fading from cyan-blue at the roots to hot pink at the ends, side-swept bangs. Eyes: ice-blue eyes with a faint pink gradient under the lids and winged liner. Skin: light cool-neutral skin. Face: small sharp adult oval face with a pointed chin, cat-like upturned eyes, thin arched brows, smug smile. Signature items that must be present: neon cat-ear headphones glowing cyan and pink (Nova only); small cyan face-marks on the cheek; black choker with a metal ring; transparent visor pushed up on the forehead in some outfits. Body: lean toned figure, narrow hips, modest natural bust, slim waist, long legs. Outfit: cropped techwear jacket with neon piping over a high-collar fitted bodysuit, utility skirt with straps over two-tone tights (one leg black, one neon cyan) with laser-cut slashes at the knees and shins only, platform combat boots. Pose: stepping forward in three-quarter view, one hand on her hip, the other pointing at the viewer. Expression: confident grin, eyes on the viewer. Framing: waist-up, centered. Setting: isolated on a plain flat light-grey studio backdrop with no scenery and no floor, easy to cut out. 7.5 heads tall, soft feminine figure with no visible muscles, form-fitting costume with a detailed cut, fabric texture and at least three accessories, layered fabrics; she is the brightest, most saturated and sharpest element of the frame; full background scene but muted and desaturated, lowered saturation and contrast, light haze and gentle darkening, fewer details, no loud bokeh, no neon clutter; thin warm-colored lineart, lost edges in highlights, soft painterly shading on a cel-shaded base, matte skin, highlights only in the eyes and on the lips, no AI gloss; fully opaque fabric, garment stays exactly in place, adult mature face, adult everyday setting, mahjong tiles blank or absent, no text, no logos, camera at eye level",
+   "quality": "high",
+   "tier": "T2 exit (x10): confident step",
+   "depends_on_task": "H3.nova_t2.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H3/nova_t2.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H3.nova_t3.search",
+   "seed": 856552,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "1k",
+    "width": 680,
+    "height": 1024
+   },
+   "candidates": 6,
+   "unit_cost_cr": 1.0,
+   "heroine": "nova",
+   "element_ids": [
+    "0c657961-8e36-4535-a0c3-0059ce5df987"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "combo_frame",
+   "prompt": "<<<0c657961-8e36-4535-a0c3-0059ce5df987>>> is Nova, an adult woman of 23, white-hat hacker and street racer. Hair: chin-length asymmetric bob fading from cyan-blue at the roots to hot pink at the ends, side-swept bangs. Eyes: ice-blue eyes with a faint pink gradient under the lids and winged liner. Skin: light cool-neutral skin. Face: small sharp adult oval face with a pointed chin, cat-like upturned eyes, thin arched brows, smug smile. Signature items that must be present: neon cat-ear headphones glowing cyan and pink (Nova only); small cyan face-marks on the cheek; black choker with a metal ring; transparent visor pushed up on the forehead in some outfits. Body: lean toned figure, narrow hips, modest natural bust, slim waist, long legs. Outfit: cropped techwear jacket with neon piping over a high-collar fitted bodysuit, utility skirt with straps over two-tone tights (one leg black, one neon cyan) with laser-cut slashes at the knees and shins only, platform combat boots. Pose: arms open wide in a proud presenting gesture, hair and ribbons flowing in a breeze (not the hem). Expression: radiant triumphant smile, eyes on the viewer. Framing: bust-up portrait with a clear headroom, centered. Setting: isolated on a plain flat light-grey studio backdrop with no scenery and no floor, easy to cut out. 7.5 heads tall, soft feminine figure with no visible muscles, form-fitting costume with a detailed cut, fabric texture and at least three accessories, layered fabrics; she is the brightest, most saturated and sharpest element of the frame; full background scene but muted and desaturated, lowered saturation and contrast, light haze and gentle darkening, fewer details, no loud bokeh, no neon clutter; thin warm-colored lineart, lost edges in highlights, soft painterly shading on a cel-shaded base, matte skin, highlights only in the eyes and on the lips, no AI gloss; fully opaque fabric, garment stays exactly in place, adult mature face, adult everyday setting, mahjong tiles blank or absent, no text, no logos, camera at eye level",
+   "quality": "medium",
+   "tier": "T3 showcase (x20): big finish",
+   "quota_cr": 6.0,
+   "max_credits": 6.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H3/nova_t3.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H3.nova_t3.final",
+   "seed": 731665,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "2k",
+    "width": 1368,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "nova",
+   "element_ids": [
+    "0c657961-8e36-4535-a0c3-0059ce5df987"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "combo_frame",
+   "prompt": "<<<0c657961-8e36-4535-a0c3-0059ce5df987>>> is Nova, an adult woman of 23, white-hat hacker and street racer. Hair: chin-length asymmetric bob fading from cyan-blue at the roots to hot pink at the ends, side-swept bangs. Eyes: ice-blue eyes with a faint pink gradient under the lids and winged liner. Skin: light cool-neutral skin. Face: small sharp adult oval face with a pointed chin, cat-like upturned eyes, thin arched brows, smug smile. Signature items that must be present: neon cat-ear headphones glowing cyan and pink (Nova only); small cyan face-marks on the cheek; black choker with a metal ring; transparent visor pushed up on the forehead in some outfits. Body: lean toned figure, narrow hips, modest natural bust, slim waist, long legs. Outfit: cropped techwear jacket with neon piping over a high-collar fitted bodysuit, utility skirt with straps over two-tone tights (one leg black, one neon cyan) with laser-cut slashes at the knees and shins only, platform combat boots. Pose: arms open wide in a proud presenting gesture, hair and ribbons flowing in a breeze (not the hem). Expression: radiant triumphant smile, eyes on the viewer. Framing: bust-up portrait with a clear headroom, centered. Setting: isolated on a plain flat light-grey studio backdrop with no scenery and no floor, easy to cut out. 7.5 heads tall, soft feminine figure with no visible muscles, form-fitting costume with a detailed cut, fabric texture and at least three accessories, layered fabrics; she is the brightest, most saturated and sharpest element of the frame; full background scene but muted and desaturated, lowered saturation and contrast, light haze and gentle darkening, fewer details, no loud bokeh, no neon clutter; thin warm-colored lineart, lost edges in highlights, soft painterly shading on a cel-shaded base, matte skin, highlights only in the eyes and on the lips, no AI gloss; fully opaque fabric, garment stays exactly in place, adult mature face, adult everyday setting, mahjong tiles blank or absent, no text, no logos, camera at eye level",
+   "quality": "high",
+   "tier": "T3 showcase (x20): big finish",
+   "depends_on_task": "H3.nova_t3.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H3/nova_t3.final",
+    "name": "cand_{n:02d}"
+   }
+  }
+ ],
+ "totals": {
+  "tasks": 30,
+  "task_quota_sum_cr": 150.0,
+  "candidates": 120
+ },
+ "style_tail_id": "v4c"
+}
