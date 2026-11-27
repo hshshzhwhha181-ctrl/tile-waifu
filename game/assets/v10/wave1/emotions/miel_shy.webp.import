@@ -15,9 +15,9 @@ dest_files=["res://.godot/imported/miel_shy.webp-f4c48196c7bc3e2946b44be0e6a8a7b
 
 [params]
 
-compress/mode=0
+compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.82
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1

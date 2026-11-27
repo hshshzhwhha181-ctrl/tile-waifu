@@ -15,9 +15,9 @@ dest_files=["res://.godot/imported/shirin_idle.webp-0ba5a4f533ff32a691a9ae2a6f48
 
 [params]
 
-compress/mode=0
+compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.82
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1

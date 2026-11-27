@@ -15,9 +15,9 @@ dest_files=["res://.godot/imported/yue_duel.webp-509f779470fd68ed92a52b70a193e5a
 
 [params]
 
-compress/mode=0
+compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=1.0
+compress/lossy_quality=0.82
 compress/uastc_level=2
 compress/rdo_quality_loss=0
 compress/hdr_compression=0

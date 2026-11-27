@@ -312,7 +312,7 @@
 3. **Изоляция `%APPDATA%` vs экспорт APK (Windows):**
    - Для прогона тестов/скриншотов использовать временный `APPDATA` (чтобы не портить `editor_settings` и сейвы).
    - Для `--export-debug` / `--export-release Android` **ОБЯЗАТЕЛЬНО** использовать настоящий `%APPDATA%` (где лежат `editor_settings-4.5.tres` с путями к Android SDK/JDK/debug keystore и шаблоны экспорта `export_templates/4.5.1.stable/`).
-   - В `export_presets.cfg` поле `exclude_filter` держать пустым (`""`) — никогда не исключать `*selftest*`, иначе сломается верификация `.pck`.
+   - `exclude_filter` в `export_presets.cfg` теперь генерирует `python tools/assets/export_filter.py --apply`: он исключает тесты/демо/раннеры/утилиты, но оставляет всё, на что `main.gd`/`g.gd`/экраны ссылаются по `class_name`/`preload` (17 selftest-файлов), поэтому `--main-pack x.pck --pt=fresh` продолжает работать. Руками `*selftest*` не исключать. Описание конвейера: `tools/assets/README.md`.
 4. **Обязательный гейт перед любой выдачей APK:**
    - `godot_qa.ps1` (все 13 сьютов + починенный `--ults_selftest` + `--fuzz=3`),
    - `python .agents/skills/tw-godot-qa/ux_lint.py` → `0 violations`,

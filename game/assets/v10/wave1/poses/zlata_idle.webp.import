@@ -15,9 +15,9 @@ dest_files=["res://.godot/imported/zlata_idle.webp-0dae070f4c8fd1a0a4cecdb8cada3
 
 [params]
 
-compress/mode=0
+compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.82
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
