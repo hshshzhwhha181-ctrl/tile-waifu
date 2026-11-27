@@ -39,8 +39,8 @@ static func panel(r: Rect2, bg: = PLUM, border: = GOLD, rad: = 18, bw: = 2) -> P
 	return p
 
 
-static func label(txt: String, r: Rect2, px: = 22, col: = CREAM, align: = HORIZONTAL_ALIGNMENT_LEFT, weight: = 800) -> Label:
-	var l: = UI.label(txt, px, col, INK, 4, "body", weight)
+static func label(txt: String, r: Rect2, px: = 22, col: = CREAM, align: = HORIZONTAL_ALIGNMENT_LEFT, weight: = 800, outline_px: = 4) -> Label:
+	var l: = UI.label(txt, px, col, INK if outline_px > 0 else Color(0, 0, 0, 0), outline_px, "body", weight)
 	l.position = r.position
 	l.size = r.size
 	l.horizontal_alignment = align
@@ -71,12 +71,32 @@ static func para(txt: String, r: Rect2, px: = 22, col: = CREAM, align: = HORIZON
 	return l
 
 
+static func haptic(k: = "tap") -> void:
+	V9Feel.haptic_frame = Engine.get_process_frames()
+	var tree: = Engine.get_main_loop() as SceneTree
+	var hp: Node = tree.root.get_node_or_null("V7Haptics") if tree != null and tree.root != null else null
+	if hp == null:
+		return
+	if k == "tap" and hp.has_method("tap"):
+		hp.call("tap")
+	elif hp.has_method("kind"):
+		hp.call("kind", k)
+
+
 # a tappable lacquer pill: returns the Panel (meta "label" -> its Label). cb() runs on press.
 static func button(txt: String, r: Rect2, cb: Callable, bg: = PLUM_HI, fg: = GOLD_HI, px: = 24, border: = GOLD) -> Panel:
 	var p: = panel(r, bg, border, int(minf(r.size.y * 0.5, 26.0)), 2)
 	p.mouse_filter = Control.MOUSE_FILTER_STOP
 	p.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	var l: = label(txt, Rect2(Vector2(10, 0), r.size - Vector2(20, 0)), px, fg, HORIZONTAL_ALIGNMENT_CENTER, 900)
+	p.set_meta("no_haptic", true)
+	var is_gold: = fg.get_luminance() < 0.35 or bg.get_luminance() > 0.5
+	var l: = label(txt, Rect2(Vector2(10, 0), r.size - Vector2(20, 0)), px, fg, HORIZONTAL_ALIGNMENT_CENTER, 900, 0 if is_gold else 4)
+	if is_gold and l.label_settings != null:
+		l.label_settings = l.label_settings.duplicate()
+		l.label_settings.outline_size = 0
+		l.label_settings.shadow_color = Color(1.0, 0.96, 0.84, 0.35)
+		l.label_settings.shadow_offset = Vector2(0, 1)
+		l.label_settings.shadow_size = 0
 	p.add_child(l)
 	p.set_meta("label", l)
 	p.gui_input.connect(func(e: InputEvent) -> void:
@@ -84,11 +104,14 @@ static func button(txt: String, r: Rect2, cb: Callable, bg: = PLUM_HI, fg: = GOL
 		if tap:
 			p.accept_event()
 			if p.has_meta("disabled") and bool(p.get_meta("disabled")):
+				haptic("deny")
+				Sfx.play("deny", 1.0, -5)
 				return
 			var tw: = p.create_tween()
 			p.pivot_offset = p.size * 0.5
 			tw.tween_property(p, "scale", Vector2(0.95, 0.95), 0.06)
 			tw.tween_property(p, "scale", Vector2.ONE, 0.10)
+			haptic("tap")
 			Sfx.play("tap", 1.0, -6)
 			cb.call())
 	return p
@@ -171,7 +194,7 @@ static func status_chip(r: Rect2, is_online: bool) -> Panel:
 	dot.size = Vector2(14, 14)
 	dot.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	p.add_child(dot)
-	var l: = label("Онлайн · SQLite" if is_online else "Офлайн-режим", Rect2(34, 0, r.size.x - 42, r.size.y), 20, col, HORIZONTAL_ALIGNMENT_LEFT, 900)
+	var l: = label("В сети" if is_online else "Офлайн-режим", Rect2(34, 0, r.size.x - 42, r.size.y), 20, col, HORIZONTAL_ALIGNMENT_LEFT, 900)
 	l.name = "Text"
 	p.add_child(l)
 	return p
@@ -182,7 +205,7 @@ static func set_status(chip: Panel, is_online: bool) -> void:
 		return
 	var col: = GREEN if is_online else Color("#F2B36B")
 	var l: Label = chip.get_node("Text")
-	l.text = "Онлайн · SQLite" if is_online else "Офлайн-режим"
+	l.text = "В сети" if is_online else "Офлайн-режим"
 	l.label_settings = l.label_settings.duplicate()
 	l.label_settings.font_color = col
 	var sb: StyleBoxFlat = (chip.get_theme_stylebox("panel") as StyleBoxFlat).duplicate()

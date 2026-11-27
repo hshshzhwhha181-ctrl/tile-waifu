@@ -57,11 +57,12 @@ static func compute(vs: Vector2, ins: Dictionary) -> Dictionary:
 	var H: = vs.y
 	var T: = float(ins.get("top", 0.0))
 	var B: = float(ins.get("bottom", 0.0))
+	var R: = float(ins.get("right", 0.0))
 	var cx: = floorf(maxf(0.0, (W - 720.0) * 0.5))
 	var d: = {"vs": vs, "T": T, "B": B, "cx": cx}
 	d.avatar = Rect2(cx + 24, T + 16, 56, 56)
 	d.nick = Rect2(cx + 96, T + 24, 360, 40)
-	d.phone = Rect2(cx + 616, T + 4, 80, 80)
+	d.phone = Rect2(minf(cx + 616.0, W - R - 92.0), T + 4, 80, 80)
 	var lan: = []
 	for i in 3:
 		lan.append(Rect2(cx + 40 + i * 112, T + 104, 72, 96))
@@ -134,7 +135,8 @@ func _ready() -> void:
 	add_child(nick_l)
 	phone_b = V10Button.make("quiet", "", Vector2(80, 80))
 	phone_b.icon = "phone"
-	phone_b.icon_color = V10DS.PAPER_300
+	phone_b.icon_px = 36
+	phone_b.icon_color = V10DS.PAPER_100
 	phone_b.pressed.connect(func() -> void: phone_pressed.emit())
 	add_child(phone_b)
 	spine_l = V10Type.label("ЧАЙНАЯ · ВЕЧЕР", "overline", 15, Color(V10DS.PAPER_500, 0.4))
@@ -288,12 +290,28 @@ class _Deco:
 		draw_circle(c, 28, Color(V10DS.NIGHT_800, 0.9), true, -1.0, true)
 		draw_arc(c, 28, 0, TAU, 64, V10DS.GOLD_700, 1.0, true)
 		V10Icons.draw(self, "avatar_ring", c, 40, V10DS.PAPER_500)
+		# dark lacquer capsule behind nick for crisp contrast over pale Tea House beams
+		var nr: Rect2 = L.nick
+		var nf: = V10Type.font("ui")
+		var nw: = clampf(nf.get_string_size(h.nick, HORIZONTAL_ALIGNMENT_LEFT, -1, 22).x + 24.0, 72.0, nr.size.x)
+		var np: = StyleBoxFlat.new()
+		np.bg_color = Color(V10DS.NIGHT_900, 0.72)
+		np.border_color = Color(V10DS.GOLD_700, 0.45)
+		np.set_border_width_all(1)
+		np.set_corner_radius_all(16)
+		draw_style_box(np, Rect2(nr.position.x - 10.0, nr.position.y + 2.0, nw, nr.size.y - 4.0))
+		# dark plum + gold-rim circular backing disc behind phone (matching Mute)
+		var pr: Rect2 = L.phone
+		if h.phone_shown:
+			var pc: = pr.get_center()
+			draw_circle(pc + Vector2(0, 2), 30.0, Color(V10DS.SHADOW, 0.55), true, -1.0, true)
+			draw_circle(pc, 30.0, Color(V10DS.PLATE_BOT, 0.88), true, -1.0, true)
+			draw_arc(pc, 30.0, 0, TAU, 48, Color(V10DS.GOLD_500, 0.78), 2.0, true)
 		# «new» dot on the phone (12 px rose.300, no rim)
 		# «new» badge on the phone (UX §3.6: Телефон is the ONLY number badge on Tea House; 9+ cap)
-		var pr: Rect2 = L.phone
 		if h.phone_shown and h.phone_count > 0:
 			var bt: = "9+" if h.phone_count > 9 else str(h.phone_count)
-			var bc: = pr.get_center() + Vector2(16, -16)
+			var bc: = pr.get_center() + Vector2(18, -18)
 			var bw: = 32.0 if bt.length() > 1 else 26.0
 			var box: = StyleBoxFlat.new()
 			box.bg_color = V10DS.ROSE_500

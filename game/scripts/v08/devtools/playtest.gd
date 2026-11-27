@@ -367,12 +367,18 @@ func story(label: = "story", max_shots: = 2, pause: = 0.9) -> int:
 	while story_scene() != null and guard < 80:
 		guard += 1
 		await wait(pause)
-		if story_scene() == null:
+		var sc: = story_scene()
+		if sc == null:
 			break
 		if k < max_shots:
 			await shot("%s_%d" % [label, k + 1])
 		k += 1
-		await tap(Vector2(main.W * 0.5, main.H * 0.55))
+		var choice_btn: Control = find(sc, func(c):
+			return (c is JButton or c is V10Button) and on_screen(c) and pos_of(c).y > 200.0) as Control
+		if choice_btn != null:
+			await tap(pos_of(choice_btn))
+		else:
+			await tap(Vector2(main.W * 0.5, main.H * 0.55))
 	return k
 
 func go_tab(id: String) -> String:
@@ -427,9 +433,14 @@ func _fresh() -> String:
 	await wait(0.2)
 	if card.nick_le.text != NICK:
 		return "typed nick reads «%s»" % card.nick_le.text
-	var slot: float = card.avatars.size.x / G.HERO_ORDER.size()
-	var ri: = G.HERO_ORDER.find("rin")
-	await tap(card.avatars.get_global_rect().position + Vector2(slot * (ri + 0.5), 60))
+	var rin_av: Control = card.avatars.avs.get("rin") as Control
+	if rin_av != null and is_instance_valid(rin_av):
+		await tap(pos_of(rin_av))
+	else:
+		var cols: = mini(5, G.HERO_ORDER.size())
+		var slot: float = card.avatars.size.x / float(cols)
+		var ri: = G.HERO_ORDER.find("rin")
+		await tap(card.avatars.get_global_rect().position + Vector2(slot * (ri % cols + 0.5), (ri / cols) * 128.0 + 50.0))
 	await wait(0.4)
 	if card.avatar != "rin":
 		return "avatar tap did not select Rin (avatar=%s)" % card.avatar

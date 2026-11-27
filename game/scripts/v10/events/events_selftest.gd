@@ -152,7 +152,7 @@ func _test_wheel() -> void:
 func _test_dates() -> void:
 	_fresh()
 	var S: Array = V10VipBoudoirScreen.SUITES
-	_check(S.size() == 8, "dates: 8 goddess suites")
+	_check(S.size() == 10, "dates: 10 goddess suites")
 	var ids: = {}
 	var complete: = true
 	for s in S:
@@ -162,9 +162,9 @@ func _test_dates() -> void:
 			complete = false
 		if V10VipBoudoirScreen.cg_texture(h) == null:
 			complete = false
-	_check(ids.size() == 8 and complete, "dates: 8 unique heroes, each with prefs/reactions/CG fallback")
-	for h in ["kohaku", "shirin", "tsubame", "zlata"]:
-		_check(ids.has(h), "dates: wave-1 goddess " + h)
+	_check(ids.size() == 10 and complete, "dates: 10 unique heroes, each with prefs/reactions/CG fallback")
+	for h in ["kohaku", "shirin", "tsubame", "zlata", "hana", "miel"]:
+		_check(ids.has(h), "dates: goddess " + h)
 	_check(V10VipDate.unlocked_levels(1) == [1] and V10VipDate.unlocked_levels(6) == [1, 2, 4, 6] and V10VipDate.unlocked_levels(4) == [1, 2, 4], "dates: levels 1/2/4/6 unlock by affection")
 	var texts_ok: = true
 	for lvn in [1, 2, 4, 6]:
@@ -208,7 +208,8 @@ func _test_ui() -> void:
 	var has_scroll: = false
 	for n in scr.find_children("*", "ScrollContainer", true, false):
 		has_scroll = true
-	_check(has_scroll and scr._tab_btns.size() == 8 and scr._idx == 4, "ui: boudoir has 8 tabs in a ScrollContainer, opens on the requested goddess")
+	_check(has_scroll and scr._tab_btns.size() == 10 and scr._idx == 4, "ui: boudoir has 10 tabs in a ScrollContainer, opens on the requested goddess")
+	_check(scr._cg_tex != null and scr._cg_tex.visible and scr._cg_tex.texture != null, "ui: boudoir shows the heroine 16+ CG")
 	_check(scr._date_btn != null and scr._date_btn.get_parent() != null, "ui: boudoir has the Date 16+ button")
 	scr._open_date()
 	var win: V10VipDateWindow = scr._date_win

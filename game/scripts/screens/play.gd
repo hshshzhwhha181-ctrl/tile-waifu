@@ -469,6 +469,7 @@ func _build_hud() -> void :
 	combo_lbl.position = Vector2(0, -6)
 	combo_lbl.size = Vector2(150, 26)
 	combo_lbl.pivot_offset = Vector2(40, 13)
+	combo_lbl.visible = false
 	mb.add_child(combo_lbl)
 	var bar_bg: = UI.rbox("plum", Rect2(140, 0, tw - 140, 16), 8, 1, 2)
 	bar_bg.colors(Color(0, 0, 0, 0.35), Color(0, 0, 0, 0.25)).set_param("shadow_color", Color(0, 0, 0, 0))
@@ -505,7 +506,9 @@ func _action(icon: String, text: String, x: float, pal: String) -> JButton:
 	var ic: = V8Art.rect(V8Art.icon(icon), Rect2(20, 17, 58, 58))
 	ic.name = "Icon"
 	b.add_child(ic)
-	var cap: = UI.center_label(UI.label(text, 15, UI.INK, UI.DARK, 4, "body", 900), Rect2(-18, 98, 134, 28))
+	var cap: = UI.center_label(UI.label(text, 15, UI.INK, UI.DARK, 4, "body", 900), Rect2(-7, 98, 112, 28))
+	cap.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	cap.clip_text = true
 	cap.name = "Cap"
 	cap.set_meta("base", text)
 	b.add_child(cap)
@@ -555,6 +558,8 @@ func _v8_toggle_sound() -> void :
 func _set_badge(b: JButton, n: int) -> void :
 	var cap: Label = b.get_node("Cap")
 	cap.text = "%s · %d" % [cap.get_meta("base"), n] if n > 0 else V6Txt.s("play.price") % cap.get_meta("base")
+	cap.label_settings.font_size = 15
+	Common.fit_line(cap, 112.0, 13)
 
 func _refresh() -> void :
 	tiles_lbl.text = str(board.board_count())
@@ -662,9 +667,9 @@ func _intro() -> void :
 func _tip(text: String) -> void :
 	# 0.11: sized to fit left of the bottom-right Heroine Ult Medallion so her Ult stays 100% visible!
 	var card_w: = W - 278.0
-	var tw_: = card_w - 104.0
+	var tw_: = maxf(120.0, card_w - 94.0 - 22.0)
 	var th: float = UI.font("body", 800).get_multiline_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, tw_, 17).y
-	var h: = maxf(98.0, 34.0 + th + 14.0)
+	var h: = maxf(98.0, 36.0 + th + 14.0)
 	var tc: = UI.rbox("cream", Rect2(12, H - 186 - h, card_w, h), 22, 3, 8)
 	tc.add_to_group("v6_tip")
 	tc.z_index = 35
@@ -672,17 +677,17 @@ func _tip(text: String) -> void :
 	tc.set_param("border_top", Color("e8c9a0")).set_param("border_bottom", Color("a8697a"))
 	add_child(tc)
 	tc.add_child(Common.avatar("mc", Rect2(8, (h - 76.0) * 0.5, 76, 76), "gold"))
+	var inner_w: = maxf(120.0, tc.size.x - 94.0 - 22.0)
 	var nm: = UI.label(V6Txt.s("play.perk_tip") % [G.HEROES[partner].name, G.PERKS[partner]], 15, Color("b8406c"), Color.WHITE, 3, "body", 900)
-	nm.position = Vector2(92, 6)
-	nm.size = Vector2(tw_, 22)
-	nm.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-	nm.clip_text = true
+	nm.position = Vector2(94, 8)
+	Common.fit_line(nm, inner_w, 13)
+	nm.size.y = 22
 	tc.add_child(nm)
 	var l: = UI.label(text, 17, UI.INK)
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	l.custom_minimum_size = Vector2(tw_, 0)
-	l.position = Vector2(92, 30)
-	l.size = Vector2(tw_, h - 38)
+	l.custom_minimum_size = Vector2(inner_w, 0)
+	l.position = Vector2(94, 32)
+	l.size = Vector2(inner_w, h - 40)
 	tc.add_child(l)
 	UI.slide_in(tc, Vector2(0, 40), 0.0, 0.35)
 	var t: Tween = tc.create_tween()
@@ -913,9 +918,10 @@ func _on_match(mid: Vector2, combo: int, gold: bool, shard: String) -> void :
 		_shard_found(shard, mid)
 	if combo >= 2:
 		charge = min(1.0, charge + 0.12 * combo)
-		combo_lbl.text = V6Txt.s("play.combo") % combo
+		if v10_fx_hud == null:
+			combo_lbl.text = V6Txt.s("play.combo") % combo
+			UI.punch(combo_lbl, 0.35)
 		Sfx.play("select", 1.0 + combo * 0.08, -6)
-		UI.punch(combo_lbl, 0.35)
 		var tiers: = ["", "", "Дуэт", "Трио", "Каскад", "Цветение", "Небесный поток"]
 		if combo in [3, 5, 8, 12, 16] or (combo >= 20 and combo % 5 == 0):
 			if v10_fx_hud == null:
@@ -948,6 +954,10 @@ func _on_match(mid: Vector2, combo: int, gold: bool, shard: String) -> void :
 		v7combo.on_match(mid, combo, gain)
 	if v10_fx_hud and not from_ult:
 		v10_fx_hud.on_match(combo, now() < fever_until)
+		if v10_fx_hud._burst_node and is_instance_valid(v10_fx_hud._burst_node):
+			v10_fx_hud._burst_node.visible = false
+			v10_fx_hud._burst_node.queue_free()
+			v10_fx_hud._burst_node = null
 	_refresh()
 
 func _shard_found(h: String, mid: Vector2) -> void :
@@ -1098,6 +1108,10 @@ func _fever() -> void :
 		UI.pop_in(rib, 0.0, 0.6)
 	if v10_fx_hud:
 		v10_fx_hud.on_fever()
+		if v10_fx_hud._burst_node and is_instance_valid(v10_fx_hud._burst_node):
+			v10_fx_hud._burst_node.visible = false
+			v10_fx_hud._burst_node.queue_free()
+			v10_fx_hud._burst_node = null
 	# the frame of V7Combo carries the fever (no full-screen vignette or embers over the tiles)
 
 func _on_deny(_t: Tile) -> void :

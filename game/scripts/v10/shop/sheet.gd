@@ -98,7 +98,7 @@ func _build(title: String) -> void:
 		close())
 	body.add_child(close_btn)
 	set_meta("v8_back", close)
-	V10Hud2Util.sfx("sheet_open")
+	V10Hud2Util.sfx("page_turn")
 
 
 func top() -> float:
@@ -139,7 +139,7 @@ func close(instant: = false) -> void:
 	if instant or not V10ShopKit.fx_on() or not is_inside_tree():
 		queue_free()
 		return
-	V10Hud2Util.sfx("sheet_close")
+	V10Hud2Util.sfx("page_turn")
 	var tw: = create_tween().set_parallel(true)
 	tw.tween_property(_panel, "position:y", size.y, 0.18).set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_IN)
 	tw.tween_property(_dim, "modulate:a", 0.0, 0.16)

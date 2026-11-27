@@ -289,14 +289,20 @@ func _card(kind: String) -> void :
 		t2.scale = Vector2(0.62, 0.62)
 		holder.add_child(t2)
 		t2.add_child(V6SpecIcon.new("key", V6SpecIcon.group_color(0)))
+	var txt_w: = maxf(140.0, c.size.x - 144.0)
 	var nm: = UI.label("Новинка · " + NAMES[kind][0], 20, Color("ffd977"), UI.DARK, 4, "body", 900)
 	nm.position = Vector2(128, 10)
-	nm.size = Vector2(W - 200, 28)
+	Common.fit_line(nm, txt_w, 15)
+	nm.size.y = 28
 	c.add_child(nm)
-	var l: = UI.label(NAMES[kind][1], 18, UI.INK)
+	var bfs: = 17
+	while bfs > 14 and UI.font("body", 800).get_multiline_string_size(NAMES[kind][1], HORIZONTAL_ALIGNMENT_LEFT, txt_w, bfs).y > 66.0:
+		bfs -= 1
+	var l: = UI.label(NAMES[kind][1], bfs, UI.INK)
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	l.custom_minimum_size = Vector2(txt_w, 0)
 	l.position = Vector2(128, 40)
-	l.size = Vector2(W - 200, 66)
+	l.size = Vector2(txt_w, 66)
 	c.add_child(l)
 	UI.slide_in(c, Vector2(0, 40), 0.0, 0.35)
 	Sfx.play("pop", 1.1, -4)

@@ -354,9 +354,12 @@ func _run_squad() -> void:
 	fxl.free()
 
 	# 15. screen: squad window, shield HUD in a real break
-	var old_shards: Dictionary = (G.S.shards as Dictionary).duplicate()
-	G.S.shards["rin"] = 9999
-	G.S.shards["hana"] = 9999
+	var old_shards: Dictionary = (G.S.shards as Dictionary).duplicate(true)
+	var old_owned: Dictionary = (G.S.owned as Dictionary).duplicate(true)
+	var old_adv: Dictionary = (G.S.get("v10_adventure", {}) as Dictionary).duplicate(true) if G.S.get("v10_adventure") is Dictionary else {}
+	G.S.shards = {"rin": 9999, "hana": 9999}
+	G.S.owned = {"o_base": true}
+	G.S["v10_adventure"] = D.defaults()
 	var scr2: = V10AdventureScreen.new()
 	scr2.size = Vector2(720, 1600)
 	add_child(scr2)
@@ -375,6 +378,6 @@ func _run_squad() -> void:
 	scr2.dev_act("shield_break")
 	_check(scr2.battle.broken_turns == 3 and scr2.battle.breaks == 1 and scr2.shield_bar.is_blinking(), "screen reflects a shield break on the HUD")
 	G.S.shards = old_shards
-	G.S.v10_adventure.squad = ["mc", "rin", "yue"]
-	G.S.v10_adventure.squad_custom = false
+	G.S.owned = old_owned
+	G.S["v10_adventure"] = old_adv if not old_adv.is_empty() else D.defaults()
 	scr2.free()

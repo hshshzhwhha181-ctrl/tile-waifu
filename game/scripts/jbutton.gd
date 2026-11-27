@@ -501,18 +501,45 @@ class Lacquer extends Control:
 		if _glint >= 0.0:
 			_draw_glint(r.grow(-5.0), maxf(2.0, rad - 5.0))
 
+	func _safe_poly(poly: PackedVector2Array, col: Color) -> void:
+		if poly.size() < 3 or col.a <= 0.004:
+			return
+		var clean: = PackedVector2Array()
+		for pt in poly:
+			if clean.is_empty() or clean[clean.size() - 1].distance_squared_to(pt) > 0.25:
+				clean.append(pt)
+		if clean.size() >= 2 and clean[0].distance_squared_to(clean[clean.size() - 1]) <= 0.25:
+			clean.resize(clean.size() - 1)
+		if clean.size() < 3:
+			return
+		var area2: = 0.0
+		for i in clean.size():
+			var p0: = clean[i]
+			var p1: = clean[(i + 1) % clean.size()]
+			area2 += p0.x * p1.y - p1.x * p0.y
+		if absf(area2) < 1.0:
+			return
+		if Geometry2D.triangulate_polygon(clean).is_empty():
+			return
+		draw_colored_polygon(clean, col)
+
 	# a slanted band of warm light swept left → right, clipped to the inner lacquer
 	func _draw_glint(inner: Rect2, rad: float) -> void:
+		if inner.size.x < 4.0 or inner.size.y < 4.0:
+			return
+		var safe_r: = clampf(rad, 1.0, minf(inner.size.x, inner.size.y) * 0.45)
 		var bw: = maxf(26.0, inner.size.y * 0.55)
 		var x: = lerpf(inner.position.x - bw * 2.0, inner.end.x + bw, _glint)
 		var sl: = inner.size.y * 0.55
 		var band: = PackedVector2Array([Vector2(x + sl, inner.position.y), Vector2(x + sl + bw, inner.position.y),
 			Vector2(x + bw, inner.end.y), Vector2(x, inner.end.y)])
-		var shape: = V10Button.rr_pts(inner, rad, 8)
+		var shape: = V10Button.rr_pts(inner, safe_r, 8)
+		if shape.size() < 3:
+			return
 		var a: = sin(_glint * PI)
 		for poly in Geometry2D.intersect_polygons(band, shape):
-			draw_colored_polygon(poly, Color(1.0, 0.93, 0.66, 0.42 * a))
+			_safe_poly(poly, Color(1.0, 0.93, 0.66, 0.42 * a))
 		var core: = PackedVector2Array([Vector2(x + sl + bw * 0.4, inner.position.y), Vector2(x + sl + bw * 0.6, inner.position.y),
 			Vector2(x + bw * 0.6, inner.end.y), Vector2(x + bw * 0.4, inner.end.y)])
 		for poly in Geometry2D.intersect_polygons(core, shape):
-			draw_colored_polygon(poly, Color(1.0, 1.0, 0.92, 0.5 * a))
+			_safe_poly(poly, Color(1.0, 1.0, 0.92, 0.5 * a))

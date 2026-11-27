@@ -148,16 +148,33 @@ func _accent() -> Color:
 	return Color(String(cur_b.get("color", "e8c47e")))
 
 
+static func _load_tex(p: String) -> Texture2D:
+	if p == "":
+		return null
+	if ResourceLoader.exists(p):
+		var t: = load(p) as Texture2D
+		if t != null:
+			return t
+	var gp: = ProjectSettings.globalize_path(p)
+	if FileAccess.file_exists(gp):
+		var im: = Image.load_from_file(gp)
+		if im != null and not im.is_empty():
+			return ImageTexture.create_from_image(im)
+	return null
+
+
 func _art_layer() -> void:
 	var k: = _kind()
 	var bg_path: = String(cur_b.get("art", ""))
-	if k == "phase":
+	var tex: Texture2D = _load_tex(bg_path)
+	if k == "phase" and tex == null:
 		bg_path = "res://assets/v10/gacha/key_new_moon.webp" if String(cur_b.get("half", "A")) == "A" else "res://assets/v10/gacha/key_full_moon.webp"
+		tex = _load_tex(bg_path)
 	var focus: = Vector2(0.6, 0.35) if k == "newbie" else Vector2(0.5, 0.4)
 	# the heroine's face never sits under the bar and the header (UX_RULES §2.2): her key art starts below them
 	var top: = 0.0 if k == "phase" else (SPINE_Y - 40.0 if k == "newbie" else 0.0)
 	var br: = V10Layout.bleed_rect(self)
-	var bg: = V10GUI.cover(V10GUI.tex_or_null(bg_path), Rect2(Vector2(br.position.x, top), Vector2(br.size.x, br.end.y - top)), focus)
+	var bg: = V10GUI.cover(tex, Rect2(Vector2(br.position.x, top), Vector2(br.size.x, br.end.y - top)), focus)
 	banner_root.add_child(bg)
 	if k == "phase":
 		_phase_cards()
@@ -339,7 +356,7 @@ func _title_block() -> void:
 	# the newbie heroine's face sits at x ≈ 430–530: the column stays left of it with the 48 px margin (Г-1)
 	var maxw: = (_card_rect().position.x - 44.0) if k == "phase" else (340.0 if k == "newbie" else W * 0.62)
 	var fs: = 56
-	while fs > 34 and UI.longest_word_w(title, fs, "title", 700) > maxw:
+	while fs > 26 and UI.longest_word_w(title, fs, "title", 700) > maxw - 10.0:
 		fs -= 2
 	var tl: = V10GUI.h1(title, fs)
 	tl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART

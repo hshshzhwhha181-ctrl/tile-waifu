@@ -128,10 +128,12 @@ func build(m, _args: Dictionary) -> void:
 	add_child(base)
 	Common.vignette(self, size, Color(0.30, 0.04, 0.10), 0.5).mouse_filter = Control.MOUSE_FILTER_IGNORE
 	Fx.ambient(self, "petals", size)
-	_build_header()
+	var safe_t: = _safe_top()
+	var safe_b: = _safe_bot()
+	_build_header(safe_t)
 	_scroll = ScrollContainer.new()
-	_scroll.position = Vector2(0, 96)
-	_scroll.size = Vector2(W, H - 96 - 150)
+	_scroll.position = Vector2(0, 96.0 + safe_t)
+	_scroll.size = Vector2(W, H - (96.0 + safe_t) - (150.0 + safe_b))
 	_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_SHOW_NEVER
 	add_child(_scroll)
@@ -140,7 +142,7 @@ func build(m, _args: Dictionary) -> void:
 	_content.mouse_filter = Control.MOUSE_FILTER_PASS
 	_scroll.add_child(_content)
 	_btn_holder = Control.new()
-	_btn_holder.position = Vector2(0, H - 140)
+	_btn_holder.position = Vector2(0, H - 140.0 - safe_b)
 	_btn_holder.size = Vector2(W, 130)
 	add_child(_btn_holder)
 	_fx = Control.new()
@@ -170,16 +172,31 @@ func _refresh() -> void:
 	_scroll.scroll_vertical = 0
 
 
-func _build_header() -> void:
-	var back_b: = V10VipBoudoirScreen._pill(Rect2(16, 18, 56, 52), Color(0.13, 0.06, 0.19, 0.9), Color("#E8C47E"), 16)
+func _safe_top() -> float:
+	if main != null and main.get("safe_top") != null:
+		return maxf(0.0, float(main.safe_top) - position.y)
+	return maxf(0.0, float(V10Layout.safe_insets(size).get("top", 0.0)) - position.y)
+
+
+func _safe_bot() -> float:
+	var vp_h: = get_viewport_rect().size.y if is_inside_tree() else H
+	var extra: = maxf(0.0, vp_h - (position.y + size.y))
+	if main != null and main.get("safe_bottom") != null:
+		return maxf(0.0, float(main.safe_bottom) - extra)
+	return maxf(0.0, float(V10Layout.safe_insets(size).get("bottom", 0.0)) - extra)
+
+
+func _build_header(safe_t: float = 0.0) -> void:
+	var back_b: = V10VipBoudoirScreen._pill(Rect2(16, 16 + safe_t, 64, 56), Color(0.13, 0.06, 0.19, 0.9), Color("#E8C47E"), 18)
 	back_b.mouse_filter = Control.MOUSE_FILTER_STOP
-	back_b.add_child(UI.center_label(UI.label("‹", 32, Color("#FFF4DE"), Color(0.06, 0.02, 0.1), 3, "body", 900), Rect2(0, -3, 56, 52)))
+	back_b.add_child(UI.center_label(UI.label("‹", 34, Color("#FFF4DE"), Color(0.06, 0.02, 0.1), 3, "body", 900), Rect2(0, -3, 64, 56)))
 	back_b.gui_input.connect(func(e: InputEvent) -> void:
 		if V10VipBoudoirScreen._is_tap(e):
 			back_b.accept_event()
+			V9Feel.press(back_b, "tap")
 			_back())
 	add_child(back_b)
-	var t: = UI.center_label(UI.label("7 Дней · Подарок хозяйки", 32, Color("#FFE9A6"), Color(0.2, 0.03, 0.1), 6, "body", 900), Rect2(80, 22, W - 160, 48))
+	var t: = UI.center_label(UI.label("7 Дней · Подарок хозяйки", 32, Color("#FFE9A6"), Color(0.2, 0.03, 0.1), 6, "body", 900), Rect2(88, 20 + safe_t, W - 176, 48))
 	add_child(t)
 
 
@@ -324,9 +341,9 @@ func _make_card(day: int, r: Rect2) -> void:
 	V10VipBoudoirScreen.wrap_size(tl, Vector2(tw_max, 78 if not grand else 120))
 	card.add_child(tl)
 	if grand:
-		var tag: = UI.label("GRAND SSR · бесплатно", 22, Color("#FF9EBE"), Color(0.1, 0.02, 0.08), 4, "body", 900)
+		var tag: = Common.fit_line(UI.label("ИМПЕРАТОРСКИЙ SSR · бесплатно", 22, Color("#FF9EBE"), Color(0.1, 0.02, 0.08), 4, "body", 900), r.size.x - 196.0, 16)
 		tag.position = Vector2(16, 196)
-		tag.size = Vector2(r.size.x - 196.0, 34)
+		tag.size.y = 34
 		card.add_child(tag)
 	if stt == "claimed":
 		var dim: = _flat_panel(Rect2(Vector2.ZERO, r.size), Color(0.05, 0.02, 0.08, 0.55), 24)
@@ -353,7 +370,11 @@ func _build_button() -> void:
 	b.modulate = Color.WHITE if can else Color(0.7, 0.7, 0.75, 0.9)
 	b.pressed.connect(func() -> void:
 		if can_claim_today():
-			_do_claim())
+			_do_claim()
+		else:
+			V9Feel.deny(b)
+			if main != null and main.has_method("toast"):
+				main.toast("Все 7 дней получены" if not is_active() else "Сегодняшний подарок уже получен — заходи завтра", "lock"))
 	_btn_holder.add_child(b)
 	if can:
 		b.breathing = true

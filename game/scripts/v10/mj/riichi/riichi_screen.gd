@@ -110,7 +110,7 @@ func setup(main_, a: Dictionary) -> void:
 	auto_flow = bool(a.get("auto_flow", false))
 	var Sd: Dictionary = D._S()
 	partner = String(a.get("partner", Sd.get("partner", "mc")))
-	if not D.HERO_COLOR.has(partner):
+	if not D.HERO_COLOR.has(partner) and not V10W1Core.is_wave1_hero(partner):
 		partner = "mc"
 	names_mode = String(D.pref("names"))
 	stickers_on = bool(D.pref("stickers"))
@@ -269,6 +269,8 @@ func visible_seats() -> Array:
 
 func color_of(seat: int) -> Color:
 	var h: String = partner if seat == me else String(heroes[seat])
+	if V10W1Core.is_wave1_hero(h):
+		return V10W1Core.HEROES[h].color
 	return D.HERO_COLOR.get(h, D.GOLD_500)
 
 func name_of(seat: int) -> String:
@@ -1910,7 +1912,33 @@ func _lobby() -> void:
 	bgl.size = Vector2(W, H)
 	bgl.modulate = Color(0.55, 0.55, 0.6)
 	add_child(bgl)
-	var top: = 48.0 + maxf(0.0, H - 1280.0) * 0.3
+	var safe_t: = maxf(0.0, float(main.safe_top) - position.y) if (main != null and "safe_top" in main) else 0.0
+	var back_b: = Control.new()
+	back_b.name = "LobbyBack"
+	back_b.position = Vector2(24, safe_t + 14.0)
+	back_b.size = Vector2(56, 56)
+	back_b.mouse_filter = Control.MOUSE_FILTER_STOP
+	back_b.draw.connect(func():
+		var sb: = StyleBoxFlat.new()
+		sb.bg_color = Color(D.NIGHT_700, 0.94)
+		sb.border_color = Color(D.GOLD_500, 0.92)
+		sb.set_border_width_all(2)
+		sb.set_corner_radius_all(28)
+		back_b.draw_style_box(sb, Rect2(Vector2.ZERO, back_b.size)))
+	var back_l: = UI.label("‹", 34, D.GOLD_300, Color(0, 0, 0, 0.65), 3, "body", 900)
+	back_l.position = Vector2(0, -2)
+	back_l.size = back_b.size
+	back_l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	back_l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	back_b.add_child(back_l)
+	back_b.gui_input.connect(func(e: InputEvent):
+		if _is_tap(e):
+			back_b.accept_event()
+			V9Feel.press(back_b, "tap")
+			if main != null and main.has_method("back"):
+				main.back())
+	add_child(back_b)
+	var top: = maxf(safe_t + 82.0, 82.0 + maxf(0.0, H - 1280.0) * 0.22)
 
 	var ov: = UI.label("СТОЛЫ · ЯПОНСКИЙ МАДЖОНГ", 15, D.GOLD_500, Color(0, 0, 0, 0), 0, "body", 900)
 	ov.position = Vector2(32, top)
@@ -2001,7 +2029,7 @@ func _lobby() -> void:
 		y += 24
 	var play_y: = minf(y, H - 140)
 	# magazine cover: the partner steps out past the right edge, under the play button
-	var ap: = "res://assets/hero/%s.png" % partner
+	var ap: = V10W1Core.hero_png(partner)
 	if ResourceLoader.exists(ap):
 		var art: = TextureRect.new()
 		art.texture = load(ap)

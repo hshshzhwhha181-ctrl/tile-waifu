@@ -13,7 +13,7 @@ const AV: = 104.0
 const NAME_PAD: = 9.0
 const NAME_PAD_K: = 0.3
 const NAME_FOOT: = 13.0
-const NAME_MIN_FS: = 14
+const NAME_MIN_FS: = 11
 const BODY_Y: = ROW_Y + AV + 14.0
 const BASE_BY_HERO: = {"mc": "o_base", "rin": "r_base", "hana": "h_base", "yue": "y_base", "nova": "n_base"}
 
@@ -484,8 +484,9 @@ func _build() -> void :
 			wk.tooltip_text = V6Txt.s("coll.worn")
 			card.add_child(wk)
 			wk.add_child(UI.center_label(UI.label("✓", 16, Color.WHITE, Color(0.05, 0.2, 0.15), 3, "body", 900), Rect2(0, -1, 24, 24)))
-		var nl: = UI.label(_name_text(String(it.name), nw, name_fs), name_fs, Color.WHITE, Color(0.2, 0.05, 0.2), 4 if name_fs >= 16 else 3, "body", 800)
-		Common.fit_words(nl, nw, 3, name_fs)
+		var card_fs: = mini(name_fs, _name_fs(String(it.name), nw))
+		var nl: = UI.label(_name_text(String(it.name), nw, card_fs), card_fs, Color.WHITE, Color(0.2, 0.05, 0.2), 4 if card_fs >= 16 else 3, "body", 800)
+		Common.fit_words(nl, nw, 3, mini(card_fs, NAME_MIN_FS))
 		nl.position = Vector2((cw - nw) * 0.5, minf(72.0, csz.y - NAME_FOOT - 84.0))
 		nl.size = Vector2(nw, 84)
 		nl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -547,7 +548,7 @@ func _hero_row() -> void:
 	var content_w: = 16.0 + n_h * MEDAL_STEP + 8.0
 	row_scroll = ScrollContainer.new()
 	row_scroll.name = "HeroRow"
-	row_scroll.position = Vector2(0, ROW_Y - 8.0)
+	row_scroll.position = Vector2(0, ROW_Y - 2.0)
 	row_scroll.size = Vector2(W, ROW_H)
 	row_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_SHOW_NEVER
 	row_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
@@ -593,14 +594,14 @@ func _hero_row() -> void:
 			content.add_child(lk)
 		# «NEW · Волна 1» on the five goddesses of wave 1
 		if W1_NEW.has(h):
-			var bw: = 100.0
-			var nb: = UI.rbox("pink", Rect2(mx + (MEDAL - bw) * 0.5, 0.0, bw, 22), 11, 2, 3)
+			var bw: = 88.0
+			var nb: = UI.rbox("pink", Rect2(mx + (MEDAL - bw) * 0.5, 6.0, bw, 18), 9, 2, 2)
 			nb.borders(Color("ffe7a6"), Color("c58a2c"))
 			nb.name = "NewBadge_" + h
 			nb.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			content.add_child(nb)
-			var nl: = UI.label("NEW · Волна 1", 13, Color.WHITE, Color(0.35, 0.05, 0.2), 3, "body", 900)
-			UI.center_label(nl, Rect2(0, -1, bw, 22))
+			var nl: = UI.label("NEW · Волна 1", 11, Color.WHITE, Color(0.35, 0.05, 0.2), 2, "body", 900)
+			UI.center_label(nl, Rect2(0, -1, bw, 18))
 			nb.add_child(nl)
 		# tap = select; a drag scrolls the row (the select fires on release when the finger hardly moved)
 		var hh: String = h

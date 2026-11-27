@@ -16,6 +16,8 @@ const TAB_TITLES: = ["Быстрый бой", "Комната", "Топ игро
 var main = null
 var W: = 720.0
 var H: = 1280.0
+var safe_t: = 0.0
+var safe_b: = 0.0
 var net: V10Online = null
 var phase: = "lobby"        # lobby | search | room_wait | match | result
 var tab: = 0
@@ -50,6 +52,7 @@ var opp_bar: Panel
 var my_lbl: Label
 var opp_lbl: Label
 var timer_lbl: Label
+var surrender_btn: Control
 var charge_bar: Panel
 var charge_lbl: Label
 var sab_btns: = {}
@@ -61,13 +64,53 @@ var sabotage_hits: = 0
 var emotes_seen: = 0
 
 
+static func _num(o, key: String) -> float:
+	if o is Dictionary:
+		var dv: Variant = (o as Dictionary).get(key, 0.0)
+		return float(dv) if (dv is float or dv is int) else 0.0
+	if o != null and o is Object:
+		var v: Variant = (o as Object).get(key)
+		if v is float or v is int:
+			return float(v)
+	return 0.0
+
+
+func _metrics() -> void:
+	var s: = size
+	if s.x <= 0.0 or s.y <= 0.0:
+		s = get_viewport_rect().size if is_inside_tree() else Vector2(720, 1280)
+		if s.x <= 0.0 or s.y <= 0.0:
+			s = Vector2(720, 1280)
+	W = s.x
+	H = s.y
+	size = Vector2(W, H)
+	var ins: = V10Layout.safe_insets(s)
+	var raw_t: = maxf(_num(main, "safe_top"), float(ins.get("top", 0.0)))
+	var raw_b: = maxf(_num(main, "safe_bottom"), float(ins.get("bottom", 0.0)))
+	if OS.has_feature("mobile"):
+		var sa: = DisplayServer.get_display_safe_area()
+		var win: = DisplayServer.window_get_size()
+		if sa.size.y > 0 and win.y > 0:
+			var ky: = H / float(win.y)
+			raw_t = maxf(raw_t, clampf(float(sa.position.y) * ky, 0.0, 110.0))
+			raw_b = maxf(raw_b, clampf(maxf(0.0, float(win.y) - float(sa.end.y)) * ky, 0.0, 80.0))
+	var in_cr: bool = false
+	if main != null and main is Object and ("CR" in main):
+		var cr: Variant = (main as Object).get("CR")
+		if cr is Rect2:
+			in_cr = absf(position.y - (cr as Rect2).position.y) < 1.0 and absf(H - (cr as Rect2).size.y) < 1.0
+	safe_t = maxf(0.0, raw_t - (position.y if in_cr else 0.0))
+	safe_b = maxf(0.0, raw_b - (maxf(0.0, _num(main, "H") - position.y - H) if in_cr else 0.0))
+
+
 func build(m, args: = {}) -> void:
 	main = m
-	W = size.x if size.x > 0.0 else 720.0
-	H = size.y if size.y > 0.0 else 1280.0
-	size = Vector2(W, H)
-	if main != null and main.has_method("show_chrome"):
-		main.show_chrome(false, false)
+	for c in get_children():
+		remove_child(c)
+		c.queue_free()
+	_metrics()
+	if main != null and main is Object and main.has_method("show_chrome"):
+		main.call("show_chrome", false, false)
 	U.backdrop(self, "bg_palace", W, H)
 	net = V10Online.new()
 	net.name = "Net"
@@ -123,8 +166,8 @@ func _go_back() -> void:
 		return
 	if net != null:
 		net.pvp_close()
-	if main != null and main.has_method("back"):
-		main.back()
+	if main != null and main is Object and main.has_method("back"):
+		main.call("back")
 
 
 # ── lobby ─────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -134,30 +177,36 @@ func _build_lobby() -> void:
 	lobby_root.size = Vector2(W, H)
 	lobby_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(lobby_root)
-	lobby_root.add_child(U.button("‹", Rect2(16, 14, 60, 60), _go_back, U.PLUM_HI, U.GOLD_HI, 30))
-	lobby_root.add_child(U.label("Онлайн-Дуэль · PvP 1×1", Rect2(90, 14, W - 110, 60), 28, U.GOLD_HI, HORIZONTAL_ALIGNMENT_LEFT, 900))
+	var top: = 14.0 + safe_t
+	var back_b: = U.button("‹", Rect2(16, top, 64, 64), _go_back, U.PLUM_HI, U.GOLD_HI, 30)
+	back_b.name = "Back"
+	lobby_root.add_child(back_b)
+	lobby_root.add_child(U.label("Онлайн-Дуэль · PvP 1×1", Rect2(92, top, W - 110, 64), 28, U.GOLD_HI, HORIZONTAL_ALIGNMENT_LEFT, 900))
 	# profile strip
-	var pr: = Rect2(16, 88, W - 32, 128)
+	var py: = top + 76.0
+	var pr: = Rect2(16, py, W - 32, 128)
 	lobby_root.add_child(U.panel(pr, U.PLUM, U.GOLD, 20))
-	lobby_root.add_child(Common.avatar(V10OnlineCfg.avatar(), Rect2(30, 100, 104, 104)))
-	var nick_l: = U.label(V10OnlineCfg.nick(), Rect2(150, 102, 300, 40), 28, U.CREAM)
+	lobby_root.add_child(Common.avatar(V10OnlineCfg.avatar(), Rect2(30, py + 12, 104, 104)))
+	var nick_l: = U.label(V10OnlineCfg.nick(), Rect2(150, py + 14, 300, 40), 28, U.CREAM)
 	nick_l.name = "Nick"
 	lobby_root.add_child(nick_l)
-	elo_lbl = U.label("", Rect2(150, 148, W - 190, 40), 22, U.GOLD)
+	elo_lbl = U.label("", Rect2(150, py + 60, W - 190, 40), 22, U.GOLD)
 	lobby_root.add_child(elo_lbl)
-	status_chip = U.status_chip(Rect2(W - 262, 104, 230, 40), net.online)
+	status_chip = U.status_chip(Rect2(W - 262, py + 16, 230, 40), net.online)
 	lobby_root.add_child(status_chip)
 	# tabs
+	var tabs_y: = py + 144.0
 	tab_btns.clear()
 	var tw: = (W - 32.0 - 24.0) / 3.0
 	for i in 3:
 		var idx: = i
-		var b: = U.button(TAB_TITLES[i], Rect2(16 + i * (tw + 12.0), 232, tw, 64), func() -> void: select_tab(idx), U.PLUM_LO, U.CREAM, 23)
+		var b: = U.button(TAB_TITLES[i], Rect2(16 + i * (tw + 12.0), tabs_y, tw, 64), func() -> void: select_tab(idx), U.PLUM_LO, U.CREAM, 23)
 		lobby_root.add_child(b)
 		tab_btns.append(b)
+	var page_y: = tabs_y + 80.0
 	page = Control.new()
-	page.position = Vector2(0, 312)
-	page.size = Vector2(W, H - 312)
+	page.position = Vector2(0, page_y)
+	page.size = Vector2(W, maxf(320.0, H - page_y - safe_b))
 	page.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	lobby_root.add_child(page)
 	_refresh_profile()
@@ -276,6 +325,7 @@ func _page_quick() -> void:
 	cta.size = btn_sz
 	cta.set_meta("ux_role", "primary")
 	cta.pressed.connect(func() -> void:
+		U.haptic("tap")
 		Sfx.play("tap", 1.0, -6)
 		start_matchmaking())
 	page.add_child(cta)
@@ -317,7 +367,7 @@ func _page_room() -> void:
 
 
 func _page_top() -> void:
-	var card: = Rect2(16, 0, W - 32, page.size.y - 24.0)
+	var card: = Rect2(16, 0, W - 32, maxf(300.0, page.size.y - 20.0))
 	page.add_child(U.panel(card, U.PLUM, U.GOLD, 22))
 	page.add_child(U.label("Топ игроков · рейтинг ELO", Rect2(36, 14, W - 72, 44), 27, U.GOLD_HI, HORIZONTAL_ALIGNMENT_CENTER, 900))
 	var info: = U.label("Загрузка рейтинга…", Rect2(36, 64, W - 72, 40), 22, U.MUTED, HORIZONTAL_ALIGNMENT_CENTER)
@@ -365,9 +415,7 @@ func fill_top(list: Control, rows: Array) -> void:
 		var medal: = [Color("#FFD34D"), Color("#D9DEE8"), Color("#E09A5A")]
 		var rc: Color = medal[rk - 1] if rk >= 1 and rk <= 3 else U.MUTED
 		list.add_child(U.label("%d" % rk, Rect2(8, y, 56, rh - 10.0), 26, rc, HORIZONTAL_ALIGNMENT_CENTER, 900))
-		var av: = String(row.get("avatar", "mc"))
-		if not (av in ["mc", "rin", "hana", "yue", "nova"]):
-			av = "mc"
+		var av: = V10OnlineCfg.valid_avatar(String(row.get("avatar", "mc")), "mc")
 		list.add_child(Common.avatar(av, Rect2(66, y + 5, 56, 56)))
 		list.add_child(U.label(String(row.get("nick", "?")), Rect2(134, y, list.size.x - 360, rh - 10.0), 23, U.CREAM))
 		list.add_child(U.label("%d / %d" % [int(row.get("wins", 0)), int(row.get("losses", 0))], Rect2(list.size.x - 226, y, 100, rh - 10.0), 20, U.MUTED, HORIZONTAL_ALIGNMENT_RIGHT))
@@ -437,16 +485,17 @@ func _show_search(title: String, sub: String) -> void:
 	dim.color = Color(0.05, 0.01, 0.08, 0.86)
 	dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	search_root.add_child(dim)
+	var cy: = safe_t + (H - safe_t - safe_b) * 0.5
 	var rad: = Radar.new()
 	rad.size = Vector2(440, 440)
-	rad.position = Vector2(W * 0.5 - 220, H * 0.5 - 330)
+	rad.position = Vector2(W * 0.5 - 220, cy - 330)
 	search_root.add_child(rad)
-	search_root.add_child(Common.avatar(V10OnlineCfg.avatar(), Rect2(W * 0.5 - 60, H * 0.5 - 170, 120, 120)))
-	search_root.add_child(U.label(title, Rect2(40, H * 0.5 + 130, W - 80, 50), 28, U.GOLD_HI, HORIZONTAL_ALIGNMENT_CENTER, 900))
-	search_root.add_child(U.label(sub, Rect2(40, H * 0.5 + 184, W - 80, 40), 22, U.CREAM, HORIZONTAL_ALIGNMENT_CENTER))
-	search_time_lbl = U.label("0:00", Rect2(40, H * 0.5 + 230, W - 80, 40), 24, U.GOLD, HORIZONTAL_ALIGNMENT_CENTER, 900)
+	search_root.add_child(Common.avatar(V10OnlineCfg.avatar(), Rect2(W * 0.5 - 60, cy - 170, 120, 120)))
+	search_root.add_child(U.label(title, Rect2(40, cy + 130, W - 80, 50), 28, U.GOLD_HI, HORIZONTAL_ALIGNMENT_CENTER, 900))
+	search_root.add_child(U.label(sub, Rect2(40, cy + 184, W - 80, 40), 22, U.CREAM, HORIZONTAL_ALIGNMENT_CENTER))
+	search_time_lbl = U.label("0:00", Rect2(40, cy + 230, W - 80, 40), 24, U.GOLD, HORIZONTAL_ALIGNMENT_CENTER, 900)
 	search_root.add_child(search_time_lbl)
-	search_root.add_child(U.button("Отмена", Rect2(W * 0.5 - 150, H * 0.5 + 300, 300, 80), cancel_search, U.PLUM_HI, U.CREAM, 26))
+	search_root.add_child(U.button("Отмена", Rect2(W * 0.5 - 150, minf(cy + 300, H - safe_b - 92), 300, 80), cancel_search, U.PLUM_HI, U.CREAM, 26))
 
 
 func cancel_search() -> void:
@@ -465,14 +514,14 @@ func _on_net_error(code: String, msg: String) -> void:
 	var txt: = msg if msg != "" else code
 	if code == "room_not_found":
 		txt = "Комната не найдена"
-	U.toast(self, txt, W, H * 0.12)
+	U.toast(self, txt, W, maxf(H * 0.12, safe_t + 24.0))
 	if phase == "search" and code in ["room_not_found", "own_room"]:
 		cancel_search()
 
 
 func _on_disconnected() -> void:
 	if phase == "match":
-		U.toast(self, "Связь с сервером потеряна", W, H * 0.12, U.RED)
+		U.toast(self, "Связь с сервером потеряна", W, maxf(H * 0.12, safe_t + 24.0), U.RED)
 		_back_to_lobby()
 	elif phase in ["search", "room_wait"]:
 		cancel_search()
@@ -550,25 +599,53 @@ func _build_match() -> void:
 	add_child(match_root)
 	move_child(match_root, lobby_root.get_index() + 1)
 	# ТЫ vs СОПЕРНИК
-	match_root.add_child(U.panel(Rect2(12, 12, W - 24, 188), U.PLUM, U.GOLD, 22))
-	match_root.add_child(Common.avatar(V10OnlineCfg.avatar(), Rect2(26, 24, 88, 88)))
-	var oav: = String(opp.get("avatar", "rin"))
-	match_root.add_child(Common.avatar(oav if oav in ["mc", "rin", "hana", "yue", "nova"] else "rin", Rect2(W - 114, 24, 88, 88), "pink"))
-	match_root.add_child(U.label("ТЫ", Rect2(124, 26, 190, 34), 24, U.GOLD_HI, HORIZONTAL_ALIGNMENT_LEFT, 900))
-	match_root.add_child(U.label("ELO %d" % V10OnlineCfg.elo(), Rect2(124, 62, 190, 30), 20, U.CREAM))
+	var mtop: = 12.0 + safe_t
+	var top_p: = U.panel(Rect2(12, mtop, W - 24, 188), U.PLUM, U.GOLD, 22)
+	top_p.name = "MatchHeader"
+	match_root.add_child(top_p)
+	match_root.add_child(Common.avatar(V10OnlineCfg.avatar(), Rect2(26, mtop + 12, 88, 88)))
+	var oav: = V10OnlineCfg.valid_avatar(String(opp.get("avatar", "rin")), "rin")
+	match_root.add_child(Common.avatar(oav, Rect2(W - 114, mtop + 12, 88, 88), "pink"))
+	match_root.add_child(U.label("ТЫ", Rect2(124, mtop + 14, 162, 34), 24, U.GOLD_HI, HORIZONTAL_ALIGNMENT_LEFT, 900))
+	match_root.add_child(U.label("ELO %d" % V10OnlineCfg.elo(), Rect2(124, mtop + 50, 162, 30), 20, U.CREAM))
 	var on: = String(opp.get("nick", "Соперник"))
-	match_root.add_child(U.label(on, Rect2(W - 314, 26, 190, 34), 24, Color("#FFB3C7"), HORIZONTAL_ALIGNMENT_RIGHT, 900))
+	match_root.add_child(U.label(on, Rect2(W - 286, mtop + 14, 162, 34), 24, Color("#FFB3C7"), HORIZONTAL_ALIGNMENT_RIGHT, 900))
 	var tag: = " · бот" if bool(opp.get("bot", false)) else ""
-	match_root.add_child(U.label("ELO %d%s" % [int(opp.get("pvp_elo", 1000)), tag], Rect2(W - 314, 62, 190, 30), 20, U.CREAM, HORIZONTAL_ALIGNMENT_RIGHT))
-	timer_lbl = U.label("3:00", Rect2(W * 0.5 - 50, 22, 100, 40), 28, U.GOLD_HI, HORIZONTAL_ALIGNMENT_CENTER, 900)
+	match_root.add_child(U.label("ELO %d%s" % [int(opp.get("pvp_elo", 1000)), tag], Rect2(W - 286, mtop + 50, 162, 30), 20, U.CREAM, HORIZONTAL_ALIGNMENT_RIGHT))
+	timer_lbl = U.label("3:00", Rect2(W * 0.5 - 60, mtop + 6, 120, 38), 28, U.GOLD_HI, HORIZONTAL_ALIGNMENT_CENTER, 900)
 	match_root.add_child(timer_lbl)
-	match_root.add_child(U.button("Сдаться", Rect2(W * 0.5 - 56, 66, 112, 40), surrender, U.PLUM_LO, U.MUTED, 20, Color(U.GOLD, 0.5)))
-	my_bar = U.bar(Rect2(26, 122, W * 0.5 - 40, 28), 1.0, Color("#F2C14E"))
-	opp_bar = U.bar(Rect2(W * 0.5 + 14, 122, W * 0.5 - 40, 28), 1.0, Color("#E0648C"))
+	# 136×52 visual pill centered inside a 148×64 (>= 64px) mobile hit target
+	surrender_btn = Control.new()
+	surrender_btn.name = "SurrenderBtn"
+	surrender_btn.position = Vector2(W * 0.5 - 74, mtop + 42)
+	surrender_btn.size = Vector2(148, 64)
+	surrender_btn.mouse_filter = Control.MOUSE_FILTER_STOP
+	surrender_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	surrender_btn.set_meta("no_haptic", true)
+	var sur_pill: = U.panel(Rect2(6, 6, 136, 52), U.PLUM_LO, Color(U.GOLD, 0.55), 26, 2)
+	sur_pill.name = "Pill"
+	var sur_lbl: = U.label("Сдаться", Rect2(8, 0, 120, 52), 21, U.CREAM, HORIZONTAL_ALIGNMENT_CENTER, 900)
+	sur_pill.add_child(sur_lbl)
+	surrender_btn.add_child(sur_pill)
+	surrender_btn.set_meta("label", sur_lbl)
+	surrender_btn.gui_input.connect(func(e: InputEvent) -> void:
+		var tap: bool = (e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT) or (e is InputEventScreenTouch and e.pressed)
+		if tap:
+			surrender_btn.accept_event()
+			var tw: = sur_pill.create_tween()
+			sur_pill.pivot_offset = sur_pill.size * 0.5
+			tw.tween_property(sur_pill, "scale", Vector2(0.95, 0.95), 0.06)
+			tw.tween_property(sur_pill, "scale", Vector2.ONE, 0.10)
+			U.haptic("tap")
+			Sfx.play("tap", 1.0, -6)
+			surrender())
+	match_root.add_child(surrender_btn)
+	my_bar = U.bar(Rect2(26, mtop + 112, W * 0.5 - 40, 28), 1.0, Color("#F2C14E"))
+	opp_bar = U.bar(Rect2(W * 0.5 + 14, mtop + 112, W * 0.5 - 40, 28), 1.0, Color("#E0648C"))
 	match_root.add_child(my_bar)
 	match_root.add_child(opp_bar)
-	my_lbl = U.label("", Rect2(26, 154, W * 0.5 - 40, 36), 20, U.CREAM)
-	opp_lbl = U.label("", Rect2(W * 0.5 + 14, 154, W * 0.5 - 40, 36), 20, U.CREAM, HORIZONTAL_ALIGNMENT_RIGHT)
+	my_lbl = U.label("", Rect2(26, mtop + 144, W * 0.5 - 40, 34), 20, U.CREAM)
+	opp_lbl = U.label("", Rect2(W * 0.5 + 14, mtop + 144, W * 0.5 - 40, 34), 20, U.CREAM, HORIZONTAL_ALIGNMENT_RIGHT)
 	match_root.add_child(my_lbl)
 	match_root.add_child(opp_lbl)
 	# tray
@@ -577,7 +654,7 @@ func _build_match() -> void:
 	var gap: = 12.0
 	var tot: = sw * SLOTS_N + gap * (SLOTS_N - 1)
 	var x0: = (W - tot) * 0.5
-	var ty: = 214.0
+	var ty: = mtop + 202.0
 	match_root.add_child(U.panel(Rect2(x0 - 14, ty - 8, tot + 28, sw * 1.12 + 16), Color(0.08, 0.05, 0.12, 0.9), U.GOLD, 16))
 	for i in SLOTS_N:
 		var r: = Rect2(x0 + i * (sw + gap), ty, sw, sw * 1.12)
@@ -585,11 +662,13 @@ func _build_match() -> void:
 		match_root.add_child(U.panel(r, Color(0.05, 0.03, 0.08, 0.92), Color(0.75, 0.62, 0.38, 0.55), 10))
 	# dock
 	var dh: = 176.0
-	var dy: = H - dh - 12.0
+	var dy: = H - dh - 12.0 - safe_b
 	var by: = ty + sw * 1.12 + 22.0
-	board_rect = Rect2(18, by, W - 36, dy - by - 12.0)
+	board_rect = Rect2(18, by, W - 36, maxf(240.0, dy - by - 12.0))
 	match_root.add_child(U.panel(board_rect.grow(5.0), Color(0.06, 0.14, 0.11, 0.85), Color("#D4AC5E"), 18))
-	match_root.add_child(U.panel(Rect2(12, dy, W - 24, dh), U.PLUM, U.GOLD, 22))
+	var dock_p: = U.panel(Rect2(12, dy, W - 24, dh), U.PLUM, U.GOLD, 22)
+	dock_p.name = "MatchDock"
+	match_root.add_child(dock_p)
 	charge_lbl = U.label("", Rect2(28, dy + 10, 320, 32), 21, U.GOLD_HI, HORIZONTAL_ALIGNMENT_LEFT, 900)
 	match_root.add_child(charge_lbl)
 	charge_bar = U.bar(Rect2(28, dy + 46, 316, 22), 0.0, Color("#8FD8FF"))
@@ -730,17 +809,21 @@ func send_emote(id: String) -> void:
 	if phase != "match":
 		return
 	net.send_emote(id)
-	_bubble(Vector2(124, 100), EMOTE_TEXT.get(id, "!"), false)
+	var my_y: = (my_bar.position.y + my_bar.size.y + 10.0) if (my_bar != null and is_instance_valid(my_bar)) else (162.0 + safe_t)
+	_bubble(Vector2(26, my_y), EMOTE_TEXT.get(id, "!"), false)
 
 
 func _on_emote(id: String) -> void:
 	emotes_seen += 1
 	if phase == "match":
-		_bubble(Vector2(W - 324, 100), EMOTE_TEXT.get(id, "!"), true)
+		var opp_y: = (opp_bar.position.y + opp_bar.size.y + 10.0) if (opp_bar != null and is_instance_valid(opp_bar)) else (162.0 + safe_t)
+		var opp_x: = (opp_bar.position.x + opp_bar.size.x - 200.0) if (opp_bar != null and is_instance_valid(opp_bar)) else (W - 226.0)
+		_bubble(Vector2(opp_x, opp_y), EMOTE_TEXT.get(id, "!"), true)
 
 
 func _bubble(pos: Vector2, txt: String, theirs: bool) -> void:
 	var p: = U.panel(Rect2(pos, Vector2(200, 56)), Color("#FFF4E0"), Color("#E0648C") if theirs else U.GOLD, 24, 3)
+	p.name = "EmoteBubble"
 	p.z_index = 240
 	var l: = U.label(txt, Rect2(8, 0, 184, 56), 24, Color("#3A1838"), HORIZONTAL_ALIGNMENT_CENTER, 900)
 	l.label_settings = l.label_settings.duplicate()
@@ -803,7 +886,8 @@ func show_result(d: Dictionary) -> void:
 	dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	result_root.add_child(dim)
 	var won: = bool(d.get("you_won", false))
-	var pr: = Rect2(48, H * 0.5 - 300, W - 96, 600)
+	var cy: = safe_t + (H - safe_t - safe_b) * 0.5
+	var pr: = Rect2(48, cy - 300, W - 96, 600)
 	result_root.add_child(U.panel(pr, U.PLUM, U.GOLD_HI if won else Color("#B9879B"), 28, 3))
 	var t: = U.label("ПОБЕДА!" if won else "ПОРАЖЕНИЕ", Rect2(pr.position.x, pr.position.y + 26, pr.size.x, 90), 28, U.GOLD_HI if won else Color("#FFB3C7"), HORIZONTAL_ALIGNMENT_CENTER, 900)
 	t.label_settings = t.label_settings.duplicate()

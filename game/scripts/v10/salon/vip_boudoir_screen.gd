@@ -1,9 +1,9 @@
 class_name V10VipBoudoirScreen
 extends Control
 
-# Screen "v10boudoir" — VIP-Будуары Салона (0.11.0 AAA 16+ luxury suites powered by Higgsfield art).
-# 4 bespoke suites (Маджонг-тян, Рин, Юэ, Нова) with slow camera breathing, warm petals, heroine 16+ CG
-# portrait, JP voice lines, interactive V10AffCurve affection gift giving, milestone tracker, and Hide-UI mode.
+# Screen "v10boudoir" — VIP-Будуары Салона (0.12.0 AAA 16+ luxury suites powered by Higgsfield art).
+# 10 bespoke suites (all 5 founders + all 5 Wave-1 goddesses) with slow camera breathing, warm petals, prominent
+# heroine 16+ CG showcase (plus full-screen Art mode), JP voice lines, V10AffCurve gifts, and branching 16+ dates.
 
 const VIP_DIR: = "res://assets/v10/salon_vip/"
 const CG_DIR: = "res://assets/v10/cg_16/"
@@ -29,7 +29,7 @@ const SUITES: Array[Dictionary] = [
 		"name": "Полуночный бар Рин",
 		"sub": "Нефритовый свет, редкий улун и приватная стойка",
 		"bg": "teabar_rin.webp",
-		"cg": "rin.webp",
+		"cg": "date_rin_16.webp",
 		"accent": Color("#FF799A"),
 		"lines": [
 			"Гости уже разошлись. Я оставила для тебя самое тёплое место у стойки.",
@@ -57,7 +57,7 @@ const SUITES: Array[Dictionary] = [
 		"name": "Пентхаус Новы",
 		"sub": "Неоновая панорама города и приватный диван",
 		"bg": "penthouse_nova.webp",
-		"cg": "nova_roof.webp",
+		"cg": "date_nova_16.webp",
 		"accent": Color("#6EE7FF"),
 		"lines": [
 			"Весь мегаполис внизу, а сигнал камер я уже отключила. Мы одни.",
@@ -129,9 +129,40 @@ const SUITES: Array[Dictionary] = [
 			"Склонись ближе, смертный. Хочу рассмотреть, кто так красиво смущается.",
 		],
 	},
+	{
+		"id": "hana",
+		"hero": "hana",
+		"name": "Тёплая гостиная Ханы",
+		"sub": "Уютный свитер, тёплый плед и поздний ужин на двоих",
+		"bg": "boudoir_hana.webp",
+		"bg_fb": "boudoir_mc.webp",
+		"cg": "date_hana_16.webp",
+		"accent": Color("#FFB25A"),
+		"lines": [
+			"Свитер опять сполз с плеча… нет, не поправляй. Мне нравится, как ты смотришь.",
+			"Дверь уже закрыта на ключ. Иди ко мне под плед — сегодня никуда не спешим~",
+			"Ты такой внимательный за столом… интересно, в полумраке ты такой же смелый?",
+		],
+	},
+	{
+		"id": "miel",
+		"hero": "miel",
+		"name": "Ночная кондитерская Миэль",
+		"sub": "Тёплая карамель, сливки и стол после закрытия",
+		"bg": "boudoir_miel.webp",
+		"bg_fb": "teabar_rin.webp",
+		"cg": "cg_miel_16.webp",
+		"pfx": "me",
+		"accent": Color("#E0566F"),
+		"lines": [
+			"Витрина уже закрыта, но самый сладкий десерт остался на стойке… попробуешь?",
+			"На губах капля крема? Ну так не стой далеко — убери сам, если не стесняешься~",
+			"Фартук и чулки пахнут ванилью. Сегодня ночью весь салон «Мёд и пар» только для тебя.",
+		],
+	},
 ]
 
-const FALLBACK_NAMES: = {"kohaku": "Кохаку", "shirin": "Ширин", "tsubame": "Цубамэ", "zlata": "Злата"}
+const FALLBACK_NAMES: = {"hana": "Хана", "miel": "Миэль", "kohaku": "Кохаку", "shirin": "Ширин", "tsubame": "Цубамэ", "zlata": "Злата"}
 
 var main
 var W: = 720.0
@@ -143,6 +174,11 @@ var _t: = 0.0
 
 var _bg_tex: TextureRect
 var _cg_tex: TextureRect
+var _cg_rim: Panel
+var _cg_mat: ShaderMaterial
+var _cg_shadow: Panel
+var _safe_top: = 0.0
+var _safe_bot: = 0.0
 var _ui_layer: Control
 var _tabs_box: Control
 var _tabs_scroll: ScrollContainer
@@ -172,6 +208,9 @@ func build(m, args: Dictionary) -> void:
 	H = size.y
 	if main != null and main.has_method("show_chrome"):
 		main.show_chrome(false, false)
+	var ins: = V10Layout.safe_insets(size)
+	_safe_top = maxf(0.0, float(ins.get("top", 0.0)) - position.y)
+	_safe_bot = maxf(0.0, float(ins.get("bottom", 0.0)) - (maxf(0.0, get_viewport_rect().size.y - (position.y + size.y)) if is_inside_tree() else 0.0))
 	Sfx.music("menu")
 	var req_h: = String(args.get("hero", G.S.get("partner", "mc")))
 	for i in SUITES.size():
@@ -199,15 +238,45 @@ func build(m, args: Dictionary) -> void:
 	var vig: = Common.vignette(self, size, Color(0.10, 0.03, 0.12), 0.34)
 	vig.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
-	# Heroine 16+ CG card floating softly in the upper-center luxury frame
+	# Heroine 16+ CG showcase floating in the upper-center luxury frame (expands full-bleed in Art mode)
+	var cg_r: = _showcase_rect()
+	_cg_shadow = _pill(cg_r, Color(0.04, 0.01, 0.06, 0.65), Color(0, 0, 0, 0), 24)
+	_cg_shadow.get_theme_stylebox("panel").set_border_width_all(0)
+	_cg_shadow.get_theme_stylebox("panel").shadow_size = 18
+	_cg_shadow.get_theme_stylebox("panel").shadow_color = Color(0.0, 0.0, 0.0, 0.62)
+	add_child(_cg_shadow)
+
 	_cg_tex = TextureRect.new()
 	_cg_tex.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	_cg_tex.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	_cg_tex.position = Vector2(0, 128)
-	_cg_tex.size = Vector2(W, H - 560)
+	_cg_tex.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	_cg_tex.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	_cg_tex.position = cg_r.position
+	_cg_tex.size = cg_r.size
+	_cg_tex.pivot_offset = cg_r.size * 0.5
 	_cg_tex.visible = false
 	_cg_tex.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_cg_mat = ShaderMaterial.new()
+	_cg_mat.shader = preload("res://shaders/card.gdshader")
+	_cg_mat.set_shader_parameter("size", cg_r.size)
+	_cg_mat.set_shader_parameter("radius", 24.0)
+	_cg_mat.set_shader_parameter("focus", Vector2(0.5, 0.24))
+	_cg_mat.set_shader_parameter("zoom", 1.0)
+	_cg_mat.set_shader_parameter("holo", 0.06)
+	_cg_mat.set_shader_parameter("bottom_shade", 0.12)
+	_cg_tex.material = _cg_mat
 	add_child(_cg_tex)
+
+	_cg_rim = Panel.new()
+	_cg_rim.position = cg_r.position
+	_cg_rim.size = cg_r.size
+	_cg_rim.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var rim_sb: = StyleBoxFlat.new()
+	rim_sb.draw_center = false
+	rim_sb.border_color = Color("#FFE49C")
+	rim_sb.set_border_width_all(3)
+	rim_sb.set_corner_radius_all(24)
+	_cg_rim.add_theme_stylebox_override("panel", rim_sb)
+	add_child(_cg_rim)
 
 	Fx.ambient(self, "petals", size)
 
@@ -228,7 +297,7 @@ func build(m, args: Dictionary) -> void:
 	_build_bottom_panel()
 
 	# Always-on Hide-UI toggle button in top-right (visible even when UI is hidden)
-	_hide_btn = _pill(Rect2(W - 118, 20, 102, 48), Color(0.12, 0.06, 0.18, 0.88), Color("#F4D484"), 24)
+	_hide_btn = _pill(Rect2(W - 118, 20 + _safe_top, 102, 48), Color(0.12, 0.06, 0.18, 0.88), Color("#F4D484"), 24)
 	_hide_btn.z_index = 60
 	_hide_btn.mouse_filter = Control.MOUSE_FILTER_STOP
 	_hide_lbl = UI.center_label(UI.label("Арт", 18, Color("#FFE7A8"), Color(0.06, 0.02, 0.10), 3, "body", 900), Rect2(0, 0, 102, 48))
@@ -236,6 +305,7 @@ func build(m, args: Dictionary) -> void:
 	_hide_btn.gui_input.connect(func(e: InputEvent) -> void:
 		if _is_tap(e):
 			_hide_btn.accept_event()
+			V9Feel.press(_hide_btn, "tap")
 			_toggle_ui())
 	add_child(_hide_btn)
 
@@ -259,48 +329,53 @@ func _process(dt: float) -> void:
 		var sc: = 1.025 + sin(_t * 0.55) * 0.014
 		_bg_tex.scale = Vector2(sc, sc)
 		_bg_tex.rotation = sin(_t * 0.32) * 0.004
+	if _cg_tex != null and is_instance_valid(_cg_tex) and _cg_tex.visible:
+		var csc: = 1.006 + sin(_t * 0.65) * 0.006
+		_cg_tex.scale = Vector2(csc, csc)
 
 
 func _build_header() -> void:
-	var back_b: = _pill(Rect2(16, 18, 56, 52), Color(0.13, 0.06, 0.19, 0.90), Color("#E8C47E"), 16)
+	var back_b: = _pill(Rect2(16, 18 + _safe_top, 56, 52), Color(0.13, 0.06, 0.19, 0.90), Color("#E8C47E"), 16)
 	back_b.mouse_filter = Control.MOUSE_FILTER_STOP
 	back_b.add_child(UI.center_label(UI.label("‹", 32, Color("#FFF4DE"), Color(0.06, 0.02, 0.10), 3, "body", 900), Rect2(0, -3, 56, 52)))
 	back_b.gui_input.connect(func(e: InputEvent) -> void:
 		if _is_tap(e):
 			back_b.accept_event()
+			V9Feel.press(back_b, "tap")
 			_back())
 	_ui_layer.add_child(back_b)
 
-	var tag: = _pill(Rect2(84, 18, 126, 30), Color(0.56, 0.10, 0.28, 0.94), Color("#FFD984"), 15)
+	var tag: = _pill(Rect2(84, 18 + _safe_top, 126, 30), Color(0.56, 0.10, 0.28, 0.94), Color("#FFD984"), 15)
 	tag.add_child(UI.center_label(UI.label("VIP · 16+", 15, Color("#FFF6E6"), Color(0.24, 0.04, 0.12), 2, "body", 900), Rect2(0, 0, 126, 30)))
 	_ui_layer.add_child(tag)
 
 	_suite_title = UI.label("", 28, Color("#FFF7E8"), Color(0.08, 0.02, 0.12), 5, "body", 900)
-	_suite_title.position = Vector2(84, 48)
+	_suite_title.position = Vector2(84, 48 + _safe_top)
 	_suite_title.size = Vector2(W - 220, 36)
 	_ui_layer.add_child(_suite_title)
 
 	_suite_sub = UI.label("", 17, Color("#F4D48A"), Color(0.08, 0.02, 0.12), 3, "body", 700)
-	_suite_sub.position = Vector2(84, 84)
+	_suite_sub.position = Vector2(84, 84 + _safe_top)
 	_suite_sub.size = Vector2(W - 110, 24)
 	_ui_layer.add_child(_suite_sub)
 
 	# Quick toggle to switch to restoration Salon map
-	var map_b: = _pill(Rect2(W - 236, 20, 108, 48), Color(0.14, 0.07, 0.21, 0.88), Color("#D8B878"), 24)
+	var map_b: = _pill(Rect2(W - 236, 20 + _safe_top, 108, 48), Color(0.14, 0.07, 0.21, 0.88), Color("#D8B878"), 24)
 	map_b.mouse_filter = Control.MOUSE_FILTER_STOP
 	map_b.add_child(UI.center_label(UI.label("Салон ›", 17, Color("#F5E7CF"), Color(0.06, 0.02, 0.10), 3, "body", 800), Rect2(0, 0, 108, 48)))
 	map_b.gui_input.connect(func(e: InputEvent) -> void:
 		if _is_tap(e):
 			map_b.accept_event()
+			V9Feel.press(map_b, "tap")
 			if main != null and main.has_method("go"):
 				main.go("v10salon"))
 	_ui_layer.add_child(map_b)
 
 
 func _build_suite_tabs() -> void:
-	# 8 goddesses: smooth horizontal ScrollContainer (touch drag / wheel), round emotional portraits
+	# 10 goddesses: smooth horizontal ScrollContainer (touch drag / wheel), round emotional portraits
 	_tabs_scroll = ScrollContainer.new()
-	_tabs_scroll.position = Vector2(10, 116)
+	_tabs_scroll.position = Vector2(10, 116 + _safe_top)
 	_tabs_scroll.size = Vector2(W - 20, 92)
 	_tabs_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_SHOW_NEVER
 	_tabs_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
@@ -366,7 +441,7 @@ func _build_suite_tabs() -> void:
 
 func _build_bottom_panel() -> void:
 	var panel_h: = 408.0
-	var py: = H - panel_h - 18.0
+	var py: = H - panel_h - 18.0 - _safe_bot
 	var box: = _pill(Rect2(18, py, W - 36, panel_h), Color(0.11, 0.04, 0.16, 0.93), Color("#F6D484"), 26)
 	box.mouse_filter = Control.MOUSE_FILTER_STOP
 	_ui_layer.add_child(box)
@@ -478,9 +553,27 @@ func _apply_suite(play_voice: bool) -> void:
 		_bg_tex.modulate = Color.WHITE.lerp(s.accent, 0.32)
 	if tex != null:
 		_bg_tex.texture = tex
+	var hid: = String(s.hero)
+	var cg_t: Texture2D = cg_texture(hid)
+	if _cg_tex != null:
+		if cg_t != null:
+			_cg_tex.texture = cg_t
+			_cg_tex.visible = true
+			if _cg_mat != null:
+				_cg_mat.set_shader_parameter("tex_size", Vector2(cg_t.get_width(), cg_t.get_height()))
+			if _cg_rim != null:
+				var rim_sb: = _cg_rim.get_theme_stylebox("panel") as StyleBoxFlat
+				if rim_sb != null:
+					rim_sb.border_color = s.accent.lerp(Color("#FFE49C"), 0.55)
+			_layout_cg(_ui_hidden, false)
+		else:
+			_cg_tex.visible = false
+			if _cg_rim != null:
+				_cg_rim.visible = false
+			if _cg_shadow != null:
+				_cg_shadow.visible = false
 	_suite_title.text = String(s.name)
 	_suite_sub.text = String(s.sub)
-	var hid: = String(s.hero)
 	_hero_name_lbl.text = _hero_name(hid)
 	if _tabs_scroll != null:
 		_scroll_to_tab.call_deferred(_idx)
@@ -548,10 +641,57 @@ func _give_gift(gid: String, from_pos: Vector2) -> void:
 	_refresh_aff()
 
 
+func _showcase_rect() -> Rect2:
+	var tabs_end: = 116.0 + _safe_top + 92.0
+	var py: = H - 408.0 - 18.0 - _safe_bot
+	var date_top: = py - 28.0
+	var y0: = tabs_end + 8.0
+	var y1: = date_top - 10.0
+	var fh: = maxf(240.0, y1 - y0)
+	var fw: = clampf(fh * 0.64, 340.0, W - 48.0)
+	return Rect2((W - fw) * 0.5, y0, fw, fh)
+
+
+func _layout_cg(full_bleed: bool, animate: bool) -> void:
+	if _cg_tex == null or not is_instance_valid(_cg_tex) or not _cg_tex.visible:
+		return
+	var target_r: Rect2 = V10Layout.bleed_rect(self) if full_bleed else _showcase_rect()
+	var target_rad: = 0.0 if full_bleed else 24.0
+	var target_focus: = Vector2(0.5, 0.44) if full_bleed else Vector2(0.5, 0.24)
+	var target_shade: = 0.0 if full_bleed else 0.12
+	if _cg_rim != null:
+		_cg_rim.visible = not full_bleed
+		_cg_rim.position = target_r.position
+		_cg_rim.size = target_r.size
+	if _cg_shadow != null:
+		_cg_shadow.visible = not full_bleed
+		_cg_shadow.position = target_r.position
+		_cg_shadow.size = target_r.size
+	_cg_tex.pivot_offset = target_r.size * 0.5
+	if animate and is_inside_tree():
+		var tw: = create_tween().set_parallel(true)
+		tw.tween_property(_cg_tex, "position", target_r.position, 0.26).set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_OUT)
+		tw.tween_property(_cg_tex, "size", target_r.size, 0.26).set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_OUT)
+		if _cg_mat != null:
+			tw.tween_method(func(v: Vector2): _cg_mat.set_shader_parameter("size", v), Vector2(_cg_mat.get_shader_parameter("size")), target_r.size, 0.26)
+			tw.tween_method(func(v: float): _cg_mat.set_shader_parameter("radius", v), float(_cg_mat.get_shader_parameter("radius")), target_rad, 0.26)
+			tw.tween_method(func(v: Vector2): _cg_mat.set_shader_parameter("focus", v), Vector2(_cg_mat.get_shader_parameter("focus")), target_focus, 0.26)
+			tw.tween_method(func(v: float): _cg_mat.set_shader_parameter("bottom_shade", v), float(_cg_mat.get_shader_parameter("bottom_shade")), target_shade, 0.26)
+	else:
+		_cg_tex.position = target_r.position
+		_cg_tex.size = target_r.size
+		if _cg_mat != null:
+			_cg_mat.set_shader_parameter("size", target_r.size)
+			_cg_mat.set_shader_parameter("radius", target_rad)
+			_cg_mat.set_shader_parameter("focus", target_focus)
+			_cg_mat.set_shader_parameter("bottom_shade", target_shade)
+
+
 func _toggle_ui() -> void:
 	_ui_hidden = not _ui_hidden
 	_ui_layer.visible = not _ui_hidden
 	_hide_lbl.text = "Показать" if _ui_hidden else "Арт"
+	_layout_cg(_ui_hidden, true)
 
 
 func _back() -> void:

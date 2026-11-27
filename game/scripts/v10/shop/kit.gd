@@ -81,7 +81,7 @@ static func deny(node: CanvasItem = null) -> void:
 		return
 	# «ошибка — глухое дерево, никогда не бззз» (UX §7.4): no shake on UI
 	V9Feel.haptic("button")
-	V10Hud2Util.sfx("wood_dull")
+	V10Hud2Util.sfx("tile_deny")
 	if node:
 		# dip and come back to the node's OWN alpha (a dimmed «Продолжить» on the age gate stays dimmed);
 		# repeated taps restart the dip from the same base instead of ratcheting it down
@@ -153,7 +153,7 @@ static func hanko(host: Control, center: Vector2) -> void:
 	s.add_to_group(FX)
 	host.add_child(s)
 	if not mute:
-		V10Hud2Util.sfx("stamp")
+		V10Hud2Util.sfx("chest_open")
 		V9Feel.haptic("match")
 	if not fx_on():
 		s.modulate.a = 0.0

@@ -36,6 +36,7 @@ func _ready() -> void:
 	await _offline_tests()
 	await _screen_tests(Vector2(720, 1600))
 	await _screen_tests(Vector2(720, 1280))
+	_check(V10OnlineCfg.url() == keep_url, "screen_tests restores V10OnlineCfg.url")
 	await _pvp_match_tests()
 	if live_url != "":
 		await _live_tests()
@@ -66,6 +67,30 @@ func _cfg_tests() -> void:
 	_check(V10OnlineCfg.elo_delta(1000, 1000, true) == 16 and V10OnlineCfg.elo_delta(1000, 1000, false) == -16, "ELO K32 even match ±16")
 	_check(V10OnlineCfg.elo_delta(1200, 1000, true) < 16, "favourite gains less")
 	_check(V10OnlineCfg.PROVIDERS.size() == 4 and "telegram" in V10OnlineCfg.PROVIDERS, "4 providers")
+	_check(V10OnlineCfg.HEROES.size() == 10 and "zlata" in V10OnlineCfg.HEROES and "tsubame" in V10OnlineCfg.HEROES, "all 10 heroines allowed")
+	var keep_u: Dictionary = V10OnlineCfg.user().duplicate(true)
+	var gs: Dictionary = V10OnlineCfg._S()
+	var keep_prof: Variant = gs.get("profile", {}).duplicate(true) if gs.get("profile") is Dictionary else null
+	var keep_part: String = String(gs.get("partner", "mc"))
+	V10OnlineCfg.st().user = {}
+	gs["profile"] = {"nick": "Акира", "avatar": "kohaku"}
+	gs["partner"] = "zlata"
+	_check(V10OnlineCfg.nick() == "Акира", "nick reads G.S.profile.nick")
+	_check(V10OnlineCfg.avatar() == "kohaku", "avatar reads Wave-1 profile avatar")
+	gs["profile"] = {"nick": "", "avatar": "mc"}
+	_check(V10OnlineCfg.nick() == "Игрок", "empty profile nick falls back to Игрок")
+	_check(V10OnlineCfg.avatar() == "zlata", "avatar reads Wave-1 partner")
+	if keep_prof != null:
+		gs["profile"] = keep_prof
+	else:
+		gs.erase("profile")
+	gs["partner"] = keep_part
+	V10OnlineCfg.st().user = keep_u
+	var chip_on: = V10OnlineUi.status_chip(Rect2(0, 0, 220, 40), true)
+	var chip_off: = V10OnlineUi.status_chip(Rect2(0, 0, 220, 40), false)
+	_check((chip_on.get_node("Text") as Label).text == "В сети" and (chip_off.get_node("Text") as Label).text == "Офлайн-режим", "status_chip uses В сети / Офлайн-режим")
+	chip_on.free()
+	chip_off.free()
 
 
 func _protocol_tests() -> void:
@@ -125,6 +150,12 @@ func _bot_tests() -> void:
 	var b2: = V10OnlineBot.new(sink)
 	b2.handle({"t": "room_join", "code": "12"})
 	_check(String(sink.got[-1].t) == "error", "bot: bad room code -> error")
+	var sink_f: = _Sink.new()
+	var b3: = V10OnlineBot.new(sink_f)
+	b3.handle({"t": "room_join", "code": "654321"})
+	b3.handle({"t": "match_finish", "cleared": false, "tiles_left": 18, "score": 300, "reason": "surrender"})
+	var ends_f: Array = sink_f.got.filter(func(x): return String(x.t) == "match_end")
+	_check(ends_f.size() == 1 and String(ends_f[0].get("reason", "")) == "forfeit", "bot: surrender emits reason=forfeit")
 
 
 func _offline_tests() -> void:
@@ -186,6 +217,7 @@ func _labels_inside(root: Control, area: Rect2) -> Array:
 
 func _screen_tests(vs: Vector2) -> void:
 	var tag: = "%dx%d" % [vs.x, vs.y]
+	var prev_url: = V10OnlineCfg.url()
 	V10OnlineCfg.st().url = "http://127.0.0.1:9"
 	var h1: = _host(vs)
 	var acc: = Control.new()
@@ -198,6 +230,11 @@ func _screen_tests(vs: Vector2) -> void:
 	_check(acc.get_child_count() > 5, "account screen builds " + tag)
 	var pb: Dictionary = acc.get("provider_buttons")
 	_check(pb.size() == 4, "account: 4 provider buttons " + tag)
+	var body_c: Control = acc.get("body")
+	var login_b: Panel = body_c.get_node_or_null("LoginBtn") if body_c != null else null
+	var logout_b: Panel = body_c.get_node_or_null("LogoutBtn") if body_c != null else null
+	_check(login_b != null and (login_b.get_meta("label") as Label).label_settings.outline_size == 0, "account: gold Войти button outline_size == 0 " + tag)
+	_check(logout_b != null and logout_b.size.y >= 64.0, "account: LogoutBtn height >= 64px " + tag)
 	var rects: = []
 	for k in pb:
 		rects.append((pb[k] as Control).get_global_rect())
@@ -226,6 +263,20 @@ func _screen_tests(vs: Vector2) -> void:
 		var b2: = _labels_inside(pvp, Rect2(Vector2.ZERO, vs))
 		_check(b2.is_empty(), "pvp tab %d labels inside %s %s" % [t, tag, str(b2)])
 	h2.queue_free()
+	if int(vs.y) == 1600:
+		var hs: = _host(vs)
+		var pvp_s: = V10PvpOnlineScreen.new()
+		pvp_s.size = vs
+		hs.add_child(pvp_s)
+		pvp_s.build({"safe_top": 60.0, "safe_bottom": 48.0}, {"no_net": true})
+		pvp_s.start_local_match()
+		for i in 4:
+			await get_tree().process_frame
+		var mh: Control = pvp_s.match_root.get_node_or_null("MatchHeader")
+		var md: Control = pvp_s.match_root.get_node_or_null("MatchDock")
+		_check(mh != null and mh.position.y >= 60.0 and md != null and md.position.y + md.size.y <= vs.y - 48.0 + 0.5, "pvp match respects safe_top & safe_bottom")
+		hs.queue_free()
+	V10OnlineCfg.st().url = prev_url
 	await get_tree().process_frame
 
 
@@ -249,14 +300,17 @@ func _pvp_match_tests() -> void:
 	_check(pvp.use_sabotage("fog") and pvp.charge == 0, "charged sabotage fires")
 	pvp.apply_sabotage("ice")
 	_check(V10AdventureVfx.active_debuff_count(pvp.board) > 0, "incoming ice freezes tiles")
+	_check(pvp.surrender_btn != null and pvp.surrender_btn.size.y >= 64.0 and (pvp.surrender_btn.get_node("Pill") as Control).size == Vector2(136, 52), "surrender button 136x52 pill with >= 64px hit target")
 	pvp._on_emote("laugh")
 	_check(pvp.emotes_seen == 1, "emote received")
+	var bub: Control = pvp.fx_layer.get_node_or_null("EmoteBubble")
+	_check(bub != null and bub.position.y >= pvp.opp_bar.position.y + pvp.opp_bar.size.y + 8.0, "opponent emote bubble sits cleanly below opp_bar")
 	pvp._on_opp_progress({"tiles_left": 10, "score": 3000, "combo": 4})
 	_check(pvp.opp_left == 10, "opponent progress applied")
 	pvp.surrender()
 	for i in 4:
 		await get_tree().process_frame
-	_check(pvp.phase == "result" and not bool(pvp.last_result.get("you_won", true)), "surrender -> result (loss)")
+	_check(pvp.phase == "result" and not bool(pvp.last_result.get("you_won", true)) and String(pvp.last_result.get("reason", "")) == "forfeit", "surrender -> result (loss, forfeit)")
 	_check(pvp.result_root != null and is_instance_valid(pvp.result_root), "result panel shown")
 	h.queue_free()
 	await get_tree().process_frame

@@ -15,6 +15,7 @@ const DEFAULT_URL: = "http://127.0.0.1:8787"
 const VERSION: = "0.12.0"
 const PROVIDERS: = ["yandex", "google", "vk", "telegram"]
 const PROVIDER_TITLES: = {"yandex": "Яндекс ID", "google": "Google", "vk": "VK ID", "telegram": "Telegram"}
+const HEROES: = ["mc", "rin", "hana", "yue", "nova", "tsubame", "miel", "kohaku", "shirin", "zlata"]
 const LOCAL_KEYS: = ["v10_online"]
 
 # a dictionary used when G (autoload) is not there (pure unit tests)
@@ -139,19 +140,43 @@ static func user() -> Dictionary:
 
 
 static func nick() -> String:
-	var n: = String(user().get("nick", ""))
+	var n: = String(user().get("nick", "")).strip_edges()
 	if n != "":
 		return n
-	var g: = _S()
-	return String(g.get("nick", g.get("name", "Игрок")))
+	var s: = _S()
+	if s.get("profile") is Dictionary:
+		var pn: = String((s.profile as Dictionary).get("nick", "")).strip_edges()
+		if pn != "":
+			return pn
+	var g: = Engine.get_main_loop() as SceneTree
+	if g != null and g.root != null and g.root.has_node("G"):
+		var gn: Node = g.root.get_node("G")
+		if gn.has_method("nick"):
+			var gn_nick: = String(gn.call("nick")).strip_edges()
+			if gn_nick != "" and gn_nick != "Гость":
+				return gn_nick
+	var fn: = String(s.get("nick", s.get("name", ""))).strip_edges()
+	return fn if fn != "" else "Игрок"
+
+
+static func valid_avatar(id: String, fallback: = "mc") -> String:
+	return id if id in HEROES else fallback
 
 
 static func avatar() -> String:
 	var a: = String(user().get("avatar", ""))
-	if a in ["mc", "rin", "hana", "yue", "nova"]:
+	if a in HEROES:
 		return a
-	var p: = String(_S().get("partner", "mc"))
-	return p if p in ["mc", "rin", "hana", "yue", "nova"] else "mc"
+	var s: = _S()
+	var pa: = ""
+	if s.get("profile") is Dictionary:
+		pa = String((s.profile as Dictionary).get("avatar", ""))
+	if pa in HEROES and pa != "mc":
+		return pa
+	var p: = String(s.get("partner", ""))
+	if p in HEROES:
+		return p
+	return pa if pa in HEROES else "mc"
 
 
 static func elo() -> int:

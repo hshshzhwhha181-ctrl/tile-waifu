@@ -309,10 +309,36 @@ static func hairline(ci: CanvasItem, x0: float, x1: float, y: float, col: Color)
 			PackedColorArray([c0, col, col, c0]), 1.0)
 
 
+func _tap_feedback(denied: = false) -> void:
+	if not is_inside_tree():
+		return
+	var tree: = get_tree()
+	if tree == null or tree.root == null:
+		return
+	var sfx: = tree.root.get_node_or_null("Sfx")
+	if sfx != null and sfx.has_method("play"):
+		if denied:
+			sfx.call("play", "deny", 1.0, -4.0)
+		else:
+			sfx.call("play", "tap", randf_range(0.96, 1.04), -4.0)
+	var feel: = V10Hud2Util.opt_class("V9Feel")
+	if feel != null:
+		feel.call("haptic", "deny" if denied else "button")
+	else:
+		var hp: = tree.root.get_node_or_null("V7Haptics")
+		if hp != null and hp.has_method("kind"):
+			hp.call("kind", "deny" if denied else "button")
+
+
 func _gui_input(e: InputEvent) -> void:
-	if not interactive or disabled:
+	if not interactive:
 		return
 	if (e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT) or e is InputEventScreenTouch:
+		if disabled:
+			if e.pressed:
+				_tap_feedback(true)
+			accept_event()
+			return
 		if e.pressed:
 			_down = true
 			pivot_offset = size * 0.5
@@ -325,5 +351,6 @@ func _gui_input(e: InputEvent) -> void:
 			tw2.tween_property(self, "scale", Vector2.ONE, 0.16).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 			queue_redraw()
 			if Rect2(Vector2.ZERO, size).grow(16).has_point(e.position):
+				_tap_feedback(false)
 				pressed.emit()
 		accept_event()

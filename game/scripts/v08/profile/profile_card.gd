@@ -11,7 +11,77 @@ extends Control
 signal finished
 
 const PW: = 660.0
-const PH: = 860.0
+const PH: = 924.0
+
+
+class AvatarGrid extends V8ProfileUI.AvatarRow:
+	const COLS: = 5
+	const ROW_H: = 128.0
+
+	func setup(sel: String, w: float) -> V8ProfileUI.AvatarRow:
+		selected = sel if G.HEROES.has(sel) else "mc"
+		var n: = maxi(1, G.HERO_ORDER.size())
+		var cols: = mini(COLS, n)
+		var rows: = ceili(float(n) / float(cols))
+		size = Vector2(w, rows * ROW_H)
+		slot = w / float(cols)
+		mouse_filter = Control.MOUSE_FILTER_PASS
+		_fill()
+		return self
+
+	func _fill() -> void :
+		avs.clear()
+		for c in get_children():
+			remove_child(c)
+			c.queue_free()
+		var n: = G.HERO_ORDER.size()
+		if n <= 0:
+			return
+		var cols: = mini(COLS, n)
+		var col_w: = size.x / float(cols)
+		slot = col_w
+		var av: = minf(col_w - 30.0, 86.0)
+		for i in n:
+			var h: String = G.HERO_ORDER[i]
+			var on: = h == selected
+			var col: = i % cols
+			var row: = i / cols
+			var cx: = col * col_w
+			var ry: = row * ROW_H
+			var x: = cx + (col_w - av) * 0.5
+			var hit: = Control.new()
+			hit.position = Vector2(cx, ry)
+			hit.size = Vector2(col_w, ROW_H)
+			hit.mouse_filter = Control.MOUSE_FILTER_STOP
+			add_child(hit)
+			if on:
+				var hr: = V8Art.hole_rect(Vector2(av, av))
+				var glow: = Sprite2D.new()
+				glow.texture = G.fx("glow")
+				glow.material = Fx.add_mat()
+				glow.position = Vector2(x, ry + 6.0) + hr.get_center()
+				glow.scale = Vector2.ONE * av / 62.0
+				glow.modulate = Color(1.0, 0.85, 0.45, 0.72)
+				add_child(glow)
+			var a: = V8Art.avatar(self, h, Rect2(x, ry + 6.0, av, av))
+			avs[h] = a
+			a.modulate = Color.WHITE
+			a.scale = Vector2(1.06, 1.06) if on else Vector2(0.95, 0.95)
+			var nm: = UI.label(G.HEROES[h].name, 16, UI.GOLD if on else Color("f6ecdf"), UI.DARK, 3, "body", 900)
+			nm.position = Vector2(cx + 2.0, ry + av + 10.0)
+			nm.size = Vector2(col_w - 4.0, 26.0)
+			nm.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			nm.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+			Common.fit_line(nm, col_w - 4.0, 12)
+			add_child(nm)
+			hit.gui_input.connect( func(e):
+				if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT:
+					if h != selected:
+						select(h)
+						V9Feel.press(avs.get(h) as CanvasItem)
+						picked.emit(h)
+					else:
+						V9Feel.press(a, "", "tap"))
 
 var main
 var imported: = false
@@ -59,12 +129,19 @@ func _build() -> void :
 	dim.create_tween().tween_property(dim, "color:a", 0.62, 0.3)
 	dim.set_meta("no_haptic", true)
 	dim.gui_input.connect(_on_bg_input)
-	var y: = clampf((size.y - PH) * 0.5 + 40.0, 150.0, 400.0)
-	panel = UI.rbox("cream", Rect2((size.x - PW) * 0.5, y, PW, PH), 34, 5, 16)
+	var n_av: = maxi(1, G.HERO_ORDER.size())
+	var rows: = ceili(float(n_av) / float(AvatarGrid.COLS))
+	var ph: = PH if rows > 1 else 860.0
+	var top_safe: float = float(main.safe_top) if (main != null and "safe_top" in main) else 0.0
+	var bot_safe: float = float(main.safe_bottom) if (main != null and "safe_bottom" in main) else 0.0
+	var min_y: = top_safe + 76.0
+	var max_y: = maxf(min_y, size.y - bot_safe - ph - 24.0)
+	var y: = clampf((size.y - ph) * 0.5 + 16.0, min_y, max_y)
+	panel = UI.rbox("cream", Rect2((size.x - PW) * 0.5, y, PW, ph), 34, 5, 16)
 	panel.set_param("pattern", 1.0)
 	# 0.8 art: the btn/panel nine-patch (graphite, gold rim, sakura corners), as in Common.popup
 	panel.cr.visible = false
-	var art: = V8Art.nine("panel", Rect2(Vector2.ZERO, Vector2(PW, PH)))
+	var art: = V8Art.nine("panel", Rect2(Vector2.ZERO, Vector2(PW, ph)))
 	art.name = "PanelArt"
 	panel.add_child(art)
 	panel.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -96,35 +173,41 @@ func _build_main(nick0: String) -> void :
 	var x: = 40.0
 	var w: = PW - 80.0
 	var ask: = UI.label(V8ProfileUI.s("card.ask"), 28, UI.INK, UI.DARK, 3, "body", 900)
-	ask.position = Vector2(x, 54)
-	ask.size = Vector2(w, 40)
+	ask.position = Vector2(x, 50)
+	ask.size = Vector2(w, 38)
 	page_main.add_child(ask)
 	var why: = UI.label(V8ProfileUI.s("card.why"), 18, UI.MUTED, UI.DARK, 2, "body", 800)
-	why.position = Vector2(x, 94)
-	why.size = Vector2(w, 28)
+	why.position = Vector2(x, 90)
+	why.size = Vector2(w, 26)
 	page_main.add_child(why)
-	nick_le = V8ProfileUI.nick_field(Rect2(x, 134, w - 104, 86), nick0)
+	nick_le = V8ProfileUI.nick_field(Rect2(x, 126, w - 104, 84), nick0)
 	nick_le.text_changed.connect( func(_t): _validate(false))
 	page_main.add_child(nick_le)
-	dice = V8ProfileUI.dice_button(Rect2(x + w - 88, 134, 88, 86))
+	dice = V8ProfileUI.dice_button(Rect2(x + w - 88, 126, 88, 84))
 	dice.pressed.connect(_on_dice)
 	page_main.add_child(dice)
 	hint_lbl = UI.label(V8ProfileUI.s("card.hint"), 18, UI.MUTED, UI.DARK, 2, "body", 800)
-	hint_lbl.position = Vector2(x + 6, 226)
-	hint_lbl.size = Vector2(w - 6, 28)
+	hint_lbl.position = Vector2(x + 6, 216)
+	hint_lbl.size = Vector2(w - 6, 26)
 	page_main.add_child(hint_lbl)
 
 	var al: = UI.label(V8ProfileUI.s("card.avatar"), 24, UI.INK, UI.DARK, 3, "body", 900)
-	al.position = Vector2(x, 274)
+	al.position = Vector2(x, 254)
 	page_main.add_child(al)
-	avatars = V8ProfileUI.avatar_row(avatar, Rect2(20, 314, PW - 40, 150))
+	var ag: = AvatarGrid.new()
+	ag.position = Vector2(20, 290)
+	ag.setup(avatar, PW - 40)
+	avatars = ag
 	avatars.picked.connect(_on_pick)
 	page_main.add_child(avatars)
-	who_lbl = UI.center_label(UI.label("", 19, UI.GOLD, UI.DARK, 2, "body", 800), Rect2(x, 468, w, 30))
+	var av_end: = avatars.position.y + avatars.size.y
+	who_lbl = UI.center_label(UI.label("", 19, UI.GOLD, UI.DARK, 2, "body", 800), Rect2(x, av_end + 6.0, w, 30))
+	who_lbl.clip_text = true
+	who_lbl.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	page_main.add_child(who_lbl)
 	_on_pick(avatar)
 
-	play_btn = JButton.make(V8ProfileUI.s("card.play"), "pink", Rect2(x, 520, w, 116), null, 34)
+	play_btn = JButton.make(V8ProfileUI.s("card.play"), "pink", Rect2(x, av_end + 48.0, w, 112), null, 34)
 	play_btn.set_sub(V8ProfileUI.s("card.play_sub"), 19)
 	play_btn.shine_every = 2.6
 	play_btn.pressed.connect(_on_play)
@@ -137,10 +220,10 @@ func _build_main(nick0: String) -> void :
 	var note: = UI.label(V8ProfileUI.s("card.note"), 17, UI.MUTED, UI.DARK, 2, "body", 800)
 	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	note.position = Vector2(x, 648)
+	note.position = Vector2(x, av_end + 172.0)
 	note.size = Vector2(w, 52)
 	page_main.add_child(note)
-	var code_btn: = JButton.make(V8ProfileUI.s("card.have_code"), "graphite", Rect2(PW * 0.5 - 170, 726, 340, 76), null, 24)
+	var code_btn: = JButton.make(V8ProfileUI.s("card.have_code"), "graphite", Rect2(PW * 0.5 - 170, av_end + 240.0, 340, 76), null, 24)
 	code_btn.pressed.connect(_show_code)
 	page_main.add_child(code_btn)
 

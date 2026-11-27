@@ -141,7 +141,23 @@ func play(name: String, pitch: = 1.0, vol_db: = 0.0) -> void :
 	p.volume_db = vol_db
 	p.play()
 
+func _stop_legacy_music(fade: float) -> void :
+	cur_music = ""
+	for p in [music_a, music_b]:
+		if p != null and p.playing:
+			var t: = create_tween()
+			t.tween_property(p, "volume_db", -40.0, fade)
+			t.tween_callback(p.stop)
+
 func music(name: String, fade: = 1.2) -> void :
+	if name == "":
+		_stop_legacy_music(fade)
+		return
+	if V10Registry.wired("audio"):
+		_stop_legacy_music(minf(fade, 0.4))
+		if V10Music.current() == "" and G.S.get("music", true):
+			V10Music.play_screen(name, fade)
+		return
 	name = V7DayNight.music_name(name)
 	if name == cur_music:
 		return
@@ -181,12 +197,74 @@ func _greet_returning() -> bool:
 	return bool(_greet_ok)
 
 func say(hero: String, kind: String) -> String:
-	# Japanese voice-over only (res://assets/voice/<hero>_<kind><n>.mp3) with Russian subtitles
+	# Japanese voice-over (res://assets/voice/<hero>_<kind><n>.mp3 or V10SfxBank OGG) with Russian subtitles;
+	# Wave-1 heroines keep their own Russian lines (never fall back to "mc").
+	if V10W1Core.is_wave1_hero(hero):
+		var wsrc: Dictionary = V10W1HomeLines.BARKS
+		if not wsrc.has(hero) or not wsrc[hero].has(kind):
+			return ""
+		var warr: Array = wsrc[hero][kind]
+		if warr.is_empty():
+			return ""
+		if kind == "greet" and not _greet_returning():
+			var wfresh: = warr.filter(func(x): return not _is_return_line(String(x)))
+			if not wfresh.is_empty():
+				warr = wfresh
+		var wi: = randi() % warr.size()
+		var wkey: String = hero + kind
+		if warr.size() > 1 and last_voice.get(wkey, -1) == wi:
+			wi = (wi + 1) % warr.size()
+		last_voice[wkey] = wi
+		var wdur: = 1.2
+		if G.S.get("sound", true) and G.S.get("voice", true):
+			var wmp3: = "res://assets/voice/%s_%s%d.mp3" % [hero, kind, wi + 1]
+			var wogg: = V10W1Audio.voice_path(hero, kind, wi)
+			var wpath: = wmp3 if ResourceLoader.exists(wmp3) else (wogg if ResourceLoader.exists(wogg) else "")
+			if wpath != "":
+				var wst: AudioStream = _stream(wpath)
+				if wst != null:
+					voice.stream = wst
+					voice.play()
+					wdur = wst.get_length()
+					duck(-8.0, clampf(wdur + 0.25, 1.2, 4.0))
+			elif V10SfxBank.has("silk_open"):
+				V10SfxBank.play("silk_open")
+			else:
+				play("pop", 1.15, -10.0)
+		voice_started.emit(hero, warr[wi], wdur)
+		return warr[wi]
+
 	var src: Dictionary = V6Txt.LINES
 	if not src.has(hero) or not src[hero].has(kind):
 		hero = "mc"
 	if not src[hero].has(kind):
 		return ""
+	# Route 0.10 founder barks (riichi / rankup) to V10SfxBank OGG voice files when present
+	if kind in V10SfxBank.VOICE_KINDS and hero in V10SfxBank.HEROES:
+		var vpath: = V10SfxBank.voice_path(hero, kind)
+		if ResourceLoader.exists(vpath):
+			var bank: = V10SfxBank.inst()
+			if bank != null and bank.is_inside_tree():
+				voice.stop()
+				if G.S.get("sound", true) and G.S.get("voice", true):
+					var vst: AudioStream = _stream(vpath)
+					var vdur: = vst.get_length() if vst != null else 1.2
+					duck(-8.0, clampf(vdur + 0.25, 1.2, 4.0))
+				var vtxt: String = V10SfxBank.voice(hero, kind)
+				if vtxt != "":
+					return vtxt
+			else:
+				var fallback_txt: String = String(VOICED[hero][kind][0]) if VOICED.has(hero) and VOICED[hero].has(kind) and not VOICED[hero][kind].is_empty() else String(src[hero][kind][0])
+				var vdur2: = 1.2
+				if G.S.get("sound", true) and G.S.get("voice", true):
+					var vst2: AudioStream = _stream(vpath)
+					if vst2 != null:
+						voice.stream = vst2
+						voice.play()
+						vdur2 = vst2.get_length()
+						duck(-8.0, clampf(vdur2 + 0.25, 1.2, 4.0))
+				voice_started.emit(hero, fallback_txt, vdur2)
+				return fallback_txt
 	var arr: Array = src[hero][kind]
 	if kind in ["match", "combo", "fever", "win", "lose", "hint"] and VOICED.has(hero) and VOICED[hero].has(kind):
 		arr = VOICED[hero][kind]
@@ -199,13 +277,22 @@ func say(hero: String, kind: String) -> String:
 	if arr.size() > 1 and last_voice.get(key, -1) == i:
 		i = (i + 1) % arr.size()
 	last_voice[key] = i
-	var path: = "res://assets/voice/%s_%s%d.mp3" % [hero, kind, i + 1]
+	var v_cnt: int = int(VOICE.get(kind, 0))
+	var v_idx: int = i + 1
+	if kind == "greet":
+		v_idx = 1 if not _greet_returning() else ((i % maxi(v_cnt, 1)) + 1)
+	elif v_cnt > 0:
+		v_idx = (i % v_cnt) + 1
+	var path: = "res://assets/voice/%s_%s%d.mp3" % [hero, kind, v_idx]
 	var dur: = 1.2
-	var voiced_ok: bool = VOICED.has(hero) and VOICED[hero].has(kind) and i < VOICED[hero][kind].size() and VOICED[hero][kind][i] == arr[i]
+	var relax_match: bool = kind in ["greet", "gacha", "rankup", "riichi"]
+	var voiced_ok: bool = VOICED.has(hero) and VOICED[hero].has(kind) and (relax_match or (i < VOICED[hero][kind].size() and VOICED[hero][kind][i] == arr[i]))
 	if voiced_ok and G.S.get("sound", true) and G.S.get("voice", true) and ResourceLoader.exists(path):
 		var st: AudioStream = _stream(path)
-		voice.stream = st
-		voice.play()
-		dur = st.get_length()
+		if st != null:
+			voice.stream = st
+			voice.play()
+			dur = st.get_length()
+			duck(-8.0, clampf(dur + 0.25, 1.2, 4.0))
 	voice_started.emit(hero, arr[i], dur)
 	return arr[i]

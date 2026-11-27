@@ -139,8 +139,12 @@ func _build(d: Dictionary, id: String) -> void :
 	elif id in ["intro", "first_win"]:
 		chapter = G.LOCS[0].name + " · "
 	ttl_lbl = UI.label(chapter + V6Scenes.TITLES.get(id, ""), 26, Color("ffe9a8"), Color(0.06, 0.02, 0.09, 0.95), 4, "body", 900)
-	ttl_lbl.position = Vector2(24, 48 + _st)
-	Common.fit_line(ttl_lbl, W - 340.0, 18)
+	var right_btn_x: = (W - 324.0) if want_cg else (W - 212.0)
+	var ttl_w: = maxf(120.0, right_btn_x - 16.0 - 24.0)
+	ttl_lbl.position = Vector2(24, 34 + _st)
+	ttl_lbl.size = Vector2(ttl_w, 60)
+	ttl_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	Common.fit_line(ttl_lbl, ttl_w, 16)
 	add_child(ttl_lbl)
 	UI.slide_in(ttl_lbl, Vector2(-30, 0), 0.2, 0.5)
 

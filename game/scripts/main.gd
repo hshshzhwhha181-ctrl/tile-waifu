@@ -125,19 +125,52 @@ func _splash() -> void :
 	sp.size = Vector2(W, H)
 	sp.mouse_filter = Control.MOUSE_FILTER_STOP
 	add_child(sp)
-	Common.backdrop(sp, "bg_festival", sp.size, 0.0, 0.8, Color(0.92, 0.88, 1.0), Vector2(0.5, 0.5))
-	Common.vignette(sp, sp.size, Color(0.08, 0.03, 0.15), 0.75)
-	Common.rays(sp, Vector2(W * 0.5, H * 0.24), 1200, Color(1, 0.85, 0.6, 0.45), 12, 0.03, 0.5)
-	Fx.ambient(sp, "lanterns", sp.size)
-	Fx.ambient(sp, "petals", sp.size)
-	var hero: = Hero.new().setup("mc", H * 0.6)
-	hero.position = Vector2(W * 0.5, H + 30)
-	hero.interactive = false
-	sp.add_child(hero)
-	UI.slide_in(hero, Vector2(0, 120), 0.4, 0.9)
+	var cg_path: = "res://assets/v10/cg_16/intro_mc_table.webp"
+	var use_cg: = not bool(G.S.get("modest", false)) and ResourceLoader.exists(cg_path)
+	var hero: Hero = null
+	if use_cg:
+		var cg_tex: = load(cg_path) as Texture2D
+		if cg_tex != null:
+			var cg_clip: = Control.new()
+			cg_clip.name = "SplashCgClip"
+			cg_clip.size = sp.size
+			cg_clip.clip_contents = true
+			cg_clip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			sp.add_child(cg_clip)
+			var splash_cg: = TextureRect.new()
+			splash_cg.name = "SplashCg"
+			splash_cg.texture = cg_tex
+			splash_cg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			splash_cg.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+			splash_cg.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+			splash_cg.position = Vector2.ZERO
+			splash_cg.size = sp.size
+			splash_cg.pivot_offset = Vector2(sp.size.x * 0.5, sp.size.y * 0.34)
+			splash_cg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			cg_clip.add_child(splash_cg)
+			var ktw: = splash_cg.create_tween().set_loops()
+			ktw.tween_property(splash_cg, "scale", Vector2(1.042, 1.042), 6.0).set_trans(Tween.TRANS_SINE)
+			ktw.tween_property(splash_cg, "scale", Vector2.ONE, 6.0).set_trans(Tween.TRANS_SINE)
+			Common.vignette(sp, sp.size, Color(0.08, 0.03, 0.15), 0.38)
+			Fx.ambient(sp, "lanterns", sp.size)
+			Fx.ambient(sp, "petals", sp.size)
+		else:
+			use_cg = false
+	if not use_cg:
+		Common.backdrop(sp, "bg_festival", sp.size, 0.0, 0.8, Color(0.92, 0.88, 1.0), Vector2(0.5, 0.5))
+		Common.vignette(sp, sp.size, Color(0.08, 0.03, 0.15), 0.75)
+		Common.rays(sp, Vector2(W * 0.5, H * 0.24), 1200, Color(1, 0.85, 0.6, 0.45), 12, 0.03, 0.5)
+		Fx.ambient(sp, "lanterns", sp.size)
+		Fx.ambient(sp, "petals", sp.size)
+		hero = Hero.new().setup("mc", H * 0.6)
+		hero.position = Vector2(W * 0.5, H + 30)
+		hero.interactive = false
+		sp.add_child(hero)
+		UI.slide_in(hero, Vector2(0, 120), 0.4, 0.9)
 	# 0.8: she is cropped at the knee by a soft dark fade that is solid under the «Играть» plate and the version
 	# line, so no legs or shoes show below the CTA (or below the profile-card modal over this screen)
-	var ff: = Common.floor_fade(sp, H - 470.0, H - 290.0, Color(0.08, 0.03, 0.12), 0.96)
+	var fade_top: = (H - safe_bottom - 580.0) if use_cg else (H - 470.0)
+	var ff: = Common.floor_fade(sp, fade_top, H - 290.0, Color(0.08, 0.03, 0.12), 0.96)
 	ff.name = "TitleFade"
 	var fb: = ColorRect.new()
 	fb.color = Color(0.08, 0.03, 0.12, 0.96)
@@ -145,20 +178,24 @@ func _splash() -> void :
 	fb.size = Vector2(W, 290.0)
 	fb.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	sp.add_child(fb)
-	# 0.10 M0: the logo block starts below a camera cut-out; on tall phones it moves down with the extra height
-	# (the art and the CTA keep their size: the free height goes between them, not into a squashed logo)
-	var ly: = safe_top + H * 0.04 + maxf(0.0, H - 1280.0) * 0.12
-	var logo: = V8Art.rect(V8Art.misc("logo"), Rect2(W * 0.5 - 270, ly, 540, 306))
-	logo.pivot_offset = Vector2(270, 153)
+	# 0.10 M0: the logo block starts below a camera cut-out; on 16+ full-bleed CG splash it sits in the lower-third
+	# above «Играть» so Маджонг-тян's face and portrait stay 100% unobstructed.
+	var lw: = 430.0 if use_cg else 540.0
+	var lh: = 244.0 if use_cg else 306.0
+	var ly: = (H - safe_bottom - 562.0) if use_cg else (safe_top + H * 0.04 + maxf(0.0, H - 1280.0) * 0.12)
+	var logo: = V8Art.rect(V8Art.misc("logo"), Rect2(W * 0.5 - lw * 0.5, ly, lw, lh))
+	logo.pivot_offset = Vector2(lw * 0.5, lh * 0.5)
 	sp.add_child(logo)
 	UI.pop_in(logo, 0.15, 0.4)
-	var tag: = UI.center_label(UI.label(V6Txt.s("title.tag"), 22, Color("ffe7c4"), UI.DARK, 4, "body", 900), Rect2(0, ly + H * 0.01 + 300, W, 34))
+	var tag_y: = (ly + lh - 4.0) if use_cg else (ly + H * 0.01 + 300.0)
+	var tag: = UI.center_label(UI.label(V6Txt.s("title.tag"), 21 if use_cg else 22, Color("ffe7c4"), UI.DARK, 4, "body", 900), Rect2(0, tag_y, W, 32))
 	sp.add_child(tag)
 	UI.slide_in(tag, Vector2(0, 20), 0.5)
 	var fades: Array = [logo, tag]
 	var has_profile: = bool(G.S.get("profile_done", false))
 	if has_profile:
-		var chip: = V8ProfileUI.title_chip(Rect2(0, ly + H * 0.01 + 346, W, 64))
+		var chip_y: = (safe_top + 18.0) if use_cg else (ly + H * 0.01 + 346.0)
+		var chip: = V8ProfileUI.title_chip(Rect2(0, chip_y, W, 64))
 		sp.add_child(chip)
 		UI.slide_in(chip, Vector2(0, 16), 0.6)
 		fades.append(chip)
@@ -183,7 +220,8 @@ func _splash() -> void :
 	await get_tree().create_timer(0.8).timeout
 	await _wait_tap(sp)
 	Sfx.play("reveal_sr", 0.9)
-	hero.react("big")
+	if hero != null and is_instance_valid(hero):
+		hero.react("big")
 	var need_card: = not has_profile
 	var need_intro: bool = not G.S.get("intro_done", false)
 	if not (G.S.get("v10_shop") is Dictionary):
@@ -319,6 +357,9 @@ func settings() -> void :
 			var v: bool = not _v6_opt(key)
 			_v6_opt(key, v)
 			G.save()
+			AudioServer.set_bus_mute(0, not (bool(G.S.get("sound", true)) or bool(G.S.get("music", true)) or bool(G.S.get("voice", true))))
+			if key == "voice" and not v and Sfx.voice:
+				Sfx.voice.stop()
 			b.lbl.text = V6Txt.s("common.on") if v else V6Txt.s("common.off")
 			b.set_pal("mint" if v else "glass")
 			if key == "deco_fonts":

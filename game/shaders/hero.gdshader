@@ -78,29 +78,8 @@ vec2 src_pos(vec2 p) {
 	return s;
 }
 
-vec3 skin_at(sampler2D tex, vec2 c) {
-	return (texture(tex, (c + vec2(-1.5, 0.0)) / tex_size).rgb + texture(tex, (c + vec2(1.5, 0.0)) / tex_size).rgb
-		+ texture(tex, (c + vec2(0.0, -1.5)) / tex_size).rgb + texture(tex, (c + vec2(0.0, 1.5)) / tex_size).rgb) * 0.25;
-}
-
-vec4 eyelid(sampler2D tex, vec2 p0, vec2 s, vec4 e, vec4 lid_s, float tl, vec4 col) {
-	if (e.z <= 0.0 || blink <= 0.001) return col;
-	// work in the eye's own frame (slanted eyes get a slanted lid)
-	vec2 p = e.xy + rot(p0 - e.xy, -tl);
-	vec2 q = (p - e.xy) / (e.zw * vec2(1.25, 1.45));
-	float er = length(q);
-	if (er > 1.0) return col;
-	float u = clamp((p.x - e.x) / (e.z * 1.25), -1.0, 1.0);
+vec4 apply_eyelid(vec2 p, vec4 e, float er, float u, vec3 skin, vec4 col) {
 	float lid = e.y - e.w * 1.4 + (e.w * 2.0) * blink + 0.35 * e.w * (1.0 - u * u) * blink;
-	vec3 skin;
-	if (lid_s.x > 0.0) {
-		skin = mix(skin_at(tex, lid_s.xy), skin_at(tex, lid_s.zw), clamp(u * 0.5 + 0.5, 0.0, 1.0));
-	} else {
-		float cy = e.y + e.w * 2.5;
-		skin = (texture(tex, vec2(e.x - e.z * 0.5, cy) / tex_size).rgb + texture(tex, vec2(e.x, cy) / tex_size).rgb
-			+ texture(tex, vec2(e.x + e.z * 0.5, cy) / tex_size).rgb + texture(tex, vec2(e.x, cy + e.w * 0.6) / tex_size).rgb) * 0.25;
-		skin = mix(skin, texture(tex, vec2(s.x, cy) / tex_size).rgb, 0.25);
-	}
 	float feather = 1.0 - smoothstep(0.82, 1.0, er);
 	float above = (1.0 - smoothstep(lid - 1.0, lid + 1.0, p.y)) * feather;
 	col.rgb = mix(col.rgb, skin, above);
@@ -116,8 +95,34 @@ void fragment() {
 	vec2 suv = s / tex_size;
 	vec4 col = texture(TEXTURE, suv);
 	if (suv.x < 0.0 || suv.y < 0.0 || suv.x > 1.0 || suv.y > 1.0) col.a = 0.0;
-	col = eyelid(TEXTURE, s, s, eye_l, lid_l, lid_tilt.x, col);
-	col = eyelid(TEXTURE, s, s, eye_r, lid_r, lid_tilt.y, col);
+	if (blink > 0.001) {
+		for (int ei = 0; ei < 2; ei++) {
+			vec4 e = (ei == 0) ? eye_l : eye_r;
+			if (e.z <= 0.0) continue;
+			float tl = (ei == 0) ? lid_tilt.x : lid_tilt.y;
+			vec2 ep = e.xy + rot(s - e.xy, -tl);
+			float er = length((ep - e.xy) / (e.zw * vec2(1.25, 1.45)));
+			if (er > 1.0) continue;
+			float u = clamp((ep.x - e.x) / (e.z * 1.25), -1.0, 1.0);
+			vec4 lid_s = (ei == 0) ? lid_l : lid_r;
+			vec3 skin;
+			if (lid_s.x > 0.0) {
+				vec2 c1 = lid_s.xy;
+				vec3 s1 = (texture(TEXTURE, (c1 + vec2(-1.5, 0.0)) / tex_size).rgb + texture(TEXTURE, (c1 + vec2(1.5, 0.0)) / tex_size).rgb
+					+ texture(TEXTURE, (c1 + vec2(0.0, -1.5)) / tex_size).rgb + texture(TEXTURE, (c1 + vec2(0.0, 1.5)) / tex_size).rgb) * 0.25;
+				vec2 c2 = lid_s.zw;
+				vec3 s2 = (texture(TEXTURE, (c2 + vec2(-1.5, 0.0)) / tex_size).rgb + texture(TEXTURE, (c2 + vec2(1.5, 0.0)) / tex_size).rgb
+					+ texture(TEXTURE, (c2 + vec2(0.0, -1.5)) / tex_size).rgb + texture(TEXTURE, (c2 + vec2(0.0, 1.5)) / tex_size).rgb) * 0.25;
+				skin = mix(s1, s2, clamp(u * 0.5 + 0.5, 0.0, 1.0));
+			} else {
+				float cy = e.y + e.w * 2.5;
+				skin = (texture(TEXTURE, vec2(e.x - e.z * 0.5, cy) / tex_size).rgb + texture(TEXTURE, vec2(e.x, cy) / tex_size).rgb
+					+ texture(TEXTURE, vec2(e.x + e.z * 0.5, cy) / tex_size).rgb + texture(TEXTURE, vec2(e.x, cy + e.w * 0.6) / tex_size).rgb) * 0.25;
+				skin = mix(skin, texture(TEXTURE, vec2(s.x, cy) / tex_size).rgb, 0.25);
+			}
+			col = apply_eyelid(ep, e, er, u, skin, col);
+		}
+	}
 	// warm rim light from upper left: where alpha drops nearby
 	float o = 7.0 / tex_size.x;
 	float al = texture(TEXTURE, suv + vec2(-o, 0.0)).a;

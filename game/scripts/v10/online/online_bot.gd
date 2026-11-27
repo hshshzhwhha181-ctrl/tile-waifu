@@ -81,7 +81,9 @@ func handle(d: Dictionary) -> void:
 			if phase == "match":
 				my_left = int(d.get("tiles_left", my_left))
 				my_score = int(d.get("score", my_score))
-				_end(bool(d.get("cleared", false)), "cleared" if bool(d.get("cleared", false)) else "overflow")
+				var cleared: = bool(d.get("cleared", false))
+				var rsn: = String(d.get("reason", ""))
+				_end(cleared, "cleared" if cleared else ("forfeit" if rsn in ["surrender", "forfeit"] else "overflow"))
 
 
 func _start() -> void:

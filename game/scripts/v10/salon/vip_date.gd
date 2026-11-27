@@ -12,7 +12,7 @@ const SPARK_BY_PREF: = [34, 20, 8]
 const AFF_REWARD: = 60
 const RANK_NAMES: = ["Тёплый вечер", "Жаркий вечер", "Пылающая ночь"]
 const RANK_MIN: = [0, 45, 75]
-const HERO_IDS: = ["mc", "rin", "yue", "nova", "kohaku", "shirin", "tsubame", "zlata"]
+const HERO_IDS: = ["mc", "rin", "yue", "nova", "kohaku", "shirin", "tsubame", "zlata", "hana", "miel"]
 
 # date level (min heroine affection level) -> title and bonus on top of +60 affection
 const LEVELS: Array[Dictionary] = [
@@ -27,12 +27,14 @@ const PREF: = {
 	"mc": ["bold", "tease", "sweet"], "rin": ["tease", "sweet", "bold"], "yue": ["sweet", "tease", "bold"],
 	"nova": ["tease", "bold", "sweet"], "kohaku": ["sweet", "bold", "tease"], "shirin": ["bold", "tease", "sweet"],
 	"tsubame": ["tease", "sweet", "bold"], "zlata": ["bold", "sweet", "tease"],
+	"hana": ["sweet", "bold", "tease"], "miel": ["sweet", "tease", "bold"],
 }
 
 const PLACE: = {
 	"mc": "в алом будуаре", "rin": "у стойки полуночного бара", "yue": "в лунной купальне", "nova": "на диване пентхауса",
 	"kohaku": "в святилище белой лисы", "shirin": "среди шёлковых подушек шатра", "tsubame": "на балконе над ночным городом",
 	"zlata": "у подножия огненного трона",
+	"hana": "на мягком диване под тёплым пледом", "miel": "у ночной стойки среди аромата карамели",
 }
 
 # reaction of a heroine to the choice: [liked best, so-so, off]
@@ -45,6 +47,8 @@ const REACT: = {
 	"shirin": ["Браслеты зазвенели сами. Ты попал в точку.", "Приятно. Сядь ближе, караванщик.", "Пустыня любит смелых, а не торопливых."],
 	"tsubame": ["Ласточка присела на твою ладонь. Редкая честь.", "Ловко. Но я ещё не сдалась.", "Мимо. Попробуй поймать ветер заново."],
 	"zlata": ["Достойно трона. Продолжай, смертный.", "Терпимо. Жар-птица ждёт большего.", "Дерзость без огня — просто шум."],
+	"hana": ["Мм… рядом с тобой сразу так тепло. Не отпускай~", "Хи-хи, мило. Но мне хочется ещё нежнее.", "Ой, ну не дразни! У меня уши уже горят."],
+	"miel": ["Слаще любого торта~ Ты умеешь растопить сердце!", "Вкусно сказано… но добавь ещё капельку дерзости.", "Горчит! Попробуй подобрать слова послаще."],
 }
 
 const ENDINGS: = [

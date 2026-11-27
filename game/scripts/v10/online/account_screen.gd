@@ -83,11 +83,13 @@ func booted() -> bool:
 # ── layout ──────────────────────────────────────────────────────────────────────────────────────────────────────
 
 static func _num(o, key: String) -> float:
-	if o == null or not (o is Object):
-		return 0.0
-	var v: Variant = (o as Object).get(key)
-	if v is float or v is int:
-		return float(v)
+	if o is Dictionary:
+		var dv: Variant = (o as Dictionary).get(key, 0.0)
+		return float(dv) if (dv is float or dv is int) else 0.0
+	if o != null and o is Object:
+		var v: Variant = (o as Object).get(key)
+		if v is float or v is int:
+			return float(v)
 	return 0.0
 
 
@@ -103,19 +105,34 @@ func _metrics() -> void:
 	var cw: = minf(COL_W, W)
 	cx = floorf(maxf(0.0, (W - COL_W) * 0.5))
 	iw = cw - 2.0 * M
-	safe_t = _num(main, "safe_top")
-	safe_b = _num(main, "safe_bottom")
+	var ins: = V10Layout.safe_insets(s)
+	var raw_t: = maxf(_num(main, "safe_top"), float(ins.get("top", 0.0)))
+	var raw_b: = maxf(_num(main, "safe_bottom"), float(ins.get("bottom", 0.0)))
+	if OS.has_feature("mobile"):
+		var sa: = DisplayServer.get_display_safe_area()
+		var win: = DisplayServer.window_get_size()
+		if sa.size.y > 0 and win.y > 0:
+			var ky: = H / float(win.y)
+			raw_t = maxf(raw_t, clampf(float(sa.position.y) * ky, 0.0, 110.0))
+			raw_b = maxf(raw_b, clampf(maxf(0.0, float(win.y) - float(sa.end.y)) * ky, 0.0, 80.0))
+	var in_cr: bool = false
+	if main != null and main is Object and ("CR" in main):
+		var cr: Variant = (main as Object).get("CR")
+		if cr is Rect2:
+			in_cr = absf(position.y - (cr as Rect2).position.y) < 1.0 and absf(H - (cr as Rect2).size.y) < 1.0
+	safe_t = maxf(0.0, raw_t - (position.y if in_cr else 0.0))
+	safe_b = maxf(0.0, raw_b - (maxf(0.0, _num(main, "H") - position.y - H) if in_cr else 0.0))
 
 
 func _build_header() -> void:
 	var top: = 20.0 + safe_t
-	var back: = V10OnlineUi.button("‹", Rect2(cx + M, top, 56, 56), _on_back, V10OnlineUi.PLUM_HI, V10OnlineUi.GOLD_HI, 28)
+	var back: = V10OnlineUi.button("‹", Rect2(cx + M, top, 64, 64), _on_back, V10OnlineUi.PLUM_HI, V10OnlineUi.GOLD_HI, 28)
 	back.name = "Back"
 	add_child(back)
-	var t: = V10OnlineUi.label("Аккаунт · Онлайн", Rect2(cx + M + 72, top, iw - 72, 56), 28, V10OnlineUi.GOLD, HORIZONTAL_ALIGNMENT_LEFT, 900)
+	var t: = V10OnlineUi.label("Аккаунт · Онлайн", Rect2(cx + M + 80, top, iw - 80, 64), 28, V10OnlineUi.GOLD, HORIZONTAL_ALIGNMENT_LEFT, 900)
 	t.name = "Title"
 	add_child(t)
-	_header_b = top + 56.0 + 16.0
+	_header_b = top + 64.0 + 16.0
 
 
 func _section(title: String, y: float) -> float:
@@ -158,24 +175,20 @@ func _build_body() -> void:
 	b_reg.name = "RegisterBtn"
 	body.add_child(b_reg)
 	y += 68.0 + 24.0
-	y = _section("Адрес сервера", y)
+	y = _section("Сервер подключения", y)
 	var chk_w: = 180.0
-	_url_e = V10OnlineUi.line_edit(Rect2(cx + M, y, iw - chk_w - 16.0, EDIT_H), "http://host:port", V10OnlineCfg.url(), false, 22)
+	_url_e = V10OnlineUi.line_edit(Rect2(cx + M, y, iw - chk_w - 16.0, EDIT_H), "http://192.168.0.12:8787", V10OnlineCfg.url(), false, 22)
 	_url_e.name = "UrlEdit"
 	body.add_child(_url_e)
 	var b_chk: = V10OnlineUi.button("Проверить", Rect2(cx + M + iw - chk_w, y, chk_w, EDIT_H), _on_check)
 	b_chk.name = "CheckBtn"
 	body.add_child(b_chk)
-	y += EDIT_H + 20.0
-	var lw: = 320.0
-	_logout_b = V10OnlineUi.button("Выйти из аккаунта", Rect2(cx + M + (iw - lw) * 0.5, y, lw, 48), _on_logout, Color(0, 0, 0, 0), V10OnlineUi.RED, 22, Color(0, 0, 0, 0))
+	y += EDIT_H + 18.0
+	var lw: = 340.0
+	_logout_b = V10OnlineUi.button("Выйти из аккаунта", Rect2(cx + M + (iw - lw) * 0.5, y, lw, 64), _on_logout, V10OnlineUi.PLUM_LO, V10OnlineUi.RED, 22, Color(V10OnlineUi.RED, 0.55))
 	_logout_b.name = "LogoutBtn"
-	var sb: StyleBoxFlat = (_logout_b.get_theme_stylebox("panel") as StyleBoxFlat).duplicate()
-	sb.shadow_size = 0
-	sb.shadow_color = Color(0, 0, 0, 0)
-	_logout_b.add_theme_stylebox_override("panel", sb)
 	body.add_child(_logout_b)
-	y += 48.0 + 16.0
+	y += 64.0 + 16.0
 	content_h = y
 	var avail: = H - _header_b - safe_b
 	if content_h <= avail:
@@ -189,7 +202,7 @@ func _build_body() -> void:
 		scroll.size = Vector2(W, maxf(120.0, avail))
 		scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 		scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
-		body.custom_minimum_size = Vector2(0, content_h)
+		body.custom_minimum_size = Vector2(W, content_h + 16.0)
 		body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		scroll.add_child(body)
 		add_child(scroll)
@@ -232,7 +245,7 @@ func _build_brand(p: String, y: float) -> void:
 	b.name = "Brand_" + p
 	var mark: = V10OnlineUi.panel(Rect2(14, 12, 60, 60), bg, Color(V10OnlineUi.GOLD, 0.9), 30, 2)
 	var mk: = String(br.mark)
-	mark.add_child(V10OnlineUi.label(mk, Rect2(0, 0, 60, 60), 22 if mk.length() > 1 else 26, fg, HORIZONTAL_ALIGNMENT_CENTER, 900))
+	mark.add_child(V10OnlineUi.label(mk, Rect2(0, 0, 60, 60), 22 if mk.length() > 1 else 26, fg, HORIZONTAL_ALIGNMENT_CENTER, 900, 0 if fg.get_luminance() < 0.35 else 4))
 	b.add_child(mark)
 	var st_w: = 190.0
 	b.add_child(V10OnlineUi.label(V10OnlineCfg.title_of(p), Rect2(92, 0, iw - 92 - st_w - 20, BRAND_H), 26, V10OnlineUi.CREAM, HORIZONTAL_ALIGNMENT_LEFT, 900))

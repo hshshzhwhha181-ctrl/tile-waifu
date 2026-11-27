@@ -671,8 +671,9 @@ class ShieldBar extends Control:
 		draw_rect(r, edge.lerp(Color.WHITE, clampf(flash_t * 3.0, 0.0, 1.0)), false, 2.0)
 		var f_font: = UI.font("body", 900)
 		var txt: = label_text()
-		draw_string_outline(f_font, Vector2(0, size.y * 0.5 + 6.0), txt, HORIZONTAL_ALIGNMENT_CENTER, size.x, 15, 4, Color(0.08, 0.02, 0.06))
-		draw_string(f_font, Vector2(0, size.y * 0.5 + 6.0), txt, HORIZONTAL_ALIGNMENT_CENTER, size.x, 15, Color("#FFF6D6"))
+		draw_string(f_font, Vector2(0, size.y * 0.5 + 7.5), txt, HORIZONTAL_ALIGNMENT_CENTER, size.x, 15, Color(0.04, 0.01, 0.03, 0.90))
+		draw_string_outline(f_font, Vector2(0, size.y * 0.5 + 6.0), txt, HORIZONTAL_ALIGNMENT_CENTER, size.x, 15, 7, Color(0.05, 0.01, 0.04, 0.99))
+		draw_string(f_font, Vector2(0, size.y * 0.5 + 6.0), txt, HORIZONTAL_ALIGNMENT_CENTER, size.x, 15, Color("#FFFFFF"))
 
 
 class ShardBurst extends Node2D:
@@ -766,6 +767,7 @@ class UltCutscene extends Control:
 				st = th
 			if st != null:
 				vid_player = VideoStreamPlayer.new()
+				vid_player.volume_db = -80.0
 				vid_player.stream = st
 				vid_player.expand = true
 				var vr: = V10Layout.cover_rect(Vector2(720, 1280), Rect2(Vector2.ZERO, size))
@@ -910,7 +912,7 @@ static func spawn_shockwave(layer: Control, center_pt: Vector2, col: Color, radi
 
 # ПРОБИТИЕ ЩИТА: gold shard burst + 110 ms slow-mo (time_scale 0.25, restored on a real-time timer) + big flash +
 # shockwaves + floating «ПРОБИТИЕ! ×2 УРОН». Returns the ShardBurst node (null without a layer).
-static func spawn_shield_break(layer: Control, center_pt: Vector2, slowmo: bool = true) -> ShardBurst:
+static func spawn_shield_break(layer: Control, center_pt: Vector2, slowmo: bool = true, text_y: float = -1.0) -> ShardBurst:
 	if layer == null or not is_instance_valid(layer):
 		return null
 	var burst: = ShardBurst.new().setup(center_pt, 26)
@@ -921,8 +923,9 @@ static func spawn_shield_break(layer: Control, center_pt: Vector2, slowmo: bool 
 		Fx.burst(layer, center_pt, "sparkle", 24, Color("#FFE48F"), 1.2)
 		Fx.flash_glow(layer, center_pt, Color("#FFF4CC"), 3.0, 0.5)
 	var tx: = layer.size.x * 0.5 if layer.size.x > 100.0 else center_pt.x
-	spawn_float_text(layer, Vector2(tx, center_pt.y - 92.0), "ПРОБИТИЕ! ×2 УРОН", Color("#FFE066"), 40, 1.25)
-	spawn_float_text(layer, Vector2(tx, center_pt.y - 40.0), "ЩИТ РАЗБИТ!", Color("#FF6B7A"), 26, 1.05)
+	var ty: = text_y if text_y > 0.0 else maxf(center_pt.y + 116.0, 320.0)
+	spawn_float_text(layer, Vector2(tx, ty), "ПРОБИТИЕ! ×2 УРОН", Color("#FFE066"), 36, 1.25)
+	spawn_float_text(layer, Vector2(tx, ty + 38.0), "ЩИТ РАЗБИТ!", Color("#FF6B7A"), 24, 1.05)
 	if slowmo and DisplayServer.get_name() != "headless" and layer.is_inside_tree():
 		Engine.time_scale = SHIELD_SLOWMO_SCALE
 		layer.get_tree().create_timer(SHIELD_SLOWMO_SEC, true, false, true).timeout.connect(func() -> void:

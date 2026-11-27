@@ -125,7 +125,7 @@ func build(m, _args: Dictionary) -> void :
 	ped.modulate = Color(1, 0.85, 0.9, 0.5)
 	ped.visible = video == null and rig10 == null and oid == ""
 	add_child(ped)
-	hero = Hero.new().setup(eff_partner, H * 0.64)
+	hero = Hero.new().setup(eff_partner, H * 0.78)
 	hero.position = Vector2(W * 0.52, floor_y)
 	_hero_base_pos = hero.position
 	_hero_base_sc = hero.scale

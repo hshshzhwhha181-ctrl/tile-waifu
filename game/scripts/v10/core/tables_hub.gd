@@ -408,7 +408,7 @@ func _status_v10(id: String) -> String:
 			var ai: Dictionary = V10AdventureData.hub_card_info()
 			return String(ai.get("subtitle", "Сразись с ёкай-боссами"))
 		"salon_vip":
-			return "8 будуаров · Свидания и подарки 16+"
+			return "10 будуаров · Свидания и подарки 16+"
 		"classic":
 			return "Свободная · День · Память"
 		"triples":

@@ -37,19 +37,24 @@ static func run(p: Control, cfg: Dictionary) -> void :
 	root.add_child(hero)
 	var cap: = UI.label(V6Txt.s("levels.boss"), 22, Color("ffd0dc"), UI.DARK, 4, "body", 900)
 	cap.position = Vector2(28, H * 0.33)
-	cap.size = Vector2(W * 0.6, 30)
+	cap.size = Vector2(W * 0.80, 30)
+	cap.z_index = 2
 	root.add_child(cap)
 	var ttl: = UI.title(cfg.get("boss_title", cfg.get("name", "")), 44, Color("ffe7a6"), Color(0.2, 0.02, 0.08))
-	ttl.position = Vector2(24, H * 0.33 + 30)
-	ttl.size = Vector2(W * 0.56, 120)
+	ttl.position = Vector2(28, H * 0.33 + 30)
+	ttl.size = Vector2(W * 0.80, 116)
+	ttl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	ttl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	ttl.z_index = 2
 	root.add_child(ttl)
 	var nm: = UI.label(G.HEROES[hid].name, 26, Color.WHITE, UI.DARK, 5, "body", 900)
 	nm.position = Vector2(28, H * 0.33 + 150)
-	nm.size = Vector2(W * 0.5, 34)
+	nm.size = Vector2(W * 0.70, 34)
+	nm.z_index = 2
 	root.add_child(nm)
 	var line: String = cfg.get("boss_line", "")
 	var box: = UI.rbox("plum", Rect2(20, H * 0.8, W - 40, 120), 26, 4, 12)
+	box.z_index = 3
 	box.colors(Color(0.14, 0.07, 0.12, 0.96), Color(0.07, 0.035, 0.07, 0.97)).borders(Color("fff0b8"), Color("c58a2c"))
 	root.add_child(box)
 	var l: = UI.label("«%s»" % line if line != "" else V6Txt.line(hid, "boss"), 23, Color("fff1dc"), UI.DARK, 2, "body", 800)

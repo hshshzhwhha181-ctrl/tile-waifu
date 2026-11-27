@@ -243,11 +243,16 @@ func _fade(p: AudioStreamPlayer, to_db: float, t: float, stop_after: = false) ->
 
 func _silence_legacy() -> void :
 	var s: = get_node_or_null("/root/Sfx")
-	if s != null and String(s.get("cur_music")) != "":
+	if s == null:
+		return
+	var ma = s.get("music_a")
+	var mb = s.get("music_b")
+	if String(s.get("cur_music")) != "" or (ma != null and ma.playing) or (mb != null and mb.playing):
 		s.music("", 0.6)
 
 
 func _play(track_id: String, fade: float) -> void :
+	_silence_legacy()
 	if track_id == _cur and (track_id == "" or _a.playing or _b.playing):
 		# same track again (e.g. "next level" after a victory sting left the loop dipped at -30 dB): bring it back up
 		var cur_p: = _base()

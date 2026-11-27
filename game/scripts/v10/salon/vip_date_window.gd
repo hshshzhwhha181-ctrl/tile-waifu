@@ -276,14 +276,10 @@ func _show_step() -> void:
 		b.add_child(tag)
 		var tx: = UI.label(String(ch.text), 22, Color("#FFF8EE"), Color(0.25, 0.02, 0.1), 4, "body", 900)
 		tx.position = Vector2(22, 34)
-		tx.size = Vector2(b.size.x - 190, 76)
-		V10VipBoudoirScreen.wrap_size(tx, Vector2(b.size.x - 190, 76))
+		tx.size = Vector2(b.size.x - 44, 76)
+		V10VipBoudoirScreen.wrap_size(tx, Vector2(b.size.x - 44, 76))
 		tx.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		b.add_child(tx)
-		var chip: = V10VipBoudoirScreen._pill(Rect2(b.size.x - 150, 28, 134, 62), Color(0.2, 0.05, 0.16, 0.92), Color("#FFC4D6"), 20)
-		chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		chip.add_child(UI.center_label(UI.label("✦ +%d" % int(ch.spark), 26, Color("#FFD0E0"), Color(0.2, 0.0, 0.06), 4, "body", 900), Rect2(0, 0, 134, 62)))
-		b.add_child(chip)
 		var idx: = i
 		_tap(b, func() -> void: _pick(idx))
 

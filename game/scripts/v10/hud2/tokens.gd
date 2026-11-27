@@ -91,6 +91,11 @@ const HEROES: = {
 	"hana": {"name": "Хана", "accent": Color("#FFB25A"), "glow": Color("#FFE0B0"), "deep": Color("#A3521C"), "element": "spark"},
 	"yue": {"name": "Юэ", "accent": Color("#C9B2F0"), "glow": Color("#EEE6FF"), "deep": Color("#5A4690"), "element": "dust"},
 	"nova": {"name": "Нова", "accent": Color("#6FE6F2"), "glow": Color("#D2FAFF"), "deep": Color("#7A2E8E"), "element": "glitch"},
+	"tsubame": {"name": "Цубамэ", "accent": Color("#C8283C"), "glow": Color("#E6A0AA"), "deep": Color("#1D1B2E"), "element": "leaf"},
+	"miel": {"name": "Миэль", "accent": Color("#E0566F"), "glow": Color("#F6E7CF"), "deep": Color("#C98A4B"), "element": "spark"},
+	"kohaku": {"name": "Кохаку", "accent": Color("#D63A2A"), "glow": Color("#E2A23D"), "deep": Color("#8A1F17"), "element": "dust"},
+	"shirin": {"name": "Ширин", "accent": Color("#D9B26F"), "glow": Color("#F6E3B8"), "deep": Color("#1F8F8A"), "element": "spark"},
+	"zlata": {"name": "Злата", "accent": Color("#FF7A2A"), "glow": Color("#FFD08A"), "deep": Color("#8E1A14"), "element": "petal"},
 }
 
 

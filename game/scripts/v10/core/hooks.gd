@@ -211,7 +211,7 @@ func _ready() -> void:
 
 const MODE_GEMS_DAILY_CAP: = 400
 const _MUSIC_MAP: = {
-	"home": "home", "profile": "home",
+	"home": "home", "profile": "home", "v10account": "home", "v10welcome7": "home",
 	"v10path": "path", "levels": "path", "tables": "path", "modes": "path", "journey": "path",
 	"play": "play", "arena": "play", "v7play": "play", "tower_play": "play", "challenge_play": "play", "hand": "play",
 	"mj_classic": "play", "mj_classic_lobby": "play", "mj_memory": "play", "mj_triples": "play", "mj_connect": "play",
@@ -219,9 +219,10 @@ const _MUSIC_MAP: = {
 	"mj_riichi": "play", "mj_sanma": "play", "mj_koikoi": "play",
 	"pagoda": "pagoda",
 	"duels": "duels", "duel2": "duels", "challenge": "duels", "v7tourney": "duels", "v7event": "duels",
+	"adventure": "duels", "v10pvp": "duels",
 	"summon": "summon", "odds": "summon",
-	"shop": "shop", "v10pass": "shop",
-	"v10salon": "salon", "collection": "salon", "room": "salon",
+	"shop": "shop", "v10pass": "shop", "v10wheel": "shop",
+	"v10salon": "salon", "collection": "salon", "room": "salon", "v10boudoir": "salon", "v10scene": "salon",
 	"v10phone": "phone", "letters": "phone",
 }
 const _MODE_SCREEN: = {

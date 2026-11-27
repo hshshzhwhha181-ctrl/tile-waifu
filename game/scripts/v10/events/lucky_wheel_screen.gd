@@ -164,18 +164,21 @@ func build(m, _args: Dictionary) -> void:
 	add_child(scrim)
 	Common.vignette(self, size, Color(0.34, 0.04, 0.1), 0.52).mouse_filter = Control.MOUSE_FILTER_IGNORE
 	Fx.ambient(self, "petals", size)
-	var back_b: = V10VipBoudoirScreen._pill(Rect2(16, 18, 56, 52), Color(0.13, 0.06, 0.19, 0.9), Color("#E8C47E"), 16)
+	var safe_t: = _safe_top()
+	var safe_b: = _safe_bot()
+	var back_b: = V10VipBoudoirScreen._pill(Rect2(16, 16 + safe_t, 64, 56), Color(0.13, 0.06, 0.19, 0.9), Color("#E8C47E"), 18)
 	back_b.mouse_filter = Control.MOUSE_FILTER_STOP
-	back_b.add_child(UI.center_label(UI.label("‹", 32, Color("#FFF4DE"), Color(0.06, 0.02, 0.1), 3, "body", 900), Rect2(0, -3, 56, 52)))
+	back_b.add_child(UI.center_label(UI.label("‹", 34, Color("#FFF4DE"), Color(0.06, 0.02, 0.1), 3, "body", 900), Rect2(0, -3, 64, 56)))
 	back_b.gui_input.connect(func(e: InputEvent) -> void:
 		if V10VipBoudoirScreen._is_tap(e):
 			back_b.accept_event()
+			V9Feel.press(back_b, "tap")
 			_back())
 	add_child(back_b)
-	add_child(UI.center_label(UI.label("Колесо Удачи Чайной", 34, Color("#FFE9A6"), Color(0.2, 0.03, 0.1), 6, "body", 900), Rect2(80, 22, W - 160, 50)))
-	_info = UI.center_label(UI.label("", 22, Color("#F4D48A"), Color(0.08, 0.02, 0.12), 4, "body", 800), Rect2(20, 92, W - 40, 34))
+	add_child(UI.center_label(UI.label("Колесо Удачи Чайной", 34, Color("#FFE9A6"), Color(0.2, 0.03, 0.1), 6, "body", 900), Rect2(88, 20 + safe_t, W - 176, 50)))
+	_info = UI.center_label(UI.label("", 22, Color("#F4D48A"), Color(0.08, 0.02, 0.12), 4, "body", 800), Rect2(20, 90 + safe_t, W - 40, 34))
 	add_child(_info)
-	_center = Vector2(W * 0.5, clampf(H * 0.37, 440.0, 620.0))
+	_center = Vector2(W * 0.5, clampf(H * 0.37 + safe_t * 0.35, 430.0 + safe_t, H - safe_b - WHEEL_PX * 0.5 - 260.0))
 	var aura: = Sprite2D.new()
 	aura.texture = G.fx("glow")
 	aura.material = Fx.add_mat()
@@ -199,7 +202,7 @@ func build(m, _args: Dictionary) -> void:
 	_pointer.z_index = 5
 	add_child(_pointer)
 	_btn_holder = Control.new()
-	_btn_holder.position = Vector2(0, _center.y + WHEEL_PX * 0.5 + 40.0)
+	_btn_holder.position = Vector2(0, minf(_center.y + WHEEL_PX * 0.5 + 40.0, H - safe_b - 230.0))
 	_btn_holder.size = Vector2(W, 130)
 	add_child(_btn_holder)
 	_hist = UI.center_label(UI.label("", 20, Color("#EDE0CE"), Color(0.06, 0.02, 0.1), 3, "body", 700), Rect2(30, _btn_holder.position.y + 140.0, W - 60, 90))
@@ -293,6 +296,20 @@ func _on_stopped(res: Dictionary) -> void:
 	_refresh()
 
 
+func _safe_top() -> float:
+	if main != null and main.get("safe_top") != null:
+		return maxf(0.0, float(main.safe_top) - position.y)
+	return maxf(0.0, float(V10Layout.safe_insets(size).get("top", 0.0)) - position.y)
+
+
+func _safe_bot() -> float:
+	var vp_h: = get_viewport_rect().size.y if is_inside_tree() else H
+	var extra: = maxf(0.0, vp_h - (position.y + size.y))
+	if main != null and main.get("safe_bottom") != null:
+		return maxf(0.0, float(main.safe_bottom) - extra)
+	return maxf(0.0, float(V10Layout.safe_insets(size).get("bottom", 0.0)) - extra)
+
+
 func _back() -> void:
 	if main != null and main.has_method("back"):
 		main.back()
@@ -319,7 +336,8 @@ class _Wheel extends Control:
 		for i in SECTORS.size():
 			var arm: = Control.new()
 			arm.position = size * 0.5
-			arm.rotation = deg_to_rad(V10LuckyWheelScreen.sector_angle_deg(i))
+			var ang: = V10LuckyWheelScreen.sector_angle_deg(i)
+			arm.rotation = deg_to_rad(ang)
 			arm.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			add_child(arm)
 			var txt: = V10LuckyWheelScreen.sector_short_label(i)
@@ -337,6 +355,9 @@ class _Wheel extends Control:
 			ls.font_size = fs
 			lb.position = Vector2(-bw * 0.5, -mid_r - bh * 0.5)
 			lb.size = Vector2(bw, bh)
+			if ang > 90.0 and ang < 270.0:
+				lb.pivot_offset = lb.size * 0.5
+				lb.rotation = PI
 			lb.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			lb.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 			lb.autowrap_mode = TextServer.AUTOWRAP_OFF

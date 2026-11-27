@@ -104,12 +104,37 @@ func _set_portrait_emo(emo: String) -> void:
 	for c in _av_holder.get_children():
 		c.queue_free()
 	var d: = _av_holder.size.x
+	var r: = Rect2(Vector2.ZERO, Vector2(d, d))
 	var eq: = G.equipped(hero_id)
-	var img_id: = String(G.ITEM.get(eq, {}).get("img", "")) if eq != "" else ""
-	if emo == "happy" and img_id != "" and not bool(G.S.get("modest", false)):
-		_av_node = Common.avatar(img_id, Rect2(Vector2.ZERO, Vector2(d, d)), "gold")
-	else:
-		_av_node = V8Art.emotion_avatar(hero_id, emo, Rect2(Vector2.ZERO, Vector2(d, d)), "gold")
+	_av_node = null
+	if emo == "happy" and eq != "" and G.ITEM.has(eq):
+		var it: Dictionary = G.ITEM[eq]
+		var img_id: = G.item_img(it)
+		if bool(G.S.get("modest", false)) and (bool(it.get("bold", false)) or not bool(it.get("sfw", true))) and it.has("alt"):
+			img_id = String(it.alt)
+		if img_id != "" and ResourceLoader.exists(V10W1Core.outfit_webp(img_id)):
+			var tex: = G.art_tex(it)
+			if tex != null:
+				var wrap: = Control.new()
+				wrap.position = r.position
+				wrap.size = r.size
+				wrap.pivot_offset = r.size * 0.5
+				wrap.mouse_filter = Control.MOUSE_FILTER_IGNORE
+				wrap.name = "V10OutfitAvatar"
+				wrap.add_child(UI.rbox("gold", r, d * 0.5, 3, 8))
+				var inner: = Rect2(Vector2(5, 5), Vector2(d - 10.0, d - 10.0))
+				var fc: Array = V10W1Core.outfit_face(img_id) if V10W1Core.is_wave1_img(img_id) else V8Population.FACES.get(img_id, [0.5, 0.18, 3.6])
+				var art: = Common.card_art(tex, inner, Vector2(float(fc[0]), float(fc[1])), float(fc[2]), inner.size.x * 0.5)
+				(art.material as ShaderMaterial).set_shader_parameter("bottom_shade", 0.0)
+				art.name = "Pic"
+				art.mouse_filter = Control.MOUSE_FILTER_IGNORE
+				wrap.add_child(art)
+				_av_node = wrap
+	if _av_node == null:
+		if V8Art.has_emotion(hero_id, emo) or Hero.RIGS.has(hero_id):
+			_av_node = V8Art.emotion_avatar(hero_id, emo, r, "gold")
+		else:
+			_av_node = Common.avatar(hero_id if ResourceLoader.exists(V10W1Core.hero_png(hero_id)) else "mc", r, "gold")
 	_av_node.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_av_holder.add_child(_av_node)
 

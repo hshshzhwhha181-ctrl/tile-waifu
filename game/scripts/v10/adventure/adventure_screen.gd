@@ -11,6 +11,8 @@ extends Control
 var main
 var W: = 720.0
 var H: = 1280.0
+var safe_top: = 0.0
+var safe_bottom: = 0.0
 var stage_idx: = 0
 var hero_id: = "mc"
 var wave: = 0
@@ -80,6 +82,9 @@ func build(m, args: Dictionary = {}) -> void:
 	main = m
 	W = size.x if size.x > 0.0 else 720.0
 	H = size.y if size.y > 0.0 else 1280.0
+	var vs_h: = get_viewport_rect().size.y if is_inside_tree() else H
+	safe_top = maxf(0.0, float(main.safe_top) - position.y) if (main != null and "safe_top" in main) else 0.0
+	safe_bottom = maxf(0.0, float(main.safe_bottom) - maxf(0.0, vs_h - (position.y + H))) if (main != null and "safe_bottom" in main) else 0.0
 	if main != null and main.has_method("show_chrome"):
 		main.show_chrome(false, false)
 	var st: Dictionary = V10AdventureData.st()
@@ -142,7 +147,7 @@ func _build_backdrop() -> void:
 
 
 func _build_header() -> void:
-	var top_y: = 8.0
+	var top_y: = 8.0 + safe_top
 	var back_p: = _pill_panel(Rect2(14, top_y, 52, 52), Color(0.12, 0.06, 0.18, 0.92), Color("#E8C47E"), 26)
 	back_p.mouse_filter = Control.MOUSE_FILTER_STOP
 	back_p.add_child(V8Art.rect(V8Art.icon("back"), Rect2(10, 10, 32, 32)))
@@ -154,18 +159,20 @@ func _build_header() -> void:
 
 	var hdr_title: = UI.label("ОХОТА НА ЁКАЕВ · ПРИКЛЮЧЕНИЕ", 19, Color("#FFE8B8"), Color(0.08, 0.03, 0.12, 0.96), 4, "body", 900)
 	hdr_title.position = Vector2(74, top_y + 4)
-	hdr_title.size = Vector2(W - 246, 26)
+	hdr_title.size = Vector2(W - 252, 26)
 	hdr_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	Common.fit_line(hdr_title, W - 252.0, 14)
+	hdr_title.size.y = 26
 	shake_root.add_child(hdr_title)
 
 	stamina_lbl = UI.label(V10AdventureData.stamina_badge_text(), 14, Color("#D8F5C8"), Color(0.06, 0.02, 0.10), 3, "body", 800)
 	stamina_lbl.position = Vector2(74, top_y + 29)
-	stamina_lbl.size = Vector2(W - 246, 20)
+	stamina_lbl.size = Vector2(W - 252, 20)
 	shake_root.add_child(stamina_lbl)
 
-	var flee_p: = _pill_panel(Rect2(W - 172, top_y + 4, 96, 44), Color(0.16, 0.08, 0.22, 0.90), Color(0.82, 0.68, 0.44, 0.78), 22)
+	var flee_p: = _pill_panel(Rect2(W - 178, top_y + 2, 102, 48), Color(0.16, 0.08, 0.22, 0.92), Color(0.86, 0.72, 0.46, 0.85), 24)
 	flee_p.mouse_filter = Control.MOUSE_FILTER_STOP
-	var fl_l: = UI.label("К столам", 14, Color("#F2DEC0"), Color(0.08, 0.03, 0.12), 3, "body", 800)
+	var fl_l: = UI.label("К столам", 15, Color("#F6E6CA"), Color(0.08, 0.03, 0.12), 3, "body", 800)
 	fl_l.size = flee_p.size
 	fl_l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	fl_l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -191,8 +198,8 @@ func _build_header() -> void:
 
 
 func _build_arena() -> void:
-	var ay: = 66.0
-	var ah: = 278.0 + clampf((H - 1280.0) * 0.10, 0.0, 32.0)
+	var ay: = 66.0 + safe_top
+	var ah: = 284.0 + clampf((H - 1280.0) * 0.10, 0.0, 32.0)
 	arena_rect = Rect2(14, ay, W - 28, ah)
 	var acc: Color = battle.m.get("accent", Color("#E85A4F"))
 	var arena_bg: = _pill_panel(arena_rect, Color(0.09, 0.04, 0.15, 0.90), acc.lerp(Color("#F4C86A"), 0.55), 20)
@@ -209,9 +216,10 @@ func _build_arena() -> void:
 	var lx: = 16.0
 	var lw: = arena_rect.size.x - 258.0
 
-	prev_stage_btn = _pill_panel(Rect2(lx, 12, 42, 38), Color(0.16, 0.08, 0.24, 0.95), Color("#E8C47E"), 12)
+	prev_stage_btn = _pill_panel(Rect2(lx, 10, 52, 48), Color(0.24, 0.11, 0.34, 0.98), Color("#FFE699"), 14)
 	prev_stage_btn.mouse_filter = Control.MOUSE_FILTER_STOP
-	var pl: = UI.label("‹", 26, Color("#FFEAB3"), Color(0.08, 0.02, 0.10), 4, "body", 900)
+	var pl: = UI.label("‹", 30, Color("#FFF6D6"), Color(0.08, 0.02, 0.10), 4, "body", 900)
+	pl.position = Vector2(0, -2)
 	pl.size = prev_stage_btn.size
 	pl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	pl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -225,15 +233,17 @@ func _build_arena() -> void:
 	var cleared_mark: = " · ✓" if V10AdventureData.is_stage_cleared(stage_idx) else ""
 	var st_txt: = "ЭТАП %d/%d · %s%s" % [stage_idx + 1, V10AdventureData.count(), String(battle.m.element).to_upper(), cleared_mark]
 	stage_lbl = UI.label(st_txt, 15, Color("#FFE6A8"), Color(0.08, 0.02, 0.12), 4, "body", 900)
-	stage_lbl.position = Vector2(lx + 48, 12)
-	stage_lbl.size = Vector2(lw - 96, 38)
+	stage_lbl.position = Vector2(lx + 58, 10)
+	Common.fit_line(stage_lbl, maxf(80.0, lw - 116.0), 12)
+	stage_lbl.size = Vector2(maxf(80.0, lw - 116.0), 48)
 	stage_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	stage_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	mon_card.add_child(stage_lbl)
 
-	next_stage_btn = _pill_panel(Rect2(lx + lw - 42, 12, 42, 38), Color(0.16, 0.08, 0.24, 0.95), Color("#E8C47E"), 12)
+	next_stage_btn = _pill_panel(Rect2(lx + lw - 52, 10, 52, 48), Color(0.24, 0.11, 0.34, 0.98), Color("#FFE699"), 14)
 	next_stage_btn.mouse_filter = Control.MOUSE_FILTER_STOP
-	var nl: = UI.label("›", 26, Color("#FFEAB3"), Color(0.08, 0.02, 0.10), 4, "body", 900)
+	var nl: = UI.label("›", 30, Color("#FFF6D6"), Color(0.08, 0.02, 0.10), 4, "body", 900)
+	nl.position = Vector2(0, -2)
 	nl.size = next_stage_btn.size
 	nl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	nl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -245,26 +255,26 @@ func _build_arena() -> void:
 	mon_card.add_child(next_stage_btn)
 
 	var mname: = UI.label(String(battle.m.name), 26, acc.lightened(0.38), Color(0.07, 0.02, 0.11), 5, "body", 900)
-	mname.position = Vector2(lx, 54)
+	mname.position = Vector2(lx, 60)
 	mname.size = Vector2(lw, 34)
 	mname.clip_text = true
 	mon_card.add_child(mname)
 
 	var mtitle: = UI.label(String(battle.m.title), 14, Color("#DECBE8"), Color(0.07, 0.02, 0.11), 3, "body", 700)
-	mtitle.position = Vector2(lx, 88)
+	mtitle.position = Vector2(lx, 93)
 	mtitle.size = Vector2(lw, 22)
 	mtitle.clip_text = true
 	mon_card.add_child(mtitle)
 
-	mon_hp_bar = V10AdventureVfx.DelayedBar.new().setup(Rect2(lx, 114, lw, 28), Color("#F44E63"), Color("#A81D34"), Color("#F6D483"))
+	mon_hp_bar = V10AdventureVfx.DelayedBar.new().setup(Rect2(lx, 118, lw, 28), Color("#F44E63"), Color("#A81D34"), Color("#F6D483"))
 	mon_card.add_child(mon_hp_bar)
-	mon_hp_lbl = _bar_lbl(mon_card, Rect2(lx, 112, lw, 30), "HP %d / %d" % [battle.mon_hp, battle.mon_max], 16)
+	mon_hp_lbl = _bar_lbl(mon_card, Rect2(lx, 116, lw, 30), "HP %d / %d" % [battle.mon_hp, battle.mon_max], 16)
 
-	shield_bar = V10AdventureVfx.ShieldBar.new().setup(Rect2(lx, 146, lw, 24))
+	shield_bar = V10AdventureVfx.ShieldBar.new().setup(Rect2(lx, 150, lw, 24))
 	shield_bar.set_state(battle.shield, battle.shield_max, battle.broken_turns, true)
 	mon_card.add_child(shield_bar)
 
-	var atk_r: = Rect2(lx, 174, lw, 24)
+	var atk_r: = Rect2(lx, 178, lw, 24)
 	mon_card.add_child(_pill_panel(atk_r, Color(0.05, 0.03, 0.09, 0.94), Color(0.85, 0.56, 0.32, 0.80), 8))
 	atk_fill = ColorRect.new()
 	atk_fill.color = Color("#F58A38")
@@ -272,17 +282,19 @@ func _build_arena() -> void:
 	atk_fill.size = atk_r.size - Vector2(4, 4)
 	atk_fill.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	mon_card.add_child(atk_fill)
-	atk_lbl = _bar_lbl(mon_card, Rect2(lx, 172, lw, 28), "Атака босса через %d" % battle.moves_left, 14)
+	atk_lbl = _bar_lbl(mon_card, Rect2(lx, 176, lw, 28), "Атака босса через %d" % battle.moves_left, 14)
 
-	var db_box: = _pill_panel(Rect2(lx, 204, lw, ah - 214.0), Color(0.13, 0.06, 0.20, 0.92), acc.darkened(0.15), 12)
+	var db_r: = Rect2(lx, 208, lw, ah - 216.0)
+	var db_box: = _pill_panel(db_r, Color(0.13, 0.06, 0.20, 0.92), acc.darkened(0.15), 12)
 	mon_card.add_child(db_box)
 	var db_icon: = "❄" if String(battle.m.debuff) == "freeze" else ("🐉" if String(battle.m.debuff) == "both" else "封")
 	var db_str: = "%s Приём: %s — %s · Урон %d" % [db_icon, String(battle.m.debuff_name), String(battle.m.debuff_desc), int(battle.m.atk)]
 	debuff_lbl = UI.label(db_str, 13, Color("#F4E4FA"), Color(0.07, 0.02, 0.10), 3, "body", 800)
-	debuff_lbl.position = Vector2(lx + 10, 206)
-	debuff_lbl.size = Vector2(lw - 20, ah - 218.0)
-	debuff_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	debuff_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	debuff_lbl.custom_minimum_size = Vector2(maxf(80.0, db_r.size.x - 28.0), 0)
+	debuff_lbl.position = db_r.position + Vector2(14, 4)
+	debuff_lbl.size = Vector2(maxf(80.0, db_r.size.x - 28.0), maxf(24.0, db_r.size.y - 8.0))
+	debuff_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	mon_card.add_child(debuff_lbl)
 
 	# Right showcase: 256x256 Living Elemental BossAura + 210x210 Boss Portrait + Glowing "БОСС" CrownEmblem
@@ -317,8 +329,8 @@ func _build_arena() -> void:
 
 
 func _build_bottom_dock() -> void:
-	var dock_h: = 168.0 + clampf((H - 1280.0) * 0.05, 0.0, 16.0)
-	var dock_y: = H - dock_h - 10.0
+	var dock_h: = 178.0 + clampf((H - 1280.0) * 0.05, 0.0, 18.0)
+	var dock_y: = H - safe_bottom - dock_h - 10.0
 	dock_rect = Rect2(14, dock_y, W - 28, dock_h)
 	hero_dock = Control.new()
 	hero_dock.position = dock_rect.position
@@ -351,12 +363,27 @@ func _build_bottom_dock() -> void:
 				Sfx.say(hero_id, "match"))
 	hero_dock.add_child(hero_medallion)
 
-	hero_art = TextureRect.new()
 	var eq: = G.equipped(hero_id)
-	hero_art.texture = G.art_tex(G.ITEM[eq]) if (eq != "" and G.ITEM.has(eq)) else V8Art.emotion(hero_id, "happy")
-	hero_art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	hero_art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
-	hero_art.size = med_r.size
+	var h_tex: Texture2D = null
+	var h_focus: = Vector2(0.5, 0.27)
+	var h_zoom: = 1.45
+	if eq != "" and G.ITEM.has(eq):
+		var it: Dictionary = G.ITEM[eq]
+		var img_id: = G.item_img(it)
+		if bool(G.S.get("modest", false)) and (bool(it.get("bold", false)) or not bool(it.get("sfw", true))) and it.has("alt"):
+			img_id = String(it.alt)
+		if img_id != "" and ResourceLoader.exists(V10W1Core.outfit_webp(img_id)):
+			h_tex = G.art_tex(it)
+			var fc: Array = V10W1Core.outfit_face(img_id) if V10W1Core.is_wave1_img(img_id) else V8Population.FACES.get(img_id, [0.5, 0.18, 4.2])
+			h_focus = Vector2(float(fc[0]), float(fc[1]))
+			h_zoom = clampf(float(fc[2]) * 0.52, 1.8, 2.8)
+	if h_tex == null:
+		h_tex = V10AdventureData.hero_portrait(hero_id)
+		var ef: Array = V8Art.EMO_FACE.get(hero_id, {}).get("happy", [0.5, 0.27])
+		h_focus = Vector2(float(ef[0]), float(ef[1]))
+		h_zoom = 1.45
+	hero_art = Common.card_art(h_tex, Rect2(Vector2.ZERO, med_r.size), h_focus, h_zoom, 12.0)
+	(hero_art.material as ShaderMaterial).set_shader_parameter("bottom_shade", 0.12)
 	hero_art.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	hero_medallion.add_child(hero_art)
 	hero_dock.add_child(_frame_only(med_r, Color("#F6D483"), 14))
@@ -370,29 +397,32 @@ func _build_bottom_dock() -> void:
 		hero_dock.add_child(sm)
 		support_medals.append(sm)
 
-	# Top-right of Dock: Heroine Name + Perk + Hero HP DelayedBar
+	# Top-right of Dock: Heroine Name + Perk + Отряд (104x44) + Hero HP DelayedBar
 	var rx: = 142.0
 	var rw: = dock_rect.size.x - rx - 12.0
+	var hp_w: = 196.0
+	var sq_w: = 106.0
 	var syn: = V10AdventureData.active_synergy(squad) if squad.size() >= 2 else {}
 	var h_info: = "%s · %s" % [V10AdventureData.hero_name(hero_id), String(syn.get("name", V10AdventureData.HERO_PERKS.get(hero_id, "")))]
 	var hname_l: = UI.label(h_info, 14, Color("#FFF2DC"), Color(0.08, 0.03, 0.12), 4, "body", 900)
-	hname_l.position = Vector2(rx, 11)
-	hname_l.size = Vector2(rw - 226.0 - 92.0, 30)
+	hname_l.position = Vector2(rx, 8)
+	var hinfo_w: = maxf(96.0, rw - hp_w - sq_w - 18.0)
+	Common.fit_line(hname_l, hinfo_w, 12)
+	hname_l.size = Vector2(hinfo_w, 40)
 	hname_l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	hname_l.clip_text = true
 	hero_dock.add_child(hname_l)
 	hero_info_lbl = hname_l
 
-	squad_btn = _build_squad_button(Rect2(rx + rw - 218.0 - 88.0, 11, 82, 30))
+	squad_btn = _build_squad_button(Rect2(rx + rw - hp_w - sq_w - 8.0, 6, sq_w, 44.0))
 	hero_dock.add_child(squad_btn)
 
-	var hp_r: = Rect2(rx + rw - 218.0, 12, 218.0, 28.0)
+	var hp_r: = Rect2(rx + rw - hp_w, 14, hp_w, 28.0)
 	hero_hp_bar = V10AdventureVfx.DelayedBar.new().setup(hp_r, Color("#46DC8C"), Color("#1E9658"), Color("#B8E8C8"))
 	hero_dock.add_child(hero_hp_bar)
 	hero_hp_lbl = _bar_lbl(hero_dock, Rect2(hp_r.position.x, hp_r.position.y - 1, hp_r.size.x, hp_r.size.y + 2), "♥ HP 100 / 100", 14)
 
 	# Thumb Row: Large Glowing Gold-Crimson ULT Button + Compact Подсказка / Перемешать Stack
-	var row_y: = 48.0
+	var row_y: = 56.0
 	var row_h: = dock_h - row_y - 12.0
 	var util_w: = 192.0
 	var ult_w: = rw - util_w - 10.0
@@ -658,7 +688,7 @@ func _apply_ult_impact(r: Dictionary) -> void:
 	V10AdventureVfx.spawn_float_text(fx_layer, bc + Vector2(0, -86), ult_tag, Color("#FFDF6B"), 36, 1.10)
 	V10AdventureVfx.spawn_float_text(fx_layer, bc + Vector2(0, 56), "★ ОГЛУШЁН! ★", Color("#7CE2FF"), 28, 1.10)
 	if bool(r.get("broke", false)):
-		_play_shield_break(bc + Vector2(0, -20))
+		_play_shield_break(bc)
 	var cleansed: = V10AdventureVfx.cleanse_board_debuffs(board)
 	if cleansed > 0:
 		V10AdventureVfx.spawn_float_text(fx_layer, board_rect.get_center() + Vector2(0, -40), "ОЧИЩЕНИЕ ЧАР!", Color("#9CF6E8"), 24, 0.90)
@@ -930,7 +960,7 @@ func dev_act(act: String) -> void:
 # ── Squad: support medallions, «Отряд» button and the 3-goddess selection window ──────────────────────────────
 
 func _play_shield_break(bc: Vector2) -> void:
-	V10AdventureVfx.spawn_shield_break(fx_layer, bc)
+	V10AdventureVfx.spawn_shield_break(fx_layer, bc, true, arena_rect.end.y - 28.0)
 	Sfx.play("reveal_ssr", 0.85, -2.0)
 	_shake_screen(16.0, 0.32)
 
@@ -944,11 +974,8 @@ func _portrait_box(parent: Control, hid: String, r: Rect2, dim: bool = false) ->
 	parent.add_child(clip)
 	var tex: Texture2D = V10AdventureData.hero_portrait(hid) if hid != "" else null
 	if tex != null:
-		var tr: = TextureRect.new()
-		tr.texture = tex
-		tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
-		tr.size = r.size
+		var tr: = Common.card_art(tex, Rect2(Vector2.ZERO, r.size), Vector2(0.5, 0.27), 1.35, 6.0)
+		(tr.material as ShaderMaterial).set_shader_parameter("bottom_shade", 0.0)
 		tr.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		if dim:
 			tr.modulate = Color(0.30, 0.30, 0.36, 1.0)
@@ -987,14 +1014,23 @@ func _build_support_medal(sid: String, r: Rect2) -> Control:
 
 
 func _build_squad_button(r: Rect2) -> Control:
-	var p: = _pill_panel(r, Color(0.40, 0.10, 0.20, 0.97), Color("#FFE48F"), 15)
+	var p: = _pill_panel(r, Color(0.46, 0.12, 0.24, 0.98), Color("#FFE89C"), int(r.size.y * 0.5))
 	p.mouse_filter = Control.MOUSE_FILTER_STOP
-	var l: = UI.label("Отряд", 15, Color("#FFF2C8"), Color(0.10, 0.02, 0.08), 4, "body", 900)
+	var l: = UI.label("Отряд", 16, Color("#FFF6D8"), Color(0.09, 0.02, 0.07), 4, "body", 900)
 	l.size = r.size
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	p.add_child(l)
+	var hit: = Control.new()
+	hit.position = Vector2(-8, -6)
+	hit.size = r.size + Vector2(16, 12)
+	hit.mouse_filter = Control.MOUSE_FILTER_STOP
+	hit.gui_input.connect(func(e: InputEvent) -> void:
+		if _is_tap(e):
+			hit.accept_event()
+			open_squad_modal())
+	p.add_child(hit)
 	p.gui_input.connect(func(e: InputEvent) -> void:
 		if _is_tap(e):
 			p.accept_event()
@@ -1094,7 +1130,7 @@ func _squad_draw() -> void:
 		_squad_card.queue_free()
 	var cw: = W - 56.0
 	var ch: = 814.0
-	var cy: = maxf(16.0, (H - ch) * 0.5)
+	var cy: = clampf((H - ch) * 0.5, 14.0 + safe_top, maxf(14.0 + safe_top, H - safe_bottom - ch - 14.0))
 	var card: = _pill_panel(Rect2(28, cy, cw, ch), Color(0.10, 0.04, 0.16, 0.99), Color("#F6D483"), 22)
 	card.mouse_filter = Control.MOUSE_FILTER_STOP
 	squad_modal.add_child(card)
@@ -1118,13 +1154,17 @@ func _squad_draw() -> void:
 				squad_slot = slot_i
 				call_deferred("_squad_draw"))
 		card.add_child(sp)
-		_portrait_box(sp, hid, Rect2(8, 8, 72, 72))
-		sp.add_child(_frame_only(Rect2(8, 8, 72, 72), Color("#F6D483"), 8))
-		_card_label(sp, "ВЕДУЩАЯ" if i == 0 else "ПОДДЕРЖКА %d" % i, 12, Color("#FFD070") if i == 0 else Color("#C8B4F0"), Rect2(88, 8, sw - 94, 18))
-		_card_label(sp, V10AdventureData.hero_name(hid) if hid != "" else "Пусто", 17, Color("#FFF2DC"), Rect2(88, 26, sw - 94, 24))
+		_portrait_box(sp, hid, Rect2(8, 10, 64, 64))
+		sp.add_child(_frame_only(Rect2(8, 10, 64, 64), Color("#F6D483"), 8))
+		var tx: = 78.0
+		var tw_slot: = maxf(64.0, sw - tx - 6.0)
+		_card_label(sp, "ВЕДУЩАЯ" if i == 0 else "ПОДДЕРЖКА %d" % i, 12, Color("#FFD070") if i == 0 else Color("#C8B4F0"), Rect2(tx, 8, tw_slot, 18))
+		var snm: = _card_label(sp, V10AdventureData.hero_name(hid) if hid != "" else "Пусто", 15, Color("#FFF2DC"), Rect2(tx, 26, tw_slot, 22))
+		Common.fit_line(snm, tw_slot, 12)
+		snm.size.y = 22
 		var pk: Array = _slot_perk(i, hid)
-		_card_label(sp, String(pk[0]), 12, Color("#FFE0A0"), Rect2(88, 52, sw - 94, 28), false, true)
-		_card_label(sp, String(pk[1]), 13, Color("#EBDDF2"), Rect2(8, 88, sw - 16, 60), false, true)
+		_card_label(sp, String(pk[0]), 12, Color("#FFE0A0"), Rect2(tx, 50, tw_slot, 32), false, true)
+		_card_label(sp, String(pk[1]), 13, Color("#EBDDF2"), Rect2(8, 86, sw - 16, 62), false, true)
 
 	# active synergy
 	var chosen: Array = squad_edit_ids()
@@ -1185,7 +1225,9 @@ func _squad_draw() -> void:
 			bl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			bl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 			badge.add_child(bl)
-		_card_label(cell, V10AdventureData.hero_name(hid2), 14, Color("#FFF2DC") if avail else Color("#9A8CA8"), Rect2(0, 98, cell_w, 20), true)
+		var cnm: = _card_label(cell, V10AdventureData.hero_name(hid2), 14, Color("#FFF2DC") if avail else Color("#9A8CA8"), Rect2(3, 98, cell_w - 6, 20), true)
+		Common.fit_line(cnm, maxf(40.0, cell_w - 6.0), 12)
+		cnm.size.y = 20
 		var pn: = String(V10AdventureData.perk_of(hid2).get("name", ""))
 		_card_label(cell, pn if avail else "Не открыта", 11, Color("#FFD890") if avail else Color("#8A7C98"), Rect2(2, 118, cell_w - 4, 18), true)
 
