@@ -21,6 +21,15 @@ var preview_root: Control
 
 const STAGE_BG: = {"mc": "menu", "rin": "bg_teahouse", "hana": "bg_street", "yue": "bg_palace", "nova": "bg_neon"}
 
+# 0.12 wave 1: ten goddesses in one swipeable row of 92 px gold medallions (rarity pill under each, «NEW · Волна 1» on the five new)
+const MEDAL: = 92.0
+const MEDAL_STEP: = 112.0
+const ROW_H: = 122.0
+const W1_NEW: = ["tsubame", "miel", "kohaku", "shirin", "zlata"]
+var row_scroll: ScrollContainer
+var row_saved_x: = -1
+var row_arrows: Array = []
+
 func build(m, args: Dictionary) -> void :
 	main = m
 	W = size.x
@@ -53,7 +62,9 @@ func _default_oid(h: String) -> String:
 	var eq: = str(G.S.outfit.get(h, ""))
 	if eq != "" and G.ITEM.has(eq) and G.owns(eq):
 		return eq
-	var b: = str(BASE_BY_HERO.get(h, "o_base"))
+	var b: = str(BASE_BY_HERO.get(h, V10W1Core.base_of(h)))
+	if b == "":
+		b = "o_base"
 	if G.ITEM.has(b):
 		return b
 	for it in G.ITEMS:
@@ -105,6 +116,9 @@ func _go_to_hero_banner(h: String, it: Dictionary = {}) -> void:
 	main.go("summon", {"banner": b_idx, "hero": h})
 
 func _build() -> void :
+	if row_scroll and is_instance_valid(row_scroll):
+		row_saved_x = row_scroll.scroll_horizontal
+	row_arrows.clear()
 	if stage:
 		stage.queue_free()
 	if sel_oid == "" or not G.ITEM.has(sel_oid) or str(G.ITEM[sel_oid].get("hero", "")) != cur:
@@ -113,7 +127,7 @@ func _build() -> void :
 	var sel_own: bool = sel_oid != "" and G.owns(sel_oid)
 	var cur_worn_id: = str(G.S.outfit.get(cur, ""))
 	if cur_worn_id == "":
-		cur_worn_id = str(BASE_BY_HERO.get(cur, ""))
+		cur_worn_id = str(BASE_BY_HERO.get(cur, V10W1Core.base_of(cur)))
 	var sel_worn: bool = sel_own and (sel_oid == cur_worn_id)
 
 	stage = Control.new()
@@ -121,42 +135,14 @@ func _build() -> void :
 	stage.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(stage)
 	move_child(stage, 0)
-	var bg: String = STAGE_BG[cur]
+	var bg: String = STAGE_BG[cur] if STAGE_BG.has(cur) else V10W1Core.stage_bg(cur)
 	Common.backdrop(stage, bg, size, 1.4 if bg != "menu" else 0.0, 0.94, Color(1, 0.98, 0.99), Vector2(0.5, 0.5))
 	Common.vignette(stage, size, Color(0.24, 0.08, 0.20), 0.28)
 	Fx.ambient(stage, "fireflies", size)
 	V8Header.make(stage, main, "Героини", Callable())
 	set_meta("v8_back", main.back)
 
-	var x: = 24.0 + (112.0 - AV) * 0.5
-	for h in G.HERO_ORDER:
-		var on: bool = h == cur
-		var unl_h: = _unlocked(h)
-		var ring: = UI.rbox("pink" if on else ("gold" if unl_h else "plum"), Rect2(x, ROW_Y, AV, AV), AV * 0.5, 4, 10)
-		stage.add_child(ring)
-		var av: TextureRect = main._avatar(h, Rect2(x + 7, ROW_Y + 7, AV - 14, AV - 14))
-		if not unl_h and not on:
-			(av.material as ShaderMaterial).set_shader_parameter("gray", 0.65)
-		stage.add_child(av)
-		if not unl_h:
-			stage.add_child(V8Art.rect(V8Art.icon("lock"), Rect2(x + AV - 30, ROW_Y + AV - 30, 28, 28)))
-		var hh: String = h
-		var hit: = Control.new()
-		hit.position = Vector2(x, ROW_Y)
-		hit.size = Vector2(AV, AV)
-		hit.mouse_filter = Control.MOUSE_FILTER_STOP
-		hit.gui_input.connect( func(e):
-			if (e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT) or (e is InputEventScreenTouch and e.pressed):
-				V9Feel.press(ring, "tap")
-				if hh != cur:
-					cur = hh
-					sel_oid = _default_oid(cur)
-					_build())
-		stage.add_child(hit)
-		if on:
-			ring.pivot_offset = Vector2(AV, AV) * 0.5
-			UI.punch(ring, 0.12)
-		x += 136
+	_hero_row()
 
 	var floor_y: = H - 132 - 250
 	var ped: = Sprite2D.new()
@@ -284,23 +270,52 @@ func _build() -> void :
 	else:
 		UI.slide_in(hero, Vector2(-60, 0), 0.0, 0.5)
 
-	# Right Heroine & Outfit Action Card
-	var card_h: = minf(456.0, floor_y - BODY_Y - 8.0)
+	# Right Heroine & Outfit Action Card (0.12: V10AffCurve progress + next 16+ rubezh, «Будуар ♥», Wave-1 ready)
+	var card_h: = minf(572.0, floor_y - BODY_Y - 8.0)
 	var ic: = UI.rbox("glass", Rect2(W - 300, BODY_Y, 284, card_h), 28, 4, 12)
+	ic.name = "HeroCard"
 	stage.add_child(ic)
 	var nm: = UI.title(G.HEROES[cur].name, 30, Color("fff6e8"), UI.DARK)
 	nm.position = Vector2(18, 12)
-	Common.fit_line(nm, 248.0, 22)
+	Common.fit_line(nm, 176.0 if W1_NEW.has(cur) else 248.0, 22)
 	ic.add_child(nm)
+	var h_rank: = _hero_rank(cur)
+	var rk_col: Color = V10Rank.color(h_rank)
+	var rk_w: = 54.0
+	var rk_pill: = UI.rbox("graphite", Rect2(ic.size.x - rk_w - 14.0, 16, rk_w, 28), 14, 2, 3)
+	rk_pill.borders(rk_col.lerp(Color.WHITE, 0.35), rk_col.darkened(0.45))
+	rk_pill.name = "HeroRankPill"
+	ic.add_child(rk_pill)
+	rk_pill.add_child(UI.center_label(UI.label(h_rank, 18, rk_col.lerp(Color.WHITE, 0.45), UI.DARK, 3, "body", 900), Rect2(0, -1, rk_w, 28)))
 	var tl: = UI.label(G.HEROES[cur].title, 18, Color("ffb3cc"), UI.DARK, 3, "body", 900)
 	tl.position = Vector2(20, 58)
 	Common.fit_line(tl, 246.0, 15)
 	ic.add_child(tl)
-	ic.add_child(V8Art.rect(V8Art.icon("heart"), Rect2(16, 94, 46, 46)))
-	var al: = UI.label(V6Txt.s("coll.aff") % G.aff_level(cur), 21, Color("fff6e8"), UI.DARK, 3, "body", 900)
-	al.position = Vector2(68, 96)
+
+	# affection on the heavy V10AffCurve (levels 1-20) with the next 16+ rubezh
+	var ai: Dictionary = G.aff_info(cur)
+	ic.add_child(V8Art.rect(V8Art.icon("heart"), Rect2(16, 88, 46, 46)))
+	var al: = UI.label(V6Txt.s("coll.aff") % int(ai.get("level", 1)), 21, Color("fff6e8"), UI.DARK, 3, "body", 900)
+	al.position = Vector2(68, 90)
 	ic.add_child(al)
-	Common.progress_bar(ic, Rect2(70, 126, 194, 16), float(int(G.S.aff.get(cur, 0)) % 100) / 100.0, "pink")
+	var a_bar: = Common.progress_bar(ic, Rect2(70, 120, 194, 16), float(ai.get("ratio", 0.0)), "pink")
+	a_bar.name = "AffBar"
+	var a_txt: = "Максимум ♥" if bool(ai.get("is_max", false)) else "%s / %s" % [UI.fmt(int(ai.get("into", 0))), UI.fmt(int(ai.get("need", 1)))]
+	var a_num: = UI.label(a_txt, 15, Color("e6d8ec"), UI.DARK, 3, "body", 800)
+	a_num.position = Vector2(70, 140)
+	ic.add_child(a_num)
+	var m16: = _next_16(int(ai.get("level", 1)))
+	var m16_t: = "Все рубежи 16+ открыты ♥" if m16.is_empty() else "Рубеж 16+ · Ур. %d" % int(m16.get("level", 0))
+	var m16_l: = UI.label(m16_t, 17, Color("ff9fc2"), UI.DARK, 3, "body", 900)
+	m16_l.name = "Next16Label"
+	m16_l.position = Vector2(20, 166)
+	Common.fit_line(m16_l, 246.0, 13)
+	ic.add_child(m16_l)
+	if not m16.is_empty():
+		var m16_n: = UI.label("«%s»" % str(m16.get("title", "")), 15, Color("e6d8ec"), UI.DARK, 3, "body", 800)
+		m16_n.position = Vector2(20, 188)
+		Common.fit_line(m16_n, 246.0, 12)
+		ic.add_child(m16_n)
 	var owned: = 0
 	var total: = 0
 	for it in G.ITEMS:
@@ -309,7 +324,7 @@ func _build() -> void :
 			if G.owns(it.id):
 				owned += 1
 	var ol: = UI.label(V6Txt.s("coll.outfits") % [owned, total], 19, Color("e6d8ec"), UI.DARK, 3, "body", 800)
-	ol.position = Vector2(20, 152)
+	ol.position = Vector2(20, 214)
 	ic.add_child(ol)
 
 	# Selected outfit status chip inside the right card
@@ -317,11 +332,11 @@ func _build() -> void :
 	var st_txt: String = "Надет в Чайной ✓" if (sel_worn and str(G.S.partner) == cur) else ("В гардеробе" if sel_own else "Закрыт · Предпросмотр")
 	var st_col: Color = Color("7ce8c2") if sel_own else Color("ffe08c")
 	var onm: = UI.label("«%s»" % sel_name, 19, Color("fff6e8"), UI.DARK, 3, "body", 900)
-	onm.position = Vector2(20, 184)
+	onm.position = Vector2(20, 242)
 	Common.fit_line(onm, 244.0, 15)
 	ic.add_child(onm)
 	var ost: = UI.label(st_txt, 17, st_col, UI.DARK, 3, "body", 900)
-	ost.position = Vector2(20, 212)
+	ost.position = Vector2(20, 268)
 	Common.fit_line(ost, 244.0, 14)
 	ic.add_child(ost)
 
@@ -329,22 +344,23 @@ func _build() -> void :
 	if sel_own:
 		var active_here: bool = sel_worn and str(G.S.partner) == cur
 		var wear_cap: String = "Надет ✓" if active_here else V6Txt.s("coll.wear")
-		var wb_cta: = JButton.make(wear_cap, "mint" if active_here else "gold", Rect2(16, 244, 252, 64), null, 24)
+		var wb_cta: = JButton.make(wear_cap, "mint" if active_here else "gold", Rect2(16, 296, 252, 64), null, 24)
 		wb_cta.name = "OutfitActionBtn"
 		wb_cta.shine_every = 0.0 if active_here else 2.2
 		wb_cta.pressed.connect(func(): _equip_outfit(sel_it))
 		ic.add_child(wb_cta)
 	else:
-		var wish_cta: = JButton.make("Получить в Желаниях ›", "gold", Rect2(16, 244, 252, 64), null, 17)
+		var wish_cta: = JButton.make("Получить в Желаниях ›", "gold", Rect2(16, 296, 252, 64), null, 17)
 		wish_cta.name = "WishCtaBtn"
 		wish_cta.shine_every = 1.8
 		wish_cta.pressed.connect(func(): _go_to_hero_banner(cur, sel_it))
 		ic.add_child(wish_cta)
 
+	var by: = 370.0
 	if unl:
 		var is_part: bool = (str(G.S.partner) == cur)
 		var pb_txt: = "Партнёр ✓" if is_part else "Сделать партнёром"
-		var pb: = JButton.make(pb_txt, "mint" if is_part else "pink", Rect2(16, 318, 252, 56), null, 20)
+		var pb: = JButton.make(pb_txt, "mint" if is_part else "pink", Rect2(16, by, 252, 56), null, 20)
 		pb.pressed.connect( func():
 			G.S.partner = cur
 			V10Look.notify()
@@ -354,21 +370,30 @@ func _build() -> void :
 			main.toast(V6Txt.s("coll.partner_toast") % G.HEROES[cur].name, "heart")
 			_build())
 		ic.add_child(pb)
-		var vb: = JButton.make(V6Txt.s("coll.voice"), "graphite", Rect2(16, 384, 122, 54), null, 19)
+		var vb: = JButton.make(V6Txt.s("coll.voice"), "graphite", Rect2(16, by + 66.0, 122, 54), null, 19)
 		vb.pressed.connect( func(): Sfx.say(cur, "greet"))
 		ic.add_child(vb)
-		var tb: = JButton.make(V6Txt.s("coll.skins"), "graphite", Rect2(146, 384, 122, 54), null, 19)
+		var tb: = JButton.make(V6Txt.s("coll.skins"), "graphite", Rect2(146, by + 66.0, 122, 54), null, 19)
 		tb.pressed.connect( func(): Common.skin_picker(main, func(): pass))
 		ic.add_child(tb)
+		by += 130.0
 	else:
 		var lb: = UI.label("Частички: %d / %d" % [mini(int(G.S.shards.get(cur, 0)), G.SHARDS_NEED), G.SHARDS_NEED], 19, Color("7a4a6a"), Color.WHITE, 3, "body", 900)
-		lb.position = Vector2(20, 322)
+		lb.position = Vector2(20, by + 4.0)
 		ic.add_child(lb)
-		var zoom_b: = JButton.make("Осмотр во весь экран", "graphite", Rect2(16, 368, 252, 60), null, 19)
+		var zoom_b: = JButton.make("Осмотр во весь экран", "graphite", Rect2(16, by + 36.0, 252, 56), null, 19)
 		zoom_b.pressed.connect( func():
 			if not sel_it.is_empty():
 				_open_inspect(sel_it))
 		ic.add_child(zoom_b)
+		by += 102.0
+	# «Будуар ♥» — the VIP boudoir of this heroine (screen v10boudoir, when registered)
+	var bd_btn: = JButton.make("Будуар ♥", "pink" if unl else "graphite", Rect2(16, by, 252, 56), null, 22)
+	bd_btn.name = "BoudoirBtn"
+	if unl:
+		bd_btn.shine_every = 2.6
+	bd_btn.pressed.connect(func(): _open_boudoir(cur, unl))
+	ic.add_child(bd_btn)
 	UI.slide_in(ic, Vector2(60, 0), 0.1)
 
 	var strip: = UI.rbox("cream", Rect2(14, H - 132 - 236, W - 28, 226), 28, 4, 12)
@@ -472,6 +497,161 @@ func _build() -> void :
 					_build())
 		UI.pop_in(card, 0.06 + cx / 2400.0, 0.85)
 		cx += cw + 5
+
+# 0.12: the hero's own rarity — Wave-1 goddesses from V10W1Gacha, the founders from their V10 kit
+static func _hero_rank(h: String) -> String:
+	if V10W1Core.is_wave1_hero(h):
+		return String(V10W1Gacha.HERO_RANK.get(h, "A"))
+	return V10Rank.hero_rank(h)
+
+
+# the next 16+ rubezh of the V10AffCurve above this level ({} when all are open)
+static func _next_16(lv: int) -> Dictionary:
+	var keys: = V10AffCurve.MILESTONES.keys()
+	keys.sort()
+	for k in keys:
+		var m: Dictionary = V10AffCurve.MILESTONES[k]
+		if int(k) > lv and bool(m.get("tag_16", false)):
+			return m.duplicate(true)
+	return {}
+
+
+func _open_boudoir(h: String, unl: bool) -> void:
+	var sc = main.get("SCREENS")
+	if not unl:
+		main.toast("Будуар откроется, когда она придёт к тебе", "lock")
+		Sfx.play("sparkle", 1.1, -8)
+		return
+	if sc is Dictionary and (sc as Dictionary).has("v10boudoir"):
+		main.go("v10boudoir", {"hero": h})
+	else:
+		main.toast("Будуар скоро откроется", "heart")
+
+
+# the swipeable row of ten goddesses (ScrollContainer): 92 px gold medallions, rarity pill, «NEW · Волна 1» on the five new
+func _hero_row() -> void:
+	var n_h: = G.HERO_ORDER.size()
+	var content_w: = 16.0 + n_h * MEDAL_STEP + 8.0
+	row_scroll = ScrollContainer.new()
+	row_scroll.name = "HeroRow"
+	row_scroll.position = Vector2(0, ROW_Y - 8.0)
+	row_scroll.size = Vector2(W, ROW_H)
+	row_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_SHOW_NEVER
+	row_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	row_scroll.mouse_filter = Control.MOUSE_FILTER_PASS
+	row_scroll.follow_focus = false
+	stage.add_child(row_scroll)
+	var content: = Control.new()
+	content.custom_minimum_size = Vector2(content_w, ROW_H)
+	content.mouse_filter = Control.MOUSE_FILTER_PASS
+	row_scroll.add_child(content)
+	var cur_i: = 0
+	for i in n_h:
+		var h: String = G.HERO_ORDER[i]
+		if h == cur:
+			cur_i = i
+		var on: bool = h == cur
+		var unl_h: = _unlocked(h)
+		var mx: = 16.0 + i * MEDAL_STEP + (MEDAL_STEP - MEDAL) * 0.5
+		var my: = 16.0
+		var ring_pal: = "pink" if on else ("gold" if unl_h else "plum")
+		var av: Control = V8Art.emotion_avatar(h, "happy", Rect2(mx, my, MEDAL, MEDAL), ring_pal)
+		av.name = "Medal_" + h
+		content.add_child(av)
+		var pic: Node = av.get_node_or_null("Pic")
+		if pic and pic is Control and (pic as Control).material is ShaderMaterial and not unl_h:
+			((pic as Control).material as ShaderMaterial).set_shader_parameter("gray", 0.65 if not on else 0.3)
+		if on:
+			av.pivot_offset = Vector2(MEDAL, MEDAL) * 0.5
+			UI.punch(av, 0.1)
+		# rarity pill under the medallion
+		var rk: = _hero_rank(h)
+		var rcol: Color = V10Rank.color(rk)
+		var pw: = 50.0
+		var pill: = UI.rbox("graphite", Rect2(mx + (MEDAL - pw) * 0.5, my + MEDAL - 14.0, pw, 24), 12, 2, 3)
+		pill.borders(rcol.lerp(Color.WHITE, 0.35), rcol.darkened(0.45))
+		pill.name = "Rank_" + h
+		pill.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		content.add_child(pill)
+		pill.add_child(UI.center_label(UI.label(rk, 16, rcol.lerp(Color.WHITE, 0.45), UI.DARK, 3, "body", 900), Rect2(0, -1, pw, 24)))
+		if not unl_h:
+			var lk: = V8Art.rect(V8Art.icon("lock"), Rect2(mx + 2.0, my + MEDAL - 32.0, 26, 26))
+			lk.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			content.add_child(lk)
+		# «NEW · Волна 1» on the five goddesses of wave 1
+		if W1_NEW.has(h):
+			var bw: = 100.0
+			var nb: = UI.rbox("pink", Rect2(mx + (MEDAL - bw) * 0.5, 0.0, bw, 22), 11, 2, 3)
+			nb.borders(Color("ffe7a6"), Color("c58a2c"))
+			nb.name = "NewBadge_" + h
+			nb.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			content.add_child(nb)
+			var nl: = UI.label("NEW · Волна 1", 13, Color.WHITE, Color(0.35, 0.05, 0.2), 3, "body", 900)
+			UI.center_label(nl, Rect2(0, -1, bw, 22))
+			nb.add_child(nl)
+		# tap = select; a drag scrolls the row (the select fires on release when the finger hardly moved)
+		var hh: String = h
+		var hit: = Control.new()
+		hit.position = Vector2(mx - 6.0, 6.0)
+		hit.size = Vector2(MEDAL + 12.0, MEDAL + 12.0)
+		hit.mouse_filter = Control.MOUSE_FILTER_PASS
+		var st: = {"down": false, "from": Vector2.ZERO, "moved": false}
+		hit.gui_input.connect(func(e: InputEvent) -> void:
+			if e is InputEventMouseButton and (e as InputEventMouseButton).button_index == MOUSE_BUTTON_LEFT:
+				if (e as InputEventMouseButton).pressed:
+					st.down = true
+					st.moved = false
+					st.from = hit.get_global_mouse_position()
+				elif st.down:
+					st.down = false
+					if not st.moved and hit.get_global_mouse_position().distance_to(st.from) < 14.0 and hh != cur:
+						V9Feel.press(av, "tap")
+						cur = hh
+						sel_oid = _default_oid(cur)
+						_build()
+			elif e is InputEventMouseMotion and st.down and (e as InputEventMouseMotion).button_mask & MOUSE_BUTTON_MASK_LEFT:
+				if hit.get_global_mouse_position().distance_to(st.from) >= 14.0:
+					st.moved = true
+				if not DisplayServer.is_touchscreen_available() and is_instance_valid(row_scroll):
+					row_scroll.scroll_horizontal -= int((e as InputEventMouseMotion).relative.x)
+			elif e is InputEventScreenTouch and (e as InputEventScreenTouch).pressed and hh != cur:
+				V9Feel.press(av, "tap")
+				cur = hh
+				sel_oid = _default_oid(cur)
+				_build())
+		content.add_child(hit)
+	# thin gold edge chevrons tell that the row swipes (ten goddesses do not fit the width)
+	var arrows: = []
+	for side in [-1, 1]:
+		var ax: = 2.0 if side < 0 else W - 34.0
+		var chev: = UI.rbox("graphite", Rect2(ax, ROW_Y + 24.0, 32, 44), 16, 2, 3)
+		chev.borders(Color("ffe7a6"), Color("a8742a"))
+		chev.modulate.a = 0.0
+		chev.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		chev.name = "RowChevL" if side < 0 else "RowChevR"
+		stage.add_child(chev)
+		chev.add_child(UI.center_label(UI.label("‹" if side < 0 else "›", 28, Color("ffe8a3"), UI.DARK, 3, "body", 900), Rect2(0, -4, 32, 44)))
+		arrows.append(chev)
+	row_arrows = arrows
+	var hb: = row_scroll.get_h_scroll_bar()
+	var upd: = func() -> void:
+		if not is_instance_valid(row_scroll):
+			return
+		var mx_s: = int(maxf(0.0, content_w - W))
+		var sx: = row_scroll.scroll_horizontal
+		for k in arrows.size():
+			if is_instance_valid(arrows[k]):
+				var show: bool = (sx > 4) if k == 0 else (sx < mx_s - 4)
+				(arrows[k] as Control).modulate.a = 0.92 if show else 0.0
+	hb.value_changed.connect(func(_v: float) -> void: upd.call())
+	# centre on the chosen goddess on first open, keep the swipe position after a tap
+	var want: int = row_saved_x if row_saved_x >= 0 else int(clampf(16.0 + cur_i * MEDAL_STEP + MEDAL_STEP * 0.5 - W * 0.5, 0.0, maxf(0.0, content_w - W)))
+	var apply: = func() -> void:
+		if is_instance_valid(row_scroll):
+			row_scroll.scroll_horizontal = want
+			upd.call()
+	apply.call_deferred()
+	get_tree().create_timer(0.05).timeout.connect(apply)
 
 static func _name_pad(cw: float) -> float:
 	return NAME_PAD + maxf(0.0, cw - 108.0) * NAME_PAD_K

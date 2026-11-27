@@ -8,6 +8,12 @@ const CG_DIR: = "res://assets/v10/cg_16/"
 const LOBBY_VID: = "res://assets/v09/video/mc_lobby.ogv"
 const LOBBY_STILL: = "res://assets/v09/video/mc_lobby_still.webp"
 const MAX_VID_DUR: = 3.2
+# 0.12 wave 1: the five goddesses' 16+ video ults and CGs. Every file is optional: a missing .ogv falls back to the CG,
+# a missing CG to her outfit art in res://assets/v10/wave1/outfits/ (never a blank screen).
+const W1_VIDEO: = {"kohaku": "kohaku.ogv", "shirin": "shirin.ogv", "tsubame": "tsubame.ogv", "zlata": "zlata.ogv", "miel": "miel.ogv"}
+const W1_CG: = {"kohaku": "cg_kohaku_16.webp", "shirin": "cg_shirin_16.webp", "tsubame": "cg_tsubame_16.webp",
+	"zlata": "cg_zlata_16.webp", "miel": "cg_miel_16.webp"}
+const W1_OUTFIT_DIR: = "res://assets/v10/wave1/outfits/"
 const CG_DUR: = 2.0
 
 static var _live: Array = []
@@ -59,6 +65,9 @@ static func resolve_video_path(h: String, outf: String = "") -> String:
 		cands.append(VID_DIR + img_id + ".ogv")
 	if h != "":
 		cands.append(VID_DIR + h + ".ogv")
+	var wh: = _w1_hero(h, outf)
+	if W1_VIDEO.has(wh):
+		cands.append(VID_DIR + String(W1_VIDEO[wh]))
 	if h == "mc":
 		cands.append(LOBBY_VID)
 	for p in cands:
@@ -77,10 +86,18 @@ static func resolve_still_path(h: String, outf: String = "", vpath: String = "")
 			var stem: = vpath.get_file().get_basename()
 			if ResourceLoader.exists(CG_DIR + stem + ".webp"):
 				return CG_DIR + stem + ".webp"
+			if ResourceLoader.exists(CG_DIR + "cg_%s_16.webp" % stem):
+				return CG_DIR + "cg_%s_16.webp" % stem
 		for k in [outf, img_id, h]:
 			if k != "" and ResourceLoader.exists(CG_DIR + k + ".webp"):
 				return CG_DIR + k + ".webp"
-	var eff: = outf if outf != "" else V9Ults.for_hero(h)
+		var wcg: = w1_cg_path(_w1_hero(h, outf))
+		if wcg != "":
+			return wcg
+	var w1_art: = w1_outfit_still(h, outf)
+	if w1_art != "":
+		return w1_art
+	var eff: = outf if outf != "" else (V9Ults.for_hero(h) if not V10W1Core.is_wave1_hero(h) else V10W1Core.base_of(h))
 	var sh: Dictionary = V9Ults.clip_art(eff)
 	var simg: = String(sh.get("img", ""))
 	if simg != "" and ResourceLoader.exists(simg):
@@ -92,6 +109,55 @@ static func resolve_still_path(h: String, outf: String = "", vpath: String = "")
 		return V8Art.emotion_path(h, "happy")
 	var hp: = "res://assets/hero/%s.png" % h
 	return hp if ResourceLoader.exists(hp) else "res://assets/outfits/mc_base.webp"
+
+
+# the wave-1 goddess an ult belongs to: the hero id, or the owner of a wave-1 outfit id ("" for everyone else)
+static func _w1_hero(h: String, outf: String = "") -> String:
+	if V10W1Core.is_wave1_hero(h):
+		return h
+	if outf != "" and V10W1Core.is_wave1_item(outf):
+		return String(V10W1Core.item(outf).get("hero", ""))
+	return ""
+
+
+# res://assets/v10/ult_video/<hero>.ogv of a wave-1 goddess, "" when the file is not there (the CG / outfit art plays)
+static func w1_video_path(h: String) -> String:
+	var p: = VID_DIR + String(W1_VIDEO.get(h, ""))
+	return p if W1_VIDEO.has(h) and _has_res(p) else ""
+
+
+# res://assets/v10/cg_16/cg_<hero>_16.webp, "" when missing
+static func w1_cg_path(h: String) -> String:
+	if not W1_CG.has(h):
+		return ""
+	var p: = CG_DIR + String(W1_CG[h])
+	return p if ResourceLoader.exists(p) else ""
+
+
+# the safe last stop for a wave-1 goddess: the outfit she wears (SFW alt in modest mode), else her base outfit card
+static func w1_outfit_still(h: String, outf: String = "") -> String:
+	var wh: = _w1_hero(h, outf)
+	if wh == "":
+		return ""
+	var modest: = bool(G.S.get("modest", false))
+	var ids: Array = []
+	if outf != "":
+		ids.append(outf)
+	var worn: = String(G.S.get("outfit", {}).get(wh, "")) if G.S.get("outfit") is Dictionary else ""
+	if worn != "":
+		ids.append(worn)
+	ids.append(V10W1Core.base_of(wh))
+	for id in ids:
+		var it: Dictionary = V10W1Core.item(String(id))
+		if it.is_empty():
+			continue
+		var img: = String(it.get("img", ""))
+		if modest and (bool(it.get("bold", false)) or not bool(it.get("sfw", true))) and it.has("alt"):
+			img = String(it.alt)
+		var p: = V10W1Core.outfit_webp(img)
+		if img != "" and ResourceLoader.exists(p):
+			return p
+	return ""
 
 
 static func _theora_dims(p: String) -> Vector2:

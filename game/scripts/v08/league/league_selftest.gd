@@ -90,7 +90,7 @@ static func _population() -> void:
 	_check("tier counts", counts == V8Population.TIER_COUNT, str(counts))
 	_check("many low, few high", counts[0] + counts[1] > 500 and counts[4] + counts[5] < 120, str(counts))
 	_check("russian and latin nicks mixed", latin > 250 and latin < 750, "latin=%d" % latin)
-	_check("all heroines used", heroes.size() == G.HERO_ORDER.size(), str(heroes))
+	_check("all heroines used", heroes.size() == V10W1Core.FOUNDERS.size(), str(heroes))
 	_check("deterministic", V8Population.nick(17) == String(pop[17].nick))
 	var sample: = []
 	for i in range(0, 1000, 25):

@@ -29,7 +29,8 @@ static func data() -> Dictionary:
 		if f:
 			var d = JSON.parse_string(f.get_as_text())
 			if d is Dictionary:
-				_data = d
+				# 0.12 wave 1: the five goddesses' phases join the calendar from their release (V10Wave1.banners_enabled)
+				_data = V10Wave1.banners(d)
 	return _data
 
 
