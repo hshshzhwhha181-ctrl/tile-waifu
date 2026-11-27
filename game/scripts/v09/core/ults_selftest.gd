@@ -43,6 +43,15 @@ static func _outfits() -> Array:
 	return ids
 
 
+# the five founders (V9Ults) — HERO_ORDER also holds the five wave-1 goddesses since 0.12.0
+static func _founders() -> Array:
+	var out: = []
+	for h in G.HERO_ORDER:
+		if not V10W1Ults.is_hero(h):
+			out.append(h)
+	return out
+
+
 static func _cyr(s: String) -> bool:
 	for ch in s:
 		var c: = ch.unicode_at(0)
@@ -55,7 +64,11 @@ static func _table() -> void :
 	var ids: = _outfits()
 	_check("28+ outfits known (23 + 5 event)", ids.size() >= 28, str(ids.size()))
 	for id in ids:
-		_check("ULTS has %s" % id, V9Ults.has(id))
+		# 0.10 wave-1 outfits live in V10W1Ults (its own table + wave1_selftest); legacy V9Ults owns the founders' 23 + 5
+		if V10W1Ults.has(id):
+			_check("W1 ULTS has %s" % id, V10W1Ults.get_ult(id).get("hero", "") == String(G.ITEM[id].get("hero", "")))
+		else:
+			_check("ULTS has %s" % id, V9Ults.has(id))
 	for id in V9Ults.ULTS:
 		_check("%s is an outfit in G.ITEM" % id, G.ITEM.has(id) and G.ITEM[id].cat == "outfit")
 	var mods_by_hero: = {}
@@ -108,9 +121,12 @@ static func _table() -> void :
 	_check("names: y_ball", V9Ults.get_ult("y_ball").name == "Последний вальс")
 	_check("names: n_offline", V9Ults.get_ult("n_offline").name == "Режим офлайн")
 	_check("mods: §5 sample", V9Ults.mod("o_dragon") == "Л" and V9Ults.mod("r_agent") == "П" and V9Ults.mod("h_gym") == "С" and V9Ults.mod("y_duel") == "Ц" and V9Ults.mod("n_ssr") == "О")
-	for h in G.HERO_ORDER:
+	for h in _founders():
 		_check("core for %s" % h, V9Ults.CORES.has(h) and _cyr(String(V9Ults.core(h).desc)))
 		_check("base ult for %s" % h, V9Ults.has(String(V9Ults.BASE[h])) and V9Ults.BASE[h] in G.BASE_OUTFITS)
+	for h in V10W1Ults.heroes():
+		_check("W1 core for %s" % h, V10W1Ults.CORES.has(h) and _cyr(String(V10W1Ults.core(h).desc)))
+		_check("W1 base ult for %s" % h, V10W1Ults.has(V10W1Ults.base(h)) and V10W1Ults.base(h) in G.BASE_OUTFITS)
 	# shown(): hidden and modest swap to alt art with that art's rects
 	var t: = V9Ults.shown("o_tutor", false)
 	_check("shown: hidden o_tutor draws its alt", t.img.ends_with("mc_base.webp") and t.face_rect == V9Ults.RECTS.mc_base[0], str(t))
@@ -176,7 +192,7 @@ static func _charge() -> void :
 	# HEROINES §2: ranked cores are levelled in pair-equivalents — on a ranked board (no ice, no secrets) every
 	# heroine's ult removes exactly 1 pair (Rin: returns the tray, or removes 1 pair when it is empty)
 	var lvl_bad: = []
-	for h in G.HERO_ORDER:
+	for h in _founders():
 		var rc: = V9Ults.core(h, true)
 		var removes: = int(rc.get("pairs", 0)) if not rc.get("return_tray", false) else int(rc.get("empty_tray_pairs", 0))
 		if removes != 1 or rc.get("reveal_all", false):
@@ -184,9 +200,11 @@ static func _charge() -> void :
 	_check("ranked cores: 1 pair-equivalent each on a board without ice / secrets", lvl_bad.is_empty(), str(lvl_bad))
 	_check("ranked core: Yue takes the pair at her beam + opens 1, never the whole board", int(V9Ults.core("yue", true).pairs) == 1 and int(V9Ults.core("yue", true).reveal) == 1 and not V9Ults.core("yue", true).reveal_all and V9Ults.core("yue").reveal_all)
 	var targets: = {}
-	for h in G.HERO_ORDER:
+	for h in _founders():
 		targets[h] = V9Ults.core(h).target
 	_check("targets per §2", targets == {"mc": "pair", "rin": "none", "hana": "swipe", "yue": "row", "nova": "tier"}, str(targets))
+	for h in V10W1Ults.heroes():
+		_check("W1 target for %s is an aim target" % h, String(V10W1Ults.core(h).get("target", "")) in V10W1Ults.AIM_TARGETS)
 	_check("target window 2 s", is_equal_approx(V9Ults.TARGET_TIME, 2.0))
 
 
