@@ -34,6 +34,16 @@ var mon_clip: Control
 var mon_art: TextureRect
 var mon_hp_bar: V10AdventureVfx.DelayedBar
 var mon_hp_lbl: Label
+var shield_bar: V10AdventureVfx.ShieldBar
+var squad: Array = []
+var support_medals: Array = []
+var hero_info_lbl: Label
+var squad_btn: Control
+var squad_modal: Control
+var squad_edit: Array = []
+var squad_slot: = 1
+var _squad_card: Control
+var _squad_prev_input: = false
 var atk_fill: ColorRect
 var atk_lbl: Label
 var debuff_lbl: Label
@@ -75,11 +85,16 @@ func build(m, args: Dictionary = {}) -> void:
 	var st: Dictionary = V10AdventureData.st()
 	stage_idx = clampi(int(args.get("stage", st.get("stage", 0))), 0, V10AdventureData.count() - 1)
 	hero_id = String(args.get("hero", G.S.get("partner", "mc")))
+	if not args.has("hero") and bool(st.get("squad_custom", false)):
+		var h0: = String((st.squad as Array)[0])
+		if Hero.RIGS.has(h0):
+			hero_id = h0
 	if not Hero.RIGS.has(hero_id):
 		hero_id = "mc"
 	if not bool(args.get("skip_stamina", false)):
 		V10AdventureData.try_spend_stamina(main)
-	battle = V10AdventureBattle.new(stage_idx, hero_id)
+	squad = V10AdventureData.effective_squad(hero_id)
+	battle = V10AdventureBattle.new(stage_idx, hero_id, squad, V10AdventureData.aff_bonuses(hero_id))
 	Sfx.music("play")
 	_build_backdrop()
 	shake_root = Control.new()
@@ -241,11 +256,15 @@ func _build_arena() -> void:
 	mtitle.clip_text = true
 	mon_card.add_child(mtitle)
 
-	mon_hp_bar = V10AdventureVfx.DelayedBar.new().setup(Rect2(lx, 118, lw, 32), Color("#F44E63"), Color("#A81D34"), Color("#F6D483"))
+	mon_hp_bar = V10AdventureVfx.DelayedBar.new().setup(Rect2(lx, 114, lw, 28), Color("#F44E63"), Color("#A81D34"), Color("#F6D483"))
 	mon_card.add_child(mon_hp_bar)
-	mon_hp_lbl = _bar_lbl(mon_card, Rect2(lx, 116, lw, 34), "HP %d / %d" % [battle.mon_hp, battle.mon_max], 16)
+	mon_hp_lbl = _bar_lbl(mon_card, Rect2(lx, 112, lw, 30), "HP %d / %d" % [battle.mon_hp, battle.mon_max], 16)
 
-	var atk_r: = Rect2(lx, 158, lw, 26)
+	shield_bar = V10AdventureVfx.ShieldBar.new().setup(Rect2(lx, 146, lw, 24))
+	shield_bar.set_state(battle.shield, battle.shield_max, battle.broken_turns, true)
+	mon_card.add_child(shield_bar)
+
+	var atk_r: = Rect2(lx, 174, lw, 24)
 	mon_card.add_child(_pill_panel(atk_r, Color(0.05, 0.03, 0.09, 0.94), Color(0.85, 0.56, 0.32, 0.80), 8))
 	atk_fill = ColorRect.new()
 	atk_fill.color = Color("#F58A38")
@@ -253,15 +272,15 @@ func _build_arena() -> void:
 	atk_fill.size = atk_r.size - Vector2(4, 4)
 	atk_fill.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	mon_card.add_child(atk_fill)
-	atk_lbl = _bar_lbl(mon_card, Rect2(lx, 156, lw, 28), "Атака босса через %d" % battle.moves_left, 14)
+	atk_lbl = _bar_lbl(mon_card, Rect2(lx, 172, lw, 28), "Атака босса через %d" % battle.moves_left, 14)
 
-	var db_box: = _pill_panel(Rect2(lx, 192, lw, ah - 204.0), Color(0.13, 0.06, 0.20, 0.92), acc.darkened(0.15), 12)
+	var db_box: = _pill_panel(Rect2(lx, 204, lw, ah - 214.0), Color(0.13, 0.06, 0.20, 0.92), acc.darkened(0.15), 12)
 	mon_card.add_child(db_box)
 	var db_icon: = "❄" if String(battle.m.debuff) == "freeze" else ("🐉" if String(battle.m.debuff) == "both" else "封")
 	var db_str: = "%s Приём: %s — %s · Урон %d" % [db_icon, String(battle.m.debuff_name), String(battle.m.debuff_desc), int(battle.m.atk)]
-	debuff_lbl = UI.label(db_str, 14, Color("#F4E4FA"), Color(0.07, 0.02, 0.10), 3, "body", 800)
-	debuff_lbl.position = Vector2(lx + 10, 195)
-	debuff_lbl.size = Vector2(lw - 20, ah - 210.0)
+	debuff_lbl = UI.label(db_str, 13, Color("#F4E4FA"), Color(0.07, 0.02, 0.10), 3, "body", 800)
+	debuff_lbl.position = Vector2(lx + 10, 206)
+	debuff_lbl.size = Vector2(lw - 20, ah - 218.0)
 	debuff_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	debuff_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	mon_card.add_child(debuff_lbl)
@@ -311,7 +330,7 @@ func _build_bottom_dock() -> void:
 	hero_dock.add_child(_pill_panel(Rect2(Vector2.ZERO, dock_rect.size), Color(0.10, 0.04, 0.16, 0.94), Color("#E8C47E"), 20))
 
 	# Left: Heroine Portrait Medallion (tappable to cast Ult when ready!)
-	var med_r: = Rect2(12, 12, 118, dock_h - 24.0)
+	var med_r: = Rect2(12, 12, 118, dock_h - 24.0 - 54.0)
 	hero_ready_glow = _pill_panel(med_r.grow(5.0), Color(1.0, 0.72, 0.24, 0.26), Color("#FFE48F"), 18)
 	hero_ready_glow.visible = false
 	hero_dock.add_child(hero_ready_glow)
@@ -342,16 +361,30 @@ func _build_bottom_dock() -> void:
 	hero_medallion.add_child(hero_art)
 	hero_dock.add_child(_frame_only(med_r, Color("#F6D483"), 14))
 
+	# Support goddesses: two compact gold medallions (48x48) under the lead portrait; a tap opens the squad window
+	support_medals.clear()
+	var sup_y: = dock_h - 12.0 - 48.0
+	for i in 2:
+		var sid: = String(squad[i + 1]) if squad.size() > i + 1 else ""
+		var sm: = _build_support_medal(sid, Rect2(12.0 + float(i) * 58.0, sup_y, 48.0, 48.0))
+		hero_dock.add_child(sm)
+		support_medals.append(sm)
+
 	# Top-right of Dock: Heroine Name + Perk + Hero HP DelayedBar
 	var rx: = 142.0
 	var rw: = dock_rect.size.x - rx - 12.0
-	var h_info: = "%s · %s" % [String(G.HEROES[hero_id].name), String(V10AdventureData.HERO_PERKS.get(hero_id, ""))]
-	var hname_l: = UI.label(h_info, 15, Color("#FFF2DC"), Color(0.08, 0.03, 0.12), 4, "body", 900)
+	var syn: = V10AdventureData.active_synergy(squad) if squad.size() >= 2 else {}
+	var h_info: = "%s · %s" % [V10AdventureData.hero_name(hero_id), String(syn.get("name", V10AdventureData.HERO_PERKS.get(hero_id, "")))]
+	var hname_l: = UI.label(h_info, 14, Color("#FFF2DC"), Color(0.08, 0.03, 0.12), 4, "body", 900)
 	hname_l.position = Vector2(rx, 11)
-	hname_l.size = Vector2(rw - 226.0, 30)
+	hname_l.size = Vector2(rw - 226.0 - 92.0, 30)
 	hname_l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	hname_l.clip_text = true
 	hero_dock.add_child(hname_l)
+	hero_info_lbl = hname_l
+
+	squad_btn = _build_squad_button(Rect2(rx + rw - 218.0 - 88.0, 11, 82, 30))
+	hero_dock.add_child(squad_btn)
 
 	var hp_r: = Rect2(rx + rw - 218.0, 12, 218.0, 28.0)
 	hero_hp_bar = V10AdventureVfx.DelayedBar.new().setup(hp_r, Color("#46DC8C"), Color("#1E9658"), Color("#B8E8C8"))
@@ -364,7 +397,7 @@ func _build_bottom_dock() -> void:
 	var util_w: = 192.0
 	var ult_w: = rw - util_w - 10.0
 	var u_meta: Dictionary = V10AdventureData.HERO_ULTS.get(hero_id, V10AdventureData.HERO_ULTS.mc)
-	var u_dmg: int = int(V10AdventureData.calc_ult_damage(stage_idx, hero_id).damage)
+	var u_dmg: int = int(V10AdventureData.calc_ult_damage(stage_idx, hero_id, battle.mods).damage)
 	ult_btn = V10AdventureVfx.UltButton.new().setup(Rect2(rx, row_y, ult_w, row_h), String(u_meta.title), u_dmg, u_meta.accent)
 	ult_btn.triggered.connect(_try_cast_ult)
 	hero_dock.add_child(ult_btn)
@@ -483,11 +516,13 @@ func _on_match(mid: Vector2, combo: int, gold: bool, _shard: String) -> void:
 	_refresh_ult_only()
 	if dmg > 0:
 		var killed: bool = bool(r.get("killed", false))
+		var broke: bool = bool(r.get("broke", false))
+		var doubled: bool = bool(r.get("doubled", false))
 		V10AdventureVfx.spawn_projectiles(fx_layer, from_pt, to_pt, orb_n, orb_col, func() -> void:
-			_apply_pair_impact(dmg, combo, is_crit, killed))
+			_apply_pair_impact(dmg, combo, is_crit, killed, broke, doubled))
 
 
-func _apply_pair_impact(dmg: int, combo: int, is_crit: bool, killed: bool) -> void:
+func _apply_pair_impact(dmg: int, combo: int, is_crit: bool, killed: bool, broke: bool = false, doubled: bool = false) -> void:
 	if not is_inside_tree():
 		return
 	var bc: = _boss_center()
@@ -503,9 +538,15 @@ func _apply_pair_impact(dmg: int, combo: int, is_crit: bool, killed: bool) -> vo
 		_start_hitstop(V10AdventureVfx.HITSTOP_SEC)
 		_shake_screen(11.0, 0.24)
 	var tag: = ("КРИТ -%d!" % dmg) if is_crit else ("-%d" % dmg)
+	if doubled:
+		tag = "×2 " + tag
 	var tcol: = Color("#FFE47A") if is_crit else Color("#FFA686")
-	V10AdventureVfx.spawn_float_text(fx_layer, bc + Vector2(randf_range(-28.0, 18.0), -62.0), tag, tcol, 32 if is_crit else 26, 0.95)
-	_hit_monster(is_crit)
+	if doubled:
+		tcol = Color("#FF6B7A")
+	V10AdventureVfx.spawn_float_text(fx_layer, bc + Vector2(randf_range(-28.0, 18.0), -62.0), tag, tcol, 32 if (is_crit or doubled) else 26, 0.95)
+	if broke:
+		_play_shield_break(bc)
+	_hit_monster(is_crit or doubled)
 	_refresh_hud(false)
 	if killed and not _ended:
 		get_tree().create_timer(0.52).timeout.connect(func() -> void:
@@ -543,6 +584,8 @@ func _on_board_cleared() -> void:
 	V10AdventureVfx.spawn_slash(fx_layer, bc, Color("#FFE066"), 2, V10AdventureVfx.SLASH_HOLD_DUR)
 	V10AdventureVfx.spawn_shockwave(fx_layer, bc, Color("#FFE066"), 165.0, true)
 	V10AdventureVfx.spawn_float_text(fx_layer, bc + Vector2(0, -70), "ЗАЛП -%d!" % int(bonus.damage), Color("#FFE066"), 34, 1.0)
+	if bool(bonus.get("broke", false)):
+		_play_shield_break(bc)
 	_hit_monster(true)
 	_refresh_hud(false)
 	if battle.over:
@@ -611,8 +654,11 @@ func _apply_ult_impact(r: Dictionary) -> void:
 		get_tree().create_timer(float(i) * 0.09).timeout.connect(func() -> void:
 			if is_inside_tree():
 				V10AdventureVfx.spawn_float_text(fx_layer, bc + off, "-%d!" % h_val, Color("#FFE680"), 26, 0.85))
-	V10AdventureVfx.spawn_float_text(fx_layer, bc + Vector2(0, -86), "СУПЕРУДАР -%d!" % int(r.damage), Color("#FFDF6B"), 36, 1.10)
+	var ult_tag: = ("СУПЕРУДАР ×2 -%d!" if bool(r.get("doubled", false)) else "СУПЕРУДАР -%d!") % int(r.damage)
+	V10AdventureVfx.spawn_float_text(fx_layer, bc + Vector2(0, -86), ult_tag, Color("#FFDF6B"), 36, 1.10)
 	V10AdventureVfx.spawn_float_text(fx_layer, bc + Vector2(0, 56), "★ ОГЛУШЁН! ★", Color("#7CE2FF"), 28, 1.10)
+	if bool(r.get("broke", false)):
+		_play_shield_break(bc + Vector2(0, -20))
 	var cleansed: = V10AdventureVfx.cleanse_board_debuffs(board)
 	if cleansed > 0:
 		V10AdventureVfx.spawn_float_text(fx_layer, board_rect.get_center() + Vector2(0, -40), "ОЧИЩЕНИЕ ЧАР!", Color("#9CF6E8"), 24, 0.90)
@@ -728,7 +774,7 @@ func _hit_hero() -> void:
 func _refresh_ult_only() -> void:
 	var uf: = battle.ult_frac()
 	var rdy: = battle.ult_ready()
-	var u_dmg: int = int(V10AdventureData.calc_ult_damage(stage_idx, hero_id).damage)
+	var u_dmg: int = int(V10AdventureData.calc_ult_damage(stage_idx, hero_id, battle.mods).damage)
 	if ult_btn != null:
 		ult_btn.set_state(uf, rdy, u_dmg)
 	if hero_ready_glow != null:
@@ -745,6 +791,8 @@ func _refresh_hud(instant_bars: bool = false) -> void:
 		mon_hp_bar.set_frac(battle.hp_frac(), instant_bars)
 	if mon_hp_lbl != null:
 		mon_hp_lbl.text = "HP %d / %d" % [battle.mon_hp, battle.mon_max]
+	if shield_bar != null:
+		shield_bar.set_state(battle.shield, battle.shield_max, battle.broken_turns, instant_bars)
 	var cad: = maxi(1, int(battle.m.cadence))
 	var full_w: = arena_rect.size.x - 258.0 - 4.0
 	if atk_fill != null:
@@ -774,10 +822,12 @@ func _finish(victory: bool) -> void:
 		board.input_on = false
 	var rw: Dictionary = {}
 	var refunded: = 0
+	var raid: Dictionary = {}
 	if victory:
 		Sfx.play("win", 1.0, -3.0)
 		Sfx.say(hero_id, "win")
-		rw = V10AdventureData.record_win(stage_idx, battle.dmg_total)
+		rw = V10AdventureData.record_win(stage_idx, battle.dmg_total, null, battle.breaks)
+		raid = rw.get("raid", {})
 		V10Money.grant({"gems": int(rw.gems), "coins": int(rw.coins)}, "adventure")
 		G.add_aff(hero_id, int(rw.aff))
 		var gift_tier: = 1 if stage_idx < 2 else (2 if stage_idx < 4 else 3)
@@ -787,15 +837,17 @@ func _finish(victory: bool) -> void:
 		G.save()
 	else:
 		Sfx.say(hero_id, "lose")
-		V10AdventureData.record_defeat(battle.dmg_total)
+		raid = V10AdventureData.record_defeat(battle.dmg_total, null, battle.breaks, stage_idx)
 		refunded = V10AdventureData.refund_defeat_stamina()
 		G.save()
+	V10AdventureData.submit_raid_score(stage_idx, battle.dmg_total)
+	var raid_line: = "\nУрон за бой: %d · Рекорд: %d%s" % [battle.dmg_total, int(raid.get("best", battle.dmg_total)), (" · НОВЫЙ РЕКОРД!" if bool(raid.get("new_best", false)) else "")]
 	var dim: = ColorRect.new()
 	dim.color = Color(0.04, 0.02, 0.08, 0.80)
 	dim.size = Vector2(W, H)
 	dim.mouse_filter = Control.MOUSE_FILTER_STOP
 	modal_layer.add_child(dim)
-	var card: = _pill_panel(Rect2(44, H * 0.25, W - 88, 436), Color(0.11, 0.06, 0.17, 0.98), Color("#F6D483"), 22)
+	var card: = _pill_panel(Rect2(44, H * 0.25, W - 88, 480), Color(0.11, 0.06, 0.17, 0.98), Color("#F6D483"), 22)
 	dim.add_child(card)
 	var t_lbl: = UI.label("БОСС ПОВЕРЖЕН!" if victory else "ПОРАЖЕНИЕ", 34, Color("#FFE28A") if victory else Color("#FF7B8A"), Color(0.08, 0.03, 0.12), 5, "body", 900)
 	t_lbl.position = Vector2(16, 24)
@@ -804,21 +856,21 @@ func _finish(victory: bool) -> void:
 	card.add_child(t_lbl)
 	var refund_note: = ("\nВозвращено чая: +%d" % refunded) if refunded > 0 else ""
 	var gift_note: = ("\nТрофей: Подарок «%s»" % String(rw.get("gift_name", ""))) if String(rw.get("gift_name", "")) != "" else ""
-	var sub_txt: String = ("%s повержен!\nНаграда: +%d кристаллов · +%d монет · +%d симпатии%s" % [String(battle.m.name), int(rw.gems), int(rw.coins), int(rw.aff), gift_note]) if victory else ("%s оказался сильнее.%s\nСнимай золотые пары и жми Суперудар внизу для оглушения!" % [String(battle.m.name), refund_note])
+	var sub_txt: String = ("%s повержен!\nНаграда: +%d кристаллов · +%d монет · +%d симпатии%s%s" % [String(battle.m.name), int(rw.gems), int(rw.coins), int(rw.aff), gift_note, raid_line]) if victory else ("%s оказался сильнее.%s\nСнимай золотые пары и жми Суперудар внизу для оглушения!%s" % [String(battle.m.name), refund_note, raid_line])
 	var sub: = UI.label(sub_txt, 20, Color("#F2E6D8"), Color(0.06, 0.03, 0.10), 3, "body", 800)
 	sub.position = Vector2(24, 92)
-	sub.size = Vector2(card.size.x - 48, 138)
+	sub.size = Vector2(card.size.x - 48, 172)
 	sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	sub.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	card.add_child(sub)
 	var next_stage: int = int(rw.get("next_stage", stage_idx)) if victory else stage_idx
 	var btn_txt: String = ("Следующий босс ›" if (victory and bool(rw.get("has_next", false))) else "Сразиться снова")
-	var b1: = JButton.make(btn_txt, "gold", Rect2(44, 248, card.size.x - 88, 76), null, 24)
+	var b1: = JButton.make(btn_txt, "gold", Rect2(44, 284, card.size.x - 88, 76), null, 24)
 	b1.pressed.connect(func() -> void:
 		if main != null:
 			main.go("adventure", {"stage": next_stage, "hero": hero_id}))
 	card.add_child(b1)
-	var b2: = JButton.make("К столам", "graphite", Rect2(44, 338, card.size.x - 88, 64), null, 22)
+	var b2: = JButton.make("К столам", "graphite", Rect2(44, 374, card.size.x - 88, 64), null, 22)
 	b2.pressed.connect(_go_back)
 	card.add_child(b2)
 
@@ -834,7 +886,17 @@ func dev_act(act: String) -> void:
 		"ult_ready":
 			battle.ult = V10AdventureData.ULT_MAX
 			_refresh_hud(false)
+		"squad":
+			open_squad_modal()
+		"shield_low":
+			battle.shield = int(round(float(battle.shield_max) * 0.34))
+			_refresh_hud(true)
+		"shield_break":
+			battle.shield = 1
+			var br: Dictionary = battle.on_pair(1, false)
+			_apply_pair_impact(int(br.damage), 1, false, false, bool(br.get("broke", false)), bool(br.get("doubled", false)))
 		"combat_showcase":
+			battle.shield = int(round(float(battle.shield_max) * 0.45))
 			battle.ult = V10AdventureData.ULT_MAX
 			battle.mon_hp = maxi(20, int(round(float(battle.mon_max) * 0.58)))
 			battle.moves_left = 2
@@ -863,6 +925,306 @@ func dev_act(act: String) -> void:
 			_try_cast_ult()
 		"boss_lunge":
 			_play_boss_counter({"attack": true, "damage": 13, "debuff": "both", "debuff_name": "Дыхание Дракона", "debuff_count": 3, "lost": false})
+
+
+# ── Squad: support medallions, «Отряд» button and the 3-goddess selection window ──────────────────────────────
+
+func _play_shield_break(bc: Vector2) -> void:
+	V10AdventureVfx.spawn_shield_break(fx_layer, bc)
+	Sfx.play("reveal_ssr", 0.85, -2.0)
+	_shake_screen(16.0, 0.32)
+
+
+func _portrait_box(parent: Control, hid: String, r: Rect2, dim: bool = false) -> Control:
+	var clip: = Control.new()
+	clip.position = r.position
+	clip.size = r.size
+	clip.clip_contents = true
+	clip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	parent.add_child(clip)
+	var tex: Texture2D = V10AdventureData.hero_portrait(hid) if hid != "" else null
+	if tex != null:
+		var tr: = TextureRect.new()
+		tr.texture = tex
+		tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+		tr.size = r.size
+		tr.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		if dim:
+			tr.modulate = Color(0.30, 0.30, 0.36, 1.0)
+		clip.add_child(tr)
+	else:
+		var plus: = UI.label("+" if hid == "" else hid.substr(0, 1).to_upper(), int(r.size.y * 0.5), Color("#E8C47E"), Color(0.06, 0.02, 0.08), 4, "body", 900)
+		plus.size = r.size
+		plus.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		plus.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		clip.add_child(plus)
+	return clip
+
+
+func _set_medal(root: Control, sid: String) -> void:
+	for ch in root.get_children():
+		root.remove_child(ch)
+		ch.queue_free()
+	root.set_meta("hero", sid)
+	var plate: = _pill_panel(Rect2(Vector2(-3, -3), root.size + Vector2(6, 6)), Color(0.34, 0.22, 0.05, 0.96), Color("#FFE48F"), 10)
+	root.add_child(plate)
+	_portrait_box(root, sid, Rect2(Vector2.ZERO, root.size))
+	root.add_child(_frame_only(Rect2(Vector2.ZERO, root.size), Color("#F6D483"), 6))
+
+
+func _build_support_medal(sid: String, r: Rect2) -> Control:
+	var root: = Control.new()
+	root.position = r.position
+	root.size = r.size
+	root.mouse_filter = Control.MOUSE_FILTER_STOP
+	_set_medal(root, sid)
+	root.gui_input.connect(func(e: InputEvent) -> void:
+		if _is_tap(e):
+			root.accept_event()
+			open_squad_modal())
+	return root
+
+
+func _build_squad_button(r: Rect2) -> Control:
+	var p: = _pill_panel(r, Color(0.40, 0.10, 0.20, 0.97), Color("#FFE48F"), 15)
+	p.mouse_filter = Control.MOUSE_FILTER_STOP
+	var l: = UI.label("Отряд", 15, Color("#FFF2C8"), Color(0.10, 0.02, 0.08), 4, "body", 900)
+	l.size = r.size
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	p.add_child(l)
+	p.gui_input.connect(func(e: InputEvent) -> void:
+		if _is_tap(e):
+			p.accept_event()
+			open_squad_modal())
+	return p
+
+
+func _refresh_squad_ui() -> void:
+	for i in support_medals.size():
+		var sid: = String(squad[i + 1]) if squad.size() > i + 1 else ""
+		_set_medal(support_medals[i] as Control, sid)
+	if hero_info_lbl != null:
+		var syn: = V10AdventureData.active_synergy(squad) if squad.size() >= 2 else {}
+		hero_info_lbl.text = "%s · %s" % [V10AdventureData.hero_name(hero_id), String(syn.get("name", V10AdventureData.HERO_PERKS.get(hero_id, "")))]
+	_refresh_ult_only()
+
+
+func _card_label(parent: Control, txt: String, fs: int, col: Color, r: Rect2, center: bool = false, wrap: bool = false) -> Label:
+	var l: = UI.label(txt, fs, col, Color(0.07, 0.02, 0.10), 3, "body", 800)
+	if wrap:
+		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	l.position = r.position
+	l.size = r.size
+	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if center:
+		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	if not wrap:
+		l.clip_text = true
+	parent.add_child(l)
+	return l
+
+
+func _slot_perk(i: int, hid: String) -> Array:
+	if hid == "":
+		return ["Пусто", "Выбери богиню из списка ниже."]
+	if i == 0 and V10AdventureData.HERO_PERKS.has(hid):
+		var um: Dictionary = V10AdventureData.HERO_ULTS.get(hid, {})
+		return [String(V10AdventureData.HERO_PERKS[hid]), "Ульта: %s" % String(um.get("title", "Суперудар"))]
+	var pk: Dictionary = V10AdventureData.perk_of(hid)
+	return [String(pk.get("name", "")), String(pk.get("desc", ""))]
+
+
+func open_squad_modal() -> void:
+	if _ended or _ult_casting or modal_layer == null:
+		return
+	if squad_modal != null and is_instance_valid(squad_modal):
+		return
+	squad_edit = squad.duplicate()
+	while squad_edit.size() < V10AdventureData.SQUAD_SIZE:
+		squad_edit.append("")
+	squad_slot = 1
+	_squad_prev_input = board != null and is_instance_valid(board) and board.input_on
+	if board != null and is_instance_valid(board):
+		board.input_on = false
+	var dim: = ColorRect.new()
+	dim.color = Color(0.04, 0.02, 0.08, 0.86)
+	dim.size = Vector2(W, H)
+	dim.mouse_filter = Control.MOUSE_FILTER_STOP
+	modal_layer.add_child(dim)
+	squad_modal = dim
+	_squad_card = null
+	_squad_draw()
+
+
+func squad_assign(hid: String) -> bool:
+	if squad_edit.size() < V10AdventureData.SQUAD_SIZE:
+		return false
+	if not V10AdventureData.hero_available(hid):
+		return false
+	if squad_slot == 0 and not Hero.RIGS.has(hid):
+		return false
+	var cur_idx: = squad_edit.find(hid)
+	if cur_idx == squad_slot:
+		return false
+	if cur_idx >= 0:
+		var tmp: Variant = squad_edit[squad_slot]
+		squad_edit[squad_slot] = hid
+		squad_edit[cur_idx] = tmp
+	else:
+		squad_edit[squad_slot] = hid
+	# the lead can never be empty: a swap that leaves slot 0 empty is undone
+	if String(squad_edit[0]) == "":
+		squad_edit[0] = squad_edit[squad_slot]
+		squad_edit[squad_slot] = ""
+	return true
+
+
+func squad_edit_ids() -> Array:
+	return squad_edit.filter(func(h: Variant) -> bool: return String(h) != "")
+
+
+func _squad_draw() -> void:
+	if squad_modal == null or not is_instance_valid(squad_modal):
+		return
+	if _squad_card != null and is_instance_valid(_squad_card):
+		squad_modal.remove_child(_squad_card)
+		_squad_card.queue_free()
+	var cw: = W - 56.0
+	var ch: = 814.0
+	var cy: = maxf(16.0, (H - ch) * 0.5)
+	var card: = _pill_panel(Rect2(28, cy, cw, ch), Color(0.10, 0.04, 0.16, 0.99), Color("#F6D483"), 22)
+	card.mouse_filter = Control.MOUSE_FILTER_STOP
+	squad_modal.add_child(card)
+	_squad_card = card
+	var inner: = cw - 32.0
+	_card_label(card, "ОТРЯД БОГИНЬ", 30, Color("#FFE8B8"), Rect2(16, 12, inner, 40), true)
+	_card_label(card, "Выбери слот, затем богиню. Ведущая бьёт ультой, поддержка даёт пассивный бонус.", 15, Color("#DCC8E8"), Rect2(16, 54, inner, 40), true, true)
+
+	# 3 slots
+	var sw: = (inner - 20.0) / 3.0
+	for i in V10AdventureData.SQUAD_SIZE:
+		var hid: = String(squad_edit[i])
+		var sx: = 16.0 + float(i) * (sw + 10.0)
+		var sel: = i == squad_slot
+		var sp: = _pill_panel(Rect2(sx, 100, sw, 154), Color(0.22, 0.09, 0.28, 0.98) if sel else Color(0.12, 0.06, 0.18, 0.95), Color("#FFE48F") if sel else Color(0.62, 0.50, 0.30, 0.70), 14)
+		sp.mouse_filter = Control.MOUSE_FILTER_STOP
+		var slot_i: = i
+		sp.gui_input.connect(func(e: InputEvent) -> void:
+			if _is_tap(e):
+				sp.accept_event()
+				squad_slot = slot_i
+				call_deferred("_squad_draw"))
+		card.add_child(sp)
+		_portrait_box(sp, hid, Rect2(8, 8, 72, 72))
+		sp.add_child(_frame_only(Rect2(8, 8, 72, 72), Color("#F6D483"), 8))
+		_card_label(sp, "ВЕДУЩАЯ" if i == 0 else "ПОДДЕРЖКА %d" % i, 12, Color("#FFD070") if i == 0 else Color("#C8B4F0"), Rect2(88, 8, sw - 94, 18))
+		_card_label(sp, V10AdventureData.hero_name(hid) if hid != "" else "Пусто", 17, Color("#FFF2DC"), Rect2(88, 26, sw - 94, 24))
+		var pk: Array = _slot_perk(i, hid)
+		_card_label(sp, String(pk[0]), 12, Color("#FFE0A0"), Rect2(88, 52, sw - 94, 28), false, true)
+		_card_label(sp, String(pk[1]), 13, Color("#EBDDF2"), Rect2(8, 88, sw - 16, 60), false, true)
+
+	# active synergy
+	var chosen: Array = squad_edit_ids()
+	var syn: = V10AdventureData.active_synergy(chosen)
+	var syn_box: = _pill_panel(Rect2(16, 264, inner, 66), Color(0.30, 0.18, 0.04, 0.95) if not syn.is_empty() else Color(0.12, 0.06, 0.16, 0.95), Color("#FFE48F") if not syn.is_empty() else Color(0.55, 0.45, 0.30, 0.6), 14)
+	card.add_child(syn_box)
+	var syn_title: = ("★ СИНЕРГИЯ · %s" % String(syn.name)) if not syn.is_empty() else "Синергии нет: собери отряд из 3 богинь"
+	_card_label(syn_box, syn_title, 19, Color("#FFE680") if not syn.is_empty() else Color("#BFA8D0"), Rect2(14, 6, inner - 28, 28), true)
+	_card_label(syn_box, String(syn.get("desc", "Три разные богини дают бонус Трио Гармонии.")), 14, Color("#FFF3D6"), Rect2(14, 34, inner - 28, 26), true)
+
+	var all_syn: Array[String] = []
+	for sdef in V10AdventureData.SQUAD_SYNERGIES:
+		if bool(sdef.get("trio", false)):
+			continue
+		var names: Array[String] = []
+		for a in (sdef.all as Array):
+			names.append(V10AdventureData.hero_name(String(a)))
+		var any_n: Array[String] = []
+		for a in (sdef.any as Array):
+			any_n.append(V10AdventureData.hero_name(String(a)))
+		if not any_n.is_empty():
+			names.append("/".join(any_n))
+		all_syn.append("%s (%s)" % [String(sdef.name), " + ".join(names)])
+	_card_label(card, "Все синергии: " + " · ".join(all_syn), 12, Color("#BFA8D0"), Rect2(16, 336, inner, 52), false, true)
+
+	# roster grid (10 goddesses)
+	var cell_w: = (inner - 32.0) / 5.0
+	var ids: Array = V10AdventureData.SUPPORT_PERKS.keys()
+	for k in ids.size():
+		var hid2: = String(ids[k])
+		var col: = k % 5
+		var row: = k / 5
+		var cx: = 16.0 + float(col) * (cell_w + 8.0)
+		var cell_y: = 394.0 + float(row) * 148.0
+		var avail: = V10AdventureData.hero_available(hid2)
+		var slot_of: = squad_edit.find(hid2)
+		var cell: = _pill_panel(Rect2(cx, cell_y, cell_w, 140), Color(0.14, 0.07, 0.20, 0.95), Color("#FFE48F") if slot_of >= 0 else Color(0.55, 0.45, 0.30, 0.55), 12)
+		cell.mouse_filter = Control.MOUSE_FILTER_STOP
+		var hid_c: = hid2
+		cell.gui_input.connect(func(e: InputEvent) -> void:
+			if _is_tap(e):
+				cell.accept_event()
+				if squad_assign(hid_c):
+					call_deferred("_squad_draw")
+				else:
+					V9Feel.deny(cell)
+					var why: = "Богиня ещё не открыта" if not V10AdventureData.hero_available(hid_c) else "Ведущей нужна поза в бою"
+					V10AdventureVfx.spawn_float_text(squad_modal, Vector2(W * 0.5, cell.get_global_rect().position.y - 20.0), why, Color("#FFD670"), 20, 0.8))
+		card.add_child(cell)
+		var pbx: = (cell_w - 88.0) * 0.5
+		_portrait_box(cell, hid2, Rect2(pbx, 6, 88, 88), not avail)
+		cell.add_child(_frame_only(Rect2(pbx, 6, 88, 88), Color("#F6D483") if avail else Color(0.5, 0.45, 0.4, 0.8), 8))
+		if slot_of >= 0:
+			var badge: = _pill_panel(Rect2(pbx - 4, 2, 24, 24), Color("#D9384A"), Color("#FFE48F"), 12)
+			cell.add_child(badge)
+			var bl: = UI.label("%d" % (slot_of + 1), 14, Color.WHITE, Color(0.1, 0.0, 0.04), 3, "body", 900)
+			bl.size = badge.size
+			bl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			bl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+			badge.add_child(bl)
+		_card_label(cell, V10AdventureData.hero_name(hid2), 14, Color("#FFF2DC") if avail else Color("#9A8CA8"), Rect2(0, 98, cell_w, 20), true)
+		var pn: = String(V10AdventureData.perk_of(hid2).get("name", ""))
+		_card_label(cell, pn if avail else "Не открыта", 11, Color("#FFD890") if avail else Color("#8A7C98"), Rect2(2, 118, cell_w - 4, 18), true)
+
+	var done_b: = JButton.make("Готово", "gold", Rect2(16, 700, inner * 0.6 - 6.0, 64), null, 24)
+	done_b.pressed.connect(squad_commit)
+	card.add_child(done_b)
+	var close_b: = JButton.make("Закрыть", "graphite", Rect2(16.0 + inner * 0.6 + 6.0, 700, inner * 0.4 - 6.0, 64), null, 22)
+	close_b.pressed.connect(squad_close)
+	card.add_child(close_b)
+	_card_label(card, "Смена ведущей начинает бой заново, смена поддержки применяется сразу.", 12, Color("#A898B8"), Rect2(16, 776, inner, 30), true, true)
+
+
+func squad_close() -> void:
+	if squad_modal != null and is_instance_valid(squad_modal):
+		squad_modal.queue_free()
+	squad_modal = null
+	_squad_card = null
+	if not _ended and not _ult_casting and board != null and is_instance_valid(board):
+		board.input_on = true
+
+
+func squad_commit() -> void:
+	var chosen: Array = squad_edit_ids()
+	if chosen.is_empty():
+		squad_close()
+		return
+	var lead: = String(chosen[0])
+	V10AdventureData.set_squad(chosen)
+	G.save()
+	var same: = chosen == squad
+	squad_close()
+	if same:
+		return
+	if lead != hero_id and main != null and main.has_method("go"):
+		main.go("adventure", {"stage": stage_idx, "hero": lead, "skip_stamina": true})
+		return
+	squad = chosen
+	battle.set_squad(squad, V10AdventureData.aff_bonuses(hero_id))
+	_refresh_squad_ui()
 
 
 func _bar_lbl(parent: Control, r: Rect2, txt: String, fs: int = 15) -> Label:

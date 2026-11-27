@@ -14,6 +14,8 @@ const PROJ_FLIGHT_DUR: = 0.38
 const SLASH_HOLD_DUR: = 0.55
 const COMBO_HOLD_DUR: = 0.90
 const HITSTOP_SEC: = 0.06
+const SHIELD_SLOWMO_SEC: = 0.11
+const SHIELD_SLOWMO_SCALE: = 0.25
 const DEBUFF_META: = "v10_adv_debuff"
 
 
@@ -590,6 +592,142 @@ class UltButton extends Control:
 		draw_string(f, Vector2(0, size.y * 0.76), l2, HORIZONTAL_ALIGNMENT_CENTER, size.x, 14, c2)
 
 
+class ShieldBar extends Control:
+	# «Щит стойкости» under the boss HP: a gold bar; blinks red/gold during ПРОБИТИЕ ×2.
+	var cur: = 100
+	var cap: = 100
+	var broken: = 0
+	var trail_frac: = 1.0
+	var _t: = 0.0
+	var flash_t: = 0.0
+
+	func setup(r: Rect2) -> ShieldBar:
+		position = r.position
+		size = r.size
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+		return self
+
+	func set_state(shield: int, shield_max: int, broken_turns: int, instant: bool = false) -> void:
+		var old_frac: = float(cur) / float(maxi(1, cap))
+		var new_frac: = float(shield) / float(maxi(1, shield_max))
+		if instant or new_frac > old_frac + 0.001:
+			trail_frac = new_frac
+		elif new_frac < old_frac - 0.001:
+			trail_frac = maxf(trail_frac, old_frac)
+			flash_t = 0.2
+		cur = shield
+		cap = shield_max
+		broken = broken_turns
+		queue_redraw()
+
+	func frac() -> float:
+		return clampf(float(cur) / float(maxi(1, cap)), 0.0, 1.0)
+
+	func is_blinking() -> bool:
+		return broken > 0
+
+	func label_text() -> String:
+		if broken > 0:
+			return "ПРОБИТИЕ ×2! ещё %d уд." % broken
+		return "ЩИТ СТОЙКОСТИ %d / %d" % [cur, cap]
+
+	func _process(dt: float) -> void:
+		_t += dt
+		if flash_t > 0.0:
+			flash_t = maxf(0.0, flash_t - dt)
+		var f: = frac()
+		if trail_frac > f:
+			trail_frac = move_toward(trail_frac, f, dt * 1.4)
+		queue_redraw()
+
+	func _draw() -> void:
+		var r: = Rect2(Vector2.ZERO, size)
+		var blink: = 0.5 + 0.5 * sin(_t * 12.0)
+		var bg: = Color(0.07, 0.04, 0.03, 0.95)
+		var edge: = Color("#F6D483")
+		if broken > 0:
+			edge = Color("#FF4757").lerp(Color("#FFE066"), blink)
+			bg = Color(0.20, 0.03, 0.05, 0.96).lerp(Color(0.25, 0.17, 0.02, 0.96), blink)
+		draw_rect(r, bg, true)
+		var pad: = 3.0
+		var ir: = Rect2(Vector2(pad, pad), Vector2(maxf(0.0, size.x - pad * 2.0), maxf(0.0, size.y - pad * 2.0)))
+		var f: = frac()
+		if broken > 0:
+			var full: = Color("#FF5468").lerp(Color("#FFD86A"), blink)
+			draw_rect(ir, full.darkened(0.15), true)
+			draw_rect(Rect2(ir.position, Vector2(ir.size.x, ir.size.y * 0.5)), full, true)
+		else:
+			if trail_frac > f + 0.002:
+				draw_rect(Rect2(ir.position, Vector2(ir.size.x * trail_frac, ir.size.y)), Color(1.0, 0.97, 0.80, 0.85), true)
+			var fw: = ir.size.x * f
+			if fw > 0.5:
+				draw_rect(Rect2(ir.position, Vector2(fw, ir.size.y)), Color("#C9921E"), true)
+				draw_rect(Rect2(ir.position, Vector2(fw, ir.size.y * 0.5)), Color("#FFD35C"), true)
+				draw_rect(Rect2(ir.position + Vector2(0, 1), Vector2(fw, 2.0)), Color(1, 1, 1, 0.32), true)
+		var seg_n: = clampi(int(round(float(cap) / 20.0)), 2, 8)
+		for i in range(1, seg_n):
+			var tx: = ir.position.x + ir.size.x * float(i) / float(seg_n)
+			draw_line(Vector2(tx, ir.position.y), Vector2(tx, ir.end.y), Color(0, 0, 0, 0.35), 1.0)
+		draw_rect(r, edge.lerp(Color.WHITE, clampf(flash_t * 3.0, 0.0, 1.0)), false, 2.0)
+		var f_font: = UI.font("body", 900)
+		var txt: = label_text()
+		draw_string_outline(f_font, Vector2(0, size.y * 0.5 + 6.0), txt, HORIZONTAL_ALIGNMENT_CENTER, size.x, 15, 4, Color(0.08, 0.02, 0.06))
+		draw_string(f_font, Vector2(0, size.y * 0.5 + 6.0), txt, HORIZONTAL_ALIGNMENT_CENTER, size.x, 15, Color("#FFF6D6"))
+
+
+class ShardBurst extends Node2D:
+	# Golden shield shards flying out of the boss on ПРОБИТИЕ (pure state, stepped by _process).
+	var shards: Array = []
+	var elapsed: = 0.0
+	var dur: = 0.95
+
+	func setup(pos: Vector2, count: int) -> ShardBurst:
+		position = pos
+		var rng: = RandomNumberGenerator.new()
+		rng.seed = 4242 + count
+		for i in count:
+			var ang: = float(i) / float(count) * TAU + rng.randf_range(-0.2, 0.2)
+			var spd: = rng.randf_range(210.0, 470.0)
+			shards.append({
+				"p": Vector2.ZERO,
+				"v": Vector2(cos(ang), sin(ang)) * spd + Vector2(0, -90.0),
+				"rot": rng.randf() * TAU,
+				"rv": rng.randf_range(-9.0, 9.0),
+				"sz": rng.randf_range(9.0, 24.0),
+				"gold": rng.randf() > 0.25,
+			})
+		return self
+
+	func step(dt: float) -> void:
+		elapsed += dt
+		for s in shards:
+			s.v = (s.v as Vector2) + Vector2(0, 760.0) * dt
+			s.p = (s.p as Vector2) + (s.v as Vector2) * dt
+			s.rot = float(s.rot) + float(s.rv) * dt
+
+	func _process(dt: float) -> void:
+		step(dt)
+		if elapsed >= dur:
+			queue_free()
+			return
+		queue_redraw()
+
+	func _draw() -> void:
+		var a: = clampf(1.0 - elapsed / dur, 0.0, 1.0)
+		for s in shards:
+			var c: = Color("#FFD35C") if bool(s.gold) else Color("#FFF1B8")
+			var sz: float = float(s.sz)
+			var rot: float = float(s.rot)
+			var pts: = PackedVector2Array()
+			for k in 3:
+				var an: = rot + float(k) * TAU / 3.0
+				var rr: = sz * (1.0 if k != 1 else 0.55)
+				pts.append((s.p as Vector2) + Vector2(cos(an), sin(an)) * rr)
+			draw_colored_polygon(pts, Color(c.r, c.g, c.b, a))
+			pts.append(pts[0])
+			draw_polyline(pts, Color(1.0, 0.98, 0.88, a), 1.6, true)
+
+
 class UltCutscene extends Control:
 	signal impact
 	signal finished
@@ -770,15 +908,38 @@ static func spawn_shockwave(layer: Control, center_pt: Vector2, col: Color, radi
 	return sw
 
 
+# ПРОБИТИЕ ЩИТА: gold shard burst + 110 ms slow-mo (time_scale 0.25, restored on a real-time timer) + big flash +
+# shockwaves + floating «ПРОБИТИЕ! ×2 УРОН». Returns the ShardBurst node (null without a layer).
+static func spawn_shield_break(layer: Control, center_pt: Vector2, slowmo: bool = true) -> ShardBurst:
+	if layer == null or not is_instance_valid(layer):
+		return null
+	var burst: = ShardBurst.new().setup(center_pt, 26)
+	layer.add_child(burst)
+	spawn_shockwave(layer, center_pt, Color("#FFD35C"), 230.0, true)
+	spawn_shockwave(layer, center_pt, Color("#FF5468"), 150.0, false)
+	if V9Feel.can_fx():
+		Fx.burst(layer, center_pt, "sparkle", 24, Color("#FFE48F"), 1.2)
+		Fx.flash_glow(layer, center_pt, Color("#FFF4CC"), 3.0, 0.5)
+	var tx: = layer.size.x * 0.5 if layer.size.x > 100.0 else center_pt.x
+	spawn_float_text(layer, Vector2(tx, center_pt.y - 92.0), "ПРОБИТИЕ! ×2 УРОН", Color("#FFE066"), 40, 1.25)
+	spawn_float_text(layer, Vector2(tx, center_pt.y - 40.0), "ЩИТ РАЗБИТ!", Color("#FF6B7A"), 26, 1.05)
+	if slowmo and DisplayServer.get_name() != "headless" and layer.is_inside_tree():
+		Engine.time_scale = SHIELD_SLOWMO_SCALE
+		layer.get_tree().create_timer(SHIELD_SLOWMO_SEC, true, false, true).timeout.connect(func() -> void:
+			Engine.time_scale = 1.0)
+	return burst
+
+
 static func spawn_float_text(layer: Control, pos: Vector2, txt: String, col: Color, fs: int, hold_sec: float = 0.88) -> Label:
 	if layer == null or not is_instance_valid(layer):
 		return null
 	var l: = UI.label(txt, fs, col, Color(0.07, 0.02, 0.10), 6, "body", 900)
-	l.size = Vector2(340, 56)
-	l.position = pos - Vector2(170, 28)
+	var tw_w: = maxf(340.0, UI.font("body", 900).get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x + 40.0)
+	l.size = Vector2(tw_w, 56)
+	l.position = pos - Vector2(tw_w * 0.5, 28)
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	l.pivot_offset = Vector2(170, 28)
+	l.pivot_offset = Vector2(tw_w * 0.5, 28)
 	l.scale = Vector2(0.45, 0.45)
 	layer.add_child(l)
 	var tw: = l.create_tween()
