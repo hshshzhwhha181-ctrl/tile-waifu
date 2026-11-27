@@ -29,6 +29,10 @@ const BTN_FIGHT: = "В бой"
 const BTN_TO_FRIENDLY: = "К дружеской"
 const BTN_CHALLENGE: = "Вызов по коду"
 const BTN_GOT_IT: = "Понятно"
+const BTN_PVP: = "Онлайн PvP · Живые игроки ›"
+const PVP_SOON: = "Онлайн-арена откроется с обновлением сервера"
+
+var _floor: = 0.0
 
 var main = null
 var args: Dictionary = {}
@@ -202,6 +206,21 @@ func refresh() -> void:
 			start_selected())
 	page.add_child(btn_primary)
 
+	# 0.12: «Онлайн PvP · Живые игроки ›» over the fight button: the live arena (v10pvp) beside the AI duels
+	var pvp: = _PvpEntry.new()
+	pvp.name = "PvpOnline"
+	pvp.size = Vector2(560.0, 80.0)
+	pvp.position = Vector2((COL_W - 560.0) * 0.5, btn_primary.position.y - 12.0 - 80.0)
+	var pl: = _lbl(BTN_PVP, "ui", 22, V10DS.NIGHT_900, 560.0 - 120.0, 1)
+	pl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	pl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	pl.position = Vector2(60.0, 0.0)
+	pl.size = Vector2(560.0 - 120.0, 80.0)
+	pvp.add_child(pl)
+	pvp.pressed.connect(open_pvp)
+	page.add_child(pvp)
+	_floor = pvp.position.y - 16.0
+
 	# Дуэль недели card (seeded via V10Meta.cal_key / V10Duel.weekly_offer)
 	var wk: = D.weekly_offer()
 	var wk_card: = _DuelCard.new()
@@ -249,7 +268,9 @@ func _build_ranked(y: float, w_col: float) -> void:
 
 	var si: = D.season_info()
 	var cp: = D.caps()
-	var s_line: = _lbl("%s · %s · %s" % [String(si.rating_text), String(si.tier_name), String(cp.ranked_text)], "ui", 18, V10DS.PAPER_300, w_col, 1)
+	# 0.12: the win reward moved onto the parade card (gem + «+5»); the line keeps it only while it reads «завтра»
+	var rk_gems: = String(cp.ranked_text).begins_with("Победа")
+	var s_line: = _lbl(("%s · %s" % [String(si.rating_text), String(si.tier_name)]) if rk_gems else ("%s · %s · %s" % [String(si.rating_text), String(si.tier_name), String(cp.ranked_text)]), "ui", 18, V10DS.PAPER_300, w_col, 1)
 	s_line.name = "RankedMeta"
 	s_line.position = Vector2(M, y)
 	page.add_child(s_line)
@@ -265,7 +286,7 @@ func _build_ranked(y: float, w_col: float) -> void:
 		card.size = Vector2(w_col, 88.0)
 		card.selected = (sel_kind == "ranked" and sel_ranked_idx == i)
 		card.accent = V10DS.hero(String(o.rival)).accent if V10DS.HEROES.has(String(o.rival)) else V10DS.GOLD_500
-		var t1: = _lbl("%s · Форма %s · %s" % [String(o.name), String(o.roman), String(o.badge)], "ui", 22, V10DS.PAPER_100, w_col - 36.0, 1)
+		var t1: = _lbl("%s · Форма %s" % [String(o.name), String(o.roman)], "ui", 22, V10DS.PAPER_100, w_col - 36.0, 1)
 		t1.position = Vector2(18, 10)
 		card.add_child(t1)
 		var t2: = _lbl("%s · шанс: %s" % [String(o.trick_text), String(o.chance_text)], "ui", 18, V10DS.GOLD_300 if card.selected else V10DS.PAPER_300, w_col - 36.0, 1)
@@ -284,8 +305,19 @@ func _build_ranked(y: float, w_col: float) -> void:
 		var tk: = F.trick(String(cur.rival))
 		var det: = _lbl("Подлость: %s" % String(tk.desc), "ui", 18, V10DS.PAPER_300, w_col, 2)
 		det.name = "TrickDesc"
-		det.position = Vector2(M, y + 4.0)
-		page.add_child(det)
+		# 0.12: her parade card fills the arena; the «Подлость» line sits in it under her name and stars
+		var rk_g: = D.WEEKLY_GEMS if sel_kind == "weekly" else (D.RANKED_WIN_GEMS if String(D.caps().ranked_text).begins_with("Победа") else 0)
+		var rshow: = _rival_show(y + 8.0, w_col, String(cur.rival), int(cur.get("form", 3)), rk_g)
+		if rshow:
+			det.position = Vector2(24.0, rshow.star_y + 40.0)
+			det.size.x = w_col * 0.5
+			det.max_lines_visible = 4
+			det.size.y = 18.0 * 1.4 * 4.0
+			det.add_theme_constant_override("line_spacing", 2)
+			rshow.add_child(det)
+		else:
+			det.position = Vector2(M, y + 4.0)
+			page.add_child(det)
 
 
 func _build_friendly(y: float, w_col: float) -> void:
@@ -358,6 +390,7 @@ func _build_friendly(y: float, w_col: float) -> void:
 		sel_kind = "friendly"
 		refresh())
 	page.add_child(pcard)
+	_rival_show(y + 148.0, w_col, sel_hero, sel_form, D.FRIENDLY_WIN_GEMS if String(cp.friendly_text).contains("+") else 0)
 
 func current_offer() -> Dictionary:
 	if sel_kind == "weekly":
@@ -455,6 +488,50 @@ func open_challenge() -> void:
 		CH_U.go_challenge(main, {"back": "duels"})
 
 
+func open_pvp() -> void:
+	if main == null or not is_instance_valid(main):
+		return
+	var scr_map = main.get("SCREENS")
+	if scr_map is Dictionary and (scr_map as Dictionary).has("v10pvp"):
+		main.call("go", "v10pvp", {})
+	elif main.has_method("toast"):
+		main.call("toast", PVP_SOON, "star")
+
+
+# the parade card of `hero` from y down to the PvP entry (skipped when the column has no room left)
+func _rival_show(y: float, w_col: float, hero: String, form: int, gems: int, badge: = "") -> _RivalShow:
+	var h: = _floor - y
+	if h < 220.0:
+		return null
+	var c: = _RivalShow.new()
+	c.name = "RivalShowcase"
+	c.position = Vector2(M, y)
+	c.accent = V10DS.hero(hero).accent if V10DS.HEROES.has(hero) else V10DS.GOLD_500
+	c.stars = clampi(form, 1, 5)
+	c.gems = gems
+	c.setup(hero, w_col, minf(h, 460.0))
+	# her name in the display face; the form reads from the gold stars (the offer card above names it) — the screen
+	# keeps its 60-word budget
+	var nm: = _lbl(U.hero_name(hero), "display", 32, V10DS.PAPER_100, w_col * 0.56, 1)
+	nm.name = "RivalName"
+	nm.position = Vector2(24.0, 18.0)
+	c.add_child(nm)
+	c.star_y = 18.0 + nm.size.y + 2.0
+	if badge != "":
+		var bl: = _lbl(badge, "ui", 18, V10DS.GOLD_300, w_col * 0.5, 1)
+		bl.name = "RivalBadge"
+		bl.position = Vector2(24.0, c.star_y)
+		c.add_child(bl)
+		c.star_y += bl.size.y + 4.0
+	if gems > 0:
+		var gl: = _lbl("+%d" % gems, "ui", 22, V10DS.GOLD_300, 120.0, 1)
+		gl.name = "RivalReward"
+		gl.position = Vector2(54.0, c.size.y - 34.0 - gl.size.y * 0.5)
+		c.add_child(gl)
+	page.add_child(c)
+	return c
+
+
 func open_help() -> V10BottomSheet:
 	var sh: = V10BottomSheet.open(_sheet_host(), TITLE_DUELS)
 	sh.name = "DuelHelpSheet"
@@ -517,9 +594,19 @@ class _LocalHost:
 
 class _DuelBg:
 	extends Control
+	# 0.12: the imperial arena — the painted duel hall (Higgsfield art, picked up by path) or the palace / shrine
+	# backdrop, under a warm candle vignette that keeps the plates readable
+	const ARENA: = "res://assets/v10/hf_ui/duel_arena_bg.webp"
+	const FALLBACKS: = ["res://assets/bg/bg_palace.webp", "res://assets/bg/bg_shrine.webp"]
+	var tex: Texture2D = null
 
 	func _init() -> void:
 		mouse_filter = Control.MOUSE_FILTER_IGNORE
+		for p in [ARENA] + FALLBACKS:
+			if ResourceLoader.exists(String(p)):
+				tex = load(String(p)) as Texture2D
+				if tex != null:
+					break
 
 	func _draw() -> void:
 		var a: = V10DS.NIGHT_800
@@ -528,8 +615,131 @@ class _DuelBg:
 			PackedVector2Array([Vector2.ZERO, Vector2(size.x, 0), size, Vector2(0, size.y)]),
 			PackedColorArray([a, a, b, b])
 		)
-		for i in 7:
-			draw_circle(Vector2(size.x * 0.5, size.y + 120.0), 220.0 + float(i) * 54.0, Color(V10DS.FELT_HI, 0.04))
+		if tex != null and tex.get_width() > 0:
+			var ts: = Vector2(tex.get_width(), tex.get_height())
+			var s: = maxf(size.x / ts.x, size.y / ts.y)
+			var ds: = ts * s
+			var pos: = (size - ds) * 0.5
+			var vis: = Rect2(Vector2.ZERO, size).intersection(Rect2(pos, ds))
+			draw_texture_rect_region(tex, vis, Rect2((vis.position - pos) / s, vis.size / s))
+		# warm vignette: dark under the header and the buttons, the arena glowing in the middle
+		var top: = Color(b, 0.82)
+		var mid: = Color(b, 0.34)
+		var low: = Color(b, 0.9)
+		var y1: = size.y * 0.42
+		var y2: = size.y * 0.7
+		draw_polygon(PackedVector2Array([Vector2.ZERO, Vector2(size.x, 0), Vector2(size.x, y1), Vector2(0, y1)]), PackedColorArray([top, top, mid, mid]))
+		draw_polygon(PackedVector2Array([Vector2(0, y1), Vector2(size.x, y1), Vector2(size.x, y2), Vector2(0, y2)]), PackedColorArray([mid, mid, mid, mid]))
+		draw_polygon(PackedVector2Array([Vector2(0, y2), Vector2(size.x, y2), size, Vector2(0, size.y)]), PackedColorArray([mid, mid, low, low]))
+		for i in 6:
+			draw_circle(Vector2(size.x * 0.5, size.y * 0.56), 140.0 + float(i) * 60.0, Color(V10DS.GOLD_500, 0.025))
+		# side vignette
+		var e: = Color(b, 0.55)
+		var z: = Color(b, 0.0)
+		draw_polygon(PackedVector2Array([Vector2.ZERO, Vector2(90, 0), Vector2(90, size.y), Vector2(0, size.y)]), PackedColorArray([e, z, z, e]))
+		draw_polygon(PackedVector2Array([Vector2(size.x - 90, 0), Vector2(size.x, 0), size, Vector2(size.x - 90, size.y)]), PackedColorArray([z, e, e, z]))
+
+
+# 0.12: the parade card of the chosen rival in the middle of the arena: her full-colour art on the right, name, form
+# stars, her «Подлость» and the win reward on the left; plum lacquer under a gold rim. Not a tap target.
+class _RivalShow:
+	extends Control
+	var accent: = V10DS.GOLD_500
+	var stars: = 3
+	var stars_max: = 5
+	var star_y: = 64.0
+	var gems: = 0
+
+	func _init() -> void:
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+		clip_contents = true
+
+	func setup(hero: String, w: float, h: float) -> void:
+		size = Vector2(w, h)
+		var p: = "res://assets/hero/%s.png" % hero
+		if ResourceLoader.exists(p):
+			var t: = load(p) as Texture2D
+			if t != null:
+				var tr: = TextureRect.new()
+				tr.name = "Portrait"
+				tr.texture = t
+				tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+				tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+				tr.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+				tr.mouse_filter = Control.MOUSE_FILTER_IGNORE
+				var pw: = minf(w * 0.5, h * 0.78)
+				var ph: = pw * float(t.get_height()) / maxf(1.0, float(t.get_width()))
+				tr.size = Vector2(pw, ph)
+				tr.position = Vector2(w - pw + 4.0, 8.0)
+				tr.stretch_mode = TextureRect.STRETCH_SCALE
+				add_child(tr)
+				# soft fade of her art into the lacquer on the left, so the text column reads
+				var fade: = TextureRect.new()
+				var gt: = GradientTexture2D.new()
+				gt.gradient = Gradient.new()
+				gt.gradient.set_color(0, Color(V10DS.BTN_SEC_BOT, 0.98))
+				gt.gradient.set_color(1, Color(V10DS.BTN_SEC_BOT, 0.0))
+				gt.fill_from = Vector2(0, 0)
+				gt.fill_to = Vector2(1, 0)
+				fade.texture = gt
+				fade.mouse_filter = Control.MOUSE_FILTER_IGNORE
+				fade.position = Vector2(w - pw - 2.0, 0)
+				fade.size = Vector2(pw * 0.42, h)
+				add_child(fade)
+				var low: = TextureRect.new()
+				var gt2: = GradientTexture2D.new()
+				gt2.gradient = Gradient.new()
+				gt2.gradient.set_color(0, Color(V10DS.BTN_SEC_BOT, 0.0))
+				gt2.gradient.set_color(1, Color(V10DS.BTN_SEC_BOT, 0.92))
+				gt2.fill_from = Vector2(0, 0)
+				gt2.fill_to = Vector2(0, 1)
+				low.texture = gt2
+				low.mouse_filter = Control.MOUSE_FILTER_IGNORE
+				low.position = Vector2(w - pw - 2.0, h - 70.0)
+				low.size = Vector2(pw + 8.0, 70.0)
+				add_child(low)
+
+	func _star(c: Vector2, r: float, col: Color) -> void:
+		var pts: = PackedVector2Array()
+		for i in 10:
+			var a: = -PI * 0.5 + float(i) * PI / 5.0
+			pts.append(c + Vector2(cos(a), sin(a)) * (r if i % 2 == 0 else r * 0.45))
+		draw_colored_polygon(pts, col)
+
+	func _draw() -> void:
+		var r: = Rect2(Vector2.ZERO, size)
+		V10Plate.draw_surface(self, r, false, false, true, false, false, -1.0, Color(V10DS.BTN_SEC_TOP, 0.94))
+		# her accent: a slim lacquer stripe on the left edge
+		draw_rect(Rect2(0, 18.0, 5.0, size.y - 36.0), accent)
+		for i in stars_max:
+			var on: = i < stars
+			_star(Vector2(34.0 + float(i) * 30.0, star_y + 14.0), 11.0, V10DS.GOLD_300 if on else Color(V10DS.PAPER_500, 0.35))
+		if gems > 0:
+			var gc: = Vector2(34.0, size.y - 34.0)
+			draw_colored_polygon(PackedVector2Array([gc + Vector2(0, -12), gc + Vector2(11, -3), gc + Vector2(0, 13), gc + Vector2(-11, -3)]), V10DS.JADE_300)
+			draw_colored_polygon(PackedVector2Array([gc + Vector2(0, -12), gc + Vector2(11, -3), gc + Vector2(0, -1), gc + Vector2(-11, -3)]), Color(V10DS.PAPER_100, 0.55))
+		# champagne studs
+		for p in [Vector2(12, 12), Vector2(size.x - 12, 12), Vector2(12, size.y - 12), Vector2(size.x - 12, size.y - 12)]:
+			var pv: Vector2 = p
+			draw_colored_polygon(PackedVector2Array([pv + Vector2(0, -4), pv + Vector2(4, 0), pv + Vector2(0, 4), pv + Vector2(-4, 0)]), V10DS.PLATE_SPARK)
+
+
+# 0.12: «Онлайн PvP · Живые игроки ›» — a gold lacquer entry plate (like the Дуэль недели card it is a tap, not one
+# of the screen's role buttons)
+class _PvpEntry:
+	extends V10Button
+
+	func _draw() -> void:
+		var r: = Rect2(Vector2.ZERO, size)
+		V10Button.lacquer(self, r, JButton.Lacquer.safe_rad(24.0, size), V10DS.PLATE_SPARK if not _down else V10DS.GOLD_300,
+			V10DS.GOLD_500, V10DS.GOLD_700, 0.9 if _down else 1.0, V10DS.PAPER_100, 0.25 if _down else 0.45)
+		var yc: = size.y * 0.5
+		for x in [22.0, size.x - 22.0]:
+			var c: = Vector2(float(x), yc)
+			draw_colored_polygon(PackedVector2Array([c + Vector2(0, -7), c + Vector2(5.5, 0), c + Vector2(0, 7), c + Vector2(-5.5, 0)]), V10DS.PAPER_100)
+		# a live dot: the arena is open to real players
+		draw_circle(Vector2(46.0, yc), 6.0, V10DS.JADE_500, true, -1.0, true)
+		draw_arc(Vector2(46.0, yc), 6.0, 0.0, TAU, 16, V10DS.NIGHT_900, 1.5, true)
 
 
 class _DuelSeg:

@@ -159,25 +159,25 @@ func _refresh(first: = false) -> void:
 	var anchor: = sec_y - 24.0
 	var y: = anchor - plate_h - info_h
 	if state == "locked":
-		# the closed state: the lines sit under the rolled scroll, on a soft tone that fades to the right
-		y = float(M.scroll_y) + SCROLL.HEIGHT * 0.5 + 132.0
-		var band: = V10TowerUI.glyph(func(ci: CanvasItem, sz: Vector2) -> void:
-			# soft on every edge: full tone on the text, feathered 36 px above and below, fading out to the right
-			var xs: = [0.0, sz.x * 0.62, sz.x]
-			var ys: = [0.0, 36.0, sz.y - 36.0, sz.y]
-			var ax: = [1.0, 1.0, 0.0]
-			var ay: = [0.0, 1.0, 1.0, 0.0]
-			for i in 2:
-				for j in 3:
-					var pts: = PackedVector2Array([Vector2(xs[i], ys[j]), Vector2(xs[i + 1], ys[j]), Vector2(xs[i + 1], ys[j + 1]), Vector2(xs[i], ys[j + 1])])
-					var cols: = PackedColorArray()
-					for k in [[i, j], [i + 1, j], [i + 1, j + 1], [i, j + 1]]:
-						cols.append(Color(V10DS.NIGHT_900, 0.72 * float(ax[k[0]]) * float(ay[k[1]])))
-					ci.draw_polygon(pts, cols),
-			Vector2(vs.x, info_h + 88.0))
-		band.name = "LockTone"
-		band.position = Vector2(0, y - 44.0)
-		layer.add_child(band)
+		# 0.12: the closed state shows the painted week scroll (journey_scroll_art, gilded lacquer roll until the art
+		# lands); its lines sit on one plum lacquer plate under a gold rim — no blurred tone band
+		var art_h: = _scroll_art(M)
+		y = float(M.scroll_y) + art_h + 40.0
+		var plate: = V10TowerUI.glyph(func(ci: CanvasItem, sz: Vector2) -> void:
+			_draw_plum_plate(ci, Rect2(Vector2.ZERO, sz)),
+			Vector2(w0 + 40.0, info_h + 36.0))
+		plate.name = "LockTone"
+		plate.position = Vector2(x0 - 20.0, y - 18.0)
+		layer.add_child(plate)
+	elif lines.size() > 0:
+		# the week lines over the landscape: the same plum lacquer plate (the honest plate stays below it)
+		var iplate: = V10TowerUI.glyph(func(ci: CanvasItem, sz: Vector2) -> void:
+			_draw_plum_plate(ci, Rect2(Vector2.ZERO, sz)),
+			Vector2(w0 + 40.0, info_h + 24.0))
+		iplate.name = "InfoPlate"
+		iplate.position = Vector2(x0 - 20.0, y - 12.0)
+		layer.add_child(iplate)
+		_intro.append(iplate)
 	for ln in lines:
 		_add_label(String(ln[0]), String(ln[1]), "ui", int(ln[2]), ln[3], Vector2(x0, y), w0)
 		y += (34.0 if int(ln[2]) == 22 else 28.0)
@@ -263,6 +263,100 @@ func _honest_plate(text: String) -> Control:
 	p.add_child(l)
 	labels["honest"] = l
 	return p
+
+
+# ---------------------------------------------------------------- 0.12 imperial scroll art
+
+const SCROLL_ART: = "res://assets/v10/hf_ui/journey_scroll_art.webp"
+const ROLL_H: = 190.0
+
+
+# The closed week scroll: the painted Higgsfield art when it is in the build (picked up by path, no code change on
+# merge), else a gilded crimson lacquer roll with gold caps, cords and a cinnabar seal. The scroll's own grey rolled
+# silhouette is hidden. Returns the height it takes under scroll_y.
+func _scroll_art(M: Dictionary) -> float:
+	var rs = scroll.get("_roll_silhouette")
+	if rs is Control:
+		(rs as Control).visible = false
+	var r: = Rect2(cx + 24.0, float(M.scroll_y), COL - 48.0, SCROLL.HEIGHT)
+	var tex: Texture2D = null
+	if ResourceLoader.exists(SCROLL_ART):
+		tex = load(SCROLL_ART) as Texture2D
+	if tex != null and tex.get_width() > 0:
+		var h: = minf(r.size.y, r.size.x * float(tex.get_height()) / float(tex.get_width()))
+		var tr: = TextureRect.new()
+		tr.name = "ScrollArt"
+		tr.texture = tex
+		tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		tr.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+		tr.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		tr.position = r.position
+		tr.size = Vector2(r.size.x, h)
+		layer.add_child(tr)
+		_intro.append(tr)
+		return h
+	var g: = V10TowerUI.glyph(_draw_gilded_roll, Vector2(r.size.x, ROLL_H))
+	g.name = "ScrollArt"
+	g.position = r.position + Vector2(0, 96.0)
+	layer.add_child(g)
+	_intro.append(g)
+	return 96.0 + ROLL_H
+
+
+func _draw_gilded_roll(ci: CanvasItem, sz: Vector2) -> void:
+	var c: = sz * 0.5
+	var L: = sz.x - 150.0
+	var bh: = 70.0
+	ci.draw_set_transform(c, deg_to_rad(-3.0), Vector2.ONE)
+	# soft shadow on the landscape
+	ci.draw_colored_polygon(V10Button.rr_pts(Rect2(-L * 0.5 - 20.0, bh * 0.5 + 6.0, L + 40.0, 22.0), 11.0, 6), Color(V10DS.NIGHT_900, 0.42))
+	# the axis knobs: dark wood in gold rings
+	for sx in [-1.0, 1.0]:
+		var kp: = Vector2(sx * (L * 0.5 + 34.0), 0)
+		ci.draw_line(Vector2(sx * L * 0.5, 0), kp, V10DS.GOLD_700, 8.0, true)
+		ci.draw_circle(kp, 16.0, V10DS.NIGHT_800, true, -1.0, true)
+		ci.draw_arc(kp, 15.0, 0.0, TAU, 28, V10DS.GOLD_500, 3.0, true)
+		ci.draw_circle(kp + Vector2(-4, -5), 4.0, Color(V10DS.PLATE_SPARK, 0.8), true, -1.0, true)
+	# crimson lacquer body under a double gold bezel
+	V10Button.lacquer(ci, Rect2(-L * 0.5, -bh * 0.5, L, bh), 18.0, V10DS.BTN_PLAY_TOP, V10DS.BTN_PLAY_MID, V10DS.BTN_PLAY_BOT, 1.0, V10DS.BTN_PLAY_GLOW, 0.3)
+	# the paper layers peeking at the seam
+	for k in 3:
+		var yy: = -bh * 0.5 + 14.0 + float(k) * 5.0
+		ci.draw_line(Vector2(-L * 0.5 + 34.0, yy), Vector2(L * 0.5 - 34.0, yy), Color(V10DS.PAPER_100, 0.16 - 0.04 * k), 1.0, true)
+	# gold end caps
+	for sx2 in [-1.0, 1.0]:
+		var cr: = Rect2(sx2 * L * 0.5 - 13.0, -bh * 0.5 - 9.0, 26.0, bh + 18.0)
+		V10Button.lacquer(ci, cr, 6.0, V10DS.PLATE_SPARK, V10DS.GOLD_500, V10DS.GOLD_700, 1.0, V10DS.PAPER_100, 0.35)
+	# two gold silk cords and the hanging cinnabar seal
+	for f in [0.26, 0.66]:
+		var x: float = -L * 0.5 + L * float(f)
+		ci.draw_rect(Rect2(x - 4.0, -bh * 0.5 - 1.0, 8.0, bh + 2.0), V10DS.GOLD_500)
+		ci.draw_line(Vector2(x - 4.0, -bh * 0.5), Vector2(x - 4.0, bh * 0.5), V10DS.GOLD_700, 1.0)
+		ci.draw_line(Vector2(x + 4.0, -bh * 0.5), Vector2(x + 4.0, bh * 0.5), V10DS.PLATE_SPARK, 1.0)
+	var sx3: = -L * 0.5 + L * 0.66
+	var sp: = Vector2(sx3 + 6.0, bh * 0.5 + 44.0)
+	ci.draw_line(Vector2(sx3, bh * 0.5), sp - Vector2(0, 16.0), V10DS.GOLD_500, 2.0, true)
+	ci.draw_circle(sp, 16.0, V10DS.CINNABAR, true, -1.0, true)
+	ci.draw_arc(sp, 16.0, 0.0, TAU, 28, V10DS.GOLD_500, 2.0, true)
+	ci.draw_rect(Rect2(sp - Vector2(6, 6), Vector2(12, 12)), Color(V10DS.PAPER_100, 0.85), false, 1.5)
+	for t in 5:
+		var tx: = sp.x - 6.0 + float(t) * 3.0
+		ci.draw_line(Vector2(tx, sp.y + 16.0), Vector2(tx - 1.0, sp.y + 34.0), V10DS.CINNABAR, 1.5, true)
+	# champagne sparkles on the lacquer
+	for p in [Vector2(-L * 0.18, -bh * 0.22), Vector2(L * 0.08, -bh * 0.28), Vector2(L * 0.36, -bh * 0.18)]:
+		var pv: Vector2 = p
+		ci.draw_colored_polygon(PackedVector2Array([pv + Vector2(0, -6), pv + Vector2(2, 0), pv + Vector2(0, 6), pv + Vector2(-2, 0)]), Color(V10DS.PLATE_SPARK, 0.85))
+		ci.draw_colored_polygon(PackedVector2Array([pv + Vector2(-6, 0), pv + Vector2(0, -2), pv + Vector2(6, 0), pv + Vector2(0, 2)]), Color(V10DS.PLATE_SPARK, 0.85))
+	ci.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+
+
+# the info plate: royal plum lacquer under the full antique-gold rim, champagne studs in the corners
+func _draw_plum_plate(ci: CanvasItem, r: Rect2) -> void:
+	V10Plate.draw_surface(ci, r, false, false, true, false, false, -1.0, Color(V10DS.BTN_SEC_TOP, 0.97))
+	for p in [Vector2(12, 12), Vector2(r.size.x - 12, 12), Vector2(12, r.size.y - 12), Vector2(r.size.x - 12, r.size.y - 12)]:
+		var pv: Vector2 = p
+		ci.draw_colored_polygon(PackedVector2Array([pv + Vector2(0, -4), pv + Vector2(4, 0), pv + Vector2(0, 4), pv + Vector2(-4, 0)]), V10DS.PLATE_SPARK)
 
 
 # ---------------------------------------------------------------- motion
