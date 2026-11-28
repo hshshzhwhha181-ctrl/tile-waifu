@@ -1,0 +1,18 @@
+file	wxh	fps	dur	kbps_before	bytes_before	bytes_after	ssim	result
+v09/video/mc_lobby.ogv	720x1280	24/1	5.041667	1177	741909	741909	-	skip:already
+v10/ult_video/hana.ogv	540x540	24/1	3.583333	1364	611316	611316	-	skip:low-bitrate
+v10/ult_video/kohaku.ogv	540x966	24/1	5.041667	3350	2111573	990602	0.949011	encoded@1500k worst-frame-ssim=0.931323
+v10/ult_video/mc.ogv	540x540	24/1	3.583333	1250	559940	559940	-	skip:low-bitrate
+v10/ult_video/mc_base.ogv	540x960	24/1	3.583333	1178	527754	527754	-	skip:low-bitrate
+v10/ult_video/miel.ogv	540x966	24/1	5.041667	2950	1859603	988857	0.955291	encoded@1500k worst-frame-ssim=0.934569
+v10/ult_video/nova.ogv	540x540	24/1	3.583333	1083	485278	485278	-	skip:already
+v10/ult_video/nova_roof.ogv	540x540	24/1	3.583333	1347	603440	603440	-	skip:low-bitrate
+v10/ult_video/o_dragon.ogv	540x966	24/1	3.791667	4464	2116067	1217591	0.941627	encoded@2500k worst-frame-ssim=0.924896
+v10/ult_video/rin.ogv	540x540	24/1	3.583333	1161	520127	520127	-	skip:low-bitrate
+v10/ult_video/shirin.ogv	540x966	24/1	5.041667	3652	2301768	1645506	0.960478	encoded@2500k worst-frame-ssim=0.936220
+v10/ult_video/tsubame.ogv	540x966	24/1	5.041667	4973	3134602	1951460	0.957522	encoded@3000k worst-frame-ssim=0.929760
+v10/ult_video/yue.ogv	540x540	24/1	3.583333	1179	528214	528214	-	skip:low-bitrate
+v10/ult_video/yue_queen.ogv	540x966	24/1	3.791667	1030	488349	488349	-	skip:already
+v10/ult_video/zlata.ogv	540x966	24/1	5.041667	5350	3372095	1961780	0.946534	encoded@3000k worst-frame-ssim=0.926919
+v10/ult_video/yue_queen.ogv	540x966	24/1	3.791667	2799	1326821	730924	0.959511	encoded@1500k worst-frame-ssim=0.944128
+v10/ult_video/zlata.ogv	540x966	24/1	5.041667	3112	1961780	1961780	-	skip:already

@@ -1,0 +1,462 @@
+kind	file	psnr_db	ssim	min_tile_or_worst_frame_ssim	edge_psnr_db	max_dalpha	band_off2	block_ratio	crops	verdict	basis
+tex	res://assets/bg/bg_festival.webp	39.93	0.9875	0.98		0	0.043	1.095	2	ok	gate
+tex	res://assets/bg/bg_festival_blur.webp	40.78	0.9844	0.98		0	0.161	1.056	2	ok	gate
+tex	res://assets/bg/bg_neon.webp	41.53	0.9842	0.966		0	0.194	1.155	2	ok	gate
+tex	res://assets/bg/bg_neon_blur.webp	41.23	0.9859	0.98		0	0.154	1.09	2	ok	gate
+tex	res://assets/bg/bg_palace.webp	40.41	0.9891	0.976		0	0.141	1.103	2	ok	gate
+tex	res://assets/bg/bg_palace_blur.webp	41.65	0.9858	0.982		0	0.117	1.087	2	ok	gate
+tex	res://assets/bg/bg_rooftop.webp	41.42	0.9912	0.981		0	0.077	0.964	2	ok	gate
+tex	res://assets/bg/bg_shrine.webp	40.42	0.9902	0.981		0	0.127	1.039	2	ok	gate
+tex	res://assets/bg/bg_shrine_blur.webp	40.95	0.9862	0.981		0	0.12	1.046	2	ok	gate
+tex	res://assets/bg/bg_street.webp	41.01	0.9907	0.974		0	0.131	0.985	2	ok	gate
+tex	res://assets/bg/bg_street_blur.webp	41.64	0.9861	0.977		0	0.159	1.069	2	ok	gate
+tex	res://assets/bg/bg_teahouse.webp	40.3	0.9885	0.971		0	0.104	1.086	2	ok	gate
+tex	res://assets/bg/bg_teahouse_blur.webp	41.68	0.9858	0.98		0	0.147	1.124	2	ok	gate
+tex	res://assets/bg/map_town.webp	39.55	0.991	0.983		0	0.075	1.011	2	ok	gate
+tex	res://assets/bg/menu.webp	39.6	0.986	0.969		0	0.142	1.138	2	ok	gate
+tex	res://assets/bg/menu_blur.webp	42.27	0.9874	0.977		0	0.161	1.118	2	ok	gate
+tex	res://assets/bg/play.webp	40.3	0.9868	0.971		0	0.153	1.05	2	ok	gate
+tex	res://assets/bg/play_blur.webp	42.84	0.988	0.979		0	0.189	1.02	2	ok	gate
+tex	res://assets/bg/summon.webp	40.09	0.982	0.948		0	0.213	1.155	2	ok	gate
+tex	res://assets/bg/victory.webp	38.81	0.981	0.967		0	0.178	1.044	2	ok	gate
+tex	res://assets/hero/hana.png	34.86	0.9768	0.95	34.1	0	0.188	1.41	3	ok	flagged-envelope
+tex	res://assets/hero/mc.png	34.6	0.9792	0.962	33.79	0		1.469	2	ok	flagged-envelope
+tex	res://assets/hero/nova.png	34.62	0.985	0.976	35.06	0		1.434	2	ok	flagged-envelope
+tex	res://assets/hero/rin.png	35.53	0.9847	0.972	36.94	0	0.095	1.887	3	ok	flagged-envelope
+tex	res://assets/hero/yue.png	35.41	0.9827	0.972	35.11	0		1.448	2	ok	flagged-envelope
+tex	res://assets/outfits/hana_base.webp	38.7	0.9781	0.962		0	0.2	0.917	2	ok	gate
+tex	res://assets/outfits/hana_beach.webp	39.21	0.9787	0.952		0	0.2	1.009	2	ok	gate
+tex	res://assets/outfits/hana_gym.webp	39.18	0.9822	0.968		0	0.218	0.882	2	ok	gate
+tex	res://assets/outfits/hana_street.webp	38.18	0.9799	0.963		0	0.193	0.923	2	ok	gate
+tex	res://assets/outfits/hana_winter.webp	37.94	0.9738	0.956		0	0.169	1.214	2	ok	flagged-envelope
+tex	res://assets/outfits/mc_base.webp	37.69	0.9789	0.953		0	0.155	0.846	2	ok	flagged-envelope
+tex	res://assets/outfits/mc_cafe.webp	38.31	0.9791	0.963		0	0.185	0.928	2	ok	gate
+tex	res://assets/outfits/mc_cozy.webp	39.13	0.9805	0.958		0	0.209	0.987	2	ok	gate
+tex	res://assets/outfits/mc_dragon.webp	36.82	0.98	0.956		0	0.149	0.961	2	ok	flagged-envelope
+tex	res://assets/outfits/mc_tutor.webp	38.52	0.9814	0.962		0	0.191	0.92	2	ok	gate
+tex	res://assets/outfits/nova_base.webp	38.82	0.9789	0.955		0	0.226	0.927	2	ok	gate
+tex	res://assets/outfits/nova_offline.webp	38.52	0.9843	0.968		0	0.148	0.968	2	ok	gate
+tex	res://assets/outfits/nova_ssr.webp	37.91	0.9846	0.973		0	0.156	0.791	2	ok	flagged-envelope
+tex	res://assets/outfits/rin_after.webp	38.36	0.9773	0.951		0	0.182	0.946	2	ok	gate
+tex	res://assets/outfits/rin_agent.webp	38.19	0.9822	0.965		0	0.204	0.925	2	ok	gate
+tex	res://assets/outfits/rin_base.webp	38.32	0.9793	0.967		0	0.179	0.965	2	ok	gate
+tex	res://assets/outfits/rin_idol.webp	38.67	0.9828	0.959		0	0.201	0.939	2	ok	gate
+tex	res://assets/outfits/rin_maid.webp	39.6	0.983	0.969		0	0.198	1.076	2	ok	gate
+tex	res://assets/outfits/rin_yukata.webp	39.91	0.9812	0.967		0	0.199	0.897	2	ok	gate
+tex	res://assets/outfits/yue_ball.webp	38.42	0.9774	0.959		0	0.141	1.095	2	ok	gate
+tex	res://assets/outfits/yue_base.webp	38.33	0.9788	0.963		0	0.161	1.097	2	ok	gate
+tex	res://assets/outfits/yue_duel.webp	38.3	0.9796	0.969		0	0.156	1.075	2	ok	gate
+tex	res://assets/outfits/yue_queen.webp	38.53	0.9825	0.968		0	0.172	0.84	2	ok	gate
+tex	res://assets/ui/app_icon.png	37.54	0.9888	0.978		0	0.009	1.589	2	ok	flagged-envelope
+tex	res://assets/ui/banner_neon.webp	39.32	0.9921	0.98		0	0.032	1.203	2	ok	gate
+tex	res://assets/ui/card_back.webp	36.63	0.9644	0.936		0		1.169	1	ok	flagged-envelope
+tex	res://assets/ui/icon_bg_432.png	49.89	1.0	1.0		0		1.0	1	ok	gate
+tex	res://assets/ui/icon_fg_432.png	34.63	0.9862	0.979		0		1.415	1	ok	flagged-envelope
+tex	res://assets/ui/logo.webp	35.06	0.9875	0.981	36.02	0		0.907	2	ok	flagged-envelope
+tex	res://assets/v06/map/w1.webp	40.04	0.99	0.979		0	0.112	1.019	2	ok	gate
+tex	res://assets/v06/map/w2.webp	40.64	0.9858	0.969		0	0.149	1.109	2	ok	gate
+tex	res://assets/v06/map/w3.webp	40.17	0.9871	0.971		0	0.128	1.012	2	ok	gate
+tex	res://assets/v06/map/w4.webp	41.49	0.987	0.969		0	0.219	1.15	2	ok	gate
+tex	res://assets/v06/map/w5.webp	41.44	0.9909	0.981		0	0.128	0.965	2	ok	gate
+tex	res://assets/v06/map/w6.webp	41.28	0.9821	0.956		0	0.234	1.119	2	ok	gate
+tex	res://assets/v07/event/cg_finale_card.webp	39.93	0.9897	0.983		0	0.09	0.944	2	ok	gate
+tex	res://assets/v07/event/cg_finale_wide.webp	40.62	0.9884	0.978		0	0.102	1.044	2	ok	gate
+tex	res://assets/v07/event/cg_hana_card.webp	41.88	0.9895	0.977		0	0.164	0.995	2	ok	gate
+tex	res://assets/v07/event/cg_hana_wide.webp	42.63	0.9911	0.98		0	0.154	0.966	2	ok	gate
+tex	res://assets/v07/event/cg_mc_card.webp	37.35	0.9779	0.946		0	0.11	0.918	2	ok	flagged-envelope
+tex	res://assets/v07/event/cg_mc_wide.webp	41.19	0.9896	0.983		0	0.136	1.039	2	ok	gate
+tex	res://assets/v07/event/cg_nova_card.webp	40.04	0.9886	0.967		0	0.143	1.041	2	ok	gate
+tex	res://assets/v07/event/cg_nova_wide.webp	40.99	0.9902	0.975		0	0.102	0.947	2	ok	gate
+tex	res://assets/v07/event/cg_rin_card.webp	40.13	0.9877	0.976		0	0.155	1.009	2	ok	gate
+tex	res://assets/v07/event/cg_rin_wide.webp	40.96	0.9861	0.971		0	0.157	1.154	2	ok	gate
+tex	res://assets/v07/event/cg_yue_card.webp	41.17	0.9896	0.982		0	0.098	0.966	2	ok	gate
+tex	res://assets/v07/event/cg_yue_wide.webp	42.18	0.9897	0.979		0	0.131	0.987	2	ok	gate
+tex	res://assets/v07/room/bg_gym.webp	41.73	0.9943	0.987		0	0.094	0.935	2	ok	gate
+tex	res://assets/v07/room/bg_parlor.webp	41.1	0.9912	0.979		0	0.062	1.004	2	ok	gate
+tex	res://assets/v07/room/bg_rooftop.webp	41.42	0.9912	0.981		0	0.077	0.964	2	ok	gate
+tex	res://assets/v07/room/cg_finale.webp	40.35	0.9876	0.974		0	0.13	1.091	2	ok	gate
+tex	res://assets/v07/room/cg_hana.webp	42.83	0.9917	0.981		0	0.172	1.016	2	ok	gate
+tex	res://assets/v07/room/cg_mc.webp	41.34	0.9899	0.98		0	0.162	1.07	2	ok	gate
+tex	res://assets/v07/room/cg_nova.webp	40.57	0.9895	0.976		0	0.117	1.069	2	ok	gate
+tex	res://assets/v07/room/cg_rin.webp	41.01	0.9859	0.975		0	0.202	1.139	2	ok	gate
+tex	res://assets/v07/room/cg_yue.webp	42.71	0.9913	0.98		0	0.136	0.98	2	ok	gate
+tex	res://assets/v08/emotions/hana_happy.webp	35.38	0.9809	0.962	35.54	0	0.122	0.988	3	ok	flagged-envelope
+tex	res://assets/v08/emotions/hana_pout.webp	35.45	0.9782	0.964	35.86	0	0.143	1.028	3	ok	flagged-envelope
+tex	res://assets/v08/emotions/hana_sad.webp	35.38	0.9809	0.962	35.54	0	0.122	0.988	3	ok	flagged-envelope
+tex	res://assets/v08/emotions/hana_shy.webp	35.45	0.9782	0.964	35.86	0	0.143	1.028	3	ok	flagged-envelope
+tex	res://assets/v08/emotions/hana_surprised.webp	34.34	0.9764	0.958	35.82	0		1.097	2	ok	flagged-envelope
+tex	res://assets/v08/emotions/mc_happy.webp	34.44	0.9796	0.966	36.81	0		1.052	2	ok	flagged-envelope
+tex	res://assets/v08/emotions/mc_pout.webp	34.89	0.9784	0.965	36.89	0		1.184	2	ok	flagged-envelope
+tex	res://assets/v08/emotions/mc_sad.webp	34.44	0.9796	0.966	36.81	0		1.052	2	ok	flagged-envelope
+tex	res://assets/v08/emotions/mc_shy.webp	34.89	0.9784	0.965	36.89	0		1.184	2	ok	flagged-envelope
+tex	res://assets/v08/emotions/mc_surprised.webp	34.1	0.9793	0.967	36.3	0	0.142	1.077	3	ok	flagged-envelope
+tex	res://assets/v08/emotions/nova_happy.webp	35.71	0.9791	0.961	35.75	0		0.929	2	ok	flagged-envelope
+tex	res://assets/v08/emotions/nova_pout.webp	35.34	0.9803	0.952	36.62	0	0.117	1.128	3	ok	flagged-envelope
+tex	res://assets/v08/emotions/nova_sad.webp	35.71	0.9791	0.961	35.75	0		0.929	2	ok	flagged-envelope
+tex	res://assets/v08/emotions/nova_shy.webp	35.34	0.9803	0.952	36.62	0	0.117	1.128	3	ok	flagged-envelope
+tex	res://assets/v08/emotions/nova_surprised.webp	34.74	0.9801	0.972	35.3	0		1.061	2	ok	flagged-envelope
+tex	res://assets/v08/emotions/rin_happy.webp	36.43	0.9825	0.969	36.67	0	0.126	0.956	3	ok	flagged-envelope
+tex	res://assets/v08/emotions/rin_pout.webp	37.09	0.9827	0.973	37.78	0	0.169	0.921	3	ok	flagged-envelope
+tex	res://assets/v08/emotions/rin_sad.webp	36.43	0.9825	0.969	36.67	0	0.126	0.956	3	ok	flagged-envelope
+tex	res://assets/v08/emotions/rin_shy.webp	37.09	0.9827	0.973	37.78	0	0.169	0.921	3	ok	flagged-envelope
+tex	res://assets/v08/emotions/rin_surprised.webp	36.7	0.981	0.972	37.07	0	0.153	1.061	3	ok	flagged-envelope
+tex	res://assets/v08/emotions/yue_happy.webp	35.37	0.9772	0.959	36.9	0	0.072	1.114	3	ok	flagged-envelope
+tex	res://assets/v08/emotions/yue_pout.webp	35.53	0.9803	0.962	38.05	0	0.093	1.153	3	ok	flagged-envelope
+tex	res://assets/v08/emotions/yue_sad.webp	35.37	0.9772	0.959	36.9	0	0.072	1.114	3	ok	flagged-envelope
+tex	res://assets/v08/emotions/yue_shy.webp	35.53	0.9803	0.962	38.05	0	0.093	1.153	3	ok	flagged-envelope
+tex	res://assets/v08/emotions/yue_surprised.webp	36.69	0.9808	0.968	42.68	0		1.127	2	ok	flagged-envelope
+tex	res://assets/v08/ui/bg/profile.webp	39.19	0.9818	0.942		0	0.19	1.103	2	ok	gate
+tex	res://assets/v08/ui/bg/tourney.webp	39.48	0.9895	0.967		0	0.208	1.0	2	ok	gate
+tex	res://assets/v09/summon/lantern_r.png	31.19	0.9809	0.967	36.92	0		1.344	2	ok	flagged-envelope
+tex	res://assets/v09/summon/lantern_sr.png	29.73	0.9786	0.961	36.53	0		1.272	2	ok	flagged-envelope
+tex	res://assets/v09/summon/lantern_ssr.png	29.95	0.986	0.97	36.77	0		1.163	2	ok	flagged-envelope
+tex	res://assets/v09/video/mc_lobby_still.webp	39.25	0.9845	0.97		0	0.15	1.009	2	ok	gate
+tex	res://assets/v10/adventure/crimson_kasha.png	31.45	0.9748	0.964	33.14	0		1.353	2	ok	flagged-envelope
+tex	res://assets/v10/adventure/dragon_shadow.png	30.07	0.9844	0.973	34.13	0		1.353	2	ok	flagged-envelope
+tex	res://assets/v10/adventure/frost_tengu.png	31.86	0.9828	0.972	34.33	0		1.365	2	ok	flagged-envelope
+tex	res://assets/v10/adventure/jade_golem.png	32.92	0.9796	0.966	36.09	0		1.481	2	ok	flagged-envelope
+tex	res://assets/v10/adventure/moon_kitsune.png	32.58	0.9801	0.969	35.07	0		1.344	2	ok	flagged-envelope
+tex	res://assets/v10/adventure/paper_oni.png	31.54	0.9804	0.968	35.77	0		1.332	2	ok	flagged-envelope
+tex	res://assets/v10/auth/key_bg.webp	41.95	0.987	0.959		0	0.196	1.014	2	ok	gate
+tex	res://assets/v10/auth/key_heroes.webp	35.24	0.9777	0.94	39.45	0	0.218	1.021	3	ok	flagged-envelope
+tex	res://assets/v10/cg_16/cg_kohaku_16.webp	38.68	0.9794	0.964		0	0.156	1.079	2	ok	gate
+tex	res://assets/v10/cg_16/cg_miel_16.webp	38.79	0.9809	0.966		0	0.163	1.02	2	ok	gate
+tex	res://assets/v10/cg_16/cg_shirin_16.webp	38.09	0.979	0.965		0	0.175	1.04	2	ok	gate
+tex	res://assets/v10/cg_16/cg_tsubame_16.webp	39.25	0.9837	0.96		0	0.164	1.03	2	ok	gate
+tex	res://assets/v10/cg_16/cg_zlata_16.webp	36.91	0.9823	0.971		0	0.167	1.3	2	ok	flagged-envelope
+tex	res://assets/v10/cg_16/date_hana_16.webp	38.68	0.9815	0.967		0	0.163	1.022	2	ok	gate
+tex	res://assets/v10/cg_16/date_nova_16.webp	38.46	0.985	0.973		0	0.176	1.019	2	ok	gate
+tex	res://assets/v10/cg_16/date_rin_16.webp	38.44	0.9824	0.955		0	0.217	1.038	2	ok	gate
+tex	res://assets/v10/cg_16/hana.webp	38.92	0.9842	0.976		0		1.033	1	ok	gate
+tex	res://assets/v10/cg_16/intro_mc_table.webp	38.11	0.9843	0.967		0	0.183	0.997	2	ok	gate
+tex	res://assets/v10/cg_16/intro_yue_moon.webp	38.38	0.9775	0.939		0	0.071	1.1	2	ok	gate
+tex	res://assets/v10/cg_16/mc.webp	39.96	0.9853	0.979		0	0.144	0.995	2	ok	gate
+tex	res://assets/v10/cg_16/mc_base.webp	41.41	0.9822	0.971		0	0.179	1.096	2	ok	gate
+tex	res://assets/v10/cg_16/nova.webp	39.94	0.9869	0.981		0	0.145	1.02	2	ok	gate
+tex	res://assets/v10/cg_16/nova_roof.webp	39.87	0.9853	0.975		0	0.168	1.0	2	ok	gate
+tex	res://assets/v10/cg_16/rin.webp	39.38	0.9869	0.98		0	0.149	1.009	2	ok	gate
+tex	res://assets/v10/cg_16/yue.webp	39.32	0.9844	0.972		0	0.114	1.044	2	ok	gate
+tex	res://assets/v10/gacha/banner_frame.png	33.41	0.9904	0.977	36.91	0		2.302	2	ok	flagged-envelope
+tex	res://assets/v10/gacha/first_pick_table.webp	43.4	0.987	0.945		0	0.297	1.09	2	ok	gate
+tex	res://assets/v10/gacha/guest_door.webp	39.61	0.9814	0.944		0	0.196	1.075	2	ok	gate
+tex	res://assets/v10/gacha/key_first_guest.webp	39.51	0.9799	0.946		0	0.218	1.026	2	ok	gate
+tex	res://assets/v10/gacha/key_five_winds.webp	39.2	0.9849	0.962		0	0.173	0.922	2	ok	gate
+tex	res://assets/v10/gacha/key_full_moon.webp	39.0	0.9876	0.959		0	0.147	0.773	2	ok	gate
+tex	res://assets/v10/gacha/key_new_moon.webp	42.59	0.988	0.957		0	0.207	1.012	2	ok	gate
+tex	res://assets/v10/hf_ui/banner_kohaku.png	33.88	0.9662	0.954	34.1	0		1.284	2	ok	flagged-envelope
+tex	res://assets/v10/hf_ui/banner_mc_tea.png	35.02	0.9735	0.957	36.25	0		1.352	2	ok	flagged-envelope
+tex	res://assets/v10/hf_ui/banner_nova.png	35.91	0.97	0.949	41.18	0	0.221	1.488	3	ok	flagged-envelope
+tex	res://assets/v10/hf_ui/banner_path.png	35.57	0.9713	0.958	37.09	0	0.18	1.34	3	ok	flagged-envelope
+tex	res://assets/v10/hf_ui/banner_pvp_online.webp	36.67	0.9864	0.978		0		1.093	1	ok	flagged-envelope
+tex	res://assets/v10/hf_ui/banner_rin.png	34.33	0.9788	0.964	38.08	0		1.301	2	ok	flagged-envelope
+tex	res://assets/v10/hf_ui/banner_shirin.png	34.97	0.9672	0.953	40.54	0	0.194	1.616	3	ok	flagged-envelope
+tex	res://assets/v10/hf_ui/banner_story.png	34.05	0.9737	0.962	34.61	0		1.445	2	ok	flagged-envelope
+tex	res://assets/v10/hf_ui/banner_tsubame.png	36.4	0.9631	0.944	40.26	0	0.199	1.487	3	ok	flagged-envelope
+tex	res://assets/v10/hf_ui/duel_arena_bg.webp	38.1	0.9843	0.957		0	0.221	1.089	2	ok	gate
+tex	res://assets/v10/hf_ui/gacha_altar_bg.webp	37.45	0.9845	0.963		0	0.163	1.253	2	ok	flagged-envelope
+tex	res://assets/v10/hf_ui/journey_scroll_art.webp	34.34	0.9764	0.952	36.55	0		0.987	2	ok	flagged-envelope
+tex	res://assets/v10/hf_ui/wheel_fortune_bg.webp	35.67	0.9791	0.96	35.16	0		1.015	2	ok	flagged-envelope
+tex	res://assets/v10/hud2/combo/hana_t1.png	34.24	0.9654	0.928	30.92	0	0.167	1.449	3	ok	flagged-envelope
+tex	res://assets/v10/hud2/combo/hana_t2.png	33.48	0.9655	0.94	32.22	0		1.373	2	ok	flagged-envelope
+tex	res://assets/v10/hud2/combo/hana_t3.png	32.14	0.9547	0.91	29.85	0		1.287	2	ok	flagged-envelope
+tex	res://assets/v10/hud2/combo/mc_t1.png	35.56	0.9763	0.949	35.75	0	0.156	1.451	3	ok	flagged-envelope
+tex	res://assets/v10/hud2/combo/mc_t2.png	35.61	0.973	0.939	35.55	0	0.192	1.412	3	ok	flagged-envelope
+tex	res://assets/v10/hud2/combo/mc_t3.png	34.48	0.9771	0.955	34.08	0	0.189	1.466	3	ok	flagged-envelope
+tex	res://assets/v10/hud2/combo/nova_t1.png	33.81	0.9589	0.901	31.68	0	0.134	1.385	3	ok	flagged-envelope
+tex	res://assets/v10/hud2/combo/nova_t2.png	33.58	0.9681	0.914	33.06	0	0.091	1.389	3	ok	flagged-envelope
+tex	res://assets/v10/hud2/combo/nova_t3.png	33.54	0.9655	0.921	32.04	0		1.412	2	ok	flagged-envelope
+tex	res://assets/v10/hud2/combo/rin_t1.png	37.39	0.979	0.94	35.44	0	0.162	1.989	3	ok	flagged-envelope
+tex	res://assets/v10/hud2/combo/rin_t2.png	37.49	0.9812	0.961	36.57	0	0.158	1.707	3	ok	flagged-envelope
+tex	res://assets/v10/hud2/combo/rin_t3.png	36.61	0.9779	0.967	36.51	0	0.199	1.78	3	ok	flagged-envelope
+tex	res://assets/v10/hud2/combo/yue_t1.png	35.82	0.9639	0.922	37.32	0	0.141	1.505	3	ok	flagged-envelope
+tex	res://assets/v10/hud2/combo/yue_t2.png	35.63	0.9681	0.948	37.69	0	0.075	1.457	3	ok	flagged-envelope
+tex	res://assets/v10/hud2/combo/yue_t3.png	34.8	0.9699	0.938	40.34	0		1.391	2	ok	flagged-envelope
+tex	res://assets/v10/look/zlata/header.webp	35.93	0.9864	0.979		0		1.012	1	ok	flagged-envelope
+tex	res://assets/v10/look/zlata/loading.webp	37.01	0.9769	0.96		0	0.196	0.977	2	ok	flagged-envelope
+tex	res://assets/v10/look/zlata/menu_bg.webp	38.94	0.9919	0.954		0	0.135	0.929	2	ok	gate
+tex	res://assets/v10/look/zlata/table.webp	38.08	0.9895	0.939		0	0.181	0.907	2	ok	gate
+tex	res://assets/v10/mj/classic/crest_hana.png	28.82	0.9911	0.981	32.62	0		1.456	2	ok	flagged-envelope
+tex	res://assets/v10/mj/classic/crest_mc.png	29.11	0.9897	0.978	32.87	0		1.422	2	ok	flagged-envelope
+tex	res://assets/v10/mj/classic/crest_nova.png	27.33	0.991	0.984	34.25	0		1.285	2	ok	flagged-envelope
+tex	res://assets/v10/mj/classic/crest_rin.png	28.59	0.9921	0.988	34.05	0		1.322	2	ok	flagged-envelope
+tex	res://assets/v10/mj/classic/crest_yue.png	28.23	0.9909	0.987	32.44	0		1.468	2	ok	flagged-envelope
+tex	res://assets/v10/mj/classic/mode_icon.png	34.39	0.9726	0.957	35.14	0		1.346	2	ok	flagged-envelope
+tex	res://assets/v10/mj/koikoi/cards/back.webp	35.43	0.9857	0.961		0		0.941	1	ok	flagged-envelope
+tex	res://assets/v10/mj/koikoi/cards/c00.webp	34.63	0.9847	0.95		0		0.962	1	ok	flagged-envelope
+tex	res://assets/v10/mj/koikoi/cards/c01.webp	34.59	0.9905	0.982		0		0.9	1	ok	flagged-envelope
+tex	res://assets/v10/mj/koikoi/cards/c02.webp	34.82	0.9902	0.972		0		0.889	1	ok	flagged-envelope
+tex	res://assets/v10/mj/koikoi/cards/c03.webp	34.79	0.9907	0.984		0		1.042	1	ok	flagged-envelope
+tex	res://assets/v10/mj/koikoi/cards/c04.webp	36.09	0.9883	0.977		0	0.026	0.894	2	ok	flagged-envelope
+tex	res://assets/v10/mj/koikoi/cards/c05.webp	35.32	0.9863	0.978		0		0.917	1	ok	flagged-envelope
+tex	res://assets/v10/mj/koikoi/cards/c06.webp	35.84	0.9851	0.973		0		0.84	1	ok	flagged-envelope
+tex	res://assets/v10/mj/koikoi/cards/c07.webp	35.93	0.9861	0.968		0		0.876	1	ok	flagged-envelope
+tex	res://assets/v10/mj/koikoi/cards/c08.webp	34.68	0.9836	0.969		0		0.966	1	ok	flagged-envelope
+tex	res://assets/v10/mj/koikoi/cards/c09.webp	34.87	0.9838	0.966		0		0.979	1	ok	flagged-envelope
+tex	res://assets/v10/mj/koikoi/cards/c10.webp	35.47	0.9834	0.973		0		0.878	1	ok	flagged-envelope
+tex	res://assets/v10/mj/koikoi/cards/c11.webp	35.21	0.982	0.964		0		0.977	1	ok	flagged-envelope
+tex	res://assets/v10/mj/koikoi/cards/c12.webp	35.16	0.9881	0.976		0		0.892	1	ok	flagged-envelope
+tex	res://assets/v10/mj/koikoi/cards/c13.webp	35.23	0.9815	0.948		0		0.918	1	ok	flagged-envelope
+tex	res://assets/v10/mj/koikoi/cards/c14.webp	34.97	0.9883	0.979		0		0.852	1	ok	flagged-envelope
+tex	res://assets/v10/mj/koikoi/cards/c15.webp	34.85	0.9885	0.974		0		0.917	1	ok	flagged-envelope
+tex	res://assets/v10/mj/koikoi/cards/c16.webp	34.4	0.99	0.977		0		0.922	1	ok	flagged-envelope
+tex	res://assets/v10/mj/koikoi/cards/c17.webp	35.04	0.9829	0.952		0		0.841	1	ok	flagged-envelope
+tex	res://assets/v10/mj/koikoi/cards/c18.webp	34.9	0.9868	0.966		0		0.896	1	ok	flagged-envelope
+tex	res://assets/v10/mj/koikoi/cards/c19.webp	35.07	0.9883	0.973		0		0.86	1	ok	flagged-envelope
+tex	res://assets/v10/mj/koikoi/cards/c20.webp	34.88	0.9859	0.974		0		1.02	1	ok	flagged-envelope
+tex	res://assets/v10/mj/koikoi/cards/c21.webp	35.08	0.982	0.956		0		0.995	1	ok	flagged-envelope
+tex	res://assets/v10/mj/koikoi/cards/c22.webp	35.06	0.9863	0.961		0		0.929	1	ok	flagged-envelope
+tex	res://assets/v10/mj/koikoi/cards/c23.webp	34.91	0.9871	0.975		0		1.071	1	ok	flagged-envelope
+tex	res://assets/v10/mj/koikoi/cards/c24.webp	35.84	0.9882	0.979		0	0.009	0.842	2	ok	flagged-envelope
+tex	res://assets/v10/mj/koikoi/cards/c25.webp	35.41	0.9804	0.949		0		0.942	1	ok	flagged-envelope
+tex	res://assets/v10/mj/koikoi/cards/c26.webp	35.42	0.986	0.971		0		0.913	1	ok	flagged-envelope
+tex	res://assets/v10/mj/koikoi/cards/c27.webp	35.19	0.9867	0.974		0		0.905	1	ok	flagged-envelope
+tex	res://assets/v10/mj/koikoi/cards/c28.webp	34.21	0.9816	0.956		0		1.089	1	ok	flagged-envelope
+tex	res://assets/v10/mj/koikoi/cards/c29.webp	35.0	0.9913	0.982		0		0.963	1	ok	flagged-envelope
+tex	res://assets/v10/mj/koikoi/cards/c30.webp	34.86	0.992	0.98		0		0.921	1	ok	flagged-envelope
+tex	res://assets/v10/mj/koikoi/cards/c31.webp	34.49	0.9909	0.982		0		0.93	1	ok	flagged-envelope
+tex	res://assets/v10/mj/koikoi/cards/c32.webp	34.84	0.9887	0.979		0		0.924	1	ok	flagged-envelope
+tex	res://assets/v10/mj/koikoi/cards/c33.webp	35.06	0.9841	0.947		0		0.901	1	ok	flagged-envelope
+tex	res://assets/v10/mj/koikoi/cards/c34.webp	34.79	0.9886	0.98		0		0.836	1	ok	flagged-envelope
+tex	res://assets/v10/mj/koikoi/cards/c35.webp	34.73	0.9881	0.979		0		0.89	1	ok	flagged-envelope
+tex	res://assets/v10/mj/koikoi/cards/c36.webp	35.18	0.9865	0.975		0		0.991	1	ok	flagged-envelope
+tex	res://assets/v10/mj/koikoi/cards/c37.webp	35.49	0.9795	0.945		0		0.953	1	ok	flagged-envelope
+tex	res://assets/v10/mj/koikoi/cards/c38.webp	35.03	0.9869	0.974		0		0.812	1	ok	flagged-envelope
+tex	res://assets/v10/mj/koikoi/cards/c39.webp	35.07	0.9858	0.968		0		0.988	1	ok	flagged-envelope
+tex	res://assets/v10/mj/koikoi/cards/c40.webp	34.57	0.9898	0.978		0		1.031	1	ok	flagged-envelope
+tex	res://assets/v10/mj/koikoi/cards/c41.webp	34.97	0.9901	0.983		0		0.901	1	ok	flagged-envelope
+tex	res://assets/v10/mj/koikoi/cards/c42.webp	35.02	0.9872	0.952		0		0.891	1	ok	flagged-envelope
+tex	res://assets/v10/mj/koikoi/cards/c43.webp	34.26	0.9903	0.978		0		1.078	1	ok	flagged-envelope
+tex	res://assets/v10/mj/koikoi/cards/c44.webp	34.46	0.9871	0.974		0		0.937	1	ok	flagged-envelope
+tex	res://assets/v10/mj/koikoi/cards/c45.webp	34.71	0.9878	0.979		0		0.992	1	ok	flagged-envelope
+tex	res://assets/v10/mj/koikoi/cards/c46.webp	34.95	0.9862	0.971		0		0.968	1	ok	flagged-envelope
+tex	res://assets/v10/mj/koikoi/cards/c47.webp	34.95	0.9871	0.978		0		0.935	1	ok	flagged-envelope
+tex	res://assets/v10/mj/koikoi/heroines/crane_rin.webp	34.55	0.985	0.962		0		1.036	1	ok	flagged-envelope
+tex	res://assets/v10/mj/koikoi/heroines/curtain_mc.webp	34.37	0.9887	0.979		0		0.901	1	ok	flagged-envelope
+tex	res://assets/v10/mj/koikoi/heroines/moon_yue.webp	34.7	0.987	0.974		0		0.854	1	ok	flagged-envelope
+tex	res://assets/v10/mj/koikoi/heroines/phoenix_hana.webp	34.22	0.9916	0.984		0		1.058	1	ok	flagged-envelope
+tex	res://assets/v10/mj/koikoi/heroines/rain_nova.webp	34.22	0.9903	0.981		0		1.125	1	ok	flagged-envelope
+tex	res://assets/v10/mj/look/tables/cloth_hana.webp	39.09	0.9373	0.914		0		1.247	1	ok	flagged-envelope
+tex	res://assets/v10/mj/look/tables/cloth_house.webp	39.59	0.9377	0.924		0		1.209	1	ok	flagged-envelope
+tex	res://assets/v10/mj/look/tables/cloth_mc.webp	39.9	0.9416	0.928		0		1.285	1	ok	flagged-envelope
+tex	res://assets/v10/mj/look/tables/cloth_nova.webp	38.61	0.9514	0.94		0		1.033	1	ok	gate
+tex	res://assets/v10/mj/look/tables/cloth_rin.webp	38.21	0.9319	0.917		0		1.066	1	ok	flagged-envelope
+tex	res://assets/v10/mj/look/tables/cloth_yue.webp	42.63	0.9731	0.953		0	0.202	1.415	2	ok	gate
+tex	res://assets/v10/mj/look/tables/far_hana.webp	40.73	0.9902	0.971		0	0.179	0.952	2	ok	gate
+tex	res://assets/v10/mj/look/tables/far_house.webp	42.38	0.9904	0.964		0	0.239	1.046	2	ok	gate
+tex	res://assets/v10/mj/look/tables/far_mc.webp	42.42	0.9915	0.97		0	0.226	0.964	2	ok	gate
+tex	res://assets/v10/mj/look/tables/far_nova.webp	41.75	0.9919	0.958		0	0.14	0.9	2	ok	gate
+tex	res://assets/v10/mj/look/tables/far_rin.webp	42.25	0.9906	0.957		0	0.196	0.989	2	ok	gate
+tex	res://assets/v10/mj/look/tables/far_yue.webp	41.46	0.9908	0.953		0	0.181	0.981	2	ok	gate
+tex	res://assets/v10/mj/look/tables/near_hana.webp	41.34	0.9886	0.979	45.78	0	0.144	1.062	3	ok	gate
+tex	res://assets/v10/mj/look/tables/near_mc.webp	41.32	0.9875	0.98	45.44	0	0.189	0.993	3	ok	gate
+tex	res://assets/v10/mj/look/tables/near_nova.webp	40.61	0.9939	0.983	46.75	0	0.17	0.986	3	ok	gate
+tex	res://assets/v10/mj/look/tables/near_rin.webp	42.07	0.9861	0.978	47.07	0	0.203	0.96	3	ok	gate
+tex	res://assets/v10/mj/look/tables/near_yue.webp	42.0	0.985	0.979	45.26	0	0.204	0.895	3	ok	gate
+tex	res://assets/v10/mj/riichi/cloth_bamboo.webp	42.98	0.9688	0.946		0	0.269	1.551	2	ok	gate
+tex	res://assets/v10/mj/riichi/cloth_gold.webp	43.44	0.9808	0.943		0	0.264	1.289	2	ok	gate
+tex	res://assets/v10/mj/riichi/cloth_jade.webp	42.64	0.9736	0.933		0	0.304	1.394	2	ok	gate
+tex	res://assets/v10/mj/riichi/cloth_school.webp	41.87	0.9622	0.948		0	0.278	1.58	2	ok	gate
+tex	res://assets/v10/mj/riichi/cloth_sky.webp	43.92	0.984	0.961		0	0.232	1.336	2	ok	gate
+tex	res://assets/v10/mj/riichi/crest_hana.webp	32.04	0.9907	0.985	38.14	0			2	ok	flagged-envelope
+tex	res://assets/v10/mj/riichi/crest_mc.webp	30.52	0.9943	0.988	38.15	0			2	ok	flagged-envelope
+tex	res://assets/v10/mj/riichi/crest_nova.webp	29.95	0.9966	0.992	39.67	0			2	ok	flagged-envelope
+tex	res://assets/v10/mj/riichi/crest_rin.webp	31.61	0.995	0.995	39.65	0			2	ok	flagged-envelope
+tex	res://assets/v10/mj/riichi/crest_yue.webp	32.17	0.9938	0.99	38.17	0			2	ok	flagged-envelope
+tex	res://assets/v10/mj/sanma/cloth/moon_cloth.webp	40.52	0.9647	0.952		0	0.23	1.472	2	ok	gate
+tex	res://assets/v10/mj/sanma/cloth/moon_cloth_event.webp	39.68	0.9496	0.924		0		1.405	1	ok	flagged-envelope
+tex	res://assets/v10/path/cover_w1.webp	37.91	0.9891	0.98		0		1.185	1	ok	flagged-envelope
+tex	res://assets/v10/path/cover_w2.webp	38.91	0.9853	0.974		0		1.188	1	ok	gate
+tex	res://assets/v10/path/cover_w3.webp	38.3	0.9869	0.975		0	0.074	1.216	2	ok	gate
+tex	res://assets/v10/path/cover_w4.webp	38.95	0.986	0.968		0		1.118	1	ok	gate
+tex	res://assets/v10/path/cover_w5.webp	38.6	0.9874	0.979		0	0.099	1.034	2	ok	gate
+tex	res://assets/v10/path/cover_w6.webp	39.6	0.9859	0.974		0		1.062	1	ok	gate
+tex	res://assets/v10/phone/stickers/c_again.webp	37.64	0.9904	0.982	45.59	0	0.084	0.926	3	ok	flagged-envelope
+tex	res://assets/v10/phone/stickers/c_fire.webp	36.66	0.9846	0.977	45.03	0		0.89	2	ok	flagged-envelope
+tex	res://assets/v10/phone/stickers/c_heart.webp	37.05	0.9872	0.98	44.84	0	0.161	1.02	3	ok	flagged-envelope
+tex	res://assets/v10/phone/stickers/c_laugh.webp	33.99	0.9865	0.977	44.77	0		0.894	2	ok	flagged-envelope
+tex	res://assets/v10/phone/stickers/c_sleepy.webp	36.81	0.988	0.977	44.44	0		1.023	2	ok	flagged-envelope
+tex	res://assets/v10/phone/stickers/c_tea.webp	36.04	0.9866	0.978	44.8	0		1.017	2	ok	flagged-envelope
+tex	res://assets/v10/phone/stickers/c_thanks.webp	35.07	0.987	0.98	45.01	0		0.966	2	ok	flagged-envelope
+tex	res://assets/v10/phone/stickers/c_wow.webp	35.08	0.9909	0.982	44.84	0		1.097	2	ok	flagged-envelope
+tex	res://assets/v10/phone/stickers/hana_blush.webp	34.8	0.9871	0.979	43.98	0		0.986	2	ok	flagged-envelope
+tex	res://assets/v10/phone/stickers/hana_five.webp	35.46	0.9871	0.979	43.72	0		0.925	2	ok	flagged-envelope
+tex	res://assets/v10/phone/stickers/hana_lantern.webp	34.89	0.9878	0.979	43.5	0		0.982	2	ok	flagged-envelope
+tex	res://assets/v10/phone/stickers/hana_pout.webp	34.99	0.9874	0.982	44.0	0		0.955	2	ok	flagged-envelope
+tex	res://assets/v10/phone/stickers/hana_rematch.webp	34.65	0.9873	0.98	43.82	0		0.954	2	ok	flagged-envelope
+tex	res://assets/v10/phone/stickers/hana_run.webp	35.3	0.9872	0.98	43.66	0		0.962	2	ok	flagged-envelope
+tex	res://assets/v10/phone/stickers/hana_start.webp	35.13	0.9871	0.979	41.35	0		0.949	2	ok	flagged-envelope
+tex	res://assets/v10/phone/stickers/hana_sun.webp	34.69	0.9865	0.979	43.95	0		0.961	2	ok	flagged-envelope
+tex	res://assets/v10/phone/stickers/mc_east.webp	35.9	0.9851	0.965	44.04	0		0.962	2	ok	flagged-envelope
+tex	res://assets/v10/phone/stickers/mc_gg.webp	35.43	0.983	0.969	42.73	0		1.065	2	ok	flagged-envelope
+tex	res://assets/v10/phone/stickers/mc_heart.webp	35.6	0.9843	0.969	43.04	0		1.052	2	ok	flagged-envelope
+tex	res://assets/v10/phone/stickers/mc_pout.webp	35.98	0.9851	0.972	44.06	0		0.95	2	ok	flagged-envelope
+tex	res://assets/v10/phone/stickers/mc_proud.webp	35.74	0.9839	0.97	43.13	0		1.026	2	ok	flagged-envelope
+tex	res://assets/v10/phone/stickers/mc_shy.webp	36.21	0.9849	0.973	44.02	0		0.989	2	ok	flagged-envelope
+tex	res://assets/v10/phone/stickers/mc_tea.webp	35.63	0.9835	0.964	43.44	0		1.052	2	ok	flagged-envelope
+tex	res://assets/v10/phone/stickers/mc_wink.webp	35.47	0.984	0.97	43.68	0		0.988	2	ok	flagged-envelope
+tex	res://assets/v10/phone/stickers/nova_bike.webp	35.54	0.9864	0.974	41.07	0		1.052	2	ok	flagged-envelope
+tex	res://assets/v10/phone/stickers/nova_dl.webp	35.79	0.9863	0.979	41.51	0		0.954	2	ok	flagged-envelope
+tex	res://assets/v10/phone/stickers/nova_ears.webp	35.58	0.9873	0.976	41.57	0		0.887	2	ok	flagged-envelope
+tex	res://assets/v10/phone/stickers/nova_glitch.webp	35.16	0.9854	0.974	42.9	0		0.983	2	ok	flagged-envelope
+tex	res://assets/v10/phone/stickers/nova_heart.webp	35.06	0.9859	0.976	43.42	0		1.004	2	ok	flagged-envelope
+tex	res://assets/v10/phone/stickers/nova_holo.webp	36.16	0.9867	0.976	42.0	0		0.935	2	ok	flagged-envelope
+tex	res://assets/v10/phone/stickers/nova_offline.webp	35.81	0.9839	0.972	43.76	0		1.055	2	ok	flagged-envelope
+tex	res://assets/v10/phone/stickers/nova_ping.webp	35.14	0.9873	0.976	42.33	0		0.936	2	ok	flagged-envelope
+tex	res://assets/v10/phone/stickers/rin_allow.webp	35.2	0.9836	0.972	44.04	0		0.97	2	ok	flagged-envelope
+tex	res://assets/v10/phone/stickers/rin_blush.webp	35.87	0.9844	0.966	43.92	0		0.929	2	ok	flagged-envelope
+tex	res://assets/v10/phone/stickers/rin_frown.webp	35.61	0.9831	0.967	43.32	0		1.01	2	ok	flagged-envelope
+tex	res://assets/v10/phone/stickers/rin_glasses.webp	35.51	0.9836	0.966	43.67	0		0.965	2	ok	flagged-envelope
+tex	res://assets/v10/phone/stickers/rin_more.webp	35.3	0.9849	0.976	43.63	0		0.999	2	ok	flagged-envelope
+tex	res://assets/v10/phone/stickers/rin_note.webp	35.42	0.9847	0.974	44.05	0		0.987	2	ok	flagged-envelope
+tex	res://assets/v10/phone/stickers/rin_smile.webp	35.38	0.9842	0.971	43.42	0		1.076	2	ok	flagged-envelope
+tex	res://assets/v10/phone/stickers/rin_tea.webp	35.61	0.9842	0.972	44.13	0		1.06	2	ok	flagged-envelope
+tex	res://assets/v10/phone/stickers/yue_curious.webp	35.41	0.9825	0.966	43.13	0		1.041	2	ok	flagged-envelope
+tex	res://assets/v10/phone/stickers/yue_fan.webp	34.91	0.9823	0.966	43.08	0		1.042	2	ok	flagged-envelope
+tex	res://assets/v10/phone/stickers/yue_moon.webp	36.28	0.9845	0.97	43.2	0		1.107	2	ok	flagged-envelope
+tex	res://assets/v10/phone/stickers/yue_smirk.webp	35.46	0.9826	0.969	43.59	0		1.111	2	ok	flagged-envelope
+tex	res://assets/v10/phone/stickers/yue_soft.webp	35.75	0.9841	0.97	43.06	0		1.036	2	ok	flagged-envelope
+tex	res://assets/v10/phone/stickers/yue_tea.webp	35.32	0.9843	0.973	43.55	0		1.004	2	ok	flagged-envelope
+tex	res://assets/v10/phone/stickers/yue_throne.webp	35.56	0.9845	0.968	43.55	0	0.081	1.036	3	ok	flagged-envelope
+tex	res://assets/v10/phone/stickers/yue_waltz.webp	35.44	0.9848	0.976	42.97	0		1.052	2	ok	flagged-envelope
+tex	res://assets/v10/rituals/bowl.webp	36.95	0.9728	0.956	36.62	0	0.218	0.966	3	ok	flagged-envelope
+tex	res://assets/v10/rituals/bowl_master.webp	35.66	0.9622	0.946	36.41	0		1.1	2	ok	flagged-envelope
+tex	res://assets/v10/rituals/cake_matcha.webp	35.25	0.9757	0.961	39.21	0		0.972	2	ok	flagged-envelope
+tex	res://assets/v10/rituals/cake_tier.webp	35.29	0.974	0.964	35.99	0	0.151	0.997	3	ok	flagged-envelope
+tex	res://assets/v10/rituals/envelope.webp	35.23	0.9634	0.932	37.26	0		1.149	2	ok	flagged-envelope
+tex	res://assets/v10/rituals/tray.webp	39.68	0.9896	0.97	38.7	0	0.103	0.935	3	ok	gate
+tex	res://assets/v10/salon/rin_cut.png	32.99	0.9766	0.959	35.12	0		1.316	2	ok	flagged-envelope
+tex	res://assets/v10/salon/z1_broken.webp	38.03	0.9742	0.96		0	0.07	1.032	2	ok	gate
+tex	res://assets/v10/salon/z1_done.webp	37.52	0.9799	0.962		0	0.126	1.115	2	ok	flagged-envelope
+tex	res://assets/v10/salon/z1_lobby.webp	38.39	0.974	0.952		0	0.133	1.07	2	ok	gate
+tex	res://assets/v10/salon/z2_broken.webp	40.68	0.9742	0.95		0	0.192	1.089	2	ok	gate
+tex	res://assets/v10/salon/z2_done.webp	39.84	0.9824	0.97		0	0.209	1.121	2	ok	gate
+tex	res://assets/v10/salon/z2_lobby.webp	40.91	0.984	0.96		0	0.218	1.106	2	ok	gate
+tex	res://assets/v10/salon/z2_scene_rin.webp	39.13	0.9811	0.961		0	0.217	1.12	2	ok	gate
+tex	res://assets/v10/salon/z2_scene_rin_close.webp	39.11	0.9818	0.948		0	0.249	1.044	2	ok	gate
+tex	res://assets/v10/salon/z3_broken.webp	39.78	0.9661	0.951		0	0.218	1.14	2	ok	gate
+tex	res://assets/v10/salon/z3_done.webp	39.25	0.9787	0.961		0	0.149	1.039	2	ok	gate
+tex	res://assets/v10/salon/z3_lobby.webp	39.97	0.9766	0.955		0	0.192	1.077	2	ok	gate
+tex	res://assets/v10/salon_vip/boudoir_hana.webp	38.47	0.9811	0.952		0	0.191	1.117	2	ok	gate
+tex	res://assets/v10/salon_vip/boudoir_mc.webp	37.42	0.9838	0.974		0	0.092	1.256	2	ok	flagged-envelope
+tex	res://assets/v10/salon_vip/boudoir_miel.webp	37.94	0.9876	0.976		0	0.112	1.073	2	ok	flagged-envelope
+tex	res://assets/v10/salon_vip/kohaku_shrine.webp	38.0	0.984	0.972		0	0.125	1.035	2	ok	gate
+tex	res://assets/v10/salon_vip/moonbath_yue.webp	37.59	0.981	0.968		0		1.106	1	ok	flagged-envelope
+tex	res://assets/v10/salon_vip/penthouse_nova.webp	37.73	0.9846	0.974		0	0.171	1.01	2	ok	flagged-envelope
+tex	res://assets/v10/salon_vip/shirin_tent.webp	37.67	0.9849	0.966		0	0.104	1.023	2	ok	flagged-envelope
+tex	res://assets/v10/salon_vip/teabar_rin.webp	38.15	0.9849	0.975		0	0.116	0.917	2	ok	gate
+tex	res://assets/v10/salon_vip/tsubame_balcony.webp	38.72	0.9804	0.968		0	0.179	1.092	2	ok	gate
+tex	res://assets/v10/salon_vip/zlata_throne.webp	37.99	0.9844	0.967		0	0.109	1.059	2	ok	flagged-envelope
+tex	res://assets/v10/shop/bg_age.webp	44.37	0.9935	0.963		0	0.181	0.935	2	ok	gate
+tex	res://assets/v10/shop/bg_pass.webp	40.24	0.9745	0.956		0	0.222	1.31	2	ok	gate
+tex	res://assets/v10/shop/bg_shop.webp	42.99	0.99	0.964		0	0.194	1.007	2	ok	gate
+tex	res://assets/v10/shop/bg_shop_blur.webp	51.07	0.998	0.981		0	0.194	0.96	2	ok	gate
+tex	res://assets/v10/shop/boost_scroll.png	32.8	0.9688	0.945	35.14	0			2	ok	flagged-envelope
+tex	res://assets/v10/shop/boost_wind.png	32.6	0.9675	0.952	34.28	0			2	ok	flagged-envelope
+tex	res://assets/v10/shop/hanko.png	33.53	0.9714	0.96	37.93	0			2	ok	flagged-envelope
+tex	res://assets/v10/shop/item_coin.png	32.82	0.9798	0.973	35.32	0			2	ok	flagged-envelope
+tex	res://assets/v10/shop/item_crystal.png	34.54	0.955	0.936	37.35	0		1.313	2	ok	flagged-envelope
+tex	res://assets/v10/shop/item_frame.png	30.7	0.9904	0.986	34.04	0			2	ok	flagged-envelope
+tex	res://assets/v10/shop/item_gift.png	33.06	0.9716	0.955	35.47	0		1.582	2	ok	flagged-envelope
+tex	res://assets/v10/shop/item_month.png	33.8	0.9709	0.951	36.36	0		1.474	2	ok	flagged-envelope
+tex	res://assets/v10/shop/item_pass.png	32.06	0.9712	0.953	36.55	0			2	ok	flagged-envelope
+tex	res://assets/v10/shop/item_petal.png	34.8	0.9332	0.917	36.81	0		1.32	2	ok	flagged-envelope
+tex	res://assets/v10/shop/item_tea.png	32.41	0.9838	0.976	35.49	0			2	ok	flagged-envelope
+tex	res://assets/v10/shop/item_wish.png	32.84	0.9588	0.935	35.27	0		1.256	2	ok	flagged-envelope
+tex	res://assets/v10/shop/moon_2.png	37.18	0.9584	0.944	39.63	0		1.379	2	ok	flagged-envelope
+tex	res://assets/v10/shop/moon_3.png	35.3	0.958	0.948	37.68	0		1.317	2	ok	flagged-envelope
+tex	res://assets/v10/shop/moon_4.png	34.8	0.9715	0.954	37.43	0		1.356	2	ok	flagged-envelope
+tex	res://assets/v10/shop/moon_5.png	34.4	0.9718	0.958	36.15	0		1.424	2	ok	flagged-envelope
+tex	res://assets/v10/shop/moon_6.png	34.02	0.9736	0.958	35.64	0		1.541	2	ok	flagged-envelope
+tex	res://assets/v10/shop/set_cup.png	32.9	0.9729	0.963	34.22	0		1.476	2	ok	flagged-envelope
+tex	res://assets/v10/shop/set_growth.png	33.03	0.9803	0.967	35.49	0		1.69	2	ok	flagged-envelope
+tex	res://assets/v10/shop/set_guest.png	32.77	0.9783	0.966	35.14	0		1.42	2	ok	flagged-envelope
+tex	res://assets/v10/shop/set_novice.png	32.59	0.9768	0.958	36.25	0			2	ok	flagged-envelope
+tex	res://assets/v10/shop/set_traveler.png	32.23	0.975	0.956	35.01	0			2	ok	flagged-envelope
+tex	res://assets/v10/tower/journey_far.webp	36.66	0.9668	0.939		0	0.25	1.118	2	ok	flagged-envelope
+tex	res://assets/v10/tower/pagoda_far.webp	43.51	0.9889	0.954		0	0.276	1.326	2	ok	gate
+tex	res://assets/v10/tower/pagoda_mid.png	33.35	0.9783	0.96	36.15	0		1.218	2	ok	flagged-envelope
+tex	res://assets/v10/tower/pagoda_near.png	32.02	0.981	0.962	36.03	0		1.172	2	ok	flagged-envelope
+tex	res://assets/v10/tower/paper.webp	43.4	0.9671	0.957		0	0.23	1.648	2	ok	gate
+tex	res://assets/v10/wave1/emotions/kohaku_happy.webp	38.0	0.9816	0.973	40.22	0	0.068	0.883	3	ok	gate
+tex	res://assets/v10/wave1/emotions/kohaku_pout.webp	37.34	0.984	0.972	37.85	0	0.167	1.013	3	ok	flagged-envelope
+tex	res://assets/v10/wave1/emotions/kohaku_sad.webp	37.49	0.9827	0.972	38.31	0	0.111	1.024	3	ok	flagged-envelope
+tex	res://assets/v10/wave1/emotions/kohaku_shy.webp	38.14	0.9817	0.968	39.11	0		1.045	2	ok	gate
+tex	res://assets/v10/wave1/emotions/kohaku_surprised.webp	36.98	0.9833	0.969	38.19	0		0.99	2	ok	flagged-envelope
+tex	res://assets/v10/wave1/emotions/miel_happy.webp	37.5	0.9837	0.977	38.16	0		0.968	2	ok	flagged-envelope
+tex	res://assets/v10/wave1/emotions/miel_pout.webp	37.32	0.984	0.976	38.44	0		0.984	2	ok	flagged-envelope
+tex	res://assets/v10/wave1/emotions/miel_sad.webp	37.08	0.9839	0.974	38.54	0		0.817	2	ok	flagged-envelope
+tex	res://assets/v10/wave1/emotions/miel_shy.webp	37.69	0.9816	0.973	38.06	0		0.933	2	ok	flagged-envelope
+tex	res://assets/v10/wave1/emotions/miel_surprised.webp	37.52	0.9826	0.972	37.49	0		0.921	2	ok	flagged-envelope
+tex	res://assets/v10/wave1/emotions/shirin_happy.webp	37.79	0.9825	0.974	40.99	0	0.13	0.966	3	ok	flagged-envelope
+tex	res://assets/v10/wave1/emotions/shirin_pout.webp	36.58	0.9854	0.976	38.87	0	0.039	0.782	3	ok	flagged-envelope
+tex	res://assets/v10/wave1/emotions/shirin_sad.webp	36.96	0.9853	0.975	39.25	0	0.038	0.789	3	ok	flagged-envelope
+tex	res://assets/v10/wave1/emotions/shirin_shy.webp	36.58	0.9847	0.969	38.75	0	0.05	0.935	3	ok	flagged-envelope
+tex	res://assets/v10/wave1/emotions/shirin_surprised.webp	36.28	0.9837	0.972	38.12	0	0.086	1.123	3	ok	flagged-envelope
+tex	res://assets/v10/wave1/emotions/tsubame_happy.webp	38.26	0.9786	0.954	39.28	0	0.109	1.07	3	ok	gate
+tex	res://assets/v10/wave1/emotions/tsubame_pout.webp	37.65	0.9766	0.95	39.04	0	0.139	1.136	3	ok	flagged-envelope
+tex	res://assets/v10/wave1/emotions/tsubame_sad.webp	38.01	0.9794	0.964	39.24	0	0.124	0.851	3	ok	gate
+tex	res://assets/v10/wave1/emotions/tsubame_shy.webp	37.89	0.9751	0.957	39.56	0	0.092	1.181	3	ok	flagged-envelope
+tex	res://assets/v10/wave1/emotions/tsubame_surprised.webp	37.91	0.9786	0.941	39.24	0	0.065	1.055	3	ok	flagged-envelope
+tex	res://assets/v10/wave1/emotions/zlata_happy.webp	35.77	0.9859	0.976	36.47	0		1.175	2	ok	flagged-envelope
+tex	res://assets/v10/wave1/emotions/zlata_pout.webp	36.0	0.9859	0.976	37.1	0		0.985	2	ok	flagged-envelope
+tex	res://assets/v10/wave1/emotions/zlata_sad.webp	35.73	0.9856	0.976	36.79	0		1.034	2	ok	flagged-envelope
+tex	res://assets/v10/wave1/emotions/zlata_shy.webp	35.6	0.9861	0.975	36.58	0		1.207	2	ok	flagged-envelope
+tex	res://assets/v10/wave1/emotions/zlata_surprised.webp	35.45	0.9868	0.975	36.28	0		1.124	2	ok	flagged-envelope
+tex	res://assets/v10/wave1/gacha/key_maslenitsa.webp	38.48	0.9824	0.968		0	0.211	1.118	2	ok	gate
+tex	res://assets/v10/wave1/hero/kohaku.png	34.24	0.9653	0.949	36.62	0	0.135	1.396	3	ok	flagged-envelope
+tex	res://assets/v10/wave1/hero/miel.png	34.58	0.9666	0.947	36.39	0	0.181	1.481	3	ok	flagged-envelope
+tex	res://assets/v10/wave1/hero/shirin.png	32.61	0.9702	0.954	34.28	0	0.117	1.496	3	ok	flagged-envelope
+tex	res://assets/v10/wave1/hero/tsubame.png	36.01	0.9588	0.935	38.94	0	0.169	1.457	3	ok	flagged-envelope
+tex	res://assets/v10/wave1/hero/zlata.png	31.7	0.9724	0.955	33.89	0		1.285	2	ok	flagged-envelope
+tex	res://assets/v10/wave1/outfits/ko_base.webp	39.04	0.975	0.952		0	0.211	1.106	2	ok	gate
+tex	res://assets/v10/wave1/outfits/ko_kyubi.webp	38.96	0.9766	0.961		0	0.226	1.099	2	ok	gate
+tex	res://assets/v10/wave1/outfits/ko_matsuri.webp	39.1	0.9749	0.954		0	0.219	1.127	2	ok	gate
+tex	res://assets/v10/wave1/outfits/ko_vow.webp	38.34	0.9763	0.961		0		0.967	1	ok	gate
+tex	res://assets/v10/wave1/outfits/me_base.webp	40.58	0.9798	0.961		0	0.239	1.129	2	ok	gate
+tex	res://assets/v10/wave1/outfits/me_gala.webp	40.07	0.9768	0.959		0	0.21	1.133	2	ok	gate
+tex	res://assets/v10/wave1/outfits/me_parlor.webp	39.91	0.9793	0.959		0	0.225	1.135	2	ok	gate
+tex	res://assets/v10/wave1/outfits/sh_base.webp	38.84	0.9793	0.962		0	0.22	1.057	2	ok	gate
+tex	res://assets/v10/wave1/outfits/sh_night.webp	37.98	0.978	0.961		0	0.205	1.082	2	ok	flagged-envelope
+tex	res://assets/v10/wave1/outfits/sh_oasis.webp	37.84	0.978	0.967		0	0.185	1.081	2	ok	flagged-envelope
+tex	res://assets/v10/wave1/outfits/sh_sun.webp	37.57	0.9805	0.959		0	0.159	1.069	2	ok	flagged-envelope
+tex	res://assets/v10/wave1/outfits/tb_base.webp	39.75	0.976	0.95		0	0.201	1.104	2	ok	gate
+tex	res://assets/v10/wave1/outfits/tb_crimson.webp	41.69	0.9823	0.956		0	0.232	1.105	2	ok	gate
+tex	res://assets/v10/wave1/outfits/tb_post.webp	40.31	0.9767	0.954		0	0.247	1.18	2	ok	gate
+tex	res://assets/v10/wave1/outfits/zl_base.webp	37.74	0.9803	0.966		0	0.188	1.132	2	ok	flagged-envelope
+tex	res://assets/v10/wave1/outfits/zl_ember.webp	37.82	0.9819	0.971		0	0.154	1.038	2	ok	flagged-envelope
+tex	res://assets/v10/wave1/outfits/zl_fair.webp	38.05	0.9797	0.966		0	0.081	1.13	2	ok	gate
+tex	res://assets/v10/wave1/outfits/zl_vow.webp	37.37	0.9785	0.965		0	0.196	1.118	2	ok	flagged-envelope
+tex	res://assets/v10/wave1/poses/kohaku_idle.webp	39.04	0.975	0.952		0	0.211	1.106	2	ok	gate
+tex	res://assets/v10/wave1/poses/kohaku_select.webp	39.62	0.9755	0.961		0	0.238	1.15	2	ok	gate
+tex	res://assets/v10/wave1/poses/kohaku_shy.webp	39.48	0.9743	0.948		0	0.233	1.171	2	ok	gate
+tex	res://assets/v10/wave1/poses/kohaku_win.webp	38.58	0.974	0.958		0	0.221	1.126	2	ok	gate
+tex	res://assets/v10/wave1/poses/miel_idle.webp	40.58	0.9798	0.961		0	0.239	1.129	2	ok	gate
+tex	res://assets/v10/wave1/poses/miel_lose.webp	40.35	0.9784	0.944		0	0.234	1.146	2	ok	gate
+tex	res://assets/v10/wave1/poses/miel_select.webp	40.43	0.9791	0.948		0	0.248	1.119	2	ok	gate
+tex	res://assets/v10/wave1/poses/miel_tease.webp	39.93	0.9791	0.957		0	0.216	1.146	2	ok	gate
+tex	res://assets/v10/wave1/poses/shirin_idle.webp	38.84	0.9793	0.962		0	0.22	1.057	2	ok	gate
+tex	res://assets/v10/wave1/poses/shirin_select.webp	38.63	0.9778	0.961		0	0.207	1.053	2	ok	gate
+tex	res://assets/v10/wave1/poses/shirin_shy.webp	38.62	0.9792	0.963		0	0.214	1.028	2	ok	gate
+tex	res://assets/v10/wave1/poses/tsubame_idle.webp	39.75	0.976	0.95		0	0.201	1.104	2	ok	gate
+tex	res://assets/v10/wave1/poses/tsubame_select.webp	41.17	0.9808	0.96		0	0.233	1.033	2	ok	gate
+tex	res://assets/v10/wave1/poses/tsubame_shy.webp	41.18	0.9805	0.96		0	0.219	1.03	2	ok	gate
+tex	res://assets/v10/wave1/poses/tsubame_win.webp	40.94	0.9794	0.952		0	0.226	1.038	2	ok	gate
+tex	res://assets/v10/wave1/poses/zlata_idle.webp	37.74	0.9803	0.966		0	0.188	1.132	2	ok	flagged-envelope
+tex	res://assets/v10/wave1/poses/zlata_lose.webp	38.05	0.9795	0.972		0		0.967	1	ok	gate
+tex	res://assets/v10/wave1/poses/zlata_select.webp	37.52	0.98	0.968		0	0.194	1.124	2	ok	flagged-envelope
+tex	res://assets/v10/wave1/poses/zlata_win.webp	37.67	0.9805	0.971		0	0.135	0.991	2	ok	flagged-envelope
+vid	game/assets/v09/video/mc_lobby.ogv	39.312061	0.972756	0.878208					6	ok	worst-frame-5-startup-frames-only
+vid	game/assets/v10/ult_video/hana.ogv								3	ok	unchanged-original
+vid	game/assets/v10/ult_video/kohaku.ogv	37.469248	0.949011	0.931323					4	ok	worst-frame>=0.92
+vid	game/assets/v10/ult_video/mc.ogv								6	ok	unchanged-original
+vid	game/assets/v10/ult_video/mc_base.ogv								6	ok	unchanged-original
+vid	game/assets/v10/ult_video/miel.ogv	38.51782	0.955291	0.934569					6	ok	worst-frame>=0.92
+vid	game/assets/v10/ult_video/nova.ogv	37.251749	0.965958	0.952164					6	ok	worst-frame>=0.92
+vid	game/assets/v10/ult_video/nova_roof.ogv								6	ok	unchanged-original
+vid	game/assets/v10/ult_video/o_dragon.ogv	36.042128	0.941627	0.924896					6	ok	worst-frame>=0.92
+vid	game/assets/v10/ult_video/rin.ogv								6	ok	unchanged-original
+vid	game/assets/v10/ult_video/shirin.ogv	39.317734	0.960478	0.93622					6	ok	worst-frame>=0.92
+vid	game/assets/v10/ult_video/tsubame.ogv	38.528464	0.957522	0.92976					6	ok	worst-frame>=0.92
+vid	game/assets/v10/ult_video/yue.ogv								3	ok	unchanged-original
+vid	game/assets/v10/ult_video/yue_queen.ogv	38.340653	0.959511	0.944128					6	ok	worst-frame>=0.92
+vid	game/assets/v10/ult_video/zlata.ogv	36.313968	0.946534	0.926919					4	ok	worst-frame>=0.92
