@@ -5,7 +5,7 @@
    "fast": {
     "marker": "ADVENTURE_SELFTEST 147/147",
     "ok": 147,
-    "secs": 6.5,
+    "secs": 6.1,
     "status": "pass",
     "total": 147
    },
@@ -21,7 +21,7 @@
    "fast": {
     "marker": "V10AUDIO OK 339/339",
     "ok": 339,
-    "secs": 26.4,
+    "secs": 26.6,
     "status": "pass",
     "total": 339
    },
@@ -37,7 +37,7 @@
    "fast": {
     "marker": "AUTH_SELFTEST 102/102",
     "ok": 102,
-    "secs": 12.3,
+    "secs": 12.2,
     "status": "pass",
     "total": 102
    },
@@ -53,7 +53,7 @@
    "fast": {
     "marker": "SELFTEST 240/240 boards solved",
     "ok": 240,
-    "secs": 28.0,
+    "secs": 24.3,
     "status": "pass",
     "total": 240
    },
@@ -117,7 +117,7 @@
    "fast": {
     "marker": "V10 CLARITY SELFTEST 4672/4672",
     "ok": 4672,
-    "secs": 5.8,
+    "secs": 5.5,
     "status": "pass",
     "total": 4672
    },
@@ -133,7 +133,7 @@
    "fast": {
     "marker": "CONTRACT_SELFTEST 35/35",
     "ok": 35,
-    "secs": 19.0,
+    "secs": 16.3,
     "status": "pass",
     "total": 35
    },
@@ -163,9 +163,9 @@
   },
   "economy": {
    "fast": {
-    "marker": "ECON_SELFTEST 384/384 (3.0 s)",
+    "marker": "ECON_SELFTEST 384/384 (3.1 s)",
     "ok": 384,
-    "secs": 8.6,
+    "secs": 8.4,
     "status": "pass",
     "total": 384
    },
@@ -179,9 +179,9 @@
   },
   "event": {
    "fast": {
-    "marker": "EVENT SELFTEST 84/84 boards solved · week par 1118/1082/1352 · bots at week end: top 2263, 5th 1948, 15th 612",
+    "marker": "EVENT SELFTEST 84/84 boards solved · week par 1118/1082/1352 · bots at week end: top 2543, 5th 2055, 15th 435",
     "ok": 84,
-    "secs": 19.0,
+    "secs": 16.0,
     "status": "pass",
     "total": 84
    },
@@ -197,7 +197,7 @@
    "fast": {
     "marker": "EVENTS_SELFTEST 63/63",
     "ok": 63,
-    "secs": 6.8,
+    "secs": 6.5,
     "status": "pass",
     "total": 63
    },
@@ -212,7 +212,7 @@
   "fonts": {
    "fast": {
     "marker": "FONTS SELFTEST: 276 ok, 0 failed (fonts 690432 bytes)",
-    "secs": 5.3,
+    "secs": 5.4,
     "status": "pass"
    },
    "full": {
@@ -225,7 +225,7 @@
    "fast": {
     "marker": "GACHA_SELFTEST 115/115",
     "ok": 115,
-    "secs": 11.5,
+    "secs": 12.0,
     "status": "pass",
     "total": 115
    },
@@ -241,7 +241,7 @@
    "fast": {
     "marker": "HUD2 SELFTEST 854/854 OK",
     "ok": 854,
-    "secs": 8.8,
+    "secs": 8.2,
     "status": "pass",
     "total": 854
    },
@@ -257,7 +257,7 @@
    "fast": {
     "marker": "HUDFX SELFTEST 1129/1129",
     "ok": 1129,
-    "secs": 16.0,
+    "secs": 14.9,
     "status": "pass",
     "total": 1129
    },
@@ -289,7 +289,7 @@
    "fast": {
     "marker": "LEAGUE SELFTEST 1131/1131",
     "ok": 1131,
-    "secs": 15.9,
+    "secs": 14.4,
     "status": "pass",
     "total": 1131
    },
@@ -333,7 +333,7 @@
     ],
     "marker": "LETTERS SELFTEST 4330/4355",
     "ok": 4330,
-    "secs": 13.3,
+    "secs": 14.3,
     "status": "fail",
     "total": 4355
    },
@@ -377,7 +377,7 @@
    "fast": {
     "marker": "LEVELS SELFTEST OK 200 levels: certificate 200/200 solvable",
     "ok": 200,
-    "secs": 18.6,
+    "secs": 17.6,
     "status": "pass",
     "total": 200
    },
@@ -393,7 +393,7 @@
    "fast": {
     "marker": "LOOK_SELFTEST 760/760 OK",
     "ok": 760,
-    "secs": 8.6,
+    "secs": 8.4,
     "status": "pass",
     "total": 760
    },
@@ -409,7 +409,7 @@
    "fast": {
     "marker": "META_SELFTEST 190/190 (meta 23/23, bond 13/13, notify 25/25, entry 7/7, lint 31/31, save 14/14, winbar 22/22, more 8/8, ",
     "ok": 190,
-    "secs": 6.1,
+    "secs": 6.0,
     "status": "pass",
     "total": 190
    },
@@ -471,9 +471,9 @@
   },
   "mj_cube": {
    "fast": {
-    "marker": "MJ_CUBE 34/34 (4365 ms)",
+    "marker": "MJ_CUBE 34/34 (4182 ms)",
     "ok": 34,
-    "secs": 10.3,
+    "secs": 10.2,
     "status": "pass",
     "total": 34
    },
@@ -487,9 +487,9 @@
   },
   "mj_garden": {
    "fast": {
-    "marker": "MJ_GARDEN 88/88 (13154 ms)",
+    "marker": "MJ_GARDEN 88/88 (12434 ms)",
     "ok": 88,
-    "secs": 19.3,
+    "secs": 18.1,
     "status": "pass",
     "total": 88
    },
@@ -505,7 +505,7 @@
    "fast": {
     "marker": "MJ_KOIKOI 138/138 (2.3 s)",
     "ok": 138,
-    "secs": 8.5,
+    "secs": 8.0,
     "status": "pass",
     "total": 138
    },
@@ -569,7 +569,7 @@
    "fast": {
     "marker": "MJ_STAGE 125/125",
     "ok": 125,
-    "secs": 30.5,
+    "secs": 30.7,
     "status": "pass",
     "total": 125
    },
@@ -583,7 +583,7 @@
   },
   "mj_triples": {
    "fast": {
-    "marker": "MJ_TRIPLES 2736/2736 (15529 ms)",
+    "marker": "MJ_TRIPLES 2736/2736 (15297 ms)",
     "ok": 2736,
     "secs": 21.2,
     "status": "pass",
@@ -601,7 +601,7 @@
    "fast": {
     "marker": "ONLINE_SELFTEST 83/83 PASS",
     "ok": 83,
-    "secs": 18.3,
+    "secs": 17.3,
     "status": "pass",
     "total": 83
    },
@@ -615,9 +615,9 @@
   },
   "palm": {
    "fast": {
-    "marker": "HAND_SELFTEST 163/163 (17.9 s)",
+    "marker": "HAND_SELFTEST 163/163 (17.1 s)",
     "ok": 163,
-    "secs": 23.6,
+    "secs": 22.8,
     "status": "pass",
     "total": 163
    },
@@ -633,7 +633,7 @@
    "fast": {
     "marker": "PATH SELFTEST 141/141 (levels 30/30, peaks 12/12, legend 10/10, boosters 24/24, wind 7/7, jam 4/4, ui 26/26, ux 28/28) 1",
     "ok": 141,
-    "secs": 7.8,
+    "secs": 7.6,
     "status": "pass",
     "total": 141
    },
@@ -649,7 +649,7 @@
    "fast": {
     "marker": "PHONE SELFTEST 50/50",
     "ok": 50,
-    "secs": 9.8,
+    "secs": 9.5,
     "status": "pass",
     "total": 50
    },
@@ -665,7 +665,7 @@
    "fast": {
     "marker": "PROFILE SELFTEST 13/13",
     "ok": 13,
-    "secs": 15.6,
+    "secs": 14.9,
     "status": "pass",
     "total": 13
    },
@@ -687,7 +687,7 @@
     ],
     "marker": "PROFILE2_SELFTEST 110/112",
     "ok": 110,
-    "secs": 8.2,
+    "secs": 8.0,
     "status": "fail",
     "total": 112
    },
@@ -709,7 +709,7 @@
    "fast": {
     "marker": "RECOVERY SELFTEST 66/66",
     "ok": 66,
-    "secs": 13.6,
+    "secs": 14.0,
     "status": "pass",
     "total": 66
    },
@@ -725,7 +725,7 @@
    "fast": {
     "marker": "LAYOUT_SELFTEST 174/174",
     "ok": 174,
-    "secs": 17.3,
+    "secs": 16.2,
     "status": "pass",
     "total": 174
    },
@@ -757,7 +757,7 @@
    "fast": {
     "marker": "RIT_SELFTEST 144/144",
     "ok": 144,
-    "secs": 5.7,
+    "secs": 5.6,
     "status": "pass",
     "total": 144
    },
@@ -789,7 +789,7 @@
    "fast": {
     "marker": "E2E_OK",
     "ok": 60,
-    "secs": 4.3,
+    "secs": 4.9,
     "status": "pass",
     "total": 60
    },
@@ -805,7 +805,7 @@
    "fast": {
     "marker": "SHOP_SELFTEST 682/682",
     "ok": 682,
-    "secs": 8.5,
+    "secs": 7.9,
     "status": "pass",
     "total": 682
    },
@@ -821,7 +821,7 @@
    "fast": {
     "marker": "SPECIAL SELFTEST solver 288/288 solved; greedy plain 156/288, greedy with specials 156/288; kinds { \"gift\": 24 }; unstic",
     "ok": 288,
-    "secs": 24.2,
+    "secs": 24.1,
     "status": "pass",
     "total": 288
    },
@@ -837,7 +837,7 @@
    "fast": {
     "marker": "STAMINA_SELFTEST 98/98",
     "ok": 98,
-    "secs": 5.8,
+    "secs": 5.4,
     "status": "pass",
     "total": 98
    },
@@ -857,7 +857,7 @@
     ],
     "marker": "SUMMON_SELFTEST 45/56",
     "ok": 45,
-    "secs": 18.0,
+    "secs": 17.9,
     "status": "fail",
     "total": 56
    },
@@ -877,7 +877,7 @@
    "fast": {
     "marker": "TOWER_SELFTEST 198/198 (1.8 s)",
     "ok": 198,
-    "secs": 11.5,
+    "secs": 12.4,
     "status": "pass",
     "total": 198
    },
@@ -971,7 +971,7 @@
    "fast": {
     "marker": "V10TUT 2757/2757 (code 61/61, lint 2412/2412, gates 39/39, geom 100/100, help 85/85, logic 60/60)",
     "ok": 2757,
-    "secs": 9.1,
+    "secs": 8.9,
     "status": "pass",
     "total": 2757
    },
@@ -987,7 +987,7 @@
    "fast": {
     "marker": "ULT SELFTEST rin 22/22",
     "ok": 22,
-    "secs": 18.3,
+    "secs": 17.7,
     "status": "pass",
     "total": 22
    },
@@ -1001,70 +1001,24 @@
   },
   "ults": {
    "fast": {
-    "expected_fail": [
-     "SCRIPT ERROR: Invalid access to property or key 'tsubame' on a base object of type 'Dictionary'.",
-     "ULTS FAIL: ULTS has ko_base",
-     "ULTS FAIL: ULTS has ko_kyubi",
-     "ULTS FAIL: ULTS has ko_matsuri",
-     "ULTS FAIL: ULTS has ko_vow",
-     "ULTS FAIL: ULTS has me_base",
-     "ULTS FAIL: ULTS has me_gala",
-     "ULTS FAIL: ULTS has me_parlor",
-     "ULTS FAIL: ULTS has sh_base",
-     "ULTS FAIL: ULTS has sh_night",
-     "ULTS FAIL: ULTS has sh_oasis",
-     "ULTS FAIL: ULTS has sh_sun",
-     "ULTS FAIL: ULTS has tb_base",
-     "ULTS FAIL: ULTS has tb_crimson",
-     "ULTS FAIL: ULTS has tb_post",
-     "ULTS FAIL: ULTS has zl_base",
-     "ULTS FAIL: ULTS has zl_ember",
-     "ULTS FAIL: ULTS has zl_fair",
-     "ULTS FAIL: ULTS has zl_vow",
-     "ULTS FAIL: core for tsubame",
-     "ULTS FAIL: targets per §2 { \"mc\": \"pair\", \"rin\": \"none\", \"hana\": \"swipe\", \"yue\": \"row\", \"nova\": \"tier\", \"tsubame\": \"pair\", \"miel\": \"pair\", \"kohaku\": \"pair\", \"sh"
-    ],
-    "marker": "ULTS SELFTEST 662/682",
-    "ok": 662,
-    "secs": 13.4,
-    "status": "fail",
-    "total": 682
+    "marker": "ULTS SELFTEST 704/704",
+    "ok": 704,
+    "secs": 14.6,
+    "status": "pass",
+    "total": 704
    },
    "full": {
-    "expected_fail": [
-     "SCRIPT ERROR: Invalid access to property or key 'tsubame' on a base object of type 'Dictionary'.",
-     "ULTS FAIL: ULTS has ko_base",
-     "ULTS FAIL: ULTS has ko_kyubi",
-     "ULTS FAIL: ULTS has ko_matsuri",
-     "ULTS FAIL: ULTS has ko_vow",
-     "ULTS FAIL: ULTS has me_base",
-     "ULTS FAIL: ULTS has me_gala",
-     "ULTS FAIL: ULTS has me_parlor",
-     "ULTS FAIL: ULTS has sh_base",
-     "ULTS FAIL: ULTS has sh_night",
-     "ULTS FAIL: ULTS has sh_oasis",
-     "ULTS FAIL: ULTS has sh_sun",
-     "ULTS FAIL: ULTS has tb_base",
-     "ULTS FAIL: ULTS has tb_crimson",
-     "ULTS FAIL: ULTS has tb_post",
-     "ULTS FAIL: ULTS has zl_base",
-     "ULTS FAIL: ULTS has zl_ember",
-     "ULTS FAIL: ULTS has zl_fair",
-     "ULTS FAIL: ULTS has zl_vow",
-     "ULTS FAIL: core for tsubame",
-     "ULTS FAIL: targets per §2 { \"mc\": \"pair\", \"rin\": \"none\", \"hana\": \"swipe\", \"yue\": \"row\", \"nova\": \"tier\", \"tsubame\": \"pair\", \"miel\": \"pair\", \"kohaku\": \"pair\", \"sh"
-    ],
-    "marker": "ULTS SELFTEST 662/682",
-    "ok": 662,
-    "secs": 13.2,
-    "status": "fail",
-    "total": 682
+    "marker": "ULTS SELFTEST 704/704",
+    "ok": 704,
+    "secs": 13.0,
+    "status": "pass",
+    "total": 704
    }
   },
   "ux_lint": {
    "fast": {
     "marker": "UX_LINT RESULT: OK (0 violations)",
-    "secs": 2.0,
+    "secs": 1.9,
     "status": "pass"
    },
    "full": {
@@ -1093,7 +1047,7 @@
    "fast": {
     "marker": "WAVE1_SELFTEST 221/221",
     "ok": 221,
-    "secs": 8.1,
+    "secs": 7.4,
     "status": "pass",
     "total": 221
    },
