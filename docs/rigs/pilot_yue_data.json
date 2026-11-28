@@ -1,0 +1,7914 @@
+{
+ "godot": "4.5.1.stable.official.f62fdbde1",
+ "measure": {
+  "_empty_scene_gl": {
+   "cpu_ms_rig_process": 0.0,
+   "cpu_ms_rig_process_note": "wall time of one V10LiveRig._process(1/60) call on THIS machine (x86 cloud core); a Mali-class phone core is roughly 3-6x slower [NP]",
+   "draw_calls_gl_max": 0,
+   "draw_calls_gl_mean": 0.0,
+   "frames": 120,
+   "gl_texture_mem_mb": 7.06,
+   "rendering_driver": "opengl3",
+   "rendering_method": "gl_compatibility",
+   "rig": "none",
+   "video_mem_mb": 13.17,
+   "wall_ms_per_frame_headless": 3.325
+  },
+  "hana_base": {
+   "gl": {
+    "bones": 27,
+    "cpu_ms_rig_process": 0.439,
+    "cpu_ms_rig_process_note": "wall time of one V10LiveRig._process(1/60) call on THIS machine (x86 cloud core); a Mali-class phone core is roughly 3-6x slower [NP]",
+    "draw_calls_gl_max": 29,
+    "draw_calls_gl_mean": 12.5,
+    "draw_items_upper": 22,
+    "frames": 240,
+    "gl_texture_mem_mb": 25.51,
+    "nodes": 54,
+    "polys": 5,
+    "rendering_driver": "opengl3",
+    "rendering_method": "gl_compatibility",
+    "rig": "hana_base",
+    "sprites": 16,
+    "tex_mem_rgba_mb": 15.39,
+    "tex_mem_rgba_mips_mb": 20.51,
+    "tex_mem_vram_mips_mb": 5.13,
+    "tex_pixels": 4033365,
+    "textures": [
+     {
+      "h": 134,
+      "tex": "mouth_pout.png",
+      "w": 220
+     },
+     {
+      "h": 104,
+      "tex": "mouth_pucker.png",
+      "w": 148
+     },
+     {
+      "h": 104,
+      "tex": "mouth_oh.png",
+      "w": 148
+     },
+     {
+      "h": 114,
+      "tex": "mouth_ah.png",
+      "w": 160
+     },
+     {
+      "h": 104,
+      "tex": "mouth_closed.png",
+      "w": 148
+     },
+     {
+      "h": 104,
+      "tex": "mouth_small.png",
+      "w": 148
+     },
+     {
+      "h": 114,
+      "tex": "eyeR_closed.png",
+      "w": 224
+     },
+     {
+      "h": 114,
+      "tex": "eyeL_closed.png",
+      "w": 224
+     },
+     {
+      "h": 114,
+      "tex": "eyes_closed.png",
+      "w": 224
+     },
+     {
+      "h": 114,
+      "tex": "eyes_happy.png",
+      "w": 224
+     },
+     {
+      "h": 114,
+      "tex": "eyes_frown.png",
+      "w": 224
+     },
+     {
+      "h": 114,
+      "tex": "blush.png",
+      "w": 224
+     },
+     {
+      "h": 114,
+      "tex": "eyes_half.png",
+      "w": 224
+     },
+     {
+      "h": 36,
+      "tex": "eyeR_socket.png",
+      "w": 56
+     },
+     {
+      "h": 36,
+      "tex": "eyeR_iris.png",
+      "w": 56
+     },
+     {
+      "h": 32,
+      "tex": "eyeL_socket.png",
+      "w": 60
+     },
+     {
+      "h": 32,
+      "tex": "eyeL_iris.png",
+      "w": 60
+     },
+     {
+      "h": 105,
+      "tex": "layer_pendant.png",
+      "w": 82
+     },
+     {
+      "h": 289,
+      "tex": "layer_sleeveB.png",
+      "w": 125
+     },
+     {
+      "h": 246,
+      "tex": "layer_sleeveA.png",
+      "w": 181
+     },
+     {
+      "h": 336,
+      "tex": "layer_flapL.png",
+      "w": 200
+     },
+     {
+      "h": 1400,
+      "tex": "layer_body.png",
+      "w": 1400
+     },
+     {
+      "h": 1583,
+      "tex": "bg.png",
+      "w": 1024
+     }
+    ],
+    "textures_unique": 23,
+    "triangles": 8526,
+    "vertices": 4666,
+    "video_mem_mb": 31.87,
+    "wall_ms_per_frame_headless": 15.398
+   },
+   "headless": {
+    "bones": 27,
+    "cpu_ms_rig_process": 0.218,
+    "cpu_ms_rig_process_note": "wall time of one V10LiveRig._process(1/60) call on THIS machine (x86 cloud core); a Mali-class phone core is roughly 3-6x slower [NP]",
+    "draw_calls_gl_max": 0,
+    "draw_calls_gl_mean": 0.0,
+    "draw_items_upper": 22,
+    "frames": 900,
+    "gl_texture_mem_mb": 0.0,
+    "nodes": 54,
+    "polys": 5,
+    "rendering_driver": "opengl3",
+    "rendering_method": "gl_compatibility",
+    "rig": "hana_base",
+    "sprites": 16,
+    "tex_mem_rgba_mb": 15.39,
+    "tex_mem_rgba_mips_mb": 20.51,
+    "tex_mem_vram_mips_mb": 5.13,
+    "tex_pixels": 4033365,
+    "textures": [
+     {
+      "h": 134,
+      "tex": "mouth_pout.png",
+      "w": 220
+     },
+     {
+      "h": 104,
+      "tex": "mouth_pucker.png",
+      "w": 148
+     },
+     {
+      "h": 104,
+      "tex": "mouth_oh.png",
+      "w": 148
+     },
+     {
+      "h": 114,
+      "tex": "mouth_ah.png",
+      "w": 160
+     },
+     {
+      "h": 104,
+      "tex": "mouth_closed.png",
+      "w": 148
+     },
+     {
+      "h": 104,
+      "tex": "mouth_small.png",
+      "w": 148
+     },
+     {
+      "h": 114,
+      "tex": "eyeR_closed.png",
+      "w": 224
+     },
+     {
+      "h": 114,
+      "tex": "eyeL_closed.png",
+      "w": 224
+     },
+     {
+      "h": 114,
+      "tex": "eyes_closed.png",
+      "w": 224
+     },
+     {
+      "h": 114,
+      "tex": "eyes_happy.png",
+      "w": 224
+     },
+     {
+      "h": 114,
+      "tex": "eyes_frown.png",
+      "w": 224
+     },
+     {
+      "h": 114,
+      "tex": "blush.png",
+      "w": 224
+     },
+     {
+      "h": 114,
+      "tex": "eyes_half.png",
+      "w": 224
+     },
+     {
+      "h": 36,
+      "tex": "eyeR_socket.png",
+      "w": 56
+     },
+     {
+      "h": 36,
+      "tex": "eyeR_iris.png",
+      "w": 56
+     },
+     {
+      "h": 32,
+      "tex": "eyeL_socket.png",
+      "w": 60
+     },
+     {
+      "h": 32,
+      "tex": "eyeL_iris.png",
+      "w": 60
+     },
+     {
+      "h": 105,
+      "tex": "layer_pendant.png",
+      "w": 82
+     },
+     {
+      "h": 289,
+      "tex": "layer_sleeveB.png",
+      "w": 125
+     },
+     {
+      "h": 246,
+      "tex": "layer_sleeveA.png",
+      "w": 181
+     },
+     {
+      "h": 336,
+      "tex": "layer_flapL.png",
+      "w": 200
+     },
+     {
+      "h": 1400,
+      "tex": "layer_body.png",
+      "w": 1400
+     },
+     {
+      "h": 1583,
+      "tex": "bg.png",
+      "w": 1024
+     }
+    ],
+    "textures_unique": 23,
+    "triangles": 8526,
+    "vertices": 4666,
+    "video_mem_mb": 0.0,
+    "wall_ms_per_frame_headless": 0.466
+   }
+  },
+  "mc_gown": {
+   "gl": {
+    "bones": 29,
+    "cpu_ms_rig_process": 0.452,
+    "cpu_ms_rig_process_note": "wall time of one V10LiveRig._process(1/60) call on THIS machine (x86 cloud core); a Mali-class phone core is roughly 3-6x slower [NP]",
+    "draw_calls_gl_max": 23,
+    "draw_calls_gl_mean": 18.5,
+    "draw_items_upper": 27,
+    "frames": 240,
+    "gl_texture_mem_mb": 33.45,
+    "nodes": 60,
+    "polys": 11,
+    "rendering_driver": "opengl3",
+    "rendering_method": "gl_compatibility",
+    "rig": "mc_gown",
+    "sprites": 15,
+    "tex_mem_rgba_mb": 21.07,
+    "tex_mem_rgba_mips_mb": 28.09,
+    "tex_mem_vram_mips_mb": 7.02,
+    "tex_pixels": 5523183,
+    "textures": [
+     {
+      "h": 136,
+      "tex": "mouth_pout.png",
+      "w": 240
+     },
+     {
+      "h": 112,
+      "tex": "mouth_pucker.png",
+      "w": 160
+     },
+     {
+      "h": 112,
+      "tex": "mouth_oh.png",
+      "w": 160
+     },
+     {
+      "h": 112,
+      "tex": "mouth_ah.png",
+      "w": 160
+     },
+     {
+      "h": 90,
+      "tex": "mouth_closed.png",
+      "w": 130
+     },
+     {
+      "h": 90,
+      "tex": "mouth_small.png",
+      "w": 130
+     },
+     {
+      "h": 140,
+      "tex": "eyeR_closed.png",
+      "w": 260
+     },
+     {
+      "h": 140,
+      "tex": "eyeL_closed.png",
+      "w": 260
+     },
+     {
+      "h": 140,
+      "tex": "eyes_closed.png",
+      "w": 260
+     },
+     {
+      "h": 160,
+      "tex": "eyes_happy.png",
+      "w": 274
+     },
+     {
+      "h": 160,
+      "tex": "eyes_frown.png",
+      "w": 274
+     },
+     {
+      "h": 140,
+      "tex": "blush.png",
+      "w": 260
+     },
+     {
+      "h": 44,
+      "tex": "eyeR_socket.png",
+      "w": 76
+     },
+     {
+      "h": 44,
+      "tex": "eyeR_iris.png",
+      "w": 76
+     },
+     {
+      "h": 42,
+      "tex": "eyeL_socket.png",
+      "w": 78
+     },
+     {
+      "h": 42,
+      "tex": "eyeL_iris.png",
+      "w": 78
+     },
+     {
+      "h": 579,
+      "tex": "layer_armR.png",
+      "w": 401
+     },
+     {
+      "h": 95,
+      "tex": "layer_tassel.png",
+      "w": 55
+     },
+     {
+      "h": 61,
+      "tex": "layer_navel.png",
+      "w": 50
+     },
+     {
+      "h": 63,
+      "tex": "layer_pendant.png",
+      "w": 55
+     },
+     {
+      "h": 176,
+      "tex": "layer_locksR.png",
+      "w": 97
+     },
+     {
+      "h": 159,
+      "tex": "layer_locks.png",
+      "w": 109
+     },
+     {
+      "h": 1400,
+      "tex": "layer_body.png",
+      "w": 1400
+     },
+     {
+      "h": 350,
+      "tex": "layer_armL.png",
+      "w": 293
+     },
+     {
+      "h": 398,
+      "tex": "layer_thigh.png",
+      "w": 397
+     },
+     {
+      "h": 1194,
+      "tex": "layer_tailR.png",
+      "w": 400
+     },
+     {
+      "h": 1261,
+      "tex": "layer_tailL.png",
+      "w": 685
+     },
+     {
+      "h": 1474,
+      "tex": "bg.png",
+      "w": 900
+     }
+    ],
+    "textures_unique": 28,
+    "triangles": 17016,
+    "vertices": 9433,
+    "video_mem_mb": 40.06,
+    "wall_ms_per_frame_headless": 19.468
+   },
+   "headless": {
+    "bones": 29,
+    "cpu_ms_rig_process": 0.352,
+    "cpu_ms_rig_process_note": "wall time of one V10LiveRig._process(1/60) call on THIS machine (x86 cloud core); a Mali-class phone core is roughly 3-6x slower [NP]",
+    "draw_calls_gl_max": 0,
+    "draw_calls_gl_mean": 0.0,
+    "draw_items_upper": 27,
+    "frames": 900,
+    "gl_texture_mem_mb": 0.0,
+    "nodes": 60,
+    "polys": 11,
+    "rendering_driver": "opengl3",
+    "rendering_method": "gl_compatibility",
+    "rig": "mc_gown",
+    "sprites": 15,
+    "tex_mem_rgba_mb": 21.07,
+    "tex_mem_rgba_mips_mb": 28.09,
+    "tex_mem_vram_mips_mb": 7.02,
+    "tex_pixels": 5523183,
+    "textures": [
+     {
+      "h": 136,
+      "tex": "mouth_pout.png",
+      "w": 240
+     },
+     {
+      "h": 112,
+      "tex": "mouth_pucker.png",
+      "w": 160
+     },
+     {
+      "h": 112,
+      "tex": "mouth_oh.png",
+      "w": 160
+     },
+     {
+      "h": 112,
+      "tex": "mouth_ah.png",
+      "w": 160
+     },
+     {
+      "h": 90,
+      "tex": "mouth_closed.png",
+      "w": 130
+     },
+     {
+      "h": 90,
+      "tex": "mouth_small.png",
+      "w": 130
+     },
+     {
+      "h": 140,
+      "tex": "eyeR_closed.png",
+      "w": 260
+     },
+     {
+      "h": 140,
+      "tex": "eyeL_closed.png",
+      "w": 260
+     },
+     {
+      "h": 140,
+      "tex": "eyes_closed.png",
+      "w": 260
+     },
+     {
+      "h": 160,
+      "tex": "eyes_happy.png",
+      "w": 274
+     },
+     {
+      "h": 160,
+      "tex": "eyes_frown.png",
+      "w": 274
+     },
+     {
+      "h": 140,
+      "tex": "blush.png",
+      "w": 260
+     },
+     {
+      "h": 44,
+      "tex": "eyeR_socket.png",
+      "w": 76
+     },
+     {
+      "h": 44,
+      "tex": "eyeR_iris.png",
+      "w": 76
+     },
+     {
+      "h": 42,
+      "tex": "eyeL_socket.png",
+      "w": 78
+     },
+     {
+      "h": 42,
+      "tex": "eyeL_iris.png",
+      "w": 78
+     },
+     {
+      "h": 579,
+      "tex": "layer_armR.png",
+      "w": 401
+     },
+     {
+      "h": 95,
+      "tex": "layer_tassel.png",
+      "w": 55
+     },
+     {
+      "h": 61,
+      "tex": "layer_navel.png",
+      "w": 50
+     },
+     {
+      "h": 63,
+      "tex": "layer_pendant.png",
+      "w": 55
+     },
+     {
+      "h": 176,
+      "tex": "layer_locksR.png",
+      "w": 97
+     },
+     {
+      "h": 159,
+      "tex": "layer_locks.png",
+      "w": 109
+     },
+     {
+      "h": 1400,
+      "tex": "layer_body.png",
+      "w": 1400
+     },
+     {
+      "h": 350,
+      "tex": "layer_armL.png",
+      "w": 293
+     },
+     {
+      "h": 398,
+      "tex": "layer_thigh.png",
+      "w": 397
+     },
+     {
+      "h": 1194,
+      "tex": "layer_tailR.png",
+      "w": 400
+     },
+     {
+      "h": 1261,
+      "tex": "layer_tailL.png",
+      "w": 685
+     },
+     {
+      "h": 1474,
+      "tex": "bg.png",
+      "w": 900
+     }
+    ],
+    "textures_unique": 28,
+    "triangles": 17016,
+    "vertices": 9433,
+    "video_mem_mb": 0.0,
+    "wall_ms_per_frame_headless": 0.81
+   }
+  },
+  "rin_officer": {
+   "gl": {
+    "bones": 17,
+    "cpu_ms_rig_process": 0.375,
+    "cpu_ms_rig_process_note": "wall time of one V10LiveRig._process(1/60) call on THIS machine (x86 cloud core); a Mali-class phone core is roughly 3-6x slower [NP]",
+    "draw_calls_gl_max": 18,
+    "draw_calls_gl_mean": 10.0,
+    "draw_items_upper": 23,
+    "frames": 240,
+    "gl_texture_mem_mb": 25.64,
+    "nodes": 44,
+    "polys": 6,
+    "rendering_driver": "opengl3",
+    "rendering_method": "gl_compatibility",
+    "rig": "rin_officer",
+    "sprites": 16,
+    "tex_mem_rgba_mb": 15.38,
+    "tex_mem_rgba_mips_mb": 20.51,
+    "tex_mem_vram_mips_mb": 5.13,
+    "tex_pixels": 4032005,
+    "textures": [
+     {
+      "h": 184,
+      "tex": "layer_tassel.png",
+      "w": 51
+     },
+     {
+      "h": 557,
+      "tex": "layer_forearm.png",
+      "w": 311
+     },
+     {
+      "h": 120,
+      "tex": "glasses_lens.png",
+      "w": 210
+     },
+     {
+      "h": 68,
+      "tex": "mouth_pout.png",
+      "w": 102
+     },
+     {
+      "h": 60,
+      "tex": "mouth_oh.png",
+      "w": 92
+     },
+     {
+      "h": 60,
+      "tex": "mouth_ah.png",
+      "w": 92
+     },
+     {
+      "h": 60,
+      "tex": "mouth_smirk.png",
+      "w": 92
+     },
+     {
+      "h": 60,
+      "tex": "mouth_laugh.png",
+      "w": 92
+     },
+     {
+      "h": 162,
+      "tex": "over_glasses.png",
+      "w": 236
+     },
+     {
+      "h": 76,
+      "tex": "eyeR_closed.png",
+      "w": 186
+     },
+     {
+      "h": 76,
+      "tex": "eyeL_closed.png",
+      "w": 186
+     },
+     {
+      "h": 76,
+      "tex": "eyes_closed.png",
+      "w": 186
+     },
+     {
+      "h": 82,
+      "tex": "eyes_happy.png",
+      "w": 186
+     },
+     {
+      "h": 102,
+      "tex": "eyes_frown.png",
+      "w": 196
+     },
+     {
+      "h": 80,
+      "tex": "blush.png",
+      "w": 204
+     },
+     {
+      "h": 30,
+      "tex": "eyeR_socket.png",
+      "w": 56
+     },
+     {
+      "h": 30,
+      "tex": "eyeR_iris.png",
+      "w": 56
+     },
+     {
+      "h": 32,
+      "tex": "eyeL_socket.png",
+      "w": 60
+     },
+     {
+      "h": 32,
+      "tex": "eyeL_iris.png",
+      "w": 60
+     },
+     {
+      "h": 85,
+      "tex": "layer_earR.png",
+      "w": 32
+     },
+     {
+      "h": 702,
+      "tex": "layer_braid.png",
+      "w": 221
+     },
+     {
+      "h": 232,
+      "tex": "layer_handR.png",
+      "w": 123
+     },
+     {
+      "h": 1400,
+      "tex": "layer_body.png",
+      "w": 1400
+     },
+     {
+      "h": 1474,
+      "tex": "bg.png",
+      "w": 1024
+     }
+    ],
+    "textures_unique": 24,
+    "triangles": 6888,
+    "vertices": 3771,
+    "video_mem_mb": 31.95,
+    "wall_ms_per_frame_headless": 14.742
+   },
+   "headless": {
+    "bones": 17,
+    "cpu_ms_rig_process": 0.131,
+    "cpu_ms_rig_process_note": "wall time of one V10LiveRig._process(1/60) call on THIS machine (x86 cloud core); a Mali-class phone core is roughly 3-6x slower [NP]",
+    "draw_calls_gl_max": 0,
+    "draw_calls_gl_mean": 0.0,
+    "draw_items_upper": 23,
+    "frames": 900,
+    "gl_texture_mem_mb": 0.0,
+    "nodes": 44,
+    "polys": 6,
+    "rendering_driver": "opengl3",
+    "rendering_method": "gl_compatibility",
+    "rig": "rin_officer",
+    "sprites": 16,
+    "tex_mem_rgba_mb": 15.38,
+    "tex_mem_rgba_mips_mb": 20.51,
+    "tex_mem_vram_mips_mb": 5.13,
+    "tex_pixels": 4032005,
+    "textures": [
+     {
+      "h": 184,
+      "tex": "layer_tassel.png",
+      "w": 51
+     },
+     {
+      "h": 557,
+      "tex": "layer_forearm.png",
+      "w": 311
+     },
+     {
+      "h": 120,
+      "tex": "glasses_lens.png",
+      "w": 210
+     },
+     {
+      "h": 68,
+      "tex": "mouth_pout.png",
+      "w": 102
+     },
+     {
+      "h": 60,
+      "tex": "mouth_oh.png",
+      "w": 92
+     },
+     {
+      "h": 60,
+      "tex": "mouth_ah.png",
+      "w": 92
+     },
+     {
+      "h": 60,
+      "tex": "mouth_smirk.png",
+      "w": 92
+     },
+     {
+      "h": 60,
+      "tex": "mouth_laugh.png",
+      "w": 92
+     },
+     {
+      "h": 162,
+      "tex": "over_glasses.png",
+      "w": 236
+     },
+     {
+      "h": 76,
+      "tex": "eyeR_closed.png",
+      "w": 186
+     },
+     {
+      "h": 76,
+      "tex": "eyeL_closed.png",
+      "w": 186
+     },
+     {
+      "h": 76,
+      "tex": "eyes_closed.png",
+      "w": 186
+     },
+     {
+      "h": 82,
+      "tex": "eyes_happy.png",
+      "w": 186
+     },
+     {
+      "h": 102,
+      "tex": "eyes_frown.png",
+      "w": 196
+     },
+     {
+      "h": 80,
+      "tex": "blush.png",
+      "w": 204
+     },
+     {
+      "h": 30,
+      "tex": "eyeR_socket.png",
+      "w": 56
+     },
+     {
+      "h": 30,
+      "tex": "eyeR_iris.png",
+      "w": 56
+     },
+     {
+      "h": 32,
+      "tex": "eyeL_socket.png",
+      "w": 60
+     },
+     {
+      "h": 32,
+      "tex": "eyeL_iris.png",
+      "w": 60
+     },
+     {
+      "h": 85,
+      "tex": "layer_earR.png",
+      "w": 32
+     },
+     {
+      "h": 702,
+      "tex": "layer_braid.png",
+      "w": 221
+     },
+     {
+      "h": 232,
+      "tex": "layer_handR.png",
+      "w": 123
+     },
+     {
+      "h": 1400,
+      "tex": "layer_body.png",
+      "w": 1400
+     },
+     {
+      "h": 1474,
+      "tex": "bg.png",
+      "w": 1024
+     }
+    ],
+    "textures_unique": 24,
+    "triangles": 6888,
+    "vertices": 3771,
+    "video_mem_mb": 0.0,
+    "wall_ms_per_frame_headless": 0.288
+   }
+  }
+ },
+ "per_file": {
+  "hana_base/bg.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 1098802
+    },
+    "bytes": 1098802,
+    "fg_px": 1620992,
+    "image_format_enum": 4,
+    "psnr_fg": 99.0,
+    "psnr_full": 99.0,
+    "px": 1620992
+   },
+   "src_bytes": 1350157,
+   "vram": {
+    "all_formats": {
+     "etc2": 811060,
+     "s3tc": 811060
+    },
+    "bytes": 811060,
+    "fg_px": 1620992,
+    "image_format_enum": 17,
+    "psnr_fg": 37.68,
+    "psnr_full": 37.68,
+    "px": 1620992
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 31250
+    },
+    "bytes": 31250,
+    "fg_px": 1620992,
+    "image_format_enum": 4,
+    "psnr_fg": 41.08,
+    "psnr_full": 41.08,
+    "px": 1620992
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 35146
+    },
+    "bytes": 35146,
+    "fg_px": 1620992,
+    "image_format_enum": 4,
+    "psnr_fg": 41.59,
+    "psnr_full": 41.59,
+    "px": 1620992
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 45942
+    },
+    "bytes": 45942,
+    "fg_px": 1620992,
+    "image_format_enum": 4,
+    "psnr_fg": 43.03,
+    "psnr_full": 43.03,
+    "px": 1620992
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 78006
+    },
+    "bytes": 78006,
+    "fg_px": 1620992,
+    "image_format_enum": 4,
+    "psnr_fg": 45.47,
+    "psnr_full": 45.47,
+    "px": 1620992
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 167550
+    },
+    "bytes": 167550,
+    "fg_px": 1620992,
+    "image_format_enum": 4,
+    "psnr_fg": 46.62,
+    "psnr_full": 46.62,
+    "px": 1620992
+   }
+  },
+  "hana_base/blush.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 1566
+    },
+    "bytes": 1566,
+    "fg_px": 5499,
+    "image_format_enum": 5,
+    "psnr_fg": 99.0,
+    "psnr_full": 99.0,
+    "px": 25536
+   },
+   "src_bytes": 2751,
+   "vram": {
+    "all_formats": {
+     "etc2": 26036,
+     "s3tc": 26036
+    },
+    "bytes": 26036,
+    "fg_px": 5499,
+    "image_format_enum": 19,
+    "psnr_fg": 47.41,
+    "psnr_full": 54.08,
+    "px": 25536
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 1530
+    },
+    "bytes": 1530,
+    "fg_px": 5499,
+    "image_format_enum": 5,
+    "psnr_fg": 68.32,
+    "psnr_full": 74.99,
+    "px": 25536
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 1534
+    },
+    "bytes": 1534,
+    "fg_px": 5499,
+    "image_format_enum": 5,
+    "psnr_fg": 68.32,
+    "psnr_full": 74.99,
+    "px": 25536
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 1530
+    },
+    "bytes": 1530,
+    "fg_px": 5499,
+    "image_format_enum": 5,
+    "psnr_fg": 68.32,
+    "psnr_full": 74.99,
+    "px": 25536
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 1536
+    },
+    "bytes": 1536,
+    "fg_px": 5499,
+    "image_format_enum": 5,
+    "psnr_fg": 68.32,
+    "psnr_full": 74.99,
+    "px": 25536
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 1538
+    },
+    "bytes": 1538,
+    "fg_px": 5499,
+    "image_format_enum": 5,
+    "psnr_fg": 68.32,
+    "psnr_full": 74.99,
+    "px": 25536
+   }
+  },
+  "hana_base/body.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 1140938
+    },
+    "bytes": 1140938,
+    "fg_px": 713080,
+    "image_format_enum": 5,
+    "psnr_fg": 68.77,
+    "psnr_full": 73.16,
+    "px": 1960000
+   },
+   "src_bytes": 1644156,
+   "vram": {
+    "all_formats": {
+     "etc2": 1960052,
+     "s3tc": 1960052
+    },
+    "bytes": 1960052,
+    "fg_px": 713080,
+    "image_format_enum": 19,
+    "psnr_fg": 33.25,
+    "psnr_full": 37.64,
+    "px": 1960000
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 168366
+    },
+    "bytes": 168366,
+    "fg_px": 713080,
+    "image_format_enum": 5,
+    "psnr_fg": 33.28,
+    "psnr_full": 37.68,
+    "px": 1960000
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 182846
+    },
+    "bytes": 182846,
+    "fg_px": 713080,
+    "image_format_enum": 5,
+    "psnr_fg": 33.89,
+    "psnr_full": 38.28,
+    "px": 1960000
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 214520
+    },
+    "bytes": 214520,
+    "fg_px": 713080,
+    "image_format_enum": 5,
+    "psnr_fg": 35.24,
+    "psnr_full": 39.63,
+    "px": 1960000
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 297428
+    },
+    "bytes": 297428,
+    "fg_px": 713080,
+    "image_format_enum": 5,
+    "psnr_fg": 37.35,
+    "psnr_full": 41.74,
+    "px": 1960000
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 390758
+    },
+    "bytes": 390758,
+    "fg_px": 713080,
+    "image_format_enum": 5,
+    "psnr_fg": 38.37,
+    "psnr_full": 42.76,
+    "px": 1960000
+   }
+  },
+  "hana_base/eyeL_closed.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 39426
+    },
+    "bytes": 39426,
+    "fg_px": 5897,
+    "image_format_enum": 5,
+    "psnr_fg": 63.29,
+    "psnr_full": 69.65,
+    "px": 25536
+   },
+   "src_bytes": 53319,
+   "vram": {
+    "all_formats": {
+     "etc2": 26036,
+     "s3tc": 26036
+    },
+    "bytes": 26036,
+    "fg_px": 5897,
+    "image_format_enum": 19,
+    "psnr_fg": 34.87,
+    "psnr_full": 41.23,
+    "px": 25536
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 3400
+    },
+    "bytes": 3400,
+    "fg_px": 5897,
+    "image_format_enum": 5,
+    "psnr_fg": 34.21,
+    "psnr_full": 40.57,
+    "px": 25536
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 3542
+    },
+    "bytes": 3542,
+    "fg_px": 5897,
+    "image_format_enum": 5,
+    "psnr_fg": 34.68,
+    "psnr_full": 41.05,
+    "px": 25536
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 3902
+    },
+    "bytes": 3902,
+    "fg_px": 5897,
+    "image_format_enum": 5,
+    "psnr_fg": 35.73,
+    "psnr_full": 42.1,
+    "px": 25536
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 4864
+    },
+    "bytes": 4864,
+    "fg_px": 5897,
+    "image_format_enum": 5,
+    "psnr_fg": 37.34,
+    "psnr_full": 43.71,
+    "px": 25536
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 5892
+    },
+    "bytes": 5892,
+    "fg_px": 5897,
+    "image_format_enum": 5,
+    "psnr_fg": 37.94,
+    "psnr_full": 44.31,
+    "px": 25536
+   }
+  },
+  "hana_base/eyeL_iris.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 2768
+    },
+    "bytes": 2768,
+    "fg_px": 526,
+    "image_format_enum": 5,
+    "psnr_fg": 79.75,
+    "psnr_full": 85.37,
+    "px": 1920
+   },
+   "src_bytes": 3273,
+   "vram": {
+    "all_formats": {
+     "etc2": 1972,
+     "s3tc": 1972
+    },
+    "bytes": 1972,
+    "fg_px": 526,
+    "image_format_enum": 19,
+    "psnr_fg": 29.88,
+    "psnr_full": 35.5,
+    "px": 1920
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 616
+    },
+    "bytes": 616,
+    "fg_px": 526,
+    "image_format_enum": 5,
+    "psnr_fg": 31.02,
+    "psnr_full": 36.64,
+    "px": 1920
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 636
+    },
+    "bytes": 636,
+    "fg_px": 526,
+    "image_format_enum": 5,
+    "psnr_fg": 31.56,
+    "psnr_full": 37.18,
+    "px": 1920
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 702
+    },
+    "bytes": 702,
+    "fg_px": 526,
+    "image_format_enum": 5,
+    "psnr_fg": 33.01,
+    "psnr_full": 38.64,
+    "px": 1920
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 876
+    },
+    "bytes": 876,
+    "fg_px": 526,
+    "image_format_enum": 5,
+    "psnr_fg": 35.65,
+    "psnr_full": 41.27,
+    "px": 1920
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 1028
+    },
+    "bytes": 1028,
+    "fg_px": 526,
+    "image_format_enum": 5,
+    "psnr_fg": 36.77,
+    "psnr_full": 42.39,
+    "px": 1920
+   }
+  },
+  "hana_base/eyeL_socket.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 3250
+    },
+    "bytes": 3250,
+    "fg_px": 819,
+    "image_format_enum": 5,
+    "psnr_fg": 59.55,
+    "psnr_full": 63.25,
+    "px": 1920
+   },
+   "src_bytes": 4579,
+   "vram": {
+    "all_formats": {
+     "etc2": 1972,
+     "s3tc": 1972
+    },
+    "bytes": 1972,
+    "fg_px": 819,
+    "image_format_enum": 19,
+    "psnr_fg": 31.01,
+    "psnr_full": 34.71,
+    "px": 1920
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 1026
+    },
+    "bytes": 1026,
+    "fg_px": 819,
+    "image_format_enum": 5,
+    "psnr_fg": 34.53,
+    "psnr_full": 38.23,
+    "px": 1920
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 1048
+    },
+    "bytes": 1048,
+    "fg_px": 819,
+    "image_format_enum": 5,
+    "psnr_fg": 35.21,
+    "psnr_full": 38.91,
+    "px": 1920
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 1152
+    },
+    "bytes": 1152,
+    "fg_px": 819,
+    "image_format_enum": 5,
+    "psnr_fg": 37.06,
+    "psnr_full": 40.76,
+    "px": 1920
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 1360
+    },
+    "bytes": 1360,
+    "fg_px": 819,
+    "image_format_enum": 5,
+    "psnr_fg": 38.52,
+    "psnr_full": 42.22,
+    "px": 1920
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 1558
+    },
+    "bytes": 1558,
+    "fg_px": 819,
+    "image_format_enum": 5,
+    "psnr_fg": 39.78,
+    "psnr_full": 43.48,
+    "px": 1920
+   }
+  },
+  "hana_base/eyeR_closed.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 38776
+    },
+    "bytes": 38776,
+    "fg_px": 4352,
+    "image_format_enum": 5,
+    "psnr_fg": 67.41,
+    "psnr_full": 75.09,
+    "px": 25536
+   },
+   "src_bytes": 52757,
+   "vram": {
+    "all_formats": {
+     "etc2": 26036,
+     "s3tc": 26036
+    },
+    "bytes": 26036,
+    "fg_px": 4352,
+    "image_format_enum": 19,
+    "psnr_fg": 34.3,
+    "psnr_full": 41.99,
+    "px": 25536
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 2652
+    },
+    "bytes": 2652,
+    "fg_px": 4352,
+    "image_format_enum": 5,
+    "psnr_fg": 33.14,
+    "psnr_full": 40.82,
+    "px": 25536
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 2808
+    },
+    "bytes": 2808,
+    "fg_px": 4352,
+    "image_format_enum": 5,
+    "psnr_fg": 33.57,
+    "psnr_full": 41.26,
+    "px": 25536
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 3064
+    },
+    "bytes": 3064,
+    "fg_px": 4352,
+    "image_format_enum": 5,
+    "psnr_fg": 34.79,
+    "psnr_full": 42.48,
+    "px": 25536
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 3862
+    },
+    "bytes": 3862,
+    "fg_px": 4352,
+    "image_format_enum": 5,
+    "psnr_fg": 36.5,
+    "psnr_full": 44.19,
+    "px": 25536
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 4630
+    },
+    "bytes": 4630,
+    "fg_px": 4352,
+    "image_format_enum": 5,
+    "psnr_fg": 37.25,
+    "psnr_full": 44.93,
+    "px": 25536
+   }
+  },
+  "hana_base/eyeR_iris.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 2942
+    },
+    "bytes": 2942,
+    "fg_px": 484,
+    "image_format_enum": 5,
+    "psnr_fg": 99.0,
+    "psnr_full": 99.0,
+    "px": 2016
+   },
+   "src_bytes": 3646,
+   "vram": {
+    "all_formats": {
+     "etc2": 2068,
+     "s3tc": 2068
+    },
+    "bytes": 2068,
+    "fg_px": 484,
+    "image_format_enum": 19,
+    "psnr_fg": 28.41,
+    "psnr_full": 34.61,
+    "px": 2016
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 574
+    },
+    "bytes": 574,
+    "fg_px": 484,
+    "image_format_enum": 5,
+    "psnr_fg": 30.47,
+    "psnr_full": 36.66,
+    "px": 2016
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 588
+    },
+    "bytes": 588,
+    "fg_px": 484,
+    "image_format_enum": 5,
+    "psnr_fg": 31.0,
+    "psnr_full": 37.2,
+    "px": 2016
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 676
+    },
+    "bytes": 676,
+    "fg_px": 484,
+    "image_format_enum": 5,
+    "psnr_fg": 32.7,
+    "psnr_full": 38.9,
+    "px": 2016
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 866
+    },
+    "bytes": 866,
+    "fg_px": 484,
+    "image_format_enum": 5,
+    "psnr_fg": 36.03,
+    "psnr_full": 42.22,
+    "px": 2016
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 1062
+    },
+    "bytes": 1062,
+    "fg_px": 484,
+    "image_format_enum": 5,
+    "psnr_fg": 37.01,
+    "psnr_full": 43.21,
+    "px": 2016
+   }
+  },
+  "hana_base/eyeR_socket.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 3374
+    },
+    "bytes": 3374,
+    "fg_px": 839,
+    "image_format_enum": 5,
+    "psnr_fg": 61.71,
+    "psnr_full": 65.51,
+    "px": 2016
+   },
+   "src_bytes": 4777,
+   "vram": {
+    "all_formats": {
+     "etc2": 2068,
+     "s3tc": 2068
+    },
+    "bytes": 2068,
+    "fg_px": 839,
+    "image_format_enum": 19,
+    "psnr_fg": 32.29,
+    "psnr_full": 36.1,
+    "px": 2016
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 1014
+    },
+    "bytes": 1014,
+    "fg_px": 839,
+    "image_format_enum": 5,
+    "psnr_fg": 35.04,
+    "psnr_full": 38.85,
+    "px": 2016
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 1048
+    },
+    "bytes": 1048,
+    "fg_px": 839,
+    "image_format_enum": 5,
+    "psnr_fg": 35.91,
+    "psnr_full": 39.72,
+    "px": 2016
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 1150
+    },
+    "bytes": 1150,
+    "fg_px": 839,
+    "image_format_enum": 5,
+    "psnr_fg": 37.69,
+    "psnr_full": 41.5,
+    "px": 2016
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 1386
+    },
+    "bytes": 1386,
+    "fg_px": 839,
+    "image_format_enum": 5,
+    "psnr_fg": 40.31,
+    "psnr_full": 44.11,
+    "px": 2016
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 1596
+    },
+    "bytes": 1596,
+    "fg_px": 839,
+    "image_format_enum": 5,
+    "psnr_fg": 42.07,
+    "psnr_full": 45.88,
+    "px": 2016
+   }
+  },
+  "hana_base/eyes_closed.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 41452
+    },
+    "bytes": 41452,
+    "fg_px": 10183,
+    "image_format_enum": 5,
+    "psnr_fg": 64.68,
+    "psnr_full": 68.67,
+    "px": 25536
+   },
+   "src_bytes": 54621,
+   "vram": {
+    "all_formats": {
+     "etc2": 26036,
+     "s3tc": 26036
+    },
+    "bytes": 26036,
+    "fg_px": 10183,
+    "image_format_enum": 19,
+    "psnr_fg": 34.59,
+    "psnr_full": 38.59,
+    "px": 25536
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 5252
+    },
+    "bytes": 5252,
+    "fg_px": 10183,
+    "image_format_enum": 5,
+    "psnr_fg": 33.74,
+    "psnr_full": 37.74,
+    "px": 25536
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 5504
+    },
+    "bytes": 5504,
+    "fg_px": 10183,
+    "image_format_enum": 5,
+    "psnr_fg": 34.25,
+    "psnr_full": 38.25,
+    "px": 25536
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 6082
+    },
+    "bytes": 6082,
+    "fg_px": 10183,
+    "image_format_enum": 5,
+    "psnr_fg": 35.36,
+    "psnr_full": 39.35,
+    "px": 25536
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 7556
+    },
+    "bytes": 7556,
+    "fg_px": 10183,
+    "image_format_enum": 5,
+    "psnr_fg": 36.93,
+    "psnr_full": 40.93,
+    "px": 25536
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 9022
+    },
+    "bytes": 9022,
+    "fg_px": 10183,
+    "image_format_enum": 5,
+    "psnr_fg": 37.61,
+    "psnr_full": 41.6,
+    "px": 25536
+   }
+  },
+  "hana_base/eyes_frown.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 44820
+    },
+    "bytes": 44820,
+    "fg_px": 16031,
+    "image_format_enum": 5,
+    "psnr_fg": 63.72,
+    "psnr_full": 65.74,
+    "px": 25536
+   },
+   "src_bytes": 59330,
+   "vram": {
+    "all_formats": {
+     "etc2": 26036,
+     "s3tc": 26036
+    },
+    "bytes": 26036,
+    "fg_px": 16031,
+    "image_format_enum": 19,
+    "psnr_fg": 32.68,
+    "psnr_full": 34.7,
+    "px": 25536
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 7428
+    },
+    "bytes": 7428,
+    "fg_px": 16031,
+    "image_format_enum": 5,
+    "psnr_fg": 32.84,
+    "psnr_full": 34.86,
+    "px": 25536
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 7808
+    },
+    "bytes": 7808,
+    "fg_px": 16031,
+    "image_format_enum": 5,
+    "psnr_fg": 33.51,
+    "psnr_full": 35.53,
+    "px": 25536
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 8686
+    },
+    "bytes": 8686,
+    "fg_px": 16031,
+    "image_format_enum": 5,
+    "psnr_fg": 34.74,
+    "psnr_full": 36.76,
+    "px": 25536
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 11052
+    },
+    "bytes": 11052,
+    "fg_px": 16031,
+    "image_format_enum": 5,
+    "psnr_fg": 36.69,
+    "psnr_full": 38.71,
+    "px": 25536
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 13156
+    },
+    "bytes": 13156,
+    "fg_px": 16031,
+    "image_format_enum": 5,
+    "psnr_fg": 37.41,
+    "psnr_full": 39.43,
+    "px": 25536
+   }
+  },
+  "hana_base/eyes_half.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 44298
+    },
+    "bytes": 44298,
+    "fg_px": 15880,
+    "image_format_enum": 5,
+    "psnr_fg": 64.08,
+    "psnr_full": 66.14,
+    "px": 25536
+   },
+   "src_bytes": 58192,
+   "vram": {
+    "all_formats": {
+     "etc2": 26036,
+     "s3tc": 26036
+    },
+    "bytes": 26036,
+    "fg_px": 15880,
+    "image_format_enum": 19,
+    "psnr_fg": 32.86,
+    "psnr_full": 34.92,
+    "px": 25536
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 7168
+    },
+    "bytes": 7168,
+    "fg_px": 15880,
+    "image_format_enum": 5,
+    "psnr_fg": 33.67,
+    "psnr_full": 35.73,
+    "px": 25536
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 7534
+    },
+    "bytes": 7534,
+    "fg_px": 15880,
+    "image_format_enum": 5,
+    "psnr_fg": 34.28,
+    "psnr_full": 36.34,
+    "px": 25536
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 8504
+    },
+    "bytes": 8504,
+    "fg_px": 15880,
+    "image_format_enum": 5,
+    "psnr_fg": 35.62,
+    "psnr_full": 37.69,
+    "px": 25536
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 10594
+    },
+    "bytes": 10594,
+    "fg_px": 15880,
+    "image_format_enum": 5,
+    "psnr_fg": 37.52,
+    "psnr_full": 39.58,
+    "px": 25536
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 12774
+    },
+    "bytes": 12774,
+    "fg_px": 15880,
+    "image_format_enum": 5,
+    "psnr_fg": 38.4,
+    "psnr_full": 40.47,
+    "px": 25536
+   }
+  },
+  "hana_base/eyes_happy.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 42798
+    },
+    "bytes": 42798,
+    "fg_px": 10196,
+    "image_format_enum": 5,
+    "psnr_fg": 66.24,
+    "psnr_full": 70.23,
+    "px": 25536
+   },
+   "src_bytes": 56565,
+   "vram": {
+    "all_formats": {
+     "etc2": 26036,
+     "s3tc": 26036
+    },
+    "bytes": 26036,
+    "fg_px": 10196,
+    "image_format_enum": 19,
+    "psnr_fg": 33.12,
+    "psnr_full": 37.11,
+    "px": 25536
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 5328
+    },
+    "bytes": 5328,
+    "fg_px": 10196,
+    "image_format_enum": 5,
+    "psnr_fg": 33.04,
+    "psnr_full": 37.03,
+    "px": 25536
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 5634
+    },
+    "bytes": 5634,
+    "fg_px": 10196,
+    "image_format_enum": 5,
+    "psnr_fg": 33.66,
+    "psnr_full": 37.65,
+    "px": 25536
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 6270
+    },
+    "bytes": 6270,
+    "fg_px": 10196,
+    "image_format_enum": 5,
+    "psnr_fg": 34.81,
+    "psnr_full": 38.8,
+    "px": 25536
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 7966
+    },
+    "bytes": 7966,
+    "fg_px": 10196,
+    "image_format_enum": 5,
+    "psnr_fg": 36.51,
+    "psnr_full": 40.49,
+    "px": 25536
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 9434
+    },
+    "bytes": 9434,
+    "fg_px": 10196,
+    "image_format_enum": 5,
+    "psnr_fg": 37.23,
+    "psnr_full": 41.21,
+    "px": 25536
+   }
+  },
+  "hana_base/layer_body.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 1087260
+    },
+    "bytes": 1087260,
+    "fg_px": 693955,
+    "image_format_enum": 5,
+    "psnr_fg": 68.83,
+    "psnr_full": 73.34,
+    "px": 1960000
+   },
+   "src_bytes": 1554629,
+   "vram": {
+    "all_formats": {
+     "etc2": 1960052,
+     "s3tc": 1960052
+    },
+    "bytes": 1960052,
+    "fg_px": 693955,
+    "image_format_enum": 19,
+    "psnr_fg": 33.52,
+    "psnr_full": 38.03,
+    "px": 1960000
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 162232
+    },
+    "bytes": 162232,
+    "fg_px": 693955,
+    "image_format_enum": 5,
+    "psnr_fg": 33.55,
+    "psnr_full": 38.06,
+    "px": 1960000
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 173342
+    },
+    "bytes": 173342,
+    "fg_px": 693955,
+    "image_format_enum": 5,
+    "psnr_fg": 34.17,
+    "psnr_full": 38.68,
+    "px": 1960000
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 202478
+    },
+    "bytes": 202478,
+    "fg_px": 693955,
+    "image_format_enum": 5,
+    "psnr_fg": 35.42,
+    "psnr_full": 39.93,
+    "px": 1960000
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 278054
+    },
+    "bytes": 278054,
+    "fg_px": 693955,
+    "image_format_enum": 5,
+    "psnr_fg": 37.51,
+    "psnr_full": 42.02,
+    "px": 1960000
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 369028
+    },
+    "bytes": 369028,
+    "fg_px": 693955,
+    "image_format_enum": 5,
+    "psnr_fg": 38.57,
+    "psnr_full": 43.08,
+    "px": 1960000
+   }
+  },
+  "hana_base/layer_flapL.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 50494
+    },
+    "bytes": 50494,
+    "fg_px": 24961,
+    "image_format_enum": 5,
+    "psnr_fg": 67.21,
+    "psnr_full": 71.51,
+    "px": 67200
+   },
+   "src_bytes": 67816,
+   "vram": {
+    "all_formats": {
+     "etc2": 67252,
+     "s3tc": 67252
+    },
+    "bytes": 67252,
+    "fg_px": 24961,
+    "image_format_enum": 19,
+    "psnr_fg": 31.72,
+    "psnr_full": 36.02,
+    "px": 67200
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 11220
+    },
+    "bytes": 11220,
+    "fg_px": 24961,
+    "image_format_enum": 5,
+    "psnr_fg": 32.07,
+    "psnr_full": 36.38,
+    "px": 67200
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 11922
+    },
+    "bytes": 11922,
+    "fg_px": 24961,
+    "image_format_enum": 5,
+    "psnr_fg": 32.7,
+    "psnr_full": 37.0,
+    "px": 67200
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 13504
+    },
+    "bytes": 13504,
+    "fg_px": 24961,
+    "image_format_enum": 5,
+    "psnr_fg": 34.06,
+    "psnr_full": 38.36,
+    "px": 67200
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 17370
+    },
+    "bytes": 17370,
+    "fg_px": 24961,
+    "image_format_enum": 5,
+    "psnr_fg": 36.37,
+    "psnr_full": 40.67,
+    "px": 67200
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 20512
+    },
+    "bytes": 20512,
+    "fg_px": 24961,
+    "image_format_enum": 5,
+    "psnr_fg": 37.31,
+    "psnr_full": 41.61,
+    "px": 67200
+   }
+  },
+  "hana_base/layer_pendant.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 9598
+    },
+    "bytes": 9598,
+    "fg_px": 4220,
+    "image_format_enum": 5,
+    "psnr_fg": 74.72,
+    "psnr_full": 77.81,
+    "px": 8610
+   },
+   "src_bytes": 13260,
+   "vram": {
+    "all_formats": {
+     "etc2": 9124,
+     "s3tc": 9124
+    },
+    "bytes": 9124,
+    "fg_px": 4220,
+    "image_format_enum": 19,
+    "psnr_fg": 30.03,
+    "psnr_full": 33.13,
+    "px": 8610
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 1904
+    },
+    "bytes": 1904,
+    "fg_px": 4220,
+    "image_format_enum": 5,
+    "psnr_fg": 32.57,
+    "psnr_full": 35.66,
+    "px": 8610
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 2020
+    },
+    "bytes": 2020,
+    "fg_px": 4220,
+    "image_format_enum": 5,
+    "psnr_fg": 33.47,
+    "psnr_full": 36.57,
+    "px": 8610
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 2354
+    },
+    "bytes": 2354,
+    "fg_px": 4220,
+    "image_format_enum": 5,
+    "psnr_fg": 35.58,
+    "psnr_full": 38.67,
+    "px": 8610
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 3128
+    },
+    "bytes": 3128,
+    "fg_px": 4220,
+    "image_format_enum": 5,
+    "psnr_fg": 39.6,
+    "psnr_full": 42.7,
+    "px": 8610
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 3900
+    },
+    "bytes": 3900,
+    "fg_px": 4220,
+    "image_format_enum": 5,
+    "psnr_fg": 42.06,
+    "psnr_full": 45.16,
+    "px": 8610
+   }
+  },
+  "hana_base/layer_sleeveA.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 34798
+    },
+    "bytes": 34798,
+    "fg_px": 19287,
+    "image_format_enum": 5,
+    "psnr_fg": 68.07,
+    "psnr_full": 71.71,
+    "px": 44526
+   },
+   "src_bytes": 47808,
+   "vram": {
+    "all_formats": {
+     "etc2": 45684,
+     "s3tc": 45684
+    },
+    "bytes": 45684,
+    "fg_px": 19287,
+    "image_format_enum": 19,
+    "psnr_fg": 35.84,
+    "psnr_full": 39.47,
+    "px": 44526
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 5104
+    },
+    "bytes": 5104,
+    "fg_px": 19287,
+    "image_format_enum": 5,
+    "psnr_fg": 34.22,
+    "psnr_full": 37.86,
+    "px": 44526
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 5584
+    },
+    "bytes": 5584,
+    "fg_px": 19287,
+    "image_format_enum": 5,
+    "psnr_fg": 34.85,
+    "psnr_full": 38.48,
+    "px": 44526
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 6750
+    },
+    "bytes": 6750,
+    "fg_px": 19287,
+    "image_format_enum": 5,
+    "psnr_fg": 36.4,
+    "psnr_full": 40.04,
+    "px": 44526
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 9504
+    },
+    "bytes": 9504,
+    "fg_px": 19287,
+    "image_format_enum": 5,
+    "psnr_fg": 39.25,
+    "psnr_full": 42.88,
+    "px": 44526
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 12404
+    },
+    "bytes": 12404,
+    "fg_px": 19287,
+    "image_format_enum": 5,
+    "psnr_fg": 40.94,
+    "psnr_full": 44.57,
+    "px": 44526
+   }
+  },
+  "hana_base/layer_sleeveB.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 37166
+    },
+    "bytes": 37166,
+    "fg_px": 24063,
+    "image_format_enum": 5,
+    "psnr_fg": 69.9,
+    "psnr_full": 71.66,
+    "px": 36125
+   },
+   "src_bytes": 49746,
+   "vram": {
+    "all_formats": {
+     "etc2": 37428,
+     "s3tc": 37428
+    },
+    "bytes": 37428,
+    "fg_px": 24063,
+    "image_format_enum": 19,
+    "psnr_fg": 35.33,
+    "psnr_full": 37.09,
+    "px": 36125
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 5156
+    },
+    "bytes": 5156,
+    "fg_px": 24063,
+    "image_format_enum": 5,
+    "psnr_fg": 34.22,
+    "psnr_full": 35.99,
+    "px": 36125
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 5644
+    },
+    "bytes": 5644,
+    "fg_px": 24063,
+    "image_format_enum": 5,
+    "psnr_fg": 34.83,
+    "psnr_full": 36.59,
+    "px": 36125
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 6846
+    },
+    "bytes": 6846,
+    "fg_px": 24063,
+    "image_format_enum": 5,
+    "psnr_fg": 36.13,
+    "psnr_full": 37.9,
+    "px": 36125
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 10034
+    },
+    "bytes": 10034,
+    "fg_px": 24063,
+    "image_format_enum": 5,
+    "psnr_fg": 38.52,
+    "psnr_full": 40.29,
+    "px": 36125
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 13328
+    },
+    "bytes": 13328,
+    "fg_px": 24063,
+    "image_format_enum": 5,
+    "psnr_fg": 39.72,
+    "psnr_full": 41.48,
+    "px": 36125
+   }
+  },
+  "hana_base/mouth_ah.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 30334
+    },
+    "bytes": 30334,
+    "fg_px": 10654,
+    "image_format_enum": 5,
+    "psnr_fg": 63.75,
+    "psnr_full": 66.09,
+    "px": 18240
+   },
+   "src_bytes": 39405,
+   "vram": {
+    "all_formats": {
+     "etc2": 18612,
+     "s3tc": 18612
+    },
+    "bytes": 18612,
+    "fg_px": 10654,
+    "image_format_enum": 19,
+    "psnr_fg": 32.69,
+    "psnr_full": 35.03,
+    "px": 18240
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 4892
+    },
+    "bytes": 4892,
+    "fg_px": 10654,
+    "image_format_enum": 5,
+    "psnr_fg": 34.84,
+    "psnr_full": 37.18,
+    "px": 18240
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 5136
+    },
+    "bytes": 5136,
+    "fg_px": 10654,
+    "image_format_enum": 5,
+    "psnr_fg": 35.42,
+    "psnr_full": 37.76,
+    "px": 18240
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 5674
+    },
+    "bytes": 5674,
+    "fg_px": 10654,
+    "image_format_enum": 5,
+    "psnr_fg": 36.82,
+    "psnr_full": 39.16,
+    "px": 18240
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 6916
+    },
+    "bytes": 6916,
+    "fg_px": 10654,
+    "image_format_enum": 5,
+    "psnr_fg": 39.11,
+    "psnr_full": 41.45,
+    "px": 18240
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 8164
+    },
+    "bytes": 8164,
+    "fg_px": 10654,
+    "image_format_enum": 5,
+    "psnr_fg": 40.18,
+    "psnr_full": 42.52,
+    "px": 18240
+   }
+  },
+  "hana_base/mouth_closed.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 22800
+    },
+    "bytes": 22800,
+    "fg_px": 7386,
+    "image_format_enum": 5,
+    "psnr_fg": 62.83,
+    "psnr_full": 66.02,
+    "px": 15392
+   },
+   "src_bytes": 29726,
+   "vram": {
+    "all_formats": {
+     "etc2": 15444,
+     "s3tc": 15444
+    },
+    "bytes": 15444,
+    "fg_px": 7386,
+    "image_format_enum": 19,
+    "psnr_fg": 36.5,
+    "psnr_full": 39.69,
+    "px": 15392
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 3396
+    },
+    "bytes": 3396,
+    "fg_px": 7386,
+    "image_format_enum": 5,
+    "psnr_fg": 38.8,
+    "psnr_full": 41.99,
+    "px": 15392
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 3492
+    },
+    "bytes": 3492,
+    "fg_px": 7386,
+    "image_format_enum": 5,
+    "psnr_fg": 39.5,
+    "psnr_full": 42.69,
+    "px": 15392
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 3780
+    },
+    "bytes": 3780,
+    "fg_px": 7386,
+    "image_format_enum": 5,
+    "psnr_fg": 40.99,
+    "psnr_full": 44.18,
+    "px": 15392
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 4436
+    },
+    "bytes": 4436,
+    "fg_px": 7386,
+    "image_format_enum": 5,
+    "psnr_fg": 42.68,
+    "psnr_full": 45.87,
+    "px": 15392
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 5192
+    },
+    "bytes": 5192,
+    "fg_px": 7386,
+    "image_format_enum": 5,
+    "psnr_fg": 43.87,
+    "psnr_full": 47.06,
+    "px": 15392
+   }
+  },
+  "hana_base/mouth_oh.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 22914
+    },
+    "bytes": 22914,
+    "fg_px": 7320,
+    "image_format_enum": 5,
+    "psnr_fg": 67.35,
+    "psnr_full": 70.58,
+    "px": 15392
+   },
+   "src_bytes": 29899,
+   "vram": {
+    "all_formats": {
+     "etc2": 15444,
+     "s3tc": 15444
+    },
+    "bytes": 15444,
+    "fg_px": 7320,
+    "image_format_enum": 19,
+    "psnr_fg": 35.45,
+    "psnr_full": 38.68,
+    "px": 15392
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 3286
+    },
+    "bytes": 3286,
+    "fg_px": 7320,
+    "image_format_enum": 5,
+    "psnr_fg": 37.68,
+    "psnr_full": 40.91,
+    "px": 15392
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 3376
+    },
+    "bytes": 3376,
+    "fg_px": 7320,
+    "image_format_enum": 5,
+    "psnr_fg": 38.31,
+    "psnr_full": 41.53,
+    "px": 15392
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 3620
+    },
+    "bytes": 3620,
+    "fg_px": 7320,
+    "image_format_enum": 5,
+    "psnr_fg": 39.94,
+    "psnr_full": 43.17,
+    "px": 15392
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 4280
+    },
+    "bytes": 4280,
+    "fg_px": 7320,
+    "image_format_enum": 5,
+    "psnr_fg": 41.99,
+    "psnr_full": 45.22,
+    "px": 15392
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 4956
+    },
+    "bytes": 4956,
+    "fg_px": 7320,
+    "image_format_enum": 5,
+    "psnr_fg": 43.16,
+    "psnr_full": 46.38,
+    "px": 15392
+   }
+  },
+  "hana_base/mouth_pout.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 49120
+    },
+    "bytes": 49120,
+    "fg_px": 17794,
+    "image_format_enum": 5,
+    "psnr_fg": 67.49,
+    "psnr_full": 69.68,
+    "px": 29480
+   },
+   "src_bytes": 64497,
+   "vram": {
+    "all_formats": {
+     "etc2": 29972,
+     "s3tc": 29972
+    },
+    "bytes": 29972,
+    "fg_px": 17794,
+    "image_format_enum": 19,
+    "psnr_fg": 34.68,
+    "psnr_full": 36.87,
+    "px": 29480
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 6756
+    },
+    "bytes": 6756,
+    "fg_px": 17794,
+    "image_format_enum": 5,
+    "psnr_fg": 35.36,
+    "psnr_full": 37.56,
+    "px": 29480
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 7154
+    },
+    "bytes": 7154,
+    "fg_px": 17794,
+    "image_format_enum": 5,
+    "psnr_fg": 35.94,
+    "psnr_full": 38.13,
+    "px": 29480
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 8096
+    },
+    "bytes": 8096,
+    "fg_px": 17794,
+    "image_format_enum": 5,
+    "psnr_fg": 37.27,
+    "psnr_full": 39.46,
+    "px": 29480
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 10396
+    },
+    "bytes": 10396,
+    "fg_px": 17794,
+    "image_format_enum": 5,
+    "psnr_fg": 39.19,
+    "psnr_full": 41.38,
+    "px": 29480
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 12462
+    },
+    "bytes": 12462,
+    "fg_px": 17794,
+    "image_format_enum": 5,
+    "psnr_fg": 39.97,
+    "psnr_full": 42.16,
+    "px": 29480
+   }
+  },
+  "hana_base/mouth_pucker.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 22826
+    },
+    "bytes": 22826,
+    "fg_px": 7136,
+    "image_format_enum": 5,
+    "psnr_fg": 64.32,
+    "psnr_full": 67.66,
+    "px": 15392
+   },
+   "src_bytes": 29775,
+   "vram": {
+    "all_formats": {
+     "etc2": 15444,
+     "s3tc": 15444
+    },
+    "bytes": 15444,
+    "fg_px": 7136,
+    "image_format_enum": 19,
+    "psnr_fg": 37.45,
+    "psnr_full": 40.79,
+    "px": 15392
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 3182
+    },
+    "bytes": 3182,
+    "fg_px": 7136,
+    "image_format_enum": 5,
+    "psnr_fg": 38.64,
+    "psnr_full": 41.98,
+    "px": 15392
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 3268
+    },
+    "bytes": 3268,
+    "fg_px": 7136,
+    "image_format_enum": 5,
+    "psnr_fg": 39.36,
+    "psnr_full": 42.7,
+    "px": 15392
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 3476
+    },
+    "bytes": 3476,
+    "fg_px": 7136,
+    "image_format_enum": 5,
+    "psnr_fg": 40.77,
+    "psnr_full": 44.11,
+    "px": 15392
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 4068
+    },
+    "bytes": 4068,
+    "fg_px": 7136,
+    "image_format_enum": 5,
+    "psnr_fg": 43.02,
+    "psnr_full": 46.36,
+    "px": 15392
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 4812
+    },
+    "bytes": 4812,
+    "fg_px": 7136,
+    "image_format_enum": 5,
+    "psnr_fg": 44.12,
+    "psnr_full": 47.46,
+    "px": 15392
+   }
+  },
+  "hana_base/mouth_small.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 23544
+    },
+    "bytes": 23544,
+    "fg_px": 7392,
+    "image_format_enum": 5,
+    "psnr_fg": 65.9,
+    "psnr_full": 69.09,
+    "px": 15392
+   },
+   "src_bytes": 30662,
+   "vram": {
+    "all_formats": {
+     "etc2": 15444,
+     "s3tc": 15444
+    },
+    "bytes": 15444,
+    "fg_px": 7392,
+    "image_format_enum": 19,
+    "psnr_fg": 34.21,
+    "psnr_full": 37.4,
+    "px": 15392
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 3506
+    },
+    "bytes": 3506,
+    "fg_px": 7392,
+    "image_format_enum": 5,
+    "psnr_fg": 36.41,
+    "psnr_full": 39.6,
+    "px": 15392
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 3626
+    },
+    "bytes": 3626,
+    "fg_px": 7392,
+    "image_format_enum": 5,
+    "psnr_fg": 37.28,
+    "psnr_full": 40.46,
+    "px": 15392
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 3920
+    },
+    "bytes": 3920,
+    "fg_px": 7392,
+    "image_format_enum": 5,
+    "psnr_fg": 38.89,
+    "psnr_full": 42.08,
+    "px": 15392
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 4662
+    },
+    "bytes": 4662,
+    "fg_px": 7392,
+    "image_format_enum": 5,
+    "psnr_fg": 41.35,
+    "psnr_full": 44.53,
+    "px": 15392
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 5502
+    },
+    "bytes": 5502,
+    "fg_px": 7392,
+    "image_format_enum": 5,
+    "psnr_fg": 42.65,
+    "psnr_full": 45.84,
+    "px": 15392
+   }
+  },
+  "hana_base/sheen_mask.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 5260
+    },
+    "bytes": 5260,
+    "fg_px": 1960000,
+    "image_format_enum": 0,
+    "psnr_fg": 99.0,
+    "psnr_full": 99.0,
+    "px": 1960000
+   },
+   "src_bytes": 8370,
+   "vram": {
+    "all_formats": {
+     "etc2": 980052,
+     "s3tc": 980052
+    },
+    "bytes": 980052,
+    "fg_px": 1960000,
+    "image_format_enum": 17,
+    "psnr_fg": 53.92,
+    "psnr_full": 53.92,
+    "px": 1960000
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 4486
+    },
+    "bytes": 4486,
+    "fg_px": 1960000,
+    "image_format_enum": 0,
+    "psnr_fg": 59.45,
+    "psnr_full": 59.45,
+    "px": 1960000
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 4538
+    },
+    "bytes": 4538,
+    "fg_px": 1960000,
+    "image_format_enum": 0,
+    "psnr_fg": 60.13,
+    "psnr_full": 60.13,
+    "px": 1960000
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 4650
+    },
+    "bytes": 4650,
+    "fg_px": 1960000,
+    "image_format_enum": 0,
+    "psnr_fg": 62.42,
+    "psnr_full": 62.42,
+    "px": 1960000
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 5104
+    },
+    "bytes": 5104,
+    "fg_px": 1960000,
+    "image_format_enum": 0,
+    "psnr_fg": 65.0,
+    "psnr_full": 65.0,
+    "px": 1960000
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 5650
+    },
+    "bytes": 5650,
+    "fg_px": 1960000,
+    "image_format_enum": 0,
+    "psnr_fg": 67.83,
+    "psnr_full": 67.83,
+    "px": 1960000
+   }
+  },
+  "mc_gown/bg.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 369482
+    },
+    "bytes": 369482,
+    "fg_px": 1326600,
+    "image_format_enum": 4,
+    "psnr_fg": 99.0,
+    "psnr_full": 99.0,
+    "px": 1326600
+   },
+   "src_bytes": 490916,
+   "vram": {
+    "all_formats": {
+     "etc2": 664252,
+     "s3tc": 664252
+    },
+    "bytes": 664252,
+    "fg_px": 1326600,
+    "image_format_enum": 17,
+    "psnr_fg": 38.02,
+    "psnr_full": 38.02,
+    "px": 1326600
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 16518
+    },
+    "bytes": 16518,
+    "fg_px": 1326600,
+    "image_format_enum": 4,
+    "psnr_fg": 44.46,
+    "psnr_full": 44.46,
+    "px": 1326600
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 18258
+    },
+    "bytes": 18258,
+    "fg_px": 1326600,
+    "image_format_enum": 4,
+    "psnr_fg": 44.88,
+    "psnr_full": 44.88,
+    "px": 1326600
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 23068
+    },
+    "bytes": 23068,
+    "fg_px": 1326600,
+    "image_format_enum": 4,
+    "psnr_fg": 46.12,
+    "psnr_full": 46.12,
+    "px": 1326600
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 37052
+    },
+    "bytes": 37052,
+    "fg_px": 1326600,
+    "image_format_enum": 4,
+    "psnr_fg": 48.36,
+    "psnr_full": 48.36,
+    "px": 1326600
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 65572
+    },
+    "bytes": 65572,
+    "fg_px": 1326600,
+    "image_format_enum": 4,
+    "psnr_fg": 49.54,
+    "psnr_full": 49.54,
+    "px": 1326600
+   }
+  },
+  "mc_gown/blush.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 1738
+    },
+    "bytes": 1738,
+    "fg_px": 6328,
+    "image_format_enum": 5,
+    "psnr_fg": 99.0,
+    "psnr_full": 99.0,
+    "px": 36400
+   },
+   "src_bytes": 3118,
+   "vram": {
+    "all_formats": {
+     "etc2": 36452,
+     "s3tc": 36452
+    },
+    "bytes": 36452,
+    "fg_px": 6328,
+    "image_format_enum": 19,
+    "psnr_fg": 47.69,
+    "psnr_full": 55.29,
+    "px": 36400
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 1650
+    },
+    "bytes": 1650,
+    "fg_px": 6328,
+    "image_format_enum": 5,
+    "psnr_fg": 99.0,
+    "psnr_full": 99.0,
+    "px": 36400
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 1662
+    },
+    "bytes": 1662,
+    "fg_px": 6328,
+    "image_format_enum": 5,
+    "psnr_fg": 99.0,
+    "psnr_full": 99.0,
+    "px": 36400
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 1662
+    },
+    "bytes": 1662,
+    "fg_px": 6328,
+    "image_format_enum": 5,
+    "psnr_fg": 99.0,
+    "psnr_full": 99.0,
+    "px": 36400
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 1662
+    },
+    "bytes": 1662,
+    "fg_px": 6328,
+    "image_format_enum": 5,
+    "psnr_fg": 99.0,
+    "psnr_full": 99.0,
+    "px": 36400
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 1664
+    },
+    "bytes": 1664,
+    "fg_px": 6328,
+    "image_format_enum": 5,
+    "psnr_fg": 99.0,
+    "psnr_full": 99.0,
+    "px": 36400
+   }
+  },
+  "mc_gown/body.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 1532004
+    },
+    "bytes": 1532004,
+    "fg_px": 1041183,
+    "image_format_enum": 5,
+    "psnr_fg": 69.01,
+    "psnr_full": 71.76,
+    "px": 1960000
+   },
+   "src_bytes": 2291085,
+   "vram": {
+    "all_formats": {
+     "etc2": 1960052,
+     "s3tc": 1960052
+    },
+    "bytes": 1960052,
+    "fg_px": 1041183,
+    "image_format_enum": 19,
+    "psnr_fg": 33.86,
+    "psnr_full": 36.61,
+    "px": 1960000
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 249404
+    },
+    "bytes": 249404,
+    "fg_px": 1041183,
+    "image_format_enum": 5,
+    "psnr_fg": 34.06,
+    "psnr_full": 36.81,
+    "px": 1960000
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 267870
+    },
+    "bytes": 267870,
+    "fg_px": 1041183,
+    "image_format_enum": 5,
+    "psnr_fg": 34.82,
+    "psnr_full": 37.56,
+    "px": 1960000
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 311618
+    },
+    "bytes": 311618,
+    "fg_px": 1041183,
+    "image_format_enum": 5,
+    "psnr_fg": 36.49,
+    "psnr_full": 39.24,
+    "px": 1960000
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 419980
+    },
+    "bytes": 419980,
+    "fg_px": 1041183,
+    "image_format_enum": 5,
+    "psnr_fg": 39.54,
+    "psnr_full": 42.28,
+    "px": 1960000
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 539714
+    },
+    "bytes": 539714,
+    "fg_px": 1041183,
+    "image_format_enum": 5,
+    "psnr_fg": 41.18,
+    "psnr_full": 43.93,
+    "px": 1960000
+   }
+  },
+  "mc_gown/eyeL_closed.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 50788
+    },
+    "bytes": 50788,
+    "fg_px": 6274,
+    "image_format_enum": 5,
+    "psnr_fg": 61.14,
+    "psnr_full": 68.77,
+    "px": 36400
+   },
+   "src_bytes": 73925,
+   "vram": {
+    "all_formats": {
+     "etc2": 36452,
+     "s3tc": 36452
+    },
+    "bytes": 36452,
+    "fg_px": 6274,
+    "image_format_enum": 19,
+    "psnr_fg": 35.02,
+    "psnr_full": 42.65,
+    "px": 36400
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 3768
+    },
+    "bytes": 3768,
+    "fg_px": 6274,
+    "image_format_enum": 5,
+    "psnr_fg": 36.39,
+    "psnr_full": 44.03,
+    "px": 36400
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 3920
+    },
+    "bytes": 3920,
+    "fg_px": 6274,
+    "image_format_enum": 5,
+    "psnr_fg": 37.15,
+    "psnr_full": 44.78,
+    "px": 36400
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 4336
+    },
+    "bytes": 4336,
+    "fg_px": 6274,
+    "image_format_enum": 5,
+    "psnr_fg": 38.9,
+    "psnr_full": 46.54,
+    "px": 36400
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 5290
+    },
+    "bytes": 5290,
+    "fg_px": 6274,
+    "image_format_enum": 5,
+    "psnr_fg": 41.89,
+    "psnr_full": 49.52,
+    "px": 36400
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 6468
+    },
+    "bytes": 6468,
+    "fg_px": 6274,
+    "image_format_enum": 5,
+    "psnr_fg": 43.88,
+    "psnr_full": 51.52,
+    "px": 36400
+   }
+  },
+  "mc_gown/eyeL_iris.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 3840
+    },
+    "bytes": 3840,
+    "fg_px": 574,
+    "image_format_enum": 5,
+    "psnr_fg": 74.62,
+    "psnr_full": 82.18,
+    "px": 3276
+   },
+   "src_bytes": 4771,
+   "vram": {
+    "all_formats": {
+     "etc2": 3572,
+     "s3tc": 3572
+    },
+    "bytes": 3572,
+    "fg_px": 574,
+    "image_format_enum": 19,
+    "psnr_fg": 31.35,
+    "psnr_full": 38.91,
+    "px": 3276
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 564
+    },
+    "bytes": 564,
+    "fg_px": 574,
+    "image_format_enum": 5,
+    "psnr_fg": 32.47,
+    "psnr_full": 40.03,
+    "px": 3276
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 588
+    },
+    "bytes": 588,
+    "fg_px": 574,
+    "image_format_enum": 5,
+    "psnr_fg": 32.65,
+    "psnr_full": 40.21,
+    "px": 3276
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 648
+    },
+    "bytes": 648,
+    "fg_px": 574,
+    "image_format_enum": 5,
+    "psnr_fg": 35.21,
+    "psnr_full": 42.77,
+    "px": 3276
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 828
+    },
+    "bytes": 828,
+    "fg_px": 574,
+    "image_format_enum": 5,
+    "psnr_fg": 38.71,
+    "psnr_full": 46.28,
+    "px": 3276
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 1022
+    },
+    "bytes": 1022,
+    "fg_px": 574,
+    "image_format_enum": 5,
+    "psnr_fg": 40.58,
+    "psnr_full": 48.15,
+    "px": 3276
+   }
+  },
+  "mc_gown/eyeL_socket.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 5076
+    },
+    "bytes": 5076,
+    "fg_px": 1135,
+    "image_format_enum": 5,
+    "psnr_fg": 65.77,
+    "psnr_full": 70.38,
+    "px": 3276
+   },
+   "src_bytes": 6887,
+   "vram": {
+    "all_formats": {
+     "etc2": 3572,
+     "s3tc": 3572
+    },
+    "bytes": 3572,
+    "fg_px": 1135,
+    "image_format_enum": 19,
+    "psnr_fg": 31.66,
+    "psnr_full": 36.27,
+    "px": 3276
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 1136
+    },
+    "bytes": 1136,
+    "fg_px": 1135,
+    "image_format_enum": 5,
+    "psnr_fg": 34.3,
+    "psnr_full": 38.9,
+    "px": 3276
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 1180
+    },
+    "bytes": 1180,
+    "fg_px": 1135,
+    "image_format_enum": 5,
+    "psnr_fg": 35.2,
+    "psnr_full": 39.8,
+    "px": 3276
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 1288
+    },
+    "bytes": 1288,
+    "fg_px": 1135,
+    "image_format_enum": 5,
+    "psnr_fg": 37.18,
+    "psnr_full": 41.78,
+    "px": 3276
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 1544
+    },
+    "bytes": 1544,
+    "fg_px": 1135,
+    "image_format_enum": 5,
+    "psnr_fg": 40.52,
+    "psnr_full": 45.12,
+    "px": 3276
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 1836
+    },
+    "bytes": 1836,
+    "fg_px": 1135,
+    "image_format_enum": 5,
+    "psnr_fg": 42.65,
+    "psnr_full": 47.26,
+    "px": 3276
+   }
+  },
+  "mc_gown/eyeR_closed.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 50596
+    },
+    "bytes": 50596,
+    "fg_px": 6835,
+    "image_format_enum": 5,
+    "psnr_fg": 61.26,
+    "psnr_full": 68.53,
+    "px": 36400
+   },
+   "src_bytes": 73713,
+   "vram": {
+    "all_formats": {
+     "etc2": 36452,
+     "s3tc": 36452
+    },
+    "bytes": 36452,
+    "fg_px": 6835,
+    "image_format_enum": 19,
+    "psnr_fg": 34.82,
+    "psnr_full": 42.09,
+    "px": 36400
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 3656
+    },
+    "bytes": 3656,
+    "fg_px": 6835,
+    "image_format_enum": 5,
+    "psnr_fg": 35.35,
+    "psnr_full": 42.61,
+    "px": 36400
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 3894
+    },
+    "bytes": 3894,
+    "fg_px": 6835,
+    "image_format_enum": 5,
+    "psnr_fg": 36.22,
+    "psnr_full": 43.48,
+    "px": 36400
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 4316
+    },
+    "bytes": 4316,
+    "fg_px": 6835,
+    "image_format_enum": 5,
+    "psnr_fg": 37.94,
+    "psnr_full": 45.2,
+    "px": 36400
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 5338
+    },
+    "bytes": 5338,
+    "fg_px": 6835,
+    "image_format_enum": 5,
+    "psnr_fg": 40.75,
+    "psnr_full": 48.02,
+    "px": 36400
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 6550
+    },
+    "bytes": 6550,
+    "fg_px": 6835,
+    "image_format_enum": 5,
+    "psnr_fg": 42.61,
+    "psnr_full": 49.87,
+    "px": 36400
+   }
+  },
+  "mc_gown/eyeR_iris.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 3750
+    },
+    "bytes": 3750,
+    "fg_px": 612,
+    "image_format_enum": 5,
+    "psnr_fg": 99.0,
+    "psnr_full": 99.0,
+    "px": 3344
+   },
+   "src_bytes": 4841,
+   "vram": {
+    "all_formats": {
+     "etc2": 3396,
+     "s3tc": 3396
+    },
+    "bytes": 3396,
+    "fg_px": 612,
+    "image_format_enum": 19,
+    "psnr_fg": 30.31,
+    "psnr_full": 37.69,
+    "px": 3344
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 634
+    },
+    "bytes": 634,
+    "fg_px": 612,
+    "image_format_enum": 5,
+    "psnr_fg": 32.45,
+    "psnr_full": 39.83,
+    "px": 3344
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 654
+    },
+    "bytes": 654,
+    "fg_px": 612,
+    "image_format_enum": 5,
+    "psnr_fg": 33.13,
+    "psnr_full": 40.51,
+    "px": 3344
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 712
+    },
+    "bytes": 712,
+    "fg_px": 612,
+    "image_format_enum": 5,
+    "psnr_fg": 35.18,
+    "psnr_full": 42.56,
+    "px": 3344
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 880
+    },
+    "bytes": 880,
+    "fg_px": 612,
+    "image_format_enum": 5,
+    "psnr_fg": 38.55,
+    "psnr_full": 45.92,
+    "px": 3344
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 1082
+    },
+    "bytes": 1082,
+    "fg_px": 612,
+    "image_format_enum": 5,
+    "psnr_fg": 40.96,
+    "psnr_full": 48.33,
+    "px": 3344
+   }
+  },
+  "mc_gown/eyeR_socket.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 5284
+    },
+    "bytes": 5284,
+    "fg_px": 1124,
+    "image_format_enum": 5,
+    "psnr_fg": 64.84,
+    "psnr_full": 69.57,
+    "px": 3344
+   },
+   "src_bytes": 7344,
+   "vram": {
+    "all_formats": {
+     "etc2": 3396,
+     "s3tc": 3396
+    },
+    "bytes": 3396,
+    "fg_px": 1124,
+    "image_format_enum": 19,
+    "psnr_fg": 31.65,
+    "psnr_full": 36.38,
+    "px": 3344
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 1192
+    },
+    "bytes": 1192,
+    "fg_px": 1124,
+    "image_format_enum": 5,
+    "psnr_fg": 34.01,
+    "psnr_full": 38.74,
+    "px": 3344
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 1234
+    },
+    "bytes": 1234,
+    "fg_px": 1124,
+    "image_format_enum": 5,
+    "psnr_fg": 35.19,
+    "psnr_full": 39.93,
+    "px": 3344
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 1326
+    },
+    "bytes": 1326,
+    "fg_px": 1124,
+    "image_format_enum": 5,
+    "psnr_fg": 37.08,
+    "psnr_full": 41.81,
+    "px": 3344
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 1602
+    },
+    "bytes": 1602,
+    "fg_px": 1124,
+    "image_format_enum": 5,
+    "psnr_fg": 40.29,
+    "psnr_full": 45.02,
+    "px": 3344
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 1920
+    },
+    "bytes": 1920,
+    "fg_px": 1124,
+    "image_format_enum": 5,
+    "psnr_fg": 43.06,
+    "psnr_full": 47.8,
+    "px": 3344
+   }
+  },
+  "mc_gown/eyes_closed.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 54142
+    },
+    "bytes": 54142,
+    "fg_px": 12990,
+    "image_format_enum": 5,
+    "psnr_fg": 61.24,
+    "psnr_full": 65.72,
+    "px": 36400
+   },
+   "src_bytes": 76088,
+   "vram": {
+    "all_formats": {
+     "etc2": 36452,
+     "s3tc": 36452
+    },
+    "bytes": 36452,
+    "fg_px": 12990,
+    "image_format_enum": 19,
+    "psnr_fg": 34.87,
+    "psnr_full": 39.35,
+    "px": 36400
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 6334
+    },
+    "bytes": 6334,
+    "fg_px": 12990,
+    "image_format_enum": 5,
+    "psnr_fg": 35.89,
+    "psnr_full": 40.37,
+    "px": 36400
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 6600
+    },
+    "bytes": 6600,
+    "fg_px": 12990,
+    "image_format_enum": 5,
+    "psnr_fg": 36.55,
+    "psnr_full": 41.02,
+    "px": 36400
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 7320
+    },
+    "bytes": 7320,
+    "fg_px": 12990,
+    "image_format_enum": 5,
+    "psnr_fg": 38.37,
+    "psnr_full": 42.84,
+    "px": 36400
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 9062
+    },
+    "bytes": 9062,
+    "fg_px": 12990,
+    "image_format_enum": 5,
+    "psnr_fg": 41.27,
+    "psnr_full": 45.75,
+    "px": 36400
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 10872
+    },
+    "bytes": 10872,
+    "fg_px": 12990,
+    "image_format_enum": 5,
+    "psnr_fg": 43.14,
+    "psnr_full": 47.61,
+    "px": 36400
+   }
+  },
+  "mc_gown/eyes_frown.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 69468
+    },
+    "bytes": 69468,
+    "fg_px": 21219,
+    "image_format_enum": 5,
+    "psnr_fg": 62.39,
+    "psnr_full": 65.55,
+    "px": 43840
+   },
+   "src_bytes": 97684,
+   "vram": {
+    "all_formats": {
+     "etc2": 44212,
+     "s3tc": 44212
+    },
+    "bytes": 44212,
+    "fg_px": 21219,
+    "image_format_enum": 19,
+    "psnr_fg": 34.09,
+    "psnr_full": 37.24,
+    "px": 43840
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 8640
+    },
+    "bytes": 8640,
+    "fg_px": 21219,
+    "image_format_enum": 5,
+    "psnr_fg": 34.87,
+    "psnr_full": 38.03,
+    "px": 43840
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 9062
+    },
+    "bytes": 9062,
+    "fg_px": 21219,
+    "image_format_enum": 5,
+    "psnr_fg": 35.67,
+    "psnr_full": 38.82,
+    "px": 43840
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 10014
+    },
+    "bytes": 10014,
+    "fg_px": 21219,
+    "image_format_enum": 5,
+    "psnr_fg": 37.23,
+    "psnr_full": 40.38,
+    "px": 43840
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 12436
+    },
+    "bytes": 12436,
+    "fg_px": 21219,
+    "image_format_enum": 5,
+    "psnr_fg": 40.35,
+    "psnr_full": 43.5,
+    "px": 43840
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 15232
+    },
+    "bytes": 15232,
+    "fg_px": 21219,
+    "image_format_enum": 5,
+    "psnr_fg": 42.31,
+    "psnr_full": 45.46,
+    "px": 43840
+   }
+  },
+  "mc_gown/eyes_happy.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 63268
+    },
+    "bytes": 63268,
+    "fg_px": 12855,
+    "image_format_enum": 5,
+    "psnr_fg": 61.62,
+    "psnr_full": 66.95,
+    "px": 43840
+   },
+   "src_bytes": 91318,
+   "vram": {
+    "all_formats": {
+     "etc2": 44212,
+     "s3tc": 44212
+    },
+    "bytes": 44212,
+    "fg_px": 12855,
+    "image_format_enum": 19,
+    "psnr_fg": 34.95,
+    "psnr_full": 40.28,
+    "px": 43840
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 5652
+    },
+    "bytes": 5652,
+    "fg_px": 12855,
+    "image_format_enum": 5,
+    "psnr_fg": 35.91,
+    "psnr_full": 41.23,
+    "px": 43840
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 5948
+    },
+    "bytes": 5948,
+    "fg_px": 12855,
+    "image_format_enum": 5,
+    "psnr_fg": 36.68,
+    "psnr_full": 42.01,
+    "px": 43840
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 6460
+    },
+    "bytes": 6460,
+    "fg_px": 12855,
+    "image_format_enum": 5,
+    "psnr_fg": 38.51,
+    "psnr_full": 43.83,
+    "px": 43840
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 8006
+    },
+    "bytes": 8006,
+    "fg_px": 12855,
+    "image_format_enum": 5,
+    "psnr_fg": 41.71,
+    "psnr_full": 47.04,
+    "px": 43840
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 9702
+    },
+    "bytes": 9702,
+    "fg_px": 12855,
+    "image_format_enum": 5,
+    "psnr_fg": 43.46,
+    "psnr_full": 48.79,
+    "px": 43840
+   }
+  },
+  "mc_gown/layer_armL.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 86728
+    },
+    "bytes": 86728,
+    "fg_px": 47247,
+    "image_format_enum": 5,
+    "psnr_fg": 72.85,
+    "psnr_full": 76.21,
+    "px": 102550
+   },
+   "src_bytes": 122368,
+   "vram": {
+    "all_formats": {
+     "etc2": 104244,
+     "s3tc": 104244
+    },
+    "bytes": 104244,
+    "fg_px": 47247,
+    "image_format_enum": 19,
+    "psnr_fg": 34.63,
+    "psnr_full": 37.99,
+    "px": 102550
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 14922
+    },
+    "bytes": 14922,
+    "fg_px": 47247,
+    "image_format_enum": 5,
+    "psnr_fg": 32.35,
+    "psnr_full": 35.71,
+    "px": 102550
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 15898
+    },
+    "bytes": 15898,
+    "fg_px": 47247,
+    "image_format_enum": 5,
+    "psnr_fg": 33.12,
+    "psnr_full": 36.48,
+    "px": 102550
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 18846
+    },
+    "bytes": 18846,
+    "fg_px": 47247,
+    "image_format_enum": 5,
+    "psnr_fg": 34.91,
+    "psnr_full": 38.28,
+    "px": 102550
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 26004
+    },
+    "bytes": 26004,
+    "fg_px": 47247,
+    "image_format_enum": 5,
+    "psnr_fg": 38.44,
+    "psnr_full": 41.81,
+    "px": 102550
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 32428
+    },
+    "bytes": 32428,
+    "fg_px": 47247,
+    "image_format_enum": 5,
+    "psnr_fg": 40.44,
+    "psnr_full": 43.8,
+    "px": 102550
+   }
+  },
+  "mc_gown/layer_armR.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 145946
+    },
+    "bytes": 145946,
+    "fg_px": 82393,
+    "image_format_enum": 5,
+    "psnr_fg": 76.01,
+    "psnr_full": 80.51,
+    "px": 232179
+   },
+   "src_bytes": 215518,
+   "vram": {
+    "all_formats": {
+     "etc2": 234372,
+     "s3tc": 234372
+    },
+    "bytes": 234372,
+    "fg_px": 82393,
+    "image_format_enum": 19,
+    "psnr_fg": 34.66,
+    "psnr_full": 39.16,
+    "px": 232179
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 22878
+    },
+    "bytes": 22878,
+    "fg_px": 82393,
+    "image_format_enum": 5,
+    "psnr_fg": 32.56,
+    "psnr_full": 37.06,
+    "px": 232179
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 24718
+    },
+    "bytes": 24718,
+    "fg_px": 82393,
+    "image_format_enum": 5,
+    "psnr_fg": 33.31,
+    "psnr_full": 37.81,
+    "px": 232179
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 29354
+    },
+    "bytes": 29354,
+    "fg_px": 82393,
+    "image_format_enum": 5,
+    "psnr_fg": 35.22,
+    "psnr_full": 39.72,
+    "px": 232179
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 40518
+    },
+    "bytes": 40518,
+    "fg_px": 82393,
+    "image_format_enum": 5,
+    "psnr_fg": 38.73,
+    "psnr_full": 43.23,
+    "px": 232179
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 52000
+    },
+    "bytes": 52000,
+    "fg_px": 82393,
+    "image_format_enum": 5,
+    "psnr_fg": 40.88,
+    "psnr_full": 45.38,
+    "px": 232179
+   }
+  },
+  "mc_gown/layer_body.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 784064
+    },
+    "bytes": 784064,
+    "fg_px": 548204,
+    "image_format_enum": 5,
+    "psnr_fg": 73.67,
+    "psnr_full": 79.2,
+    "px": 1960000
+   },
+   "src_bytes": 1210949,
+   "vram": {
+    "all_formats": {
+     "etc2": 1960052,
+     "s3tc": 1960052
+    },
+    "bytes": 1960052,
+    "fg_px": 548204,
+    "image_format_enum": 19,
+    "psnr_fg": 33.57,
+    "psnr_full": 39.11,
+    "px": 1960000
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 106556
+    },
+    "bytes": 106556,
+    "fg_px": 548204,
+    "image_format_enum": 5,
+    "psnr_fg": 34.0,
+    "psnr_full": 39.53,
+    "px": 1960000
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 113454
+    },
+    "bytes": 113454,
+    "fg_px": 548204,
+    "image_format_enum": 5,
+    "psnr_fg": 34.8,
+    "psnr_full": 40.33,
+    "px": 1960000
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 135384
+    },
+    "bytes": 135384,
+    "fg_px": 548204,
+    "image_format_enum": 5,
+    "psnr_fg": 36.53,
+    "psnr_full": 42.06,
+    "px": 1960000
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 186134
+    },
+    "bytes": 186134,
+    "fg_px": 548204,
+    "image_format_enum": 5,
+    "psnr_fg": 39.46,
+    "psnr_full": 45.0,
+    "px": 1960000
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 248646
+    },
+    "bytes": 248646,
+    "fg_px": 548204,
+    "image_format_enum": 5,
+    "psnr_fg": 40.96,
+    "psnr_full": 46.49,
+    "px": 1960000
+   }
+  },
+  "mc_gown/layer_locks.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 17340
+    },
+    "bytes": 17340,
+    "fg_px": 8293,
+    "image_format_enum": 5,
+    "psnr_fg": 99.0,
+    "psnr_full": 99.0,
+    "px": 17331
+   },
+   "src_bytes": 22660,
+   "vram": {
+    "all_formats": {
+     "etc2": 17972,
+     "s3tc": 17972
+    },
+    "bytes": 17972,
+    "fg_px": 8293,
+    "image_format_enum": 19,
+    "psnr_fg": 31.69,
+    "psnr_full": 34.9,
+    "px": 17331
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 2862
+    },
+    "bytes": 2862,
+    "fg_px": 8293,
+    "image_format_enum": 5,
+    "psnr_fg": 32.66,
+    "psnr_full": 35.86,
+    "px": 17331
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 3124
+    },
+    "bytes": 3124,
+    "fg_px": 8293,
+    "image_format_enum": 5,
+    "psnr_fg": 33.36,
+    "psnr_full": 36.57,
+    "px": 17331
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 3648
+    },
+    "bytes": 3648,
+    "fg_px": 8293,
+    "image_format_enum": 5,
+    "psnr_fg": 35.13,
+    "psnr_full": 38.33,
+    "px": 17331
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 4988
+    },
+    "bytes": 4988,
+    "fg_px": 8293,
+    "image_format_enum": 5,
+    "psnr_fg": 38.09,
+    "psnr_full": 41.29,
+    "px": 17331
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 6282
+    },
+    "bytes": 6282,
+    "fg_px": 8293,
+    "image_format_enum": 5,
+    "psnr_fg": 39.78,
+    "psnr_full": 42.98,
+    "px": 17331
+   }
+  },
+  "mc_gown/layer_locksR.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 14662
+    },
+    "bytes": 14662,
+    "fg_px": 8235,
+    "image_format_enum": 5,
+    "psnr_fg": 99.0,
+    "psnr_full": 99.0,
+    "px": 17072
+   },
+   "src_bytes": 20083,
+   "vram": {
+    "all_formats": {
+     "etc2": 17652,
+     "s3tc": 17652
+    },
+    "bytes": 17652,
+    "fg_px": 8235,
+    "image_format_enum": 19,
+    "psnr_fg": 35.34,
+    "psnr_full": 38.51,
+    "px": 17072
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 1868
+    },
+    "bytes": 1868,
+    "fg_px": 8235,
+    "image_format_enum": 5,
+    "psnr_fg": 34.05,
+    "psnr_full": 37.22,
+    "px": 17072
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 2038
+    },
+    "bytes": 2038,
+    "fg_px": 8235,
+    "image_format_enum": 5,
+    "psnr_fg": 34.75,
+    "psnr_full": 37.91,
+    "px": 17072
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 2518
+    },
+    "bytes": 2518,
+    "fg_px": 8235,
+    "image_format_enum": 5,
+    "psnr_fg": 36.76,
+    "psnr_full": 39.93,
+    "px": 17072
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 3628
+    },
+    "bytes": 3628,
+    "fg_px": 8235,
+    "image_format_enum": 5,
+    "psnr_fg": 40.07,
+    "psnr_full": 43.23,
+    "px": 17072
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 4744
+    },
+    "bytes": 4744,
+    "fg_px": 8235,
+    "image_format_enum": 5,
+    "psnr_fg": 42.32,
+    "psnr_full": 45.49,
+    "px": 17072
+   }
+  },
+  "mc_gown/layer_navel.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 3042
+    },
+    "bytes": 3042,
+    "fg_px": 1069,
+    "image_format_enum": 5,
+    "psnr_fg": 99.0,
+    "psnr_full": 99.0,
+    "px": 3050
+   },
+   "src_bytes": 3811,
+   "vram": {
+    "all_formats": {
+     "etc2": 3380,
+     "s3tc": 3380
+    },
+    "bytes": 3380,
+    "fg_px": 1069,
+    "image_format_enum": 19,
+    "psnr_fg": 28.55,
+    "psnr_full": 33.1,
+    "px": 3050
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 820
+    },
+    "bytes": 820,
+    "fg_px": 1069,
+    "image_format_enum": 5,
+    "psnr_fg": 29.89,
+    "psnr_full": 34.44,
+    "px": 3050
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 898
+    },
+    "bytes": 898,
+    "fg_px": 1069,
+    "image_format_enum": 5,
+    "psnr_fg": 31.06,
+    "psnr_full": 35.61,
+    "px": 3050
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 1050
+    },
+    "bytes": 1050,
+    "fg_px": 1069,
+    "image_format_enum": 5,
+    "psnr_fg": 32.88,
+    "psnr_full": 37.43,
+    "px": 3050
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 1402
+    },
+    "bytes": 1402,
+    "fg_px": 1069,
+    "image_format_enum": 5,
+    "psnr_fg": 35.38,
+    "psnr_full": 39.93,
+    "px": 3050
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 1712
+    },
+    "bytes": 1712,
+    "fg_px": 1069,
+    "image_format_enum": 5,
+    "psnr_fg": 36.41,
+    "psnr_full": 40.96,
+    "px": 3050
+   }
+  },
+  "mc_gown/layer_pendant.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 2938
+    },
+    "bytes": 2938,
+    "fg_px": 884,
+    "image_format_enum": 5,
+    "psnr_fg": 99.0,
+    "psnr_full": 99.0,
+    "px": 3465
+   },
+   "src_bytes": 3669,
+   "vram": {
+    "all_formats": {
+     "etc2": 3636,
+     "s3tc": 3636
+    },
+    "bytes": 3636,
+    "fg_px": 884,
+    "image_format_enum": 19,
+    "psnr_fg": 29.73,
+    "psnr_full": 35.67,
+    "px": 3465
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 736
+    },
+    "bytes": 736,
+    "fg_px": 884,
+    "image_format_enum": 5,
+    "psnr_fg": 30.55,
+    "psnr_full": 36.48,
+    "px": 3465
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 792
+    },
+    "bytes": 792,
+    "fg_px": 884,
+    "image_format_enum": 5,
+    "psnr_fg": 31.53,
+    "psnr_full": 37.47,
+    "px": 3465
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 930
+    },
+    "bytes": 930,
+    "fg_px": 884,
+    "image_format_enum": 5,
+    "psnr_fg": 33.43,
+    "psnr_full": 39.37,
+    "px": 3465
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 1258
+    },
+    "bytes": 1258,
+    "fg_px": 884,
+    "image_format_enum": 5,
+    "psnr_fg": 36.7,
+    "psnr_full": 42.64,
+    "px": 3465
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 1590
+    },
+    "bytes": 1590,
+    "fg_px": 884,
+    "image_format_enum": 5,
+    "psnr_fg": 38.69,
+    "psnr_full": 44.62,
+    "px": 3465
+   }
+  },
+  "mc_gown/layer_tailL.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 611896
+    },
+    "bytes": 611896,
+    "fg_px": 354717,
+    "image_format_enum": 5,
+    "psnr_fg": 65.79,
+    "psnr_full": 69.66,
+    "px": 863785
+   },
+   "src_bytes": 848291,
+   "vram": {
+    "all_formats": {
+     "etc2": 869684,
+     "s3tc": 869684
+    },
+    "bytes": 869684,
+    "fg_px": 354717,
+    "image_format_enum": 19,
+    "psnr_fg": 34.54,
+    "psnr_full": 38.41,
+    "px": 863785
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 160252
+    },
+    "bytes": 160252,
+    "fg_px": 354717,
+    "image_format_enum": 5,
+    "psnr_fg": 34.63,
+    "psnr_full": 38.5,
+    "px": 863785
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 167344
+    },
+    "bytes": 167344,
+    "fg_px": 354717,
+    "image_format_enum": 5,
+    "psnr_fg": 35.38,
+    "psnr_full": 39.24,
+    "px": 863785
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 184786
+    },
+    "bytes": 184786,
+    "fg_px": 354717,
+    "image_format_enum": 5,
+    "psnr_fg": 37.05,
+    "psnr_full": 40.91,
+    "px": 863785
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 226874
+    },
+    "bytes": 226874,
+    "fg_px": 354717,
+    "image_format_enum": 5,
+    "psnr_fg": 39.89,
+    "psnr_full": 43.76,
+    "px": 863785
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 274158
+    },
+    "bytes": 274158,
+    "fg_px": 354717,
+    "image_format_enum": 5,
+    "psnr_fg": 41.51,
+    "psnr_full": 45.38,
+    "px": 863785
+   }
+  },
+  "mc_gown/layer_tailR.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 243032
+    },
+    "bytes": 243032,
+    "fg_px": 133150,
+    "image_format_enum": 5,
+    "psnr_fg": 64.88,
+    "psnr_full": 70.43,
+    "px": 477600
+   },
+   "src_bytes": 321562,
+   "vram": {
+    "all_formats": {
+     "etc2": 478452,
+     "s3tc": 478452
+    },
+    "bytes": 478452,
+    "fg_px": 133150,
+    "image_format_enum": 19,
+    "psnr_fg": 34.09,
+    "psnr_full": 39.64,
+    "px": 477600
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 71628
+    },
+    "bytes": 71628,
+    "fg_px": 133150,
+    "image_format_enum": 5,
+    "psnr_fg": 34.59,
+    "psnr_full": 40.14,
+    "px": 477600
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 73774
+    },
+    "bytes": 73774,
+    "fg_px": 133150,
+    "image_format_enum": 5,
+    "psnr_fg": 35.34,
+    "psnr_full": 40.89,
+    "px": 477600
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 80650
+    },
+    "bytes": 80650,
+    "fg_px": 133150,
+    "image_format_enum": 5,
+    "psnr_fg": 37.03,
+    "psnr_full": 42.57,
+    "px": 477600
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 96174
+    },
+    "bytes": 96174,
+    "fg_px": 133150,
+    "image_format_enum": 5,
+    "psnr_fg": 40.07,
+    "psnr_full": 45.61,
+    "px": 477600
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 114876
+    },
+    "bytes": 114876,
+    "fg_px": 133150,
+    "image_format_enum": 5,
+    "psnr_fg": 41.97,
+    "psnr_full": 47.52,
+    "px": 477600
+   }
+  },
+  "mc_gown/layer_tassel.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 5126
+    },
+    "bytes": 5126,
+    "fg_px": 2333,
+    "image_format_enum": 5,
+    "psnr_fg": 99.0,
+    "psnr_full": 99.0,
+    "px": 5225
+   },
+   "src_bytes": 6510,
+   "vram": {
+    "all_formats": {
+     "etc2": 5428,
+     "s3tc": 5428
+    },
+    "bytes": 5428,
+    "fg_px": 2333,
+    "image_format_enum": 19,
+    "psnr_fg": 30.6,
+    "psnr_full": 34.11,
+    "px": 5225
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 1064
+    },
+    "bytes": 1064,
+    "fg_px": 2333,
+    "image_format_enum": 5,
+    "psnr_fg": 31.93,
+    "psnr_full": 35.43,
+    "px": 5225
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 1134
+    },
+    "bytes": 1134,
+    "fg_px": 2333,
+    "image_format_enum": 5,
+    "psnr_fg": 32.33,
+    "psnr_full": 35.84,
+    "px": 5225
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 1356
+    },
+    "bytes": 1356,
+    "fg_px": 2333,
+    "image_format_enum": 5,
+    "psnr_fg": 33.88,
+    "psnr_full": 37.39,
+    "px": 5225
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 1892
+    },
+    "bytes": 1892,
+    "fg_px": 2333,
+    "image_format_enum": 5,
+    "psnr_fg": 36.16,
+    "psnr_full": 39.66,
+    "px": 5225
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 2336
+    },
+    "bytes": 2336,
+    "fg_px": 2333,
+    "image_format_enum": 5,
+    "psnr_fg": 37.12,
+    "psnr_full": 40.62,
+    "px": 5225
+   }
+  },
+  "mc_gown/layer_thigh.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 125322
+    },
+    "bytes": 125322,
+    "fg_px": 105671,
+    "image_format_enum": 5,
+    "psnr_fg": 113.78,
+    "psnr_full": 115.53,
+    "px": 158006
+   },
+   "src_bytes": 177260,
+   "vram": {
+    "all_formats": {
+     "etc2": 160052,
+     "s3tc": 160052
+    },
+    "bytes": 160052,
+    "fg_px": 105671,
+    "image_format_enum": 19,
+    "psnr_fg": 37.17,
+    "psnr_full": 38.92,
+    "px": 158006
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 11154
+    },
+    "bytes": 11154,
+    "fg_px": 105671,
+    "image_format_enum": 5,
+    "psnr_fg": 36.54,
+    "psnr_full": 38.29,
+    "px": 158006
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 11924
+    },
+    "bytes": 11924,
+    "fg_px": 105671,
+    "image_format_enum": 5,
+    "psnr_fg": 37.24,
+    "psnr_full": 38.99,
+    "px": 158006
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 14416
+    },
+    "bytes": 14416,
+    "fg_px": 105671,
+    "image_format_enum": 5,
+    "psnr_fg": 38.92,
+    "psnr_full": 40.67,
+    "px": 158006
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 21248
+    },
+    "bytes": 21248,
+    "fg_px": 105671,
+    "image_format_enum": 5,
+    "psnr_fg": 41.89,
+    "psnr_full": 43.63,
+    "px": 158006
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 31170
+    },
+    "bytes": 31170,
+    "fg_px": 105671,
+    "image_format_enum": 5,
+    "psnr_fg": 43.66,
+    "psnr_full": 45.41,
+    "px": 158006
+   }
+  },
+  "mc_gown/mouth_ah.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 23636
+    },
+    "bytes": 23636,
+    "fg_px": 6340,
+    "image_format_enum": 5,
+    "psnr_fg": 80.48,
+    "psnr_full": 84.99,
+    "px": 17920
+   },
+   "src_bytes": 31644,
+   "vram": {
+    "all_formats": {
+     "etc2": 17972,
+     "s3tc": 17972
+    },
+    "bytes": 17972,
+    "fg_px": 6340,
+    "image_format_enum": 19,
+    "psnr_fg": 36.11,
+    "psnr_full": 40.62,
+    "px": 17920
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 2428
+    },
+    "bytes": 2428,
+    "fg_px": 6340,
+    "image_format_enum": 5,
+    "psnr_fg": 39.66,
+    "psnr_full": 44.18,
+    "px": 17920
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 2502
+    },
+    "bytes": 2502,
+    "fg_px": 6340,
+    "image_format_enum": 5,
+    "psnr_fg": 39.94,
+    "psnr_full": 44.45,
+    "px": 17920
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 2600
+    },
+    "bytes": 2600,
+    "fg_px": 6340,
+    "image_format_enum": 5,
+    "psnr_fg": 41.52,
+    "psnr_full": 46.03,
+    "px": 17920
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 2922
+    },
+    "bytes": 2922,
+    "fg_px": 6340,
+    "image_format_enum": 5,
+    "psnr_fg": 44.54,
+    "psnr_full": 49.06,
+    "px": 17920
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 3322
+    },
+    "bytes": 3322,
+    "fg_px": 6340,
+    "image_format_enum": 5,
+    "psnr_fg": 46.17,
+    "psnr_full": 50.68,
+    "px": 17920
+   }
+  },
+  "mc_gown/mouth_closed.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 15498
+    },
+    "bytes": 15498,
+    "fg_px": 6443,
+    "image_format_enum": 5,
+    "psnr_fg": 83.15,
+    "psnr_full": 85.74,
+    "px": 11700
+   },
+   "src_bytes": 19759,
+   "vram": {
+    "all_formats": {
+     "etc2": 12196,
+     "s3tc": 12196
+    },
+    "bytes": 12196,
+    "fg_px": 6443,
+    "image_format_enum": 19,
+    "psnr_fg": 37.29,
+    "psnr_full": 39.88,
+    "px": 11700
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 2822
+    },
+    "bytes": 2822,
+    "fg_px": 6443,
+    "image_format_enum": 5,
+    "psnr_fg": 39.96,
+    "psnr_full": 42.56,
+    "px": 11700
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 2890
+    },
+    "bytes": 2890,
+    "fg_px": 6443,
+    "image_format_enum": 5,
+    "psnr_fg": 40.36,
+    "psnr_full": 42.95,
+    "px": 11700
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 3024
+    },
+    "bytes": 3024,
+    "fg_px": 6443,
+    "image_format_enum": 5,
+    "psnr_fg": 42.1,
+    "psnr_full": 44.69,
+    "px": 11700
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 3480
+    },
+    "bytes": 3480,
+    "fg_px": 6443,
+    "image_format_enum": 5,
+    "psnr_fg": 45.72,
+    "psnr_full": 48.31,
+    "px": 11700
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 4078
+    },
+    "bytes": 4078,
+    "fg_px": 6443,
+    "image_format_enum": 5,
+    "psnr_fg": 47.34,
+    "psnr_full": 49.94,
+    "px": 11700
+   }
+  },
+  "mc_gown/mouth_oh.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 23468
+    },
+    "bytes": 23468,
+    "fg_px": 5863,
+    "image_format_enum": 5,
+    "psnr_fg": 81.15,
+    "psnr_full": 86.0,
+    "px": 17920
+   },
+   "src_bytes": 31842,
+   "vram": {
+    "all_formats": {
+     "etc2": 17972,
+     "s3tc": 17972
+    },
+    "bytes": 17972,
+    "fg_px": 5863,
+    "image_format_enum": 19,
+    "psnr_fg": 36.0,
+    "psnr_full": 40.85,
+    "px": 17920
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 2320
+    },
+    "bytes": 2320,
+    "fg_px": 5863,
+    "image_format_enum": 5,
+    "psnr_fg": 38.27,
+    "psnr_full": 43.13,
+    "px": 17920
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 2372
+    },
+    "bytes": 2372,
+    "fg_px": 5863,
+    "image_format_enum": 5,
+    "psnr_fg": 39.08,
+    "psnr_full": 43.94,
+    "px": 17920
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 2466
+    },
+    "bytes": 2466,
+    "fg_px": 5863,
+    "image_format_enum": 5,
+    "psnr_fg": 40.48,
+    "psnr_full": 45.33,
+    "px": 17920
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 2774
+    },
+    "bytes": 2774,
+    "fg_px": 5863,
+    "image_format_enum": 5,
+    "psnr_fg": 43.61,
+    "psnr_full": 48.47,
+    "px": 17920
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 3158
+    },
+    "bytes": 3158,
+    "fg_px": 5863,
+    "image_format_enum": 5,
+    "psnr_fg": 45.13,
+    "psnr_full": 49.98,
+    "px": 17920
+   }
+  },
+  "mc_gown/mouth_pout.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 50656
+    },
+    "bytes": 50656,
+    "fg_px": 21426,
+    "image_format_enum": 5,
+    "psnr_fg": 60.71,
+    "psnr_full": 62.54,
+    "px": 32640
+   },
+   "src_bytes": 69471,
+   "vram": {
+    "all_formats": {
+     "etc2": 32692,
+     "s3tc": 32692
+    },
+    "bytes": 32692,
+    "fg_px": 21426,
+    "image_format_enum": 19,
+    "psnr_fg": 35.4,
+    "psnr_full": 37.23,
+    "px": 32640
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 8732
+    },
+    "bytes": 8732,
+    "fg_px": 21426,
+    "image_format_enum": 5,
+    "psnr_fg": 37.33,
+    "psnr_full": 39.15,
+    "px": 32640
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 9046
+    },
+    "bytes": 9046,
+    "fg_px": 21426,
+    "image_format_enum": 5,
+    "psnr_fg": 38.08,
+    "psnr_full": 39.91,
+    "px": 32640
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 9826
+    },
+    "bytes": 9826,
+    "fg_px": 21426,
+    "image_format_enum": 5,
+    "psnr_fg": 39.67,
+    "psnr_full": 41.5,
+    "px": 32640
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 11822
+    },
+    "bytes": 11822,
+    "fg_px": 21426,
+    "image_format_enum": 5,
+    "psnr_fg": 42.48,
+    "psnr_full": 44.31,
+    "px": 32640
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 14078
+    },
+    "bytes": 14078,
+    "fg_px": 21426,
+    "image_format_enum": 5,
+    "psnr_fg": 44.12,
+    "psnr_full": 45.94,
+    "px": 32640
+   }
+  },
+  "mc_gown/mouth_pucker.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 24490
+    },
+    "bytes": 24490,
+    "fg_px": 7426,
+    "image_format_enum": 5,
+    "psnr_fg": 66.99,
+    "psnr_full": 70.81,
+    "px": 17920
+   },
+   "src_bytes": 32672,
+   "vram": {
+    "all_formats": {
+     "etc2": 17972,
+     "s3tc": 17972
+    },
+    "bytes": 17972,
+    "fg_px": 7426,
+    "image_format_enum": 19,
+    "psnr_fg": 37.92,
+    "psnr_full": 41.74,
+    "px": 17920
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 3002
+    },
+    "bytes": 3002,
+    "fg_px": 7426,
+    "image_format_enum": 5,
+    "psnr_fg": 41.14,
+    "psnr_full": 44.96,
+    "px": 17920
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 3048
+    },
+    "bytes": 3048,
+    "fg_px": 7426,
+    "image_format_enum": 5,
+    "psnr_fg": 41.94,
+    "psnr_full": 45.77,
+    "px": 17920
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 3164
+    },
+    "bytes": 3164,
+    "fg_px": 7426,
+    "image_format_enum": 5,
+    "psnr_fg": 43.23,
+    "psnr_full": 47.06,
+    "px": 17920
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 3512
+    },
+    "bytes": 3512,
+    "fg_px": 7426,
+    "image_format_enum": 5,
+    "psnr_fg": 46.22,
+    "psnr_full": 50.04,
+    "px": 17920
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 3938
+    },
+    "bytes": 3938,
+    "fg_px": 7426,
+    "image_format_enum": 5,
+    "psnr_fg": 47.99,
+    "psnr_full": 51.81,
+    "px": 17920
+   }
+  },
+  "mc_gown/mouth_small.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 15642
+    },
+    "bytes": 15642,
+    "fg_px": 6498,
+    "image_format_enum": 5,
+    "psnr_fg": 74.14,
+    "psnr_full": 76.69,
+    "px": 11700
+   },
+   "src_bytes": 20189,
+   "vram": {
+    "all_formats": {
+     "etc2": 12196,
+     "s3tc": 12196
+    },
+    "bytes": 12196,
+    "fg_px": 6498,
+    "image_format_enum": 19,
+    "psnr_fg": 36.03,
+    "psnr_full": 38.58,
+    "px": 11700
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 2912
+    },
+    "bytes": 2912,
+    "fg_px": 6498,
+    "image_format_enum": 5,
+    "psnr_fg": 39.02,
+    "psnr_full": 41.58,
+    "px": 11700
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 2962
+    },
+    "bytes": 2962,
+    "fg_px": 6498,
+    "image_format_enum": 5,
+    "psnr_fg": 39.69,
+    "psnr_full": 42.25,
+    "px": 11700
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 3144
+    },
+    "bytes": 3144,
+    "fg_px": 6498,
+    "image_format_enum": 5,
+    "psnr_fg": 41.12,
+    "psnr_full": 43.68,
+    "px": 11700
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 3620
+    },
+    "bytes": 3620,
+    "fg_px": 6498,
+    "image_format_enum": 5,
+    "psnr_fg": 43.9,
+    "psnr_full": 46.45,
+    "px": 11700
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 4206
+    },
+    "bytes": 4206,
+    "fg_px": 6498,
+    "image_format_enum": 5,
+    "psnr_fg": 45.18,
+    "psnr_full": 47.74,
+    "px": 11700
+   }
+  },
+  "mc_gown/sheen_mask.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 1888
+    },
+    "bytes": 1888,
+    "fg_px": 158006,
+    "image_format_enum": 0,
+    "psnr_fg": 99.0,
+    "psnr_full": 99.0,
+    "px": 158006
+   },
+   "src_bytes": 2589,
+   "vram": {
+    "all_formats": {
+     "etc2": 80052,
+     "s3tc": 80052
+    },
+    "bytes": 80052,
+    "fg_px": 158006,
+    "image_format_enum": 17,
+    "psnr_fg": 46.2,
+    "psnr_full": 46.2,
+    "px": 158006
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 754
+    },
+    "bytes": 754,
+    "fg_px": 158006,
+    "image_format_enum": 0,
+    "psnr_fg": 51.27,
+    "psnr_full": 51.27,
+    "px": 158006
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 772
+    },
+    "bytes": 772,
+    "fg_px": 158006,
+    "image_format_enum": 0,
+    "psnr_fg": 53.0,
+    "psnr_full": 53.0,
+    "px": 158006
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 810
+    },
+    "bytes": 810,
+    "fg_px": 158006,
+    "image_format_enum": 0,
+    "psnr_fg": 54.23,
+    "psnr_full": 54.23,
+    "px": 158006
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 980
+    },
+    "bytes": 980,
+    "fg_px": 158006,
+    "image_format_enum": 0,
+    "psnr_fg": 56.04,
+    "psnr_full": 56.04,
+    "px": 158006
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 1184
+    },
+    "bytes": 1184,
+    "fg_px": 158006,
+    "image_format_enum": 0,
+    "psnr_fg": 59.14,
+    "psnr_full": 59.14,
+    "px": 158006
+   }
+  },
+  "rin_officer/bg.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 692672
+    },
+    "bytes": 692672,
+    "fg_px": 1509376,
+    "image_format_enum": 4,
+    "psnr_fg": 99.0,
+    "psnr_full": 99.0,
+    "px": 1509376
+   },
+   "src_bytes": 909934,
+   "vram": {
+    "all_formats": {
+     "etc2": 755764,
+     "s3tc": 755764
+    },
+    "bytes": 755764,
+    "fg_px": 1509376,
+    "image_format_enum": 17,
+    "psnr_fg": 38.01,
+    "psnr_full": 38.01,
+    "px": 1509376
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 28324
+    },
+    "bytes": 28324,
+    "fg_px": 1509376,
+    "image_format_enum": 4,
+    "psnr_fg": 42.59,
+    "psnr_full": 42.59,
+    "px": 1509376
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 31728
+    },
+    "bytes": 31728,
+    "fg_px": 1509376,
+    "image_format_enum": 4,
+    "psnr_fg": 43.12,
+    "psnr_full": 43.12,
+    "px": 1509376
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 39964
+    },
+    "bytes": 39964,
+    "fg_px": 1509376,
+    "image_format_enum": 4,
+    "psnr_fg": 44.43,
+    "psnr_full": 44.43,
+    "px": 1509376
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 64526
+    },
+    "bytes": 64526,
+    "fg_px": 1509376,
+    "image_format_enum": 4,
+    "psnr_fg": 46.95,
+    "psnr_full": 46.95,
+    "px": 1509376
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 108222
+    },
+    "bytes": 108222,
+    "fg_px": 1509376,
+    "image_format_enum": 4,
+    "psnr_fg": 48.46,
+    "psnr_full": 48.46,
+    "px": 1509376
+   }
+  },
+  "rin_officer/blush.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 1460
+    },
+    "bytes": 1460,
+    "fg_px": 4837,
+    "image_format_enum": 5,
+    "psnr_fg": 99.0,
+    "psnr_full": 99.0,
+    "px": 16320
+   },
+   "src_bytes": 2362,
+   "vram": {
+    "all_formats": {
+     "etc2": 16372,
+     "s3tc": 16372
+    },
+    "bytes": 16372,
+    "fg_px": 4837,
+    "image_format_enum": 19,
+    "psnr_fg": 47.02,
+    "psnr_full": 52.31,
+    "px": 16320
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 1330
+    },
+    "bytes": 1330,
+    "fg_px": 4837,
+    "image_format_enum": 5,
+    "psnr_fg": 69.6,
+    "psnr_full": 74.88,
+    "px": 16320
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 1336
+    },
+    "bytes": 1336,
+    "fg_px": 4837,
+    "image_format_enum": 5,
+    "psnr_fg": 69.6,
+    "psnr_full": 74.88,
+    "px": 16320
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 1344
+    },
+    "bytes": 1344,
+    "fg_px": 4837,
+    "image_format_enum": 5,
+    "psnr_fg": 69.6,
+    "psnr_full": 74.88,
+    "px": 16320
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 1342
+    },
+    "bytes": 1342,
+    "fg_px": 4837,
+    "image_format_enum": 5,
+    "psnr_fg": 69.6,
+    "psnr_full": 74.88,
+    "px": 16320
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 1342
+    },
+    "bytes": 1342,
+    "fg_px": 4837,
+    "image_format_enum": 5,
+    "psnr_fg": 69.6,
+    "psnr_full": 74.88,
+    "px": 16320
+   }
+  },
+  "rin_officer/body.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 809244
+    },
+    "bytes": 809244,
+    "fg_px": 621133,
+    "image_format_enum": 5,
+    "psnr_fg": 74.49,
+    "psnr_full": 79.48,
+    "px": 1960000
+   },
+   "src_bytes": 1317737,
+   "vram": {
+    "all_formats": {
+     "etc2": 1960052,
+     "s3tc": 1960052
+    },
+    "bytes": 1960052,
+    "fg_px": 621133,
+    "image_format_enum": 19,
+    "psnr_fg": 33.5,
+    "psnr_full": 38.49,
+    "px": 1960000
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 117202
+    },
+    "bytes": 117202,
+    "fg_px": 621133,
+    "image_format_enum": 5,
+    "psnr_fg": 34.55,
+    "psnr_full": 39.54,
+    "px": 1960000
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 123882
+    },
+    "bytes": 123882,
+    "fg_px": 621133,
+    "image_format_enum": 5,
+    "psnr_fg": 35.28,
+    "psnr_full": 40.27,
+    "px": 1960000
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 149192
+    },
+    "bytes": 149192,
+    "fg_px": 621133,
+    "image_format_enum": 5,
+    "psnr_fg": 37.34,
+    "psnr_full": 42.34,
+    "px": 1960000
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 203140
+    },
+    "bytes": 203140,
+    "fg_px": 621133,
+    "image_format_enum": 5,
+    "psnr_fg": 41.35,
+    "psnr_full": 46.34,
+    "px": 1960000
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 267406
+    },
+    "bytes": 267406,
+    "fg_px": 621133,
+    "image_format_enum": 5,
+    "psnr_fg": 44.25,
+    "psnr_full": 49.24,
+    "px": 1960000
+   }
+  },
+  "rin_officer/eyeL_closed.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 21454
+    },
+    "bytes": 21454,
+    "fg_px": 2353,
+    "image_format_enum": 5,
+    "psnr_fg": 70.86,
+    "psnr_full": 78.64,
+    "px": 14136
+   },
+   "src_bytes": 30387,
+   "vram": {
+    "all_formats": {
+     "etc2": 14340,
+     "s3tc": 14340
+    },
+    "bytes": 14340,
+    "fg_px": 2353,
+    "image_format_enum": 19,
+    "psnr_fg": 32.34,
+    "psnr_full": 40.13,
+    "px": 14136
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 1878
+    },
+    "bytes": 1878,
+    "fg_px": 2353,
+    "image_format_enum": 5,
+    "psnr_fg": 33.27,
+    "psnr_full": 41.05,
+    "px": 14136
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 1970
+    },
+    "bytes": 1970,
+    "fg_px": 2353,
+    "image_format_enum": 5,
+    "psnr_fg": 34.37,
+    "psnr_full": 42.16,
+    "px": 14136
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 2206
+    },
+    "bytes": 2206,
+    "fg_px": 2353,
+    "image_format_enum": 5,
+    "psnr_fg": 36.11,
+    "psnr_full": 43.9,
+    "px": 14136
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 2730
+    },
+    "bytes": 2730,
+    "fg_px": 2353,
+    "image_format_enum": 5,
+    "psnr_fg": 39.59,
+    "psnr_full": 47.37,
+    "px": 14136
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 3306
+    },
+    "bytes": 3306,
+    "fg_px": 2353,
+    "image_format_enum": 5,
+    "psnr_fg": 41.18,
+    "psnr_full": 48.97,
+    "px": 14136
+   }
+  },
+  "rin_officer/eyeL_iris.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 2328
+    },
+    "bytes": 2328,
+    "fg_px": 560,
+    "image_format_enum": 5,
+    "psnr_fg": 82.74,
+    "psnr_full": 88.09,
+    "px": 1920
+   },
+   "src_bytes": 3274,
+   "vram": {
+    "all_formats": {
+     "etc2": 1972,
+     "s3tc": 1972
+    },
+    "bytes": 1972,
+    "fg_px": 560,
+    "image_format_enum": 19,
+    "psnr_fg": 31.09,
+    "psnr_full": 36.45,
+    "px": 1920
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 492
+    },
+    "bytes": 492,
+    "fg_px": 560,
+    "image_format_enum": 5,
+    "psnr_fg": 33.79,
+    "psnr_full": 39.14,
+    "px": 1920
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 512
+    },
+    "bytes": 512,
+    "fg_px": 560,
+    "image_format_enum": 5,
+    "psnr_fg": 34.28,
+    "psnr_full": 39.63,
+    "px": 1920
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 558
+    },
+    "bytes": 558,
+    "fg_px": 560,
+    "image_format_enum": 5,
+    "psnr_fg": 36.7,
+    "psnr_full": 42.05,
+    "px": 1920
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 680
+    },
+    "bytes": 680,
+    "fg_px": 560,
+    "image_format_enum": 5,
+    "psnr_fg": 40.52,
+    "psnr_full": 45.88,
+    "px": 1920
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 848
+    },
+    "bytes": 848,
+    "fg_px": 560,
+    "image_format_enum": 5,
+    "psnr_fg": 43.7,
+    "psnr_full": 49.05,
+    "px": 1920
+   }
+  },
+  "rin_officer/eyeL_socket.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 2774
+    },
+    "bytes": 2774,
+    "fg_px": 899,
+    "image_format_enum": 5,
+    "psnr_fg": 63.72,
+    "psnr_full": 67.01,
+    "px": 1920
+   },
+   "src_bytes": 4202,
+   "vram": {
+    "all_formats": {
+     "etc2": 1972,
+     "s3tc": 1972
+    },
+    "bytes": 1972,
+    "fg_px": 899,
+    "image_format_enum": 19,
+    "psnr_fg": 33.95,
+    "psnr_full": 37.25,
+    "px": 1920
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 906
+    },
+    "bytes": 906,
+    "fg_px": 899,
+    "image_format_enum": 5,
+    "psnr_fg": 36.69,
+    "psnr_full": 39.99,
+    "px": 1920
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 932
+    },
+    "bytes": 932,
+    "fg_px": 899,
+    "image_format_enum": 5,
+    "psnr_fg": 37.43,
+    "psnr_full": 40.72,
+    "px": 1920
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 1004
+    },
+    "bytes": 1004,
+    "fg_px": 899,
+    "image_format_enum": 5,
+    "psnr_fg": 39.5,
+    "psnr_full": 42.8,
+    "px": 1920
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 1190
+    },
+    "bytes": 1190,
+    "fg_px": 899,
+    "image_format_enum": 5,
+    "psnr_fg": 42.86,
+    "psnr_full": 46.15,
+    "px": 1920
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 1372
+    },
+    "bytes": 1372,
+    "fg_px": 899,
+    "image_format_enum": 5,
+    "psnr_fg": 45.54,
+    "psnr_full": 48.83,
+    "px": 1920
+   }
+  },
+  "rin_officer/eyeR_closed.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 21192
+    },
+    "bytes": 21192,
+    "fg_px": 2185,
+    "image_format_enum": 5,
+    "psnr_fg": 68.55,
+    "psnr_full": 76.66,
+    "px": 14136
+   },
+   "src_bytes": 30254,
+   "vram": {
+    "all_formats": {
+     "etc2": 14340,
+     "s3tc": 14340
+    },
+    "bytes": 14340,
+    "fg_px": 2185,
+    "image_format_enum": 19,
+    "psnr_fg": 32.0,
+    "psnr_full": 40.11,
+    "px": 14136
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 1700
+    },
+    "bytes": 1700,
+    "fg_px": 2185,
+    "image_format_enum": 5,
+    "psnr_fg": 33.73,
+    "psnr_full": 41.84,
+    "px": 14136
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 1802
+    },
+    "bytes": 1802,
+    "fg_px": 2185,
+    "image_format_enum": 5,
+    "psnr_fg": 34.41,
+    "psnr_full": 42.52,
+    "px": 14136
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 2016
+    },
+    "bytes": 2016,
+    "fg_px": 2185,
+    "image_format_enum": 5,
+    "psnr_fg": 36.05,
+    "psnr_full": 44.16,
+    "px": 14136
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 2510
+    },
+    "bytes": 2510,
+    "fg_px": 2185,
+    "image_format_enum": 5,
+    "psnr_fg": 39.19,
+    "psnr_full": 47.3,
+    "px": 14136
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 3030
+    },
+    "bytes": 3030,
+    "fg_px": 2185,
+    "image_format_enum": 5,
+    "psnr_fg": 41.03,
+    "psnr_full": 49.14,
+    "px": 14136
+   }
+  },
+  "rin_officer/eyeR_iris.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 2216
+    },
+    "bytes": 2216,
+    "fg_px": 560,
+    "image_format_enum": 5,
+    "psnr_fg": 71.73,
+    "psnr_full": 76.5,
+    "px": 1680
+   },
+   "src_bytes": 3021,
+   "vram": {
+    "all_formats": {
+     "etc2": 1844,
+     "s3tc": 1844
+    },
+    "bytes": 1844,
+    "fg_px": 560,
+    "image_format_enum": 19,
+    "psnr_fg": 31.47,
+    "psnr_full": 36.25,
+    "px": 1680
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 482
+    },
+    "bytes": 482,
+    "fg_px": 560,
+    "image_format_enum": 5,
+    "psnr_fg": 33.83,
+    "psnr_full": 38.61,
+    "px": 1680
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 500
+    },
+    "bytes": 500,
+    "fg_px": 560,
+    "image_format_enum": 5,
+    "psnr_fg": 34.51,
+    "psnr_full": 39.28,
+    "px": 1680
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 540
+    },
+    "bytes": 540,
+    "fg_px": 560,
+    "image_format_enum": 5,
+    "psnr_fg": 36.22,
+    "psnr_full": 40.99,
+    "px": 1680
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 678
+    },
+    "bytes": 678,
+    "fg_px": 560,
+    "image_format_enum": 5,
+    "psnr_fg": 40.96,
+    "psnr_full": 45.73,
+    "px": 1680
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 812
+    },
+    "bytes": 812,
+    "fg_px": 560,
+    "image_format_enum": 5,
+    "psnr_fg": 43.82,
+    "psnr_full": 48.59,
+    "px": 1680
+   }
+  },
+  "rin_officer/eyeR_socket.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 2410
+    },
+    "bytes": 2410,
+    "fg_px": 872,
+    "image_format_enum": 5,
+    "psnr_fg": 64.73,
+    "psnr_full": 67.57,
+    "px": 1680
+   },
+   "src_bytes": 3804,
+   "vram": {
+    "all_formats": {
+     "etc2": 1844,
+     "s3tc": 1844
+    },
+    "bytes": 1844,
+    "fg_px": 872,
+    "image_format_enum": 19,
+    "psnr_fg": 33.53,
+    "psnr_full": 36.37,
+    "px": 1680
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 870
+    },
+    "bytes": 870,
+    "fg_px": 872,
+    "image_format_enum": 5,
+    "psnr_fg": 36.4,
+    "psnr_full": 39.25,
+    "px": 1680
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 908
+    },
+    "bytes": 908,
+    "fg_px": 872,
+    "image_format_enum": 5,
+    "psnr_fg": 37.21,
+    "psnr_full": 40.06,
+    "px": 1680
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 958
+    },
+    "bytes": 958,
+    "fg_px": 872,
+    "image_format_enum": 5,
+    "psnr_fg": 38.64,
+    "psnr_full": 41.49,
+    "px": 1680
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 1150
+    },
+    "bytes": 1150,
+    "fg_px": 872,
+    "image_format_enum": 5,
+    "psnr_fg": 43.23,
+    "psnr_full": 46.08,
+    "px": 1680
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 1356
+    },
+    "bytes": 1356,
+    "fg_px": 872,
+    "image_format_enum": 5,
+    "psnr_fg": 45.72,
+    "psnr_full": 48.56,
+    "px": 1680
+   }
+  },
+  "rin_officer/eyes_closed.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 22222
+    },
+    "bytes": 22222,
+    "fg_px": 4507,
+    "image_format_enum": 5,
+    "psnr_fg": 69.81,
+    "psnr_full": 74.78,
+    "px": 14136
+   },
+   "src_bytes": 31077,
+   "vram": {
+    "all_formats": {
+     "etc2": 14340,
+     "s3tc": 14340
+    },
+    "bytes": 14340,
+    "fg_px": 4507,
+    "image_format_enum": 19,
+    "psnr_fg": 32.14,
+    "psnr_full": 37.1,
+    "px": 14136
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 3094
+    },
+    "bytes": 3094,
+    "fg_px": 4507,
+    "image_format_enum": 5,
+    "psnr_fg": 33.52,
+    "psnr_full": 38.48,
+    "px": 14136
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 3234
+    },
+    "bytes": 3234,
+    "fg_px": 4507,
+    "image_format_enum": 5,
+    "psnr_fg": 34.41,
+    "psnr_full": 39.37,
+    "px": 14136
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 3626
+    },
+    "bytes": 3626,
+    "fg_px": 4507,
+    "image_format_enum": 5,
+    "psnr_fg": 36.2,
+    "psnr_full": 41.16,
+    "px": 14136
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 4506
+    },
+    "bytes": 4506,
+    "fg_px": 4507,
+    "image_format_enum": 5,
+    "psnr_fg": 39.55,
+    "psnr_full": 44.51,
+    "px": 14136
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 5396
+    },
+    "bytes": 5396,
+    "fg_px": 4507,
+    "image_format_enum": 5,
+    "psnr_fg": 41.23,
+    "psnr_full": 46.19,
+    "px": 14136
+   }
+  },
+  "rin_officer/eyes_frown.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 31396
+    },
+    "bytes": 31396,
+    "fg_px": 8862,
+    "image_format_enum": 5,
+    "psnr_fg": 67.33,
+    "psnr_full": 70.86,
+    "px": 19992
+   },
+   "src_bytes": 45712,
+   "vram": {
+    "all_formats": {
+     "etc2": 20436,
+     "s3tc": 20436
+    },
+    "bytes": 20436,
+    "fg_px": 8862,
+    "image_format_enum": 19,
+    "psnr_fg": 32.61,
+    "psnr_full": 36.14,
+    "px": 19992
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 5342
+    },
+    "bytes": 5342,
+    "fg_px": 8862,
+    "image_format_enum": 5,
+    "psnr_fg": 33.68,
+    "psnr_full": 37.22,
+    "px": 19992
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 5606
+    },
+    "bytes": 5606,
+    "fg_px": 8862,
+    "image_format_enum": 5,
+    "psnr_fg": 34.53,
+    "psnr_full": 38.06,
+    "px": 19992
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 6238
+    },
+    "bytes": 6238,
+    "fg_px": 8862,
+    "image_format_enum": 5,
+    "psnr_fg": 36.43,
+    "psnr_full": 39.97,
+    "px": 19992
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 7714
+    },
+    "bytes": 7714,
+    "fg_px": 8862,
+    "image_format_enum": 5,
+    "psnr_fg": 40.09,
+    "psnr_full": 43.62,
+    "px": 19992
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 9284
+    },
+    "bytes": 9284,
+    "fg_px": 8862,
+    "image_format_enum": 5,
+    "psnr_fg": 42.54,
+    "psnr_full": 46.08,
+    "px": 19992
+   }
+  },
+  "rin_officer/eyes_happy.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 23316
+    },
+    "bytes": 23316,
+    "fg_px": 5188,
+    "image_format_enum": 5,
+    "psnr_fg": 70.48,
+    "psnr_full": 75.16,
+    "px": 15252
+   },
+   "src_bytes": 32776,
+   "vram": {
+    "all_formats": {
+     "etc2": 15844,
+     "s3tc": 15844
+    },
+    "bytes": 15844,
+    "fg_px": 5188,
+    "image_format_enum": 19,
+    "psnr_fg": 31.97,
+    "psnr_full": 36.65,
+    "px": 15252
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 3290
+    },
+    "bytes": 3290,
+    "fg_px": 5188,
+    "image_format_enum": 5,
+    "psnr_fg": 34.08,
+    "psnr_full": 38.77,
+    "px": 15252
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 3440
+    },
+    "bytes": 3440,
+    "fg_px": 5188,
+    "image_format_enum": 5,
+    "psnr_fg": 34.75,
+    "psnr_full": 39.44,
+    "px": 15252
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 3808
+    },
+    "bytes": 3808,
+    "fg_px": 5188,
+    "image_format_enum": 5,
+    "psnr_fg": 36.63,
+    "psnr_full": 41.32,
+    "px": 15252
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 4804
+    },
+    "bytes": 4804,
+    "fg_px": 5188,
+    "image_format_enum": 5,
+    "psnr_fg": 40.36,
+    "psnr_full": 45.04,
+    "px": 15252
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 5750
+    },
+    "bytes": 5750,
+    "fg_px": 5188,
+    "image_format_enum": 5,
+    "psnr_fg": 42.43,
+    "psnr_full": 47.12,
+    "px": 15252
+   }
+  },
+  "rin_officer/fan_plate.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 113522
+    },
+    "bytes": 113522,
+    "fg_px": 33711,
+    "image_format_enum": 5,
+    "psnr_fg": 68.44,
+    "psnr_full": 72.12,
+    "px": 78600
+   },
+   "src_bytes": 162853,
+   "vram": {
+    "all_formats": {
+     "etc2": 79252,
+     "s3tc": 79252
+    },
+    "bytes": 79252,
+    "fg_px": 33711,
+    "image_format_enum": 19,
+    "psnr_fg": 32.46,
+    "psnr_full": 36.14,
+    "px": 78600
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 9452
+    },
+    "bytes": 9452,
+    "fg_px": 33711,
+    "image_format_enum": 5,
+    "psnr_fg": 34.53,
+    "psnr_full": 38.21,
+    "px": 78600
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 10028
+    },
+    "bytes": 10028,
+    "fg_px": 33711,
+    "image_format_enum": 5,
+    "psnr_fg": 35.22,
+    "psnr_full": 38.9,
+    "px": 78600
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 11558
+    },
+    "bytes": 11558,
+    "fg_px": 33711,
+    "image_format_enum": 5,
+    "psnr_fg": 36.94,
+    "psnr_full": 40.62,
+    "px": 78600
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 15154
+    },
+    "bytes": 15154,
+    "fg_px": 33711,
+    "image_format_enum": 5,
+    "psnr_fg": 39.42,
+    "psnr_full": 43.09,
+    "px": 78600
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 18912
+    },
+    "bytes": 18912,
+    "fg_px": 33711,
+    "image_format_enum": 5,
+    "psnr_fg": 40.7,
+    "psnr_full": 44.38,
+    "px": 78600
+   }
+  },
+  "rin_officer/glasses_lens.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 3726
+    },
+    "bytes": 3726,
+    "fg_px": 11402,
+    "image_format_enum": 5,
+    "psnr_fg": 99.0,
+    "psnr_full": 99.0,
+    "px": 25200
+   },
+   "src_bytes": 5578,
+   "vram": {
+    "all_formats": {
+     "etc2": 25492,
+     "s3tc": 25492
+    },
+    "bytes": 25492,
+    "fg_px": 11402,
+    "image_format_enum": 19,
+    "psnr_fg": 35.82,
+    "psnr_full": 39.26,
+    "px": 25200
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 3668
+    },
+    "bytes": 3668,
+    "fg_px": 11402,
+    "image_format_enum": 5,
+    "psnr_fg": 99.0,
+    "psnr_full": 99.0,
+    "px": 25200
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 3666
+    },
+    "bytes": 3666,
+    "fg_px": 11402,
+    "image_format_enum": 5,
+    "psnr_fg": 99.0,
+    "psnr_full": 99.0,
+    "px": 25200
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 3668
+    },
+    "bytes": 3668,
+    "fg_px": 11402,
+    "image_format_enum": 5,
+    "psnr_fg": 99.0,
+    "psnr_full": 99.0,
+    "px": 25200
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 3672
+    },
+    "bytes": 3672,
+    "fg_px": 11402,
+    "image_format_enum": 5,
+    "psnr_fg": 99.0,
+    "psnr_full": 99.0,
+    "px": 25200
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 3672
+    },
+    "bytes": 3672,
+    "fg_px": 11402,
+    "image_format_enum": 5,
+    "psnr_fg": 99.0,
+    "psnr_full": 99.0,
+    "px": 25200
+   }
+  },
+  "rin_officer/layer_body.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 714246
+    },
+    "bytes": 714246,
+    "fg_px": 579297,
+    "image_format_enum": 5,
+    "psnr_fg": 74.61,
+    "psnr_full": 79.9,
+    "px": 1960000
+   },
+   "src_bytes": 1143430,
+   "vram": {
+    "all_formats": {
+     "etc2": 1960052,
+     "s3tc": 1960052
+    },
+    "bytes": 1960052,
+    "fg_px": 579297,
+    "image_format_enum": 19,
+    "psnr_fg": 33.81,
+    "psnr_full": 39.1,
+    "px": 1960000
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 101626
+    },
+    "bytes": 101626,
+    "fg_px": 579297,
+    "image_format_enum": 5,
+    "psnr_fg": 34.9,
+    "psnr_full": 40.19,
+    "px": 1960000
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 106674
+    },
+    "bytes": 106674,
+    "fg_px": 579297,
+    "image_format_enum": 5,
+    "psnr_fg": 35.61,
+    "psnr_full": 40.9,
+    "px": 1960000
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 129086
+    },
+    "bytes": 129086,
+    "fg_px": 579297,
+    "image_format_enum": 5,
+    "psnr_fg": 37.66,
+    "psnr_full": 42.96,
+    "px": 1960000
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 174808
+    },
+    "bytes": 174808,
+    "fg_px": 579297,
+    "image_format_enum": 5,
+    "psnr_fg": 41.51,
+    "psnr_full": 46.8,
+    "px": 1960000
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 232284
+    },
+    "bytes": 232284,
+    "fg_px": 579297,
+    "image_format_enum": 5,
+    "psnr_fg": 44.25,
+    "psnr_full": 49.54,
+    "px": 1960000
+   }
+  },
+  "rin_officer/layer_braid.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 87312
+    },
+    "bytes": 87312,
+    "fg_px": 49296,
+    "image_format_enum": 5,
+    "psnr_fg": 72.69,
+    "psnr_full": 77.67,
+    "px": 155142
+   },
+   "src_bytes": 131929,
+   "vram": {
+    "all_formats": {
+     "etc2": 157748,
+     "s3tc": 157748
+    },
+    "bytes": 157748,
+    "fg_px": 49296,
+    "image_format_enum": 19,
+    "psnr_fg": 33.69,
+    "psnr_full": 38.67,
+    "px": 155142
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 16978
+    },
+    "bytes": 16978,
+    "fg_px": 49296,
+    "image_format_enum": 5,
+    "psnr_fg": 34.17,
+    "psnr_full": 39.15,
+    "px": 155142
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 17968
+    },
+    "bytes": 17968,
+    "fg_px": 49296,
+    "image_format_enum": 5,
+    "psnr_fg": 35.03,
+    "psnr_full": 40.01,
+    "px": 155142
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 20544
+    },
+    "bytes": 20544,
+    "fg_px": 49296,
+    "image_format_enum": 5,
+    "psnr_fg": 36.97,
+    "psnr_full": 41.95,
+    "px": 155142
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 27074
+    },
+    "bytes": 27074,
+    "fg_px": 49296,
+    "image_format_enum": 5,
+    "psnr_fg": 41.04,
+    "psnr_full": 46.02,
+    "px": 155142
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 34112
+    },
+    "bytes": 34112,
+    "fg_px": 49296,
+    "image_format_enum": 5,
+    "psnr_fg": 44.07,
+    "psnr_full": 49.05,
+    "px": 155142
+   }
+  },
+  "rin_officer/layer_earR.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 2156
+    },
+    "bytes": 2156,
+    "fg_px": 576,
+    "image_format_enum": 5,
+    "psnr_fg": 99.0,
+    "psnr_full": 99.0,
+    "px": 2720
+   },
+   "src_bytes": 2918,
+   "vram": {
+    "all_formats": {
+     "etc2": 2868,
+     "s3tc": 2868
+    },
+    "bytes": 2868,
+    "fg_px": 576,
+    "image_format_enum": 19,
+    "psnr_fg": 31.44,
+    "psnr_full": 38.18,
+    "px": 2720
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 670
+    },
+    "bytes": 670,
+    "fg_px": 576,
+    "image_format_enum": 5,
+    "psnr_fg": 31.87,
+    "psnr_full": 38.61,
+    "px": 2720
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 704
+    },
+    "bytes": 704,
+    "fg_px": 576,
+    "image_format_enum": 5,
+    "psnr_fg": 33.41,
+    "psnr_full": 40.15,
+    "px": 2720
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 798
+    },
+    "bytes": 798,
+    "fg_px": 576,
+    "image_format_enum": 5,
+    "psnr_fg": 35.39,
+    "psnr_full": 42.13,
+    "px": 2720
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 1036
+    },
+    "bytes": 1036,
+    "fg_px": 576,
+    "image_format_enum": 5,
+    "psnr_fg": 39.2,
+    "psnr_full": 45.94,
+    "px": 2720
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 1268
+    },
+    "bytes": 1268,
+    "fg_px": 576,
+    "image_format_enum": 5,
+    "psnr_fg": 42.77,
+    "psnr_full": 49.52,
+    "px": 2720
+   }
+  },
+  "rin_officer/layer_forearm.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 84198
+    },
+    "bytes": 84198,
+    "fg_px": 51227,
+    "image_format_enum": 5,
+    "psnr_fg": 71.08,
+    "psnr_full": 76.37,
+    "px": 173227
+   },
+   "src_bytes": 128261,
+   "vram": {
+    "all_formats": {
+     "etc2": 174772,
+     "s3tc": 174772
+    },
+    "bytes": 174772,
+    "fg_px": 51227,
+    "image_format_enum": 19,
+    "psnr_fg": 32.83,
+    "psnr_full": 38.12,
+    "px": 173227
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 15108
+    },
+    "bytes": 15108,
+    "fg_px": 51227,
+    "image_format_enum": 5,
+    "psnr_fg": 34.12,
+    "psnr_full": 39.41,
+    "px": 173227
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 16034
+    },
+    "bytes": 16034,
+    "fg_px": 51227,
+    "image_format_enum": 5,
+    "psnr_fg": 34.96,
+    "psnr_full": 40.25,
+    "px": 173227
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 18408
+    },
+    "bytes": 18408,
+    "fg_px": 51227,
+    "image_format_enum": 5,
+    "psnr_fg": 37.03,
+    "psnr_full": 42.32,
+    "px": 173227
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 24326
+    },
+    "bytes": 24326,
+    "fg_px": 51227,
+    "image_format_enum": 5,
+    "psnr_fg": 41.24,
+    "psnr_full": 46.53,
+    "px": 173227
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 31418
+    },
+    "bytes": 31418,
+    "fg_px": 51227,
+    "image_format_enum": 5,
+    "psnr_fg": 44.3,
+    "psnr_full": 49.6,
+    "px": 173227
+   }
+  },
+  "rin_officer/layer_handR.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 25626
+    },
+    "bytes": 25626,
+    "fg_px": 15776,
+    "image_format_enum": 5,
+    "psnr_fg": 67.26,
+    "psnr_full": 69.83,
+    "px": 28536
+   },
+   "src_bytes": 34654,
+   "vram": {
+    "all_formats": {
+     "etc2": 28820,
+     "s3tc": 28820
+    },
+    "bytes": 28820,
+    "fg_px": 15776,
+    "image_format_enum": 19,
+    "psnr_fg": 34.62,
+    "psnr_full": 37.19,
+    "px": 28536
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 5986
+    },
+    "bytes": 5986,
+    "fg_px": 15776,
+    "image_format_enum": 5,
+    "psnr_fg": 35.91,
+    "psnr_full": 38.49,
+    "px": 28536
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 6218
+    },
+    "bytes": 6218,
+    "fg_px": 15776,
+    "image_format_enum": 5,
+    "psnr_fg": 36.67,
+    "psnr_full": 39.25,
+    "px": 28536
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 6882
+    },
+    "bytes": 6882,
+    "fg_px": 15776,
+    "image_format_enum": 5,
+    "psnr_fg": 38.66,
+    "psnr_full": 41.23,
+    "px": 28536
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 8712
+    },
+    "bytes": 8712,
+    "fg_px": 15776,
+    "image_format_enum": 5,
+    "psnr_fg": 42.41,
+    "psnr_full": 44.99,
+    "px": 28536
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 10474
+    },
+    "bytes": 10474,
+    "fg_px": 15776,
+    "image_format_enum": 5,
+    "psnr_fg": 44.98,
+    "psnr_full": 47.55,
+    "px": 28536
+   }
+  },
+  "rin_officer/layer_tassel.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 7686
+    },
+    "bytes": 7686,
+    "fg_px": 3073,
+    "image_format_enum": 5,
+    "psnr_fg": 99.0,
+    "psnr_full": 99.0,
+    "px": 9384
+   },
+   "src_bytes": 10282,
+   "vram": {
+    "all_formats": {
+     "etc2": 9620,
+     "s3tc": 9620
+    },
+    "bytes": 9620,
+    "fg_px": 3073,
+    "image_format_enum": 19,
+    "psnr_fg": 30.57,
+    "psnr_full": 35.42,
+    "px": 9384
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 1678
+    },
+    "bytes": 1678,
+    "fg_px": 3073,
+    "image_format_enum": 5,
+    "psnr_fg": 32.54,
+    "psnr_full": 37.39,
+    "px": 9384
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 1804
+    },
+    "bytes": 1804,
+    "fg_px": 3073,
+    "image_format_enum": 5,
+    "psnr_fg": 33.44,
+    "psnr_full": 38.29,
+    "px": 9384
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 2072
+    },
+    "bytes": 2072,
+    "fg_px": 3073,
+    "image_format_enum": 5,
+    "psnr_fg": 35.54,
+    "psnr_full": 40.39,
+    "px": 9384
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 2790
+    },
+    "bytes": 2790,
+    "fg_px": 3073,
+    "image_format_enum": 5,
+    "psnr_fg": 39.92,
+    "psnr_full": 44.77,
+    "px": 9384
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 3444
+    },
+    "bytes": 3444,
+    "fg_px": 3073,
+    "image_format_enum": 5,
+    "psnr_fg": 42.73,
+    "psnr_full": 47.58,
+    "px": 9384
+   }
+  },
+  "rin_officer/mouth_ah.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 8310
+    },
+    "bytes": 8310,
+    "fg_px": 2328,
+    "image_format_enum": 5,
+    "psnr_fg": 67.15,
+    "psnr_full": 70.9,
+    "px": 5520
+   },
+   "src_bytes": 11106,
+   "vram": {
+    "all_formats": {
+     "etc2": 5572,
+     "s3tc": 5572
+    },
+    "bytes": 5572,
+    "fg_px": 2328,
+    "image_format_enum": 19,
+    "psnr_fg": 32.21,
+    "psnr_full": 35.96,
+    "px": 5520
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 1572
+    },
+    "bytes": 1572,
+    "fg_px": 2328,
+    "image_format_enum": 5,
+    "psnr_fg": 34.68,
+    "psnr_full": 38.43,
+    "px": 5520
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 1624
+    },
+    "bytes": 1624,
+    "fg_px": 2328,
+    "image_format_enum": 5,
+    "psnr_fg": 35.21,
+    "psnr_full": 38.96,
+    "px": 5520
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 1772
+    },
+    "bytes": 1772,
+    "fg_px": 2328,
+    "image_format_enum": 5,
+    "psnr_fg": 36.88,
+    "psnr_full": 40.63,
+    "px": 5520
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 2122
+    },
+    "bytes": 2122,
+    "fg_px": 2328,
+    "image_format_enum": 5,
+    "psnr_fg": 40.0,
+    "psnr_full": 43.75,
+    "px": 5520
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 2546
+    },
+    "bytes": 2546,
+    "fg_px": 2328,
+    "image_format_enum": 5,
+    "psnr_fg": 41.99,
+    "psnr_full": 45.74,
+    "px": 5520
+   }
+  },
+  "rin_officer/mouth_laugh.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 8426
+    },
+    "bytes": 8426,
+    "fg_px": 2335,
+    "image_format_enum": 5,
+    "psnr_fg": 70.89,
+    "psnr_full": 74.63,
+    "px": 5520
+   },
+   "src_bytes": 11307,
+   "vram": {
+    "all_formats": {
+     "etc2": 5572,
+     "s3tc": 5572
+    },
+    "bytes": 5572,
+    "fg_px": 2335,
+    "image_format_enum": 19,
+    "psnr_fg": 32.19,
+    "psnr_full": 35.92,
+    "px": 5520
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 1578
+    },
+    "bytes": 1578,
+    "fg_px": 2335,
+    "image_format_enum": 5,
+    "psnr_fg": 34.08,
+    "psnr_full": 37.82,
+    "px": 5520
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 1628
+    },
+    "bytes": 1628,
+    "fg_px": 2335,
+    "image_format_enum": 5,
+    "psnr_fg": 34.5,
+    "psnr_full": 38.24,
+    "px": 5520
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 1794
+    },
+    "bytes": 1794,
+    "fg_px": 2335,
+    "image_format_enum": 5,
+    "psnr_fg": 36.75,
+    "psnr_full": 40.49,
+    "px": 5520
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 2230
+    },
+    "bytes": 2230,
+    "fg_px": 2335,
+    "image_format_enum": 5,
+    "psnr_fg": 40.17,
+    "psnr_full": 43.9,
+    "px": 5520
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 2650
+    },
+    "bytes": 2650,
+    "fg_px": 2335,
+    "image_format_enum": 5,
+    "psnr_fg": 42.39,
+    "psnr_full": 46.13,
+    "px": 5520
+   }
+  },
+  "rin_officer/mouth_oh.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 8054
+    },
+    "bytes": 8054,
+    "fg_px": 2310,
+    "image_format_enum": 5,
+    "psnr_fg": 68.12,
+    "psnr_full": 71.9,
+    "px": 5520
+   },
+   "src_bytes": 10656,
+   "vram": {
+    "all_formats": {
+     "etc2": 5572,
+     "s3tc": 5572
+    },
+    "bytes": 5572,
+    "fg_px": 2310,
+    "image_format_enum": 19,
+    "psnr_fg": 35.03,
+    "psnr_full": 38.82,
+    "px": 5520
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 1550
+    },
+    "bytes": 1550,
+    "fg_px": 2310,
+    "image_format_enum": 5,
+    "psnr_fg": 37.62,
+    "psnr_full": 41.4,
+    "px": 5520
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 1594
+    },
+    "bytes": 1594,
+    "fg_px": 2310,
+    "image_format_enum": 5,
+    "psnr_fg": 38.08,
+    "psnr_full": 41.87,
+    "px": 5520
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 1702
+    },
+    "bytes": 1702,
+    "fg_px": 2310,
+    "image_format_enum": 5,
+    "psnr_fg": 40.01,
+    "psnr_full": 43.79,
+    "px": 5520
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 2000
+    },
+    "bytes": 2000,
+    "fg_px": 2310,
+    "image_format_enum": 5,
+    "psnr_fg": 43.04,
+    "psnr_full": 46.82,
+    "px": 5520
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 2320
+    },
+    "bytes": 2320,
+    "fg_px": 2310,
+    "image_format_enum": 5,
+    "psnr_fg": 45.51,
+    "psnr_full": 49.29,
+    "px": 5520
+   }
+  },
+  "rin_officer/mouth_pout.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 9528
+    },
+    "bytes": 9528,
+    "fg_px": 2428,
+    "image_format_enum": 5,
+    "psnr_fg": 71.51,
+    "psnr_full": 76.07,
+    "px": 6936
+   },
+   "src_bytes": 13005,
+   "vram": {
+    "all_formats": {
+     "etc2": 7124,
+     "s3tc": 7124
+    },
+    "bytes": 7124,
+    "fg_px": 2428,
+    "image_format_enum": 19,
+    "psnr_fg": 34.67,
+    "psnr_full": 39.23,
+    "px": 6936
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 1644
+    },
+    "bytes": 1644,
+    "fg_px": 2428,
+    "image_format_enum": 5,
+    "psnr_fg": 37.69,
+    "psnr_full": 42.25,
+    "px": 6936
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 1674
+    },
+    "bytes": 1674,
+    "fg_px": 2428,
+    "image_format_enum": 5,
+    "psnr_fg": 38.38,
+    "psnr_full": 42.94,
+    "px": 6936
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 1794
+    },
+    "bytes": 1794,
+    "fg_px": 2428,
+    "image_format_enum": 5,
+    "psnr_fg": 40.39,
+    "psnr_full": 44.94,
+    "px": 6936
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 2126
+    },
+    "bytes": 2126,
+    "fg_px": 2428,
+    "image_format_enum": 5,
+    "psnr_fg": 43.44,
+    "psnr_full": 48.0,
+    "px": 6936
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 2488
+    },
+    "bytes": 2488,
+    "fg_px": 2428,
+    "image_format_enum": 5,
+    "psnr_fg": 44.88,
+    "psnr_full": 49.44,
+    "px": 6936
+   }
+  },
+  "rin_officer/mouth_smirk.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 8298
+    },
+    "bytes": 8298,
+    "fg_px": 2066,
+    "image_format_enum": 5,
+    "psnr_fg": 65.12,
+    "psnr_full": 69.39,
+    "px": 5520
+   },
+   "src_bytes": 10997,
+   "vram": {
+    "all_formats": {
+     "etc2": 5572,
+     "s3tc": 5572
+    },
+    "bytes": 5572,
+    "fg_px": 2066,
+    "image_format_enum": 19,
+    "psnr_fg": 34.08,
+    "psnr_full": 38.35,
+    "px": 5520
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 1506
+    },
+    "bytes": 1506,
+    "fg_px": 2066,
+    "image_format_enum": 5,
+    "psnr_fg": 36.31,
+    "psnr_full": 40.58,
+    "px": 5520
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 1558
+    },
+    "bytes": 1558,
+    "fg_px": 2066,
+    "image_format_enum": 5,
+    "psnr_fg": 37.1,
+    "psnr_full": 41.37,
+    "px": 5520
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 1684
+    },
+    "bytes": 1684,
+    "fg_px": 2066,
+    "image_format_enum": 5,
+    "psnr_fg": 38.79,
+    "psnr_full": 43.06,
+    "px": 5520
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 2000
+    },
+    "bytes": 2000,
+    "fg_px": 2066,
+    "image_format_enum": 5,
+    "psnr_fg": 42.03,
+    "psnr_full": 46.3,
+    "px": 5520
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 2374
+    },
+    "bytes": 2374,
+    "fg_px": 2066,
+    "image_format_enum": 5,
+    "psnr_fg": 43.86,
+    "psnr_full": 48.13,
+    "px": 5520
+   }
+  },
+  "rin_officer/over_glasses.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 59084
+    },
+    "bytes": 59084,
+    "fg_px": 16524,
+    "image_format_enum": 5,
+    "psnr_fg": 67.17,
+    "psnr_full": 70.81,
+    "px": 38232
+   },
+   "src_bytes": 86193,
+   "vram": {
+    "all_formats": {
+     "etc2": 38756,
+     "s3tc": 38756
+    },
+    "bytes": 38756,
+    "fg_px": 16524,
+    "image_format_enum": 19,
+    "psnr_fg": 33.19,
+    "psnr_full": 36.83,
+    "px": 38232
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 6758
+    },
+    "bytes": 6758,
+    "fg_px": 16524,
+    "image_format_enum": 5,
+    "psnr_fg": 33.99,
+    "psnr_full": 37.63,
+    "px": 38232
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 7198
+    },
+    "bytes": 7198,
+    "fg_px": 16524,
+    "image_format_enum": 5,
+    "psnr_fg": 34.74,
+    "psnr_full": 38.39,
+    "px": 38232
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 8170
+    },
+    "bytes": 8170,
+    "fg_px": 16524,
+    "image_format_enum": 5,
+    "psnr_fg": 36.52,
+    "psnr_full": 40.17,
+    "px": 38232
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 10660
+    },
+    "bytes": 10660,
+    "fg_px": 16524,
+    "image_format_enum": 5,
+    "psnr_fg": 40.01,
+    "psnr_full": 43.65,
+    "px": 38232
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 13168
+    },
+    "bytes": 13168,
+    "fg_px": 16524,
+    "image_format_enum": 5,
+    "psnr_fg": 42.11,
+    "psnr_full": 45.75,
+    "px": 38232
+   }
+  },
+  "rin_officer/sheen_mask.png": {
+   "lossless": {
+    "all_formats": {
+     "ctex": 2898
+    },
+    "bytes": 2898,
+    "fg_px": 1960000,
+    "image_format_enum": 0,
+    "psnr_fg": 99.0,
+    "psnr_full": 99.0,
+    "px": 1960000
+   },
+   "src_bytes": 5256,
+   "vram": {
+    "all_formats": {
+     "etc2": 980052,
+     "s3tc": 980052
+    },
+    "bytes": 980052,
+    "fg_px": 1960000,
+    "image_format_enum": 17,
+    "psnr_fg": 56.52,
+    "psnr_full": 56.52,
+    "px": 1960000
+   },
+   "webp_q60": {
+    "all_formats": {
+     "ctex": 4106
+    },
+    "bytes": 4106,
+    "fg_px": 1960000,
+    "image_format_enum": 0,
+    "psnr_fg": 60.61,
+    "psnr_full": 60.61,
+    "px": 1960000
+   },
+   "webp_q70": {
+    "all_formats": {
+     "ctex": 4142
+    },
+    "bytes": 4142,
+    "fg_px": 1960000,
+    "image_format_enum": 0,
+    "psnr_fg": 63.0,
+    "psnr_full": 63.0,
+    "px": 1960000
+   },
+   "webp_q80": {
+    "all_formats": {
+     "ctex": 4256
+    },
+    "bytes": 4256,
+    "fg_px": 1960000,
+    "image_format_enum": 0,
+    "psnr_fg": 65.01,
+    "psnr_full": 65.01,
+    "px": 1960000
+   },
+   "webp_q90": {
+    "all_formats": {
+     "ctex": 4490
+    },
+    "bytes": 4490,
+    "fg_px": 1960000,
+    "image_format_enum": 0,
+    "psnr_fg": 66.82,
+    "psnr_full": 66.82,
+    "px": 1960000
+   },
+   "webp_q95": {
+    "all_formats": {
+     "ctex": 4814
+    },
+    "bytes": 4814,
+    "fg_px": 1960000,
+    "image_format_enum": 0,
+    "psnr_fg": 70.37,
+    "psnr_full": 70.37,
+    "px": 1960000
+   }
+  }
+ },
+ "psnr_gate_db": 38.0,
+ "rigs": [
+  "mc_gown",
+  "rin_officer",
+  "hana_base"
+ ],
+ "summary": {
+  "hana_base": {
+   "other_bytes_runtime": 697677,
+   "runtime_png": [
+    "bg.png",
+    "blush.png",
+    "eyeL_closed.png",
+    "eyeL_iris.png",
+    "eyeL_socket.png",
+    "eyeR_closed.png",
+    "eyeR_iris.png",
+    "eyeR_socket.png",
+    "eyes_closed.png",
+    "eyes_frown.png",
+    "eyes_half.png",
+    "eyes_happy.png",
+    "layer_body.png",
+    "layer_flapL.png",
+    "layer_pendant.png",
+    "layer_sleeveA.png",
+    "layer_sleeveB.png",
+    "mouth_ah.png",
+    "mouth_closed.png",
+    "mouth_oh.png",
+    "mouth_pout.png",
+    "mouth_pucker.png",
+    "mouth_small.png",
+    "sheen_mask.png"
+   ],
+   "source_png_bytes_all": 5313716,
+   "source_png_bytes_runtime": 3669560,
+   "variants": {
+    "hybrid_gate": {
+     "choice": {
+      "bg.png": "webp_q60",
+      "blush.png": "lossless",
+      "eyeL_closed.png": "lossless",
+      "eyeL_iris.png": "lossless",
+      "eyeL_socket.png": "lossless",
+      "eyeR_closed.png": "lossless",
+      "eyeR_iris.png": "lossless",
+      "eyeR_socket.png": "lossless",
+      "eyes_closed.png": "lossless",
+      "eyes_frown.png": "lossless",
+      "eyes_half.png": "webp_q95",
+      "eyes_happy.png": "lossless",
+      "layer_body.png": "webp_q95",
+      "layer_flapL.png": "lossless",
+      "layer_pendant.png": "lossless",
+      "layer_sleeveA.png": "webp_q90",
+      "layer_sleeveB.png": "webp_q90",
+      "mouth_ah.png": "webp_q90",
+      "mouth_closed.png": "webp_q60",
+      "mouth_oh.png": "webp_q70",
+      "mouth_pout.png": "webp_q90",
+      "mouth_pucker.png": "webp_q60",
+      "mouth_small.png": "webp_q80",
+      "sheen_mask.png": "lossless"
+     },
+     "runtime_bytes": 750300
+    },
+    "lossless": {
+     "all_bytes": 3901324,
+     "min_psnr_big_files": 62.83,
+     "min_psnr_runtime": 59.55,
+     "runtime_bytes": 2760386
+    },
+    "vram": {
+     "all_bytes": 6171396,
+     "min_psnr_big_files": 31.72,
+     "min_psnr_runtime": 28.41,
+     "runtime_bytes": 4211344
+    },
+    "webp_q60": {
+     "all_bytes": 450724,
+     "min_psnr_big_files": 32.07,
+     "min_psnr_runtime": 30.47,
+     "runtime_bytes": 282358
+    },
+    "webp_q70": {
+     "all_bytes": 484778,
+     "min_psnr_big_files": 32.7,
+     "min_psnr_runtime": 31.0,
+     "runtime_bytes": 301932
+    },
+    "webp_q80": {
+     "all_bytes": 567328,
+     "min_psnr_big_files": 34.06,
+     "min_psnr_runtime": 32.7,
+     "runtime_bytes": 352808
+    },
+    "webp_q90": {
+     "all_bytes": 785304,
+     "min_psnr_big_files": 36.37,
+     "min_psnr_runtime": 35.65,
+     "runtime_bytes": 487876
+    },
+    "webp_q95": {
+     "all_bytes": 1085908,
+     "min_psnr_big_files": 37.23,
+     "min_psnr_runtime": 36.77,
+     "runtime_bytes": 695150
+    }
+   }
+  },
+  "mc_gown": {
+   "other_bytes_runtime": 1772388,
+   "runtime_png": [
+    "bg.png",
+    "blush.png",
+    "eyeL_closed.png",
+    "eyeL_iris.png",
+    "eyeL_socket.png",
+    "eyeR_closed.png",
+    "eyeR_iris.png",
+    "eyeR_socket.png",
+    "eyes_closed.png",
+    "eyes_frown.png",
+    "eyes_happy.png",
+    "layer_armL.png",
+    "layer_armR.png",
+    "layer_body.png",
+    "layer_locks.png",
+    "layer_locksR.png",
+    "layer_navel.png",
+    "layer_pendant.png",
+    "layer_tailL.png",
+    "layer_tailR.png",
+    "layer_tassel.png",
+    "layer_thigh.png",
+    "mouth_ah.png",
+    "mouth_closed.png",
+    "mouth_oh.png",
+    "mouth_pout.png",
+    "mouth_pucker.png",
+    "mouth_small.png",
+    "sheen_mask.png"
+   ],
+   "source_png_bytes_all": 6382537,
+   "source_png_bytes_runtime": 4091452,
+   "variants": {
+    "hybrid_gate": {
+     "choice": {
+      "bg.png": "webp_q60",
+      "blush.png": "lossless",
+      "eyeL_closed.png": "webp_q80",
+      "eyeL_iris.png": "lossless",
+      "eyeL_socket.png": "lossless",
+      "eyeR_closed.png": "webp_q90",
+      "eyeR_iris.png": "lossless",
+      "eyeR_socket.png": "lossless",
+      "eyes_closed.png": "webp_q80",
+      "eyes_frown.png": "webp_q90",
+      "eyes_happy.png": "webp_q80",
+      "layer_armL.png": "webp_q90",
+      "layer_armR.png": "webp_q90",
+      "layer_body.png": "webp_q90",
+      "layer_locks.png": "lossless",
+      "layer_locksR.png": "lossless",
+      "layer_navel.png": "lossless",
+      "layer_pendant.png": "lossless",
+      "layer_tailL.png": "webp_q90",
+      "layer_tailR.png": "webp_q90",
+      "layer_tassel.png": "lossless",
+      "layer_thigh.png": "webp_q80",
+      "mouth_ah.png": "webp_q60",
+      "mouth_closed.png": "lossless",
+      "mouth_oh.png": "webp_q60",
+      "mouth_pout.png": "webp_q70",
+      "mouth_pucker.png": "webp_q60",
+      "mouth_small.png": "lossless",
+      "sheen_mask.png": "lossless"
+     },
+     "runtime_bytes": 755148
+    },
+    "lossless": {
+     "all_bytes": 4404810,
+     "min_psnr_big_files": 60.71,
+     "min_psnr_runtime": 60.71,
+     "runtime_bytes": 2872806
+    },
+    "vram": {
+     "all_bytes": 6918448,
+     "min_psnr_big_files": 33.57,
+     "min_psnr_runtime": 28.55,
+     "runtime_bytes": 4958396
+    },
+    "webp_q60": {
+     "all_bytes": 716858,
+     "min_psnr_big_files": 32.35,
+     "min_psnr_runtime": 29.89,
+     "runtime_bytes": 467454
+    },
+    "webp_q70": {
+     "all_bytes": 759560,
+     "min_psnr_big_files": 33.12,
+     "min_psnr_runtime": 31.06,
+     "runtime_bytes": 491690
+    },
+    "webp_q80": {
+     "all_bytes": 870740,
+     "min_psnr_big_files": 34.91,
+     "min_psnr_runtime": 32.88,
+     "runtime_bytes": 559122
+    },
+    "webp_q90": {
+     "all_bytes": 1142910,
+     "min_psnr_big_files": 38.44,
+     "min_psnr_runtime": 35.38,
+     "runtime_bytes": 722930
+    },
+    "webp_q95": {
+     "all_bytes": 1465540,
+     "min_psnr_big_files": 40.44,
+     "min_psnr_runtime": 36.41,
+     "runtime_bytes": 925826
+    }
+   }
+  },
+  "rin_officer": {
+   "other_bytes_runtime": 466876,
+   "runtime_png": [
+    "bg.png",
+    "blush.png",
+    "eyeL_closed.png",
+    "eyeL_iris.png",
+    "eyeL_socket.png",
+    "eyeR_closed.png",
+    "eyeR_iris.png",
+    "eyeR_socket.png",
+    "eyes_closed.png",
+    "eyes_frown.png",
+    "eyes_happy.png",
+    "fan_plate.png",
+    "glasses_lens.png",
+    "layer_body.png",
+    "layer_braid.png",
+    "layer_earR.png",
+    "layer_forearm.png",
+    "layer_handR.png",
+    "layer_tassel.png",
+    "mouth_ah.png",
+    "mouth_laugh.png",
+    "mouth_oh.png",
+    "mouth_pout.png",
+    "mouth_smirk.png",
+    "over_glasses.png",
+    "sheen_mask.png"
+   ],
+   "source_png_bytes_all": 4182965,
+   "source_png_bytes_runtime": 2865228,
+   "variants": {
+    "hybrid_gate": {
+     "choice": {
+      "bg.png": "webp_q60",
+      "blush.png": "lossless",
+      "eyeL_closed.png": "webp_q90",
+      "eyeL_iris.png": "lossless",
+      "eyeL_socket.png": "lossless",
+      "eyeR_closed.png": "webp_q90",
+      "eyeR_iris.png": "lossless",
+      "eyeR_socket.png": "lossless",
+      "eyes_closed.png": "webp_q90",
+      "eyes_frown.png": "webp_q90",
+      "eyes_happy.png": "webp_q90",
+      "fan_plate.png": "webp_q90",
+      "glasses_lens.png": "lossless",
+      "layer_body.png": "webp_q90",
+      "layer_braid.png": "webp_q90",
+      "layer_earR.png": "lossless",
+      "layer_forearm.png": "webp_q90",
+      "layer_handR.png": "webp_q80",
+      "layer_tassel.png": "lossless",
+      "mouth_ah.png": "lossless",
+      "mouth_laugh.png": "lossless",
+      "mouth_oh.png": "lossless",
+      "mouth_pout.png": "lossless",
+      "mouth_smirk.png": "lossless",
+      "over_glasses.png": "webp_q90",
+      "sheen_mask.png": "lossless"
+     },
+     "runtime_bytes": 379762
+    },
+    "lossless": {
+     "all_bytes": 2775754,
+     "min_psnr_big_files": 67.17,
+     "min_psnr_runtime": 63.72,
+     "runtime_bytes": 1966510
+    },
+    "vram": {
+     "all_bytes": 6305964,
+     "min_psnr_big_files": 31.97,
+     "min_psnr_runtime": 30.57,
+     "runtime_bytes": 4345912
+    },
+    "webp_q60": {
+     "all_bytes": 338790,
+     "min_psnr_big_files": 33.27,
+     "min_psnr_runtime": 31.87,
+     "runtime_bytes": 221588
+    },
+    "webp_q70": {
+     "all_bytes": 358364,
+     "min_psnr_big_files": 34.37,
+     "min_psnr_runtime": 33.41,
+     "runtime_bytes": 234482
+    },
+    "webp_q80": {
+     "all_bytes": 425642,
+     "min_psnr_big_files": 36.05,
+     "min_psnr_runtime": 35.39,
+     "runtime_bytes": 276450
+    },
+    "webp_q90": {
+     "all_bytes": 578170,
+     "min_psnr_big_files": 39.19,
+     "min_psnr_runtime": 39.19,
+     "runtime_bytes": 375030
+    },
+    "webp_q95": {
+     "all_bytes": 774068,
+     "min_psnr_big_files": 40.7,
+     "min_psnr_runtime": 40.7,
+     "runtime_bytes": 506662
+    }
+   }
+  }
+ }
+}
