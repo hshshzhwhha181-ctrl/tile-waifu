@@ -5,7 +5,7 @@
 
 | gate | suites | how it is judged |
 | --- | --- | --- |
-| Godot selftests | 56 (9 core (8 flags + `state`), 43 v10 registry modules, `registry`, `spec`, `summon`, `ult_rin`) | marker line of each suite (`ECON_SELFTEST 384/384`, `V10VOICE OK`, ...) |
+| Godot selftests | 57 (10 core (8 flags + `state` + `twboard`), 43 v10 registry modules, `registry`, `spec`, `summon`, `ult_rin`) | marker line of each suite (`ECON_SELFTEST 384/384`, `V10VOICE OK`, ...) |
 | `server/e2e_test.mjs` | `server_e2e` | `E2E_OK`, `N passed, 0 failed` (skipped with a reason if node or `node:sqlite` is missing) |
 | `ux_lint.py` | `ux_lint` | `UX_LINT RESULT: OK (0 violations)` (lives at `.agents/skills/tw-godot-qa/scripts/ux_lint.py`, verified present) |
 | `audio_gate` | 1 (`--selftest`) | `AUDIO_GATE SELFTEST 50/50`: loudness meter vs 12 synthetic signals with known loudness (<= 0.3 LU), true peak, leading silence, verdict rules |

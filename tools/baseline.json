@@ -1079,6 +1079,22 @@
     "total": 64
    }
   },
+  "twboard": {
+   "fast": {
+    "marker": "TWBOARD_SELFTEST 1997/1997  (8.8 s)",
+    "ok": 1997,
+    "secs": 14.6,
+    "status": "pass",
+    "total": 1997
+   },
+   "full": {
+    "marker": "TWBOARD_SELFTEST 1997/1997  (8.8 s)",
+    "ok": 1997,
+    "secs": 14.7,
+    "status": "pass",
+    "total": 1997
+   }
+  },
   "ult_rin": {
    "fast": {
     "marker": "ULT SELFTEST rin 22/22",
