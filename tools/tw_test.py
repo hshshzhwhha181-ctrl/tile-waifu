@@ -100,6 +100,8 @@ CATALOG: list[Suite] = [
       note="P16: TWRng, TWFree, TWBoardEvents, TWBoard (unified solitaire rules): scenarios, 1000 seeds, 200 Path levels (lockstep with V10LevelSim, certificate, solver bot), replay, shuffle, fuzz"),
     S("twnav", "TWNAV_SELFTEST", "res://shell/nav/nav_selftest.tscn", group="core",
       note="P23: ScreenSpec, TWScreen, TWScreens (go/back/history/tabs on 12 fake screens, 3 s watchdog), TWContext, TWBus"),
+    S("twmodal", "TWMODAL_SELFTEST", "res://shell/nav/modal_selftest.tscn", group="core",
+      note="P24: TWModal, ModalStack (scrim owned by the modal, on_close exactly once, clear_all), Android back table (4 rows), 500-sequence property test"),
     S("ults", "ULTS", args=["--ults_selftest=1"], group="core"),
     S("letters", "LETTERS", args=["--letters_selftest=1"], group="core"),
     # ---- v10 registry modules (docs/INTEGRATION_0.10.md; ids == V10RegistryList ids) -----------------
@@ -194,6 +196,10 @@ EXTERNAL: list[Suite] = [
     Suite(id="screen_has_spec", kind="python", group="lint", marker="SCREEN_HAS_SPEC SELFTEST", timeout=60, fast=True,
           script="tools/lint_screen_has_spec.py", args=["--selftest", "--check"],
           note="SCREEN_HAS_SPEC: 7 synthetic trees + the repo has 0 violations"),
+    # P24: modals only through the ModalStack: shell enforcing (0), legacy overlay scans counted as a ratchet (39 sites)
+    Suite(id="modal_only_via_stack", kind="python", group="lint", marker="MODAL_ONLY_VIA_STACK SELFTEST", timeout=60, fast=True,
+          script="tools/lint_modal_only_via_stack.py", args=["--selftest", "--check"],
+          note="MODAL_ONLY_VIA_STACK: 14 synthetic cases + shell has 0 violations + legacy overlay-scan sites (report mode, 39) within tools/lint_modal_baseline.json"),
     # P45: loudness meter self-test on synthetic signals (python + numpy + ffmpeg; the corpus scan is a separate CLI run)
     Suite(id="audio_gate", kind="python", group="lint", marker="AUDIO_GATE SELFTEST", timeout=120, fast=True,
           script="tools/audio/lufs_gate.py", args=["--selftest", "--no-write"],
