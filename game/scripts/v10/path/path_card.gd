@@ -6,9 +6,9 @@ extends RefCounted
 #   mechanic, the first-clear reward, «полная награда 11/15» (from the 10th win of the day), the Огонёк пути cups and
 #   the three booster circles; Peaks: fog, «Здесь не продаётся ни один бустер»; Legendary: laurel, «Обходная тропа».
 
-const Gen = preload("res://scripts/v10/levels/level_gen.gd")
-const State = preload("res://scripts/v10/path/path_state.gd")
-const Rules = preload("res://scripts/v10/path/path_rules.gd")
+const Gen = preload("res://core/levels/level_gen.gd")
+const State = preload("res://core/path/path_state.gd")
+const Rules = preload("res://core/path/path_rules.gd")
 const Boost = preload("res://scripts/v10/path/path_boosters.gd")
 const PFx = preload("res://scripts/v10/path/path_fx.gd")
 const Dlg = preload("res://scripts/v10/path/path_dialogs.gd")

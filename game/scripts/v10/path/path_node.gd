@@ -9,7 +9,7 @@ extends Control
 # UX_RULES: the node is still (no pulse, no flicker, no bobbing crown — the screen's one breathing element is
 # «Играть»), and a closed node is a silhouette without a lock (§6.4); the toast on tap says when it opens.
 
-const Rules = preload("res://scripts/v10/path/path_rules.gd")
+const Rules = preload("res://core/path/path_rules.gd")
 
 var i: = 0
 var kind: = "level"

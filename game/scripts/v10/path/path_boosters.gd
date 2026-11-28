@@ -12,10 +12,10 @@ extends RefCounted
 #   Фонарик: tiles start revealed (no secret, no flip-backs). Попутный ветер: 2 pairs leave at the start and do NOT
 #   count for combo. Свиток: +3 hints.
 
-const Gen = preload("res://scripts/v10/levels/level_gen.gd")
-const Sim = preload("res://scripts/v10/levels/level_sim.gd")
-const Rules = preload("res://scripts/v10/path/path_rules.gd")
-const State = preload("res://scripts/v10/path/path_state.gd")
+const Gen = preload("res://core/levels/level_gen.gd")
+const Sim = preload("res://core/levels/level_sim.gd")
+const Rules = preload("res://core/path/path_rules.gd")
+const State = preload("res://core/path/path_state.gd")
 
 
 static func st() -> Dictionary:

@@ -14,7 +14,7 @@ extends Control
 
 signal finished(result: Dictionary)
 
-const D = preload("res://scripts/v10/mj/riichi/riichi_data.gd")
+const D = preload("res://core/modes/riichi/riichi_data.gd")
 const STICKER_TXT: = {"surprised": "Ого!", "pout": "Хм.", "happy": "Ура!", "sad": "Эх…", "shy": "Хи-хи"}
 const SEAT_ORDER: = [0, 1, 2, 3]
 

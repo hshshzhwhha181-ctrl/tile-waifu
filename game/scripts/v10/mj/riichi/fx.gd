@@ -7,7 +7,7 @@ extends Control
 
 signal cutin_done
 
-const D = preload("res://scripts/v10/mj/riichi/riichi_data.gd")
+const D = preload("res://core/modes/riichi/riichi_data.gd")
 const STAMP_T: = 0.5
 const RIBBON_T: = 0.7
 const DORA_T: = 0.5

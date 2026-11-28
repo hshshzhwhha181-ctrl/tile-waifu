@@ -11,15 +11,21 @@ extends Node
 # The uniqueness proof is re-done by an INDEPENDENT brute force written here (own complete-hand test, own
 # enumeration of the closed positions), not by V8Mj or V10HandGen.
 
-const U: = preload("res://scripts/v10/palm/hand_util.gd")
-const GEN: = preload("res://scripts/v10/palm/hand_gen.gd")
-const ST: = preload("res://scripts/v10/palm/hand_state.gd")
-const T: = preload("res://scripts/v10/palm/hand_text.gd")
-const H: = preload("res://scripts/v10/palm/hand.gd")
-const L: = preload("res://scripts/v10/palm/hand_lessons.gd")
+const U: = preload("res://core/modes/palm/hand_util.gd")
+const GEN: = preload("res://core/modes/palm/hand_gen.gd")
+const ST: = preload("res://core/modes/palm/hand_state.gd")
+const T: = preload("res://core/modes/palm/hand_text.gd")
+const H: = preload("res://core/modes/palm/hand.gd")
+const L: = preload("res://core/modes/palm/hand_lessons.gd")
 const BOARD: = preload("res://scripts/v10/palm/hand_board.gd")
-const INFO: = preload("res://scripts/v10/palm/hand_info.gd")
+const INFO: = preload("res://core/modes/palm/hand_info.gd")
 const SCREEN: = preload("res://scripts/v10/palm/hand_screen.gd")
+
+static func _sp(f: String) -> String:
+	# WP3: the UI-free hand_*.gd files live in res://core/modes/palm, the screens stay here
+	var a: = "res://scripts/v10/palm/" + f
+	return a if FileAccess.file_exists(a) else "res://core/modes/palm/" + f
+
 
 const FILES: = ["hand_util.gd", "hand_gen.gd", "hand_state.gd", "hand_text.gd", "hand.gd", "hand_lessons.gd", "hand_board.gd", "hand_info.gd", "hand_screen.gd"]
 
@@ -857,7 +863,7 @@ func _texts() -> void:
 	# no «ставк» / «пари» anywhere in the module's strings (source scan, code-only strings included)
 	var src_bad: = []
 	for f in FILES:
-		for lit in _literals("res://scripts/v10/palm/" + f):
+		for lit in _literals(_sp(f)):
 			var low2: = String(lit).to_lower()
 			for w in ["ставк", "ставок", "пари"]:
 				if low2.find(w) >= 0:
@@ -959,7 +965,7 @@ func _misc() -> void:
 	var re: = RegEx.new()
 	re.compile("(^|[^\\w\\.])(randi|randf|randi_range|randf_range|randomize)\\(|\\.shuffle\\(\\)")
 	for f in FILES:
-		var txt: = FileAccess.get_file_as_string("res://scripts/v10/palm/" + f)
+		var txt: = FileAccess.get_file_as_string(_sp(f))
 		for line in txt.split("\n"):
 			var code: = line.split("#")[0]
 			if re.search(code) != null:
@@ -1063,7 +1069,7 @@ func _ui() -> void:
 
 	var hex_re: = RegEx.create_from_string("Color\\(\\s*\"|Color8\\(|Color\\(0x|#[0-9A-Fa-f]{6}\\b")
 	for uf in ["hand_info.gd", "hand_screen.gd"]:
-		var src: = FileAccess.get_file_as_string("res://scripts/v10/palm/" + uf)
+		var src: = FileAccess.get_file_as_string(_sp(uf))
 		check(hex_re.search(src) == null, "%s: zero hex colours (V10DS tokens only)" % uf)
 
 	SCREEN.set_test_clip_mode(true)

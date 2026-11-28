@@ -8,7 +8,7 @@ signal done
 
 const P: = preload("res://scripts/v10/phone/phone.gd")
 const PUI: = preload("res://scripts/v10/phone/phone_ui.gd")
-const NAMES: = preload("res://scripts/v10/phone/names.gd")
+const NAMES: = preload("res://core/phone/names.gd")
 
 var W: = 600.0
 var H: = 900.0

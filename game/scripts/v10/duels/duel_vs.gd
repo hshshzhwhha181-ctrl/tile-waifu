@@ -7,9 +7,9 @@ extends Control
 
 signal done
 
-const U: = preload("res://scripts/v10/duels/duel_util.gd")
-const F: = preload("res://scripts/v10/duels/duel_forms.gd")
-const D: = preload("res://scripts/v10/duels/duel_state.gd")
+const U: = preload("res://core/modes/duels/duel_util.gd")
+const F: = preload("res://core/modes/duels/duel_forms.gd")
+const D: = preload("res://core/modes/duels/duel_state.gd")
 
 const FULL_SECS: = 1.15
 const MIN_SECS: = 0.16

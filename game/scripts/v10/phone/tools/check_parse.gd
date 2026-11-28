@@ -5,12 +5,12 @@ extends SceneTree
 
 func _initialize() -> void:
 	var bad: = 0
-	var d: = DirAccess.open("res://scripts/v10/phone/")
-	for f in d.get_files():
-		if f.ends_with(".gd"):
-			var s: = load("res://scripts/v10/phone/" + f)
-			if s == null or not (s as GDScript).can_instantiate():
-				print("PARSE FAIL ", f)
-				bad += 1
+	for dir in ["res://scripts/v10/phone/", "res://core/phone/"]:  # WP3: UI-free phone files live in core
+		for f in DirAccess.get_files_at(dir):
+			if f.ends_with(".gd"):
+				var s: = load(dir + f)
+				if s == null or not (s as GDScript).can_instantiate():
+					print("PARSE FAIL ", f)
+					bad += 1
 	print("PARSE CHECK bad=%d" % bad)
 	quit(1 if bad > 0 else 0)

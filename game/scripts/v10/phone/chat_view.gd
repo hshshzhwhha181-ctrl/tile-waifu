@@ -11,8 +11,8 @@ signal closed
 
 const P: = preload("res://scripts/v10/phone/phone.gd")
 const PUI: = preload("res://scripts/v10/phone/phone_ui.gd")
-const C: = preload("res://scripts/v10/chat/chat.gd")
-const D: = preload("res://scripts/v10/chat/chat_data.gd")
+const C: = preload("res://core/chat/chat.gd")
+const D: = preload("res://core/chat/chat_data.gd")
 const BUB: = preload("res://scripts/v10/phone/bubble.gd")
 const TRAY: = preload("res://scripts/v10/phone/sticker_tray.gd")
 

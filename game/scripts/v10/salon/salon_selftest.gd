@@ -280,11 +280,15 @@ func _lines() -> void:
 func _contract_grep() -> void:
 	# §2.4/§2.5: no direct clock or affinity calls outside meta/bond
 	var hits: = []
-	var d: = DirAccess.open("res://scripts/v10/salon")
-	for f in d.get_files():
+	var salon_files: = []
+	for d0 in ["res://scripts/v10/salon/", "res://core/salon/"]:  # WP3: UI-free salon files moved to core
+		for f0 in DirAccess.get_files_at(d0):
+			salon_files.append(d0 + f0)
+	for fp in salon_files:
+		var f: = fp.get_file()
 		if not f.ends_with(".gd") or f == "salon_selftest.gd":
 			continue
-		var src: = FileAccess.get_file_as_string("res://scripts/v10/salon/" + f)
+		var src: = FileAccess.get_file_as_string(fp)
 		for pat in ["Time." + "get_unix_time_from_system", "Time." + "get_date_string_from_system", "G." + "add_aff", "S.gems +="]:
 			if src.contains(pat):
 				hits.append(f + ": " + pat)

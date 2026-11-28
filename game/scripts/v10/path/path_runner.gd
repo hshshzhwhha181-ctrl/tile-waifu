@@ -9,14 +9,14 @@ extends Node
 #   --path_shots=<dir> --path_seq=map,card,card_peak,... --path_name=<prefix>   screenshots
 #   (also pass a bare --shots so main skips its title splash)
 
-const State = preload("res://scripts/v10/path/path_state.gd")
+const State = preload("res://core/path/path_state.gd")
 const Boost = preload("res://scripts/v10/path/path_boosters.gd")
-const Gen = preload("res://scripts/v10/levels/level_gen.gd")
+const Gen = preload("res://core/levels/level_gen.gd")
 const PathMap = preload("res://scripts/v10/path/path_map.gd")
 const Card = preload("res://scripts/v10/path/path_card.gd")
 const Dlg = preload("res://scripts/v10/path/path_dialogs.gd")
 const PFx = preload("res://scripts/v10/path/path_fx.gd")
-const Jam = preload("res://scripts/v10/path/path_jam.gd")
+const Jam = preload("res://core/path/path_jam.gd")
 
 var a: = {}
 var main

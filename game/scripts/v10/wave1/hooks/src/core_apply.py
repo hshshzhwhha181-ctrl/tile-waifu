@@ -121,9 +121,9 @@ P = "scripts/v08/league/population.gd"
 hook(P, '		var hero: String = G.HERO_ORDER[rng.randi() % G.HERO_ORDER.size()]', '		var hero: String = V10W1Core.FOUNDERS[rng.randi() % V10W1Core.FOUNDERS.size()]')
 hook(P, '		var fav: = hero if rng.randf() < 0.7 else String(G.HERO_ORDER[rng.randi() % G.HERO_ORDER.size()])', '		var fav: = hero if rng.randf() < 0.7 else String(V10W1Core.FOUNDERS[rng.randi() % V10W1Core.FOUNDERS.size()])')
 hook(P, '	var src: = img if ResourceLoader.exists("res://assets/outfits/%s.webp" % img) else (hero if G.HEROES.has(hero) else "mc")', '	var src: = img if ResourceLoader.exists(V10W1Core.outfit_webp(img)) else (hero if G.HEROES.has(hero) else "mc")')
-hook("scripts/v08/league/league_selftest.gd", '	_check("all heroines used", heroes.size() == G.HERO_ORDER.size(), str(heroes))', '	_check("all heroines used", heroes.size() == V10W1Core.FOUNDERS.size(), str(heroes))')
+hook("core/v08/league/league_selftest.gd", '	_check("all heroines used", heroes.size() == G.HERO_ORDER.size(), str(heroes))', '	_check("all heroines used", heroes.size() == V10W1Core.FOUNDERS.size(), str(heroes))')
 # H9 auth nick ideas: only goddesses that have ideas (a wave-1 goddess without a list would index an empty array)
-hook("scripts/v10/auth/auth_nicks.gd", '	var heroes: Array = G.HERO_ORDER.duplicate()', '	var heroes: Array = G.HERO_ORDER.filter(func(h): return not IDEAS.get(h, []).is_empty())')
+hook("core/auth/auth_nicks.gd", '	var heroes: Array = G.HERO_ORDER.duplicate()', '	var heroes: Array = G.HERO_ORDER.filter(func(h): return not IDEAS.get(h, []).is_empty())')
 
 ok = True
 for f, old, new in H:

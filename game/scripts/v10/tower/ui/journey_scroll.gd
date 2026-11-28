@@ -18,8 +18,8 @@ extends Control
 
 signal unrolled
 
-const J: = preload("res://scripts/v10/tower/journey.gd")
-const U: = preload("res://scripts/v10/tower/tower_util.gd")
+const J: = preload("res://core/modes/tower/journey.gd")
+const U: = preload("res://core/modes/tower/tower_util.gd")
 
 const PAD: = 14.0  # the axes stick out above and below the paper
 const PAPER_H: = 480.0

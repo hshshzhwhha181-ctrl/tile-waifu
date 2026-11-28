@@ -16,9 +16,9 @@ extends Control
 # 4 type sizes (44 header · 32 · 22 · 18), hit zones ≥ 80, no «%» and no «₽».
 
 const U: = preload("res://scripts/v10/duels/challenge/challenge_util.gd")
-const C: = preload("res://scripts/v10/duels/challenge/challenge_code.gd")
-const D: = preload("res://scripts/v10/duels/challenge/challenge_deal.gd")
-const ST: = preload("res://scripts/v10/duels/challenge/challenge_state.gd")
+const C: = preload("res://core/modes/duels/challenge/challenge_code.gd")
+const D: = preload("res://core/modes/duels/challenge/challenge_deal.gd")
+const ST: = preload("res://core/modes/duels/challenge/challenge_state.gd")
 const UI2: = preload("res://scripts/v10/duels/challenge/challenge_ui.gd")
 const P: = preload("res://scripts/v10/duels/challenge/challenge_poster.gd")
 

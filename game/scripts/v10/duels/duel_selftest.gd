@@ -7,15 +7,15 @@ extends Node
 #   --duel_race_debug=1 --duel_h=nova --duel_f=5     per-bot race totals of one heroine-form
 # The real-match part instantiates main.tscn: run it with --save=user://duel_selftest.json --save_wipe=1.
 
-const U: = preload("res://scripts/v10/duels/duel_util.gd")
-const F: = preload("res://scripts/v10/duels/duel_forms.gd")
-const R: = preload("res://scripts/v10/duels/duel_rank.gd")
-const C: = preload("res://scripts/v10/duels/duel_cfg.gd")
-const D: = preload("res://scripts/v10/duels/duel_state.gd")
-const SIM: = preload("res://scripts/v10/duels/duel_sim.gd")
+const U: = preload("res://core/modes/duels/duel_util.gd")
+const F: = preload("res://core/modes/duels/duel_forms.gd")
+const R: = preload("res://core/modes/duels/duel_rank.gd")
+const C: = preload("res://core/modes/duels/duel_cfg.gd")
+const D: = preload("res://core/modes/duels/duel_state.gd")
+const SIM: = preload("res://core/modes/duels/duel_sim.gd")
 const RUN: = preload("res://scripts/v10/duels/duel_run.gd")
 const PLAY2: = preload("res://scripts/v10/duels/duel_play.gd")
-const INFO: = preload("res://scripts/v10/duels/duel_info.gd")
+const INFO: = preload("res://core/modes/duels/duel_info.gd")
 const VS: = preload("res://scripts/v10/duels/duel_vs.gd")
 const SCREEN: = preload("res://scripts/v10/duels/duel_screen.gd")
 
@@ -694,7 +694,7 @@ func _ui_screen() -> void:
 	check("V10DuelInfo MODES §7.1 contract", String(INFO.INFO.id) == "duels" and String(INFO.INFO.shelf) == "trials" and INFO.HOW.size() == 3)
 	var hex_re: = RegEx.create_from_string("Color\\(\\s*\"|Color8\\(|Color\\(0x|#[0-9A-Fa-f]{6}\\b")
 	for uf in ["duel_info.gd", "duel_vs.gd", "duel_screen.gd"]:
-		var src: = FileAccess.get_file_as_string("res://scripts/v10/duels/" + uf)
+		var src: = FileAccess.get_file_as_string("res://scripts/v10/duels/" + uf if FileAccess.file_exists("res://scripts/v10/duels/" + uf) else "res://core/modes/duels/" + uf)
 		check("%s: zero hex colours" % uf, hex_re.search(src) == null)
 
 	for c in main.overlay.get_children():

@@ -15,13 +15,13 @@ extends Node
 #   --bot_runs=N           runs per bot measurement (default 40)
 # Output: "TOWER_SELFTEST ok/total" (+ per-module lines), exit code 0 when all pass.
 
-const U: = preload("res://scripts/v10/tower/tower_util.gd")
-const D: = preload("res://scripts/v10/tower/mods_data.gd")
-const M: = preload("res://scripts/v10/tower/mods.gd")
-const SIM: = preload("res://scripts/v10/tower/sim.gd")
-const P: = preload("res://scripts/v10/tower/pagoda.gd")
-const J: = preload("res://scripts/v10/tower/journey.gd")
-const TB: = preload("res://scripts/v10/tower/tower_board.gd")
+const U: = preload("res://core/modes/tower/tower_util.gd")
+const D: = preload("res://core/modes/tower/mods_data.gd")
+const M: = preload("res://core/modes/tower/mods.gd")
+const SIM: = preload("res://core/modes/tower/sim.gd")
+const P: = preload("res://core/modes/tower/pagoda.gd")
+const J: = preload("res://core/modes/tower/journey.gd")
+const TB: = preload("res://core/modes/tower/tower_board.gd")
 const TR: = preload("res://scripts/v10/tower/tower_rules.gd")
 
 const FOUNDERS: = ["mc", "rin", "hana", "yue", "nova"]
@@ -460,7 +460,7 @@ func _pagoda() -> void:
 	check(not P.PAID_HELP and not J.PAID_HELP, "no paid help flags")
 	var srcs: = ""
 	for p in ["pagoda.gd", "journey.gd", "tower_rules.gd", "mods.gd"]:
-		srcs += FileAccess.get_file_as_string("res://scripts/v10/tower/" + p)
+		srcs += FileAccess.get_file_as_string("res://core/modes/tower/" + p if FileAccess.file_exists("res://core/modes/tower/" + p) else "res://scripts/v10/tower/" + p)
 	check(not ("_v8_pay" in srcs or "gems -=" in srcs or "\"price\"" in srcs or "continue_paid" in srcs), "no paid help in the code")
 	U.fake_now = 0
 

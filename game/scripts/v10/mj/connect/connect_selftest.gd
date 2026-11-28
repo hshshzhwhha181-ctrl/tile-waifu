@@ -221,14 +221,20 @@ func _t_save_ults_words() -> void:
 
 	# Тексты и отсутствие Time.*_from_system
 	var dir: = "res://scripts/v10/mj/connect/"
+	var core_dir: = "res://core/modes/connect/"  # UI-free files moved by WP3: scan both directories
 	var re: = RegEx.new()
 	re.compile("\"([^\"\\\\]*[А-Яа-яЁё][^\"\\\\]*)\"")
 	var strs: Array = []
 	var raw_time: = 0
-	for f in DirAccess.get_files_at(dir):
+	var scan_files: = []
+	for d0 in [dir, core_dir]:
+		for f0 in DirAccess.get_files_at(d0):
+			scan_files.append(d0 + f0)
+	for fp in scan_files:
+		var f: = fp.get_file()
 		if not f.ends_with(".gd") or f == "connect_selftest.gd":
 			continue
-		var txt: = FileAccess.get_file_as_string(dir + f)
+		var txt: = FileAccess.get_file_as_string(fp)
 		raw_time += txt.count("Time." + "get_unix_time_from_system") + txt.count("Time." + "get_date_string_from_system")
 		for ln in txt.split("\n"):
 			if ln.strip_edges().begins_with("#"):

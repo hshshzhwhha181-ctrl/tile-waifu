@@ -10,9 +10,9 @@ extends Control
 #
 # args: {arc, select: i (opens the card), won: {i, stars} (plays the progress animation), from_fail: {i, log}}
 
-const Gen = preload("res://scripts/v10/levels/level_gen.gd")
-const State = preload("res://scripts/v10/path/path_state.gd")
-const Rules = preload("res://scripts/v10/path/path_rules.gd")
+const Gen = preload("res://core/levels/level_gen.gd")
+const State = preload("res://core/path/path_state.gd")
+const Rules = preload("res://core/path/path_rules.gd")
 const Boost = preload("res://scripts/v10/path/path_boosters.gd")
 const PNode = preload("res://scripts/v10/path/path_node.gd")
 const Card = preload("res://scripts/v10/path/path_card.gd")

@@ -11,7 +11,7 @@ Writes (repo root relative):
     game/assets/v10/wave1/outfits/<outfit>.webp      850×1280 RGB (q 88)
     game/assets/v10/wave1/poses/<hero>_<slot>.webp   height 1280 RGB (q 88); <hero>_idle = the FINAL card
     game/assets/v10/wave1/emotions/<hero>_<emo>.webp RGBA waist-up, height 800, ≤ 600 wide (founders' framing)
-    game/scripts/v10/wave1/data/w1_art_cards.json    measurements (merged: entries not rebuilt this run are kept)
+    game/core/wave1/data/w1_art_cards.json    measurements (merged: entries not rebuilt this run are kept)
 
 Options
     --only KEY [KEY ...]   rebuild only these: outfit ids (tb_post), pose keys (tsubame_win), emotion keys
@@ -105,7 +105,7 @@ HIP_MAX = {"tsubame": 870, "miel": 1000, "kohaku": 950, "shirin": 960, "zlata": 
 HERE = os.path.dirname(os.path.abspath(__file__))
 LANDMARKS = os.path.join(HERE, "w1_art_landmarks.json")
 OUT_ASSETS = "game/assets/v10/wave1"
-OUT_JSON = "game/scripts/v10/wave1/data/w1_art_cards.json"
+OUT_JSON = "game/core/wave1/data/w1_art_cards.json"
 RES = "res://assets/v10/wave1"
 
 BG_DARK = (0x1d, 0x1b, 0x2e)

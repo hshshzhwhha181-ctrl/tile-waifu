@@ -3,12 +3,12 @@ extends Node
 # 0.10 Path selftest (П1–П3): --path_selftest=1 → «PATH SELFTEST ok/total» (+ FAIL lines).
 # The model runs on a private dictionary (V10PathState.root_override), never on the player's save.
 
-const Gen = preload("res://scripts/v10/levels/level_gen.gd")
-const Sim = preload("res://scripts/v10/levels/level_sim.gd")
-const State = preload("res://scripts/v10/path/path_state.gd")
-const Rules = preload("res://scripts/v10/path/path_rules.gd")
+const Gen = preload("res://core/levels/level_gen.gd")
+const Sim = preload("res://core/levels/level_sim.gd")
+const State = preload("res://core/path/path_state.gd")
+const Rules = preload("res://core/path/path_rules.gd")
 const Boost = preload("res://scripts/v10/path/path_boosters.gd")
-const Jam = preload("res://scripts/v10/path/path_jam.gd")
+const Jam = preload("res://core/path/path_jam.gd")
 const PathMap = preload("res://scripts/v10/path/path_map.gd")
 const Card = preload("res://scripts/v10/path/path_card.gd")
 const Dlg = preload("res://scripts/v10/path/path_dialogs.gd")

@@ -2,7 +2,7 @@ extends Node
 
 # Loads the levels scripts at runtime so a compile error prints a FAIL line and quits instead of hanging headless.
 
-const PARTS: = ["res://scripts/v10/levels/level_sim.gd", "res://scripts/v10/levels/level_gen.gd",
+const PARTS: = ["res://core/levels/level_sim.gd", "res://core/levels/level_gen.gd",
 	"res://scripts/v10/levels/level_board.gd", "res://scripts/v10/levels/levels_selftest.gd"]
 
 

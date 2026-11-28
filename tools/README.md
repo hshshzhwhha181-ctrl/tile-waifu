@@ -105,3 +105,30 @@ The workflow has not run on GitHub yet (only locally validated: same command, sa
 
 Add one `S(...)` line to `CATALOG` in `tw_test.py` (id, marker, scene/script, args, optional `fast_args`, `render`, `timeout`, `soft`), then
 `python tools/tw_test.py -s <id> --update-baseline`. `--check-drift` fails if a module appears in `V10RegistryList` without a catalog entry.
+
+## Core carve-out (WP3): `game/core`, `move_map.tsv`, two checkers
+
+`game/core/` holds every UI-free script of the v06-v10 logic (`extends RefCounted/Resource`, no Node/Control/Tween/Audio tokens;
+209 scripts, ~54k lines, plus their `.uid` files and the `data/*.json` they load). Files were moved with `git mv` (history kept), every
+`class_name` is unchanged, so class references do not change; only path literals (`preload`/`load`/`extends "res://..."`, scene `ext_resource`s,
+selftest source scans, `tools/tw_test.py`, `ux_lint.py`) were re-pointed. `project.godot` (autoloads) and `export_presets.cfg` are untouched.
+
+| where it was | where it is |
+| --- | --- |
+| `scripts/v10/mj/<mode>/` | `core/modes/<mode>/` (`tower`, `duels`, `adventure`, `palm` also under `core/modes/`) |
+| `scripts/v10/core/` | `core/base/` (`registry*.gd`, `money`, `rank`, `sku`) |
+| `scripts/v10/<module>/` (economy, gacha, levels, meta, shop, rituals, wave1, ...) | `core/<module>/` |
+| `scripts/v06..v09/<group>/` | `core/v06..v09/<group>/` |
+
+Anything with a UI token, a Node base class, an autoload, or living in a presentation dir (`hud2`, `hudfx`, `fonts`, `juice`, `mj/stage`,
+`mj/look`, `tower/ui`, `rig`, `audio`, `ult`, `clarity`, `responsive`, `events`) stays in `game/scripts` (the future shell / legacy).
+
+* `tools/move_map.tsv` — every move (`old<TAB>new`, repo-relative; `.gd`, `.gd.uid` and data files).
+* `python3 tools/check_move_map.py` — proves each move is mechanical: old path gone, new path present, content identical to the pre-move commit
+  except for lines that mention a `res://` path. Exit 0 = clean.
+* `python3 tools/lint_core_purity.py [--files] [--json F] [--max N]` — CORE_PURITY lint, **report-only** (exit 0): Node-family `extends`, Node/Control/
+  Tween/get_tree tokens, `await get_tree()`, `Sfx`/`V9Feel`, `G.` (autoload god-object), `/root/` and core -> shell class dependencies. The counts are the
+  burn-down list for WP4+ (`G.` is the big one: it goes away with `TWState`).
+* Registry: `V10RegistryList` is now `game/core/base/registry_list.gd` (same 43 modules, same ids); the per-module `module.gd` split is left for a follow-up.
+* Selftests that source-scan a module directory now scan `scripts/v10/<m>/` **and** `core/<m>/` (so nothing silently stops being checked).
+* After pulling this change run `python3 tools/tw_test.py --import` once: `game/.godot/global_script_class_cache.cfg` must be regenerated for the new paths.

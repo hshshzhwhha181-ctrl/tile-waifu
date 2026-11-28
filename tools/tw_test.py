@@ -46,7 +46,7 @@ GAME = REPO / "game"
 BASELINE_PATH = REPO / "tools" / "baseline.json"
 UX_LINT = REPO / ".agents" / "skills" / "tw-godot-qa" / "scripts" / "ux_lint.py"
 E2E = REPO / "server" / "e2e_test.mjs"
-REGISTRY_LIST = GAME / "scripts" / "v10" / "core" / "registry_list.gd"
+REGISTRY_LIST = GAME / "core" / "base" / "registry_list.gd"
 
 # return codes that mean "engine aborted/crashed while tearing down"; accepted only with a green marker
 TEARDOWN_RCS = {134, -6, 139, -11, 0xC0000005, -1073741819, 3221225477}

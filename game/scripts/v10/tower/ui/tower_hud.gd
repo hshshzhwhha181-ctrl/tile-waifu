@@ -18,9 +18,9 @@ extends Control
 #   V10TowerHud.status_text(mode, run)  # that title, for V10HudMatch.configure({"level": …})
 #   V10TowerHud.preferred_width(mode, run, compact) # the plate width the content needs
 
-const P: = preload("res://scripts/v10/tower/pagoda.gd")
-const J: = preload("res://scripts/v10/tower/journey.gd")
-const M: = preload("res://scripts/v10/tower/mods.gd")
+const P: = preload("res://core/modes/tower/pagoda.gd")
+const J: = preload("res://core/modes/tower/journey.gd")
+const M: = preload("res://core/modes/tower/mods.gd")
 const UI_T: = preload("res://scripts/v10/tower/ui/tower_ui.gd")
 const ART: = preload("res://scripts/v10/tower/ui/tower_art.gd")
 

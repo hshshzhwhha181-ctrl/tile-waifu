@@ -13,10 +13,10 @@ static var total: = 0
 static var fails: Array = []
 
 const ALLOWED_GD: = [
-	"res://scripts/v10/core/sku.gd",
-	"res://scripts/v10/economy/econ_catalog.gd",
-	"res://scripts/v10/economy/econ_odds.gd",
-	"res://scripts/v10/gacha/rates.gd",
+	"res://core/base/sku.gd",
+	"res://core/economy/econ_catalog.gd",
+	"res://core/economy/econ_odds.gd",
+	"res://core/gacha/rates.gd",
 ]
 const ALLOWED_JSON: = [
 	"res://data/v10/chat/reactions.json",
@@ -67,8 +67,11 @@ static func _scan_all() -> void:
 	var fmt_re: = RegEx.create_from_string("%[-+0 #]*\\d*(?:\\.\\d+)?[dsfxX]")
 	var hit_re: = RegEx.create_from_string("\\d[\\d\\s\u00a0,\\.]*\\s*[₽%]|[₽%]\\s*\\d")
 	var dig_re: = RegEx.create_from_string("\\d")
-	var gd_files: = ["res://scripts/v06/story/txt.gd"]
+	var gd_files: = ["res://core/v06/story/txt.gd"]
 	_walk("res://scripts/v10", ".gd", gd_files)
+	for d0 in DirAccess.get_directories_at("res://core"):  # WP3: v10 logic moved to core (core/v06..v09 were never scanned here)
+		if not d0.begins_with("v0"):
+			_walk("res://core/" + d0, ".gd", gd_files)
 	var bad_gd: = []
 	for p in gd_files:
 		if p in ALLOWED_GD or _skip_path(p):

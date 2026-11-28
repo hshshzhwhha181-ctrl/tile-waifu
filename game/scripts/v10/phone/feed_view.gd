@@ -8,7 +8,7 @@ extends Control
 
 const P: = preload("res://scripts/v10/phone/phone.gd")
 const PUI: = preload("res://scripts/v10/phone/phone_ui.gd")
-const FEED: = preload("res://scripts/v10/chat/chat_feed.gd")
+const FEED: = preload("res://core/chat/chat_feed.gd")
 
 const WD: = ["вс", "пн", "вт", "ср", "чт", "пт", "сб"]
 const MON: = ["янв", "фев", "мар", "апр", "мая", "июн", "июл", "авг", "сен", "окт", "ноя", "дек"]

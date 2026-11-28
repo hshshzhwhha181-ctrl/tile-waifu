@@ -10,10 +10,10 @@ const DEMO_JOURNEY: = preload("res://scripts/v10/tower/ui/demo_journey.gd")
 const DEMO_FAN: = preload("res://scripts/v10/tower/ui/demo_fan.gd")
 const DEMO_PLAY: = preload("res://scripts/v10/tower/ui/demo_play.gd")
 const UIT: = preload("res://scripts/v10/tower/ui/tower_ui.gd")
-const U: = preload("res://scripts/v10/tower/tower_util.gd")
-const P: = preload("res://scripts/v10/tower/pagoda.gd")
-const J: = preload("res://scripts/v10/tower/journey.gd")
-const D: = preload("res://scripts/v10/tower/mods_data.gd")
+const U: = preload("res://core/modes/tower/tower_util.gd")
+const P: = preload("res://core/modes/tower/pagoda.gd")
+const J: = preload("res://core/modes/tower/journey.gd")
+const D: = preload("res://core/modes/tower/mods_data.gd")
 
 
 static func run_into(host: Node) -> void:
@@ -54,6 +54,7 @@ static func _hygiene(host: Node) -> void:
 	host.cur = "hygiene"
 	var files: Array = []
 	_list_gd("res://scripts/v10/tower", files)
+	_list_gd("res://core/modes/tower", files)  # WP3: UI-free tower files moved to core
 	host.check(files.size() >= 22, "all tower scripts scanned (%d)" % files.size())
 	var raw_time: Array = []
 	var raw_aff: Array = []

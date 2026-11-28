@@ -117,6 +117,7 @@ func _suite_code_hygiene() -> void:
 	_mod = "code"
 	var files: = []
 	_collect_gd(DIR, files)
+	_collect_gd("res://core/tutorial/", files)  # WP3: tut_state/tut_lines/tut_reveal moved to core
 	ok(files.size() >= 11, "tutorial scripts count >= 11 (%d)" % files.size())
 	var hex_re: = RegEx.create_from_string("Color\\s*\\(\\s*\"#?[0-9a-fA-F]{6,8}\"")
 	var flt_re: = RegEx.create_from_string("Color\\s*\\(\\s*0\\.[0-9]")

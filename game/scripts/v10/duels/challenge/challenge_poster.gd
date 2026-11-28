@@ -17,7 +17,7 @@ extends RefCounted
 #   face_rect(poster) -> Rect2                where the face is (nothing may cover it + 48 px)
 
 const U: = preload("res://scripts/v10/duels/challenge/challenge_util.gd")
-const C: = preload("res://scripts/v10/duels/challenge/challenge_code.gd")
+const C: = preload("res://core/modes/duels/challenge/challenge_code.gd")
 
 const SIZE: = Vector2(720, 1280)
 const HEROES: = ["mc", "rin", "hana", "yue", "nova"]

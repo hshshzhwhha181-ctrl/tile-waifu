@@ -122,8 +122,8 @@ func _ready() -> void:
 							if is_instance_valid(main) and main.has_method("go"):
 								main.go("collection", {"item": oid2}))
 		if V10Registry.wired("profile"):
-			var feats_sc = load("res://scripts/v10/profile/feats.gd")
-			var pcos_sc = load("res://scripts/v10/profile/cosmetics.gd")
+			var feats_sc = load("res://core/profile/feats.gd")
+			var pcos_sc = load("res://core/profile/cosmetics.gd")
 			if feats_sc:
 				feats_sc.best(G.S, "best_combo", int(r.get("max_combo", 0)))
 				if bool(r.get("win", false)):
