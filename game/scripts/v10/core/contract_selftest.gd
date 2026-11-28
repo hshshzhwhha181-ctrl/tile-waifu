@@ -3,7 +3,7 @@ extends RefCounted
 
 # --contract_selftest=1 (docs/0.10-spec.md §2.2, docs/INTEGRATION_0.10.md §3.6, §4 W3):
 # 1. Single source of ₽ (V10Sku / V10Catalog) and % odds (V10Rates): zero hardcoded ruble or percent numbers in
-#    V6Txt, v10/** runtime UI scripts, or game/data/** JSON (outside V10Sku, V10Rates, V10Catalog, V10Odds, and
+#    V6Txt, v10/** runtime UI scripts, or game/data/** JSON (outside V10Sku, V10Rates, V10Catalog and
 #    Nova's in-character chat dialogue).
 # 2. Spec §2.2 alignment: reference pack 1 190 ₽ = 1 090 moon → ≈ 164 ₽ per wish; every SKU ≤ 3.0×; SSR base 1.6 %,
 #    consolidated 2.90 %; V10Rates == V10Catalog == V10Sku.
@@ -15,7 +15,6 @@ static var fails: Array = []
 const ALLOWED_GD: = [
 	"res://core/base/sku.gd",
 	"res://core/economy/econ_catalog.gd",
-	"res://core/economy/econ_odds.gd",
 	"res://core/gacha/rates.gd",
 ]
 const ALLOWED_JSON: = [
@@ -58,8 +57,7 @@ static func _numbers() -> void:
 	_check(absf(V10Catalog.SSR_BASE - float(V10Rates.SSR_BASE[2])) < 1e-9, "SSR base unified at 1.6%")
 	_check(absf(V10Catalog.S_BASE - float(V10Rates.S_BASE[2])) < 1e-9, "S base unified at 13%")
 	var c2: = V10Rates.consolidated(2)
-	var co: = V10Odds.consolidated(60)
-	_check(absf(float(c2.SSR) - float(co.SSR)) < 0.001 and absf(float(c2.SSR) * 100.0 - 2.90) < 0.02, "consolidated SSR unified ≈ 2.90%")
+	_check(absf(float(c2.SSR) - 1.0 / V10Rates.mean_ssr_wishes(2)) < 0.001 and absf(float(c2.SSR) * 100.0 - 2.90) < 0.02, "consolidated SSR unified ≈ 2.90%")
 
 
 static func _scan_all() -> void:

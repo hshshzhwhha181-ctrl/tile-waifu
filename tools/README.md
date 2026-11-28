@@ -68,12 +68,11 @@ below baseline (checks silently removed); times out / has no marker where the ba
 | `ults` | 662/682 | 18x "ULTS has tb_/me_/ko_/sh_/zl_*" + `SCRIPT ERROR ... 'tsubame'`: wave-1 goddess outfits/ults are not wired into core `G`/`V9Ults` data (art is not under `res://assets/outfits/`) |
 | `letters` | 4330/4355 | wave-1 goddesses have < 2 letter variants (`kohaku`, `zlata`, ...) + `SCRIPT ERROR ... 'hand'` in `letters_selftest.gd:206` |
 | `profile2` | 110/112 | "unreleased goddess frame hidden/invalid" + missing `res://assets/outfits/tb_base.webp` -> `card_art` null deref |
-| `summon` | 45/56 | `V9Summon` pity/guarantee replay differs from `G.pull` (11 checks) |
 | `challenge` | 285/291 | 6 `ui:` checks "<= 4 type sizes" (typography budget) |
 | `tower` | 6842/6880 (full only; `fast` is green 198/198) | 38 x "<= 4 type sizes + overline" at 720x1280 in the full UI matrix |
 
 `challenge`/`tower` are typography checks that I did not verify on a Windows/GPU box; they may be platform dependent (fonts) — check there before "fixing".
-The other 48 Godot suites + `server_e2e` + `ux_lint` are green: 50/56 full, 43/47 `--fast` (the 4 known reds in `--fast` are `ults`, `letters`, `profile2`, `summon`).
+The other 48 Godot suites + `server_e2e` + `ux_lint` are green: 50/56 full, 43/47 `--fast` (the known reds in `--fast` are `ults`, `letters`, `profile2`; `summon` became green in P09).
 
 ## Measured performance (4 vCPU, 15 GB, Godot 4.5.1 headless, software GL via xvfb for 4 render suites)
 

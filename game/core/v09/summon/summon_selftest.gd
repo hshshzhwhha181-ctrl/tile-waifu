@@ -3,7 +3,7 @@ extends RefCounted
 
 # Summon rules selftest (0.9 §E). Run on the summon screen:
 #   godot … -- --unlock=10 --screen=summon --shots=<dir> --at=1.5 --act=selftest
-# prints «SUMMON_SELFTEST ok/total» and every failed check. Checks V9Summon against G.roll/G.pull's rules, the
+# prints «SUMMON_SELFTEST ok/total» and every failed check. Checks V9Summon against the rules of the real engine (TWGacha.pull), the
 # lantern art / code fallback, the timings budget and that the fake dev pulls never touch the save.
 
 static var ok: = 0
@@ -41,7 +41,7 @@ static func run(host: Node = null) -> int:
 	# skip from the second summon on
 	_check(not V9Summon.can_skip(0), "no skip on the first summon")
 	_check(V9Summon.can_skip(1) and V9Summon.can_skip(10), "skip from the second summon")
-	# pity replay matches G.roll: +1 per wish, 0 after an SSR
+	# pity replay: +1 per wish, 0 after an SSR
 	var pt: = V9Summon.pity_track(40, [R, SR, {"rar": "SSR", "id": "a"}, R])
 	_check(pt == [41, 42, 0, 1], "pity track %s" % [pt])
 	_check(V9Summon.left(0) == 60 and V9Summon.left(59) == 1 and V9Summon.left(70) == 0, "wishes left")
@@ -49,29 +49,22 @@ static func run(host: Node = null) -> int:
 	var gt: = V9Summon.guar_track(false, [R, {"rar": "SSR", "id": "off"}, R, {"rar": "SSR", "id": "ban"}], "ban")
 	_check(gt == [false, true, true, false], "guar track %s" % [gt])
 	_check(V9Summon.guar_track(true, [{"rar": "SSR", "id": "off"}], "ban", true) == [true], "newbie keeps guar")
-	# replay against the real G.pull on a copy of the save
-	var keep: Dictionary = G.S.duplicate(true)
-	var seed0: = G.rng.seed
-	var st0: = G.rng.state
-	G.rng.seed = 777
-	for b_i in [1]:
-		var b: Dictionary = G.BANNERS[b_i]
-		for k in 6:
-			G.S.pity = [0, 30, 50, 58, 59, 12][k]
-			G.S.guar = k % 2 == 0
-			var p0: = int(G.S.pity)
-			var g0: = bool(G.S.guar)
-			var res: = G.pull(10, b)
-			_check(V9Summon.pity_track(p0, res).back() == int(G.S.pity), "pity replay = G.pull (%d)" % p0)
-			_check(V9Summon.guar_track(g0, res, b.item).back() == bool(G.S.guar), "guar replay = G.pull (%d)" % p0)
-	for key in G.S.keys():
-		if not keep.has(key):
-			G.S.erase(key)
-	for key in keep:
-		G.S[key] = keep[key]
-	G.rng.seed = seed0
-	G.rng.state = st0
-	G.save()
+	# replay against the real engine: TWGacha.pull on throw-away states (G.S and the global rng are never touched); the 0.9 tracks
+	# must equal what V10Gacha2 reports card by card (r.pity / r.guar after each card)
+	var pb: = TWGachaSelftest.banner("phase")
+	var pits: = TWGachaSelftest.items()
+	for k in 8:
+		var p0: int = [0, 30, 50, 58, 59, 12, 44, 1][k]
+		var g0: = k % 2 == 0
+		var S: = TWGachaSelftest.fresh({"pity": p0, "guar": g0})
+		var out: = TWGacha.pull(S, pb, 10, {"items": pits, "seed": 777 + k})
+		var res09: Array = out.res.map(func(r): return {"rar": V10Gacha2.rar09(String(r.rar)), "id": String(r.id)})
+		var tgt: = V10Banners.target(S, pb)
+		_check(bool(out.ok) and res09.size() == 10, "replay pull %d ran" % k)
+		_check(V9Summon.pity_track(p0, res09) == out.res.map(func(r): return int(r.pity)) and V9Summon.pity_track(p0, res09).back() == int(S.pity),
+			"pity replay = TWGacha.pull (%d)" % p0)
+		_check(V9Summon.guar_track(g0, res09, tgt) == out.res.map(func(r): return bool(r.guar)) and V9Summon.guar_track(g0, res09, tgt).back() == bool(S.guar),
+			"guar replay = TWGacha.pull (%d)" % p0)
 	# lantern art or the code fallback, both build
 	for rar in V9Summon.ORDER:
 		var tex: = V9Summon.lantern_tex(rar)

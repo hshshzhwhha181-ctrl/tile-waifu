@@ -7,7 +7,7 @@ extends "res://scripts/main.gd"
 # `main` API the 16 + 45 legacy screens use stays exactly what it was: go / back / android_back / toast / overlay / screen /
 # screen_id / refresh_currency / refresh_nav / show_chrome / fly_gems / need_gems / maybe_offer / settings / leave_match /
 # CR / W / H / safe_* / busy / trans / topbar / navbar / tab_nodes / SCREENS / history. The reason it is an extension and not a
-# re-implementation: 19 legacy sites find the root through `get_tree().current_scene` (G.pull, the tutorial, info cards,
+# re-implementation: 19 legacy sites find the root through `get_tree().current_scene` (the tutorial, info cards,
 # the playtest runner), 88 `has_method` probes and 103 `main.screen` pokes reach into its internals; a copy would drift
 # silently, an extension cannot. Pixel identity of Home (acceptance) follows from the same fact.
 #
