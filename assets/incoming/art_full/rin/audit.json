@@ -1,0 +1,62 @@
+[
+ {
+  "file": "assets/incoming/art_full/rin/canon_base_hip_final.jpg",
+  "verdict": "pass",
+  "reasons": "Identity canon: sage braid, gold round glasses, jade drop earrings, jade bangle, phoenix cheongsam. Hands in hair and on hip have correct 5-finger anatomy. 3/4 crop to mid-thigh so head count cannot be measured, but face and figure read clearly adult. Plunging neckline, hip slit, garter strap and lace stocking top; no nudity, no text.",
+  "boldness": "ok (bold, keeps the owner's leg and bust accent)"
+ },
+ {
+  "file": "assets/incoming/art_full/rin/canon_win_tile_final.jpg",
+  "verdict": "pass",
+  "reasons": "Same identity as canon (glasses, earrings, braid, bangle all match). Wink, open-mouth laugh, tile held in a correct hand, other hand on the table with a clean bangle. Adult face. Plunging keyhole, garter straps, lace-top stockings; no nudity or text.",
+  "boldness": "ok (bold, strongest canon frame)"
+ },
+ {
+  "file": "assets/incoming/art_full/rin/canon_tease_shoulder_final.jpg",
+  "verdict": "pass",
+  "reasons": "Identity matches. Over-shoulder look, fingertip at lips, correct fingers, bangle. Open back and rounded hip well drawn. Cropped at the thigh so height is not measurable; adult face. No nudity or text.",
+  "boldness": "ok (back-view and hip focus)"
+ },
+ {
+  "file": "assets/incoming/art_full/rin/base_A_final.jpg",
+  "verdict": "pass",
+  "reasons": "Identity matches (glasses, earrings, braid, bangle; the cup hides part of the mouth). Full body about 7.7 heads including heels, slender with full thighs as the table says. Crossed-leg stance: hands, stiletto feet and joints are clean. Lace stocking top, garter strap and hip slit shown at hip-level camera, nothing under the skirt visible. No text.",
+  "boldness": "ok (slightly less teasing than the canon frames)"
+ },
+ {
+  "file": "assets/incoming/art_full/rin/evening_B_final.jpg",
+  "verdict": "pass",
+  "reasons": "Identity matches. Hand at glasses and hand on the book are correct; crossed legs and both stilettos are clean. Full soft thighs, lace-top stockings, off-shoulder cable-knit mini, side lacing. About 7.6 heads. No underwear visible, no text.",
+  "boldness": "ok (good leg accent, bust and legs both read)"
+ },
+ {
+  "file": "assets/incoming/art_full/rin/swim_A_final.jpg",
+  "verdict": "fail",
+  "reasons": "Hard-line risk. The green bikini top and cut-out are drawn, but no bikini bottom is visible under the sheer wet sarong: the skin runs straight across the hip and thigh junction through the sheer fabric, so it reads as bottomless. Identity and anatomy are fine (hands, toes, sandals correct), but the frame cannot be used as a clothed training example. Also drifts from the wardrobe (no straw hat, green instead of pink-and-white bikini). The paired pick swim_A_search_A.jpg has the same flaw and was removed too.",
+  "boldness": "bold but over the line"
+ },
+ {
+  "file": "assets/incoming/art_full/rin/service_C_final.jpg",
+  "verdict": "pass",
+  "reasons": "Identity matches (glasses, earrings, braid, bangle over the glove). Bunny ears, bow tie, thigh straps, pantyhose, white gloves with correct fingers on teapot and saucer, two clean heeled shoes. About 7.7 heads. Underbust cut-out and plunging front are fully lined; no text. Sofa seat instead of the chair-straddle pose, which is acceptable.",
+  "boldness": "ok (bunny and legs, solid)"
+ },
+ {
+  "file": "assets/incoming/art_full/rin/robe_C_final.jpg",
+  "verdict": "pass",
+  "reasons": "Identity matches. Hand on the book is correct, both pumps are clean, thighs full and soft, lace-top stockings. Satin mini nightgown covers the pelvis; the raised leg opens to the side, not toward the camera, and no under-hem area is visible. Borderline on the no-legs-open rule, but allowed as a sprawl. Adult face, no text.",
+  "boldness": "ok (boldest pose of the set)"
+ },
+ {
+  "file": "assets/incoming/art_full/rin/battle_B_final.jpg",
+  "verdict": "pass",
+  "reasons": "Identity matches. Cup hand and belt hand are correct, fishnet stockings and platform boots are clean, about 7.9 heads. Caution: side hips are bare with only straps, the front apron panel is the only visible cover, which reads like a loincloth. No genital outline or exposed nipple, so it passes, but the legs are noticeably slimmer than the 'full soft thighs' of the Rin figure descriptor. No text.",
+  "boldness": "ok (leg accent weaker than the others)"
+ },
+ {
+  "file": "assets/incoming/art_full/rin/seasonal_B_final.jpg",
+  "verdict": "pass",
+  "reasons": "Identity matches. Dango hand and the hand on the stone are correct, both geta feet have five toes each, white thigh-highs with ribbon bands, off-shoulder kimono mini. Hem covers, hip-level camera. Wardrobe drift (kimono, not the red velvet mini-qipao), harmless. No text.",
+  "boldness": "ok to a bit tame"
+ }
+]
