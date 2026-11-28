@@ -88,17 +88,6 @@
   "quality_notes": "2k high, jpg q92; seed nominal (tool has no seed parameter; prompt identical to the winning pose candidate); torii lean, knee bent, wink; stocking band + thigh visible; lifted knee in hakama (no under-skirt)"
  },
  {
-  "file": "assets/incoming/art_full/kohaku/evening_C_search_c0.jpg",
-  "batch": "H2",
-  "task_id": "H2.kohaku_evening.search",
-  "outfit_slot": "evening",
-  "pose": "C",
-  "prompt": "<<<0b0bc9fd-fb9e-44c9-8f6b-bdb4899cacd8>>> is Kohaku, an adult woman of 25, white fox shrine maiden of the Thousand Gates. Hair: long silver-white hair with vermilion-red gradient ends. Eyes: amber-gold slanted eyes with vermilion eyeliner. Skin: fair pale skin. Face: triangular fox-like adult face with a pointed chin, narrow slanted amber eyes, small fang when smiling. Signature items that must be present: pair of white fox ears with red inner fur; one big fluffy white fox tail with a red tip (nine tails only in the Kyubi outfit); white fox mask worn at the side of the head; small gold bell on a red cord at the neck; red-thonged geta. Body: slightly petite but clearly a grown woman, about 160 cm tall (7.0 heads tall), soft athletic-soft figure with full soft thighs and rounded hips, a slim waist, a full bust. Outfit: vermilion-and-gold short kimono dress with an off-shoulder plunging neckline, a wide obi with a bell charm, a slit to the hip, sheer white lace-top thigh-high stockings with a red ribbon band, red heeled geta. Pose: kneeling on a tatami platform with a hand on her thigh band. Expression: playful smile. Framing: full-body view from head to heels, centered. Setting: night shrine garden with floating fox-fire lanterns. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman with grown-woman proportions, 7.0 heads tall (160 cm, slightly petite but clearly a grown woman), soft legs with full thighs, a mature adult face and figure, a defined waist, the composition accents her legs, thighs and bust, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
-  "seed": 353688,
-  "stage": "search",
-  "quality_notes": "1k medium, pose candidate C of A-E (all five viewed); kneeling on tatami, hand on thigh band, lace-top stockings; FINAL is a re-roll with the dress slit changed to \"front-closed skirt with a slit to the upper thigh that stays closed over the hips\" because the first final showed a bare pelvic gap at the hip (rejected)"
- },
- {
   "file": "assets/incoming/art_full/kohaku/evening_C_final.jpg",
   "batch": "H2",
   "task_id": "H2.kohaku_evening.final",
