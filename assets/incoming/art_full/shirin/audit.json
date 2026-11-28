@@ -1,0 +1,122 @@
+[
+ {
+  "file": "assets/incoming/art_full/shirin/canon_base_final.jpg",
+  "verdict": "pass",
+  "reasons": "Identity on canon (plum wavy hair, honey kohl eyes, forehead jewel, teal veil, coin belt, lamp on head as in wave1 canon). Hands (hair, hip) and face clean. Adult. Covered, no text.",
+  "boldness": "ok"
+ },
+ {
+  "file": "assets/incoming/art_full/shirin/canon_base_search_pick.jpg",
+  "verdict": "pass",
+  "reasons": "Same identity, clean hands and face; lower resolution and near-duplicate of the final composition. Adult, covered.",
+  "boldness": "ok, slightly tame"
+ },
+ {
+  "file": "assets/incoming/art_full/shirin/canon_win_final.jpg",
+  "verdict": "pass",
+  "reasons": "Laughing wink, blank ivory tile in clean hand, raised fist fine, 5 fingers each. Identity good, adult, covered, no glyphs on tile.",
+  "boldness": "ok"
+ },
+ {
+  "file": "assets/incoming/art_full/shirin/canon_win_search_pick.jpg",
+  "verdict": "pass",
+  "reasons": "Tile pinch grip slightly stiff but readable; face and identity good; hip hand clean. Blank tile.",
+  "boldness": "ok"
+ },
+ {
+  "file": "assets/incoming/art_full/shirin/canon_tease_final.jpg",
+  "verdict": "pass",
+  "reasons": "Over-shoulder, finger at lips, back and hip accent; clean hand and bracelets; identity on canon; adult; covered at hip, slit shows thigh only.",
+  "boldness": "bold"
+ },
+ {
+  "file": "assets/incoming/art_full/shirin/canon_tease_search_pick.jpg",
+  "verdict": "pass",
+  "reasons": "Same pose, no head lamp (minor drift vs canon, otherwise consistent); hands clean; bare back, covered.",
+  "boldness": "bold"
+ },
+ {
+  "file": "assets/incoming/art_full/shirin/base_C_final.jpg",
+  "verdict": "pass",
+  "reasons": "Reclining on elbow, raised knee, full thighs and long legs; hand on knee and both bare feet with 5 toes clean, anklets; skirt covers, no view under it. Adult face.",
+  "boldness": "bold"
+ },
+ {
+  "file": "assets/incoming/art_full/shirin/base_C_search_pick.jpg",
+  "verdict": "pass",
+  "reasons": "Same pose; fingers on knee slightly overlapped but valid; feet clean; skirt covers; no lamp (veil only).",
+  "boldness": "bold"
+ },
+ {
+  "file": "assets/incoming/art_full/shirin/evening_B_final.jpg",
+  "verdict": "pass",
+  "reasons": "Sitting on pool edge, legs crossed, veil at lips; sheer gown over bare legs, thigh chains, coin belt covers hips; sandals and fingers clean; strong identity. Legs accent.",
+  "boldness": "bold"
+ },
+ {
+  "file": "assets/incoming/art_full/shirin/evening_B_search_pick.jpg",
+  "verdict": "pass",
+  "reasons": "Same pose; hands and sandals clean; gown reads as gown over lining at hips, no see-through read; identity good.",
+  "boldness": "bold"
+ },
+ {
+  "file": "assets/incoming/art_full/shirin/swim_E_final.jpg",
+  "verdict": "pass",
+  "reasons": "Kneeling bust-forward with a wink; wet-look bikini with coin trim readable under the sheer wrap, bottom reads as swimwear, no nipples or genital outline; hands on carpet clean. Edge case: very glossy wet thighs and wide kneel, boldest frame of the set; keep but do not crop tighter.",
+  "boldness": "very bold, at the line"
+ },
+ {
+  "file": "assets/incoming/art_full/shirin/swim_E_search_pick.jpg",
+  "verdict": "fail",
+  "reasons": "Tighter crop; the narrow bikini bottom with a pendant over the crotch blends into skin sheen through sheer chiffon, reads translucent or nude-adjacent at the hips (hard-line risk). Removed.",
+  "boldness": "too risky"
+ },
+ {
+  "file": "assets/incoming/art_full/shirin/service_C_final.jpg",
+  "verdict": "pass",
+  "reasons": "Bunny leotard with sheer tan-teal pantyhose, thigh straps, seated legs crossed; heels, feet and chin hand clean; crotch hidden by the thigh; leg accent. Adult; bunny ears per spec.",
+  "boldness": "bold"
+ },
+ {
+  "file": "assets/incoming/art_full/shirin/service_C_search_pick.jpg",
+  "verdict": "pass",
+  "reasons": "Same pose; leotard bottom with coin trim, pantyhose, heels, hands clean; covered.",
+  "boldness": "bold"
+ },
+ {
+  "file": "assets/incoming/art_full/shirin/robe_A_final.jpg",
+  "verdict": "pass",
+  "reasons": "Reclining, knee raised, robe off one shoulder over satin mini nightgown; hem at upper thigh with hip-level camera, no view under; hands and feet clean.",
+  "boldness": "bold"
+ },
+ {
+  "file": "assets/incoming/art_full/shirin/robe_A_search_pick.jpg",
+  "verdict": "fail",
+  "reasons": "Low camera with raised knee: sheer nightgown front tented open and the area between the thighs reads as dark teal shorts or underwear through sheer cloth (rejection rule: looks like underwear / view under skirt). Removed.",
+  "boldness": "too risky"
+ },
+ {
+  "file": "assets/incoming/art_full/shirin/battle_C_final.jpg",
+  "verdict": "pass",
+  "reasons": "Standing hip tilted, blade on shoulder, gold greaves, thigh straps; sword grip and feet clean; high-cut leotard with side cuts and coin belt covers hips; about 7 heads, long legs. At the edge of the leotard cut but acceptable.",
+  "boldness": "bold"
+ },
+ {
+  "file": "assets/incoming/art_full/shirin/battle_C_search_pick.jpg",
+  "verdict": "pass",
+  "reasons": "Same pose with split skirt covering the hips; blades and hands clean; heels clean; identity good.",
+  "boldness": "ok"
+ },
+ {
+  "file": "assets/incoming/art_full/shirin/seasonal_B_final.jpg",
+  "verdict": "pass",
+  "reasons": "Sitting on stall counter, legs crossed, pomegranate in clean hand with rings; T-strap heels and feet clean; thigh chains, hem covers; fuller thighs accent.",
+  "boldness": "bold"
+ },
+ {
+  "file": "assets/incoming/art_full/shirin/seasonal_B_search_pick.jpg",
+  "verdict": "pass",
+  "reasons": "Same pose; hands clean; hem covers; identity good; no lamp (veil only).",
+  "boldness": "bold"
+ }
+]
