@@ -1,0 +1,122 @@
+[
+ {
+  "file": "canon_base_standing_hip_final.jpg",
+  "verdict": "pass",
+  "reasons": "Identity matches canon; hand on hip and hand in hair, five fingers each, legs and lace stocking top coherent; adult face; keyhole front closed by fabric edges; slit shows bare hip but no groin outline; no text. Bust large vs 7.5 heads but acceptable.",
+  "boldness": "ok"
+ },
+ {
+  "file": "canon_base_standing_hip_search_pick.jpg",
+  "verdict": "pass",
+  "reasons": "Same pose and identity at 1k, clean hands, same slit height; pass (lower-res duplicate composition of the final).",
+  "boldness": "ok"
+ },
+ {
+  "file": "canon_win_victory_wink_final.jpg",
+  "verdict": "pass",
+  "reasons": "Identity ok, wink and open laugh, tile is blank, hands clean (fist + tile hand), lace stockings coherent, motion ticks are not glyphs; adult face; chest covered.",
+  "boldness": "ok"
+ },
+ {
+  "file": "canon_win_victory_wink_search_pick.jpg",
+  "verdict": "pass",
+  "reasons": "Same as final at 1k, clean; pass (duplicate composition).",
+  "boldness": "ok"
+ },
+ {
+  "file": "canon_tease_glance_finger_lip_final.jpg",
+  "verdict": "pass",
+  "reasons": "Identity ok; fingertip at lips, other hand on thigh with correct fingers; stocking, slit and hip tilt coherent; slit shows bare hip down to the lace top (watch: closest of the set to the back-view no-nudity line, but buttock stays covered and no groin outline); no text.",
+  "boldness": "ok"
+ },
+ {
+  "file": "canon_tease_glance_finger_lip_search_pick.jpg",
+  "verdict": "pass",
+  "reasons": "Same pose at 1k; same slit read; pass with the same watch note.",
+  "boldness": "ok"
+ },
+ {
+  "file": "base_D_leg_final.jpg",
+  "verdict": "pass",
+  "reasons": "Strongest leg-focus frame: garter strap clipped to lace stocking, hand on hip, long crossed-stance legs, heels correct, full-body qipao; identity ok; no text; adult; no under-skirt view (camera at knee/hip, hem long).",
+  "boldness": "ok (strong)"
+ },
+ {
+  "file": "base_D_leg_search_pick.jpg",
+  "verdict": "pass",
+  "reasons": "Same composition at 1k; clean; pass (duplicate composition).",
+  "boldness": "ok (strong)"
+ },
+ {
+  "file": "evening_C_kneel_arch_final.jpg",
+  "verdict": "pass",
+  "reasons": "Kneeling on cushion with both hands in hair, ribbon-and-bell garter band, heart cutout closed by fabric, heels and feet count correct, thighs full as per MC table; identity ok; slit shows bare hip but no outline; no text.",
+  "boldness": "ok (strong)"
+ },
+ {
+  "file": "evening_C_kneel_arch_search_pick.jpg",
+  "verdict": "pass",
+  "reasons": "Same at 1k; clean; pass (duplicate composition).",
+  "boldness": "ok (strong)"
+ },
+ {
+  "file": "swim_A_kneel_wink_final.jpg",
+  "verdict": "fail",
+  "reasons": "FAIL: hips and thighs exaggerated far beyond the MC figure (thigh mass wider than torso, short foreshortened torso, reads clearly under the 7.5-head table and as a 'thicc' caricature); the bikini bottom is narrow and groin-hugging with a visible centre seam that sits too close to the no-genital-outline line; pink-on-pink frame (hair, bikini, towel, sky, petals) breaks the 20% accent limit (worker also flagged it); identity partly hidden by the sun hat (twin tails not readable).",
+  "boldness": "too bold at the groin and caricatured, not usable"
+ },
+ {
+  "file": "swim_A_kneel_wink_search_pick.jpg",
+  "verdict": "fail",
+  "reasons": "FAIL: same proportion distortion, groin-hugging bottom and pink dominance as the final.",
+  "boldness": "too bold at the groin and caricatured, not usable"
+ },
+ {
+  "file": "service_D_seated_legs_final.jpg",
+  "verdict": "pass",
+  "reasons": "Bunny leotard with heart cutout and underbust window, crossed legs on table with thigh straps, sheer pantyhose, heels correct, wave hand five fingers; identity ok (bunny ears over hairpins); no text; hip-level camera, no under-skirt view; adult.",
+  "boldness": "ok (strong)"
+ },
+ {
+  "file": "service_D_seated_legs_search_pick.jpg",
+  "verdict": "pass",
+  "reasons": "Same at 1k; clean; pass (duplicate composition).",
+  "boldness": "ok (strong)"
+ },
+ {
+  "file": "robe_E_bust_kneel_pillow_final.jpg",
+  "verdict": "pass",
+  "reasons": "Pillow hug with satin robe, lace-top stockings, feet and heels coherent, hands fine; identity ok; adult; chest covered; WARNING: pink dominates the frame (robe, bed, curtains, hair) so a strict accent mask would likely exceed 20%, kept as acceptable look (warm satin read, not flat); thighs very full.",
+  "boldness": "ok"
+ },
+ {
+  "file": "robe_E_bust_kneel_pillow_search_pick.jpg",
+  "verdict": "pass",
+  "reasons": "Same at 1k; same pink-dominance warning; pass.",
+  "boldness": "ok"
+ },
+ {
+  "file": "battle_D_low_stride_final.jpg",
+  "verdict": "fail",
+  "reasons": "FAIL: the knee-level view shows the green armoured leotard bottom directly under the flared skirt hem (an underwear-like patch with gold waist edge), violating 'no area under the skirt / does not look like underwear'; hip and thigh volume also exaggerated vs a 7.5-head figure (reads about 6 heads), and the near boot shows its sole. The worker's own notes rejected A/B/C for the same patch.",
+  "boldness": "strong pose but violates the under-skirt rule"
+ },
+ {
+  "file": "battle_D_low_stride_search_pick.jpg",
+  "verdict": "fail",
+  "reasons": "FAIL: same green leotard bottom visible under the skirt at 1k.",
+  "boldness": "strong pose but violates the under-skirt rule"
+ },
+ {
+  "file": "seasonal_B_lean_kiss_final.jpg",
+  "verdict": "pass",
+  "reasons": "Lean on lantern post blowing a kiss, red velvet mini-qipao with garter straps and bows, white stockings with bands, fur boots, raised leg coherent, hands fine; identity ok; heart glyph is a symbol, not text; hem at mid-thigh, no under-skirt view; adult.",
+  "boldness": "ok (strong)"
+ },
+ {
+  "file": "seasonal_B_lean_kiss_search_pick.jpg",
+  "verdict": "pass",
+  "reasons": "Same at 1k; clean; pass (duplicate composition).",
+  "boldness": "ok (strong)"
+ }
+]
