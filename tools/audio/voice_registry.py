@@ -11,7 +11,7 @@ The registry is the single table that the future voice bank (P47) fills in: a li
 and `measured_s` once its file exists.  Every JP text is model-written and carries np=true ([NP] = native
 proofread pending) until a native speaker signs it off.
 
-The same checks run in Godot: game/core/voice/voice_registry_selftest.gd (mora counter and all rules are
+The same checks run in Godot: game/scripts/v10/voice/voice_registry_selftest.gd (mora counter and all rules are
 mirrored there; the registry stores `mora` so the two implementations cross-check each other).
 """
 from __future__ import annotations
@@ -235,7 +235,7 @@ def build_md(rows: list[dict]) -> str:
     w("")
     w("```")
     w("python3 tools/audio/voice_registry.py check          # VOICE_REGISTRY ok/total + VOICE_FILES have/total")
-    w("python3 tools/tw_test.py -s voice_registry          # то же в Godot (res://core/voice/voice_registry_selftest.gd)")
+    w("python3 tools/tw_test.py -s voice_registry          # то же в Godot (res://scripts/v10/voice/voice_registry_selftest.gd)")
     w("```")
     w("")
     w("Правила проверки и стоп-листы лежат в блоке `policy` самого `voice_registry.json`; тест требует, чтобы в стоп-листе были базовые слова (нельзя «пройти», опустошив список).")

@@ -1,8 +1,8 @@
 extends SceneTree
 
 # Voice registry selftest (P44, GDD 8.4). Pure data: no scenes, no autoloads, no audio.
-#   godot --headless --path game -s res://core/voice/voice_registry_selftest.gd
-#   godot --headless --path game -s res://core/voice/voice_registry_selftest.gd -- --strict_files=1
+#   godot --headless --path game -s res://scripts/v10/voice/voice_registry_selftest.gd
+#   godot --headless --path game -s res://scripts/v10/voice/voice_registry_selftest.gd -- --strict_files=1
 # Prints:  VOICE_FILES have/total pct%      (map coverage: how many ids already have an audio file; 0/240 is expected now)
 #          VOICE_REGISTRY ok/total          (schema + text + red-line + duration checks; exit code 0 when all pass)
 # --strict_files=1 adds the check "every id has its file" (release gate "карта реплик 100%").

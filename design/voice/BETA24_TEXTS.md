@@ -312,7 +312,7 @@
 
 ```
 python3 tools/audio/voice_registry.py check          # VOICE_REGISTRY ok/total + VOICE_FILES have/total
-python3 tools/tw_test.py -s voice_registry          # то же в Godot (res://core/voice/voice_registry_selftest.gd)
+python3 tools/tw_test.py -s voice_registry          # то же в Godot (res://scripts/v10/voice/voice_registry_selftest.gd)
 ```
 
 Правила проверки и стоп-листы лежат в блоке `policy` самого `voice_registry.json`; тест требует, чтобы в стоп-листе были базовые слова (нельзя «пройти», опустошив список).

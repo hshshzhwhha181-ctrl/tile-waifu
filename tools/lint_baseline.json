@@ -1,13 +1,13 @@
 {
  "version": 1,
- "N": 574,
+ "N": 573,
  "by_rule": {
   "NODE_BASE": 0,
   "NODE_API": 57,
   "AUDIO_FX": 0,
   "AUTOLOAD_G": 465,
   "ROOT_PATH": 1,
-  "SHELL_DEP": 51
+  "SHELL_DEP": 50
  },
  "core_files": 249,
  "files": {
@@ -36,9 +36,6 @@
   "game/core/economy/affection_curve.gd": {
    "NODE_API": 1,
    "AUTOLOAD_G": 1
-  },
-  "game/core/economy/affection/module.gd": {
-   "SHELL_DEP": 1
   },
   "game/core/gacha/gacha_selftest.gd": {
    "AUTOLOAD_G": 2
