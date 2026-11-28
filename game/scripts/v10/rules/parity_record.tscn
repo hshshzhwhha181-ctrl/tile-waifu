@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/v10/rules/parity_record_runner.gd" id="1"]
+
+[node name="Parity_record" type="Node"]
+script = ExtResource("1")

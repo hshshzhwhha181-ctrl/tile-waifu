@@ -1193,6 +1193,22 @@
     "total": 132
    }
   },
+  "twparity": {
+   "fast": {
+    "marker": "TWPARITY_SELFTEST 1401/1401",
+    "ok": 1401,
+    "secs": 13.6,
+    "status": "pass",
+    "total": 1401
+   },
+   "full": {
+    "marker": "TWPARITY_SELFTEST 7001/7001",
+    "ok": 7001,
+    "secs": 46.2,
+    "status": "pass",
+    "total": 7001
+   }
+  },
   "twwidgets": {
    "fast": {
     "marker": "TWWIDGETS_SELFTEST 1396/1396",
