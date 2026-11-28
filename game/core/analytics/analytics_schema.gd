@@ -11,6 +11,17 @@ extends RefCounted
 #   - monetization ethics guard (no spend-profile personalized discounts / dynamic pricing)
 
 const EV_VER: = 1
+const MIN_TS_MS: = 1577836800000 # 2020-01-01T00:00:00Z
+const MAX_TS_MS: = 4102444800000 # 2100-01-01T00:00:00Z
+const MAX_STR_LEN: = 256
+const MAX_SCAN_DEPTH: = 6
+
+const NUMERIC_PARAMS: = [
+	"dur_s", "t_s", "level", "pairs", "k", "g", "c", "n", "cost", "limit_left",
+	"idx", "k_before", "g_before", "c_before", "cost_amt", "ssr_count", "spent_rub_equiv",
+	"price_rub", "wishes_equiv", "amount", "debt_after", "days_since", "delta",
+	"value", "prev", "from", "to", "step", "milestone", "hud_level", "star", "day", "lv", "amt",
+]
 
 const ENVELOPE_REQUIRED: = [
 	"event",
@@ -45,22 +56,31 @@ const FORBIDDEN_PII_KEYS: = [
 	"birth_day",
 	"email",
 	"e_mail",
+	"email_address",
+	"emailaddress",
 	"nick",
 	"nickname",
 	"username",
 	"full_name",
+	"fullname",
 	"real_name",
+	"realname",
 	"phone",
 	"phone_number",
+	"phonenumber",
 	"ip",
 	"ip_address",
+	"ipaddress",
 	"device_id",
+	"deviceid",
 	"imei",
 	"idfa",
 	"gaid",
 	"advertising_id",
+	"advertisingid",
 	"passport",
 	"card_number",
+	"cardnumber",
 ]
 
 # Hard ethics denylist (MP §1.5, §7.3 DB-10, §7.5: no personalized discounts by spend profile)
@@ -218,19 +238,56 @@ static func _looks_like_email(val: String) -> bool:
 	return dot_idx > at_idx + 1 and dot_idx < val.length() - 1
 
 
-static func _scan_forbidden_keys(d: Dictionary, prefix: String, errors: Array) -> void:
+static func _normalize_key(raw: String) -> String:
+	var low: String = raw.to_lower()
+	var out: String = ""
+	for i in low.length():
+		var c: int = low.unicode_at(i)
+		if (c >= 97 and c <= 122) or (c >= 48 and c <= 57):
+			out += low.substr(i, 1)
+	return out
+
+
+static func _is_forbidden_key(k: String, list: Array) -> bool:
+	if list.has(k):
+		return true
+	var kn: String = _normalize_key(k)
+	for fk in list:
+		if _normalize_key(str(fk)) == kn:
+			return true
+	return false
+
+
+static func _scan_forbidden_value(v: Variant, full: String, k: String, errors: Array, depth: int) -> void:
+	if depth > MAX_SCAN_DEPTH:
+		errors.append("NESTING_TOO_DEEP:" + full)
+		return
+	if v is Dictionary:
+		_scan_forbidden_keys(v, full, errors, depth + 1)
+	elif v is Array:
+		var arr: Array = v
+		for i in arr.size():
+			_scan_forbidden_value(arr[i], "%s[%d]" % [full, i], "", errors, depth + 1)
+	elif v is String:
+		var s: String = str(v)
+		if not full.is_empty() and s.length() > MAX_STR_LEN:
+			errors.append("PARAM_TOO_LONG:" + full)
+		if k != "stack_hash" and _looks_like_email(s):
+			errors.append("PII_EMAIL_VALUE:" + full)
+
+
+static func _scan_forbidden_keys(d: Dictionary, prefix: String, errors: Array, depth: int = 0) -> void:
+	if depth > MAX_SCAN_DEPTH:
+		errors.append("NESTING_TOO_DEEP:" + prefix)
+		return
 	for k_raw in d:
 		var k: String = str(k_raw).to_lower()
 		var full: String = k if prefix.is_empty() else (prefix + "." + k)
-		if FORBIDDEN_PII_KEYS.has(k):
+		if _is_forbidden_key(k, FORBIDDEN_PII_KEYS):
 			errors.append("PII_FORBIDDEN:" + full)
-		elif FORBIDDEN_ETHICS_KEYS.has(k):
+		elif _is_forbidden_key(k, FORBIDDEN_ETHICS_KEYS):
 			errors.append("ETHICS_FORBIDDEN:" + full)
-		var v: Variant = d[k_raw]
-		if v is Dictionary:
-			_scan_forbidden_keys(v, full, errors)
-		elif v is String and k != "stack_hash" and _looks_like_email(str(v)):
-			errors.append("PII_EMAIL_VALUE:" + full)
+		_scan_forbidden_value(d[k_raw], full, k, errors, depth)
 
 
 static func validate_event(ev: Dictionary) -> Dictionary:
@@ -252,7 +309,7 @@ static func validate_event(ev: Dictionary) -> Dictionary:
 
 	if ev.has("ts"):
 		var ts_v: Variant = ev.get("ts")
-		if not (ts_v is int or ts_v is float) or int(ts_v) <= 0:
+		if not (ts_v is int or ts_v is float) or int(ts_v) < MIN_TS_MS or int(ts_v) > MAX_TS_MS:
 			errors.append("BAD_TS")
 
 	if ev.has("ev_ver") and int(ev.get("ev_ver", -1)) != EV_VER:
@@ -300,6 +357,13 @@ static func validate_event(ev: Dictionary) -> Dictionary:
 		for fk in forbid_list:
 			if p.has(fk):
 				errors.append("FORBIDDEN_PARAM:%s.%s" % [ev_name, str(fk)])
+
+		# Numeric param type enforcement (matches server validator)
+		for nk in NUMERIC_PARAMS:
+			if p.has(nk) and not (ev_name == "preview_open" and nk == "from") and not (ev_name == "ftue_step" and nk == "step"):
+				var nv: Variant = p[nk]
+				if not (nv is int or nv is float) or nv is bool:
+					errors.append("BAD_PARAM_TYPE:%s.%s" % [ev_name, str(nk)])
 
 		# Extra MP §7.4 privacy checks
 		if ev_name == "age_gate_result" and p.has("birth_year_bucket"):

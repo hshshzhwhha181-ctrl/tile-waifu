@@ -38,14 +38,25 @@ def load_events_ndjson(path: Path) -> list[dict]:
 def load_events_sqlite(path: Path) -> list[dict]:
     conn = sqlite3.connect(str(path))
     try:
+        cols = {r[1] for r in conn.execute("PRAGMA table_info(analytics_events)").fetchall()}
+        has_source = "source" in cols
+        has_ev_id = "event_id" in cols
+        select_cols = [
+            "event_name", "ts_ms", "uid_hmac", "sess", "app_ver", "build",
+            "lang", "tier", "age_ok", "conn", "ev_ver", "params_json",
+        ]
+        if has_source:
+            select_cols.append("source")
+        if has_ev_id:
+            select_cols.append("event_id")
         rows = conn.execute(
-            "SELECT event_name, ts_ms, uid_hmac, sess, app_ver, build, lang, tier, age_ok, conn, ev_ver, params_json "
-            "FROM analytics_events ORDER BY ts_ms ASC, id ASC"
+            f"SELECT {', '.join(select_cols)} FROM analytics_events ORDER BY ts_ms ASC, id ASC"
         ).fetchall()
     finally:
         conn.close()
-    return [
-        {
+    out = []
+    for r in rows:
+        item = {
             "event": r[0],
             "ts": int(r[1]),
             "uid": r[2],
@@ -59,8 +70,29 @@ def load_events_sqlite(path: Path) -> list[dict]:
             "ev_ver": int(r[10]),
             "params": json.loads(r[11]),
         }
-        for r in rows
-    ]
+        idx = 12
+        if has_source:
+            item["source"] = r[idx]
+            idx += 1
+        if has_ev_id:
+            item["event_id"] = r[idx]
+        out.append(item)
+    return out
+
+
+def _safe_float(val, default: float | None = None) -> float | None:
+    if isinstance(val, bool) or val is None:
+        return default
+    try:
+        f = float(val)
+    except (TypeError, ValueError):
+        return default
+    return f if math.isfinite(f) else default
+
+
+def _safe_int(val, default: int = 0) -> int:
+    f = _safe_float(val, None)
+    return int(f) if f is not None else default
 
 
 def _day_str(ts_ms: int) -> str:
@@ -123,6 +155,7 @@ def compute_dashboards(events: list[dict]) -> dict:
     banner_stats: dict[str, dict] = collections.defaultdict(lambda: {
         "pulls": 0, "ssr": 0, "s": 0, "gift": 0, "featured_ssr": 0,
         "pity_ssr": 0, "candle_ssr": 0, "odds_hashes": set(),
+        "exp_ssr": 0.0, "exp_s": 0.0, "exp_gift": 0.0,
     })
     pulls_since_featured: dict[tuple[str, str], int] = collections.defaultdict(int)
     pulls_to_featured_samples: list[int] = []
@@ -139,6 +172,11 @@ def compute_dashboards(events: list[dict]) -> dict:
     # DB-06 Payment Ops
     pay_counts = collections.Counter()
     pay_methods = collections.Counter()
+    seen_purchase_ids: set[str] = set()
+    seen_refund_purchase_ids: set[str] = set()
+    duplicate_purchases_ignored = 0
+    unverified_client_purchases_ignored = 0
+    malformed_purchases_ignored = 0
     refund_rub = 0.0
     refund_count = 0
     audit_ok = 0
@@ -221,6 +259,19 @@ def compute_dashboards(events: list[dict]) -> dict:
             bs = banner_stats[bid]
             bs["pulls"] += 1
             bs["odds_hashes"].add(str(p.get("odds_hash", "")))
+            k_before = max(0, _safe_int(p.get("k_before", 0)))
+            hard_cap = 30 if bid == "first_guest" else 80
+            if k_before + 1 >= hard_cap:
+                p_ssr_exp = 1.0
+            elif k_before >= 60:
+                p_ssr_exp = min(1.0, 0.015 + (k_before - 59) * 0.05)
+            else:
+                p_ssr_exp = 0.015
+            p_s_exp = min(1.0 - p_ssr_exp, 0.08)
+            p_gift_exp = max(0.0, 1.0 - p_ssr_exp - p_s_exp)
+            bs["exp_ssr"] += p_ssr_exp
+            bs["exp_s"] += p_s_exp
+            bs["exp_gift"] += p_gift_exp
             res = str(p.get("result", "gift"))
             bs[res] = bs.get(res, 0) + 1
             key = (uid, str(p.get("family", bid)))
@@ -230,7 +281,7 @@ def compute_dashboards(events: list[dict]) -> dict:
                 s_ssr.add(uid)
                 pulls_to_ssr_samples.append(pulls_since_ssr[key])
                 pulls_since_ssr[key] = 0
-                if int(p.get("k_before", 0)) >= 69:
+                if k_before >= hard_cap - 1:
                     bs["pity_ssr"] += 1
                 if bool(p.get("candle")):
                     bs["candle_ssr"] += 1
@@ -239,16 +290,29 @@ def compute_dashboards(events: list[dict]) -> dict:
                     pulls_to_featured_samples.append(pulls_since_featured[key])
                     pulls_since_featured[key] = 0
             cur = str(p.get("cost_cur", "gems"))
-            econ_sinks[cur] += int(p.get("cost_amt", 0))
+            econ_sinks[cur] += _safe_int(p.get("cost_amt", 0))
         elif name == "store_open":
             s_store.add(uid)
         elif name in ("purchase_start", "purchase_fail", "purchase_cancel", "purchase_pending"):
             pay_counts[name] += 1
             pay_methods[str(p.get("method", "unknown"))] += 1
         elif name == "purchase_ok":
+            # Revenue events must be server-verified (never trust forgeable client purchase_ok)
+            if ev.get("source") != "server":
+                unverified_client_purchases_ignored += 1
+                continue
+            price = _safe_float(p.get("price_rub"))
+            if price is None or price < 0:
+                malformed_purchases_ignored += 1
+                continue
+            pid = str(p.get("purchase_id", "")).strip()
+            if pid:
+                if pid in seen_purchase_ids:
+                    duplicate_purchases_ignored += 1
+                    continue
+                seen_purchase_ids.add(pid)
             pay_counts[name] += 1
             pay_methods[str(p.get("method", "unknown"))] += 1
-            price = float(p.get("price_rub", 0.0))
             sku = str(p.get("sku_id", "unknown"))
             cat = str(p.get("category", "other"))
             rev_by_sku[sku] += price
@@ -258,16 +322,30 @@ def compute_dashboards(events: list[dict]) -> dict:
             if uid in preview_viewers:
                 preview_buyers.add(uid)
         elif name == "purchase_refund":
+            if ev.get("source") != "server":
+                unverified_client_purchases_ignored += 1
+                continue
+            amt = _safe_float(p.get("amount"))
+            if amt is None or amt < 0:
+                malformed_purchases_ignored += 1
+                continue
+            rpid = str(p.get("purchase_id", "")).strip()
+            if rpid:
+                if rpid in seen_refund_purchase_ids:
+                    duplicate_purchases_ignored += 1
+                    continue
+                seen_refund_purchase_ids.add(rpid)
             refund_count += 1
-            refund_rub += float(p.get("amount", 0.0))
-            if float(p.get("debt_after", 0.0)) > 0:
+            refund_rub += amt
+            debt_after = _safe_float(p.get("debt_after"), 0.0) or 0.0
+            if debt_after > 0:
                 debt_users.add(uid)
         elif name == "moon_balance_audit":
             if bool(p.get("ok")):
                 audit_ok += 1
             else:
                 audit_fail += 1
-            audit_max_abs_delta = max(audit_max_abs_delta, abs(int(p.get("delta", 0))))
+            audit_max_abs_delta = max(audit_max_abs_delta, abs(_safe_int(p.get("delta", 0))))
         elif name == "limit_choice_shown":
             limit_shown_users.add(uid)
         elif name == "limit_set":
@@ -335,7 +413,9 @@ def compute_dashboards(events: list[dict]) -> dict:
 
     # ── DB-02 Revenue ──
     gross_rub = round(sum(user_spend.values()), 2)
-    net_rub = round(gross_rub * NET_MARGIN, 2)
+    refund_rub_rounded = round(refund_rub, 2)
+    gross_after_refunds_rub = round(max(0.0, gross_rub - refund_rub_rounded), 2)
+    net_rub = round(gross_after_refunds_rub * NET_MARGIN, 2)
     avg_dau = (sum(len(s) for s in dau_by_day.values()) / max(1, len(dau_by_day)))
     mau = len(user_active_days)
     rev_by_segment: dict[str, float] = collections.defaultdict(float)
@@ -358,6 +438,8 @@ def compute_dashboards(events: list[dict]) -> dict:
         "title": "Выручка",
         "owner": "продукт, финансы",
         "gross_rub": gross_rub,
+        "refund_rub": refund_rub_rounded,
+        "gross_after_refunds_rub": gross_after_refunds_rub,
         "net_rub": net_rub,
         "net_factor": NET_MARGIN,
         "payers": n_payers,
@@ -377,17 +459,21 @@ def compute_dashboards(events: list[dict]) -> dict:
         },
     }
 
-    # ── DB-03 Gacha Health (with Pearson chi-square vs expected SSR/S rates) ──
-    # Expected effective rates from soft-pity model: SSR ~2.25%, S ~8.0%, gift ~89.75%
-    exp_rates = {"ssr": 0.0225, "s": 0.080, "gift": 0.8975}
+    # ── DB-03 Gacha Health (with Pearson chi-square vs pity-conditioned expected SSR/S/gift counts) ──
+    # Critical value for df=2 at alpha=0.01 is 9.210 (exact survival function for df=2 is exp(-chi2 / 2)).
+    chi2_critical_99 = 9.210
+    chi2_min_pulls = 100
     banners_out = {}
     for bid, bs in sorted(banner_stats.items()):
         n_p = bs["pulls"]
         chi2 = 0.0
-        for cls, rate in exp_rates.items():
-            exp_c = max(1e-9, n_p * rate)
+        for cls, exp_k in (("ssr", "exp_ssr"), ("s", "exp_s"), ("gift", "exp_gift")):
+            exp_c = max(1e-9, bs[exp_k])
             obs_c = bs.get(cls, 0)
             chi2 += ((obs_c - exp_c) ** 2) / exp_c
+        chi2_p_value = round(math.exp(-chi2 / 2.0), 6)
+        chi2_ok = (n_p < chi2_min_pulls) or (chi2 <= chi2_critical_99)
+        hashes_consistent = len(bs["odds_hashes"]) <= 1
         banners_out[bid] = {
             "pulls": n_p,
             "ssr_count": bs["ssr"],
@@ -398,8 +484,11 @@ def compute_dashboards(events: list[dict]) -> dict:
             "candle_share_pct": _pct(bs["candle_ssr"], bs["ssr"]),
             "chi2_stat": round(chi2, 3),
             "chi2_df": 2,
+            "chi2_critical_99": chi2_critical_99,
+            "chi2_p_value": chi2_p_value,
+            "chi2_ok": chi2_ok,
             "odds_hashes": sorted(bs["odds_hashes"]),
-            "odds_consistent": len(bs["odds_hashes"]) <= 1,
+            "odds_consistent": hashes_consistent and chi2_ok,
         }
     mean_to_featured = round(sum(pulls_to_featured_samples) / len(pulls_to_featured_samples), 2) if pulls_to_featured_samples else 0.0
     db03 = {
@@ -477,6 +566,9 @@ def compute_dashboards(events: list[dict]) -> dict:
         "reconcile_fail": audit_fail,
         "reconcile_max_abs_delta": audit_max_abs_delta,
         "users_with_debt": len(debt_users),
+        "duplicate_purchases_ignored": duplicate_purchases_ignored,
+        "unverified_client_purchases_ignored": unverified_client_purchases_ignored,
+        "malformed_purchases_ignored": malformed_purchases_ignored,
         "methods": dict(sorted(pay_methods.items())),
     }
 
@@ -515,7 +607,10 @@ def compute_dashboards(events: list[dict]) -> dict:
     }
 
     # ── DB-09 Ads ──
+    ad_daily_cap = 3
     max_ads_user_day = max(ad_per_user_day.values()) if ad_per_user_day else 0
+    cap_violation_user_days = sum(1 for c in ad_per_user_day.values() if c > ad_daily_cap)
+    cap_excess_rewards = sum(c - ad_daily_cap for c in ad_per_user_day.values() if c > ad_daily_cap)
     total_dau_sum = sum(len(s) for s in dau_by_day.values())
     db09 = {
         "id": "DB-09",
@@ -525,8 +620,11 @@ def compute_dashboards(events: list[dict]) -> dict:
         "watches": ad_watches,
         "rewards": ad_rewards,
         "rewards_per_dau": round(ad_rewards / max(1, total_dau_sum), 3),
+        "daily_cap_limit": ad_daily_cap,
         "max_rewards_per_user_day": max_ads_user_day,
-        "daily_cap_respected": max_ads_user_day <= 3,
+        "cap_violation_user_days": cap_violation_user_days,
+        "cap_excess_rewards": cap_excess_rewards,
+        "daily_cap_respected": cap_violation_user_days == 0,
         "complaints": ad_complaints,
         "complaint_rate_pct": _pct(ad_complaints, ad_watches),
         "ecpm_buckets": dict(sorted(ad_ecpm_buckets.items())),
@@ -535,14 +633,28 @@ def compute_dashboards(events: list[dict]) -> dict:
     # ── DB-10 Whale Radar (STRICTLY ANONYMIZED — support & thanks only, zero individual IDs) ──
     payer_spends = sorted((v for v in user_spend.values() if v > 0), reverse=True)
     n_p = len(payer_spends)
-    def top_share(frac: float) -> float:
+    suppressed_label = f"<{K_ANON_MIN}_suppressed"
+
+    def top_share(frac: float) -> float | str:
         if n_p == 0 or gross_rub <= 0:
             return 0.0
         k = max(1, int(math.ceil(n_p * frac)))
+        # Enforce k-anonymity on top-X% concentration slices so no slice represents < K_ANON_MIN payers
+        if n_p < K_ANON_MIN or k < K_ANON_MIN:
+            return suppressed_label
         return _pct(sum(payer_spends[:k]), gross_rub)
 
+    whale_kraken_users = users_by_segment["whale"] + users_by_segment["kraken"]
     whale_kraken_rev = rev_by_segment["whale"] + rev_by_segment["kraken"]
-    whale_kraken_share = _pct(whale_kraken_rev, gross_rub)
+    if whale_kraken_users == 0:
+        whale_kraken_share: float | str = 0.0
+        conc_alert: bool | str = False
+    elif whale_kraken_users < K_ANON_MIN:
+        whale_kraken_share = suppressed_label
+        conc_alert = suppressed_label
+    else:
+        whale_kraken_share = _pct(whale_kraken_rev, gross_rub)
+        conc_alert = whale_kraken_share > 70.0
 
     # Aggregate Circle rank bands & churn risk (inactive >= 7 days before max_ts) — NO uids, k-anonymized
     rank_counts: collections.Counter = collections.Counter()
@@ -556,6 +668,7 @@ def compute_dashboards(events: list[dict]) -> dict:
             rank_churn_risk[band] += 1
 
     # Enforce k-anonymity cell suppression (never output small identifiable cells < K_ANON_MIN)
+    # Note: when churn_risk_count is suppressed, churn_risk_pct MUST also be suppressed to prevent exact recovery.
     rank_bands_anon = {}
     for band in ("rank_1", "rank_2", "rank_3_plus"):
         cnt = rank_counts.get(band, 0)
@@ -563,12 +676,13 @@ def compute_dashboards(events: list[dict]) -> dict:
         if cnt == 0:
             rank_bands_anon[band] = {"cohort_size_band": "0", "churn_risk_band": "0"}
         elif cnt < K_ANON_MIN:
-            rank_bands_anon[band] = {"cohort_size_band": f"<{K_ANON_MIN}_suppressed", "churn_risk_band": f"<{K_ANON_MIN}_suppressed"}
+            rank_bands_anon[band] = {"cohort_size_band": suppressed_label, "churn_risk_band": suppressed_label}
         else:
+            risk_suppressed = 0 < risk < K_ANON_MIN
             rank_bands_anon[band] = {
                 "cohort_size": cnt,
-                "churn_risk_count": risk if risk >= K_ANON_MIN else (0 if risk == 0 else f"<{K_ANON_MIN}_suppressed"),
-                "churn_risk_pct": _pct(risk, cnt),
+                "churn_risk_count": suppressed_label if risk_suppressed else risk,
+                "churn_risk_pct": suppressed_label if risk_suppressed else _pct(risk, cnt),
             }
 
     db10 = {
@@ -586,7 +700,7 @@ def compute_dashboards(events: list[dict]) -> dict:
             "top_10_pct_payers": top_share(0.10),
             "top_25_pct_payers": top_share(0.25),
             "whale_plus_kraken_share": whale_kraken_share,
-            "concentration_alert_gt_70pct": whale_kraken_share > 70.0,
+            "concentration_alert_gt_70pct": conc_alert,
         },
         "circle_rank_cohorts": rank_bands_anon,
     }

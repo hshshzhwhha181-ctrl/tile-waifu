@@ -60,6 +60,13 @@ var _back_notifications: = 0
 var _last_back_result: = ""
 
 
+class RealLegacyMain extends "res://scripts/main.gd":
+	func _shell_redirect() -> bool:
+		return false
+	func _splash() -> void:
+		pass
+
+
 class SoakModal extends TWModal:
 	var kind: = "plain"
 	var wizard_steps: = 0
@@ -145,7 +152,8 @@ func run(p_host: Node) -> Array:
 	var t0: = Time.get_ticks_msec()
 	var catalog: Array = _build_screen_catalog()
 	_test_catalog_integrity(catalog)
-	await _test_regression_0121(p_host)
+	await _test_regression_0121(p_host, catalog)
+	await _test_real_v11_screens_and_modals(p_host, catalog)
 	await _test_full_screen_modal_matrix(p_host, catalog)
 	await _test_android_back_and_history(p_host, catalog)
 	await _test_watchdog_busy_recovery(p_host, catalog)
@@ -273,22 +281,31 @@ func _create_harness(p_host: Node, catalog: Array) -> Dictionary:
 	chrome_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.add_child(chrome_layer)
 
+	var clk: = TWClock.new()
+	var st: = TWState.new(TWSave.new("user://modal_soak_v11_state.json"), clk, {})
 	var screens: = TWScreens.new()
 	screens.name = "Screens"
 	screens.host = screen_host
-	screens.ctx = TWContext.build(null, null, TWBus.new(), screens)
+	screens.ctx = TWContext.build(st, clk, TWBus.new(), screens)
 	_fake_ms = 0
 	screens.now_fn = func() -> int: return _fake_ms
 	root.add_child(screens)
-
-	for e in catalog:
-		var spec: = ScreenSpec.make(str(e.id), FAKE_SCREEN, e.opts)
-		screens.register(spec)
 
 	var stack: = ModalStack.new()
 	stack.quit_fn = func() -> void: pass
 	root.add_child(stack)  # LAST child: above screen_host and chrome_layer
 	stack.bind_screens(screens)
+	screens.ctx.provide("modals", stack)
+
+	# Register REAL v11 screens from res://shell/screens/ first (never stubbed with TWNavFakeScreen)
+	screens.scan()
+
+	# Only unmigrated/planned catalog slots fall back to TWNavFakeScreen in the TWScreens harness
+	for e in catalog:
+		var sid: String = str(e.id)
+		if not screens.has_screen(sid):
+			var spec: = ScreenSpec.make(sid, FAKE_SCREEN, e.opts)
+			screens.register(spec)
 
 	return {
 		"root": root,
@@ -400,53 +417,138 @@ func _verify_post_nav_invariants(h: Dictionary, transient_ids: Dictionary) -> St
 	return ""
 
 
-# ── 1. Reproducible 0.12.1 regression: RED on legacy whitelist path, GREEN on ModalStack ───────────────────
+# ── 1. Reproducible 0.12.1 regression: REAL legacy main.gd go() (RED) vs ModalStack (GREEN) + real legacy screens ──
 
-func _test_regression_0121(p_host: Node) -> void:
-	# (A) Legacy path simulation (0.12.1): whitelist meta sweep misses untagged FirstPick STOP view
-	var legacy_root: = Control.new()
-	legacy_root.name = "LegacyRoot0121"
-	legacy_root.set_anchors_preset(Control.PRESET_FULL_RECT)
-	legacy_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	p_host.add_child(legacy_root)
+func _legacy_go_sync(legacy: Control, p_host: Node, id: String, args: Dictionary = {}) -> bool:
+	legacy.set("busy", false)
+	legacy.set("screen_id", "")
+	legacy.call("go", id, args, false)
+	var guard: = 0
+	while bool(legacy.get("busy")) and guard < 120:
+		await p_host.get_tree().process_frame
+		guard += 1
+	await p_host.get_tree().process_frame
+	return str(legacy.get("screen_id")) == id and legacy.get("screen") != null and is_instance_valid(legacy.get("screen"))
 
-	var legacy_screen_host: = Control.new()
-	legacy_screen_host.name = "LegacyScreenHost"
-	legacy_screen_host.set_anchors_preset(Control.PRESET_FULL_RECT)
-	legacy_screen_host.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	legacy_root.add_child(legacy_screen_host)
 
-	var legacy_layer: = Control.new()
-	legacy_layer.name = "LegacyPopupLayer"
-	legacy_layer.set_anchors_preset(Control.PRESET_FULL_RECT)
-	legacy_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	legacy_root.add_child(legacy_layer)
+func _test_regression_0121(p_host: Node, _catalog: Array) -> void:
+	# (A) REAL legacy main.gd path (0.12.1): instantiate res://scripts/main.gd and call real go()
+	var prev_save_path: String = G.save_path
+	var prev_sheet_layer: Control = V10ShopSheet.layer
+	G.save_path = "user://modal_soak_legacy.json"
+	G.S.profile_done = true
+	G.S.intro_done = true
+	G.S.tut_done = true
+	G.S.unlocked = mini(40, G.LEVELS.size())
+	V10Money.set_balance("gems", 12450)
+	V10Money.set_balance("coins", 38200)
+	G.S.free10 = true
+	if not (G.S.get("v6_story") is Dictionary):
+		G.S["v6_story"] = {}
+	G.S["v6_story"]["on"] = false
 
-	# Tagged modal (removed by legacy whitelist) + untagged FirstPick STOP view (the 0.12.1 leak!)
+	var legacy: = RealLegacyMain.new()
+	legacy.name = "RealLegacyMain0121"
+	legacy.size = Vector2(720, 1280)
+	p_host.add_child(legacy)
+	await p_host.get_tree().process_frame
+	await p_host.get_tree().process_frame
+
+	var leg_layer: Control = legacy.get("overlay") as Control
+	var leg_screen_root: Control = legacy.get("screen_root") as Control
+	var booted_home: bool = str(legacy.get("screen_id")) == "home" and legacy.get("screen") != null and leg_layer != null
+	check("0.12.1 regression (real main.gd): booted real legacy home screen", booted_home, "id=%s" % str(legacy.get("screen_id")))
+
+	# Attach (1) a tagged popup (swept by real main.gd:go()) and (2) an untagged wrapper with a STOP scrim child (leaked by real main.gd:go()!)
 	var tagged: = ColorRect.new()
 	tagged.name = "TaggedLegacyPopup"
-	tagged.set_meta("v8_popup", true)
+	tagged.set_meta("popup", true)
 	tagged.set_anchors_preset(Control.PRESET_FULL_RECT)
 	tagged.mouse_filter = Control.MOUSE_FILTER_STOP
-	legacy_layer.add_child(tagged)
+	leg_layer.add_child(tagged)
 
+	var untagged_wrapper: = Control.new()
+	untagged_wrapper.name = "FirstPickUntaggedWrapper0121"
+	untagged_wrapper.set_anchors_preset(Control.PRESET_FULL_RECT)
+	untagged_wrapper.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var first_pick_leak: = ColorRect.new()
-	first_pick_leak.name = "FirstPickUntagged0121"
+	first_pick_leak.name = "FirstPickUntaggedStop0121"
 	first_pick_leak.set_anchors_preset(Control.PRESET_FULL_RECT)
 	first_pick_leak.mouse_filter = Control.MOUSE_FILTER_STOP
-	legacy_layer.add_child(first_pick_leak)
+	untagged_wrapper.add_child(first_pick_leak)
+	leg_layer.add_child(untagged_wrapper)
 
-	# Legacy go() whitelist sweep: only frees children carrying known legacy meta tags
-	for c in legacy_layer.get_children():
-		if c.has_meta("v8_popup") or c.has_meta("v8_modal"):
-			legacy_layer.remove_child(c)
-			c.free()
+	# Call REAL main.gd:go("levels", {}, false)
+	var went_levels: bool = await _legacy_go_sync(legacy, p_host, "levels", {"select": 4})
+	var tagged_swept: bool = not is_instance_valid(tagged) or tagged.is_queued_for_deletion() or tagged.get_parent() == null
+	var legacy_stops: Array = ModalStack.stop_visible_under(leg_layer)
+	var legacy_caught_leak: bool = went_levels and tagged_swept and legacy_stops.has(first_pick_leak)
+	check("0.12.1 regression (real main.gd go()): tagged popup swept, untagged wrapper STOP leaked (RED on legacy)", legacy_caught_leak, "went=%s tagged_swept=%s stops=%d" % [str(went_levels), str(tagged_swept), legacy_stops.size()])
 
-	var legacy_stops: Array = ModalStack.stop_visible_under(legacy_root, legacy_screen_host)
-	var legacy_caught_leak: bool = legacy_layer.get_child_count() == 1 and legacy_stops.size() == 1 and legacy_stops[0] == first_pick_leak
-	check("0.12.1 regression (legacy path): leak detector catches leaked STOP blocker (RED on legacy)", legacy_caught_leak, "children=%d stops=%d" % [legacy_layer.get_child_count(), legacy_stops.size()])
-	legacy_root.get_parent().remove_child(legacy_root)
-	legacy_root.free()
+	# Remove the injected 0.12.1 leak and verify real legacy popup (settings) + real legacy screen transitions
+	if is_instance_valid(untagged_wrapper):
+		if untagged_wrapper.get_parent() != null:
+			untagged_wrapper.get_parent().remove_child(untagged_wrapper)
+		untagged_wrapper.free()
+
+	legacy.call("settings")
+	await p_host.get_tree().process_frame
+	var settings_stops: Array = ModalStack.stop_visible_under(leg_layer)
+	var back_home_ok: bool = await _legacy_go_sync(legacy, p_host, "home", {})
+	var post_settings_stops: Array = ModalStack.stop_visible_under(leg_layer)
+	check("real legacy main.gd: real settings() popup opens STOP (%d) and real go('home') clears it (0 STOP)" % settings_stops.size(), settings_stops.size() >= 1 and back_home_ok and post_settings_stops.is_empty(), "pre=%d post=%d" % [settings_stops.size(), post_settings_stops.size()])
+
+	# Exercise real legacy screens from legacy_screens.json through real main.gd:go()
+	var legacy_meta: Dictionary = {}
+	var lf: = FileAccess.open(LEGACY_CATALOGUE, FileAccess.READ)
+	if lf != null:
+		var parsed: Variant = JSON.parse_string(lf.get_as_text())
+		if parsed is Dictionary and parsed.get("screens") is Dictionary:
+			legacy_meta = parsed.screens
+	var leg_ids: Array = (legacy.get("SCREENS") as Dictionary).keys()
+	leg_ids.sort()
+	var leg_opened: = 0
+	var leg_bad: Array = []
+	for i in leg_ids.size():
+		var lid: String = str(leg_ids[i])
+		if lid == "home":
+			leg_opened += 1
+			continue
+		var largs: Dictionary = {}
+		if legacy_meta.has(lid) and legacy_meta[lid] is Dictionary and legacy_meta[lid].get("args") is Dictionary:
+			largs = (legacy_meta[lid].args as Dictionary).duplicate(true)
+		var ok_open: bool = await _legacy_go_sync(legacy, p_host, lid, largs)
+		if not ok_open:
+			leg_bad.append("open:" + lid)
+			continue
+		# On every 6th real legacy screen, open a real legacy Common.confirm popup before navigating home
+		if i % 6 == 0:
+			Common.confirm(legacy, "Soak", "Проверка", "", 0, func(): pass)
+			await p_host.get_tree().process_frame
+		var ok_close: bool = await _legacy_go_sync(legacy, p_host, "home", {})
+		var residual_stops: Array = ModalStack.stop_visible_under(leg_layer)
+		if not ok_close or not residual_stops.is_empty():
+			leg_bad.append("close:%s(stops=%d)" % [lid, residual_stops.size()])
+			for rs in residual_stops:
+				var top_c: Node = rs
+				while top_c.get_parent() != null and top_c.get_parent() != leg_layer:
+					top_c = top_c.get_parent()
+				if top_c.get_parent() == leg_layer:
+					leg_layer.remove_child(top_c)
+					top_c.queue_free()
+		else:
+			leg_opened += 1
+	check("real legacy main.gd: mounted and closed %d/%d real legacy screens with 0 leaked STOP blockers" % [leg_opened, leg_ids.size()], leg_bad.is_empty() and leg_opened == leg_ids.size(), str(leg_bad.slice(0, 5)))
+
+	# Tear down RealLegacyMain cleanly
+	if is_instance_valid(legacy):
+		if legacy.get_parent() != null:
+			legacy.get_parent().remove_child(legacy)
+		legacy.free()
+	V10ShopSheet.layer = prev_sheet_layer
+	G.save_path = prev_save_path
+	await p_host.get_tree().process_frame
+	await p_host.get_tree().process_frame
 
 	# (B) ModalStack path (v11): same FirstPick full-screen STOP view + untagged stray -> 100% clean on go()
 	var mini_cat: Array = [
@@ -470,6 +572,72 @@ func _test_regression_0121(p_host: Node) -> void:
 	await p_host.get_tree().process_frame
 
 
+# ── 1b. Real v11 screens (TWLegalScreen, TWMatchScreen) opening REAL modals on ModalStack ─────────────────
+
+func _test_real_v11_screens_and_modals(p_host: Node, catalog: Array) -> void:
+	var h: Dictionary = _create_harness(p_host, catalog)
+	var screens: TWScreens = h.screens
+	var stack: ModalStack = h.stack
+	_active_screens = screens
+
+	# Real TWLegalScreen -> opens real TWLegalDocModal -> go("home") sweeps it cleanly
+	screens.go("home")
+	screens.go("legal")
+	await p_host.get_tree().process_frame
+	var is_real_legal: bool = screens.current is TWLegalScreen and not (screens.current is TWNavFakeScreen)
+	check("real v11 screen: 'legal' mounts real TWLegalScreen", is_real_legal, str(screens.current.get_class() if screens.current else "null"))
+
+	var legal_scr: TWLegalScreen = screens.current as TWLegalScreen
+	var opened_doc: bool = legal_scr != null and legal_scr.open_doc("offer", true)
+	var doc_modal_on_stack: bool = opened_doc and stack.depth() == 1 and stack.top() is TWLegalDocModal
+	check("real v11 modal: TWLegalScreen.open_doc('offer', true) opens real TWLegalDocModal on ModalStack", doc_modal_on_stack, "opened=%s depth=%d" % [str(opened_doc), stack.depth()])
+
+	screens.go("home")
+	var legal_go_err: String = _verify_post_nav_invariants(h, {"match": true})
+	check("real v11 modal: go('home') sweeps real TWLegalDocModal with 0 STOP leaks", legal_go_err == "", legal_go_err)
+
+	# Real TWLegalScreen + TWLegalDocModal + Android back notification
+	screens.go("legal")
+	await p_host.get_tree().process_frame
+	var legal_scr2: TWLegalScreen = screens.current as TWLegalScreen
+	var opened_priv: bool = legal_scr2 != null and legal_scr2.open_doc("privacy", true)
+	notification(NOTIFICATION_WM_GO_BACK_REQUEST)
+	var back_closed_doc: bool = opened_priv and _last_back_result == "modal" and stack.depth() == 0 and screens.current_id == "legal"
+	notification(NOTIFICATION_WM_GO_BACK_REQUEST)
+	var back_left_legal: bool = _last_back_result == "history" and screens.current_id == "home"
+	check("real v11 modal: Android back closes TWLegalDocModal then leaves TWLegalScreen", back_closed_doc and back_left_legal, "closed=%s left=%s cur=%s" % [str(back_closed_doc), str(back_left_legal), screens.current_id])
+
+	# Real TWMatchScreen -> clears real 2-pair board -> opens real TWResultModal -> go("home") sweeps it cleanly
+	var tiny_cfg: Dictionary = {
+		"cols": 2, "rows": 2, "layers": 1, "fill": 1.0, "faces": 2, "seed": 1,
+		"shape": "rect", "gold": 0, "ice": 0, "hidden": false, "shard": "", "plan": {},
+	}
+	screens.go("match", {"show_result": true, "cfg": tiny_cfg})
+	await p_host.get_tree().process_frame
+	var is_real_match: bool = screens.current is TWMatchScreen and not (screens.current is TWNavFakeScreen)
+	check("real v11 screen: 'match' mounts real TWMatchScreen", is_real_match, str(screens.current.get_class() if screens.current else "null"))
+
+	var match_scr: TWMatchScreen = screens.current as TWMatchScreen
+	var guard: = 0
+	while match_scr != null and match_scr.board != null and not match_scr.board.cleared and not match_scr.board.failed and guard < 40:
+		guard += 1
+		var mv: Variant = match_scr.board.solver_move()
+		if mv == null:
+			break
+		var tid: int = int(mv.id) if (mv is Object and "id" in mv) else int(mv)
+		match_scr.tap_tile(tid)
+	await p_host.get_tree().process_frame
+	var cleared_and_modal: bool = match_scr != null and match_scr.board != null and match_scr.board.cleared and stack.depth() == 1 and stack.top() is TWResultModal
+	check("real v11 modal: clearing real TWMatchScreen board opens real TWResultModal on ModalStack", cleared_and_modal, "cleared=%s depth=%d top=%s" % [str(match_scr.board.cleared if match_scr and match_scr.board else false), stack.depth(), str(stack.top())])
+
+	screens.go("home")
+	var match_go_err: String = _verify_post_nav_invariants(h, {"match": true})
+	check("real v11 modal: go('home') sweeps real TWResultModal with 0 STOP leaks", match_go_err == "", match_go_err)
+
+	_destroy_harness(h)
+	await p_host.get_tree().process_frame
+
+
 # ── 2. Exhaustive matrix: all 61 screens x all modal archetypes x go / back / go_tab ───────────────────────
 
 func _test_full_screen_modal_matrix(p_host: Node, catalog: Array) -> void:
@@ -477,13 +645,18 @@ func _test_full_screen_modal_matrix(p_host: Node, catalog: Array) -> void:
 	var screens: TWScreens = h.screens
 	var stack: ModalStack = h.stack
 	check("matrix: all %d screens registered with 0 rejects" % catalog.size(), screens.registry.size() == catalog.size() and screens.rejects.is_empty(), "reg=%d rej=%s" % [screens.registry.size(), str(screens.rejects)])
+	# MAJOR #6 assertion: scanned real v11 screens must use real ScreenSpecs, not TWNavFakeScreen
+	var legal_spec: ScreenSpec = screens.registry.get("legal")
+	var match_spec: ScreenSpec = screens.registry.get("match")
+	check("real v11 screens: legal and match registered with real scripts (not FAKE_SCREEN)", legal_spec != null and match_spec != null and legal_spec.script_path != FAKE_SCREEN and match_spec.script_path != FAKE_SCREEN, "legal=%s match=%s" % [legal_spec.script_path if legal_spec else "null", match_spec.script_path if match_spec else "null"])
 
 	var transient_ids: Dictionary = {}
 	var all_ids: Array = []
 	for e in catalog:
 		var id: String = str(e.id)
 		all_ids.append(id)
-		if not bool(e.opts.get("keep_history", true)):
+		var sp: ScreenSpec = screens.registry.get(id)
+		if (sp != null and not sp.keep_history) or not bool(e.opts.get("keep_history", true)):
 			transient_ids[id] = true
 
 	# Compute shard slice
@@ -694,12 +867,21 @@ func _test_random_soak(p_host: Node, catalog: Array) -> void:
 	var all_ids: Array = []
 	var transient_ids: Dictionary = {}
 	for e in catalog:
-		all_ids.append(str(e.id))
-		if not bool(e.opts.get("keep_history", true)):
-			transient_ids[str(e.id)] = true
+		var sid: String = str(e.id)
+		all_ids.append(sid)
+		var sp: ScreenSpec = screens.registry.get(sid)
+		if (sp != null and not sp.keep_history) or not bool(e.opts.get("keep_history", true)):
+			transient_ids[sid] = true
 
 	var rng: = RandomNumberGenerator.new()
 	rng.seed = _seed
+	# Shuffled full-catalog coverage deck guarantees every catalog screen is exercised under random modal states
+	var coverage_deck: Array = all_ids.duplicate()
+	for ci in range(coverage_deck.size() - 1, 0, -1):
+		var cj: int = rng.randi() % (ci + 1)
+		var tmp_id: Variant = coverage_deck[ci]
+		coverage_deck[ci] = coverage_deck[cj]
+		coverage_deck[cj] = tmp_id
 	var tracked: Array = []
 	var visited: Dictionary = {}
 	var bad_navs: = 0
@@ -713,7 +895,7 @@ func _test_random_soak(p_host: Node, catalog: Array) -> void:
 		var r: int = rng.randi() % 100
 		var did_nav: = false
 		if r < 24:
-			var target: String = str(all_ids[rng.randi() % all_ids.size()])
+			var target: String = str(coverage_deck.pop_back()) if not coverage_deck.is_empty() else str(all_ids[rng.randi() % all_ids.size()])
 			screens.go(target, {"op": op})
 			visited[target] = true
 			did_nav = true
@@ -793,7 +975,12 @@ func _test_random_soak(p_host: Node, catalog: Array) -> void:
 			if first_once == "":
 				first_once = "modal %d got %d on_close calls" % [int(mid), c]
 
-	check("random soak: %d ops (%d verified navs, %d/%d screens visited) keep all invariants" % [_soak_ops, nav_verifications, visited.size(), all_ids.size()], bad_navs == 0 and visited.size() >= all_ids.size() - 5, first_bad)
+	var unvisited: Array = []
+	for sid_u in all_ids:
+		if not visited.has(sid_u):
+			unvisited.append(sid_u)
+	check("random soak: %d ops (%d verified navs) keep all invariants" % [_soak_ops, nav_verifications], bad_navs == 0, first_bad)
+	check("random soak: 100%% screen coverage (%d/%d screens visited)" % [visited.size(), all_ids.size()], visited.size() == all_ids.size(), "unvisited=%s" % str(unvisited))
 	check("random soak: all %d tracked modals got on_close exactly once" % tracked.size(), once_bad == 0 and tracked.size() > 100, first_once)
 	check("random soak: exercised opens (%d), closes (%d), refusals (%d), strays swept (%d)" % [stack.opened_count, stack.closed_count, stack.refused_count, stack.strays_swept], stack.opened_count > 100 and stack.closed_count == stack.opened_count and stack.strays_swept > 0)
 

@@ -207,6 +207,25 @@ func _test_pii_and_ethics_guards() -> void:
 	var r_whale: Dictionary = buf.record("store_open", {"section": "vip", "spend_profile_offer": "whale_9990"}, ts)
 	check("ethics: spend_profile_offer key rejected", not bool(r_whale.ok) and r_whale.errors.has("ETHICS_FORBIDDEN:params.spend_profile_offer"), str(r_whale.errors))
 
+	# MAJOR #2 parity: array PII recursion, normalized PII keys, ts range, param types/length
+	var r_arr_obj: Dictionary = buf.record("app_open", {"src": "organic", "list": [{"email": "a@b.ru"}]}, ts)
+	check("pii: email inside array object rejected", not bool(r_arr_obj.ok), str(r_arr_obj.errors))
+
+	var r_arr_str: Dictionary = buf.record("app_open", {"src": "organic", "nested": ["x@y.com"]}, ts)
+	check("pii: email literal inside array rejected", not bool(r_arr_str.ok), str(r_arr_str.errors))
+
+	var r_norm: Dictionary = buf.record("app_open", {"src": "organic", "E-Mail": "none", "deviceid": "d1", "Email_Address": "none"}, ts)
+	check("pii: normalized keys E-Mail/deviceid/Email_Address rejected", not bool(r_norm.ok) and r_norm.errors.size() >= 3, str(r_norm.errors))
+
+	var r_bad_ts: Dictionary = buf.record("app_open", {"src": "organic"}, 10000000000000000)
+	check("range: ts=1e16 rejected", not bool(r_bad_ts.ok) and r_bad_ts.errors.has("BAD_TS"), str(r_bad_ts.errors))
+
+	var r_bad_price: Dictionary = buf.record("purchase_ok", {"sku_id": "s1", "price_rub": "abc", "method": "sbp", "purchase_id": "p1"}, ts)
+	check("type: non-numeric price_rub rejected", not bool(r_bad_price.ok), str(r_bad_price.errors))
+
+	var ev_id_ok: Dictionary = buf.record("app_open", {"src": "organic"}, ts)
+	check("dedup: buffer attaches deterministic event_id", bool(ev_id_ok.ok) and str(ev_id_ok.event.get("event_id", "")) != "", str(ev_id_ok.event))
+
 
 func _test_buffer_consent_and_batching() -> void:
 	var ts: int = 1764300300000

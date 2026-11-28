@@ -68,9 +68,12 @@ def generate_events(n_users: int = 800, days: int = 31, seed: int = 20261128) ->
     events: list[dict] = []
     purchase_seq = 0
 
-    def emit(uid: str, sess: str, ts: int, tier: str, age_ok: bool, conn: str, name: str, params: dict) -> None:
+    def emit(uid: str, sess: str, ts: int, tier: str, age_ok: bool, conn: str, name: str, params: dict, source: str | None = None) -> None:
+        if source is None:
+            source = "server" if name in ("purchase_ok", "purchase_refund", "moon_balance_audit") else "client"
         events.append({
             "event": name,
+            "source": source,
             "ts": ts,
             "uid": uid,
             "sess": sess,
@@ -197,16 +200,19 @@ def generate_events(n_users: int = 800, days: int = 31, seed: int = 20261128) ->
                     })
                     ssr_in_series = 0
                     for p_idx in range(1, n_pulls + 1):
-                        # Soft pity ramp matching TWOdds: base 0.012, soft pity from k>=50, hard pity at 70
+                        # Soft pity ramp matching data/shop.json / MP §3:
+                        # base 0.015, soft pity from k>=60 (+0.05/pull), hard pity at 80 (first_guest hard pity at 30)
                         k_before = k_pity
                         g_before = g_fifty
                         c_before = c_candle
-                        if k_before + 1 >= 70:
+                        hard_cap = 30 if banner_id == "first_guest" else 80
+                        if k_before + 1 >= hard_cap:
                             p_ssr = 1.0
-                        elif k_before >= 50:
-                            p_ssr = min(1.0, 0.012 + (k_before - 49) * 0.05)
+                        elif k_before >= 60:
+                            p_ssr = min(1.0, 0.015 + (k_before - 59) * 0.05)
                         else:
-                            p_ssr = 0.012
+                            p_ssr = 0.015
+                        p_s = min(1.0 - p_ssr, 0.08)
                         roll = rng.random()
                         if roll < p_ssr:
                             result = "ssr"
@@ -223,7 +229,7 @@ def generate_events(n_users: int = 800, days: int = 31, seed: int = 20261128) ->
                             k_pity = 0
                             ssr_in_series += 1
                             item_id = "akari_silk" if featured else "off_banner_ssr"
-                        elif roll < p_ssr + 0.08:
+                        elif roll < p_ssr + p_s:
                             result = "s"
                             featured = False
                             candle_used = False

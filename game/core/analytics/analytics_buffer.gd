@@ -26,6 +26,7 @@ var dropped_overflow: int = 0
 var last_errors: Array = []
 
 var _queue: Array = []
+var _seq: int = 0
 
 
 func configure_session(p_uid: String, p_sess: String, opts: Dictionary = {}) -> void:
@@ -56,8 +57,13 @@ func set_consent(granted: bool) -> void:
 		_queue.clear()
 
 
-func build_event(event_name: String, params: Dictionary, ts_ms: int) -> Dictionary:
+func build_event(event_name: String, params: Dictionary, ts_ms: int, event_id: String = "") -> Dictionary:
+	var eid: String = event_id
+	if eid.is_empty():
+		_seq += 1
+		eid = "%s_%d_%d" % [sess, ts_ms, _seq]
 	return {
+		"event_id": eid,
 		"event": event_name,
 		"ts": ts_ms,
 		"uid": uid,

@@ -90,26 +90,34 @@ export function readJson(req, limit = MAX_BODY) {
 
 export function clientIp(req) {
   const xf = req.headers['x-forwarded-for'];
-  if (xf && process.env.TRUST_PROXY !== '0') return String(xf).split(',')[0].trim();
+  if (xf && process.env.TRUST_PROXY === '1') return String(xf).split(',')[0].trim();
   return req.socket.remoteAddress || '?';
 }
 
-/** Fixed-window limiter: allow `max` hits per `windowMs` per key. */
+/** Fixed-window limiter: allow `max` hits per `windowMs` per key, with bounded map size. */
 export class RateLimiter {
-  constructor(max, windowMs) {
+  constructor(max, windowMs, maxEntries = 10000) {
     this.max = max;
     this.windowMs = windowMs;
+    this.maxEntries = Math.max(1, Number(maxEntries) || 10000);
     this.map = new Map();
   }
   hit(key) {
     const t = Date.now();
     let e = this.map.get(key);
     if (!e || t - e.start >= this.windowMs) {
+      if (!e && this.map.size >= this.maxEntries) {
+        this.sweep();
+        while (this.map.size >= this.maxEntries) {
+          const oldest = this.map.keys().next().value;
+          if (oldest === undefined) break;
+          this.map.delete(oldest);
+        }
+      }
       e = { start: t, n: 0 };
       this.map.set(key, e);
     }
     e.n++;
-    if (this.map.size > 50000) this.sweep();
     return e.n <= this.max;
   }
   sweep() {
