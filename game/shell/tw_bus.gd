@@ -82,8 +82,7 @@ func unsubscribe_owner(owner: Object) -> int:
 	var target_id: int = owner.get_instance_id() if owner != null and is_instance_valid(owner) else 0
 	for tok in _by_token.keys():
 		var rec: Dictionary = _by_token[tok]
-		var rec_owner = rec.owner
-		if rec_owner != null and not is_instance_valid(rec_owner):
+		if int(rec.owner_id) != 0 and not is_instance_valid(rec.owner):
 			unsubscribe(tok)
 			continue
 		if target_id != 0 and int(rec.owner_id) == target_id:
@@ -160,7 +159,7 @@ func _deliver(ev: Dictionary) -> void:
 		var rec = _by_token.get(tok)
 		if rec == null:
 			continue                    # unsubscribed by an earlier handler of this very event
-		if rec.owner != null and not is_instance_valid(rec.owner):
+		if int(rec.owner_id) != 0 and not is_instance_valid(rec.owner):
 			unsubscribe(tok)            # owner freed without exiting tree
 			continue
 		var cb: Callable = rec.cb
