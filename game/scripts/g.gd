@@ -490,6 +490,7 @@ func _ready() -> void :
 
 
 func _recovery_selftest() -> void :
+	V8RecoverySelftest.extra = V10WalletGoldenSelftest.run
 	var fails: int = V8RecoverySelftest.run()
 	get_tree().quit(1 if fails > 0 else 0)
 

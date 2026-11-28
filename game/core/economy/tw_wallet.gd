@@ -97,13 +97,12 @@ static func forget() -> void:
 	_live = null
 
 
+# the live economy (G.econ), registered by V10Money.attach; null in a headless core run
+static var live_econ: V10Econ = null
+
+
 static func _live_econ() -> V10Econ:
-	var tree: = Engine.get_main_loop() as SceneTree
-	var g = tree.root.get_node_or_null("G") if tree else null
-	if g == null:
-		return null
-	var e = g.get("econ")
-	return e as V10Econ if e is V10Econ else null
+	return live_econ
 
 
 var _econ_st: Dictionary = {}

@@ -137,6 +137,7 @@ static func attach(S: Dictionary) -> void:
 	e.owns = func(id: String) -> bool: return g.owns(id)
 	S["econ"] = e.st
 	g.set("econ", e)
+	TWWallet.live_econ = e
 	# the day's grants (month card) and store receipts; NOT e.tick(): it pays «Воск» for ended banners (spec: no wax)
 	e.shop.reconcile()
 	TWWallet.forget()          # the snapshot is rewritten from the wallet below: whatever S.gems held on load is not input
