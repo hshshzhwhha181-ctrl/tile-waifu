@@ -10,3 +10,6 @@ date,batch_id,task_id,quote_ref,quoted_cr,actual_cr,balance_after,note
 2026-11-28,H0,height re-rolls nova x5 + yue x5 (new body table prompts),,10,10,,P50b round 2; 9:16 1k medium x1 each
 2026-11-28,P50b,round 2 total,,25.5,25.5,,P50b round 2; session total 76.5 cr (51 + 25.5)
 2026-11-28,H2,round 3 pilots x4 (fuller thighs, leg and bust focus: mc_base D, miel_evening D, hana_base D, yue_base E),,4,4,,P50b round 3; 2:3 1k medium; 0 refusals; session total 80.5 cr
+2026-11-28,ART6,miel candidates 17 slots x 6 (gpt_image_2_6 2:3 1k medium) + swim0 reroll x6 (5 moderation refusals on first wet-look variant) + seasonal Y02 reroll x6 + first call billed 6 for 2 images,,118,118,,art6-miel (own estimate; account balance is shared with parallel workers)
+2026-11-28,ART6,miel 2k finals via bytedance_image_upscale x17 + 1 wrong-job upscale wasted,,36,36,,art6-miel; 2 cr each
+2026-11-28,ART6,miel total,,154,154,,art6-miel; cap 380
