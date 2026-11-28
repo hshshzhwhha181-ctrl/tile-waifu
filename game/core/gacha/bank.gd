@@ -9,6 +9,10 @@ extends RefCounted
 var S: Dictionary
 var give_fn: Callable = Callable()        # optional: G.give(id) -> bool (true when new); default writes S.owned
 var live_money: = false
+# P09: TWGacha.pull switches this on for the length of one pull and reads `ledger` afterwards: every movement of money through
+# the bank as {cur, delta, src} in order (the payment, then the petals / crystals of duplicates). Off: nothing is recorded.
+var record: = false
+var ledger: Array = []
 
 
 func _init(state: Dictionary = {}) -> void:
@@ -21,7 +25,13 @@ func balance(cur: String) -> int:
 	return TWWallet.for_state(S).bal(cur)
 
 
+func _note(cur: String, delta: int) -> void:
+	if record and delta != 0:
+		ledger.append({"cur": cur, "delta": delta, "src": "gacha"})
+
+
 func add(cur: String, n: int) -> void:
+	_note(cur, n)
 	if live_money:
 		V10Money.grant({cur: n}, "gacha")
 		return
@@ -31,9 +41,10 @@ func add(cur: String, n: int) -> void:
 func spend(cur: String, n: int) -> bool:
 	if n <= 0:
 		return true
-	if live_money:
-		return V10Money.spend({cur: n}, "gacha")
-	return bool(TWWallet.for_state(S).spend({cur: n}, "gacha").ok)
+	var done: bool = V10Money.spend({cur: n}, "gacha") if live_money else bool(TWWallet.for_state(S).spend({cur: n}, "gacha").ok)
+	if done:
+		_note(cur, -n)
+	return done
 
 
 func owns(id: String) -> bool:

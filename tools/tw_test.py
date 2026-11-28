@@ -96,6 +96,10 @@ CATALOG: list[Suite] = [
     S("recovery", "RECOVERY", args=["--recovery_selftest=1"], group="core"),
     S("state", "STATE_SELFTEST", SV + "state/state_selftest.tscn", group="core",
       note="P12: TWClock/TWSave/TWMigrate/TWState, golden saves v4..v8, 500-case save fuzz (+ parity with the legacy G.apply_state)"),
+    S("twgacha", "TWGACHA_SELFTEST", SV + "gacha/twgacha_selftest.tscn", ["--mc=1"], fast_args=["--mc=0.25"], group="core",
+      note="P09: TWGacha.pull (the one wish engine): fixed-seed parity with the pre-P09 engine (6 pinned fingerprints + 60 seeds), exact Markov numbers "
+           "pinned to the deleted odds class and to an independent chain, 1000-pull journal property (balance delta = ledger), gifted / refused pulls, "
+           "pity guarantees, and a source scan: the deleted engine and the g.gd proxies are named nowhere"),
     S("round", "ROUND_SELFTEST", SV + "round/round_selftest.tscn", group="core",
       note="P20: TWRound.resolve + TWBoosters + TWModeCfg + TWRewards: 139-row table (independent python model of the legacy award code), 300-scenario diff vs the frozen play.gd transcription, ladder == G, bot rounds, outfit invariance, wallet payment, core purity"),
     S("twboard", "TWBOARD_SELFTEST", SV + "rules/tw_board_selftest.tscn", group="core",

@@ -2,7 +2,7 @@ class_name V10LadderScreen
 extends Control
 
 # «Лестница возвращения» (Р5): 7 steps (gap ≥ 14 days) or 3 (7–13). One step a day, a skipped day never burns.
-# Main action «Забрать · день N»; the 10-ticket day carries «Шансы» (odds disclosure, V10Odds hook H9).
+# Main action «Забрать · день N»; the 10-ticket day carries «Шансы» (odds disclosure, V10OddsScreen hook H9).
 #   V10LadderScreen.open(parent, key) -> screen        signals closed, odds_requested
 
 signal closed

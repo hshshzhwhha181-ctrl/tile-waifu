@@ -174,14 +174,14 @@
    "fast": {
     "marker": "CONTRACT_SELFTEST 35/35",
     "ok": 35,
-    "secs": 16.3,
+    "secs": 13.1,
     "status": "pass",
     "total": 35
    },
    "full": {
     "marker": "CONTRACT_SELFTEST 35/35",
     "ok": 35,
-    "secs": 16.7,
+    "secs": 13.3,
     "status": "pass",
     "total": 35
    }
@@ -220,18 +220,18 @@
   },
   "economy": {
    "fast": {
-    "marker": "ECON_SELFTEST 381/381 (4.8 s)",
-    "ok": 381,
-    "secs": 9.9,
+    "marker": "ECON_SELFTEST 213/213 (1.9 s)",
+    "ok": 213,
+    "secs": 6.3,
     "status": "pass",
-    "total": 381
+    "total": 213
    },
    "full": {
-    "marker": "ECON_SELFTEST 381/381 (26.3 s)",
-    "ok": 381,
-    "secs": 31.3,
+    "marker": "ECON_SELFTEST 213/213 (1.5 s)",
+    "ok": 213,
+    "secs": 5.7,
     "status": "pass",
-    "total": 381
+    "total": 213
    }
   },
   "event": {
@@ -282,14 +282,14 @@
    "fast": {
     "marker": "GACHA_SELFTEST 115/115",
     "ok": 115,
-    "secs": 12.0,
+    "secs": 11.4,
     "status": "pass",
     "total": 115
    },
    "full": {
     "marker": "GACHA_SELFTEST 115/115",
     "ok": 115,
-    "secs": 13.4,
+    "secs": 17.2,
     "status": "pass",
     "total": 115
    }
@@ -1020,26 +1020,18 @@
   },
   "summon": {
    "fast": {
-    "expected_fail": [
-     "SUMMON_SELFTEST FAIL: guar replay = G.pull ",
-     "SUMMON_SELFTEST FAIL: pity replay = G.pull "
-    ],
-    "marker": "SUMMON_SELFTEST 45/56",
-    "ok": 45,
-    "secs": 17.9,
-    "status": "fail",
-    "total": 56
+    "marker": "SUMMON_SELFTEST 68/68",
+    "ok": 68,
+    "secs": 14.5,
+    "status": "pass",
+    "total": 68
    },
    "full": {
-    "expected_fail": [
-     "SUMMON_SELFTEST FAIL: guar replay = G.pull ",
-     "SUMMON_SELFTEST FAIL: pity replay = G.pull "
-    ],
-    "marker": "SUMMON_SELFTEST 45/56",
-    "ok": 45,
-    "secs": 17.7,
-    "status": "fail",
-    "total": 56
+    "marker": "SUMMON_SELFTEST 68/68",
+    "ok": 68,
+    "secs": 14.8,
+    "status": "pass",
+    "total": 68
    }
   },
   "tower": {
@@ -1207,6 +1199,22 @@
     "secs": 17.5,
     "status": "pass",
     "total": 130
+   }
+  },
+  "twgacha": {
+   "fast": {
+    "marker": "TWGACHA_SELFTEST 65/65",
+    "ok": 65,
+    "secs": 25.7,
+    "status": "pass",
+    "total": 65
+   },
+   "full": {
+    "marker": "TWGACHA_SELFTEST 65/65",
+    "ok": 65,
+    "secs": 49.5,
+    "status": "pass",
+    "total": 65
    }
   },
   "twmodal": {

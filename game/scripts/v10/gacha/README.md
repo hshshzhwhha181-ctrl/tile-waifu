@@ -53,7 +53,7 @@ flock /tmp/tw-godot.lock xvfb-run -a /opt/tw-tools/godot --path game --rendering
 ## Хуки для интегратора (горячие файлы правит только он)
 - **H1 main.gd** `SCREENS["summon"]` → `res://scripts/v10/gacha/ui/wish_screen.gd`; `SCREENS["odds"]` → `ui/odds_screen.gd` (args `{source, id, tab}`).
   `dev_act` нового экрана понимает старые акты 0.9 и `v2_ssr10/v2_r10/v2_ssr1`, `odds`, `spark`, `first`, `b<i>`.
-- **H2 g.gd** `G.roll/G.pull` → прокси: `V10WishScreen.make_gacha().pull(banner, n)`; `give` при дубле больше не платит `DUP_GEMS`
+- **H2 g.gd** (P09) прокси roll/pull в `g.gd` удалены: единственная точка входа — `TWGacha.pull(state, banner, n, opts)` (платит, крутит, пишет журнал); `give` при дубле больше не платит `DUP_GEMS`
   (дубли идут в `V10Stars.on_dup` внутри `V10Gacha2`; `bank.give_fn` вызывает `G.give` только для нового).
   Кнопка «Обмен 120» (`S.ex`) удалена вместе со старым баннером (её поглощают Лепестки; перевод `ex → petals` — Ф2 кошелька).
 - **H3 время**: в M1 `V10GClock.now_fn = V10Meta.now_unix` (одна строка в регистре). Grep-самотест `Time.*` не сработает: системные часы только в `clock.gd` как запасной путь.
