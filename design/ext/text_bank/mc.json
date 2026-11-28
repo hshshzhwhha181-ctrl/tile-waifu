@@ -1,0 +1,266 @@
+{
+  "heroine_id": "mc",
+  "name_ru": "Маджонг-тян",
+  "age": "26",
+  "role": "Хозяйка салона «Пять ветров»",
+  "ssr_outfit_ref": "o_dragon / mc_ssrp_dragonnight",
+  "beta24_note": "24 строки Beta-24 по DEC-P44-1 + 8 строк SSR-костюма = 32",
+  "lines": [
+    {
+      "id": "mc_login_morning_1",
+      "slot": "login_morning",
+      "tier": "beta24",
+      "text": "Доброе утро! Салон открыт, и я уже перемешала фишки для тебя.",
+      "emotion": "happy",
+      "max_words": 12
+    },
+    {
+      "id": "mc_login_evening_1",
+      "slot": "login_evening",
+      "tier": "beta24",
+      "text": "Наконец-то вернулся! Вечер длинный, сыграем партию на желание?",
+      "emotion": "tease",
+      "max_words": 12
+    },
+    {
+      "id": "mc_intro_summon_1",
+      "slot": "intro_summon",
+      "tier": "beta24",
+      "text": "Я Маджонг-тян, хозяйка «Пяти ветров». Готов стать моим равным партнёром?",
+      "emotion": "confident",
+      "max_words": 12
+    },
+    {
+      "id": "mc_outfit_equip_1",
+      "slot": "outfit_equip",
+      "tier": "beta24",
+      "text": "Ну как тебе образ? Только не проигрывай, заглядевшись на меня~",
+      "emotion": "tease",
+      "max_words": 12
+    },
+    {
+      "id": "mc_idle_1",
+      "slot": "idle_1",
+      "tier": "beta24",
+      "text": "Кручу фишку Востока и жду, когда ты сделаешь первый ход.",
+      "emotion": "neutral",
+      "max_words": 12
+    },
+    {
+      "id": "mc_idle_2",
+      "slot": "idle_2",
+      "tier": "beta24",
+      "text": "Налила свежего чаю — садись поближе, обсудим нашу тактику.",
+      "emotion": "warm",
+      "max_words": 12
+    },
+    {
+      "id": "mc_idle_warm_1",
+      "slot": "idle_warm",
+      "tier": "beta24",
+      "text": "За моим столом мне нужен только один соперник — ты.",
+      "emotion": "warm",
+      "max_words": 12
+    },
+    {
+      "id": "mc_touch_head_1",
+      "slot": "touch_head",
+      "tier": "beta24",
+      "text": "Эй, причёска! Хвосты же подпрыгнут — гладь аккуратнее, ладно?",
+      "emotion": "surprised",
+      "max_words": 12
+    },
+    {
+      "id": "mc_touch_hand_1",
+      "slot": "touch_hand",
+      "tier": "beta24",
+      "text": "Лови фишку Востока! Хотя руку можешь пока не отпускать.",
+      "emotion": "tease",
+      "max_words": 12
+    },
+    {
+      "id": "mc_touch_hair_1",
+      "slot": "touch_hair",
+      "tier": "beta24",
+      "text": "Нефритовые узлы я вязала сама — не развяжи случайно!",
+      "emotion": "shy",
+      "max_words": 12
+    },
+    {
+      "id": "mc_touch_outfit_1",
+      "slot": "touch_outfit",
+      "tier": "beta24",
+      "text": "Не тяни за рукав ципао, иначе я выиграю без поддавков!",
+      "emotion": "pout",
+      "max_words": 12
+    },
+    {
+      "id": "mc_touch_spam_1",
+      "slot": "touch_spam",
+      "tier": "beta24",
+      "text": "Хватит дразнить хозяйку салона! Я тебе не игровая фишка!",
+      "emotion": "pout",
+      "max_words": 12
+    },
+    {
+      "id": "mc_touch_bold_1",
+      "slot": "touch_bold",
+      "tier": "beta24",
+      "text": "Когда ты так близко, даже мне трудно думать о партии.",
+      "emotion": "shy",
+      "max_words": 12
+    },
+    {
+      "id": "mc_gift_normal_1",
+      "slot": "gift_normal",
+      "tier": "beta24",
+      "text": "Подарок для меня? Как мило, запишу тебе очко в плюс!",
+      "emotion": "happy",
+      "max_words": 12
+    },
+    {
+      "id": "mc_gift_liked_1",
+      "slot": "gift_liked",
+      "tier": "beta24",
+      "text": "Именно то, о чём я мечтала! Ты читаешь мои мысли?",
+      "emotion": "excited",
+      "max_words": 12
+    },
+    {
+      "id": "mc_level_max_vow_1",
+      "slot": "level_max_vow",
+      "tier": "beta24",
+      "text": "Весенний ветер стихнет, а наш стол останется только для двоих.",
+      "emotion": "warm",
+      "max_words": 12
+    },
+    {
+      "id": "mc_combo_t2_1",
+      "slot": "combo_t2",
+      "tier": "beta24",
+      "text": "Вот это ритм!",
+      "emotion": "happy",
+      "max_words": 12
+    },
+    {
+      "id": "mc_combo_t3_1",
+      "slot": "combo_t3",
+      "tier": "beta24",
+      "text": "Не остановить!",
+      "emotion": "excited",
+      "max_words": 12
+    },
+    {
+      "id": "mc_clear_normal_1",
+      "slot": "clear",
+      "tier": "beta24",
+      "text": "Партия окончена~ Мы с тобой лучшая пара в салоне!",
+      "emotion": "happy",
+      "max_words": 12
+    },
+    {
+      "id": "mc_fail_1",
+      "slot": "fail",
+      "tier": "beta24",
+      "text": "Хм, не считается! Требую немедленный реванш, садись обратно!",
+      "emotion": "pout",
+      "max_words": 12
+    },
+    {
+      "id": "mc_ult_cast_1",
+      "slot": "ult_cast",
+      "tier": "beta24",
+      "text": "Восточный ветер, сметай!",
+      "emotion": "confident",
+      "max_words": 12
+    },
+    {
+      "id": "mc_riichi_1",
+      "slot": "riichi",
+      "tier": "beta24",
+      "text": "Риичи, держись!",
+      "emotion": "confident",
+      "max_words": 12
+    },
+    {
+      "id": "mc_ron_1",
+      "slot": "ron",
+      "tier": "beta24",
+      "text": "Рон! Моя победа~",
+      "emotion": "happy",
+      "max_words": 12
+    },
+    {
+      "id": "mc_tsumo_1",
+      "slot": "tsumo",
+      "tier": "beta24",
+      "text": "Цумо! Партия окончена~",
+      "emotion": "excited",
+      "max_words": 12
+    },
+    {
+      "id": "mc_ssr_outfit_new",
+      "slot": "outfit_new",
+      "tier": "ssr_outfit",
+      "text": "Императрица дракона выходит к столу. Нравится мой золотой шёлк?",
+      "emotion": "confident",
+      "max_words": 12
+    },
+    {
+      "id": "mc_ssr_idle_2",
+      "slot": "idle_2",
+      "tier": "ssr_outfit",
+      "text": "Дракон не любит ждать, но ради тебя сделаю исключение~",
+      "emotion": "tease",
+      "max_words": 12
+    },
+    {
+      "id": "mc_ssr_touch_2",
+      "slot": "touch_2",
+      "tier": "ssr_outfit",
+      "text": "Прикроюсь веером, иначе заметишь, как я улыбаюсь только тебе.",
+      "emotion": "shy",
+      "max_words": 12
+    },
+    {
+      "id": "mc_ssr_level_vow",
+      "slot": "level_vow",
+      "tier": "ssr_outfit",
+      "text": "В золоте дракона даю слово: я всегда на твоей стороне.",
+      "emotion": "warm",
+      "max_words": 12
+    },
+    {
+      "id": "mc_ssr_ult_cast_a",
+      "slot": "ult_cast_a",
+      "tier": "ssr_outfit",
+      "text": "Пробуждение дракона!",
+      "emotion": "confident",
+      "max_words": 12
+    },
+    {
+      "id": "mc_ssr_ult_cast_b",
+      "slot": "ult_cast_b",
+      "tier": "ssr_outfit",
+      "text": "Четыре ветра — ко мне!",
+      "emotion": "excited",
+      "max_words": 12
+    },
+    {
+      "id": "mc_ssr_equip",
+      "slot": "equip",
+      "tier": "ssr_outfit",
+      "text": "Алое с золотом — для нашей самой яркой партии сегодня~",
+      "emotion": "tease",
+      "max_words": 12
+    },
+    {
+      "id": "mc_ssr_win",
+      "slot": "win",
+      "tier": "ssr_outfit",
+      "text": "Дракон празднует победу! Принимай комплимент от хозяйки салона~",
+      "emotion": "happy",
+      "max_words": 12
+    }
+  ]
+}

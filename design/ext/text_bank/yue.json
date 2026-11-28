@@ -1,0 +1,266 @@
+{
+  "heroine_id": "yue",
+  "name_ru": "Юэ",
+  "age": "на вид 27",
+  "role": "Правительница Лунного дворца",
+  "ssr_outfit_ref": "y_queen / yue_ssr_scalearmor",
+  "beta24_note": "24 строки Beta-24 по DEC-P44-1 + 8 строк SSR-костюма = 32",
+  "lines": [
+    {
+      "id": "yue_login_morning_1",
+      "slot": "login_morning",
+      "tier": "beta24",
+      "text": "Даже при утреннем свете луна помнит о тебе. Проходи.",
+      "emotion": "regal",
+      "max_words": 12
+    },
+    {
+      "id": "yue_login_evening_1",
+      "slot": "login_evening",
+      "tier": "beta24",
+      "text": "Полночь принадлежит нам. Присядешь к столу Лунного дворца?",
+      "emotion": "tease",
+      "max_words": 12
+    },
+    {
+      "id": "yue_intro_summon_1",
+      "slot": "intro_summon",
+      "tier": "beta24",
+      "text": "Я Юэ. Триста лет без поражений — рискнёшь бросить вызов?",
+      "emotion": "regal",
+      "max_words": 12
+    },
+    {
+      "id": "yue_outfit_equip_1",
+      "slot": "outfit_equip",
+      "tier": "beta24",
+      "text": "Любопытно… Ты выбрал именно этот шёлк? У тебя отличный вкус.",
+      "emotion": "tease",
+      "max_words": 12
+    },
+    {
+      "id": "yue_idle_1",
+      "slot": "idle_1",
+      "tier": "beta24",
+      "text": "Сливовый чай ещё тёплый, а луна высоко. Удиви меня ходом.",
+      "emotion": "neutral",
+      "max_words": 12
+    },
+    {
+      "id": "yue_idle_2",
+      "slot": "idle_2",
+      "tier": "beta24",
+      "text": "За веером легко скрыть улыбку, но ты её всё равно видишь.",
+      "emotion": "tease",
+      "max_words": 12
+    },
+    {
+      "id": "yue_idle_warm_1",
+      "slot": "idle_warm",
+      "tier": "beta24",
+      "text": "Иногда я уступаю нарочно — лишь бы ты пришёл снова.",
+      "emotion": "warm",
+      "max_words": 12
+    },
+    {
+      "id": "yue_touch_head_1",
+      "slot": "touch_head",
+      "tier": "beta24",
+      "text": "Смело… Прикоснуться к тиаре правительницы дозволено только тебе.",
+      "emotion": "surprised",
+      "max_words": 12
+    },
+    {
+      "id": "yue_touch_hand_1",
+      "slot": "touch_hand",
+      "tier": "beta24",
+      "text": "Подаю руку как королева. Можешь задержать её чуть дольше.",
+      "emotion": "regal",
+      "max_words": 12
+    },
+    {
+      "id": "yue_touch_hair_1",
+      "slot": "touch_hair",
+      "tier": "beta24",
+      "text": "Лавандовые пряди береги — в них вплетён лунный свет.",
+      "emotion": "warm",
+      "max_words": 12
+    },
+    {
+      "id": "yue_touch_outfit_1",
+      "slot": "touch_outfit",
+      "tier": "beta24",
+      "text": "Мой веер раскрывается звёздами. Не отвлекайся от игры, смельчак.",
+      "emotion": "tease",
+      "max_words": 12
+    },
+    {
+      "id": "yue_touch_spam_1",
+      "slot": "touch_spam",
+      "tier": "beta24",
+      "text": "Какое нетерпение… Ещё шаг, и я слегка щёлкну тебя веером.",
+      "emotion": "pout",
+      "max_words": 12
+    },
+    {
+      "id": "yue_touch_bold_1",
+      "slot": "touch_bold",
+      "tier": "beta24",
+      "text": "Склонись ближе. Сегодня луна светит исключительно для тебя.",
+      "emotion": "tease",
+      "max_words": 12
+    },
+    {
+      "id": "yue_gift_normal_1",
+      "slot": "gift_normal",
+      "tier": "beta24",
+      "text": "Подношение дворцу? Принимаю с благосклонной улыбкой.",
+      "emotion": "happy",
+      "max_words": 12
+    },
+    {
+      "id": "yue_gift_liked_1",
+      "slot": "gift_liked",
+      "tier": "beta24",
+      "text": "Любопытно… Ты угадал желание правительницы без единой подсказки.",
+      "emotion": "warm",
+      "max_words": 12
+    },
+    {
+      "id": "yue_level_max_vow_1",
+      "slot": "level_max_vow",
+      "tier": "beta24",
+      "text": "Вечность казалась долгой, пока рядом не оказался ты.",
+      "emotion": "warm",
+      "max_words": 12
+    },
+    {
+      "id": "yue_combo_t2_1",
+      "slot": "combo_t2",
+      "tier": "beta24",
+      "text": "Любопытно…",
+      "emotion": "tease",
+      "max_words": 12
+    },
+    {
+      "id": "yue_combo_t3_1",
+      "slot": "combo_t3",
+      "tier": "beta24",
+      "text": "Достойно луны!",
+      "emotion": "regal",
+      "max_words": 12
+    },
+    {
+      "id": "yue_clear_normal_1",
+      "slot": "clear",
+      "tier": "beta24",
+      "text": "Красивая партия. Ты действительно умеешь радовать правительницу.",
+      "emotion": "happy",
+      "max_words": 12
+    },
+    {
+      "id": "yue_fail_1",
+      "slot": "fail",
+      "tier": "beta24",
+      "text": "Тень прошла по луне — не беда. Сыграем снова.",
+      "emotion": "neutral",
+      "max_words": 12
+    },
+    {
+      "id": "yue_ult_cast_1",
+      "slot": "ult_cast",
+      "tier": "beta24",
+      "text": "Свет полумесяца!",
+      "emotion": "regal",
+      "max_words": 12
+    },
+    {
+      "id": "yue_riichi_1",
+      "slot": "riichi",
+      "tier": "beta24",
+      "text": "Риичи. Смотри внимательно.",
+      "emotion": "regal",
+      "max_words": 12
+    },
+    {
+      "id": "yue_ron_1",
+      "slot": "ron",
+      "tier": "beta24",
+      "text": "Рон. Весьма предсказуемо.",
+      "emotion": "tease",
+      "max_words": 12
+    },
+    {
+      "id": "yue_tsumo_1",
+      "slot": "tsumo",
+      "tier": "beta24",
+      "text": "Цумо. Луна благосклонна.",
+      "emotion": "regal",
+      "max_words": 12
+    },
+    {
+      "id": "yue_ssr_outfit_new",
+      "slot": "outfit_new",
+      "tier": "ssr_outfit",
+      "text": "Королева ночи спустилась с трона — приглашаю на последний вальс.",
+      "emotion": "regal",
+      "max_words": 12
+    },
+    {
+      "id": "yue_ssr_idle_2",
+      "slot": "idle_2",
+      "tier": "ssr_outfit",
+      "text": "Три четверти такта, серебро платья… И только твой шаг рядом.",
+      "emotion": "warm",
+      "max_words": 12
+    },
+    {
+      "id": "yue_ssr_touch_2",
+      "slot": "touch_2",
+      "tier": "ssr_outfit",
+      "text": "Шлейф невесом, как облако. Коснись перчатки — начнём танец.",
+      "emotion": "tease",
+      "max_words": 12
+    },
+    {
+      "id": "yue_ssr_level_vow",
+      "slot": "level_vow",
+      "tier": "ssr_outfit",
+      "text": "Отныне Лунный дворец делит корону с тобой одним.",
+      "emotion": "warm",
+      "max_words": 12
+    },
+    {
+      "id": "yue_ssr_ult_cast_a",
+      "slot": "ult_cast_a",
+      "tier": "ssr_outfit",
+      "text": "Созвездие затмения!",
+      "emotion": "regal",
+      "max_words": 12
+    },
+    {
+      "id": "yue_ssr_ult_cast_b",
+      "slot": "ult_cast_b",
+      "tier": "ssr_outfit",
+      "text": "Выпад полумесяца!",
+      "emotion": "confident",
+      "max_words": 12
+    },
+    {
+      "id": "yue_ssr_equip",
+      "slot": "equip",
+      "tier": "ssr_outfit",
+      "text": "Серебро полуночи готово. Не отводи взгляда от своей королевы.",
+      "emotion": "tease",
+      "max_words": 12
+    },
+    {
+      "id": "yue_ssr_win",
+      "slot": "win",
+      "tier": "ssr_outfit",
+      "text": "Блестящий финал под луной. Награда — ещё один вальс.",
+      "emotion": "happy",
+      "max_words": 12
+    }
+  ]
+}

@@ -1,0 +1,266 @@
+{
+  "heroine_id": "nova",
+  "name_ru": "Нова",
+  "age": "23",
+  "role": "Специалист по кибербезопасности, гонщица",
+  "ssr_outfit_ref": "n_ssr / nova_ssrp_idolstage",
+  "beta24_note": "24 строки Beta-24 по DEC-P44-1 + 8 строк SSR-костюма = 32",
+  "lines": [
+    {
+      "id": "nova_login_morning_1",
+      "slot": "login_morning",
+      "tier": "beta24",
+      "text": "Лог: утро, связь стабильна. Ну что, разгоним новую партию?",
+      "emotion": "confident",
+      "max_words": 12
+    },
+    {
+      "id": "nova_login_evening_1",
+      "slot": "login_evening",
+      "tier": "beta24",
+      "text": "Неон зажёгся, трафик упал. Самое время для ночного заезда.",
+      "emotion": "tease",
+      "max_words": 12
+    },
+    {
+      "id": "nova_intro_summon_1",
+      "slot": "intro_summon",
+      "tier": "beta24",
+      "text": "Скачано. Я Нова — проверю твою защиту на прочность.",
+      "emotion": "confident",
+      "max_words": 12
+    },
+    {
+      "id": "nova_outfit_equip_1",
+      "slot": "outfit_equip",
+      "tier": "beta24",
+      "text": "Новый билд загружен. Видишь, как сияет неон? Оценишь?",
+      "emotion": "happy",
+      "max_words": 12
+    },
+    {
+      "id": "nova_idle_1",
+      "slot": "idle_1",
+      "tier": "beta24",
+      "text": "Вывела твоё имя на табло квартала… Это тест уязвимости!",
+      "emotion": "shy",
+      "max_words": 12
+    },
+    {
+      "id": "nova_idle_2",
+      "slot": "idle_2",
+      "tier": "beta24",
+      "text": "Пинг идеальный, голограмма фишки крутится. Жду твой клик.",
+      "emotion": "neutral",
+      "max_words": 12
+    },
+    {
+      "id": "nova_idle_warm_1",
+      "slot": "idle_warm",
+      "tier": "beta24",
+      "text": "В моих логах твоё имя помечено как приоритет номер один.",
+      "emotion": "warm",
+      "max_words": 12
+    },
+    {
+      "id": "nova_touch_head_1",
+      "slot": "touch_head",
+      "tier": "beta24",
+      "text": "Доступ запрещён! Наушники мигают — собьёшь мне частоту!",
+      "emotion": "surprised",
+      "max_words": 12
+    },
+    {
+      "id": "nova_touch_hand_1",
+      "slot": "touch_hand",
+      "tier": "beta24",
+      "text": "Лови голограмму фишки. И ладно, рукопожатие тоже логирую.",
+      "emotion": "tease",
+      "max_words": 12
+    },
+    {
+      "id": "nova_touch_hair_1",
+      "slot": "touch_hair",
+      "tier": "beta24",
+      "text": "Эй, асимметрию не порти! Синий и розовый должны лежать ровно.",
+      "emotion": "pout",
+      "max_words": 12
+    },
+    {
+      "id": "nova_touch_outfit_1",
+      "slot": "touch_outfit",
+      "tier": "beta24",
+      "text": "Поднял мне визор? Вот и смотри в глаза без фильтров.",
+      "emotion": "shy",
+      "max_words": 12
+    },
+    {
+      "id": "nova_touch_spam_1",
+      "slot": "touch_spam",
+      "tier": "beta24",
+      "text": "Алерт: DDoS-атака! Ещё тап — и забаню на пять секунд!",
+      "emotion": "pout",
+      "max_words": 12
+    },
+    {
+      "id": "nova_touch_bold_1",
+      "slot": "touch_bold",
+      "tier": "beta24",
+      "text": "Ты нашёл уязвимость в моём фаерволе… и я не патчу.",
+      "emotion": "shy",
+      "max_words": 12
+    },
+    {
+      "id": "nova_gift_normal_1",
+      "slot": "gift_normal",
+      "tier": "beta24",
+      "text": "Пакет принят, хэш совпал. Спасибо, напарник!",
+      "emotion": "happy",
+      "max_words": 12
+    },
+    {
+      "id": "nova_gift_liked_1",
+      "slot": "gift_liked",
+      "tier": "beta24",
+      "text": "Вау, точное попадание! Ты взломал мой список желаний?",
+      "emotion": "excited",
+      "max_words": 12
+    },
+    {
+      "id": "nova_level_max_vow_1",
+      "slot": "level_max_vow",
+      "tier": "beta24",
+      "text": "Выдаю тебе root-доступ к моему сердцу. Без срока действия.",
+      "emotion": "warm",
+      "max_words": 12
+    },
+    {
+      "id": "nova_combo_t2_1",
+      "slot": "combo_t2",
+      "tier": "beta24",
+      "text": "Чистый коммит!",
+      "emotion": "confident",
+      "max_words": 12
+    },
+    {
+      "id": "nova_combo_t3_1",
+      "slot": "combo_t3",
+      "tier": "beta24",
+      "text": "Турбо-разгон!",
+      "emotion": "excited",
+      "max_words": 12
+    },
+    {
+      "id": "nova_clear_normal_1",
+      "slot": "clear",
+      "tier": "beta24",
+      "text": "Скачано! Победа записана в лог, а ты крут!",
+      "emotion": "happy",
+      "max_words": 12
+    },
+    {
+      "id": "nova_fail_1",
+      "slot": "fail",
+      "tier": "beta24",
+      "text": "…Баг. Не мой. Перезапускаем сессию и берём реванш.",
+      "emotion": "pout",
+      "max_words": 12
+    },
+    {
+      "id": "nova_ult_cast_1",
+      "slot": "ult_cast",
+      "tier": "beta24",
+      "text": "Взлом яруса!",
+      "emotion": "confident",
+      "max_words": 12
+    },
+    {
+      "id": "nova_riichi_1",
+      "slot": "riichi",
+      "tier": "beta24",
+      "text": "Риичи! Сигнал ушёл!",
+      "emotion": "confident",
+      "max_words": 12
+    },
+    {
+      "id": "nova_ron_1",
+      "slot": "ron",
+      "tier": "beta24",
+      "text": "Рон! Перехват выполнен!",
+      "emotion": "excited",
+      "max_words": 12
+    },
+    {
+      "id": "nova_tsumo_1",
+      "slot": "tsumo",
+      "tier": "beta24",
+      "text": "Цумо! Файл скачан!",
+      "emotion": "happy",
+      "max_words": 12
+    },
+    {
+      "id": "nova_ssr_outfit_new",
+      "slot": "outfit_new",
+      "tier": "ssr_outfit",
+      "text": "Неоновый форсаж активирован! Держись крепче, прокачу с ветерком!",
+      "emotion": "excited",
+      "max_words": 12
+    },
+    {
+      "id": "nova_ssr_idle_2",
+      "slot": "idle_2",
+      "tier": "ssr_outfit",
+      "text": "Сняла визор ради тебя… Давай просто побудем офлайн.",
+      "emotion": "shy",
+      "max_words": 12
+    },
+    {
+      "id": "nova_ssr_touch_2",
+      "slot": "touch_2",
+      "tier": "ssr_outfit",
+      "text": "Голо-сердечко качается на проводе — поймаешь или побоишься?",
+      "emotion": "tease",
+      "max_words": 12
+    },
+    {
+      "id": "nova_ssr_level_vow",
+      "slot": "level_vow",
+      "tier": "ssr_outfit",
+      "text": "С тобой мне не нужна сеть — лучший сигнал прямо рядом.",
+      "emotion": "warm",
+      "max_words": 12
+    },
+    {
+      "id": "nova_ssr_ult_cast_a",
+      "slot": "ult_cast_a",
+      "tier": "ssr_outfit",
+      "text": "Неоновый форсаж!",
+      "emotion": "excited",
+      "max_words": 12
+    },
+    {
+      "id": "nova_ssr_ult_cast_b",
+      "slot": "ult_cast_b",
+      "tier": "ssr_outfit",
+      "text": "Root-доступ открыт!",
+      "emotion": "confident",
+      "max_words": 12
+    },
+    {
+      "id": "nova_ssr_equip",
+      "slot": "equip",
+      "tier": "ssr_outfit",
+      "text": "Топовый скин на месте. Сейчас зажжём эту сцену!",
+      "emotion": "confident",
+      "max_words": 12
+    },
+    {
+      "id": "nova_ssr_win",
+      "slot": "win",
+      "tier": "ssr_outfit",
+      "text": "Дроп на полную! Стадион наш, а победа — твоя!",
+      "emotion": "excited",
+      "max_words": 12
+    }
+  ]
+}

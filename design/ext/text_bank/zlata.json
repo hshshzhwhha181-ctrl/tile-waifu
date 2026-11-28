@@ -1,0 +1,266 @@
+{
+  "heroine_id": "zlata",
+  "name_ru": "Злата",
+  "age": "25",
+  "role": "Царевна Жар-птица из сказочного царства",
+  "ssr_outfit_ref": "zl_base / zlata_ssr_firebird",
+  "beta24_note": "24 строки Beta-24 по DEC-P44-1 + 8 строк SSR-костюма = 32",
+  "lines": [
+    {
+      "id": "zlata_login_morning_1",
+      "slot": "login_morning",
+      "tier": "beta24",
+      "text": "Весна пришла! Встречай рассвет со мной — будет тепло.",
+      "emotion": "happy",
+      "max_words": 12
+    },
+    {
+      "id": "zlata_login_evening_1",
+      "slot": "login_evening",
+      "tier": "beta24",
+      "text": "Искры в очаге танцуют. Заходи греться за вечерней партией.",
+      "emotion": "warm",
+      "max_words": 12
+    },
+    {
+      "id": "zlata_intro_summon_1",
+      "slot": "intro_summon",
+      "tier": "beta24",
+      "text": "Я Злата, царевна Жар-птица. Моё перо привело меня к тебе!",
+      "emotion": "regal",
+      "max_words": 12
+    },
+    {
+      "id": "zlata_outfit_equip_1",
+      "slot": "outfit_equip",
+      "tier": "beta24",
+      "text": "Алый узор и золотая нить — достойно ли твоей царевны?",
+      "emotion": "confident",
+      "max_words": 12
+    },
+    {
+      "id": "zlata_idle_1",
+      "slot": "idle_1",
+      "tier": "beta24",
+      "text": "Угольки бегут по косе… Не бойся, для тебя они нежные.",
+      "emotion": "warm",
+      "max_words": 12
+    },
+    {
+      "id": "zlata_idle_2",
+      "slot": "idle_2",
+      "tier": "beta24",
+      "text": "Признаюсь, съела лишний блин… Только никому не рассказывай, ладно?",
+      "emotion": "shy",
+      "max_words": 12
+    },
+    {
+      "id": "zlata_idle_warm_1",
+      "slot": "idle_warm",
+      "tier": "beta24",
+      "text": "Раз в сто лет Жар-птица выбирает одного… Я выбрала тебя.",
+      "emotion": "warm",
+      "max_words": 12
+    },
+    {
+      "id": "zlata_touch_head_1",
+      "slot": "touch_head",
+      "tier": "beta24",
+      "text": "Царевну — по голове? Смело! Но кокошник вспыхнул от радости.",
+      "emotion": "surprised",
+      "max_words": 12
+    },
+    {
+      "id": "zlata_touch_hand_1",
+      "slot": "touch_hand",
+      "tier": "beta24",
+      "text": "Прими светящееся перо на счастье. Ладони у тебя такие тёплые.",
+      "emotion": "warm",
+      "max_words": 12
+    },
+    {
+      "id": "zlata_touch_hair_1",
+      "slot": "touch_hair",
+      "tier": "beta24",
+      "text": "Поймал тлеющий кончик косы? Осторожнее — в нём весенняя искра!",
+      "emotion": "tease",
+      "max_words": 12
+    },
+    {
+      "id": "zlata_touch_outfit_1",
+      "slot": "touch_outfit",
+      "tier": "beta24",
+      "text": "Крылья-плащ раскрываются, когда ты рядом. Не дёргай за перья~",
+      "emotion": "tease",
+      "max_words": 12
+    },
+    {
+      "id": "zlata_touch_spam_1",
+      "slot": "touch_spam",
+      "tier": "beta24",
+      "text": "Ох, озорник! Рассыплю искрами, если не перестанешь щекотать!",
+      "emotion": "happy",
+      "max_words": 12
+    },
+    {
+      "id": "zlata_touch_bold_1",
+      "slot": "touch_bold",
+      "tier": "beta24",
+      "text": "Поведу тебя за собой золотой косой — шагнёшь ближе ко мне?",
+      "emotion": "tease",
+      "max_words": 12
+    },
+    {
+      "id": "zlata_gift_normal_1",
+      "slot": "gift_normal",
+      "tier": "beta24",
+      "text": "Какой тёплый дар! Царевна благодарит от всего сердца.",
+      "emotion": "happy",
+      "max_words": 12
+    },
+    {
+      "id": "zlata_gift_liked_1",
+      "slot": "gift_liked",
+      "tier": "beta24",
+      "text": "Ах, прямо как из сказки! Ты знаешь путь к моему сердцу!",
+      "emotion": "excited",
+      "max_words": 12
+    },
+    {
+      "id": "zlata_level_max_vow_1",
+      "slot": "level_max_vow",
+      "tier": "beta24",
+      "text": "Моё пламя не угаснет, пока мы делим рассвет вдвоём.",
+      "emotion": "warm",
+      "max_words": 12
+    },
+    {
+      "id": "zlata_combo_t2_1",
+      "slot": "combo_t2",
+      "tier": "beta24",
+      "text": "Ярче пламя!",
+      "emotion": "happy",
+      "max_words": 12
+    },
+    {
+      "id": "zlata_combo_t3_1",
+      "slot": "combo_t3",
+      "tier": "beta24",
+      "text": "Сияние весны!",
+      "emotion": "excited",
+      "max_words": 12
+    },
+    {
+      "id": "zlata_clear_normal_1",
+      "slot": "clear",
+      "tier": "beta24",
+      "text": "Весна пришла! Крылья света сияют в честь нашей победы!",
+      "emotion": "happy",
+      "max_words": 12
+    },
+    {
+      "id": "zlata_fail_1",
+      "slot": "fail",
+      "tier": "beta24",
+      "text": "Пепел — только начало. Соберём перья и вспыхнем ярче!",
+      "emotion": "confident",
+      "max_words": 12
+    },
+    {
+      "id": "zlata_ult_cast_1",
+      "slot": "ult_cast",
+      "tier": "beta24",
+      "text": "Огненный шлейф!",
+      "emotion": "regal",
+      "max_words": 12
+    },
+    {
+      "id": "zlata_riichi_1",
+      "slot": "riichi",
+      "tier": "beta24",
+      "text": "Риичи! Пламя занялось!",
+      "emotion": "regal",
+      "max_words": 12
+    },
+    {
+      "id": "zlata_ron_1",
+      "slot": "ron",
+      "tier": "beta24",
+      "text": "Рон! Жаркая победа!",
+      "emotion": "excited",
+      "max_words": 12
+    },
+    {
+      "id": "zlata_tsumo_1",
+      "slot": "tsumo",
+      "tier": "beta24",
+      "text": "Цумо! Весна моя!",
+      "emotion": "happy",
+      "max_words": 12
+    },
+    {
+      "id": "zlata_ssr_outfit_new",
+      "slot": "outfit_new",
+      "tier": "ssr_outfit",
+      "text": "Чёрный лак и золотое пламя! Царица ночи готова к игре.",
+      "emotion": "regal",
+      "max_words": 12
+    },
+    {
+      "id": "zlata_ssr_idle_2",
+      "slot": "idle_2",
+      "tier": "ssr_outfit",
+      "text": "У купальского костра тени мягче, а твой голос — ближе.",
+      "emotion": "warm",
+      "max_words": 12
+    },
+    {
+      "id": "zlata_ssr_touch_2",
+      "slot": "touch_2",
+      "tier": "ssr_outfit",
+      "text": "Дотронься до золотой перчатки — почувствуешь тепло Жар-птицы.",
+      "emotion": "tease",
+      "max_words": 12
+    },
+    {
+      "id": "zlata_ssr_level_vow",
+      "slot": "level_vow",
+      "tier": "ssr_outfit",
+      "text": "Под белым кокошником рассвета дарю тебе вечную весну.",
+      "emotion": "warm",
+      "max_words": 12
+    },
+    {
+      "id": "zlata_ssr_ult_cast_a",
+      "slot": "ult_cast_a",
+      "tier": "ssr_outfit",
+      "text": "Купальский костёр!",
+      "emotion": "excited",
+      "max_words": 12
+    },
+    {
+      "id": "zlata_ssr_ult_cast_b",
+      "slot": "ult_cast_b",
+      "tier": "ssr_outfit",
+      "text": "Перо на счастье!",
+      "emotion": "regal",
+      "max_words": 12
+    },
+    {
+      "id": "zlata_ssr_equip",
+      "slot": "equip",
+      "tier": "ssr_outfit",
+      "text": "Огненный шлейф расправлен. Покажем этому столу настоящий жар!",
+      "emotion": "confident",
+      "max_words": 12
+    },
+    {
+      "id": "zlata_ssr_win",
+      "slot": "win",
+      "tier": "ssr_outfit",
+      "text": "Каблучок притопнул, крылья вспыхнули — сказочная победа наша!",
+      "emotion": "excited",
+      "max_words": 12
+    }
+  ]
+}
