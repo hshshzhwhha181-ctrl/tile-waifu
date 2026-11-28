@@ -9,7 +9,7 @@ One record per shipped asset file under game/assets (the manifest itself, .impor
   md5, bytes    of the SOURCE file (so re-running after slimming records the slimmed bytes)
   px            "WxH" for images and videos, else null
   dup_of        id of the first file with the same md5 (byte-identical duplicate), else null
-  status        approved | pending | rejected. First seed (--seed) marks every existing asset `approved`; later runs keep the
+  status        approved | generated | pending | rejected (generated = P58 art waiting in assets/incoming, see tools/art/approve.py). First seed (--seed) marks every existing asset `approved`; later runs keep the
                 status already in the manifest and mark NEW files `pending` (review gate for generated art).
   referenced_by sorted list of source files (gd/tscn/tres/json/tsv/godot) that reference it, from a STATIC graph:
                   1. exact "res://assets/..." literals                         (direct)
@@ -100,6 +100,8 @@ def main():
     files = []
     for dp, dn, fn in os.walk(ASSETS):
         dn[:] = sorted(d for d in dn)
+        if os.path.relpath(dp, GAME).replace(os.sep, "/") == "assets":
+            dn[:] = [d for d in dn if d != "incoming"]     # P58: art waiting for the human gate is not an asset yet
         for f in sorted(fn):
             if f.endswith(SKIP_SUFFIX):
                 continue
@@ -180,10 +182,14 @@ def main():
 
     # ---- manifest
     old = {}
+    carry = []                       # P58: status=generated rows live in incoming/, not in the walk above: keep them verbatim
     if os.path.exists(a.out):
         try:
             for r in json.load(open(a.out, encoding="utf-8"))["assets"]:
-                old[r["path"][len("res://"):]] = r
+                if r.get("status") == "generated" and r["path"][len("res://"):] not in by_path:
+                    carry.append(r)
+                else:
+                    old[r["path"][len("res://"):]] = r
         except Exception:
             pass
     recs = []
@@ -196,14 +202,21 @@ def main():
         rid = slug(rel, taken)
         taken.add(rid)
         st = "approved" if a.seed else (old.get(rel, {}).get("status") or ("approved" if not old else "pending"))
-        recs.append({
+        rec = {
             "id": rid, "path": "res://" + rel, "kind": k, "group": g, "md5": h, "bytes": os.path.getsize(p),
             "px": px_of(p, k), "dup_of": first_md5.get(h), "status": st,
             "referenced_by": sorted(refs.get(rel, [])),
-        })
+        }
+        for kk, vv in old.get(rel, {}).items():      # P58: keep curated fields (approved_by, source, prompt_hash, watermark, note ...)
+            if kk not in rec and kk != "src":
+                rec[kk] = vv
+        recs.append(rec)
         first_md5.setdefault(h, rid)
+    for r in carry:
+        recs.append(r)
+    recs.sort(key=lambda r: r["path"])
     doc = {"schema": 1, "generator": "tools/assets/gen_manifest.py", "count": len(recs),
-           "statuses": ["approved", "pending", "rejected"], "assets": recs}
+           "statuses": ["approved", "generated", "pending", "rejected"], "assets": recs}
     text = json.dumps(doc, ensure_ascii=False, indent=1) + "\n"
     if a.check:
         cur = open(a.out, encoding="utf-8").read() if os.path.exists(a.out) else ""
