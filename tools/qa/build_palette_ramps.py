@@ -56,7 +56,7 @@ PROPOSED_THEMES = {  # T1..T5
     "TIDE": ["#CCECED", "#90D2D5", "#41AAAF", "#077176", "#003538"],
     "NEON": ["#C0EEF9", "#72D5EC", "#01AAC6", "#016F82", "#02343E"],
     "NEON2": ["#F8D9F4", "#E9ADE3", "#C876C1", "#8A4585", "#441B41"],
-    "INK": ["#E6E3E8", "#C7C2CB", "#9C95A2", "#66616B", "#302C32"],
+    "INK": ["#EBDFF4", "#CABFD3", "#9E93A7", "#685F70", "#322A39"],  # C~0.03 (was 0.007-0.020: indistinguishable from NIGHT; review T15)
     "GILT": ["#F0E3CB", "#DBC090", "#B7924B", "#7D5D1C", "#3D2A02"],
 }
 PROPOSED_RARITY = {"RARITY_R": "#30C883", "RARITY_S": "#D2D6EC", "RARITY_SSR": "#FFC93C", "RARITY_R_DARK": "#1E5A3C",

@@ -19,7 +19,7 @@ import build_skin_schema as bss  # noqa: E402
 OUT = Path(__file__).resolve().parent / "fixtures" / "skins"
 GODOT = Path(__file__).resolve().parents[2] / "game" / "tests" / "fixtures" / "skins"      # copies read by the Godot skin_swap_soak test
 FOLDER = {"art": "art", "rig": "rig", "kit": "kit", "cf": "kit", "bg": "bg", "tl": "bg", "fx": "fx", "ult": "ult", "bt": "battle", "au": "audio"}
-EXT = {"tex": "webp", "tex9": "webp", "particles": "webp", "video": "ogv", "audio": "ogg", "clip": "res", "rig": "tscn", "anim": "webp"}
+EXT = {"tex": "webp", "tex9": "webp", "particles": "webp", "video": "ogv", "audio": "ogg", "clip": "json", "rig": "tscn", "anim": "webp"}
 
 
 def slot_file(name: str, kind: str) -> str:
@@ -77,7 +77,7 @@ def build_valid() -> dict:
         "rig": {"scene": "rig/rig.tscn", "bones": 34, "polys": 24, "verts": 1900, "spring_chains": 4, "spring_bones": 20, "fps_full": 60, "fps_std": 30},
         "faces": ["neutral", "smile", "shy", "surprised", "pout", "wink"],
         "touch": {"zones": 6, "reactions": 18, "gestures": 3},
-        "ult": {"beats": 6, "full": "ult/ult_full.ogv", "short": "ult/ult_short.ogv", "rig_clip": "ult/ult_rig.res", "name_key": "ult.ssr.yue_scalearmor"},
+        "ult": {"beats": 6, "full": "ult/ult_full.ogv", "short": "ult/ult_short.ogv", "rig_clip": "ult/ult_rig.json", "name_key": "ult.ssr.yue_scalearmor"},
         "voice": {"lines": lines},
         "slots": slots,
         "files": [files[k] for k in sorted(files)],

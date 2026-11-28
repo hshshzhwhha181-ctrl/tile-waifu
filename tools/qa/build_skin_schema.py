@@ -96,8 +96,9 @@ COLOR_SLOTS = {
     "tray_slot_bg": {"from": NIGHT_MIX, "mix": ["T5", "H900"], "mix_max": 0.15, "levels": [1, 2], "tokens": ["TRAY_SLOT_BG"]},
     "sheet_bg": {"from": ["NIGHT_700", "NIGHT_800"], "mix": ["T5", "H900"], "mix_max": 0.12, "levels": [1, 2], "tokens": ["SHEET_BG"]},
     "window_bg": {"from": ["NIGHT_700", "NIGHT_800"], "mix": ["T5", "H900"], "mix_max": 0.12, "levels": [1, 2], "tokens": ["WINDOW_BG"]},
-    "felt_hi": {"from": ["T4", "T5"], "levels": [2], "tokens": ["FELT_HI"]},
-    "felt_lo": {"from": ["T4", "T5"], "levels": [2], "tokens": ["FELT_LO"]},
+    # review 2026-11-28 (T15): T4 is OKLab L 0.50 (outside the felt range) and T5 chroma of EMBER/NEON2 > 0.07, so felt uses T5 or a NIGHT_800+T5 mix
+    "felt_hi": {"from": ["T5", "NIGHT_800"], "mix": ["T5"], "mix_max": 0.6, "levels": [2], "tokens": ["FELT_HI"]},
+    "felt_lo": {"from": ["NIGHT_800"], "mix": ["T5"], "mix_max": 0.5, "levels": [2], "tokens": ["FELT_LO"]},
     "tile_back_main": {"from": ["T3", "T4"], "levels": [2], "tokens": ["TILE_BACK_MAIN"]},
     "tile_back_trim": {"from": ["T1", "T3"], "levels": [2], "tokens": ["TILE_BACK_TRIM"]},
     "tile_select_ring": {"from": ["H300"], "levels": [0, 1, 2], "tokens": ["TILE_SELECT_RING"]},
@@ -120,7 +121,7 @@ REF_RE = ("^(NIGHT_(900|800|700|600|500|400)|PLATE_RIM|PLATE_SPARK|H(100|300|500
 SLOT_ENTRY = {
     "type": "object", "additionalProperties": False, "required": ["file", "kind", "fallback"],
     "properties": {
-        "file": {"type": "string", "pattern": "^[a-z0-9_]+(/[a-z0-9_]+)*\\.(webp|png|ogv|ogg|res|tres|tscn|json)$", "maxLength": 96},
+        "file": {"type": "string", "pattern": "^[a-z0-9_]+(/[a-z0-9_]+)*\\.(webp|png|ogv|ogg|tscn|json)$", "maxLength": 96},
         "kind": {"enum": ["tex", "tex9", "anim", "video", "rig", "audio", "particles", "clip"]},
         "w": {"type": "integer", "minimum": 1, "maximum": 2048}, "h": {"type": "integer", "minimum": 1, "maximum": 2048},
         "nine": {"type": "array", "items": {"type": "integer", "minimum": 0, "maximum": 512}, "minItems": 4, "maxItems": 4},
@@ -158,7 +159,7 @@ def schema() -> dict:
             "engine": {"type": "string", "pattern": "^4\\.[0-9]+\\.x$"},
             "min_game": {"type": "string", "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$"},
             "proportions": {"type": "object", "additionalProperties": False, "required": ["heads", "height_cm"],
-                            "properties": {"heads": {"type": "number", "minimum": 6.75, "maximum": 8.0},
+                            "properties": {"heads": {"type": "number", "minimum": 7.0, "maximum": 8.0},
                                            "height_cm": {"type": "number", "minimum": 150, "maximum": 190}}},
             "palette": {"type": "object", "additionalProperties": False, "required": ["hero", "theme", "slots"],
                         "properties": {"hero": {"type": "string", "pattern": "^[a-z][a-z0-9]{1,15}$"},
@@ -191,8 +192,8 @@ def schema() -> dict:
             "ult": {"type": "object", "additionalProperties": False, "required": ["beats", "short", "rig_clip", "name_key"],
                     "properties": {"beats": {"type": "integer", "minimum": 1, "maximum": 12},
                                    "full": {"type": "string", "pattern": "^ult/[a-z0-9_]+\\.ogv$"},
-                                   "short": {"type": "string", "pattern": "^ult/[a-z0-9_]+\\.(ogv|res)$"},
-                                   "rig_clip": {"type": "string", "pattern": "^ult/[a-z0-9_]+\\.res$"},
+                                   "short": {"type": "string", "pattern": "^ult/[a-z0-9_]+\\.(ogv|json)$"},
+                                   "rig_clip": {"type": "string", "pattern": "^ult/[a-z0-9_]+\\.json$"},
                                    "name_key": {"type": "string", "pattern": "^ult\\.[a-z]+\\.[a-z0-9_]+$"}}},
             "voice": {"type": "object", "additionalProperties": False, "required": ["lines"],
                       "properties": {"lines": {"type": "array", "items": {
@@ -255,7 +256,7 @@ def schema() -> dict:
         "x-locked-slots": LOCKED_SLOTS,
         "x-locked-tokens": LOCKED_TOKENS,
         "x-forbidden-extensions": [".ttf", ".otf", ".woff", ".woff2", ".gd", ".gdc", ".cs", ".dll", ".so", ".apk", ".exe", ".sh", ".py",
-                                   ".js", ".gdshader", ".shader"],
+                                   ".js", ".gdshader", ".shader", ".res", ".tres"],  # .res/.tres: binary/text resources may embed scripts or method tracks (review T12)
         "x-forbidden-keys": ["font", "fonts", "font_size", "font_override", "theme_override", "script", "scripts", "shader", "shaders",
                              "tokens", "token_overrides", "layout", "geometry", "hit_size", "hit_target", "size_override", "timing",
                              "bus_volume", "url", "urls", "exec", "command"],

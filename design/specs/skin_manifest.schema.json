@@ -111,7 +111,7 @@
    "properties": {
     "heads": {
      "type": "number",
-     "minimum": 6.75,
+     "minimum": 7.0,
      "maximum": 8.0
     },
     "height_cm": {
@@ -341,11 +341,11 @@
     },
     "short": {
      "type": "string",
-     "pattern": "^ult/[a-z0-9_]+\\.(ogv|res)$"
+     "pattern": "^ult/[a-z0-9_]+\\.(ogv|json)$"
     },
     "rig_clip": {
      "type": "string",
-     "pattern": "^ult/[a-z0-9_]+\\.res$"
+     "pattern": "^ult/[a-z0-9_]+\\.json$"
     },
     "name_key": {
      "type": "string",
@@ -434,7 +434,7 @@
     "properties": {
      "file": {
       "type": "string",
-      "pattern": "^[a-z0-9_]+(/[a-z0-9_]+)*\\.(webp|png|ogv|ogg|res|tres|tscn|json)$",
+      "pattern": "^[a-z0-9_]+(/[a-z0-9_]+)*\\.(webp|png|ogv|ogg|tscn|json)$",
       "maxLength": 96
      },
      "kind": {
@@ -1668,9 +1668,13 @@
   },
   "felt_hi": {
    "from": [
-    "T4",
+    "T5",
+    "NIGHT_800"
+   ],
+   "mix": [
     "T5"
    ],
+   "mix_max": 0.6,
    "levels": [
     2
    ],
@@ -1680,9 +1684,12 @@
   },
   "felt_lo": {
    "from": [
-    "T4",
+    "NIGHT_800"
+   ],
+   "mix": [
     "T5"
    ],
+   "mix_max": 0.5,
    "levels": [
     2
    ],
@@ -1855,7 +1862,9 @@
   ".py",
   ".js",
   ".gdshader",
-  ".shader"
+  ".shader",
+  ".res",
+  ".tres"
  ],
  "x-forbidden-keys": [
   "font",

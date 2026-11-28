@@ -15,3 +15,9 @@ Every numeric threshold used by a QA gate lives here once. Raising a threshold t
 | skin_swap_soak | static memory growth | <= 1.5 MB | [ГИПОТЕЗА] | MAX_STATIC_GROWTH_BYTES | 2026-11-28 initial |
 | skin_swap_soak | swap logic p95 | <= 20 ms | [ГИПОТЕЗА] | P95_SWAP_USEC | 2026-11-28 initial |
 | golden diff | changed pixels outside dynamic zones | <= 0.10 % (WARN to 0.50 %) | AT-S24 | `golden_diff.py` (not implemented) | |
+| skin_lint proportions | min heads | 7.0 (was 6.75) | review 2026-11-28 C3 | `build_skin_schema.py` | 2026-11-28 review |
+| skin_lint nudity gate | exposed classes | FAIL, no manual bypass | [ГИПОТЕЗА] threshold to calibrate on approved ATF set; detector not implemented (P94) | `skin_lint --media` (planned) | 2026-11-28 review |
+| skin_lint face coverage | body-without-face area share | <= 55 % | [ГИПОТЕЗА] | `SL-RL-07` (planned) | 2026-11-28 review |
+| skin_lint video | Theora size, per clip | 540x960, <= 0.9 MB | review T7 | `SL-ULT-02` | 2026-11-28 review |
+| golden PENDING | PENDING becomes FAIL after | date X not set (proposal: P96 merged + 14 days) | open | `UNIFIED_QA_PLAN` Appendix R T13 | 2026-11-28 review |
+| freeze watchdog | FREEZE_SUSPECT threshold | 2 s (was ANR 5 s) | [ГИПОТЕЗА] H11 | `UNIFIED_QA_PLAN` 15.2 | 2026-11-28 review |

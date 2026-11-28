@@ -105,7 +105,7 @@
   "beats": 6,
   "full": "ult/ult_full.ogv",
   "short": "ult/ult_short.ogv",
-  "rig_clip": "ult/ult_rig.res",
+  "rig_clip": "ult/ult_rig.json",
   "name_key": "ult.ssr.noboard"
  },
  "voice": {
@@ -469,7 +469,7 @@
    "loop": false
   },
   "ult.rig_clip": {
-   "file": "ult/ult_rig.res",
+   "file": "ult/ult_rig.json",
    "kind": "clip",
    "fallback": "base"
   },
@@ -739,9 +739,9 @@
    "status": "approved"
   },
   {
-   "path": "ult/ult_rig.res",
+   "path": "ult/ult_rig.json",
    "bytes": 64512,
-   "sha256": "f6069e76b71d550219b1c191f24f88f0ae42fd05ec080c9637f0157838117b8b",
+   "sha256": "81536a2a998fa7a68a91c4dcce3ef9b2d59d78279e94e4fd0745acd1ed57ce56",
    "status": "approved"
   },
   {

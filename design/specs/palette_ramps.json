@@ -879,31 +879,31 @@
    "status": "proposed"
   },
   "THEME_INK_T1": {
-   "hex": "#E6E3E8",
+   "hex": "#EBDFF4",
    "family": "THEME_INK",
    "kind": "theme",
    "status": "proposed"
   },
   "THEME_INK_T2": {
-   "hex": "#C7C2CB",
+   "hex": "#CABFD3",
    "family": "THEME_INK",
    "kind": "theme",
    "status": "proposed"
   },
   "THEME_INK_T3": {
-   "hex": "#9C95A2",
+   "hex": "#9E93A7",
    "family": "THEME_INK",
    "kind": "theme",
    "status": "proposed"
   },
   "THEME_INK_T4": {
-   "hex": "#66616B",
+   "hex": "#685F70",
    "family": "THEME_INK",
    "kind": "theme",
    "status": "proposed"
   },
   "THEME_INK_T5": {
-   "hex": "#302C32",
+   "hex": "#322A39",
    "family": "THEME_INK",
    "kind": "theme",
    "status": "proposed"

@@ -90,6 +90,35 @@ class Fixtures(Base):
         self.assertTrue(any("palette.slots.rim" in p for p in mine))
 
 
+class ReviewFixes(Base):
+    """Regression tests for the 2026-11-28 spec review (tech T3/T12/T15, compliance C3)."""
+
+    def test_min_heads_is_seven(self):
+        self.assertEqual(SCHEMA["properties"]["proportions"]["properties"]["heads"]["minimum"], 7.0)
+        self.assertCode(self.mut(lambda d: d["proportions"].__setitem__("heads", 6.9)), "SL-MAN-01", "heads")
+        self.assertEqual(self.mut(lambda d: d["proportions"].__setitem__("heads", 7.0)).errors, [])
+
+    def test_binary_resources_forbidden_in_pack(self):
+        self.assertIn(".res", SCHEMA["x-forbidden-extensions"])
+        self.assertIn(".tres", SCHEMA["x-forbidden-extensions"])
+        self.assertCode(self.mut(lambda d: d["ult"].__setitem__("rig_clip", "ult/ult_rig.res")), "SL-MAN-01", "rig_clip")
+        self.assertEqual(self.valid["ult"]["rig_clip"], "ult/ult_rig.json")
+
+    def test_felt_slots_use_t5_or_night_mix(self):
+        hi, lo = SCHEMA["x-color-slots"]["felt_hi"], SCHEMA["x-color-slots"]["felt_lo"]
+        self.assertNotIn("T4", hi["from"] + lo["from"])
+        self.assertEqual((hi["mix_max"], lo["mix_max"]), (0.6, 0.5))
+        self.assertEqual(hi["levels"], [2])
+
+    def test_ink_theme_is_not_grey(self):
+        import json as _j
+        import colorlib as cl
+        ramps = _j.loads((REPO / "design/specs/palette_ramps.json").read_text(encoding="utf-8"))["colors"]
+        for i in range(1, 6):
+            c = float(cl.rgb_to_oklch(cl.hex_to_rgb(ramps[f"THEME_INK_T{i}"]["hex"]))[1])
+            self.assertGreaterEqual(c, 0.025, f"THEME_INK_T{i} chroma {c:.3f} (review T15: >= 0.03 target)")
+
+
 class PaletteRules(Base):
     def test_no_raw_colour_anywhere(self):
         for where, fn in {
