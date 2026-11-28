@@ -120,6 +120,9 @@ CATALOG: list[Suite] = [
       note="P31: TWBoardView + TWMatchScreen: layout (field >= 92% x 60%, tile 56/64/72/80), 20/20 events animated, 100 games with and without the view = same events and state hash, mirror == board, pixel contrast, 60-tile frame cost, screen API"),
     S("twresult", "TWRESULT_SELFTEST", "res://shell/screens/match/match_selftest.tscn", group="core", render=True, res="720x1280", timeout=600,
       note="P33: victory screen: TWResultChain (milestones, fast <= 3 s / chain <= 20 s timeline, tap + Skip state machine, 500 random sequences) + TWResultModal on the ModalStack (fixed button rects, one primary, Skip always visible, 0 banned words) + real-time <= 3 s + pixels + TWMatchScreen hook"),
+    S("slice", "SLICE_SELFTEST", "res://shell/main_v11.tscn", ["--slice=play"], fast_args=["--slice=play", "--slice_games=20"], group="core",
+      render=True, res="720x1280", timeout=1200,
+      note="P37: vertical slice: N bot games (100; --fast 20) through the screen API: Home -> TWMatchScreen (solver / hint / random / mixed bot) -> victory modal -> Collection -> Wish -> Shop on the LegacyHost, 0 SCRIPT ERROR / engine ERROR, no modal leak, no stage > 10 s without an event"),
     S("skin_soak", "TWSKINSOAK_SELFTEST", "res://tests/skin_swap_soak/skin_swap_soak.tscn", group="core", timeout=300,
       note="QA plan T-SOAK-1: 61 synthetic+real skin manifests, 300 swaps through TWSkinHostStub -> TWSkin.apply -> tw_skinned group -> TWBus: no leak of the previous skin, "
            "locked tokens untouched, atomic rejection of bad manifests (hex / locked / unknown / wrong level), replay hash, no object/memory growth; pending items printed as PENDING"),
@@ -233,6 +236,14 @@ EXTERNAL: list[Suite] = [
     Suite(id="asset_id_only", kind="python", group="lint", marker="ASSET_ID_ONLY SELFTEST", timeout=60, fast=True,
           script="tools/lint_asset_id_only.py", args=["--selftest", "--check"],
           note="ASSET_ID_ONLY: 13 synthetic cases + game/shell has 0 res://assets literals + legacy literals (report mode, 493) within tools/lint_asset_id_baseline.json"),
+    # P37: the six slice screens x 3 sizes against game/tests/goldens (1.5 % of the pixels), rendered by the game under xvfb
+    Suite(id="slice_goldens", kind="python", group="lint", marker="SLICE_GOLDENS", timeout=900, fast=False,
+          script="tools/slice_goldens.py", args=[],
+          note="P37: home/match/result/collection/wish/shop at 720x1280, 720x1600, 1536x2048 vs game/tests/goldens (<= 1.5 % of pixels differ); `python tools/slice_goldens.py --update` re-records"),
+    # P37: 60-tile frame cost (headless + software GL) and the exported pack size
+    Suite(id="perf_budget", kind="python", group="lint", marker="PERF_BUDGET", timeout=600, fast=False,
+          script="tools/perf_budget.py", args=[],
+          note="P37: p95 frame cost of a live 60-tile round <= 16.6 ms (headless and xvfb; device not verified) + the Android-store pack <= 135 MB (export-pack)"),
     # QA plan: tools/qa tool-belt (palette_audit on synthetic images, skin_lint + schema + 3 sample manifests, fuzz, ramps/schema in sync); numpy+Pillow optional (palette tests skip without them)
     Suite(id="qa_tools", kind="python", group="lint", marker="QA_TOOLS RESULT", timeout=120, fast=True,
           script="tools/qa/run_qa_tools.py",
