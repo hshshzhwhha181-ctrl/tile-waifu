@@ -184,3 +184,7 @@ Conventions: voice mono files are measured as the plain file (like ffmpeg / pylo
 (mono duplicated to both speakers, +3.01 LU) because the asset slimming turned some stereo masters into mono (stings, `motif_rin`, `motif_nova`)
 without changing what is heard. Both numbers are in the CSV. mp3 is measured as ffmpeg decodes it. True peak is a 4x windowed-sinc
 oversampling (checked against an 8x FFT reconstruction within 0.1 dB).
+
+## QA tool-belt (`tools/qa/`)
+
+`python tools/qa/run_qa_tools.py` (suite `qa_tools` in `tw_test.py`) = palette_audit + skin_lint + schema/ramps sync + fuzz, see `tools/qa/README.md` and `design/specs/UNIFIED_QA_PLAN.md`. Suite `skin_soak` (`game/tests/skin_swap_soak`) swaps 60+ synthetic skin manifests through `TWSkin`/`TWBus` (marker `TWSKINSOAK_SELFTEST`).

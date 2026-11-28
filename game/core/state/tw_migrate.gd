@@ -192,7 +192,8 @@ static func _new_profile(ctx: Dictionary, now: int) -> Dictionary:
 		var p = (ctx.new_profile as Callable).call()
 		if p is Dictionary:
 			return (p as Dictionary).duplicate(true)
-	return {"nick": "", "avatar": "mc", "frame": "", "created": now, "id": "%08x" % (randi() & 0xffffffff)}
+	var pid: int = (ctx.rng as TWRng).next_u32() if ctx.get("rng") is TWRng else TWRng.make(now, 0x70726f66).next_u32()
+	return {"nick": "", "avatar": "mc", "frame": "", "created": now, "id": "%08x" % pid}
 
 
 static func _ensure_profile(S: Dictionary, ctx: Dictionary, now: int, heroes: Array) -> void:

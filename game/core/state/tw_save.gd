@@ -115,9 +115,9 @@ func load_best(validate: Callable = Callable()) -> Dictionary:
 
 # ── write ──────────────────────────────────────────────────────────────────────────────────────────────────────
 
-func write(text: String) -> bool:
+func write(text: String, validate: Callable = Callable()) -> bool:
 	last_error = ""
-	if text.length() > MAX_BYTES:
+	if text.to_utf8_buffer().size() > MAX_BYTES:
 		last_error = "too big"
 		return false
 	var tmp: = tmp_path()
@@ -158,7 +158,12 @@ func write(text: String) -> bool:
 	if kill_at == "tmp_verified":
 		return false
 	if FileAccess.file_exists(path):
-		if bool(read_file(path).ok):
+		var cur_read: = read_file(path)
+		var cur_ok: = bool(cur_read.ok)
+		if cur_ok and validate.is_valid():
+			var vr = validate.call(cur_read.data)
+			cur_ok = vr is Dictionary and bool(vr.get("ok", false))
+		if cur_ok:
 			if FileAccess.file_exists(bak):
 				DirAccess.remove_absolute(bak)
 			if DirAccess.rename_absolute(path, bak) != OK:

@@ -1,0 +1,4850 @@
+{
+ "meta": {
+  "generated": "2026-11-27",
+  "language": "ru",
+  "project": "Tile Waifu",
+  "horizon_weeks": 4,
+  "base_branch": "claude/integration @ e0cf801 (WP1 + WP2 уже влиты)",
+  "higgsfield_balance": 18695.18,
+  "balance_note": "balance прочитан инструментом 2026-11-27: 18 695,18 кр; значения 232,81 (HANDOFF) и 20 167 (hf-mining) устарели",
+  "packages": 59,
+  "total_agent_hours": 472.0,
+  "hours_by_week": {
+   "1": 143.0,
+   "2": 123,
+   "3": 165,
+   "4": 41
+  },
+  "hours_by_lane": {
+   "qa": 39.0,
+   "art": 78,
+   "core": 126,
+   "shell": 131,
+   "audio": 48,
+   "rigs": 50
+  },
+  "critical_path": {
+   "hours": 91.5,
+   "chain": [
+    "P01",
+    "P05",
+    "P16",
+    "P17",
+    "P18",
+    "P31",
+    "P32",
+    "P37",
+    "P38",
+    "P39"
+   ]
+  },
+  "done": [
+   {
+    "id": "D1",
+    "name": "WP1 QA-раннер tools/tw_test.py + baseline + CI",
+    "status": "готово, в claude/integration (1a8b18f)",
+    "note": "47 fast-suites ~150 с на 4 ядрах; 56 полных ~490 с; known-fail: ults, letters, profile2, summon, challenge, tower(full)"
+   },
+   {
+    "id": "D2",
+    "name": "WP2 слимминг ассетов + манифест",
+    "status": "готово, в claude/integration (0d83a09)",
+    "note": "PCK 432 -> ~129 МБ (export-pack Android-store); gen_manifest.py; export_filter 4924 -> 4597 файлов; визуальный QA не проводился (P03)"
+   }
+  ],
+  "lanes": [
+   "core",
+   "shell",
+   "art",
+   "audio",
+   "rigs",
+   "qa"
+  ],
+  "spec_phase": {
+   "generated": "2026-11-28",
+   "packages_added": 53,
+   "id_range": "P60-P112",
+   "agent_hours": 6144,
+   "hours_by_week": {
+    "5": 312,
+    "6": 248,
+    "7": 408,
+    "8": 520,
+    "9": 432,
+    "10": 647,
+    "11": 160,
+    "12": 2945,
+    "14": 296,
+    "16": 176
+   },
+   "hours_by_lane": {
+    "shell": 872,
+    "qa": 400,
+    "core": 1336,
+    "rigs": 519,
+    "art": 3017
+   },
+   "higgsfield_credits": {
+    "min": 9232,
+    "max": 11942
+   },
+   "source": "SKIN_HUD_SYSTEM §8.1 (P60-P72), BATTLE_ULT_SPEC §11 (P73-P89), ревью спек 2026-11-28 (P90-P99), MONETIZATION_PLAN §11 PM01-PM26 -> P101-P112, UNIFIED_QA_PLAN §16 -> P109",
+   "branches": "claude/spec-all = claude/spec-skin + spec-battle + spec-money + spec-qa",
+   "note": "недели 5+ идут после первых 4 недель v11 hybrid; часы = оценка спеки в чел.-днях x 8 [ГИПОТЕЗА]; hours_by_week и critical_path выше относятся только к P01-P59"
+  }
+ },
+ "packages": [
+  {
+   "id": "P01",
+   "week": 1,
+   "name": "Слить cfc6356 (ults 704/704) в claude/integration, обновить baseline, тег v10-freeze, ветка release/v10",
+   "goal": "Одна общая база: интеграционная ветка claude/integration (e0cf801: WP1+WP2) не содержит фикса ults из v10-work (cfc6356). Слить, пересчитать baseline, зафиксировать freeze.",
+   "depends_on": [],
+   "lane": "qa",
+   "files": [
+    "tools/baseline.json",
+    "tools/tw_test.py (read-only)",
+    "git: claude/integration, v10-work"
+   ],
+   "acceptance": [
+    "`python tools/tw_test.py --fast` на слитой ветке: exit 0, 'no regression', suite `ults` = 704/704 (было known-fail 662/682)",
+    "baseline.json обновлён флагом --update-baseline в отдельном коммите; число known-fail в baseline уменьшилось минимум на 1",
+    "локальный тег v10-freeze и ветка release/v10 созданы от слитого коммита (push — только после клика владельца)"
+   ],
+   "agent_hours": 1.5,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "низкий",
+    "note": "конфликты слияния в g.gd/v9 ults: разрешаются в пользу cfc6356; полный прогон 56 suites (~490 с) подтверждает"
+   },
+   "player_visible": null,
+   "arch_ref": "WP1 хвост",
+   "night_safe": true,
+   "night_check": "локальные git-операции в worktree wt/int; без push; откат `git reset --hard e0cf801`",
+   "owner_action": "push + включение CI на удалённом репозитории (утро, M1)"
+  },
+  {
+   "id": "P02",
+   "week": 1,
+   "name": "Спайк: корневая причина SIGABRT rc=134 при выходе Godot",
+   "goal": "Все 65 запусков Godot завершаются rc=134 на teardown; раннер маскирует это только при зелёной маркер-строке. Выяснить, реальный ли это баг движка/нативных ресурсов (риск краша при выходе на устройстве).",
+   "depends_on": [],
+   "lane": "qa",
+   "files": [
+    "tools/tw_test.py",
+    "docs/qa/SIGABRT_SPIKE.md (новый)",
+    "tools/markers.py (если нужен)"
+   ],
+   "acceptance": [
+    "матрица >=6 вариантов запуска (`--audio-driver Dummy`, `--rendering-driver`, без autoload'ов по одному из 11, `--quit-after`) с rc каждого; таблица в документе",
+    "либо назван минимальный триггер (autoload/ресурс) и заведён тикет, либо доказано, что rc=134 воспроизводится на пустом проекте Godot 4.5.1 (тогда помечено 'engine, не наш')",
+    "раннер получил флаг `--no-mask-rc` и CI-джоб, который падает на любом rc кроме 0/134"
+   ],
+   "agent_hours": 4,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "средний",
+    "note": "может не найтись причины за 4 ч; тогда результат = матрица + тикет"
+   },
+   "player_visible": null,
+   "arch_ref": "WP1 хвост",
+   "night_safe": true,
+   "night_check": "Godot только `nice -n 19` и 1 процесс (CPU-бюджет, см. правила ночи); репозиторий не меняется кроме tools/ и docs/qa/",
+   "owner_action": null
+  },
+  {
+   "id": "P03",
+   "week": 1,
+   "name": "Визуальный QA слимминга: ogv, градиентные фоны, ореолы вырезов",
+   "goal": "WP2 сжал арт в lossy WebP q0.82 и ogv до 1000 kbps; в ARCH отмечено, что Theora и бэндинг градиентов глазами не смотрели. Получить решение 'ок / откатить конкретные файлы'.",
+   "depends_on": [],
+   "lane": "qa",
+   "files": [
+    "tools/assets/qa_dump.gd",
+    "tools/assets/qa_compare.py",
+    "tools/assets/reimport.py (KEEP_LOSSLESS)",
+    "docs/qa/SLIM_VISUAL_QA.md (новый)"
+   ],
+   "acceptance": [
+    "контактные листы: 14 .ogv (кадры 10/50/90%), все фоны bg_* (crops градиентных зон), все cutout-арты героинь (кропы краёв), всего >=300 кропов",
+    "для каждого файла с PSNR < 38 дБ или SSIM < 0.95 вердикт 'ок' или 'вернуть в lossless' с правкой KEEP_LOSSLESS",
+    "после правок размер PCK `--export-pack Android-store` <= 135 МБ (сейчас ~129)"
+   ],
+   "agent_hours": 3,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "низкий",
+    "note": "вернуть файлы в lossless = +5-10 МБ, бюджет 150 держится"
+   },
+   "player_visible": "размер установки 432 -> ~130 МБ и отсутствие видимых артефактов",
+   "arch_ref": "WP2 хвост",
+   "night_safe": true,
+   "night_check": "read-only рендер, 1 Godot-процесс nice 19; правки KEEP_LOSSLESS/.import только в виде патча в docs/qa, применяются утром",
+   "owner_action": "проверка на телефоне (утро, M2)"
+  },
+  {
+   "id": "P04",
+   "week": 1,
+   "name": "Триаж неиспользованных Higgsfield-ассетов: полноразмерный аудит топ-30 и 100 фонов",
+   "goal": "HF REPORT: 596 неиспользованных картинок, ~1 из 6 'топ-полка', но анатомию смотрели по превью ~250 px. Перевести кандидатов в короткий список с полноразмерной проверкой (бесплатно, уже сгенерировано).",
+   "depends_on": [],
+   "lane": "art",
+   "files": [
+    "hf-mining/ (read-only)",
+    "design/art_batches/triage_top30.json (новый)",
+    "design/art_batches/triage_bg100.json (новый)"
+   ],
+   "acceptance": [
+    "все 30 ключ-артов и 100 фонов открыты в полном размере; кропы рук/ног/пальцев; для каждого pass/fail + теги дефектов",
+    "не менее 12 ключ-артов и 40 фонов помечены `candidate` и пригодны как референсы/фоны Чайной и Салона без перегенерации",
+    "ни один файл не попадает в game/ (только в assets/incoming/ со статусом generated)"
+   ],
+   "agent_hours": 4,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "низкий",
+    "note": "часть кандидатов окажется вне стиля 'recipe v4': нормально, отсев"
+   },
+   "player_visible": "кандидаты на новые фоны Чайной/Салона и баннеры без затрат кредитов",
+   "arch_ref": "HF REPORT",
+   "night_safe": true,
+   "night_check": "только чтение и просмотр изображений, запись только в design/",
+   "owner_action": "выбор лучшего из shortlist (утро/день, M7)"
+  },
+  {
+   "id": "P05",
+   "week": 1,
+   "name": "WP3: механический вынос ядра в game/core (одно окно заморозки)",
+   "goal": "git mv всех UI-free групп в game/core с сохранением class_name; патч path-based preload/extends; project.godot не трогаем. Один агент, остальные не пишут в game/scripts во время окна.",
+   "depends_on": [
+    "P01"
+   ],
+   "lane": "core",
+   "files": [
+    "game/core/**",
+    "tools/move_map.tsv",
+    "game/scripts/v10/core/registry*.gd",
+    "tools/lint_core_purity.py (заготовка)"
+   ],
+   "acceptance": [
+    "`tw_test.py --fast` на ветке = baseline.json: 0 регрессий, число проверок `total` не меньше базового (35 851 исполненных проверок сохранены)",
+    "tools/move_map.tsv содержит каждый перенос (старый путь, новый путь); `git mv` без изменения содержимого, кроме путей preload/extends (diff-проверка скриптом: только строки с res://)",
+    "0 новых `SCRIPT ERROR` в логах 47 fast-suites; запуск `--shell=default` (main.tscn) доходит до Home в headless-скрине `tw_test.py --shot home`"
+   ],
+   "agent_hours": 10,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "высокий",
+    "note": "затрагивает сотни путей; динамические загрузки по составным id (715 файлов) могут сломаться. Откат: ветка не вливается без равенства baseline; fallback ARCH — границы lint без переноса файлов"
+   },
+   "player_visible": null,
+   "arch_ref": "WP3",
+   "night_safe": true,
+   "night_check": "изолированный worktree claude/wp3; в integration вливается только при равенстве baseline; второй агент не пишет в game/scripts; откат = удалить ветку",
+   "owner_action": null
+  },
+  {
+   "id": "P06",
+   "week": 1,
+   "name": "lint_core_purity в режиме отчёта + CI-шаг",
+   "goal": "Автоматически ловить Node/Control/Tween/Audio/DisplayServer/`G.`/`/root/` в game/core; сначала только отчёт, чтобы видеть реальный объём связности.",
+   "depends_on": [
+    "P05"
+   ],
+   "lane": "qa",
+   "files": [
+    "tools/lint_core_purity.py",
+    "tools/lint_baseline.json",
+    "tools/tw_test.py (новая группа `lint`)",
+    ".github/workflows/qa.yml"
+   ],
+   "acceptance": [
+    "отчёт по каждому файлу core с категориями нарушений; baseline нарушений зафиксирован числом N и растёт-запрещён (новые нарушения = красный)",
+    "время работы линта < 5 с на всём дереве",
+    "self-test линта: 6 синтетических файлов (по 1 нарушению каждого вида) дают ровно 6 находок"
+   ],
+   "agent_hours": 2.5,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "низкий",
+    "note": "ложные срабатывания на комментариях: игнорировать строки после `#`"
+   },
+   "player_visible": null,
+   "arch_ref": "WP3",
+   "night_safe": true,
+   "night_check": "чистый Python, без Godot; новые файлы в tools/",
+   "owner_action": null
+  },
+  {
+   "id": "P07",
+   "week": 1,
+   "name": "Реестр модулей: registry_list.gd -> module.gd на модуль + сканирующий V10Registry",
+   "goal": "Убрать горячий файл registry_list.gd: 43 модуля, те же id, обнаружение сканом каталогов.",
+   "depends_on": [
+    "P05"
+   ],
+   "lane": "core",
+   "files": [
+    "game/core/**/module.gd (43)",
+    "game/core/registry/registry.gd",
+    "game/scripts/v10/core/registry_list.gd (удаляется)"
+   ],
+   "acceptance": [
+    "V10Registry.ids() до и после равны побайтно (сортированный список 43 id + порядок selftest) — проверка скриптом",
+    "`tw_test.py --check-drift`: 0 расхождений; fast-suites = baseline",
+    "добавление нового модуля = 1 новый файл module.gd, 0 правок существующих (демонстрация на тестовом модуле)"
+   ],
+   "agent_hours": 4,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "низкий",
+    "note": "порядок инициализации модулей: сохранить явным полем order"
+   },
+   "player_visible": null,
+   "arch_ref": "WP3",
+   "night_safe": true,
+   "night_check": "после P05 в том же worktree-потоке агента A; гейт = baseline",
+   "owner_action": null
+  },
+  {
+   "id": "P08",
+   "week": 1,
+   "name": "Убить энергию: V10Stamina, V10Energy, 'чайный' гейт в nav.gd/home.gd, пилюли",
+   "goal": "Решение владельца и GDD: энергии нет. Удалить ~810 строк и гейт Path-уровней (nav.gd:112-115, home.gd:953), убрать --shots/--selftest sniffing из production play_path.",
+   "depends_on": [
+    "P05"
+   ],
+   "lane": "core",
+   "files": [
+    "game/core/economy/stamina.gd",
+    "game/core/economy/energy.gd",
+    "game/scripts/v10/core/nav.gd",
+    "game/scripts/screens/home.gd",
+    "game/scripts/screens/summon.gd (пилюли)",
+    "game/core/economy/README.md"
+   ],
+   "acceptance": [
+    "grep `V10Stamina|V10Energy|tea_` по game/ = 0 совпадений вне tools/history",
+    "econ_selftest без energy-блока: 100% маркер, число проверок упало ровно на удалённые (список в коммите); остальные suites = baseline",
+    "headless: 30 подряд Path-уровней стартуют без 'чая' (скрипт-бот), ноль диалогов 'не хватает энергии'"
+   ],
+   "agent_hours": 5,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "средний",
+    "note": "сейв-ключи энергии в старых сейвах: оставить как игнорируемые, не падать (golden-сейвы P12)"
+   },
+   "player_visible": "игрок больше не упирается в энергию/чай при запуске уровней",
+   "arch_ref": "WP6",
+   "night_safe": true,
+   "night_check": "решение принято владельцем и GDD; чисто удаление; гейт baseline; откат git",
+   "owner_action": null
+  },
+  {
+   "id": "P09",
+   "week": 1,
+   "name": "Убить дубль гача-движка (V10Gacha, V10Odds, G.pull/roll) -> TWGacha.pull самоплатящий",
+   "goal": "Одна точка входа TWGacha.pull(state, banner, n): платит, пишет журнал, использует V10Gacha2/V10Rates. Удалить ~520 строк и proxy-билеты.",
+   "depends_on": [
+    "P08"
+   ],
+   "lane": "core",
+   "files": [
+    "game/core/gacha/gacha2.gd",
+    "game/core/gacha/tw_gacha.gd (новый)",
+    "game/scripts/screens/summon.gd",
+    "game/scripts/g.gd (pull/roll proxies)",
+    "game/core/gacha/gacha_selftest.gd"
+   ],
+   "acceptance": [
+    "grep `V10Gacha\\b|V10Odds|G\\.pull|G\\.roll` = 0 вне tools/history",
+    "gacha_selftest 115/115 и Марков-консолидированный SSR ~2,90% (для текущих v10-правил) не изменились; summon_selftest 45/56 заменён на новый тест с 0 известных падений",
+    "баланс до/после 1000 случайных пулов равен сумме списаний журнала (инвариант, property-тест)"
+   ],
+   "agent_hours": 7,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "высокий",
+    "note": "влияет на деньги и шансы; пока правила v10 не меняем, только схлопываем пути"
+   },
+   "player_visible": null,
+   "arch_ref": "WP6",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": null
+  },
+  {
+   "id": "P10",
+   "week": 1,
+   "name": "Кошелёк как единственная истина: TWWallet, убрать зеркала S.gems/coins и _absorb",
+   "goal": "60 прямых записей S.gems/coins/tickets вне V10Money -> вызовы TWWallet.can/spend/grant; сохранить HMAC-печать и лимиты по возрасту.",
+   "depends_on": [
+    "P05"
+   ],
+   "lane": "core",
+   "files": [
+    "game/core/economy/*.gd",
+    "game/core/money.gd",
+    "game/core/path/path_boosters.gd",
+    "game/core/path/path_state.gd",
+    "game/core/economy/econ_selftest.gd"
+   ],
+   "acceptance": [
+    "статический счётчик прямых записей `S.gems|S.coins|S.tickets =` вне wallet = 0 (скрипт в tools/lint)",
+    "property-тест: >=10 000 случайных операций, инвариант balance - debt = earned - spent - revoked выполняется всегда",
+    "отрицательный grant бросает ошибку, а не клампится молча; econ_selftest 384 -> не меньше (минус energy) и 100% зелёный"
+   ],
+   "agent_hours": 8,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "высокий",
+    "note": "money-affecting; нужен тест миграции на сейвах v4..v8 (P12) до включения; зеркала удаляются только после 0 записей"
+   },
+   "player_visible": null,
+   "arch_ref": "WP6",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": null
+  },
+  {
+   "id": "P11",
+   "week": 2,
+   "name": "Правила гачи v11 как данные: мягкий гарант 60, жёсткий 80, 50/50+catch-up, Свеча 120, 'Первый гость'",
+   "goal": "GDD §5.5/DECISIONS п.1-4 реализовать в core/gacha как JSON-конфиг + Марков-калькулятор шансов, за флагом `gacha_rules=v11` (по умолчанию выключен).",
+   "depends_on": [
+    "P09"
+   ],
+   "lane": "core",
+   "files": [
+    "game/core/gacha/rules_v11.json",
+    "game/core/gacha/odds_markov.gd",
+    "game/core/gacha/odds_selftest.gd",
+    "game/core/gacha/odds_hash.gd"
+   ],
+   "acceptance": [
+    "Марков SSR ≈2,43% и ≈41,2 желания до SSR; избранная ≈61,9 (медиана 64, p90 119, максимум 120) — совпадение с Монте-Карло 2 млн (seed 11) в пределах ±0,5%",
+    "'Первый гость': SSR гарантирована не позже 30-го желания на 100 000 симуляциях (0 нарушений)",
+    "хэш таблицы шансов детерминирован, меняется при любой правке JSON (тест)"
+   ],
+   "agent_hours": 8,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "высокий",
+    "note": "выручка v11 ниже v10 (цена желания -49%, Q-01); флаг выключен до решения владельца"
+   },
+   "player_visible": null,
+   "arch_ref": "WP6 + GDD §5.5",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": "Q-01 принять/изменить параметры гаранта и цены (включение флага; код можно писать без ответа)"
+  },
+  {
+   "id": "P12",
+   "week": 1,
+   "name": "TWClock, TWState, TWSave, TWMigrate + golden-сейвы v4..v8",
+   "goal": "Одна RefCounted-запись сейва с инъекцией пути IO, dirty-флагом и debounce-flush; атомарная запись tmp->rename->.bak; миграции ver<4..8 и 48->1000 вынесены из g.gd; TWClock устойчив к откату времени.",
+   "depends_on": [
+    "P05"
+   ],
+   "lane": "core",
+   "files": [
+    "game/core/state/tw_state.gd",
+    "game/core/state/tw_save.gd",
+    "game/core/state/tw_migrate.gd",
+    "game/core/clock/tw_clock.gd",
+    "game/tests/fixtures/saves/v4.json..v8.json",
+    "game/core/state/state_selftest.gd"
+   ],
+   "acceptance": [
+    "recovery_selftest 66/66 + новый golden-тест: каждый из 5 фикстур-сейвов v4..v8 мигрирует в SAVE_VER 8 и даёт заранее записанный хэш состояния",
+    "фаззинг: 500 повреждённых сейвов (обрезка, мусорные ключи, будущий ver) — 0 крашей, всегда либо загрузка, либо понятный отказ + .bak",
+    "flush на pause/exit и после денежной операции в течение 100 мс; прочие записи debounce 1 с (тест на фейковых часах)"
+   ],
+   "agent_hours": 12,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "высокий",
+    "note": "debounce меняет семантику сохранения: потеря покупки при убийстве процесса; флаш после денежных операций обязателен"
+   },
+   "player_visible": null,
+   "arch_ref": "WP4",
+   "night_safe": true,
+   "night_check": "новый код рядом со старым; G ещё не переключён (P15); гейт — fixtures + baseline",
+   "owner_action": null
+  },
+  {
+   "id": "P13",
+   "week": 2,
+   "name": "TWContent: JSON-паки героинь, предметов, баннеров, заданий, ранг/яку/перки",
+   "goal": "Таблицы HEROES, ITEMS, LOCS, RANKS, YAKU, FORTUNES, BANNERS, TASKS, LOGIN_REWARDS, PERKS, SKILLS из g.gd в JSON; wave1 как явный пак; sync_hidden_items — чистая функция.",
+   "depends_on": [
+    "P12"
+   ],
+   "lane": "core",
+   "files": [
+    "game/core/content/tw_content.gd",
+    "game/core/content/heroes.json",
+    "game/core/content/items.json",
+    "game/core/content/tasks.json",
+    "game/core/content/banners.json",
+    "game/core/content/packs/wave1/*.json"
+   ],
+   "acceptance": [
+    "round-trip тест: данные из JSON побайтно равны прежним константам g.gd (скриптовое сравнение всех таблиц)",
+    "добавление героини = только новые JSON-файлы (демо-героиня в тесте), 0 правок .gd",
+    "wave1 selftest 221/221 без изменений; загрузка всех паков < 60 мс в headless"
+   ],
+   "agent_hours": 9,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "средний",
+    "note": "скрытые мутации глобалов в runtime; искать присваивания по таблицам"
+   },
+   "player_visible": null,
+   "arch_ref": "WP4",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": null
+  },
+  {
+   "id": "P14",
+   "week": 2,
+   "name": "TWEvents: типизированные события; V8League/V9Letters как подписчики",
+   "goal": "MATCH, DENY, CLEARED, ROUND_ENDED, RANK_UP, PULL_DONE, WALLET_CHANGED, TASK_PROGRESS, SETTINGS_CHANGED; побочные эффекты внутри add_rp/record_game превращены в события.",
+   "depends_on": [
+    "P12"
+   ],
+   "lane": "core",
+   "files": [
+    "game/core/events/tw_events.gd",
+    "game/core/events/event_types.gd",
+    "game/core/events/events_selftest.gd",
+    "game/core/league/*.gd",
+    "game/core/letters/*.gd"
+   ],
+   "acceptance": [
+    "events_selftest >= 40 проверок: порядок, синхронность, отсутствие save() внутри обработчиков",
+    "league selftest 1131 и letters (после P01 baseline) не хуже базового",
+    "в core 0 импортов TWBus/Signal/Node (проверка P06 линтом)"
+   ],
+   "agent_hours": 5,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "средний",
+    "note": "порядок побочных эффектов ранее неявный: фиксируем тестом"
+   },
+   "player_visible": null,
+   "arch_ref": "WP4",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": null
+  },
+  {
+   "id": "P15",
+   "week": 2,
+   "name": "Фасад G поверх TWState (единственный владелец g.gd)",
+   "goal": "g.gd становится тонкой совместимостью: G.S, G.save, add_rp, rank_of, give/owns, tasks, aff_level делегируют ядру; 306 вызывающих компилируются без правок; dev/demo-запуски вынесены в tools/dev.",
+   "depends_on": [
+    "P12",
+    "P13",
+    "P14"
+   ],
+   "lane": "core",
+   "files": [
+    "game/scripts/g.gd",
+    "tools/dev/*.gd"
+   ],
+   "acceptance": [
+    "g.gd <= 300 строк (было 1109); `tw_test.py` полный прогон = baseline (0 регрессий)",
+    "сквозной headless-прогон V8Playtest --pt=fresh не хуже чем на v10-freeze (красный шаг 54 известен: не должен сдвинуться раньше)",
+    "счётчик прямых `G.S[...] =` записей (232 в 78 файлах) зафиксирован в отчёте, для каждого файла есть план"
+   ],
+   "agent_hours": 9,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "высокий",
+    "note": "горячий файл: все остальные ветки дают конфликты; делается одним агентом в окне после слияния P12-P14"
+   },
+   "player_visible": null,
+   "arch_ref": "WP4",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": null
+  },
+  {
+   "id": "P16",
+   "week": 1,
+   "name": "TWRng + TWFree + TWBoard: единый движок правил пасьянса",
+   "goal": "Целочисленные id плиток, сидированные грани/gold/ice/secret/shard, инъекция часов, tap(id)->[Event], undo, hint, shuffle, return_tray, спец-плитки из V6SpecialBoard, state_hash, certificate. Без твинов и await.",
+   "depends_on": [
+    "P05"
+   ],
+   "lane": "core",
+   "files": [
+    "game/core/rules/tw_board.gd",
+    "game/core/rules/tw_free.gd",
+    "game/core/rules/tw_rng.gd",
+    "game/core/rules/tw_events_board.gd",
+    "game/core/rules/tw_board_selftest.gd"
+   ],
+   "acceptance": [
+    "один и тот же seed => одинаковые грани/лёд/золото на 1000 сидов (тест воспроизводимости)",
+    "TWBoard-selftest >= 300 проверок: tap/deny/ice/tray_full/cleared/undo/hint/shuffle; ни одного await/Tween (линт P06)",
+    "сертификаты решаемости: первые 200 уровней Пути проходят ботом 200/200 на новом ядре (полные 1000/1000 — в P17)"
+   ],
+   "agent_hours": 14,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "высокий",
+    "note": "в 15 файлах свои правила 'свободной' плитки; различия выявятся на паритете P17"
+   },
+   "player_visible": null,
+   "arch_ref": "WP5",
+   "night_safe": true,
+   "night_check": "новые файлы в game/core/rules; старый tray_board.gd не трогаем; гейт = собственный selftest + baseline",
+   "owner_action": null
+  },
+  {
+   "id": "P17",
+   "week": 2,
+   "name": "Паритет TWBoard: корпус 500 партий старого TrayBoard, 1000/1000 сертификатов, фаззинг",
+   "goal": "Доказать эквивалентность по легальности ходов и исходам (унаследованный _assign несидированный, поэтому по сиду нельзя).",
+   "depends_on": [
+    "P16"
+   ],
+   "lane": "qa",
+   "files": [
+    "game/tests/fixtures/replays/*.json",
+    "game/core/rules/parity_selftest.gd",
+    "game/core/levels/level_sim.gd",
+    "game/core/levels/level_gen.gd"
+   ],
+   "acceptance": [
+    "корпус 500 записанных партий (фиксированные раскладки + журнал ходов) воспроизводится на TWBoard с 0 расхождений легальности и исхода",
+    "сертификаты уровней Пути 1000/1000, Тройки 2736, Классика 22x3, Связи 90x3, Куб 200 — как в baseline",
+    "фаззинг 5000 случайных ходов: инвариант 'свободная плитка по TWFree = по старому TrayBoard' в 100% позиций"
+   ],
+   "agent_hours": 9,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "высокий",
+    "note": "любое расхождение = правим TWBoard, не генераторы (baked артефакты 2027 daily table и bake.json нельзя инвалидировать)"
+   },
+   "player_visible": null,
+   "arch_ref": "WP5",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": null
+  },
+  {
+   "id": "P18",
+   "week": 2,
+   "name": "tray_board.gd -> тонкий адаптер над TWBoard; режимы переведены с TrayBoard.gen_layout на TWFree",
+   "goal": "Правила уходят из Node: tray_board только анимирует события; triples/garden/classic/hand_gen/sim/duel_sim больше не грузят render-стек.",
+   "depends_on": [
+    "P17"
+   ],
+   "lane": "core",
+   "files": [
+    "game/scripts/tray_board.gd",
+    "game/scripts/tile.gd",
+    "game/core/modes/triples/*.gd",
+    "game/core/modes/garden/*.gd",
+    "game/core/modes/classic/*.gd"
+   ],
+   "acceptance": [
+    "tray_board.gd <= 450 строк (было 798); 0 `await create_timer` в путях правил",
+    "все contract-suites режимов = baseline; 240-board main selftest 240/240",
+    "в core 0 ссылок на TrayBoard (grep)"
+   ],
+   "agent_hours": 7,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "высокий",
+    "note": "визуальная регрессия анимации; снять 3 headless-скрина партии до/после и сравнить"
+   },
+   "player_visible": "партия играется на новом ядре; поведение прежнее (паритет)",
+   "arch_ref": "WP5",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": null
+  },
+  {
+   "id": "P19",
+   "week": 1,
+   "name": "TWLevels.at(n) + запрет прямого G.LEVELS[...] + фикс режима trial",
+   "goal": "Баг: trial-режим использует ленивые заглушки, уровни 499/799/999/699/899 играются как обычные прямоугольные доски. Единый доступ + линт на 29 мест.",
+   "depends_on": [
+    "P05"
+   ],
+   "lane": "core",
+   "files": [
+    "game/core/levels/tw_levels.gd",
+    "game/scripts/v06/modes/mode_play.gd",
+    "tools/lint_no_direct_levels.py"
+   ],
+   "acceptance": [
+    "тест: уровни 499, 699, 799, 899, 999 через trial-режим дают те же раскладки, что Путь (хэш доски равен)",
+    "grep `G.LEVELS[` = 0 вне tw_levels.gd; линт в CI",
+    "levels selftest 1000/1000 без изменений"
+   ],
+   "agent_hours": 3,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "низкий",
+    "note": "ленивая генерация может быть медленнее: замер < 250 мс на карту (soft-проверка path)"
+   },
+   "player_visible": "исправлен баг: боссовые уровни больше не 'пустые прямоугольники' в испытаниях",
+   "arch_ref": "WP7 часть",
+   "night_safe": true,
+   "night_check": "изолированная ветка, гейт baseline + новый тест",
+   "owner_action": null
+  },
+  {
+   "id": "P20",
+   "week": 2,
+   "name": "TWRound: resolve(), бустеры, modecfg, награды + табличные тесты",
+   "goal": "Вынести награды/ранг/звёзды/бустеры/rescue из play.gd (~930 строк) в core/round: resolve(state, mode, cfg, stats)->RoundResult.",
+   "depends_on": [
+    "P10",
+    "P12",
+    "P16"
+   ],
+   "lane": "core",
+   "files": [
+    "game/core/round/tw_round.gd",
+    "game/core/round/tw_boosters.gd",
+    "game/core/round/tw_modecfg.gd",
+    "game/core/round/tw_rewards.gd",
+    "game/core/round/round_selftest.gd"
+   ],
+   "acceptance": [
+    "табличные тесты >= 120 строк: path/daily/blitz/zen/duel/trial/tower x победа/поражение/rescue/бустеры; расчёты наград равны старым play.gd на 300 сценариях (дифф-тест со старым кодом)",
+    "на экране победы по модели 0 счётчиков 'осталось сегодня' (поле RoundResult не содержит их)",
+    "наряд не влияет: бот с одним сидом и 3 разными нарядами даёт идентичный RoundResult (разница 0)"
+   ],
+   "agent_hours": 14,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "высокий",
+    "note": "money/награды; дифф-тест со старым путём обязателен"
+   },
+   "player_visible": null,
+   "arch_ref": "WP7",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": null
+  },
+  {
+   "id": "P21",
+   "week": 3,
+   "name": "play.gd вызывает TWRound; V10Hooks.handle_mode_finished разделён на сервис наград и шину",
+   "goal": "Легаси-партия работает на новом резолвере; play.gd и 5 подклассов сокращаются на ~900 строк без изменения поведения.",
+   "depends_on": [
+    "P20"
+   ],
+   "lane": "core",
+   "files": [
+    "game/scripts/screens/play.gd",
+    "game/scripts/v10/core/hooks.gd",
+    "game/scripts/v10/tower/tower_play.gd"
+   ],
+   "acceptance": [
+    "play.gd <= 2600 строк (было 3458); PT --pt=fresh не хуже baseline",
+    "fast-suites = baseline; round_selftest зелёный на реальных RoundResult из playthrough",
+    "hooks.gd <= 60% прежнего размера"
+   ],
+   "agent_hours": 7,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "высокий",
+    "note": "play.gd — горячий файл; делает один агент"
+   },
+   "player_visible": null,
+   "arch_ref": "WP7",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": null
+  },
+  {
+   "id": "P22",
+   "week": 3,
+   "name": "TWAge/TWConsent: дата рождения, заявление 18+, согласие на ПДн, лимит трат, привязка до платежа (ядро)",
+   "goal": "GDD §5.9/§11.3, DECISIONS п.5,16: возраст из даты рождения, <18 -> отказ; лимит 5 000 руб/мес по умолчанию; платёж невозможен без привязки аккаунта; История желаний 365 дней.",
+   "depends_on": [
+    "P12"
+   ],
+   "lane": "core",
+   "files": [
+    "game/core/age/tw_age.gd",
+    "game/core/age/tw_spend_limit.gd",
+    "game/core/age/age_selftest.gd",
+    "game/core/gacha/pull_history.gd"
+   ],
+   "acceptance": [
+    "age_selftest >= 60 проверок: граничные даты (18 лет минус 1 день, 29 февраля, будущая дата, 1900), часовой пояс МСК",
+    "лимит: покупка сверх 5 000 руб/мес за 30 дней отклоняется, пауза 1/7/30 дней работает на фейковых часах",
+    "журнал желаний хранит >=365 дней и экспортируется текстом; первая покупка без привязки возвращает DENY_LINK"
+   ],
+   "agent_hours": 4,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "средний",
+    "note": "юридические формулировки: тексты экрана — после ответа владельца/юриста"
+   },
+   "player_visible": null,
+   "arch_ref": "GDD §5.9",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": "тексты Оферты/Политики/согласия ПДн (Q-07, Q-08) — до экрана P36"
+  },
+  {
+   "id": "P23",
+   "week": 1,
+   "name": "WP8a: TWScreens, TWScreen, ScreenSpec, TWContext, TWBus",
+   "goal": "Скелет оболочки v11: состояние IDLE/TRANSITIONING с watchdog 3 с, история, вкладки, регистрация экранов по скану ScreenSpec, типизированный TWContext вместо `main`.",
+   "depends_on": [
+    "P05"
+   ],
+   "lane": "shell",
+   "files": [
+    "game/shell/nav/tw_screens.gd",
+    "game/shell/nav/tw_screen.gd",
+    "game/shell/nav/screen_spec.gd",
+    "game/shell/tw_context.gd",
+    "game/shell/tw_bus.gd",
+    "project.godot (autoload, только интегратор)"
+   ],
+   "acceptance": [
+    "unit-тест навигации: go/back/history на 12 фейковых экранах; зависшая анимация принудительно завершается за 3,0 +- 0,2 с",
+    "экран без ScreenSpec не регистрируется (линт SCREEN_HAS_SPEC) — тест",
+    "автозагрузок в project.godot не больше 11+1 на этом этапе; убрать старые — только на cutover"
+   ],
+   "agent_hours": 9,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "средний",
+    "note": "autoload-правки только интегратором (hot file)"
+   },
+   "player_visible": null,
+   "arch_ref": "WP8",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": null
+  },
+  {
+   "id": "P24",
+   "week": 1,
+   "name": "WP8b: ModalStack с гарантированной очисткой + единый Android back",
+   "goal": "Исключить класс багов 0.12.1 ('ничего не нажимается'): все модалки только через стек, scrim принадлежит модалке, clear_all на каждый go, on_close всегда вызывается.",
+   "depends_on": [
+    "P23"
+   ],
+   "lane": "shell",
+   "files": [
+    "game/shell/nav/modal_stack.gd",
+    "game/shell/nav/tw_modal.gd",
+    "tools/lint_modal_only_via_stack.py"
+   ],
+   "acceptance": [
+    "после любой из 500 случайных последовательностей go/back/open/close слой модалок пуст и ни один Control со STOP не виден (property-тест)",
+    "Android back: закрывает верхнюю модалку, иначе can_back экрана, иначе историю, иначе подтверждение выхода — таблица из 4 случаев в тесте",
+    "линт MODAL_ONLY_VIA_STACK в режиме отчёта находит 39 прежних scan-мест overlay-детекторов"
+   ],
+   "agent_hours": 9,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "средний",
+    "note": "легаси-экраны добавляют детей в слой напрямую: решает LegacyHost (P25)"
+   },
+   "player_visible": null,
+   "arch_ref": "WP8",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": null
+  },
+  {
+   "id": "P25",
+   "week": 2,
+   "name": "WP8c: LegacyHost + main_v11.tscn (--shell=v11)",
+   "goal": "v11 грузится как вторая главная сцена; shim реализует старый duck-typed `main` API (go/back/toast/overlay/screen/refresh_currency/show_chrome/has_method) и оборачивает 16+45 легаси-экранов.",
+   "depends_on": [
+    "P23",
+    "P24"
+   ],
+   "lane": "shell",
+   "files": [
+    "game/shell/main_v11.tscn",
+    "game/shell/nav/legacy_host.gd",
+    "game/shell/nav/legacy_screens.json"
+   ],
+   "acceptance": [
+    "`--shell=v11` показывает Home v10 пиксельно идентично: скрин 720x1280 diff <= 0.5% площади пикселей на 6 экранах",
+    "все 61 легаси-экран (16+45) открываются и закрываются через host без SCRIPT ERROR",
+    "дефолтный запуск без флага = прежний v10 (флаг default OFF)"
+   ],
+   "agent_hours": 10,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "высокий",
+    "note": "88 has_method и 103 main.screen-обращений: возможны тихие отличия; страхует soak P26"
+   },
+   "player_visible": "первый собираемый v11-билд, пиксельно равный v10",
+   "arch_ref": "WP8",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": null
+  },
+  {
+   "id": "P26",
+   "week": 3,
+   "name": "Soak-тест утечек модалок: все экраны x все модалки x go/back/Android-back",
+   "goal": "Поймать следующий 0.12.1 до релиза; регрессия бага первого тапа красная на легаси, зелёная через стек.",
+   "depends_on": [
+    "P25"
+   ],
+   "lane": "qa",
+   "files": [
+    "game/shell/tests/modal_soak.gd",
+    "tools/tw_test.py (suite `modal_soak`)"
+   ],
+   "acceptance": [
+    "после каждой навигации: 0 детей в слое модалок, 0 видимых Control со STOP выше экрана, busy=false, стек back корректен — на 61 экране",
+    "время прогона < 5 мин в --fast (1 Godot-процесс), включён в CI на каждый PR",
+    "регрессия 0.12.1 воспроизводима: красная против легаси-пути, зелёная через ModalStack"
+   ],
+   "agent_hours": 7,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "средний",
+    "note": "долгий прогон: разбить на 4 шарда"
+   },
+   "player_visible": "'ничего не нажимается' больше не повторяется",
+   "arch_ref": "WP8",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": null
+  },
+  {
+   "id": "P27",
+   "week": 1,
+   "name": "WP9a: tokens.json + TWTokens + генератор Theme + линты токенов",
+   "goal": "Единый источник стиля 'Тишина и лак' из значений V10DS: цвета, 8-pt отступы, hit 96, радиусы, тени, длительности/easing, шкала шрифтов 64/44/34/30/26 (+36 субтитры); линты NO_RAW_HEX, NO_RAW_FONT_SIZE, TYPE_SCALE_MAX_4, HIT_TARGET_MIN=96.",
+   "depends_on": [
+    "P05"
+   ],
+   "lane": "shell",
+   "files": [
+    "game/shell/design/tokens.json",
+    "tools/gen_tokens.py",
+    "game/shell/design/tw_tokens.gd (генерируется)",
+    "tools/lint_tokens.py"
+   ],
+   "acceptance": [
+    "`python tools/gen_tokens.py` детерминирован: два запуска дают одинаковые байты; значения цветов совпадают с V10DS (скриптовое сравнение, 100%)",
+    "линты: на 1 076 сырых hex-литералах легаси режим отчёта (число зафиксировано), на game/shell — 0 нарушений",
+    "шкала шрифтов <= 4 размеров на 720; HIT_TARGET_MIN = 96 px (GDD §7.2), 112 px для Отмены/Подсказки/Перемешать"
+   ],
+   "agent_hours": 7,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "низкий",
+    "note": "файл токенов — hot file: один владелец, добавления только по строкам, отсортировано"
+   },
+   "player_visible": null,
+   "arch_ref": "WP9",
+   "night_safe": true,
+   "night_check": "Python + JSON, новые файлы; Godot не нужен (генерация .gd как текст)",
+   "owner_action": null
+  },
+  {
+   "id": "P28",
+   "week": 2,
+   "name": "WP9b: виджеты TWButton, TWPlate, TWSheet, TWHeader, TWTabBar, TWToast, TWCurrencyChip",
+   "goal": "Один API кнопки вместо трёх (JButton/V10Button/V10HudSkin), векторная отрисовка 'лак'; скины = подмена токенов; перенос 854 hud2-проверок.",
+   "depends_on": [
+    "P27"
+   ],
+   "lane": "shell",
+   "files": [
+    "game/shell/design/tw_button.gd",
+    "game/shell/design/tw_plate.gd",
+    "game/shell/design/tw_sheet.gd",
+    "game/shell/design/tw_header.gd",
+    "game/shell/design/tw_tabbar.gd",
+    "game/shell/design/tw_toast.gd",
+    "game/shell/design/tw_currency_chip.gd",
+    "game/shell/design/widgets_selftest.gd"
+   ],
+   "acceptance": [
+    "widgets_selftest >= 854 проверок (перенесены hud2) + новые; все виджеты на 3 разрешениях 720x1280/1600/1536x2048 без выхода за safe-area",
+    "нажатие: вниз 90 мс / вверх 160 мс пружина 0,94->1,0 (замер по тику); отклик на тап < 100 мс (p95 в headless-таймере)",
+    "JButton/V10Button получили compat-shim: 77+56 вызывающих рендерятся без правок"
+   ],
+   "agent_hours": 13,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "средний",
+    "note": "объём; делится на 2 агентов (кнопки/плашки и листы/тулбар) по файлам"
+   },
+   "player_visible": "новые кнопки и плашки в стиле 'лак' во всех v11-экранах",
+   "arch_ref": "WP9",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": null
+  },
+  {
+   "id": "P29",
+   "week": 1,
+   "name": "WP9c: TWAssets-реестр (id -> ресурс), резолверы составных id, режим approved-only",
+   "goal": "Единый доступ TWAssets.tex/stream/video(id); составные id (hero_png, cutouts, deck skins) регистрируются резолверами; в релизе не-approved id запрещены, в dev — помеченная заглушка.",
+   "depends_on": [
+    "P05"
+   ],
+   "lane": "shell",
+   "files": [
+    "game/shell/assets/tw_assets.gd",
+    "game/shell/assets/resolvers/*.gd",
+    "game/assets/manifest/assets.json",
+    "tools/lint_asset_id_only.py"
+   ],
+   "acceptance": [
+    "все ассеты, на которые ссылаются v11-экраны, разрешаются по id: тест перечисляет id и грузит каждый (0 missing)",
+    "в режиме release запрос id со статусом != approved возвращает ошибку; в dev — заглушка с видимым бейджем (скрин-тест)",
+    "линт ASSET_ID_ONLY: на game/shell 0 нарушений, на legacy — отчёт"
+   ],
+   "agent_hours": 7,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "средний",
+    "note": "715 файлов доступны только через составные id: опираться на трассу загрузок, не на статический анализ"
+   },
+   "player_visible": null,
+   "arch_ref": "WP9",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": null
+  },
+  {
+   "id": "P30",
+   "week": 2,
+   "name": "TWAudio: шины SFX/Music/Voice/UI, дакинг, очередь голосов, кулдауны",
+   "goal": "Заменить Sfx, V9Feel звук/haptic, V7Haptics, V10Music-фасад единой шиной по GDD §8: Voice -14 LUFS, дакинг музыки -8 дБ (attack 80 / release 400 мс), <=1 голос, приоритет ron>tsumo>riichi>pon/chi/kan>прочее, лестница высоты combo_pitch.",
+   "depends_on": [
+    "P23"
+   ],
+   "lane": "audio",
+   "files": [
+    "game/shell/audio/tw_audio.gd",
+    "game/shell/audio/voice_queue.gd",
+    "game/shell/audio/audio_selftest.gd",
+    "game/default_bus_layout.tres"
+   ],
+   "acceptance": [
+    "audio_selftest >= 339 (перенесены) + новые: очередь голосов глубиной 1 отбрасывает младший приоритет, кулдаун реплики 4 с, категории 60 с",
+    "ducking измерен рендером в WAV: музыка опускается на 8 +- 1 дБ за 80 +- 20 мс, возврат за 400 +- 60 мс",
+    "на профиле 'слабый Mali': <= 8 SFX-голосов и <= 1 голос, проверка симулятором нагрузки"
+   ],
+   "agent_hours": 11,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "средний",
+    "note": "старый Sfx используется повсюду: сначала shim, замена вызовов по мере миграции экранов"
+   },
+   "player_visible": "слышимая разница: клик плитки по 'лестнице', голос не накладывается, музыка приглушается под голос",
+   "arch_ref": "WP10 (TWAudio min)",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": null
+  },
+  {
+   "id": "P31",
+   "week": 3,
+   "name": "WP10a: TWBoardView — вид партии на событиях TWBoard",
+   "goal": "Node2D/Control-вид, который читает события ядра и проигрывает таймлайн анимаций (подъём 90 мс, полёт пары 180 мс, лоток 160 мс, оседание соседей 40 мс); правил внутри нет.",
+   "depends_on": [
+    "P18",
+    "P23",
+    "P29"
+   ],
+   "lane": "shell",
+   "files": [
+    "game/shell/screens/match/board_view.gd",
+    "game/shell/screens/match/match_screen.gd",
+    "game/shell/screens/match/spec.tres"
+   ],
+   "acceptance": [
+    "все 6 событий ядра (MATCH, DENY, ICE_CRACK, TRAY_WARN, TRAY_FULL, CLEARED) имеют анимацию; тест: ядро резолвит ход мгновенно, UI-таймлайн не меняет исход (100 игр: исходы с анимацией и без равны)",
+    "плитка >= 64 px при базе 720 (M), слайдер S/M/L/XL = 56/64/72/80+; контраст свободной/заблокированной >= 4,5:1 (замер скриптом по скрину)",
+    "60 fps на 60 плитках в headless-профайле: кадр <= 16,6 мс p95 (на устройстве — P37)"
+   ],
+   "agent_hours": 14,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "высокий",
+    "note": "ключевой экран; визуальное качество определяется владельцем на гейте P38"
+   },
+   "player_visible": "новая партия 'board-first': крупное поле, чистая сцена",
+   "arch_ref": "WP10",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": null
+  },
+  {
+   "id": "P32",
+   "week": 3,
+   "name": "WP10b: HUD партии board-first из токенов",
+   "goal": "5 интерактивных элементов (Пауза, Отмена, Подсказка, Перемешать, кольцо ульты), поле >=92% ширины и >=60% высоты, лоток на всю ширину, героиня-полоса <=28% высоты, без счётчиков на Отмене/Перемешать.",
+   "depends_on": [
+    "P28",
+    "P31"
+   ],
+   "lane": "shell",
+   "files": [
+    "game/shell/screens/match/match_hud.gd",
+    "game/shell/screens/match/hud_layout.gd (математика из V10HudMatch.compute)"
+   ],
+   "acceptance": [
+    "автотест раскладки на 720x1280, 720x1600, 960x1280: поле >=92% ширины, >=60% высоты, 0 пересечений HUD с полем, 0 цифр на Отмене/Перемешать",
+    "hit-цели >= 96 px, три кнопки 112 px; интерактивных ровно 5 (ux_lint)",
+    "скрин-голдены 3 аспектов с допуском 1,5% и diff-артефактом"
+   ],
+   "agent_hours": 10,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "средний",
+    "note": "конфликт с макетом v10 `01_match`/`02_combo`: берём GDD §7.2"
+   },
+   "player_visible": "HUD партии: четыре кнопки и кольцо ульты, ни одной цифры на безлимитных бустерах",
+   "arch_ref": "WP10",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": null
+  },
+  {
+   "id": "P33",
+   "week": 3,
+   "name": "WP10c: экран победы — быстрый путь <=3 с и цепочка вех <=20 с на TWRound",
+   "goal": "Результат через ModalStack и RoundResult: обычный уровень 1 панель <=3 с, веха (первая победа, босс главы, ★★★ главы, каждая 10-я победа) 3 панели <=20 с с одним Confirm; 0 счётчиков 'осталось сегодня'.",
+   "depends_on": [
+    "P20",
+    "P24",
+    "P31"
+   ],
+   "lane": "shell",
+   "files": [
+    "game/shell/screens/match/result_modal.gd",
+    "game/shell/screens/match/result_chain.gd",
+    "game/shell/screens/match/match_selftest.gd"
+   ],
+   "acceptance": [
+    "быстрый путь: от 'Поле чисто' до кнопки 'Ещё уровень' <= 3,0 с (замер таймлайна), кнопка на постоянном месте",
+    "веха <= 20 с, любой тап ускоряет текущую панель; Skip всегда виден",
+    "grep по тексту победы: 0 вхождений 'осталось', 0 продаж, 0 интерстишлов (ux_lint-правило)"
+   ],
+   "agent_hours": 8,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "средний",
+    "note": "стинг 9,3 с должен прерываться тапом"
+   },
+   "player_visible": "победа за 3 секунды вместо длинной цепочки",
+   "arch_ref": "WP10",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": null
+  },
+  {
+   "id": "P34",
+   "week": 3,
+   "name": "TWPresence: героиня-полоса <=28% высоты на live_rig, режим 'Минимум' (медальон 160 px)",
+   "goal": "Интерфейс присутствия героини в партии над готовым V10LiveRig; ни пикселя на поле; касания в партии отключены; один риг + одно видео на экран.",
+   "depends_on": [
+    "P23"
+   ],
+   "lane": "rigs",
+   "files": [
+    "game/shell/stage/presence.gd",
+    "game/shell/stage/presence_selftest.gd",
+    "game/core/rig/live_rig.gd (не ломать)"
+   ],
+   "acceptance": [
+    "rig_data_selftest и live_rig 214 проверок = baseline; presence_selftest >= 30: высота полосы <= 28% на 3 аспектах",
+    "реакции combo_t1/t2/t3, clear, fail, tray_danger, ult_cast подключены к событиям ядра; задержка реакции < 100 мс",
+    "draw calls на героиню <= 40 и текстуры <= 24 МБ (замер в P41 методом, цифры в отчёте)"
+   ],
+   "agent_hours": 8,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "средний",
+    "note": "только 3 из 10 ригов готовы (mc_gown, rin_officer, hana_base): остальные — заглушка-медальон"
+   },
+   "player_visible": "героиня реагирует на комбо под полем и не закрывает плитки",
+   "arch_ref": "WP10",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": null
+  },
+  {
+   "id": "P35",
+   "week": 3,
+   "name": "v11 Чайная (Home) + навбар 5 вкладок с ростом 1->3->5",
+   "goal": "Home v11: партнёрша в кадре от колен (>=35% экрана), кнопка 'Играть · N', <=8 интерактивных; навбар Чайная·Героини·Игры·Желания·Лавка, растёт по уровням (L5 +2, L9 +1, L16 +1).",
+   "depends_on": [
+    "P25",
+    "P28"
+   ],
+   "lane": "shell",
+   "files": [
+    "game/shell/screens/home/home_screen.gd",
+    "game/shell/nav/tab_model.gd",
+    "game/shell/screens/home/spec.tres"
+   ],
+   "acceptance": [
+    "<=1 с от тапа 'Играть' до доски (замер); интерактивных на Home <= 8 (ux_lint SCROLL_SHELF исключение учтено)",
+    "навбар: на L1 одна кнопка, на L5 три, на L9 четыре, на L16 пять — тест по фейковому состоянию",
+    "вкладка названа 'Игры' (не 'Столы'); режим 'Только пасьянс' сворачивает навбар до 'Играть · Игры'"
+   ],
+   "agent_hours": 12,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "средний",
+    "note": "зависит от арта фонов и ригов; временно берём фон из P04 shortlist"
+   },
+   "player_visible": "новая главная: 'Играть' одним касанием, чистый навбар",
+   "arch_ref": "Phase 4",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": null
+  },
+  {
+   "id": "P36",
+   "week": 4,
+   "name": "Экран S02: возраст (дата ДД ММ ГГГГ), чип 'Аниме / Спокойное', согласия, ссылка 'Я играю в риичи'",
+   "goal": "Юридически и по ТЗ обязательный первый экран v11 поверх TWAge; <18 -> экран отказа; сборка модерации по умолчанию 'Нейтральный'.",
+   "depends_on": [
+    "P22",
+    "P24",
+    "P28"
+   ],
+   "lane": "shell",
+   "files": [
+    "game/shell/screens/age/age_screen.gd",
+    "game/shell/screens/age/spec.tres",
+    "game/shell/screens/age/refusal_modal.gd"
+   ],
+   "acceptance": [
+    "8 цифр + 1-2 тапа до игры (<=15 с на сценарии бота); экран <=8 интерактивных",
+    "возраст < 18 не пропускает дальше ни при каком пути (тест Android back, перезапуск, подмена даты)",
+    "выбор 'Спокойное' виден в первой же партии (тир арта 'Нейтральный'): скрин-тест"
+   ],
+   "agent_hours": 6,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "средний",
+    "note": "юр. формулировки и Оферта от владельца; пока плейсхолдеры со штампом 'DRAFT'"
+   },
+   "player_visible": "первый экран игры по новому ТЗ",
+   "arch_ref": "GDD S02",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": "тексты Оферты/Политики (Q-07/Q-08)"
+  },
+  {
+   "id": "P37",
+   "week": 3,
+   "name": "WP10d: QA вертикального среза: скрин-голдены, 100 игр ботом через API экрана, perf-бюджет",
+   "goal": "Доказать срез: Путь -> партия -> победа на v11 с легаси-экранами через host; бот проходит home->play->result->collection->wish->shop.",
+   "depends_on": [
+    "P31",
+    "P32",
+    "P33"
+   ],
+   "lane": "qa",
+   "files": [
+    "game/shell/tests/slice_playthrough.gd",
+    "game/tests/goldens/*.png",
+    "tools/tw_test.py (suite `slice`)",
+    "tools/perf_budget.py"
+   ],
+   "acceptance": [
+    "100/100 партий бот проходит без SCRIPT ERROR и без зависания (>10 с без события = провал)",
+    "голдены 720x1280/720x1600/1536x2048 для 6 экранов, допуск 1,5%",
+    "perf: p95 кадра <= 16,6 мс на 60 плитках на эталонном устройстве владельца (если нет — headless-профиль + пометка 'устройство не проверено'); PCK <= 135 МБ"
+   ],
+   "agent_hours": 9,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "средний",
+    "note": "нет эталонного Android в контейнере: perf на устройстве делает владелец (M2)"
+   },
+   "player_visible": null,
+   "arch_ref": "WP10",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": "прогон на телефоне владельца (замер FPS и старт)"
+  },
+  {
+   "id": "P38",
+   "week": 4,
+   "name": "Гейт вертикального среза: пакет для владельца (видео, голдены, цифры) и решение 'веер агентов'",
+   "goal": "Единственное решение владельца перед масштабированием: look-and-feel, размер, perf. До этого экраны веера не стартуют.",
+   "depends_on": [
+    "P37"
+   ],
+   "lane": "qa",
+   "files": [
+    "design/SLICE_GATE.md (новый)",
+    "design/slice_gate/*.mp4|*.png"
+   ],
+   "acceptance": [
+    "пакет: запись экрана 90 с на 3 аспектах, таблица цифр (PCK МБ, p95 мс, холодный старт с, ошибки), список 10 известных проблем",
+    "лист решений: 'идём в веер / правим N пунктов', ответы владельца записаны в DECISIONS.md",
+    "каждая цифра пакета воспроизводима командой, указанной в документе"
+   ],
+   "agent_hours": 3,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "средний",
+    "note": "владелец может отклонить look-and-feel: стоимость = 1-2 недели правок"
+   },
+   "player_visible": "владелец видит и принимает/отклоняет новый вид партии",
+   "arch_ref": "Phase 4 gate",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": "решение владельца по срезу (ворота)"
+  },
+  {
+   "id": "P39",
+   "week": 4,
+   "name": "Веер 1: карта Пути (S17) + карточка уровня (S18) на v11",
+   "goal": "Первый экран веера после гейта: арки, узлы, 'решаемо · сид · бот', бустеры перед уровнем; легаси-карта удаляется в том же PR.",
+   "depends_on": [
+    "P38",
+    "P19"
+   ],
+   "lane": "shell",
+   "files": [
+    "game/shell/screens/path/path_screen.gd",
+    "game/shell/screens/path/level_sheet.gd",
+    "game/shell/screens/path/spec.tres"
+   ],
+   "acceptance": [
+    "<=6 интерактивных на карте, <=7 на листе уровня (ux_lint)",
+    "легаси path map удалён, soak P26 зелёный, PT путь L1-L30 проходится ботом 30/30",
+    "карта на 1000 уровней строится < 250 мс (soft-проверка path)"
+   ],
+   "agent_hours": 14,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "высокий",
+    "note": "стартует только после P38; при отказе владельца откладывается"
+   },
+   "player_visible": "новая карта Пути",
+   "arch_ref": "Phase 5",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": "старт после гейта P38"
+  },
+  {
+   "id": "P40",
+   "week": 4,
+   "name": "Веер 2: Героини (S08) + карточка героини (S09) + гардероб/примерка (S10)",
+   "goal": "Коллекция на v11: список 10 героинь, Bond, наряды с плашкой 'Риг/Видео/Статика', примерка 1,2 с; легаси collection удаляется.",
+   "depends_on": [
+    "P38",
+    "P13"
+   ],
+   "lane": "shell",
+   "files": [
+    "game/shell/screens/heroes/heroes_screen.gd",
+    "game/shell/screens/heroes/hero_card.gd",
+    "game/shell/screens/heroes/wardrobe.gd"
+   ],
+   "acceptance": [
+    "<=9 интерактивных (список — один скролл-контрол), смена наряда <= 1,2 с вкл. вспышку 0,15 с",
+    "все 10 героинь открываются без SCRIPT ERROR; 0 ссылок на старые 0.5-спрайты hero/*.png",
+    "soak P26 зелёный; golden-скрины 3 аспектов"
+   ],
+   "agent_hours": 12,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "средний",
+    "note": "зависит от P42/P43 ригов; пока заглушка статикой"
+   },
+   "player_visible": "новая коллекция героинь",
+   "arch_ref": "Phase 5",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": "старт после гейта P38"
+  },
+  {
+   "id": "P41",
+   "week": 1,
+   "name": "Пилот рига Юэ: бюджеты Skeleton2D (draw calls, память), сжатие слоёв >=3x",
+   "goal": "Закрыть R-16/R-34: измерить Skeleton2D/V10LiveRig на реальном риге Юэ, проверить lossy-слои (сейчас 13 МБ rig layers лежат lossless), решить методом сжатия до заказа 25 ригов. Сравнение с gd_cubism/spine-godot — только по документации и лицензиям (без интеграции).",
+   "depends_on": [],
+   "lane": "rigs",
+   "files": [
+    "game/core/rig/live_rig.gd (read-only)",
+    "game/assets/v10/rig/",
+    "docs/rigs/PILOT_YUE.md (новый)",
+    "tools/rigs/measure.gd (новый)"
+   ],
+   "acceptance": [
+    "отчёт: draw calls, текстурная память, CPU мс/кадр для рига Юэ и mc_gown в headless; цель <=40 draw calls и <=24 МБ на героиню",
+    "эксперимент lossy-слоёв: PSNR >= 38 дБ на слоях, размер рига падает >= 3x (цель <=3 МБ/риг) либо вердикт 'нельзя' с причиной",
+    "таблица лицензий и размеров для 3 вариантов (Skeleton2D / gd_cubism / spine-godot) — со ссылками на источники, непроверенное помечено [НП]"
+   ],
+   "agent_hours": 8,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "средний",
+    "note": "замер на Mali невозможен в контейнере: помечаем 'не на устройстве'; финальный замер — владелец"
+   },
+   "player_visible": null,
+   "arch_ref": "GDD R-16/R-34",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": "замер на устройстве владельца (после P37)"
+  },
+  {
+   "id": "P42",
+   "week": 3,
+   "name": "Риг yue_base (базовый наряд Юэ) по контракту V10LiveRig v2",
+   "goal": "Первый новый риг: слои из утверждённого каноничного арта, gestures.json (8 автожестов), лица neutral/happy/shy/pout + 4 новых, rig_data_selftest.",
+   "depends_on": [
+    "P41",
+    "P50"
+   ],
+   "lane": "rigs",
+   "files": [
+    "game/assets/v10/rig/yue_base/",
+    "game/assets/v10/rig/yue_base/gestures.json",
+    "assets/manifest/assets.json (status)"
+   ],
+   "acceptance": [
+    "rig_data_selftest зелёный для yue_base; дыхание 3,5-4,5 с, моргание 2-6 с (замер тиков)",
+    "размер рига <= 3 МБ; draw calls <= 40",
+    "3 тира касаний работают (голова/рука/волосы/наряд); интимные зоны мертвы: тест нулевой реакции на 4 зоны"
+   ],
+   "agent_hours": 14,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "высокий",
+    "note": "качество послойной нарезки из генерации; оценка +-40%"
+   },
+   "player_visible": "живая Юэ в Чайной",
+   "arch_ref": "GDD §9.2",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": "одобрение золотых композитов (P50) — условие старта"
+  },
+  {
+   "id": "P43",
+   "week": 3,
+   "name": "Риг nova_base (базовый наряд Новы)",
+   "goal": "Второй риг после гейта 'Единый стиль': неон Новы только в наряде и FX.",
+   "depends_on": [
+    "P41",
+    "P50"
+   ],
+   "lane": "rigs",
+   "files": [
+    "game/assets/v10/rig/nova_base/",
+    "game/assets/v10/rig/nova_base/gestures.json"
+   ],
+   "acceptance": [
+    "rig_data_selftest зелёный для nova_base; размер <= 3 МБ; draw calls <= 40",
+    "8 автожестов (6 общих + 2 фирменных), лица 8 штук",
+    "акцентный цвет героини <= 20% площади кадра (автозамер по скрину Home)"
+   ],
+   "agent_hours": 14,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "высокий",
+    "note": "как P42"
+   },
+   "player_visible": "живая Нова в Чайной",
+   "arch_ref": "GDD §9.2",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": "одобрение золотых композитов (P50)"
+  },
+  {
+   "id": "P44",
+   "week": 1,
+   "name": "Реестр реплик: схема id, Beta-24 x 10 героинь (JP + RU субтитры), селф-тест карты 100%",
+   "goal": "Таблица heroine x line_id x JP x RU x условие x пул x длительность x файл; id `<heroine>_<категория>_<N>`; тексты Beta-24 для всех 10 героинь (240 строк). Без озвучки.",
+   "depends_on": [],
+   "lane": "audio",
+   "files": [
+    "game/core/voice/voice_registry.json",
+    "game/core/voice/voice_registry_selftest.gd",
+    "tools/audio/voice_registry.py",
+    "design/voice/BETA24_TEXTS.md"
+   ],
+   "acceptance": [
+    "240 строк (24 x 10), каждая: id, JP, RU, условие, пул, длительность-цель (вызовы 0,4-1,2 с; лобби 1,5-4 с; intro_summon <=4 с)",
+    "валидатор: 0 дубль-id, 0 пустых RU, длина JP-строки в целевом диапазоне по оценке каны; красные линии: 0 интимных зон, флирт только на игрока (стоп-лист слов в тесте)",
+    "карта: для каждой строки известен будущий путь файла; тест 'каждый ID имеет файл' умеет работать на 0 из 240 (ожидаемо) и показывает долю"
+   ],
+   "agent_hours": 6,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "средний",
+    "note": "JP-тексты пишет модель: нужна проверка носителем (утро/день); помечено [НП] до проверки"
+   },
+   "player_visible": null,
+   "arch_ref": "GDD §8.4",
+   "night_safe": true,
+   "night_check": "текстовая работа, без кредитов; новые файлы",
+   "owner_action": "проверка JP-текстов носителем (M8, часть прослушивания)"
+  },
+  {
+   "id": "P45",
+   "week": 1,
+   "name": "LUFS/true-peak/тишина-в-начале гейт для аудио (tools/audio)",
+   "goal": "Автоматический аудио-QA по GDD §8.1/§11.5: музыка -16 +-1 LUFS, голос -14 +-1, разброс внутри героини +-1 LU и между героинями +-1,5 LU, true peak <= -1 dBTP, тишина в начале <= 40 мс.",
+   "depends_on": [],
+   "lane": "audio",
+   "files": [
+    "tools/audio/lufs_gate.py",
+    "tools/audio/normalize.py",
+    "tools/audio/tests/*.wav (синтетика)",
+    "tools/tw_test.py (suite `audio_gate`)"
+   ],
+   "acceptance": [
+    "тест на 12 синтетических сигналах с известной громкостью: ошибка измерения <= 0,3 LU",
+    "прогон по существующим 283 аудиофайлам даёт отчёт; все файлы вне допуска перечислены в CSV",
+    "ffmpeg ebur128 или pyloudnorm: зависимость описана, прогон 283 файлов < 60 с"
+   ],
+   "agent_hours": 4,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "низкий",
+    "note": "нужен ffmpeg в контейнере (проверить)"
+   },
+   "player_visible": null,
+   "arch_ref": "GDD §11.5",
+   "night_safe": true,
+   "night_check": "только Python и ffmpeg; без Godot",
+   "owner_action": null
+  },
+  {
+   "id": "P46",
+   "week": 1,
+   "name": "Слепой тест JP-голосов: 90 образцов, страница прослушивания и протокол",
+   "goal": "Ворота R-06: 3 модели x 3 голоса x 10 типовых реплик (seed_audio 0,20 кр, ElevenLabs v4 0,23, text2speech_v2 0,15); порог >=70% 'не отличают от студийного'. Генерируем образцы и страницу оценки; прослушивает человек.",
+   "depends_on": [
+    "P44"
+   ],
+   "lane": "audio",
+   "files": [
+    "design/voice/blind_test/samples/*.ogg",
+    "design/voice/blind_test/index.html",
+    "design/voice/blind_test/PROTOCOL.md",
+    "design/voice/blind_test/results.csv"
+   ],
+   "acceptance": [
+    "90 файлов, имена скрыты (хеш), ключ в отдельном файле; нормализация по P45",
+    "страница работает офлайн, пишет оценки 1-5 и 'отличаю/не отличаю'; протокол: >= 3 слушателя, минимум 1 носитель JP",
+    "итог считается скриптом: доля 'не отличают' по модели и по голосу; решение: порог 70% достигнут/нет -> живая актриса для МТ, Юэ, Златы"
+   ],
+   "agent_hours": 3,
+   "gpu": "Higgsfield API (аудио)",
+   "higgsfield_credits": {
+    "min": 17,
+    "max": 24
+   },
+   "risk": {
+    "level": "средний",
+    "note": "качество просодии не измерено никем; порог может не пройти (Q-14)"
+   },
+   "player_visible": null,
+   "arch_ref": "GDD §8.4",
+   "night_safe": true,
+   "night_check": "микро-трата <= 24 кр (0,03% баланса): допустимо без подтверждения; сами оценки — утром",
+   "owner_action": "прослушивание 90 образцов (~25 мин), M8"
+  },
+  {
+   "id": "P47",
+   "week": 2,
+   "name": "Озвучка Beta-24 x 10 героинь на победившей модели + LUFS-гейт",
+   "goal": "240 строк x 3 дубля, выбор лучшего дубля; интеграция путей в реестр; предзагрузка банка партнёрши при старте партии.",
+   "depends_on": [
+    "P44",
+    "P45",
+    "P46"
+   ],
+   "lane": "audio",
+   "files": [
+    "game/assets/voice/<heroine>/*.ogg",
+    "game/core/voice/voice_registry.json"
+   ],
+   "acceptance": [
+    "240 из 240 строк имеют файл; LUFS-гейт: голос -14 +-1, true peak <= -1 dBTP, тишина в начале <= 40 мс — 100% строк",
+    "разброс между героинями <= 1,5 LU, внутри героини <= 1 LU",
+    "суммарный размер голоса Beta-24 <= 4 МБ (ogg моно ~15 КБ/строка)"
+   ],
+   "agent_hours": 6,
+   "gpu": "Higgsfield API (аудио)",
+   "higgsfield_credits": {
+    "min": 144,
+    "max": 166
+   },
+   "risk": {
+    "level": "средний",
+    "note": "если тест P46 провален: не заказываем для МТ, Юэ, Златы (живая актриса)"
+   },
+   "player_visible": "героини говорят новыми голосами с субтитрами",
+   "arch_ref": "GDD §8.4",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": "Решение по результату P46 (порог 70%) и бюджет (M3)"
+  },
+  {
+   "id": "P48",
+   "week": 3,
+   "name": "Музыка M1: стол риичи + слои, финал партии, стинги раскрытия, итог, 4 режимных петли (шов-гейт)",
+   "goal": "Приоритетные треки из GDD §8.2: table_riichi (+layers riichi_1/2), match_finale, summon_r/sr/ssr/outfit, results_bed, loops Классика/Связи/Коикои/Сад; 3 варианта на трек, стемы `separate_stems(four)` для партии.",
+   "depends_on": [
+    "P45"
+   ],
+   "lane": "audio",
+   "files": [
+    "game/assets/audio/music/*.ogg",
+    "tools/audio/seam_gate.py",
+    "tools/audio/approved_music_prompts.json"
+   ],
+   "acceptance": [
+    "12-13 треков, каждый прошёл шов-гейт (петля: скачок громкости на стыке <= 1 дБ, спектральный flux ниже порога) и LUFS -16 +-1",
+    "стемы партии: 4 слоя одной генерации, суммарно переход NEXT_BAR без щелчка (замер по рендеру)",
+    "музыка <= 12 МБ (в рамках бюджета 24 МБ на всю музыку, ogg 64 kbps петли <=60 с)"
+   ],
+   "agent_hours": 12,
+   "gpu": "Higgsfield API (музыка)",
+   "higgsfield_credits": {
+    "min": 200,
+    "max": 300
+   },
+   "risk": {
+    "level": "средний",
+    "note": "тональность стемов держится лишь в 12 из 17 треков — слои только из одной генерации"
+   },
+   "player_visible": "музыка стола/раскрытия/режимов",
+   "arch_ref": "GDD §8.2",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": "отбор лучших вариантов на слух (M8) и бюджет"
+  },
+  {
+   "id": "P49",
+   "week": 3,
+   "name": "SFX +40 и 2 амбиента (чайный дом, дождь/бамбук) + подключение в TWAudio",
+   "goal": "76 SFX к релизу: 40 новых (гача, симпатия, касания, игра, UI) x 3 варианта, лаковое дерево/кость, без 'бзззз'.",
+   "depends_on": [
+    "P30",
+    "P45"
+   ],
+   "lane": "audio",
+   "files": [
+    "game/assets/audio/sfx/*.ogg",
+    "tools/audio/sfx_manifest.json"
+   ],
+   "acceptance": [
+    "40 звуков + 2 амбиента; пики <= -6 dBFS; каждый проходит P45; общий размер <= 3 МБ",
+    "все 40 id привязаны к событиям TWAudio; тест 'нет несвязанных id'",
+    "локальный A/B: 3 варианта каждого, лучший выбран (запись выбора)"
+   ],
+   "agent_hours": 6,
+   "gpu": "Higgsfield API (SFX)",
+   "higgsfield_credits": {
+    "min": 60,
+    "max": 105
+   },
+   "risk": {
+    "level": "низкий",
+    "note": "лицензия Epidemic Sound не используется; SFX генерируем"
+   },
+   "player_visible": "звуки гачи, касаний, партии",
+   "arch_ref": "GDD §8.3",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": "бюджет (M3)"
+  },
+  {
+   "id": "P50",
+   "week": 2,
+   "name": "Ворота 'Единый стиль': 5 золотых композитов x МТ, Юэ, Нова",
+   "goal": "GDD §11.4: партия, Чайная, призыв, Лавка, победа; канон героинь gpt_image_2_6 + Elements + recipe v4, окружения LoRA/HF-кандидаты; проходят критерии а-е. Не прошёл — конвейер ригов стоит.",
+   "depends_on": [
+    "P04",
+    "P58",
+    "P59"
+   ],
+   "lane": "art",
+   "files": [
+    "art/incoming/gold/*.png",
+    "design/art_batches/gold_composites.json",
+    "design/gold/GATE_REPORT.md"
+   ],
+   "acceptance": [
+    "15 финальных кадров (3 героини x 5 сцен); лица различимы по >= 3 из 5 признаков (форма глаз, ширина лица, нос/рот, возраст, брови) — таблица замеров",
+    "автоизмерение: акцент героини <= 20% площади; число голов 7-7,5 (линейка по ключ-артам); золото только SSR + 1 акцент",
+    "двойной аудит анатомии: кропы рук/ног/пальцев, 0 текста, метаданные очищены (скрипт P58)"
+   ],
+   "agent_hours": 12,
+   "gpu": "Higgsfield API (изображения)",
+   "higgsfield_credits": {
+    "min": 180,
+    "max": 300
+   },
+   "risk": {
+    "level": "высокий",
+    "note": "композит может не пройти (листы 'combo_faces' по мнению критика не проходят): итерации до 3 раундов"
+   },
+   "player_visible": "первые кадры нового единого стиля",
+   "arch_ref": "GDD §11.4",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": "AD-проход: одобрение 15 кадров (M7); бюджет (M3)"
+  },
+  {
+   "id": "P51",
+   "week": 3,
+   "name": "Канон-набор героинь H1: 10 x 3 кадра (база по пояс, win, shy/pout) через gpt_image_2_6 + Elements",
+   "goal": "Базовые портреты для Чайной, карточек, победы; одинаковый recipe v4; возраст 23+, 7-7,5 голов.",
+   "depends_on": [
+    "P50"
+   ],
+   "lane": "art",
+   "files": [
+    "art/incoming/heroines/<id>/*.png",
+    "design/art_batches/H1_canon.json"
+   ],
+   "acceptance": [
+    "30 финалистов, каждый approved только после двойного аудита; лица 10 героинь различимы (матрица попарного сравнения 45 пар: >= 3 из 5 признаков отличаются в >=90% пар)",
+    "палитра героини <= 20% кадра; цвет волос/глаз по каноническим описаниям Elements — таблица сверки 10 x 4 признака",
+    "все файлы <= 1536 px по длинной стороне, WebP lossy q0.8-0.85"
+   ],
+   "agent_hours": 14,
+   "gpu": "Higgsfield API (изображения)",
+   "higgsfield_credits": {
+    "min": 300,
+    "max": 420
+   },
+   "risk": {
+    "level": "высокий",
+    "note": "дрейф лиц; поэтому Elements, не LoRA (по LORA HOWTO)"
+   },
+   "player_visible": "10 героинь в едином стиле",
+   "arch_ref": "GDD §11.4",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": "AD-проход (M7)"
+  },
+  {
+   "id": "P52",
+   "week": 1,
+   "name": "Обучение LoRA tw_master_v2 (запуск по MORNING.md)",
+   "goal": "Подготовлено: датасет (348 пар), кит, скрипт. Нужны gpt-подтверждения на аренду H200 и ровно один exec. Цель — единый стиль окружений/тайлов/FX/UI без перекоса v1 (розовый/лавандовый, 'curvy hourglass').",
+   "depends_on": [],
+   "lane": "art",
+   "files": [
+    "lora-v2/MORNING.md",
+    "lora-v2/EXEC_COMMAND_V2.txt",
+    "lora-v2/launch_v2.sh"
+   ],
+   "acceptance": [
+    "DONE_V2 получен; чекпоинты 500..4500 сохранены на /workspace и СКАЧАНЫ (CloudFront + sha256 совпал)",
+    "гейты G1-G5 SPEC_V2 §8 (идентичность, пропорции, палитра по image_stats.py, текст, красные линии): выбран чекпоинт (ожидаемо s3000/s4000)",
+    "после работы `gpu_my` показывает 0 живых боксов этой задачи; фактические кредиты записаны"
+   ],
+   "agent_hours": 2,
+   "gpu": "GPU-аренда H200 (134 кр/ч)",
+   "higgsfield_credits": {
+    "min": 160,
+    "max": 270
+   },
+   "risk": {
+    "level": "средний",
+    "note": "на v1 перетренированные чекпоинты хуже; слоты загрузки истекают через 24 ч после 2026-11-27 23:13 UTC"
+   },
+   "player_visible": null,
+   "arch_ref": "PROD-art",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": "клик gpu_rent и один gpu_rental_exec (M3)"
+  },
+  {
+   "id": "P53",
+   "week": 2,
+   "name": "Окружения E1: 24 фона стола, 10 зон Салона, 12 фонов Коикои, тайлы/FX (LoRA v2, один бокс)",
+   "goal": "GDD §7.3: фоны 'меняющиеся'; генерация на том же боксе сразу после обучения, чтобы не платить загрузку дважды; финалисты через upscale.",
+   "depends_on": [
+    "P52",
+    "P59"
+   ],
+   "lane": "art",
+   "files": [
+    "art/incoming/env/*.png",
+    "design/art_batches/E1_env.json"
+   ],
+   "acceptance": [
+    "~540 кандидатов -> 46 финалистов (24+10+12) + >= 40 тайлов/FX; каждый без текста, без персонажей, контраст граней плиток >= 4,5:1 на фоне стола",
+    "палитра: доля pink/lavender пикселей <= 0,25 (image_stats.py; у v1 было 0,21-0,42 — цель не хуже) и средняя насыщенность >= 0,22",
+    "все финалисты <= 1536 px, статус generated -> approved только после AD"
+   ],
+   "agent_hours": 10,
+   "gpu": "GPU-аренда H200 + Higgsfield API (upscale)",
+   "higgsfield_credits": {
+    "min": 300,
+    "max": 420
+   },
+   "risk": {
+    "level": "средний",
+    "note": "на каждый gpu_rental_exec нужен клик: 4-6 кликов (запуск, 2-3 опроса, выгрузка)"
+   },
+   "player_visible": "меняющиеся фоны Чайной/Салона/Стола",
+   "arch_ref": "GDD §7.3",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": "клики GPU-сессии (M3) и AD-проход (M7)"
+  },
+  {
+   "id": "P54",
+   "week": 3,
+   "name": "UI-кит иконок: навбар 5, валюты 5, бустеры 4, режимы 11 (обложки), редкость и мелочь",
+   "goal": "Один набор иконок/обложек в стиле 'лак', монолинейные золотые; плашки и кнопки рисуются в движке (P28), без текста в картинках.",
+   "depends_on": [
+    "P50",
+    "P59"
+   ],
+   "lane": "art",
+   "files": [
+    "art/incoming/ui/*.png",
+    "game/shell/design/icons/*.svg|png",
+    "design/art_batches/UI_icons.json"
+   ],
+   "acceptance": [
+    "60 иконок (по 4 кандидата) + 11 обложек режимов; единая толщина линии (замер по скелетизации <= 1,3 разброс), палитра из tokens.json (100% пикселей из палитры +-4 ΔE)",
+    "кириллица в картинках 0 (OCR-проверка на отсутствие текста)",
+    "обложка режима: хозяйка режима + фон его зоны; <= 1536 px"
+   ],
+   "agent_hours": 8,
+   "gpu": "Higgsfield API (изображения)",
+   "higgsfield_credits": {
+    "min": 280,
+    "max": 420
+   },
+   "risk": {
+    "level": "средний",
+    "note": "LoRA искажает кириллицу; поэтому текст только в движке"
+   },
+   "player_visible": "единые иконки навбара и режимов",
+   "arch_ref": "GDD §11.4",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": "AD-проход (M7)"
+  },
+  {
+   "id": "P55",
+   "week": 3,
+   "name": "Нейтральный тир: 10 закрытых нарядов + набор из 8 лиц на героиню",
+   "goal": "'Нейтральный' = отдельный закрытый наряд на героиню (GDD §4.6/§0.4 п.8) — сборка модерации и скриншоты стора; лица neutral, happy, shy, pout, surprised, sad, sleepy, shy-averted.",
+   "depends_on": [
+    "P50"
+   ],
+   "lane": "art",
+   "files": [
+    "art/incoming/neutral/<id>/*.png",
+    "design/art_batches/H2_neutral_faces.json"
+   ],
+   "acceptance": [
+    "10 нарядов: нет чулок/подвязок, вырез не глубже ключицы, героиня <= 40% кадра (аудит по чек-листу §11.6)",
+    "80 лиц (10 x 8), у каждой лицо совпадает с каноном (попарное сравнение с H1 >= 4 из 5 признаков)",
+    "аудит просвета юбок/подолов светлых платьев: 0 нарушений"
+   ],
+   "agent_hours": 10,
+   "gpu": "Higgsfield API (изображения)",
+   "higgsfield_credits": {
+    "min": 180,
+    "max": 260
+   },
+   "risk": {
+    "level": "высокий",
+    "note": "стилевой дрейф; по ответу RuStore (Q-09) тир 'Полный' не делаем"
+   },
+   "player_visible": "безопасные скриншоты для стора и 'Спокойное' оформление",
+   "arch_ref": "GDD §4.6",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": "AD-проход (M7)"
+  },
+  {
+   "id": "P56",
+   "week": 3,
+   "name": "Combo T1/T2/T3 для 5 героинь волны 1 (2K, прозрачные)",
+   "goal": "HANDOFF P0-2: у Цубамэ, Миэль, Кохаку, Ширин, Златы нет витрин hud2/combo; делаем 15 кадров в стиле основательниц.",
+   "depends_on": [
+    "P50"
+   ],
+   "lane": "art",
+   "files": [
+    "art/incoming/combo/<id>_t1..t3.png",
+    "game/assets/v10/hud2/combo/combo_meta.json"
+   ],
+   "acceptance": [
+    "15 прозрачных PNG -> WebP q0.85, <= 1536 px, края без ореола (проверка на тёмном и светлом фоне, скрипт: halo-score <= порога)",
+    "лица совпадают с H1 (>= 4 из 5 признаков)",
+    "в партии v11 (P34) комбо-реакции показывают их без SCRIPT ERROR"
+   ],
+   "agent_hours": 8,
+   "gpu": "Higgsfield API (изображения + remove_background)",
+   "higgsfield_credits": {
+    "min": 120,
+    "max": 190
+   },
+   "risk": {
+    "level": "средний",
+    "note": "прозрачность/ореолы"
+   },
+   "player_visible": "комбо-витрины всех 10 героинь",
+   "arch_ref": "HANDOFF P0-2",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": "AD-проход (M7)"
+  },
+  {
+   "id": "P57",
+   "week": 4,
+   "name": "Видео-пилоты: 1 SSR-ульта (Kling 3.0 vs Seedance 2.5) и 1 memorial-сцена",
+   "goal": "Проверить качество и стоимость видео до заказа 6 SSR-ульт и 3 memorial; ограничение APK: <= 0,7-0,9 МБ на ogv.",
+   "depends_on": [
+    "P51"
+   ],
+   "lane": "rigs",
+   "files": [
+    "art/incoming/video/*.mp4",
+    "tools/video/pilots/compare.tsv"
+   ],
+   "acceptance": [
+    "6 попыток Kling (10 кр/5 с) + 2 Seedance (35 кр/5 с): таблица качество/стоимость/дрейф лица (кадр 1 vs кадр N, сходство лица >= 4 из 5 признаков)",
+    "лучший клип -> ogv <= 0,9 МБ, SSIM >= 0,90 к источнику",
+    "1 memorial 10-15 с для флагманской героини или вердикт 'через риг'"
+   ],
+   "agent_hours": 6,
+   "gpu": "Higgsfield API (видео)",
+   "higgsfield_credits": {
+    "min": 130,
+    "max": 230
+   },
+   "risk": {
+    "level": "высокий",
+    "note": "видео-дрейф лица; кредиты быстро растут"
+   },
+   "player_visible": "первая новая видео-ульта",
+   "arch_ref": "GDD §9.4/§9.2",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": "бюджет (M3), AD-одобрение"
+  },
+  {
+   "id": "P58",
+   "week": 1,
+   "name": "Конвейер одобрения арта: assets/incoming, статусы approved, скраб метаданных, чек-лист двойного аудита",
+   "goal": "ARCH: арт не попадает в релиз каталогом. Инструменты: `incoming/` + запись в manifest (status=generated), CLI `approve <id>` (одна строка манифеста), зачистка EXIF/XMP/C2PA, детектор водяных знаков по краям, нарезка кропов рук/ног/пальцев для аудита.",
+   "depends_on": [],
+   "lane": "art",
+   "files": [
+    "tools/art/approve.py",
+    "tools/art/scrub_metadata.py",
+    "tools/art/audit_crops.py",
+    "tools/art/watermark_scan.py",
+    "game/assets/manifest/assets.json (формат)"
+   ],
+   "acceptance": [
+    "на 20 тестовых картинках: 0 EXIF/XMP/C2PA после скраба (проверка exiftool), пиксели идентичны (SSIM 1,0)",
+    "audit_crops на картинке 1536x1536 даёт >= 6 кропов (руки, ноги) и контактный лист < 5 с",
+    "approve меняет ровно одну строку manifest; CI-проверка: релиз-пресет не содержит файлов status != approved (тест на 3 примерах)"
+   ],
+   "agent_hours": 6,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "низкий",
+    "note": "нужны exiftool/Pillow в контейнере (проверить)"
+   },
+   "player_visible": null,
+   "arch_ref": "ARCH asset gate",
+   "night_safe": true,
+   "night_check": "Python-инструменты в tools/art; картинки не генерируются; манифест не меняем без флага",
+   "owner_action": null
+  },
+  {
+   "id": "P59",
+   "week": 1,
+   "name": "Пакеты промптов и задач для всех арт-батчей (JSON): элементы, сиды, хвосты, лимиты кредитов",
+   "goal": "Подготовить design/art_batches/*.json: для каждого батча список заданий (id, модель, prompt, element ids/LoRA-триггер, размер, seed, число кандидатов, потолок кредитов), чтобы утром владелец одобрял ЧИСЛО, а не текст. Ничего не тратим.",
+   "depends_on": [],
+   "lane": "art",
+   "files": [
+    "design/art_batches/*.json",
+    "design/art_batches/README.md",
+    "design/ART_BATCHES.md"
+   ],
+   "acceptance": [
+    "по 1 JSON на батч H0-H4, E1, UI, V*, M*, S*, X*: каждая запись валидна схемой (скрипт validate_batches.py), сумма quota == бюджету в ART_BATCHES.md ± 1%",
+    "промпты героинь содержат element id из HANDOFF §2.2 (10 штук, проверка по списку) и 0 запрещённых слов (garter, lingerie, panties, upskirt, school, schoolgirl, teacher)",
+    "каждый батч имеет потолок кредитов, число кандидатов и критерий отсева"
+   ],
+   "agent_hours": 4,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "низкий",
+    "note": "промпты не проверены генерацией: первая партия по 2-3 кадра"
+   },
+   "player_visible": null,
+   "arch_ref": "ART plan",
+   "night_safe": true,
+   "night_check": "только текст/JSON, без вызовов генерации",
+   "owner_action": null
+  },
+  {
+   "id": "P60",
+   "week": 5,
+   "name": "Палитра: TWPalette (OKLab-микс), tokens schema 2, gen_tokens.py, palette_selftest, правки токенов",
+   "goal": "Единая цветовая система PALETTE_LOCK: рампы героинь H100-H900, 8 тем T1-T5 (NEON2 как часть NEON), редкость, новые нейтрали; TWPalette.mix в OKLab; заглушка skin_host_stub получает OKLab-микс сразу.",
+   "depends_on": [
+    "P27"
+   ],
+   "lane": "shell",
+   "files": [
+    "game/shell/design/tokens.json",
+    "tools/gen_tokens.py",
+    "game/shell/skin/tw_palette.gd",
+    "game/shell/skin/palette_selftest.gd",
+    "design/specs/PALETTE_LOCK.md"
+   ],
+   "acceptance": [
+    "palette_selftest зелёный; gen_tokens.py --check: токены совпадают со сгенерированными файлами",
+    "TWPalette.mix в OKLab; тест 'sRGB-lerp и OKLab-mix различаются на >=dE 1' (ревью T15) и сукно felt_hi/felt_lo по новому правилу (T5 или NIGHT_800+T5@<=0,6/0,5)",
+    "THEME_INK C>=0,03; NEON2 учтён как часть NEON; lint_tokens NO_RAW_HEX без новых нарушений"
+   ],
+   "agent_hours": 32,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "средний",
+    "note": "RFC PAL-0001 должен быть принят владельцем; tokens.json только-добавление строк"
+   },
+   "player_visible": null,
+   "arch_ref": "PALETTE_LOCK §3-§8",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": "принять RFC PAL-0001 (рампы героинь и темы)"
+  },
+  {
+   "id": "P61",
+   "week": 6,
+   "name": "Ворота палитры: palette_audit.py по кадрам + TWSkinShot + 12 золотых кадров",
+   "goal": "Аудит палитры по кадрам рендерящего прогона (xvfb, не --headless): chrome-кадр без героини, маска кромок, калибровка на 10 экранах до включения FAIL; трещотка legacy-UI.",
+   "depends_on": [
+    "P60",
+    "P37",
+    "P96"
+   ],
+   "lane": "qa",
+   "files": [
+    "tools/qa/palette_audit.py",
+    "game/shell/skin/tw_skin_shot.gd",
+    "tools/palette_baseline.json",
+    "design/specs/palette_ramps.json"
+   ],
+   "acceptance": [
+    "palette_audit 0 FAIL на 12 золотых кадрах; ложные FAIL от сглаженных краёв и теней = 0 (erode 2 px)",
+    "калибровка порога dE на 10 текущих экранах записана в docs/qa/THRESHOLDS.md; трещотка не растёт",
+    "кадры снимаются в закреплённом образе xvfb+Mesa; снимок дерева и пиксельный хэш для комплаенс-экранов"
+   ],
+   "agent_hours": 48,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "средний",
+    "note": "пороги ΔE - гипотеза до калибровки; зависит от рендерящего CI (P96)"
+   },
+   "player_visible": null,
+   "arch_ref": "PALETTE_LOCK §9; UNIFIED_QA_PLAN §3",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": null
+  },
+  {
+   "id": "P62",
+   "week": 5,
+   "name": "TWWardrobe (core): события, миграция сейва в модульной версии, golden-сейвы",
+   "goal": "Владение скинами и ульта-id без повышения SAVE_VER: mod_ver.wardrobe, golden-сейвы v8, downgrade-тест.",
+   "depends_on": [
+    "P12",
+    "P13"
+   ],
+   "lane": "core",
+   "files": [
+    "game/core/wardrobe/",
+    "game/tests/fixtures/saves/golden_v8_wardrobe_*.json",
+    "data/wardrobe_map.json"
+   ],
+   "acceptance": [
+    "wardrobe_selftest: инварианты M1-M5 QA §11 (идемпотентность, неизвестное сохраняется)",
+    "SAVE_VER остаётся 8; сейв новой сборки открывается старой без потери и без write-lock (тест downgrade, ревью T17)",
+    "миграция legacy_id -> skin_id через wardrobe_map.json; неизвестные в legacy.unknown_outfits"
+   ],
+   "agent_hours": 40,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "низкий",
+    "note": "golden-сейвы нужно создать вместе с кодом"
+   },
+   "player_visible": null,
+   "arch_ref": "SKIN_HUD_SYSTEM §2.9; QA §11",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": null
+  },
+  {
+   "id": "P63",
+   "week": 7,
+   "name": "SkinPack core: TWSkinHost/Pack/Manifest/Slots/Surface, цепочка отката, горячая смена, мост TWSkin",
+   "goal": "Ядро системы скинов: манифест схемы 1, реестр слотов, откат пак -> базовый -> five_winds -> вектор, атомарный commit(), pin-счётчики, ScreenSpec.skin_slots.",
+   "depends_on": [
+    "P23",
+    "P27",
+    "P28",
+    "P29",
+    "P62",
+    "P90",
+    "P92"
+   ],
+   "lane": "shell",
+   "files": [
+    "game/shell/skin/tw_skin_host.gd",
+    "game/shell/skin/tw_skin_pack.gd",
+    "game/shell/skin/tw_skin_manifest.gd",
+    "game/shell/skin/tw_skin_slots.gd",
+    "game/shell/skin/tw_skin_surface.gd",
+    "design/specs/SKIN_HUD_SYSTEM.md"
+   ],
+   "acceptance": [
+    "TWSkinHost.commit(): указатели ресурсов -> TWSkin.apply -> одно событие skin.committed; не-виджетные потребители подписаны только на него (ревью T11)",
+    "pin-счётчики на время ULT_CINEMATIC и модалки примерки; skin_swap_soak: 300 смен без утечки Texture2D, счётчик отказов в TWSkinHost",
+    "AT-S01..AT-S06, AT-S30 зелёные; потеря любого слота -> откат без пустого экрана (AT-S03)",
+    "бюджет считается по собственному учёту TWSkinHost (байты по слотам), пик при смене <= 1,6 x бюджета активного"
+   ],
+   "agent_hours": 80,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "высокий",
+    "note": "самый большой кусок новой архитектуры; зависит от TWAssets-расширения (P90) и экспорт-пресетов (P92)"
+   },
+   "player_visible": "горячая смена наряда без перезапуска",
+   "arch_ref": "SKIN_HUD_SYSTEM §2",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": null
+  },
+  {
+   "id": "P64",
+   "week": 8,
+   "name": "TWPackStore, skin_pack.py, skin_catalog.py, CDN, подпись, состояния пака в S10/S43",
+   "goal": "Скачиваемые паки скинов: версионированные пути, подпись каталога (ключ .pub PEM), карантин, докачка Range; поле delivery apk|pack.",
+   "depends_on": [
+    "P63",
+    "P92"
+   ],
+   "lane": "core",
+   "files": [
+    "game/shell/skin/tw_pack_store.gd",
+    "tools/skin_pack.py",
+    "tools/skin_catalog.py",
+    "game/shell/skin/pack_pub.pub"
+   ],
+   "acceptance": [
+    "смонтировать v1, затем v2: load() видит v2 (путь res://skins_dl/<skin_id>/<major.minor>/, ревью T3); skins_dl/** отсутствует в APK (CI-проверка)",
+    "AT-S05: ключ отсутствует -> все паки отклонены, игра на базовом скине; AT-S14 расширен",
+    "T-PACK-1: две сборки дают одинаковую таблицу файлов и хэши записей; подписан манифест хэшей"
+   ],
+   "agent_hours": 64,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "высокий",
+    "note": "нужен ответ RuStore (Q-R08/Q-09) о докачке контента; Android-сборка для проверки монтирования"
+   },
+   "player_visible": null,
+   "arch_ref": "SKIN_HUD_SYSTEM §2.8; QA §10",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": "письмо в RuStore (Q-09): докачка контента и лимит APK"
+  },
+  {
+   "id": "P65",
+   "week": 7,
+   "name": "Ворота skin_lint: skin_lint.py, skin_rules.json, схема манифеста, фикстуры",
+   "goal": "Единый линтер скинов: манифест, слоты, палитра, безопасность пака (только JSON-клипы, без .res/.tres), бюджеты по формуле mem=Σ(w·h·bpp), красные линии (SL-RL-05..09, SL-VOX-01).",
+   "depends_on": [
+    "P63"
+   ],
+   "lane": "qa",
+   "files": [
+    "tools/qa/skin_lint.py",
+    "design/specs/skin_manifest.schema.json",
+    "design/specs/skin_rules.json",
+    "tools/qa/fixtures/skins/"
+   ],
+   "acceptance": [
+    "tools/qa: 77/77 (уже зелёные на claude/spec-all): heads>=7,0, .res/.tres запрещены, felt, INK",
+    "SL-MEM-01: бюджет из реальных размеров слоёв и формата импорта (ETC2/ASTC 4x4=1 Б/пиксель)",
+    "SL-SEC-01 разбирает .tscn: [sub_resource type=\"GDScript\"] и method-треки запрещены"
+   ],
+   "agent_hours": 40,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "низкий",
+    "note": "часть уже сделана в ветке spec-qa (скелет линтера)"
+   },
+   "player_visible": null,
+   "arch_ref": "SKIN_HUD_SYSTEM §7.1; QA §4",
+   "night_safe": true,
+   "night_check": "только Python; без Godot",
+   "owner_action": null
+  },
+  {
+   "id": "P66",
+   "week": 9,
+   "name": "Пилот-скин mc_ssrp_dragonnight целиком (первый showcase: MC) + расширение «витрины живой героини» P38",
+   "goal": "Первый SSR+ целиком: риг 44 слоя, касания, ульта (полная/короткая), HUD L2, параллакс-лобби без видео-петли, раскрытие SSR+ 5-7 с, превью 10 с.",
+   "depends_on": [
+    "P41",
+    "P42",
+    "P43",
+    "P50",
+    "P60",
+    "P61",
+    "P62",
+    "P63",
+    "P64",
+    "P65",
+    "P94",
+    "P98"
+   ],
+   "lane": "rigs",
+   "files": [
+    "art/skins/mc/mc_ssrp_dragonnight/",
+    "game/skins_dl/mc_ssrp_dragonnight/",
+    "design/skins/mc_ssrp_dragonnight/CHECKLIST.md"
+   ],
+   "acceptance": [
+    "AT-S01..AT-S24 зелёные; G1-G10 пройдены; два аудитора G3 + детектор наготы без FAIL (P94)",
+    "Лобби SSR+: p5 fps >= 50 на Ref-L, p95 кадра <= 16,6 мс; draw calls по новой функции числа слоёв",
+    "одобрение владельцем скриншотов и видео пилота (ворота перед P72)"
+   ],
+   "agent_hours": 200,
+   "gpu": "да (Higgsfield)",
+   "higgsfield_credits": {
+    "min": 764,
+    "max": 955
+   },
+   "risk": {
+    "level": "высокий",
+    "note": "критический путь; качество послойной нарезки; замер на устройстве владельца"
+   },
+   "player_visible": "первый полностью анимированный SSR+ на экране",
+   "arch_ref": "SKIN_HUD_SYSTEM §5; owner brief 2026-11-28 (MC первая)",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": "одобрение пилота"
+  },
+  {
+   "id": "P67",
+   "week": 8,
+   "name": "TWRigSpring, мягкие зоны, TWGlow (бывший TWHeat), TWSkinPerf (лестница деградации)",
+   "goal": "Вторичное движение с видимыми амплитудами (грудь 4/8/12 px, бёдра 5/8/12, пояс чулка 2/3/4), настроение TWGlow без источников 'касание/подарок', лестница по доле кадра на частоте дисплея.",
+   "depends_on": [
+    "P41",
+    "P91"
+   ],
+   "lane": "rigs",
+   "files": [
+    "game/shell/skin/tw_rig_spring.gd",
+    "game/shell/skin/tw_soft_zone.gd",
+    "game/shell/skin/tw_glow.gd",
+    "game/shell/skin/tw_skin_perf.gd"
+   ],
+   "acceptance": [
+    "SL-ANIM-02/03 зелёные; ни один клип не двигает только мягкие зоны (>=2 крупные части >=6 px)",
+    "критерий 'движение читается на дистанции вытянутой руки' на панели взрослых игроков (QA §14)",
+    "лестница нормирована на screen_get_refresh_rate() с гистерезисом; счётчик флапов в телеметрии"
+   ],
+   "agent_hours": 56,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "средний",
+    "note": "замер на Ref-L; GDExtension для пружин - риск (arm64/подпись)"
+   },
+   "player_visible": null,
+   "arch_ref": "SKIN_HUD_SYSTEM §4.4/§4.6/§4.10",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": null
+  },
+  {
+   "id": "P68",
+   "week": 8,
+   "name": "TWTouchMap/Brain и инструмент разметки touchmap",
+   "goal": "Карта зон касаний 256x512, мозг реакций; нижняя часть касаний ограничена красными линиями.",
+   "depends_on": [
+    "P41",
+    "P44"
+   ],
+   "lane": "rigs",
+   "files": [
+    "game/shell/skin/tw_touch_map.gd",
+    "tools/art/touchmap_tool.py"
+   ],
+   "acceptance": [
+    "8 зон x 4 реакции (SSR+); реакции <100 мс от касания",
+    "touchmap без запрещённых нижних зон; тест на попадание по id-карте"
+   ],
+   "agent_hours": 48,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "низкий",
+    "note": "разметка зон - ручная работа AD"
+   },
+   "player_visible": null,
+   "arch_ref": "SKIN_HUD_SYSTEM §4.5",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": null
+  },
+  {
+   "id": "P69",
+   "week": 10,
+   "name": "Директор ульт (тиры, Галерея), боевая анимация S27",
+   "goal": "Проигрыватель ульт по тирам и режимам: полная/короткая/хайлайт SSR+/любимая ульта/режиссёрская (DIRECTOR); Ult Replay в Галерею.",
+   "depends_on": [
+    "P34",
+    "P66"
+   ],
+   "lane": "shell",
+   "files": [
+    "game/shell/ult/tw_ult_director.gd",
+    "game/shell/gallery/"
+   ],
+   "acceptance": [
+    "AT-S24: правила показа (первое надевание, первая ульта дня, Галерея, любимая ульта <=1 раз/20 с, Дуэли/Рейтинг всегда коротко)",
+    "хайлайт SSR+ 1,0-1,5 с вне соревновательных режимов; Ult Replay 6-8 с без текста",
+    "DIRECTOR (8-12 с) проигрывается как полная версия при купленном tw_ultdir_<skin>"
+   ],
+   "agent_hours": 80,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "средний",
+    "note": "зависит от пилота P66"
+   },
+   "player_visible": "видимая ульта SSR+ в основном цикле",
+   "arch_ref": "SKIN_HUD_SYSTEM §4.9; BU §5.11",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": null
+  },
+  {
+   "id": "P70",
+   "week": 11,
+   "name": "TWThermal (опция) и «Экономия батареи» (на Android-плагине P91)",
+   "goal": "Термо- и батарейные ступени деградации через Kotlin-плагин (getCurrentThermalStatus, BatteryManager).",
+   "depends_on": [
+    "P67",
+    "P91"
+   ],
+   "lane": "shell",
+   "files": [
+    "game/shell/skin/tw_thermal.gd",
+    "android/plugin/"
+   ],
+   "acceptance": [
+    "тестовый метод плагина вызывает ступени деградации; без плагина - только прокси по времени кадра",
+    "20-минутный soak: падение fps <=10%, без ступени ниже 'moderate' на Ref-L (устройство владельца)"
+   ],
+   "agent_hours": 24,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "средний",
+    "note": "нужно устройство; OS.get_power_state() в 4.x нет"
+   },
+   "player_visible": null,
+   "arch_ref": "SKIN_HUD_SYSTEM §4.10",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": "замер на устройстве"
+  },
+  {
+   "id": "P71",
+   "week": 10,
+   "name": "Интеграция экономики и скинов: баннер SSR+, окна прямой продажи, ★, оттенки, форма «Чемпион», экран «vs» в Дуэлях",
+   "goal": "Эвергрин-Бутик с дня 1, SSR+ с дня 57, заглавный SSR S2/S4 с дня 57; ★ и оттенки как косметика; заставка 'vs' с нарядами и короткой ультой.",
+   "depends_on": [
+    "P11",
+    "P13",
+    "P62"
+   ],
+   "lane": "core",
+   "files": [
+    "data/skins.json",
+    "game/core/shop/direct_sale.gd",
+    "game/shell/duel/vs_splash.gd"
+   ],
+   "acceptance": [
+    "AT-M19: окна по календарю; одна витрина; цена и дата на баннере в день 1",
+    "★/оттенки не влияют на исход (AT-S08 и AT-B01 при outfit_stats_enabled=false)",
+    "'Печать сезона' и 'Витрина N' рядом с ником в Дуэлях"
+   ],
+   "agent_hours": 48,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "средний",
+    "note": "решения Q-R03/Q-R05 меняют окна"
+   },
+   "player_visible": null,
+   "arch_ref": "SKIN_HUD_SYSTEM §6.4; MP §3.6/§4.5",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": "ответ на Q-R03"
+  },
+  {
+   "id": "P72",
+   "week": 12,
+   "name": "Контент-батчи скинов: S1 (28 скинов), затем S2…S6 по каталогу",
+   "goal": "Производство каталога 58 скинов; S1 = 38 (10 базовых делают P41-P43/P51); отображаемые названия по правилу взрослых контекстов.",
+   "depends_on": [
+    "P66",
+    "P94",
+    "P95"
+   ],
+   "lane": "art",
+   "files": [
+    "art/skins/",
+    "data/skins.json",
+    "design/skins/*/CHECKLIST.md"
+   ],
+   "acceptance": [
+    "каждый скин проходит G1-G10 и чек-лист K0-K17 с двумя аудиторами и детектором наготы",
+    "S1 по плану: 12 S, 4 SSR, 2 SSR+ + 10 клятвенных; бюджет часов SH §5.4: 1 849 ч и 5 352 кр номинал",
+    "отображаемые названия: Салон/Вечер/Спорт-клуб вместо Библиотека/Офицер/Стадион"
+   ],
+   "agent_hours": 1849,
+   "gpu": "да (Higgsfield)",
+   "higgsfield_credits": {
+    "min": 5352,
+    "max": 6689
+   },
+   "risk": {
+    "level": "высокий",
+    "note": "объём; календарь SSR+ ≈5 нед. на скин [ГИПОТЕЗА]"
+   },
+   "player_visible": "каталог скинов",
+   "arch_ref": "SKIN_HUD_SYSTEM §5.4/§6",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": "одобрение партий (G10)"
+  },
+  {
+   "id": "P73",
+   "week": 5,
+   "name": "balance.json и контракт симулятора боя (вариант A: надбавки нарядов = 0) + battle sim v2",
+   "goal": "Константы боя в данных; battle_sim.py и battle_bot.gd читают один JSON; sim пересчитан под outfit_stats_enabled=false и догонялку.",
+   "depends_on": [],
+   "lane": "core",
+   "files": [
+    "data/battle/balance.json",
+    "design/specs/sim/battle_sim.py",
+    "design/specs/BATTLE_ULT_SPEC.md"
+   ],
+   "acceptance": [
+    "battle_sim и battle_selftest читают один файл; пороги ворот win(P0,mid,normal) 90-97% (гипотеза, до калибровки по логам беты)",
+    "профили F2P-середина/мес.2/6+ и 'кит' в варианте A дают одну силу; отчёт перегенерирован",
+    "числа §3.4 не публикуются в Правилах до калибровки"
+   ],
+   "agent_hours": 24,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "низкий",
+    "note": "числа - гипотезы"
+   },
+   "player_visible": null,
+   "arch_ref": "BU §3",
+   "night_safe": true,
+   "night_check": "только Python и JSON",
+   "owner_action": null
+  },
+  {
+   "id": "P74",
+   "week": 6,
+   "name": "Ядро боя core/modes/battle (TWBattle, TWBattleMath, события) - целочисленное",
+   "goal": "Чистое ядро (seed, squad, actions[]); вся арифметика в базисных пунктах, mul_bp с floor, таблица xp[L] целыми; ULT_AIM пишется в журнал.",
+   "depends_on": [
+    "P73"
+   ],
+   "lane": "core",
+   "files": [
+    "game/core/modes/battle/",
+    "tools/lint_core_purity.py"
+   ],
+   "acceptance": [
+    "AT-B01..AT-B06; AT-B04: итог x86 и arm64 бит в бит; CORE_PURITY запрещает pow/exp/log/sin/cos/randf в каталоге боя (ревью T10)",
+    "Lv60=196 610 и Lv90=545 611 воспроизводятся таблицей",
+    "реплей: итог с пропуском и без пропуска ульты совпадает (AT-U10)"
+   ],
+   "agent_hours": 80,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "средний",
+    "note": "две платформы для AT-B04"
+   },
+   "player_visible": null,
+   "arch_ref": "BU §1.5, §7.6",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": null
+  },
+  {
+   "id": "P75",
+   "week": 8,
+   "name": "Бот и --battle_selftest (ворота после калибровки)",
+   "goal": "Бот-игрок и самотест боя; ворота включаются после калибровки по логам беты.",
+   "depends_on": [
+    "P74"
+   ],
+   "lane": "qa",
+   "files": [
+    "game/core/modes/battle/battle_bot.gd",
+    "game/core/modes/battle/battle_selftest.gd"
+   ],
+   "acceptance": [
+    "AT-B07..AT-B09",
+    "селфтест читает тот же balance.json, что симулятор"
+   ],
+   "agent_hours": 48,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "низкий",
+    "note": "-"
+   },
+   "player_visible": null,
+   "arch_ref": "BU §3.6",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": null
+  },
+  {
+   "id": "P76",
+   "week": 6,
+   "name": "Данные ролей, аур, пассивов, лидерских (roles.json, heroes_battle.json)",
+   "goal": "Таблицы §1.3-§1.6.1: 5 ролей, 3 ауры, составы отряда 1+4.",
+   "depends_on": [
+    "P73"
+   ],
+   "lane": "core",
+   "files": [
+    "data/battle/roles.json",
+    "data/battle/heroes_battle.json"
+   ],
+   "acceptance": [
+    "таблицы BU §1.3-§1.6.1 в данных; схема валидна; 10 героинь с ролью и аурой"
+   ],
+   "agent_hours": 24,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "низкий",
+    "note": "-"
+   },
+   "player_visible": null,
+   "arch_ref": "BU §1",
+   "night_safe": true,
+   "night_check": "только JSON",
+   "owner_action": null
+  },
+  {
+   "id": "P77",
+   "week": 9,
+   "name": "60 этапов, gen_stages.py, сертификация досок с suit_weights",
+   "goal": "Этапы Похода с гарантией решаемости.",
+   "depends_on": [
+    "P74"
+   ],
+   "lane": "core",
+   "files": [
+    "tools/gen_stages.py",
+    "data/battle/stages.json"
+   ],
+   "acceptance": [
+    "100% решаемость сертификатом; AT-B10"
+   ],
+   "agent_hours": 48,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "средний",
+    "note": "сертификация доски с весами мастей"
+   },
+   "player_visible": null,
+   "arch_ref": "BU §1.7",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": null
+  },
+  {
+   "id": "P78",
+   "week": 8,
+   "name": "Прогресс: уровни, навыки, талисманы, pity материалов (чисто) + догонялка",
+   "goal": "Прокачка без осколков героини; догонялка: x2 опыт отстающим на >=10 уровней, синхронизация новой героини, подарок перед ростом потолка; без платных ускорителей.",
+   "depends_on": [
+    "P73"
+   ],
+   "lane": "core",
+   "files": [
+    "game/core/modes/battle/progress.gd",
+    "data/battle/progress.json"
+   ],
+   "acceptance": [
+    "AT-B03, AT-B11; метрика беты: доля F2P-середины, дошедших до главы 4 к D30 >= 60%",
+    "outfit_stats_enabled=false и bond_stats_enabled=false по умолчанию; тесты обоих значений флага"
+   ],
+   "agent_hours": 64,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "средний",
+    "note": "баланс - гипотеза"
+   },
+   "player_visible": null,
+   "arch_ref": "BU §2",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": "Q-R01 (вариант A/B)"
+  },
+  {
+   "id": "P79",
+   "week": 9,
+   "name": "Сохранение v11_battle в модульной версии (mod_ver.battle), ult_seen",
+   "goal": "Миграция без повышения SAVE_VER; ult_seen и ult_repeat в модульной версии.",
+   "depends_on": [
+    "P78",
+    "P62"
+   ],
+   "lane": "core",
+   "files": [
+    "game/core/state/mod_battle.gd",
+    "game/tests/fixtures/saves/golden_v8_ult_seen.json"
+   ],
+   "acceptance": [
+    "AT-U12; downgrade-тест: старая сборка открывает сейв без потери и без write-lock"
+   ],
+   "agent_hours": 24,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "низкий",
+    "note": "-"
+   },
+   "player_visible": null,
+   "arch_ref": "BU §7.3",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": null
+  },
+  {
+   "id": "P80",
+   "week": 10,
+   "name": "Боевой HUD, TWBattleScreen, SquadRow, BossBar, слоты bt.*",
+   "goal": "Экран боя board-first на слотах скина.",
+   "depends_on": [
+    "P74",
+    "P63"
+   ],
+   "lane": "shell",
+   "files": [
+    "game/shell/screens/battle/"
+   ],
+   "acceptance": [
+    "AT-B12, скриншоты 20:9 и 9:16",
+    "комплаенс-экраны не зависят от скина (T-CMP-1)"
+   ],
+   "agent_hours": 64,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "средний",
+    "note": "-"
+   },
+   "player_visible": "экран боя",
+   "arch_ref": "BU §1.11",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": null
+  },
+  {
+   "id": "P81",
+   "week": 11,
+   "name": "Поход: карта, карточка этапа, итоги",
+   "goal": "Первый режим слоя B.",
+   "depends_on": [
+    "P77",
+    "P80"
+   ],
+   "lane": "shell",
+   "files": [
+    "game/shell/screens/trek/"
+   ],
+   "acceptance": [
+    "цепочка победы <=3 с; AT-B13"
+   ],
+   "agent_hours": 64,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "средний",
+    "note": "-"
+   },
+   "player_visible": "Поход",
+   "arch_ref": "BU §1.3",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": null
+  },
+  {
+   "id": "P82",
+   "week": 12,
+   "name": "Хранилища, зачистка и автобой (без платных заходов)",
+   "goal": "Хранилища без энергии: 3 полные награды в сутки, далее x0,5; доп. заходы за кристаллы не вводятся в 1.0.",
+   "depends_on": [
+    "P75",
+    "P78",
+    "P81"
+   ],
+   "lane": "core",
+   "files": [
+    "game/core/modes/battle/vaults.gd"
+   ],
+   "acceptance": [
+    "AT-B14, AT-B16; на экране победы 0 счётчиков"
+   ],
+   "agent_hours": 48,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "средний",
+    "note": "-"
+   },
+   "player_visible": null,
+   "arch_ref": "BU §1.3",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": null
+  },
+  {
+   "id": "P83",
+   "week": 14,
+   "name": "Башня (П2)",
+   "goal": "Режим Башня.",
+   "depends_on": [
+    "P82"
+   ],
+   "lane": "shell",
+   "files": [
+    "game/shell/screens/tower/"
+   ],
+   "acceptance": [
+    "критерии П2 BU §1.3"
+   ],
+   "agent_hours": 64,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "средний",
+    "note": "приоритет П2"
+   },
+   "player_visible": null,
+   "arch_ref": "BU §1.3",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": null
+  },
+  {
+   "id": "P84",
+   "week": 14,
+   "name": "Великий Дух, борды «Мастерство», серверная проверка призраков (П2)",
+   "goal": "Рейд с отдельным бордом 'Мастерство' (борд 'Мощь' с наградами не вводится в варианте A).",
+   "depends_on": [
+    "P82"
+   ],
+   "lane": "core",
+   "files": [
+    "server/src/ghost_verify.mjs",
+    "game/shell/screens/spirit/"
+   ],
+   "acceptance": [
+    "headless-экспорт ядра проверяет призрак; расхождений из-за float нет (целочисленное ядро)"
+   ],
+   "agent_hours": 80,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "высокий",
+    "note": "ложная отбраковка при расхождении платформ"
+   },
+   "player_visible": null,
+   "arch_ref": "BU §7.6",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": null
+  },
+  {
+   "id": "P85",
+   "week": 16,
+   "name": "Клуб «Чайный круг» (П3)",
+   "goal": "Социальный режим П3.",
+   "depends_on": [
+    "P84"
+   ],
+   "lane": "shell",
+   "files": [
+    "game/shell/screens/club/"
+   ],
+   "acceptance": [
+    "критерии П3 BU"
+   ],
+   "agent_hours": 96,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "средний",
+    "note": "приоритет П3"
+   },
+   "player_visible": null,
+   "arch_ref": "BU §1.3",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": null
+  },
+  {
+   "id": "P86",
+   "week": 16,
+   "name": "«Зал риичи-боя» (П3)",
+   "goal": "Риичи-ручной режим в бою.",
+   "depends_on": [
+    "P74"
+   ],
+   "lane": "core",
+   "files": [
+    "game/core/modes/battle/riichi_hall.gd"
+   ],
+   "acceptance": [
+    "критерии П3 BU §1.5.6"
+   ],
+   "agent_hours": 80,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "средний",
+    "note": "приоритет П3"
+   },
+   "player_visible": null,
+   "arch_ref": "BU §1.5.6",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": null
+  },
+  {
+   "id": "P87",
+   "week": 5,
+   "name": "TWUltRegistry, самотест схемы на 100% id каталога, TWUltPolicy, ult_seen; ults_selftest до 100%; HANDOFF 662/682 -> фактическое",
+   "goal": "Единый реестр ульт: V9Ults + V10W1Ults + data/ult_catalogue.json; схема на все 58 id; ults_selftest 100%; обновить HANDOFF.",
+   "depends_on": [],
+   "lane": "core",
+   "files": [
+    "game/core/ult/ult_registry.gd",
+    "game/core/ult/ult_policy.gd",
+    "game/core/ult/ult_selftest.gd",
+    "data/ult_catalogue.json",
+    "HANDOFF_CLAUDE.md"
+   ],
+   "acceptance": [
+    "ults_selftest N/N = 100% (на claude/integration 704/704 по сообщению коммита cfc6356; реальный прогон зафиксировать)",
+    "схема записи валидна на 100% id каталога; покрытие: каждый skin_id каталога имеет запись",
+    "AT-U01, AT-U02, AT-U09; HANDOFF не называет 662/682"
+   ],
+   "agent_hours": 72,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "низкий",
+    "note": "два реестра надо слить аккуратно"
+   },
+   "player_visible": null,
+   "arch_ref": "BU §7.3, §7.8",
+   "night_safe": true,
+   "night_check": "код и данные; без GPU",
+   "owner_action": null
+  },
+  {
+   "id": "P88",
+   "week": 7,
+   "name": "timeline.json, TWUltTimeline, правила SL-ULT-05..13 в skin_lint, TWSkinShot --ult-shots",
+   "goal": "Раскадровка ульты данными: камера по классу подола, лицо или силуэт, события мягких зон <=4, палитра пресета, SL-ULT-13 (просвет).",
+   "depends_on": [
+    "P65",
+    "P87"
+   ],
+   "lane": "qa",
+   "files": [
+    "game/core/ult/ult_timeline.gd",
+    "tools/qa/skin_lint.py"
+   ],
+   "acceptance": [
+    "AT-U03..U08",
+    "контактный лист 4 кадра/с прикладывается к письму RuStore"
+   ],
+   "agent_hours": 56,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "низкий",
+    "note": "-"
+   },
+   "player_visible": null,
+   "arch_ref": "BU §6.6, §7.4",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": null
+  },
+  {
+   "id": "P89",
+   "week": 10,
+   "name": "TWUltDirector + слои VFX + пропуск; TWUltLoader и «Пакеты боя героини»; один экранный проход; прогрев шейдеров",
+   "goal": "Кинематограф боя: ≤1 прохода hint_screen_texture, bloom спрайтом BLEND_ADD, прогрев шейдеров/частиц в SubViewport, локальный scene_clock (не Engine.time_scale).",
+   "depends_on": [
+    "P69",
+    "P88"
+   ],
+   "lane": "shell",
+   "files": [
+    "game/shell/ult/tw_ult_director.gd",
+    "game/shell/ult/tw_ult_loader.gd"
+   ],
+   "acceptance": [
+    "AT-U08, AT-U11; первый удар ульты без подвисания >N мс (прогрев)",
+    "Draw calls в ульту <=60; частицы 60/80/96 по ULT_CINEMATIC и возврат 18/8/0"
+   ],
+   "agent_hours": 136,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "высокий",
+    "note": "Mali-G52: шейдеры и частицы - замер"
+   },
+   "player_visible": "ульта-кинематограф",
+   "arch_ref": "BU §5, §7.5",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": "замер на устройстве"
+  },
+  {
+   "id": "P90",
+   "week": 5,
+   "name": "TWAssets: add_records/remove_records/evict, cache=false для skin:, резолвер без владения ресурсами",
+   "goal": "Сделать TWAssets совместимым с паками (ревью T2): аддитивная регистрация записей пака, вытеснение, release-режим без null.",
+   "depends_on": [
+    "P29"
+   ],
+   "lane": "core",
+   "files": [
+    "game/shell/assets/tw_assets.gd",
+    "game/shell/assets/assets_selftest.gd"
+   ],
+   "acceptance": [
+    "assets_selftest: add_records/remove_records/evict; кэш не растёт на 50 сменах (AT-S30)",
+    "install_manifest() не обнуляет записи смонтированных паков",
+    "load_threaded_request вместо синхронного load для skin:"
+   ],
+   "agent_hours": 24,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "низкий",
+    "note": "P63 не стартует без него"
+   },
+   "player_visible": null,
+   "arch_ref": "ревью T2",
+   "night_safe": true,
+   "night_check": "код + selftest",
+   "owner_action": null
+  },
+  {
+   "id": "P91",
+   "week": 5,
+   "name": "Android-плагин (Kotlin): onTrimMemory, getCurrentThermalStatus, BatteryManager",
+   "goal": "Сигналы ОС, которых нет в Godot 4.5 GDScript (ревью T14); тестовый метод плагина для QA вместо 'am send-trim-memory'.",
+   "depends_on": [],
+   "lane": "shell",
+   "files": [
+    "android/plugin/",
+    "game/shell/platform/tw_android.gd",
+    "export_presets.cfg"
+   ],
+   "acceptance": [
+    "плагин собирается в двух ABI и подписывается единым экспортом; без плагина игра работает на прокси-метриках",
+    "тестовый метод вызывает выгрузку классов P, затем L; FZ-7 использует его"
+   ],
+   "agent_hours": 32,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "средний",
+    "note": "сборка плагина в CI; нужен Android SDK"
+   },
+   "player_visible": null,
+   "arch_ref": "ревью T14",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": null
+  },
+  {
+   "id": "P92",
+   "week": 5,
+   "name": "Экспорт-пресеты: исключить skins_dl/**, .pub в include_filter, CI-проверка 'в APK нет skins_dl'",
+   "goal": "Исправить дыры упаковки (ревью T3, T12): базовые скины в skins_base/, версионированные пути паков, ключ подписи .pub.",
+   "depends_on": [],
+   "lane": "core",
+   "files": [
+    "export_presets.cfg",
+    "tools/assets/export_filter.py",
+    ".github/workflows/qa.yml"
+   ],
+   "acceptance": [
+    "три пресета (Android/test/store) исключают skins_dl/**; CI падает, если в APK есть skins_dl/",
+    "pack_pub.pub попадает во все три пресета; тест 'ключ отсутствует'"
+   ],
+   "agent_hours": 16,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "низкий",
+    "note": "-"
+   },
+   "player_visible": null,
+   "arch_ref": "ревью T3/T12",
+   "night_safe": true,
+   "night_check": "конфиги и CI",
+   "owner_action": null
+  },
+  {
+   "id": "P93",
+   "week": 5,
+   "name": "Единый источник чисел data/skins.json + data/shop.json v2 и CI design_lint (MD ↔ JSON)",
+   "goal": "Закрыть расхождения W17: лепестки SSR+ 3 600/300, порог ульты, id ульт, S дорожки; таблицы MD сверяются с JSON.",
+   "depends_on": [],
+   "lane": "qa",
+   "files": [
+    "data/skins.json",
+    "data/shop.json",
+    "tools/design_lint.py"
+   ],
+   "acceptance": [
+    "design_lint: таблицы MP/SH/BU совпадают с JSON по ценам, лепесткам, окнам, id",
+    "CI красный при расхождении"
+   ],
+   "agent_hours": 24,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "низкий",
+    "note": "-"
+   },
+   "player_visible": null,
+   "arch_ref": "ревью W17",
+   "night_safe": true,
+   "night_check": "Python + JSON",
+   "owner_action": null
+  },
+  {
+   "id": "P94",
+   "week": 7,
+   "name": "Медиа-гейт skin_lint --media: детектор наготы, apparent-age, face_box, словарный гейт реплик (SL-VOX-01)",
+   "goal": "Автоматические красные линии (ревью C1, C3, C4, C6): локальная модель наготы как стоп-гейт, возрастной скоринг лица как сигнал, лицо в каждом статичном кадре.",
+   "depends_on": [
+    "P65"
+   ],
+   "lane": "qa",
+   "files": [
+    "tools/qa/skin_lint.py",
+    "tools/qa/media_gate.py",
+    "docs/qa/THRESHOLDS.md"
+   ],
+   "acceptance": [
+    "exposed breast/genitalia/buttocks = FAIL без ручного обхода; порог откалиброван на утверждённом наборе ATF (12 пробных кадров P50b)",
+    "face_box в каждом статичном кадре; доля тела без лица <=55%; SL-RL-06..09 работают на манифестах",
+    "SL-VOX-01 на RU-субтитры и JP-транскрипцию"
+   ],
+   "agent_hours": 40,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "высокий",
+    "note": "модель и калибровочный набор нужно подобрать; ложные срабатывания"
+   },
+   "player_visible": null,
+   "arch_ref": "ревью C1/C3/C4/C6; QA §4.4",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": "утвердить калибровочный набор кадров"
+  },
+  {
+   "id": "P95",
+   "week": 5,
+   "name": "Патч ART_TIER_FULL (p50b): камера L -> hip-level, 7,0 головы, лицо в кадре, сужение запрета дуэтов + повторный аудит кадров",
+   "goal": "Внести в design/ART_TIER_FULL.md решения ревью (C2, C3, C4, C22) и вернуть на повторный аудит ранее сгенерированные кадры с кодом L по мини-юбкам.",
+   "depends_on": [],
+   "lane": "art",
+   "files": [
+    "design/ART_TIER_FULL.md (ветка claude/p50b)",
+    "design/art_batches/*.json"
+   ],
+   "acceptance": [
+    "таблица §3a: нижняя граница 7,0; код ракурса L заменён; leg/lean с лицом в кадре; §2 п.7 сужен",
+    "список перегенерируемых кадров и оценка кредитов (Q-R16)"
+   ],
+   "agent_hours": 16,
+   "gpu": "возможно",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 150
+   },
+   "risk": {
+    "level": "средний",
+    "note": "перегенерация кадров Миэль/Новы/Кохаку"
+   },
+   "player_visible": null,
+   "arch_ref": "ревью C2/C3/C4/C22",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": "Q-R09, Q-R11, Q-R16"
+  },
+  {
+   "id": "P96",
+   "week": 5,
+   "name": "Рендерящий CI: закреплённый образ xvfb+Mesa, PENDING->FAIL, правило rc 134 в tw_test",
+   "goal": "Заменить --headless в рендер-тестах на xvfb-run --rendering-driver opengl3; AT-S22 сравнивает снимок команд/дерева; rc 134 только после маркера OK и без SCRIPT ERROR (ревью T13, T19).",
+   "depends_on": [],
+   "lane": "qa",
+   "files": [
+    ".github/workflows/qa.yml",
+    "tools/tw_test.py",
+    "docker/qa-render/",
+    "docs/qa/THRESHOLDS.md"
+   ],
+   "acceptance": [
+    "образ с зафиксированными Mesa/LLVM/Godot/шрифтами; голдены снимаются только в нём",
+    "PENDING в голденах = FAIL после даты X (задать в THRESHOLDS.md)",
+    "skin_swap_soak: счётчик живых Texture2D, пиксельный пункт в рендерящем прогоне"
+   ],
+   "agent_hours": 32,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "средний",
+    "note": "нужен Docker-образ в CI"
+   },
+   "player_visible": null,
+   "arch_ref": "ревью T13/T19",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": null
+  },
+  {
+   "id": "P97",
+   "week": 8,
+   "name": "Применение HUD/доски/меню по поверхностям: L1 (SSR) и L2 (SSR+) для S03, S19, S21, S23, S27, S29-S35",
+   "goal": "Каждая поверхность читает слоты скина через TWSkinSurface: Чайная, доска, Стол риичи, результаты, бой, Желания, Лавка, загрузка; комплаенс-экраны не скинируются.",
+   "depends_on": [
+    "P63",
+    "P60",
+    "P28"
+   ],
+   "lane": "shell",
+   "files": [
+    "game/shell/screens/*/spec.tres (skin_slots)",
+    "game/shell/skin/tw_skin_surface.gd"
+   ],
+   "acceptance": [
+    "AT-S06..AT-S13 по поверхностям; комплаенс-экраны S02/S32/S34/S35/S36/S41/S45 не меняются при всех тирах (T-CMP-1 по снимку команд)",
+    "board-first: поле >=92% ширины, плитка >=64 px при любой теме; грани плиток стандартные",
+    "контраст текста >=4,5 и палитровый аудит 0 FAIL на 9 обязательных поверхностях"
+   ],
+   "agent_hours": 96,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "средний",
+    "note": "зависит от P63; 20+ экранов"
+   },
+   "player_visible": "тема наряда на всех экранах",
+   "arch_ref": "SKIN_HUD_SYSTEM §3",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": null
+  },
+  {
+   "id": "P98",
+   "week": 8,
+   "name": "Анимационный пайплайн SSR+: слои, JSON-клипы, пружины, лица, касания, раскрытие 5-7 с, превью 10 с",
+   "goal": "Пайплайн K4-K11: нарезка слоёв (ETC2/ASTC 4x4, лицо lossless), JSON-клипы с белым списком треков, миграция V10LiveRig на загрузку из TWSkinHost, параллакс-лобби вместо видео-петли, видео ульты 540x960.",
+   "depends_on": [
+    "P41",
+    "P63",
+    "P67"
+   ],
+   "lane": "rigs",
+   "files": [
+    "tools/rigs/",
+    "game/core/rig/live_rig.gd",
+    "docs/rigs/PIPELINE.md"
+   ],
+   "acceptance": [
+    "замер hana_base в двух форматах (ctex-размер и TEXTURE_MEM_USED на устройстве): бюджет §2.7 пересчитан по замеру",
+    "draw calls: слои = вызовы после слияния статических слоёв по общему материалу; бюджет задан функцией числа слоёв",
+    "клипы - только JSON; Animation собирается кодом по белому списку (position/rotation/scale/modulate)"
+   ],
+   "agent_hours": 96,
+   "gpu": "да (Higgsfield)",
+   "higgsfield_credits": {
+    "min": 80,
+    "max": 200
+   },
+   "risk": {
+    "level": "высокий",
+    "note": "качество послойной нарезки из генерации; GDExtension - риск"
+   },
+   "player_visible": null,
+   "arch_ref": "SKIN_HUD_SYSTEM §4-§5; ревью T1/T6-T8",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": "замер на устройстве"
+  },
+  {
+   "id": "P99",
+   "week": 10,
+   "name": "Второй showcase-скин: Юэ (yue_ssr_scalearmor) целиком",
+   "goal": "Вторая героиня первой витрины (по решению владельца: MC и Юэ первыми): статуарная, SSR с ригом, видео-ультой и HUD L1.",
+   "depends_on": [
+    "P42",
+    "P66",
+    "P98"
+   ],
+   "lane": "rigs",
+   "files": [
+    "art/skins/yue/yue_ssr_scalearmor/",
+    "game/skins_dl/yue_ssr_scalearmor/"
+   ],
+   "acceptance": [
+    "G1-G10 и AT-S01..AT-S24 для SSR; Лобби p5 fps >=55 Партия / >=50 Лобби на Ref-L",
+    "два аудитора G3, детектор наготы без FAIL"
+   ],
+   "agent_hours": 119,
+   "gpu": "да (Higgsfield)",
+   "higgsfield_credits": {
+    "min": 366,
+    "max": 458
+   },
+   "risk": {
+    "level": "высокий",
+    "note": "риг yue_base должен быть готов (P42)"
+   },
+   "player_visible": "Юэ живая в Чайной",
+   "arch_ref": "SKIN_HUD_SYSTEM §5; owner brief",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": "одобрение"
+  },
+  {
+   "id": "P100",
+   "week": 12,
+   "name": "Арт-партии ульт: B1-B5 (BASE 10, S, SSR, SSR+), 38 ульт запуска -> 58 к 12-му месяцу",
+   "goal": "Производство ассетов ульт по BU §10.3: позы 1024x1536, плиты как шоты одного ult_full.ogv 540x960, голос, SFX; камера по классу подола.",
+   "depends_on": [
+    "P88",
+    "P89",
+    "P66"
+   ],
+   "lane": "art",
+   "files": [
+    "art/ults/",
+    "data/ult_catalogue.json"
+   ],
+   "acceptance": [
+    "AT-U13; запуск ≈2 470 кр и ≈1 000 ч на 38 ульт (BU §0 п.12), к m12 58 ульт ≈3 990 кр / ≈1 570 ч",
+    "каждая партия: SL-ULT-05..13 зелёные, 2 аудитора, детектор наготы без FAIL",
+    "замер CPU-декодера Theora на Ref-L ДО заказа Kling/Seedance"
+   ],
+   "agent_hours": 1000,
+   "gpu": "да (Higgsfield)",
+   "higgsfield_credits": {
+    "min": 2470,
+    "max": 3090
+   },
+   "risk": {
+    "level": "высокий",
+    "note": "объём; видео - риск фризов на Android"
+   },
+   "player_visible": "ульты героинь и нарядов",
+   "arch_ref": "BU §10",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": "одобрение партий; замер декодера"
+  },
+  {
+   "id": "P101",
+   "week": 6,
+   "name": "Гача: ставки, гарант, Свеча, 50/50, баннеры v2, банк реквизита (TWGacha v2) + публикуемые шансы",
+   "goal": "data/banners.json v2, семьи счётчиков, Марков-расчёт публикуемых шансов, 'До гаранта', Свеча 120; ревизия экранов 'Желания' (три строки, превью 10 с, дата прямой продажи).",
+   "depends_on": [
+    "P09",
+    "P11",
+    "P93"
+   ],
+   "lane": "core",
+   "files": [
+    "data/banners.json",
+    "game/core/gacha/tw_gacha.gd",
+    "game/shell/screens/wish/"
+   ],
+   "acceptance": [
+    "AT-M01, M02, M13, M15; допуск ±0,5% против design/specs/sim/gacha_exact.py",
+    "odds_hash в листе подтверждения = SHA-256[:8] опубликованной таблицы",
+    "SSR+ в раскрытии: сцена 5-7 с; ×10 <=14 с; 'Пропустить' одним тапом"
+   ],
+   "agent_hours": 96,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "средний",
+    "note": "юридический аудит шансов; Q-R02 меняет поток"
+   },
+   "player_visible": null,
+   "arch_ref": "MP §3, PM01/PM02/PM06/PM19",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": "Q-R02"
+  },
+  {
+   "id": "P102",
+   "week": 7,
+   "name": "Кошелёк v2 и серверный ledger: moon/gems/tickets/petals/coins/ev_*, порядок списания, долг, аудит",
+   "goal": "TWWallet v2 + server/src/economy.mjs, /wallet, /claim, reconcile, возвраты и долг.",
+   "depends_on": [
+    "P10",
+    "P12"
+   ],
+   "lane": "core",
+   "files": [
+    "game/core/economy/tw_wallet.gd",
+    "server/src/economy.mjs"
+   ],
+   "acceptance": [
+    "wallet_audit инвариант на 10 000 случайных операций; AT-M16, M17",
+    "возврат: consumable -> долг камня; non_consumable -> владение снимается (ревью C16)"
+   ],
+   "agent_hours": 88,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "высокий",
+    "note": "деньги: нужен аудит"
+   },
+   "player_visible": null,
+   "arch_ref": "MP PM03/PM04/PM24",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": null
+  },
+  {
+   "id": "P103",
+   "week": 9,
+   "name": "Лавка и IAP: RuStore Pay SDK (purchase, confirm/consume, restore), серверная проверка чеков /pay/verify, webhook, экраны S33-S35",
+   "goal": "Платёжный каркас: провайдер TWPay, e2e в песочнице RuStore, лист подтверждения с 'не хватает', 'Мои покупки', чеки.",
+   "depends_on": [
+    "P22",
+    "P102",
+    "P28",
+    "P35"
+   ],
+   "lane": "core",
+   "files": [
+    "game/shell/pay/tw_pay.gd",
+    "server/src/pay.mjs",
+    "game/shell/screens/shop/"
+   ],
+   "acceptance": [
+    "сквозной e2e в sandbox RuStore; AT-M09, M16, M18",
+    "лист подтверждения не скинируется; цена, '≈N желаний', 'Не влияет на игру'",
+    "real_payments_enabled=false по умолчанию до входных ворот P1 (MP Прил. R §R.2)"
+   ],
+   "agent_hours": 120,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "высокий",
+    "note": "SDK-документацию не проверял [НП]; зависит от юрлица и договора (Q-R07)"
+   },
+   "player_visible": null,
+   "arch_ref": "MP PM05/PM07",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": "Q-R07: получатель платежей и договор RuStore Pay"
+  },
+  {
+   "id": "P104",
+   "week": 10,
+   "name": "Дорожка сезона (battle pass), месячные карточки, «Круг Чайного дома» (VIP 0-15), фонды",
+   "goal": "3 линии дорожки (купоны вместо наград, зависящих от владения), Лунный/Нефритовый пропуск, 16 уровней Круга, Фонд Пути/Коллекции.",
+   "depends_on": [
+    "P101",
+    "P102",
+    "P93"
+   ],
+   "lane": "core",
+   "files": [
+    "game/core/pass/",
+    "game/core/vip/",
+    "data/vip.json"
+   ],
+   "acceptance": [
+    "AT-M20, M21, M22, M07; sku_lint SL-REWARD: награда не требует предмета, которого нет в сезоне",
+    "ratio линий Премиум ≈2,05, Люкс ≈2,2; Q-R04 меняет состав карточек"
+   ],
+   "agent_hours": 120,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "средний",
+    "note": "цены Q-R04"
+   },
+   "player_visible": null,
+   "arch_ref": "MP PM10/PM11/PM12",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": "Q-R04"
+  },
+  {
+   "id": "P105",
+   "week": 10,
+   "name": "Лайв-опс: календарь баннеров на 14+ дней, окна прямой продажи, remote config (подписанный), dev notes, наборы сезона",
+   "goal": "Планировщик баннеров, effective_from >=14 дней, подписанный remote config, анонсы, 'Эвергрин-Бутик' с дня 1.",
+   "depends_on": [
+    "P71",
+    "P101"
+   ],
+   "lane": "core",
+   "files": [
+    "game/core/liveops/",
+    "tools/liveops_calendar.py",
+    "data/calendar.json"
+   ],
+   "acceptance": [
+    "AT-M19, M26; изменения шансов/цен только по правилу 14 дней (AT-M30)",
+    "календарь из LIVEOPS_CALENDAR.md импортируется и сверяется design_lint"
+   ],
+   "agent_hours": 80,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "средний",
+    "note": "сервер конфигов"
+   },
+   "player_visible": null,
+   "arch_ref": "MP PM09/PM23/PM25; LC",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": null
+  },
+  {
+   "id": "P106",
+   "week": 8,
+   "name": "Аналитика: схема событий MP §7.4, собственный приёмник в РФ, дашборды DB-01…DB-10",
+   "goal": "События воронки, платежей, гачи, лимитов; приёмник в РФ; дашборды (без персональных скидок по профилю трат).",
+   "depends_on": [
+    "P22"
+   ],
+   "lane": "core",
+   "files": [
+    "game/core/analytics/",
+    "server/src/events.mjs",
+    "tools/dashboards/"
+   ],
+   "acceptance": [
+    "схема валидна; 10 дашбордов живые на тестовых данных",
+    "DB-10 'Радар китов' обезличен, только для поддержки"
+   ],
+   "agent_hours": 48,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "средний",
+    "note": "хостинг в РФ (Q-08)"
+   },
+   "player_visible": null,
+   "arch_ref": "MP PM17",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": "выбор хостинга"
+  },
+  {
+   "id": "P107",
+   "week": 7,
+   "name": "Экраны защиты: лимит трат (экран выбора, аварийный порог), пауза/самоисключение, возрастной шлюз 18+, шансы, 'Правила гачи'",
+   "goal": "S02/S32/S36/S41/S45 и автомат клиент+сервер MP §8.6: BLOCKED_MINOR серверно на 30 суток, тумблер 'Полный' блокируется только при <18, аварийный порог 30 000 ₽/30 дн или 10 000 ₽/24 ч.",
+   "depends_on": [
+    "P22",
+    "P36"
+   ],
+   "lane": "shell",
+   "files": [
+    "game/shell/screens/protect/",
+    "server/src/age_gate.mjs"
+   ],
+   "acceptance": [
+    "AT-M05, M06 (пауза блокирует платёж, а не тумблер), M11, M12",
+    "сервер хранит булев '18+ заявлено' и год рождения, не хэш полной даты; метка 18+ на сплэше и креативах",
+    "комплаенс-экраны не скинируются (T-CMP-1)"
+   ],
+   "agent_hours": 64,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "высокий",
+    "note": "юридический аудит; Q-R06"
+   },
+   "player_visible": "экраны защиты",
+   "arch_ref": "MP PM08; ревью C13-C15",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": "Q-R06"
+  },
+  {
+   "id": "P108",
+   "week": 9,
+   "name": "Юридический пакет в приложении: Оферта, Политика, Согласие на ПДн, Правила гачи/возврата/лимитов, 18+, Правила беты",
+   "goal": "Интеграция текстов юриста; версия оферты в журнале согласий; формулировка про возвраты по ревью C16.",
+   "depends_on": [],
+   "lane": "shell",
+   "files": [
+    "game/shell/screens/legal/",
+    "data/legal/"
+   ],
+   "acceptance": [
+    "13 текстов опубликованы и открываются из приложения; журнал согласий с версией оферты",
+    "формулировка: 'не возвращаются, за исключением случаев, предусмотренных законом и правилами магазина'"
+   ],
+   "agent_hours": 40,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "высокий",
+    "note": "тексты пишет юрист; без них нет P1"
+   },
+   "player_visible": null,
+   "arch_ref": "MP PM21",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": "юрист + владелец (Q-R07)"
+  },
+  {
+   "id": "P109",
+   "week": 7,
+   "name": "Автоматизация Content Drop Checklist (QA §16): 25 пунктов как CI-воротa, S0 для красных линий",
+   "goal": "Один запуск проверяет дроп (новая героиня/скин/баннер): красные линии, комплаенс-экраны, сборка пака, подпись, kill-switch, окна продаж, цены, odds_hash, превью за 14 дней.",
+   "depends_on": [
+    "P65",
+    "P94",
+    "P96",
+    "P93"
+   ],
+   "lane": "qa",
+   "files": [
+    "tools/content_drop.py",
+    "design/specs/UNIFIED_QA_PLAN.md"
+   ],
+   "acceptance": [
+    "чек-лист §16 исполняется скриптом: S0-пункты блокируют, S1-S2 предупреждают; отчёт в PR",
+    "детектор наготы и подписи двух аудиторов - зависимость S0"
+   ],
+   "agent_hours": 40,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "низкий",
+    "note": "-"
+   },
+   "player_visible": null,
+   "arch_ref": "QA §16",
+   "night_safe": true,
+   "night_check": "Python",
+   "owner_action": null
+  },
+  {
+   "id": "P110",
+   "week": 12,
+   "name": "Событийный движок: валюта события, лавка события, вечеринка-пропуск, «Великий пир» (приз S + ★ + рамки)",
+   "goal": "События A/B/мега; ev_* -> лепестки; 'Великий пир' по решению Q-R05.",
+   "depends_on": [
+    "P13",
+    "P102"
+   ],
+   "lane": "core",
+   "files": [
+    "game/core/events/"
+   ],
+   "acceptance": [
+    "AT-M23"
+   ],
+   "agent_hours": 48,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "средний",
+    "note": "Q-R05"
+   },
+   "player_visible": null,
+   "arch_ref": "MP PM13",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": "Q-R05"
+  },
+  {
+   "id": "P111",
+   "week": 11,
+   "name": "econ_budget v2 из sim/, soft-launch набор (фича-флаги, когорты, kill-switch SKU), набор AT-M01..AT-M30",
+   "goal": "CI красный при выходе шансов и покрытия витрины F2P из допуска; флаги real_payments_enabled, review_tier, outfit_stats_enabled.",
+   "depends_on": [
+    "P101",
+    "P102",
+    "P106"
+   ],
+   "lane": "qa",
+   "files": [
+    "tools/econ_budget.py",
+    "game/core/flags/"
+   ],
+   "acceptance": [
+    "покрытие витрины активным F2P 35-45% к D56 и <=60% к S3 (после Q-R02)",
+    "AT-M01..AT-M30 в CI",
+    "отчёты P1: воронка, ARPPU, возвраты"
+   ],
+   "agent_hours": 72,
+   "gpu": "нет",
+   "higgsfield_credits": {
+    "min": 0,
+    "max": 0
+   },
+   "risk": {
+    "level": "средний",
+    "note": "зависит от решений Q-R02/Q-R04"
+   },
+   "player_visible": null,
+   "arch_ref": "MP PM18/PM22/PM26",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": null
+  },
+  {
+   "id": "P112",
+   "week": 14,
+   "name": "Косметика высшего уровня: «Шкатулка» (слот prop), режиссёрская ульта (DIRECTOR), люкс-будуар, пак поз, декор сезона",
+   "goal": "Товары кита: реквизит ульты, альтернативная полная ульта 8-12 с, будуар (B<=B3, G3, нет кровати), пак поз (предрендеренные позы, без свободной камеры), глубокие стоки Q-R15.",
+   "depends_on": [
+    "P69",
+    "P66",
+    "P101",
+    "P89"
+   ],
+   "lane": "art",
+   "files": [
+    "game/shell/skin/slots_prop.gd",
+    "data/shop.json"
+   ],
+   "acceptance": [
+    "слот prop в TWSkinSlots.TABLE и манифесте; ult.variant = director; AT-S24, AT-M24 (подписан пакет G3 на все сцены)",
+    "SKU убраны из беты P1 и включаются после приёмки"
+   ],
+   "agent_hours": 152,
+   "gpu": "да (Higgsfield)",
+   "higgsfield_credits": {
+    "min": 200,
+    "max": 400
+   },
+   "risk": {
+    "level": "высокий",
+    "note": "красные линии: будуар и фото-режим - на двойном аудите"
+   },
+   "player_visible": null,
+   "arch_ref": "MP PM14/15/16; ревью C5/W14",
+   "night_safe": false,
+   "night_check": null,
+   "owner_action": "Q-R10, Q-R15"
+  }
+ ],
+ "night_plan": {
+  "rules": [
+   "Два агента, 4 CPU. Агент A (код игры) держит максимум 3 процесса Godot (`tw_test.py -j 3`), агент B — максимум 1 и только под `nice -n 19`. Полный прогон 56 suites (~490 с на 4 ядрах) запускает только A и только через `flock /tmp/tw_godot.lock`.",
+   "Godot-задачи агента B (P02, P03) идут только в отдельных worktree wt/verify-base и wt/verify-wp2, чтобы не видеть файлы, которые A переносит в P05.",
+   "Агент B не пишет в game/scripts/** и game/core/** пока идёт P05 (окно заморозки). Разрешено: tools/**, design/**, docs/**, новые каталоги game/shell/design/**.",
+   "Каждый пакет — в своём worktree и ветке `claude/<pkg>`; в `claude/integration` вливается только при `tw_test.py` = baseline (0 регрессий); push, теги в remote, релизы, платежи запрещены.",
+   "Лимит трат Higgsfield за ночь: микро-траты <= 50 кр суммарно (ожидаемо ~18-24 кр на P46). Аренда GPU и любые `gpu_rental_exec` ночью не выполняются (каждый требует клик).",
+   "Остановка: если P05 не зелёный после 3 попыток (каждая — откат ветки), A переключается на запасной список (P17-запись корпуса в отдельном worktree от adbedfc, затем P02). Все ночные результаты фиксируются коммитами и короткой записью в design/NIGHT_LOG.md; незаконченное — в ветке, не в integration.",
+   "Жёсткие запреты: не менять project.godot и export_presets.cfg (интегратор утром), не трогать баланс/цены/шансы в рабочем поведении, не запускать генерацию арта/голоса/музыки/видео кроме P46-микро."
+  ],
+  "safety_columns": [
+   "без кредитов",
+   "без GPU-аренды",
+   "без push/публикации",
+   "изолированная ветка",
+   "откат git",
+   "автогейт",
+   "CPU в бюджете",
+   "без ввода владельца"
+  ],
+  "queue": [
+   {
+    "agent": "A",
+    "order": 1,
+    "id": "P01",
+    "hours": 1.5,
+    "checks": {
+     "без кредитов": true,
+     "без GPU-аренды": true,
+     "без push/публикации": true,
+     "изолированная ветка": true,
+     "откат git": true,
+     "автогейт": true,
+     "CPU в бюджете": true,
+     "без ввода владельца": true
+    },
+    "note": "локальное слияние в wt/int; push утром"
+   },
+   {
+    "agent": "A",
+    "order": 2,
+    "id": "P05",
+    "hours": 10,
+    "checks": {
+     "без кредитов": true,
+     "без GPU-аренды": true,
+     "без push/публикации": true,
+     "изолированная ветка": true,
+     "откат git": true,
+     "автогейт": true,
+     "CPU в бюджете": true,
+     "без ввода владельца": true
+    },
+    "note": "гейт = равенство baseline; при 3 провалах откат ветки"
+   },
+   {
+    "agent": "A",
+    "order": 3,
+    "id": "P06",
+    "hours": 2.5,
+    "checks": {
+     "без кредитов": true,
+     "без GPU-аренды": true,
+     "без push/публикации": true,
+     "изолированная ветка": true,
+     "откат git": true,
+     "автогейт": true,
+     "CPU в бюджете": true,
+     "без ввода владельца": true
+    },
+    "note": "чистый Python; режим отчёта"
+   },
+   {
+    "agent": "A",
+    "order": 4,
+    "id": "P07",
+    "hours": 4,
+    "checks": {
+     "без кредитов": true,
+     "без GPU-аренды": true,
+     "без push/публикации": true,
+     "изолированная ветка": true,
+     "откат git": true,
+     "автогейт": true,
+     "CPU в бюджете": true,
+     "без ввода владельца": true
+    },
+    "note": "гейт: V10Registry.ids() равен до/после"
+   },
+   {
+    "agent": "A",
+    "order": 5,
+    "id": "P19",
+    "hours": 3,
+    "checks": {
+     "без кредитов": true,
+     "без GPU-аренды": true,
+     "без push/публикации": true,
+     "изолированная ветка": true,
+     "откат git": true,
+     "автогейт": true,
+     "CPU в бюджете": true,
+     "без ввода владельца": true
+    },
+    "note": "видимый фикс trial-режима; новый тест + baseline"
+   },
+   {
+    "agent": "A",
+    "order": 6,
+    "id": "P08",
+    "hours": 5,
+    "checks": {
+     "без кредитов": true,
+     "без GPU-аренды": true,
+     "без push/публикации": true,
+     "изолированная ветка": true,
+     "откат git": true,
+     "автогейт": true,
+     "CPU в бюджете": true,
+     "без ввода владельца": true
+    },
+    "note": "решение принято (GDD п.8); чистое удаление; гейт baseline"
+   },
+   {
+    "agent": "B",
+    "order": 1,
+    "id": "P59",
+    "hours": 4,
+    "checks": {
+     "без кредитов": true,
+     "без GPU-аренды": true,
+     "без push/публикации": true,
+     "изолированная ветка": true,
+     "откат git": true,
+     "автогейт": true,
+     "CPU в бюджете": true,
+     "без ввода владельца": true
+    },
+    "note": "только JSON; вызовов генерации нет"
+   },
+   {
+    "agent": "B",
+    "order": 2,
+    "id": "P44",
+    "hours": 6,
+    "checks": {
+     "без кредитов": true,
+     "без GPU-аренды": true,
+     "без push/публикации": true,
+     "изолированная ветка": true,
+     "откат git": true,
+     "автогейт": true,
+     "CPU в бюджете": true,
+     "без ввода владельца": true
+    },
+    "note": "тексты; проверка носителем — утром"
+   },
+   {
+    "agent": "B",
+    "order": 3,
+    "id": "P45",
+    "hours": 4,
+    "checks": {
+     "без кредитов": true,
+     "без GPU-аренды": true,
+     "без push/публикации": true,
+     "изолированная ветка": true,
+     "откат git": true,
+     "автогейт": true,
+     "CPU в бюджете": true,
+     "без ввода владельца": true
+    },
+    "note": "Python + ffmpeg"
+   },
+   {
+    "agent": "B",
+    "order": 4,
+    "id": "P58",
+    "hours": 6,
+    "checks": {
+     "без кредитов": true,
+     "без GPU-аренды": true,
+     "без push/публикации": true,
+     "изолированная ветка": true,
+     "откат git": true,
+     "автогейт": true,
+     "CPU в бюджете": true,
+     "без ввода владельца": true
+    },
+    "note": "инструменты tools/art; картинок не генерирует"
+   },
+   {
+    "agent": "B",
+    "order": 5,
+    "id": "P04",
+    "hours": 4,
+    "checks": {
+     "без кредитов": true,
+     "без GPU-аренды": true,
+     "без push/публикации": true,
+     "изолированная ветка": true,
+     "откат git": true,
+     "автогейт": true,
+     "CPU в бюджете": true,
+     "без ввода владельца": true
+    },
+    "note": "просмотр сохранённых картинок"
+   },
+   {
+    "agent": "B",
+    "order": 6,
+    "id": "P27",
+    "hours": 7,
+    "checks": {
+     "без кредитов": true,
+     "без GPU-аренды": true,
+     "без push/публикации": true,
+     "изолированная ветка": true,
+     "откат git": true,
+     "автогейт": true,
+     "CPU в бюджете": true,
+     "без ввода владельца": true
+    },
+    "note": "Python/JSON; генерируемый .gd — текстом"
+   },
+   {
+    "agent": "B",
+    "order": 7,
+    "id": "P46",
+    "hours": 3,
+    "checks": {
+     "без кредитов": false,
+     "без GPU-аренды": true,
+     "без push/публикации": true,
+     "изолированная ветка": true,
+     "откат git": true,
+     "автогейт": true,
+     "CPU в бюджете": true,
+     "без ввода владельца": true
+    },
+    "note": "микро-трата <= 24 кр (0,13% баланса) — допущение: порог 'крупной траты' владельца выше; если нет — выполнить утром"
+   },
+   {
+    "agent": "B",
+    "order": 8,
+    "id": "P03",
+    "hours": 3,
+    "checks": {
+     "без кредитов": true,
+     "без GPU-аренды": true,
+     "без push/публикации": true,
+     "изолированная ветка": true,
+     "откат git": true,
+     "автогейт": true,
+     "CPU в бюджете": true,
+     "без ввода владельца": true
+    },
+    "note": "1 Godot nice 19 в отдельном worktree wt/verify-wp2; правки .import только патчем в docs/qa, применение утром"
+   },
+   {
+    "agent": "B",
+    "order": 9,
+    "id": "P02",
+    "hours": 4,
+    "checks": {
+     "без кредитов": true,
+     "без GPU-аренды": true,
+     "без push/публикации": true,
+     "изолированная ветка": true,
+     "откат git": true,
+     "автогейт": true,
+     "CPU в бюджете": true,
+     "без ввода владельца": true
+    },
+    "note": "1 Godot nice 19 в отдельном worktree wt/verify-base (чистая база adbedfc); код игры не меняется"
+   },
+   {
+    "agent": "A",
+    "order": 7,
+    "id": "P16",
+    "hours": 14,
+    "checks": {
+     "без кредитов": true,
+     "без GPU-аренды": true,
+     "без push/публикации": true,
+     "изолированная ветка": true,
+     "откат git": true,
+     "автогейт": true,
+     "CPU в бюджете": true,
+     "без ввода владельца": true
+    },
+    "note": "РЕЗЕРВ, если A закончил P08 раньше: только новые файлы game/core/rules, старый tray_board.gd не трогаем"
+   },
+   {
+    "agent": "A",
+    "order": 8,
+    "id": "P12",
+    "hours": 12,
+    "checks": {
+     "без кредитов": true,
+     "без GPU-аренды": true,
+     "без push/публикации": true,
+     "изолированная ветка": true,
+     "откат git": true,
+     "автогейт": true,
+     "CPU в бюджете": true,
+     "без ввода владельца": true
+    },
+    "note": "РЕЗЕРВ: новые файлы core/state; G ещё не переключается (P15), поведение игры не меняется"
+   }
+  ],
+  "not_tonight": [
+   {
+    "ids": "P09, P10, P11",
+    "reason": "деньги/шансы: меняют кошелёк и гачу, нужен дневной ревью; ночью не запускаем (P11 ещё и ждёт Q-01)"
+   },
+   {
+    "ids": "P13-P15, P17, P18, P20, P21",
+    "reason": "зависят от P12/P16 или меняют горячие файлы (g.gd, play.gd, tray_board.gd): один владелец и дневной ревью"
+   },
+   {
+    "ids": "P23-P25, P28-P35",
+    "reason": "нужен интегратор для project.godot (автозагрузки) и решение по look-and-feel; P23 и P29 допустимы только как бонус после резерва A, поэтому в очередь не внесены"
+   },
+   {
+    "ids": "P50-P57, P52, P53",
+    "reason": "траты Higgsfield/GPU и клики владельца"
+   },
+   {
+    "ids": "P38, P47, P48, P49",
+    "reason": "решения/бюджет владельца и слух"
+   },
+   {
+    "ids": "P41",
+    "reason": "замер на Mali нельзя; headless-замер допустим, но CPU нужен A; переносим на день"
+   }
+  ],
+  "hours_per_agent": {
+   "A": 52.0,
+   "B": 41
+  }
+ },
+ "morning_plan": [
+  {
+   "id": "M1",
+   "action": "git push claude/integration и тегов v10-freeze/release/v10; включить CI (.github/workflows/qa.yml)",
+   "kind": "1 клик/команда",
+   "unblocks": "CI-гейты P06, P26, P37 на удалённом репозитории",
+   "owner_minutes": "2 мин"
+  },
+  {
+   "id": "M2",
+   "action": "Поставить на телефон слимм-сборку (PCK ~129 МБ; APK собирает владелец с release.keystore) и ответить 'ок/не ок' по 5 экранам и видео-ультам (P03); записать FPS/холодный старт",
+   "kind": "на ПК владельца (keystore только у него)",
+   "unblocks": "P03, P37",
+   "owner_minutes": "20 мин"
+  },
+  {
+   "id": "M3",
+   "action": "Утвердить потолок кредитов этапа: 3 074 кр (≈16,4% баланса 18 695,18) с лимитами по батчам (таблица 7); клик `gpu_rent` H200 + 1 `gpu_rental_exec` по lora-v2/MORNING.md (до этого `gpu_my`: не трогать чужой бокс UI-LoRA)",
+   "kind": "платёжка/GPU",
+   "unblocks": "P52, P53, P46-P49, P54-P57",
+   "owner_minutes": "10 мин"
+  },
+  {
+   "id": "M4",
+   "action": "Ответы на Q-01, Q-02 (параметры гаранта и цены), Q-04 (лимит 5 000 руб/мес), Q-13 (метка 'ИИ'), Q-17/Q-18 (правка ROS/HER/UX_RULES). Без Q-01 флаг gacha_rules=v11 остаётся OFF",
+   "kind": "решение",
+   "unblocks": "P11, P22",
+   "owner_minutes": "15 мин"
+  },
+  {
+   "id": "M5",
+   "action": "Отправить письмо в поддержку RuStore (3 вопроса §11.6) — запускает 30-дневные часы до сабмита; без ответа тир 'Полный' не производим",
+   "kind": "только владелец аккаунта",
+   "unblocks": "P55 (рамки), релиз",
+   "owner_minutes": "15 мин"
+  },
+  {
+   "id": "M6",
+   "action": "Назвать дату заморозки контента (Q-15) и состав: цель 10, минимум 7 героинь по воротам",
+   "kind": "решение",
+   "unblocks": "P50, P51",
+   "owner_minutes": "5 мин"
+  },
+  {
+   "id": "M7",
+   "action": "AD-проход: одобрить/отклонить 15 золотых композитов P50 (критерии а-е), позже H1/H2/H3/UI-кит; записи в манифест `approve`",
+   "kind": "глаза владельца",
+   "unblocks": "P50 -> P42, P43, P51-P56",
+   "owner_minutes": "30-40 мин на первый прогон"
+  },
+  {
+   "id": "M8",
+   "action": "Слепое прослушивание 90 JP-образцов (владелец или JP-носитель) + проверка JP-текстов Beta-24; порог 70% решает Q-14 (живая актриса для МТ, Юэ, Златы)",
+   "kind": "слух",
+   "unblocks": "P46, P47, P44",
+   "owner_minutes": "25-40 мин"
+  },
+  {
+   "id": "M9",
+   "action": "Подтвердить тексты: публичное заявление об ИИ (Q-16), Оферта/Политика/согласие ПДн, хостинг и юрлицо (Q-07, Q-08) — нужны к P36 (неделя 4)",
+   "kind": "юр. решения",
+   "unblocks": "P22, P36",
+   "owner_minutes": "по возможности"
+  }
+ ],
+ "art_batches": {
+  "balance": 18695.18,
+  "nominal_credits": 2561.8,
+  "reserve_20pct": 512.4,
+  "ceiling": 3074.0,
+  "share_of_balance_pct": 16.4,
+  "by_section": {
+   "Героини": 860.0,
+   "Окружения (LoRA v2)": 574.9,
+   "UI-кит": 372.0,
+   "Голос": 161.4,
+   "Музыка": 298.5,
+   "SFX": 105.0,
+   "Видео": 190.0
+  },
+  "batches": [
+   {
+    "id": "H0",
+    "section": "Героини",
+    "name": "Золотые композиты (ворота 'Единый стиль')",
+    "package": "P50",
+    "tool": "gpt_image_2_6 + Elements (МТ, Юэ, Нова) + окружение HF-кандидат/LoRA v1",
+    "gate": "AD одобряет 15 кадров по критериям а-е §11.4",
+    "week": "W2",
+    "total_credits": 180.0,
+    "range": null,
+    "lines": [
+     {
+      "what": "поиск: 3 героини x 5 сцен x 8 кандидатов, 1k medium",
+      "n": 120,
+      "unit_credits": 1.0,
+      "credits": 120.0
+     },
+     {
+      "what": "финал: 3 x 5 x 2 лучших в 2k high",
+      "n": 30,
+      "unit_credits": 2.0,
+      "credits": 60.0
+     }
+    ]
+   },
+   {
+    "id": "H1",
+    "section": "Героини",
+    "name": "Канон-набор: база по пояс, win, shy/pout для 10 героинь",
+    "package": "P51",
+    "tool": "gpt_image_2_6 + Elements + recipe v4 (ROSTER_20 §2.1)",
+    "gate": "двойной аудит анатомии + матрица 45 пар лиц",
+    "week": "W3",
+    "total_credits": 330.0,
+    "range": null,
+    "lines": [
+     {
+      "what": "поиск: 10 x 3 x 6 кандидатов, 1k medium",
+      "n": 180,
+      "unit_credits": 1.0,
+      "credits": 180.0
+     },
+     {
+      "what": "финал: 10 x 3 x 2 в 2k high",
+      "n": 60,
+      "unit_credits": 2.0,
+      "credits": 120.0
+     },
+     {
+      "what": "постобработка (upscale/remove_background) ~10%",
+      "n": 1,
+      "unit_credits": 30.0,
+      "credits": 30.0
+     }
+    ]
+   },
+   {
+    "id": "H2",
+    "section": "Героини",
+    "name": "Нейтральный тир: 10 закрытых нарядов + 8 лиц на героиню",
+    "package": "P55",
+    "tool": "gpt_image_2_6 + Elements",
+    "gate": "чек-лист §11.6, сравнение лиц с H1",
+    "week": "W3",
+    "total_credits": 200.0,
+    "range": null,
+    "lines": [
+     {
+      "what": "наряды: 10 x 4 кандидата, 2k high",
+      "n": 40,
+      "unit_credits": 2.0,
+      "credits": 80.0
+     },
+     {
+      "what": "лица: 10 x 8 x 2 кандидата, дефолт 0,75",
+      "n": 160,
+      "unit_credits": 0.75,
+      "credits": 120.0
+     }
+    ]
+   },
+   {
+    "id": "H3",
+    "section": "Героини",
+    "name": "Combo T1/T2/T3 для 5 героинь волны 1",
+    "package": "P56",
+    "tool": "gpt_image_2_6 + Elements + remove_background",
+    "gate": "halo-score и сравнение лиц",
+    "week": "W3",
+    "total_credits": 150.0,
+    "range": null,
+    "lines": [
+     {
+      "what": "поиск: 5 x 3 x 6 кандидатов, 1k",
+      "n": 90,
+      "unit_credits": 1.0,
+      "credits": 90.0
+     },
+     {
+      "what": "финал: 5 x 3 x 2 в 2k high",
+      "n": 30,
+      "unit_credits": 2.0,
+      "credits": 60.0
+     }
+    ]
+   },
+   {
+    "id": "E0",
+    "section": "Окружения (LoRA v2)",
+    "name": "Обучение tw_master_v2 (H200, 4500 шагов)",
+    "package": "P52",
+    "tool": "GPU-аренда H200 134 кр/ч, ~70-100 мин (измерено на v1: 248 кр за весь сеанс)",
+    "gate": "гейты G1-G5 SPEC_V2 §8",
+    "week": "W1",
+    "total_credits": 215.0,
+    "range": [
+     160,
+     270
+    ],
+    "lines": [
+     {
+      "what": "середина вилки 160-270 кр",
+      "n": 1,
+      "unit_credits": 215.0,
+      "credits": 215.0
+     }
+    ]
+   },
+   {
+    "id": "E1",
+    "section": "Окружения (LoRA v2)",
+    "name": "Продакшн-прогон: 24 фона стола, 10 зон Салона, 12 Коикои, тайлы/FX",
+    "package": "P53",
+    "tool": "тот же бокс сразу после обучения (gen.py, 9 шагов, 0,085 кр/картинка)",
+    "gate": "палитра image_stats.py, AD",
+    "week": "W2",
+    "total_credits": 267.9,
+    "range": null,
+    "lines": [
+     {
+      "what": "бокс 1,5 ч x 134 кр/ч",
+      "n": 1,
+      "unit_credits": 201.0,
+      "credits": 201.0
+     },
+     {
+      "what": "540 кандидатов x 0,085 кр",
+      "n": 540,
+      "unit_credits": 0.085,
+      "credits": 45.9
+     },
+     {
+      "what": "3 загрузки модели x 7 кр",
+      "n": 3,
+      "unit_credits": 7.0,
+      "credits": 21.0
+     }
+    ]
+   },
+   {
+    "id": "E2",
+    "section": "Окружения (LoRA v2)",
+    "name": "Финалисты: upscale 46 фонов",
+    "package": "P53",
+    "tool": "Higgsfield upscale_image (цена за кадр НЕ котирована: допущение 2 кр)",
+    "gate": "AD",
+    "week": "W2",
+    "total_credits": 92.0,
+    "range": null,
+    "lines": [
+     {
+      "what": "46 финалистов x ~2 кр (допущение)",
+      "n": 46,
+      "unit_credits": 2.0,
+      "credits": 92.0
+     }
+    ]
+   },
+   {
+    "id": "U1",
+    "section": "UI-кит",
+    "name": "60 иконок (4 кандидата), 11 обложек режимов, 22 мелочи",
+    "package": "P54",
+    "tool": "gpt_image_2_6 (иконки, 1k) + LoRA v2 для фонов обложек",
+    "gate": "набор в палитре tokens.json, 0 текста",
+    "week": "W3",
+    "total_credits": 372.0,
+    "range": null,
+    "lines": [
+     {
+      "what": "иконки: 60 x 4, 1k medium",
+      "n": 240,
+      "unit_credits": 1.0,
+      "credits": 240.0
+     },
+     {
+      "what": "обложки режимов: 11 x 4, 2k high",
+      "n": 44,
+      "unit_credits": 2.0,
+      "credits": 88.0
+     },
+     {
+      "what": "редкость/мелочь: 22 x 2, 1k",
+      "n": 44,
+      "unit_credits": 1.0,
+      "credits": 44.0
+     }
+    ]
+   },
+   {
+    "id": "V1",
+    "section": "Голос",
+    "name": "Слепой тест JP: 3 модели x 3 голоса x 10 реплик",
+    "package": "P46",
+    "tool": "seed_audio 0,20 (котировка получена) / ElevenLabs v4 0,23 / text2speech_v2 0,15 (по R2/PS, не котировано)",
+    "gate": "порог >=70% 'не отличают' (Q-14)",
+    "week": "W1",
+    "total_credits": 17.4,
+    "range": null,
+    "lines": [
+     {
+      "what": "seed_audio 30 реплик",
+      "n": 30,
+      "unit_credits": 0.2,
+      "credits": 6.0
+     },
+     {
+      "what": "ElevenLabs v4 30 реплик",
+      "n": 30,
+      "unit_credits": 0.23,
+      "credits": 6.9
+     },
+     {
+      "what": "text2speech_v2 30 реплик",
+      "n": 30,
+      "unit_credits": 0.15,
+      "credits": 4.5
+     }
+    ]
+   },
+   {
+    "id": "V2",
+    "section": "Голос",
+    "name": "Beta-24 x 10 героинь, 3 дубля на строку",
+    "package": "P47",
+    "tool": "победившая модель (расчёт по 0,20)",
+    "gate": "LUFS-гейт, слух 10% выборки",
+    "week": "W2",
+    "total_credits": 144.0,
+    "range": null,
+    "lines": [
+     {
+      "what": "240 строк x 3 дубля x 0,20",
+      "n": 720,
+      "unit_credits": 0.2,
+      "credits": 144.0
+     }
+    ]
+   },
+   {
+    "id": "M1",
+    "section": "Музыка",
+    "name": "12-13 приоритетных треков, 3 варианта, стемы партии",
+    "package": "P48",
+    "tool": "ElevenLabs Music v2.5: 13,08 кр за 90 с (R2/PS); separate_stems (цена НЕ котирована, допущение 5 кр/трек)",
+    "gate": "шов-гейт + LUFS, слух",
+    "week": "W3",
+    "total_credits": 298.5,
+    "range": null,
+    "lines": [
+     {
+      "what": "456 с материала x 0,1453 кр/с x 3 варианта",
+      "n": 1368,
+      "unit_credits": 0.1453,
+      "credits": 198.8
+     },
+     {
+      "what": "стемы 8 треков x ~5 кр (допущение)",
+      "n": 8,
+      "unit_credits": 5.0,
+      "credits": 40.0
+     },
+     {
+      "what": "запас на повтор 25%",
+      "n": 1,
+      "unit_credits": 0.0,
+      "credits": 0.0
+     }
+    ]
+   },
+   {
+    "id": "S1",
+    "section": "SFX",
+    "name": "40 звуков x 3 варианта + 2 амбиента 30 с",
+    "package": "P49",
+    "tool": "Mirelo 0,50 кр за 2 с (R2/PS)",
+    "gate": "пики -6 dBFS, P45",
+    "week": "W3",
+    "total_credits": 105.0,
+    "range": null,
+    "lines": [
+     {
+      "what": "40 x 3 x 0,5",
+      "n": 120,
+      "unit_credits": 0.5,
+      "credits": 60.0
+     },
+     {
+      "what": "2 амбиента x 3 x (30 с / 2 с x 0,5)",
+      "n": 6,
+      "unit_credits": 7.5,
+      "credits": 45.0
+     }
+    ]
+   },
+   {
+    "id": "X1",
+    "section": "Видео",
+    "name": "Пилоты: ульта SSR (Kling 3.0 / Seedance 2.5) + memorial",
+    "package": "P57",
+    "tool": "Kling 3.0 10 кр/5 с; Seedance 2.5 35 кр/5 с (R2/PS)",
+    "gate": "сходство лица, размер ogv <= 0,9 МБ",
+    "week": "W4",
+    "total_credits": 190.0,
+    "range": null,
+    "lines": [
+     {
+      "what": "Kling ульта 6 попыток",
+      "n": 6,
+      "unit_credits": 10.0,
+      "credits": 60.0
+     },
+     {
+      "what": "Seedance ульта 2 попытки",
+      "n": 2,
+      "unit_credits": 35.0,
+      "credits": 70.0
+     },
+     {
+      "what": "Kling memorial 6 попыток",
+      "n": 6,
+      "unit_credits": 10.0,
+      "credits": 60.0
+     }
+    ]
+   }
+  ],
+  "outside_window": [
+   {
+    "what": "H4 SSR key-art 'Первый гость' (rin_ssr, hana_ssr, yue_ssr)",
+    "credits": "≈60-100 кр",
+    "condition": "после ворот P50 и решения по составу (Q-15); вне 4 недель"
+   },
+   {
+    "what": "V3 Launch-60 для флагманов (МТ, Юэ, Злата): остальные 36 строк x 3 дубля",
+    "credits": "≈65-75 кр",
+    "condition": "только если слепой тест P46 пройден и принят Q-14"
+   },
+   {
+    "what": "Memorial-видео x3, ульта-видео x6 SSR",
+    "credits": "600-2 100 кр (R2/PS)",
+    "condition": "после пилота P57; потребует отдельной сметы"
+   },
+   {
+    "what": "Музыка остальных ~13 треков (мотивы волны 1, memorial, event)",
+    "credits": "≈220 кр",
+    "condition": "после M1"
+   }
+  ],
+  "unit_prices": {
+   "gpt_image_2_6_default": 0.75,
+   "gpt_image_2_6_1k_medium": 1.0,
+   "gpt_image_2_6_2k_high": 2.0,
+   "seed_audio_per_line": 0.2,
+   "elevenlabs_v4_per_line": 0.23,
+   "text2speech_v2_per_line": 0.15,
+   "music_per_90s": 13.08,
+   "music_8s": 1.17,
+   "sfx_per_2s": 0.5,
+   "lora_h200_per_hour": 134,
+   "lora_image": 0.085,
+   "kling3_5s": 10,
+   "seedance25_5s": 35,
+   "verified_today": "gpt_image_2_6 default 0,75 и seed_audio 0,20 — котировки estimate_*_cost 2026-11-27; остальное из R2/PS, SPEC_V2, HOWTO, не перепроверено"
+  }
+ }
+}

@@ -46,8 +46,9 @@ class Fake extends RefCounted:
 		return msec
 
 	func advance_ms(ms: int) -> void:
-		msec += ms
-		unix_ms += ms
+		var step: int = maxi(0, ms)
+		msec += step
+		unix_ms += step
 
 	func set_unix(u: int) -> void:
 		unix_ms = u * 1000
@@ -124,7 +125,14 @@ static func _valid_key(k: String) -> bool:
 	for i in [0, 1, 2, 3, 5, 6, 8, 9]:
 		if not (k[i] >= "0" and k[i] <= "9"):
 			return false
-	return true
+	var y: int = int(k.substr(0, 4))
+	var m: int = int(k.substr(5, 2))
+	var day: int = int(k.substr(8, 2))
+	if y < 1970 or y > 2999 or m < 1 or m > 12:
+		return false
+	var leap: bool = (y % 4 == 0 and y % 100 != 0) or (y % 400 == 0)
+	var dim: Array = [31, 29 if leap else 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+	return day >= 1 and day <= int(dim[m - 1])
 
 
 func bind(d: Dictionary) -> void:

@@ -69,6 +69,7 @@ static func reset() -> void:
 	_loaded = false
 	_by_id = {}
 	_by_path = {}
+	_resolvers = {}
 	_cache = {}
 	problems = []
 	placeholders_served = 0
@@ -88,7 +89,11 @@ static func install_manifest(m: Dictionary) -> void:
 		var rec: Dictionary = r
 		_by_id[String(rec.get("id", ""))] = rec
 		_by_path[String(rec.get("path", ""))] = rec
+	var prev: Dictionary = _resolvers.duplicate()
 	_register_builtin()
+	for f in prev:
+		if not _resolvers.has(f):
+			register_resolver(prev[f])
 
 
 static func _ensure() -> void:
