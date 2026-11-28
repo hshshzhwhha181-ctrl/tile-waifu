@@ -69,7 +69,7 @@ func item(id: String) -> Dictionary:
 
 func ensure() -> void:
 	var st: = V10Banners.state(S)
-	for k in ["tickets", "petals", "candles", "pity_std", "s_pity_std", "pity", "sr_pity", "pulls"]:
+	for k in ["candles", "pity_std", "s_pity_std", "pity", "sr_pity", "pulls"]:
 		S[k] = int(S.get(k, 0))
 	S["guar"] = bool(S.get("guar", false))
 	for k in ["ostars", "targets", "mastery"]:

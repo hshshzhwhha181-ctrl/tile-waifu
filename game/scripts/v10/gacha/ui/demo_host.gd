@@ -56,9 +56,10 @@ func start(a: Dictionary) -> void:
 func _demo_state() -> void:
 	var S: Dictionary = G.default_state()
 	S["unlocked"] = 12
-	S["gems"] = 24600
-	S["tickets"] = 3
-	S["petals"] = 75
+	var wal: = TWWallet.for_state(S)
+	wal.set_balance("gems", 24600)
+	wal.set_balance("tickets", 3)
+	wal.set_balance("petals", 75)
 	S["pulls"] = 63
 	S["pity"] = 37
 	S["sr_pity"] = 3
@@ -108,8 +109,8 @@ func show_chrome(top: bool, nav: bool) -> void:
 
 func refresh_currency(_punch: = false) -> void:
 	if gem_l:
-		gem_l.text = UI.fmt(int(G.S.gems))
-		tick_l.text = str(int(G.S.get("tickets", 0)))
+		gem_l.text = UI.fmt(V10Money.bal("gems"))
+		tick_l.text = str(V10Money.bal("tickets"))
 
 
 func toast(text: String, _icon: = "") -> void:

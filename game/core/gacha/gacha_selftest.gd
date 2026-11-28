@@ -219,7 +219,7 @@ func _phase() -> void:
 	check(absf(float(featured_n) / maxf(1, ssr_n) - 2.0 / 3.0) < 0.08, "2/3 of SSRs featured (%.2f)" % (float(featured_n) / maxf(1, ssr_n)))
 	check(not V10Banners.set_target(S, ph, "r_base"), "target must be an SSR of the phase")
 	var sp: = g.split(ph, 10)
-	S.tickets = 3
+	TWWallet.for_state(S).set_balance("tickets", 3)
 	sp = g.split(ph, 10)
 	check(sp.tickets == 3 and sp.gems == 1050, "split: 3 tickets then 1050 crystals")
 
@@ -335,7 +335,7 @@ func _stars() -> void:
 	check(int(V10Stars.on_dup(S, {"id": "s_lemon", "rar": "R", "cat": "skin"}).gems) == 25, "A non-outfit dup → 25 crystals")
 	var g: = gacha(S)
 	S.ostars["r_maid"] = 2
-	S.petals = 70
+	TWWallet.for_state(S).set_balance("petals", 70)
 	check(g.add_star("r_maid") and int(S.petals) == 10 and V10Stars.level(S, "r_maid") == 3, "add star costs exactly 60")
 	check(not g.add_star("r_maid"), "not without petals")
 	check(V10Stars.unlocks({"name": "Юэ"}, 5).all(func(u): return u.ranked_safe), "unlocks ranked_safe")

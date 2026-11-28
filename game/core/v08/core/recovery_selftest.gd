@@ -146,9 +146,9 @@ static func _bad_codes() -> void :
 
 static func _save_fallback() -> void :
 	G.S = late_game_state()
-	G.S.gems = 111
+	V10Money.set_balance("gems", 111)
 	G.save()
-	G.S.gems = 222
+	V10Money.set_balance("gems", 222)
 	G.save()
 	_check("save writes main", int(G.read_save_file(G.save_path).gems) == 222)
 	_check("save keeps backup of previous", int(G.read_save_file(G._bak_path()).gems) == 111)
@@ -158,7 +158,7 @@ static func _save_fallback() -> void :
 	f.close()
 	G.load_game()
 	_check("damaged main -> loaded from backup", G.loaded_from == G._bak_path() and int(G.S.gems) == 111, G.loaded_from)
-	G.S.gems = 333
+	V10Money.set_balance("gems", 333)
 	G.save()
 	_check("save after fallback keeps good backup", int(G.read_save_file(G._bak_path()).gems) == 111 and int(G.read_save_file(G.save_path).gems) == 333)
 	DirAccess.remove_absolute(G.save_path)
@@ -242,10 +242,14 @@ static func _migration_v7() -> void :
 	G.S.erase("v10_afisha")
 	G.v10_attach()
 	_check("damaged new keys repaired", G.S.v10_clarity is Dictionary and G.S.v10_afisha is Dictionary)
-	# the mirrors: a leftover direct write becomes a wallet operation; spend is all or nothing
-	G.S.gems = int(G.S.gems) + 44
+	# the snapshot S.gems is not an input (P10): a leftover direct write is UNDONE and counted, never turned into money
+	var dw0: = TWWallet.direct_writes
+	G.S.gems = int(G.S.gems) + 44   # wallet-lint: ok the test of the guard itself
 	G.save()
-	_check("direct S.gems write absorbed by the wallet", V10Money.bal("gems") == 23500 and int(G.S.gems) == 23500)
+	_check("direct S.gems write undone, not absorbed", V10Money.bal("gems") == 23456 and int(G.S.gems) == 23456 and TWWallet.direct_writes == dw0 + 1)
+	V10Money.grant({"gems": 44}, "test")
+	G.save()
+	_check("a grant moves wallet and snapshot", V10Money.bal("gems") == 23500 and int(G.S.gems) == 23500)
 	_check("spend all or nothing", not V10Money.spend({"gems": 10, "coins": 10 ** 9}, "test") and V10Money.bal("gems") == 23500)
 	_check("spend moves the mirror", V10Money.spend({"gems": 500}, "test") and int(G.S.gems) == 23000)
 	G.save()

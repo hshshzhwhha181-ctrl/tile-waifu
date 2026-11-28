@@ -458,22 +458,12 @@ static func _grant_into(res: Dictionary, bundle: Dictionary, src: String) -> voi
 	res.gems = int(res.grants.get("gems", 0))
 
 
-# every Path reward goes through here: V10Money when the economy lane is merged, else a plain counter on S
+# every Path reward goes through here: the wallet of the state the Path runs on (the live one -> V10Money, with items)
 static func grant(bundle: Dictionary, src: String) -> void:
-	var mon = Rules.cls("V10Money") if root_override == null else null
-	if mon != null and mon.has_method("grant"):
-		mon.call("grant", bundle, src)
+	if root_override == null:
+		V10Money.grant(bundle, src)
 		return
-	var wallet = Rules.cls("V10Wallet") if root_override == null else null
-	for k in bundle:
-		var n: = int(bundle[k])
-		if n == 0:
-			continue
-		if wallet != null and wallet.has_method("add"):
-			wallet.add(str(k), n, src)
-		else:
-			var s: = S()
-			s[k] = int(s.get(k, 0)) + n
+	TWWallet.for_state(S()).grant(bundle, src)
 
 
 static func _cos(id: String) -> void:

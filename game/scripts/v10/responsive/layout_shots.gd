@@ -114,8 +114,8 @@ func _prep_save() -> void:
 	for i in 13:
 		st[str(i)] = 3 if i % 3 != 2 else 2
 	G.S.stars = st
-	G.S.gems = 12450
-	G.S.coins = 38200
+	V10Money.set_balance("gems", 12450)
+	V10Money.set_balance("coins", 38200)
 	G.S.rp = 180
 	G.S.free10 = true
 	G.S.profile.nick = "Чайный Гость"

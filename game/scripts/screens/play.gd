@@ -488,7 +488,7 @@ func _build_hud() -> void :
 		var gem_ic: = V8Art.rect(V8Art.cur("gem"), Rect2(10.0, (gem_rect.size.y - 26.0) * 0.5, 26.0, 26.0))
 		gem_slot.add_child(gem_ic)
 		gems_lbl = Label.new()
-		gems_lbl.text = UI.fmt(G.S.gems)
+		gems_lbl.text = UI.fmt(V10Money.bal("gems"))
 		gems_lbl.label_settings = V10Type.settings("num", 20, V10DS.PAPER_100, false)
 		gems_lbl.position = Vector2(40.0, 0.0)
 		gems_lbl.size = Vector2(gem_rect.size.x - 50.0, gem_rect.size.y)
@@ -732,7 +732,7 @@ func _refresh() -> void :
 		_top_bar.queue_redraw()
 	if stage:
 		stage.set_charge(SKILL_NEED if skill_ready else skill_charge, SKILL_NEED)
-	gems_lbl.text = UI.fmt(G.S.gems)
+	gems_lbl.text = UI.fmt(V10Money.bal("gems"))
 	if shard_lbl:
 		shard_lbl.text = "%d/1" % shards_found
 	_set_badge(btn_hint, hint_n)
@@ -1592,7 +1592,7 @@ func _v8_pay(kind: String, title: String, text: String, price: int, on_yes: Call
 	Common.confirm(main, title, text, "gem", price, on_yes, {"skip_key": _v8_skip_prefix() + kind})
 
 func _v8_can_pay(price: int) -> bool:
-	if int(G.S.gems) < price:
+	if V10Money.bal("gems") < price:
 		var sm: = V10ShopHub.model()
 		if sm != null and main != null:
 			var top_cb: = func() -> void:
@@ -1600,7 +1600,7 @@ func _v8_can_pay(price: int) -> bool:
 					main.go("shop", {"tab": 2})
 				else:
 					main.toast(V10Nav.tab_lock_text("shop"), "lock")
-			V10ShopFlow.need(self, sm, maxi(1, price - int(G.S.gems)), top_cb, V10ShopHub.go_free_cb(main))
+			V10ShopFlow.need(self, sm, maxi(1, price - V10Money.bal("gems")), top_cb, V10ShopHub.go_free_cb(main))
 		else:
 			main.toast(V6Txt.s("play.need60") if price >= 60 else V6Txt.s("play.need30"), "gem")
 		return false

@@ -206,6 +206,10 @@ EXTERNAL: list[Suite] = [
     # P19: the Path table is read through TWLevels.at(n) only; direct G.LEVELS[...] indexing is red
     Suite(id="no_direct_levels", kind="python", group="lint", marker="NO_DIRECT_LEVELS RESULT", timeout=60, fast=True,
           script="tools/lint_no_direct_levels.py", args=["--selftest", "--check"]),
+    # P10: currency moves through TWWallet / V10Money only; a direct write of S.gems / coins / tickets / petals / moon is red
+    Suite(id="no_direct_wallet", kind="python", group="lint", marker="NO_DIRECT_WALLET RESULT", timeout=60, fast=True,
+          script="tools/lint_no_direct_wallet.py", args=["--selftest", "--check"],
+          note="P10: 24 synthetic lines + 0 direct writes of the wallet mirrors under game/"),
     # P23: a screen folder without spec.tres / a TWScreen outside shell/screens / a bad or duplicate ScreenSpec is red
     Suite(id="screen_has_spec", kind="python", group="lint", marker="SCREEN_HAS_SPEC SELFTEST", timeout=60, fast=True,
           script="tools/lint_screen_has_spec.py", args=["--selftest", "--check"],
@@ -434,6 +438,8 @@ def run_suite(suite: Suite, godot: str | None, fast: bool, tscale: float, logdir
         res = parse_purity(suite, out, rc, timed_out)
     elif suite.kind == "python" and suite.id == "no_direct_levels":
         res = parse_nodl(suite, out, rc, timed_out)
+    elif suite.kind == "python" and suite.id == "no_direct_wallet":
+        res = parse_nodw(suite, out, rc, timed_out)
     elif suite.kind == "python" and not suite.script:
         res = parse_lint(suite, out, rc, timed_out)
     else:
@@ -497,6 +503,26 @@ def parse_nodl(suite: Suite, out: str, rc, timed_out) -> Result:
     else:
         r.status = "pass" if (rc == 0 and m.group(1) == "PASS" and st.group(3) == "PASS") else "fail"
         r.reason = f"{m.group(2)} direct G.LEVELS[...] sites" if r.status != "pass" else ""
+    return r
+
+
+def parse_nodw(suite: Suite, out: str, rc, timed_out) -> Result:
+    """tools/lint_no_direct_wallet.py --selftest --check: green = selftest k/k AND 0 direct writes of the wallet mirrors."""
+    r = Result(suite.id, rc=rc)
+    if timed_out:
+        r.status, r.reason = "timeout", "no exit within the limit"
+        return r
+    m = re.search(r"NO_DIRECT_WALLET RESULT: (PASS|FAIL) \((\d+) violations", out)
+    st = re.search(r"NO_DIRECT_WALLET SELFTEST: (\d+)/(\d+) (PASS|FAIL)", out)
+    r.marker_line = m.group(0) if m else ""
+    if st:
+        r.ok, r.total = int(st.group(1)), int(st.group(2))
+    r.failures = sorted({norm_fail(ln) for ln in out.split("\n") if re.match(r"game/\S+:\d+: (FIELD|DYN)", ln)})
+    if not m or not st:
+        r.status, r.reason = "error", "missing 'NO_DIRECT_WALLET RESULT' / 'NO_DIRECT_WALLET SELFTEST' line"
+    else:
+        r.status = "pass" if (rc == 0 and m.group(1) == "PASS" and st.group(3) == "PASS") else "fail"
+        r.reason = f"{m.group(2)} direct wallet writes" if r.status != "pass" else ""
     return r
 
 

@@ -42,12 +42,9 @@ static func opened() -> bool:
 	return State.unlocked() >= Rules.BOOST_FROM
 
 
-# crystals the player can spend on a booster (V10Wallet when merged, else the plain counter)
+# crystals the player can spend on a booster (the wallet of the state the Path runs on)
 static func gems_balance() -> int:
-	var wallet = Rules.cls("V10Wallet") if State.root_override == null else null
-	if wallet != null and wallet.has_method("balance"):
-		return int(wallet.balance("gems"))
-	return int(State.S().get("gems", 0))
+	return TWWallet.for_state(State.S()).bal("gems")
 
 
 static func can_use(mode: String, tier: String, peak: = false) -> bool:
@@ -124,24 +121,10 @@ static func _count(sel: Dictionary) -> int:
 	return n
 
 
-# buy one booster for crystals (the card asks first). V10Money when merged, else plain counter.
+# buy one booster for crystals (the card asks first)
 static func buy(kind: String) -> bool:
-	var s: = State.S()
-	var mon = Rules.cls("V10Money") if State.root_override == null else null
-	if mon != null and mon.has_method("spend"):
-		if not bool(mon.call("spend", {"gems": Rules.BOOST_PRICE}, "path_booster_" + kind)):
-			return false
-		st()[kind] = stock(kind) + 1
-		State.save()
-		return true
-	var wallet = Rules.cls("V10Wallet") if State.root_override == null else null
-	if wallet != null and wallet.has_method("spend"):
-		if not wallet.spend("gems", Rules.BOOST_PRICE, "path_booster_" + kind):
-			return false
-	else:
-		if int(s.get("gems", 0)) < Rules.BOOST_PRICE:
-			return false
-		s["gems"] = int(s.get("gems", 0)) - Rules.BOOST_PRICE
+	if not bool(TWWallet.for_state(State.S()).spend({"gems": Rules.BOOST_PRICE}, "path_booster_" + kind).ok):
+		return false
 	st()[kind] = stock(kind) + 1
 	State.save()
 	return true

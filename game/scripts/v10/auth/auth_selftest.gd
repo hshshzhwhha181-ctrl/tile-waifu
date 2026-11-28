@@ -93,7 +93,7 @@ static func run(host: Control) -> Array:
 	check(not V10Auth.needs_login(), "after guest sign-in no login screen")
 	check(int(V10Auth.state().created_at) == 1800000000 and int(V10Auth.state().login_count) == 1, "created_at / login_count")
 	G.set_profile("Лунный веер", "yue", true)
-	G.S.gems = 1234
+	V10Money.set_balance("gems", 1234)
 	G.save()
 
 	# ── 4. relaunch → auto sign-in ──
@@ -213,7 +213,7 @@ static func run(host: Control) -> Array:
 	pid = V10Auth.player_id()
 
 	# ── 10. account deletion ──
-	G.S.gems = 999
+	V10Money.set_balance("gems", 999)
 	G.save()
 	G.save()
 	var bak: = G.save_path.get_basename() + ".bak.json"

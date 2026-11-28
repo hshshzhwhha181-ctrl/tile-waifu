@@ -294,7 +294,7 @@ static func claim_chest(zid: String) -> Dictionary:
 		var inv: Dictionary = st().inv
 		for k in r:
 			if k == "gems":
-				root["gems"] = int(root.get("gems", 0)) + int(r[k])
+				TWWallet.for_state(root).grant({"gems": int(r[k])}, "salon_" + zid)
 			else:
 				inv[k] = int(inv.get(k, 0)) + int(r[k])
 	_save()
