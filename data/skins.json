@@ -1,0 +1,4214 @@
+{
+  "schema": 1,
+  "source_specs": [
+    "design/specs/SKIN_HUD_SYSTEM.md",
+    "design/specs/MONETIZATION_PLAN.md",
+    "design/specs/BATTLE_ULT_SPEC.md",
+    "design/specs/LIVEOPS_CALENDAR.md",
+    "design/specs/ult_catalogue.json"
+  ],
+  "heroes": {
+    "mc": {
+      "name_ru": "Маджонг-тян",
+      "short_ru": "МТ"
+    },
+    "rin": {
+      "name_ru": "Рин",
+      "short_ru": "Рин"
+    },
+    "hana": {
+      "name_ru": "Хана",
+      "short_ru": "Хана"
+    },
+    "yue": {
+      "name_ru": "Юэ",
+      "short_ru": "Юэ"
+    },
+    "nova": {
+      "name_ru": "Нова",
+      "short_ru": "Нова"
+    },
+    "zlata": {
+      "name_ru": "Злата",
+      "short_ru": "Злата"
+    },
+    "tsubame": {
+      "name_ru": "Цубамэ",
+      "short_ru": "Цубамэ"
+    },
+    "miel": {
+      "name_ru": "Миэль",
+      "short_ru": "Миэль"
+    },
+    "kohaku": {
+      "name_ru": "Кохаку",
+      "short_ru": "Кохаку"
+    },
+    "shirin": {
+      "name_ru": "Ширин",
+      "short_ru": "Ширин"
+    }
+  },
+  "ult_rules": {
+    "layer_a_threshold_pairs": 8,
+    "layer_a_initial_charge": 0,
+    "layer_b_energy_max": 100,
+    "layer_b_energy_initial": 40,
+    "ult_id_equals_skin_id": true,
+    "outfit_stats_enabled_default": false,
+    "bond_stats_enabled_default": false
+  },
+  "season_s_policy": {
+    "catalog_s_per_season": 3,
+    "pass_s_per_season": 1,
+    "total_s_per_season": 4,
+    "pass_archive_after_seasons": 2,
+    "catalog_main_count": 58,
+    "pass_skins_count": 6,
+    "total_12m_count": 64,
+    "launch_s1_main_count": 38
+  },
+  "tiers": {
+    "base": {
+      "hud": 0,
+      "boldness_default": "B1",
+      "rub": null,
+      "petals": null,
+      "dupe_petals_after_star5": null,
+      "direct_from_day": null,
+      "direct_after_days": null,
+      "stars": null,
+      "dyes": {
+        "free": [],
+        "paid": []
+      },
+      "ult_beats": 4,
+      "voice_min": 0,
+      "touch": {
+        "zones": 5,
+        "reactions": 5
+      },
+      "disk_mb": 4.3,
+      "delivery": "apk"
+    },
+    "vow": {
+      "hud": 0,
+      "boldness_default": "B1",
+      "rub": null,
+      "petals": null,
+      "dupe_petals_after_star5": null,
+      "direct_from_day": null,
+      "direct_after_days": null,
+      "stars": {
+        "petals": [
+          60,
+          120,
+          180,
+          300
+        ],
+        "rub": [
+          49,
+          79,
+          119,
+          199
+        ]
+      },
+      "dyes": {
+        "free": [],
+        "paid": []
+      },
+      "ult_beats": 4,
+      "voice_min": 4,
+      "touch": {
+        "zones": 5,
+        "reactions": 11
+      },
+      "disk_mb": 6.9,
+      "delivery": "apk"
+    },
+    "s_static": {
+      "hud": 0,
+      "boldness_default": "B1",
+      "rub": 359,
+      "petals": 540,
+      "dupe_petals_after_star5": 60,
+      "direct_from_day": 29,
+      "direct_after_days": 28,
+      "stars": {
+        "petals": [
+          60,
+          120,
+          180,
+          300
+        ],
+        "rub": [
+          49,
+          79,
+          119,
+          199
+        ]
+      },
+      "dyes": {
+        "free": [
+          "dye_1@5"
+        ],
+        "paid": []
+      },
+      "ult_beats": 4,
+      "voice_min": 4,
+      "touch": {
+        "zones": 5,
+        "reactions": 11
+      },
+      "disk_mb": 6.9,
+      "delivery": "apk"
+    },
+    "s": {
+      "hud": 0,
+      "boldness_default": "B1",
+      "rub": 599,
+      "petals": 900,
+      "dupe_petals_after_star5": 60,
+      "direct_from_day": 29,
+      "direct_after_days": 28,
+      "stars": {
+        "petals": [
+          60,
+          120,
+          180,
+          300
+        ],
+        "rub": [
+          49,
+          79,
+          119,
+          199
+        ]
+      },
+      "dyes": {
+        "free": [
+          "dye_1@5"
+        ],
+        "paid": []
+      },
+      "ult_beats": 4,
+      "voice_min": 4,
+      "touch": {
+        "zones": 5,
+        "reactions": 11
+      },
+      "disk_mb": 6.9,
+      "delivery": "apk"
+    },
+    "ssr": {
+      "hud": 1,
+      "boldness_default": "B2",
+      "rub": 1490,
+      "petals": 1800,
+      "dupe_petals_after_star5": 150,
+      "direct_from_day": 29,
+      "direct_after_days": 28,
+      "headline_direct_from_day": 57,
+      "headline_direct_after_days": 56,
+      "stars": {
+        "petals": [
+          60,
+          120,
+          180,
+          300
+        ],
+        "rub": [
+          49,
+          79,
+          119,
+          199
+        ]
+      },
+      "dyes": {
+        "free": [
+          "dye_1@3",
+          "dye_2@5"
+        ],
+        "paid": [
+          "dye_3"
+        ],
+        "dye_3_rub": 199,
+        "dye_3_petals": 400
+      },
+      "ult_beats": 6,
+      "voice_min": 8,
+      "touch": {
+        "zones": 6,
+        "reactions": 20
+      },
+      "disk_mb": 12.3,
+      "delivery": "apk"
+    },
+    "ssrp": {
+      "hud": 2,
+      "boldness_default": "B3",
+      "rub": 2490,
+      "petals": 3600,
+      "dupe_petals_after_star5": 300,
+      "direct_from_day": 57,
+      "direct_after_days": 56,
+      "stars": {
+        "petals": [
+          90,
+          180,
+          270,
+          450
+        ],
+        "rub": [
+          69,
+          119,
+          179,
+          299
+        ]
+      },
+      "dyes": {
+        "free": [
+          "dye_1@3",
+          "dye_2@5"
+        ],
+        "paid": [
+          "dye_3"
+        ],
+        "dye_3_rub": 199,
+        "dye_3_petals": 400
+      },
+      "ult_beats": 8,
+      "voice_min": 20,
+      "touch": {
+        "zones": 8,
+        "reactions": 38
+      },
+      "disk_mb": 23.2,
+      "delivery": "pack"
+    },
+    "gift": {
+      "petals": 5
+    },
+    "champion": {
+      "sold": false,
+      "requires_star": 5,
+      "requires_bond": 8,
+      "requires_mastery_pairs": 2000,
+      "free_dye": "dye_g"
+    }
+  },
+  "seasons": [
+    {
+      "id": "S1",
+      "banner_a_featured": "mc_ssrp_dragonnight",
+      "banner_a_s": [
+        "mc_s_tea",
+        "mc_s_serving",
+        "nova_s_street"
+      ],
+      "banner_b_featured": [
+        "nova_ssrp_idolstage",
+        "zlata_ssr_firebird"
+      ],
+      "banner_b_s": [
+        "zlata_s_folk",
+        "hana_s_track",
+        "shirin_s_oasis"
+      ],
+      "mega_prize_s": "kohaku_s_festival",
+      "pass_s": "miel_s_pass1",
+      "catalog_new_s": [
+        "mc_s_tea",
+        "mc_s_serving",
+        "rin_s_library",
+        "rin_s_officer",
+        "hana_s_track",
+        "yue_s_robe",
+        "nova_s_street",
+        "zlata_s_folk",
+        "tsubame_s_roof",
+        "miel_s_baker",
+        "kohaku_s_festival",
+        "shirin_s_oasis"
+      ],
+      "first_guest_ssrs": [
+        "rin_ssr_bunnytea",
+        "hana_ssr_beach",
+        "yue_ssr_scalearmor"
+      ],
+      "headline_direct_from_day": 57
+    },
+    {
+      "id": "S2",
+      "banner_a_featured": "tsubame_ssr_ninjarose",
+      "banner_a_s": [
+        "yue_s_snowqueen",
+        "hana_s_ski",
+        "rin_s_library"
+      ],
+      "banner_b_featured": [
+        "rin_ssr_bunnytea",
+        "hana_ssr_beach"
+      ],
+      "banner_b_s": [
+        "miel_s_cocoa",
+        "rin_s_officer",
+        "tsubame_s_roof"
+      ],
+      "mega_prize_s": "miel_s_baker",
+      "pass_s": "kohaku_s_pass2",
+      "catalog_new_s": [
+        "yue_s_snowqueen",
+        "hana_s_ski",
+        "miel_s_cocoa"
+      ],
+      "headline_direct_from_day": 57
+    },
+    {
+      "id": "S3",
+      "banner_a_featured": "shirin_ssrp_oasislight",
+      "banner_a_s": [
+        "kohaku_s_hanami",
+        "zlata_s_spring",
+        "nova_s_idolcasual"
+      ],
+      "banner_b_featured": [
+        "mc_ssrp_dragonnight",
+        "yue_ssr_scalearmor"
+      ],
+      "banner_b_s": [
+        "yue_s_robe",
+        "mc_s_tea",
+        "hana_s_track"
+      ],
+      "mega_prize_s": "shirin_s_oasis",
+      "pass_s": "shirin_s_pass3",
+      "catalog_new_s": [
+        "kohaku_s_hanami",
+        "zlata_s_spring",
+        "nova_s_idolcasual"
+      ],
+      "headline_direct_from_day": 57
+    },
+    {
+      "id": "S4",
+      "banner_a_featured": "miel_ssr_seaside",
+      "banner_a_s": [
+        "mc_s_swim",
+        "tsubame_s_pool",
+        "rin_s_yacht"
+      ],
+      "banner_b_featured": [
+        "tsubame_ssr_ninjarose",
+        "zlata_ssr_firebird"
+      ],
+      "banner_b_s": [
+        "kohaku_s_hanami",
+        "miel_s_cocoa",
+        "nova_s_street"
+      ],
+      "mega_prize_s": "hana_s_track",
+      "pass_s": "miel_s_pass4",
+      "catalog_new_s": [
+        "mc_s_swim",
+        "tsubame_s_pool",
+        "rin_s_yacht"
+      ],
+      "headline_direct_from_day": 57
+    },
+    {
+      "id": "S5",
+      "banner_a_featured": "kohaku_ssrp_moonfest",
+      "banner_a_s": [
+        "zlata_s_harvest",
+        "hana_s_onsen",
+        "shirin_s_sleep"
+      ],
+      "banner_b_featured": [
+        "nova_ssrp_idolstage",
+        "miel_ssr_seaside"
+      ],
+      "banner_b_s": [
+        "yue_s_snowqueen",
+        "rin_s_yacht",
+        "tsubame_s_pool"
+      ],
+      "mega_prize_s": "zlata_s_folk",
+      "pass_s": "kohaku_s_pass5",
+      "catalog_new_s": [
+        "zlata_s_harvest",
+        "hana_s_onsen",
+        "shirin_s_sleep"
+      ],
+      "headline_direct_from_day": 57
+    },
+    {
+      "id": "S6",
+      "banner_a_featured": "mc_ssrp_goldtable",
+      "banner_a_s": [
+        "nova_s_sleep",
+        "yue_s_fantasy",
+        "tsubame_s_noir"
+      ],
+      "banner_b_featured": [],
+      "banner_b_s": [],
+      "mega_prize_s": "rin_s_library",
+      "pass_s": "shirin_s_pass6",
+      "catalog_new_s": [
+        "nova_s_sleep",
+        "yue_s_fantasy",
+        "tsubame_s_noir"
+      ],
+      "headline_direct_from_day": 57
+    }
+  ],
+  "skins": [
+    {
+      "id": "mc_base",
+      "hero": "mc",
+      "tier": "base",
+      "hud": 0,
+      "theme": null,
+      "season": "S1",
+      "boldness": "B1",
+      "name_ru": "Базовый",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 4.3,
+        "delivery": "apk",
+        "cdn": "v1/mc/mc_base/1.0.0"
+      },
+      "sources": {
+        "free_hero_unlock": true,
+        "gacha": false,
+        "guest": false,
+        "pass": false,
+        "petals": null,
+        "dupe_petals_after_star5": null,
+        "rub": null,
+        "direct_after_days": null,
+        "direct_from_day": null,
+        "evergreen_from_day": null
+      },
+      "stars": null,
+      "dyes": {
+        "free": [],
+        "paid": []
+      },
+      "voice_lines": 0,
+      "touch": {
+        "zones": 5,
+        "reactions": 5
+      },
+      "plate": "rig+ult+voice_base",
+      "ult": {
+        "id": "mc_base",
+        "ult_key": "ult.base.mc_base",
+        "beats": 4,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "rin_base",
+      "hero": "rin",
+      "tier": "base",
+      "hud": 0,
+      "theme": null,
+      "season": "S1",
+      "boldness": "B1",
+      "name_ru": "Базовый",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 4.3,
+        "delivery": "apk",
+        "cdn": "v1/rin/rin_base/1.0.0"
+      },
+      "sources": {
+        "free_hero_unlock": true,
+        "gacha": false,
+        "guest": false,
+        "pass": false,
+        "petals": null,
+        "dupe_petals_after_star5": null,
+        "rub": null,
+        "direct_after_days": null,
+        "direct_from_day": null,
+        "evergreen_from_day": null
+      },
+      "stars": null,
+      "dyes": {
+        "free": [],
+        "paid": []
+      },
+      "voice_lines": 0,
+      "touch": {
+        "zones": 5,
+        "reactions": 5
+      },
+      "plate": "rig+ult+voice_base",
+      "ult": {
+        "id": "rin_base",
+        "ult_key": "ult.base.rin_base",
+        "beats": 4,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "hana_base",
+      "hero": "hana",
+      "tier": "base",
+      "hud": 0,
+      "theme": null,
+      "season": "S1",
+      "boldness": "B1",
+      "name_ru": "Базовый",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 4.3,
+        "delivery": "apk",
+        "cdn": "v1/hana/hana_base/1.0.0"
+      },
+      "sources": {
+        "free_hero_unlock": true,
+        "gacha": false,
+        "guest": false,
+        "pass": false,
+        "petals": null,
+        "dupe_petals_after_star5": null,
+        "rub": null,
+        "direct_after_days": null,
+        "direct_from_day": null,
+        "evergreen_from_day": null
+      },
+      "stars": null,
+      "dyes": {
+        "free": [],
+        "paid": []
+      },
+      "voice_lines": 0,
+      "touch": {
+        "zones": 5,
+        "reactions": 5
+      },
+      "plate": "rig+ult+voice_base",
+      "ult": {
+        "id": "hana_base",
+        "ult_key": "ult.base.hana_base",
+        "beats": 4,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "yue_base",
+      "hero": "yue",
+      "tier": "base",
+      "hud": 0,
+      "theme": null,
+      "season": "S1",
+      "boldness": "B1",
+      "name_ru": "Базовый",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 4.3,
+        "delivery": "apk",
+        "cdn": "v1/yue/yue_base/1.0.0"
+      },
+      "sources": {
+        "free_hero_unlock": true,
+        "gacha": false,
+        "guest": false,
+        "pass": false,
+        "petals": null,
+        "dupe_petals_after_star5": null,
+        "rub": null,
+        "direct_after_days": null,
+        "direct_from_day": null,
+        "evergreen_from_day": null
+      },
+      "stars": null,
+      "dyes": {
+        "free": [],
+        "paid": []
+      },
+      "voice_lines": 0,
+      "touch": {
+        "zones": 5,
+        "reactions": 5
+      },
+      "plate": "rig+ult+voice_base",
+      "ult": {
+        "id": "yue_base",
+        "ult_key": "ult.base.yue_base",
+        "beats": 4,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "nova_base",
+      "hero": "nova",
+      "tier": "base",
+      "hud": 0,
+      "theme": null,
+      "season": "S1",
+      "boldness": "B1",
+      "name_ru": "Базовый",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 4.3,
+        "delivery": "apk",
+        "cdn": "v1/nova/nova_base/1.0.0"
+      },
+      "sources": {
+        "free_hero_unlock": true,
+        "gacha": false,
+        "guest": false,
+        "pass": false,
+        "petals": null,
+        "dupe_petals_after_star5": null,
+        "rub": null,
+        "direct_after_days": null,
+        "direct_from_day": null,
+        "evergreen_from_day": null
+      },
+      "stars": null,
+      "dyes": {
+        "free": [],
+        "paid": []
+      },
+      "voice_lines": 0,
+      "touch": {
+        "zones": 5,
+        "reactions": 5
+      },
+      "plate": "rig+ult+voice_base",
+      "ult": {
+        "id": "nova_base",
+        "ult_key": "ult.base.nova_base",
+        "beats": 4,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "zlata_base",
+      "hero": "zlata",
+      "tier": "base",
+      "hud": 0,
+      "theme": null,
+      "season": "S1",
+      "boldness": "B1",
+      "name_ru": "Базовый",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 4.3,
+        "delivery": "apk",
+        "cdn": "v1/zlata/zlata_base/1.0.0"
+      },
+      "sources": {
+        "free_hero_unlock": true,
+        "gacha": false,
+        "guest": false,
+        "pass": false,
+        "petals": null,
+        "dupe_petals_after_star5": null,
+        "rub": null,
+        "direct_after_days": null,
+        "direct_from_day": null,
+        "evergreen_from_day": null
+      },
+      "stars": null,
+      "dyes": {
+        "free": [],
+        "paid": []
+      },
+      "voice_lines": 0,
+      "touch": {
+        "zones": 5,
+        "reactions": 5
+      },
+      "plate": "rig+ult+voice_base",
+      "ult": {
+        "id": "zlata_base",
+        "ult_key": "ult.base.zlata_base",
+        "beats": 4,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "tsubame_base",
+      "hero": "tsubame",
+      "tier": "base",
+      "hud": 0,
+      "theme": null,
+      "season": "S1",
+      "boldness": "B1",
+      "name_ru": "Базовый",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 4.3,
+        "delivery": "apk",
+        "cdn": "v1/tsubame/tsubame_base/1.0.0"
+      },
+      "sources": {
+        "free_hero_unlock": true,
+        "gacha": false,
+        "guest": false,
+        "pass": false,
+        "petals": null,
+        "dupe_petals_after_star5": null,
+        "rub": null,
+        "direct_after_days": null,
+        "direct_from_day": null,
+        "evergreen_from_day": null
+      },
+      "stars": null,
+      "dyes": {
+        "free": [],
+        "paid": []
+      },
+      "voice_lines": 0,
+      "touch": {
+        "zones": 5,
+        "reactions": 5
+      },
+      "plate": "rig+ult+voice_base",
+      "ult": {
+        "id": "tsubame_base",
+        "ult_key": "ult.base.tsubame_base",
+        "beats": 4,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "miel_base",
+      "hero": "miel",
+      "tier": "base",
+      "hud": 0,
+      "theme": null,
+      "season": "S1",
+      "boldness": "B1",
+      "name_ru": "Базовый",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 4.3,
+        "delivery": "apk",
+        "cdn": "v1/miel/miel_base/1.0.0"
+      },
+      "sources": {
+        "free_hero_unlock": true,
+        "gacha": false,
+        "guest": false,
+        "pass": false,
+        "petals": null,
+        "dupe_petals_after_star5": null,
+        "rub": null,
+        "direct_after_days": null,
+        "direct_from_day": null,
+        "evergreen_from_day": null
+      },
+      "stars": null,
+      "dyes": {
+        "free": [],
+        "paid": []
+      },
+      "voice_lines": 0,
+      "touch": {
+        "zones": 5,
+        "reactions": 5
+      },
+      "plate": "rig+ult+voice_base",
+      "ult": {
+        "id": "miel_base",
+        "ult_key": "ult.base.miel_base",
+        "beats": 4,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "kohaku_base",
+      "hero": "kohaku",
+      "tier": "base",
+      "hud": 0,
+      "theme": null,
+      "season": "S1",
+      "boldness": "B1",
+      "name_ru": "Базовый",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 4.3,
+        "delivery": "apk",
+        "cdn": "v1/kohaku/kohaku_base/1.0.0"
+      },
+      "sources": {
+        "free_hero_unlock": true,
+        "gacha": false,
+        "guest": false,
+        "pass": false,
+        "petals": null,
+        "dupe_petals_after_star5": null,
+        "rub": null,
+        "direct_after_days": null,
+        "direct_from_day": null,
+        "evergreen_from_day": null
+      },
+      "stars": null,
+      "dyes": {
+        "free": [],
+        "paid": []
+      },
+      "voice_lines": 0,
+      "touch": {
+        "zones": 5,
+        "reactions": 5
+      },
+      "plate": "rig+ult+voice_base",
+      "ult": {
+        "id": "kohaku_base",
+        "ult_key": "ult.base.kohaku_base",
+        "beats": 4,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "shirin_base",
+      "hero": "shirin",
+      "tier": "base",
+      "hud": 0,
+      "theme": null,
+      "season": "S1",
+      "boldness": "B1",
+      "name_ru": "Базовый",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 4.3,
+        "delivery": "apk",
+        "cdn": "v1/shirin/shirin_base/1.0.0"
+      },
+      "sources": {
+        "free_hero_unlock": true,
+        "gacha": false,
+        "guest": false,
+        "pass": false,
+        "petals": null,
+        "dupe_petals_after_star5": null,
+        "rub": null,
+        "direct_after_days": null,
+        "direct_from_day": null,
+        "evergreen_from_day": null
+      },
+      "stars": null,
+      "dyes": {
+        "free": [],
+        "paid": []
+      },
+      "voice_lines": 0,
+      "touch": {
+        "zones": 5,
+        "reactions": 5
+      },
+      "plate": "rig+ult+voice_base",
+      "ult": {
+        "id": "shirin_base",
+        "ult_key": "ult.base.shirin_base",
+        "beats": 4,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "mc_vow",
+      "hero": "mc",
+      "tier": "vow",
+      "hud": 0,
+      "theme": null,
+      "season": "S1",
+      "boldness": "B1",
+      "name_ru": "Клятва",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 6.9,
+        "delivery": "apk",
+        "cdn": "v1/mc/mc_vow/1.0.0"
+      },
+      "sources": {
+        "bond_vow": 10,
+        "gacha": false,
+        "guest": false,
+        "pass": false,
+        "petals": null,
+        "dupe_petals_after_star5": null,
+        "rub": null,
+        "direct_after_days": null,
+        "direct_from_day": null,
+        "evergreen_from_day": null
+      },
+      "stars": {
+        "petals": [
+          60,
+          120,
+          180,
+          300
+        ],
+        "rub": [
+          49,
+          79,
+          119,
+          199
+        ]
+      },
+      "dyes": {
+        "free": [],
+        "paid": []
+      },
+      "voice_lines": 4,
+      "touch": {
+        "zones": 5,
+        "reactions": 11
+      },
+      "plate": "rig+vow+voice4",
+      "ult": {
+        "id": "mc_vow",
+        "ult_key": "ult.vow.mc_vow",
+        "beats": 4,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "rin_vow",
+      "hero": "rin",
+      "tier": "vow",
+      "hud": 0,
+      "theme": null,
+      "season": "S1",
+      "boldness": "B1",
+      "name_ru": "Клятва",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 6.9,
+        "delivery": "apk",
+        "cdn": "v1/rin/rin_vow/1.0.0"
+      },
+      "sources": {
+        "bond_vow": 10,
+        "gacha": false,
+        "guest": false,
+        "pass": false,
+        "petals": null,
+        "dupe_petals_after_star5": null,
+        "rub": null,
+        "direct_after_days": null,
+        "direct_from_day": null,
+        "evergreen_from_day": null
+      },
+      "stars": {
+        "petals": [
+          60,
+          120,
+          180,
+          300
+        ],
+        "rub": [
+          49,
+          79,
+          119,
+          199
+        ]
+      },
+      "dyes": {
+        "free": [],
+        "paid": []
+      },
+      "voice_lines": 4,
+      "touch": {
+        "zones": 5,
+        "reactions": 11
+      },
+      "plate": "rig+vow+voice4",
+      "ult": {
+        "id": "rin_vow",
+        "ult_key": "ult.vow.rin_vow",
+        "beats": 4,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "hana_vow",
+      "hero": "hana",
+      "tier": "vow",
+      "hud": 0,
+      "theme": null,
+      "season": "S1",
+      "boldness": "B1",
+      "name_ru": "Клятва",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 6.9,
+        "delivery": "apk",
+        "cdn": "v1/hana/hana_vow/1.0.0"
+      },
+      "sources": {
+        "bond_vow": 10,
+        "gacha": false,
+        "guest": false,
+        "pass": false,
+        "petals": null,
+        "dupe_petals_after_star5": null,
+        "rub": null,
+        "direct_after_days": null,
+        "direct_from_day": null,
+        "evergreen_from_day": null
+      },
+      "stars": {
+        "petals": [
+          60,
+          120,
+          180,
+          300
+        ],
+        "rub": [
+          49,
+          79,
+          119,
+          199
+        ]
+      },
+      "dyes": {
+        "free": [],
+        "paid": []
+      },
+      "voice_lines": 4,
+      "touch": {
+        "zones": 5,
+        "reactions": 11
+      },
+      "plate": "rig+vow+voice4",
+      "ult": {
+        "id": "hana_vow",
+        "ult_key": "ult.vow.hana_vow",
+        "beats": 4,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "yue_vow",
+      "hero": "yue",
+      "tier": "vow",
+      "hud": 0,
+      "theme": null,
+      "season": "S1",
+      "boldness": "B1",
+      "name_ru": "Клятва",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 6.9,
+        "delivery": "apk",
+        "cdn": "v1/yue/yue_vow/1.0.0"
+      },
+      "sources": {
+        "bond_vow": 10,
+        "gacha": false,
+        "guest": false,
+        "pass": false,
+        "petals": null,
+        "dupe_petals_after_star5": null,
+        "rub": null,
+        "direct_after_days": null,
+        "direct_from_day": null,
+        "evergreen_from_day": null
+      },
+      "stars": {
+        "petals": [
+          60,
+          120,
+          180,
+          300
+        ],
+        "rub": [
+          49,
+          79,
+          119,
+          199
+        ]
+      },
+      "dyes": {
+        "free": [],
+        "paid": []
+      },
+      "voice_lines": 4,
+      "touch": {
+        "zones": 5,
+        "reactions": 11
+      },
+      "plate": "rig+vow+voice4",
+      "ult": {
+        "id": "yue_vow",
+        "ult_key": "ult.vow.yue_vow",
+        "beats": 4,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "nova_vow",
+      "hero": "nova",
+      "tier": "vow",
+      "hud": 0,
+      "theme": null,
+      "season": "S1",
+      "boldness": "B1",
+      "name_ru": "Клятва",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 6.9,
+        "delivery": "apk",
+        "cdn": "v1/nova/nova_vow/1.0.0"
+      },
+      "sources": {
+        "bond_vow": 10,
+        "gacha": false,
+        "guest": false,
+        "pass": false,
+        "petals": null,
+        "dupe_petals_after_star5": null,
+        "rub": null,
+        "direct_after_days": null,
+        "direct_from_day": null,
+        "evergreen_from_day": null
+      },
+      "stars": {
+        "petals": [
+          60,
+          120,
+          180,
+          300
+        ],
+        "rub": [
+          49,
+          79,
+          119,
+          199
+        ]
+      },
+      "dyes": {
+        "free": [],
+        "paid": []
+      },
+      "voice_lines": 4,
+      "touch": {
+        "zones": 5,
+        "reactions": 11
+      },
+      "plate": "rig+vow+voice4",
+      "ult": {
+        "id": "nova_vow",
+        "ult_key": "ult.vow.nova_vow",
+        "beats": 4,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "zlata_vow",
+      "hero": "zlata",
+      "tier": "vow",
+      "hud": 0,
+      "theme": null,
+      "season": "S1",
+      "boldness": "B1",
+      "name_ru": "Клятва",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 6.9,
+        "delivery": "apk",
+        "cdn": "v1/zlata/zlata_vow/1.0.0"
+      },
+      "sources": {
+        "bond_vow": 10,
+        "gacha": false,
+        "guest": false,
+        "pass": false,
+        "petals": null,
+        "dupe_petals_after_star5": null,
+        "rub": null,
+        "direct_after_days": null,
+        "direct_from_day": null,
+        "evergreen_from_day": null
+      },
+      "stars": {
+        "petals": [
+          60,
+          120,
+          180,
+          300
+        ],
+        "rub": [
+          49,
+          79,
+          119,
+          199
+        ]
+      },
+      "dyes": {
+        "free": [],
+        "paid": []
+      },
+      "voice_lines": 4,
+      "touch": {
+        "zones": 5,
+        "reactions": 11
+      },
+      "plate": "rig+vow+voice4",
+      "ult": {
+        "id": "zlata_vow",
+        "ult_key": "ult.vow.zlata_vow",
+        "beats": 4,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "tsubame_vow",
+      "hero": "tsubame",
+      "tier": "vow",
+      "hud": 0,
+      "theme": null,
+      "season": "S1",
+      "boldness": "B1",
+      "name_ru": "Клятва",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 6.9,
+        "delivery": "apk",
+        "cdn": "v1/tsubame/tsubame_vow/1.0.0"
+      },
+      "sources": {
+        "bond_vow": 10,
+        "gacha": false,
+        "guest": false,
+        "pass": false,
+        "petals": null,
+        "dupe_petals_after_star5": null,
+        "rub": null,
+        "direct_after_days": null,
+        "direct_from_day": null,
+        "evergreen_from_day": null
+      },
+      "stars": {
+        "petals": [
+          60,
+          120,
+          180,
+          300
+        ],
+        "rub": [
+          49,
+          79,
+          119,
+          199
+        ]
+      },
+      "dyes": {
+        "free": [],
+        "paid": []
+      },
+      "voice_lines": 4,
+      "touch": {
+        "zones": 5,
+        "reactions": 11
+      },
+      "plate": "rig+vow+voice4",
+      "ult": {
+        "id": "tsubame_vow",
+        "ult_key": "ult.vow.tsubame_vow",
+        "beats": 4,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "miel_vow",
+      "hero": "miel",
+      "tier": "vow",
+      "hud": 0,
+      "theme": null,
+      "season": "S1",
+      "boldness": "B1",
+      "name_ru": "Клятва",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 6.9,
+        "delivery": "apk",
+        "cdn": "v1/miel/miel_vow/1.0.0"
+      },
+      "sources": {
+        "bond_vow": 10,
+        "gacha": false,
+        "guest": false,
+        "pass": false,
+        "petals": null,
+        "dupe_petals_after_star5": null,
+        "rub": null,
+        "direct_after_days": null,
+        "direct_from_day": null,
+        "evergreen_from_day": null
+      },
+      "stars": {
+        "petals": [
+          60,
+          120,
+          180,
+          300
+        ],
+        "rub": [
+          49,
+          79,
+          119,
+          199
+        ]
+      },
+      "dyes": {
+        "free": [],
+        "paid": []
+      },
+      "voice_lines": 4,
+      "touch": {
+        "zones": 5,
+        "reactions": 11
+      },
+      "plate": "rig+vow+voice4",
+      "ult": {
+        "id": "miel_vow",
+        "ult_key": "ult.vow.miel_vow",
+        "beats": 4,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "kohaku_vow",
+      "hero": "kohaku",
+      "tier": "vow",
+      "hud": 0,
+      "theme": null,
+      "season": "S1",
+      "boldness": "B1",
+      "name_ru": "Клятва",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 6.9,
+        "delivery": "apk",
+        "cdn": "v1/kohaku/kohaku_vow/1.0.0"
+      },
+      "sources": {
+        "bond_vow": 10,
+        "gacha": false,
+        "guest": false,
+        "pass": false,
+        "petals": null,
+        "dupe_petals_after_star5": null,
+        "rub": null,
+        "direct_after_days": null,
+        "direct_from_day": null,
+        "evergreen_from_day": null
+      },
+      "stars": {
+        "petals": [
+          60,
+          120,
+          180,
+          300
+        ],
+        "rub": [
+          49,
+          79,
+          119,
+          199
+        ]
+      },
+      "dyes": {
+        "free": [],
+        "paid": []
+      },
+      "voice_lines": 4,
+      "touch": {
+        "zones": 5,
+        "reactions": 11
+      },
+      "plate": "rig+vow+voice4",
+      "ult": {
+        "id": "kohaku_vow",
+        "ult_key": "ult.vow.kohaku_vow",
+        "beats": 4,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "shirin_vow",
+      "hero": "shirin",
+      "tier": "vow",
+      "hud": 0,
+      "theme": null,
+      "season": "S1",
+      "boldness": "B1",
+      "name_ru": "Клятва",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 6.9,
+        "delivery": "apk",
+        "cdn": "v1/shirin/shirin_vow/1.0.0"
+      },
+      "sources": {
+        "bond_vow": 10,
+        "gacha": false,
+        "guest": false,
+        "pass": false,
+        "petals": null,
+        "dupe_petals_after_star5": null,
+        "rub": null,
+        "direct_after_days": null,
+        "direct_from_day": null,
+        "evergreen_from_day": null
+      },
+      "stars": {
+        "petals": [
+          60,
+          120,
+          180,
+          300
+        ],
+        "rub": [
+          49,
+          79,
+          119,
+          199
+        ]
+      },
+      "dyes": {
+        "free": [],
+        "paid": []
+      },
+      "voice_lines": 4,
+      "touch": {
+        "zones": 5,
+        "reactions": 11
+      },
+      "plate": "rig+vow+voice4",
+      "ult": {
+        "id": "shirin_vow",
+        "ult_key": "ult.vow.shirin_vow",
+        "beats": 4,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "mc_s_tea",
+      "hero": "mc",
+      "tier": "s",
+      "hud": 0,
+      "theme": null,
+      "season": "S1",
+      "boldness": "B1",
+      "name_ru": "Чайный дом",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 6.9,
+        "delivery": "apk",
+        "cdn": "v1/mc/mc_s_tea/1.0.0"
+      },
+      "sources": {
+        "gacha": true,
+        "guest": false,
+        "pass": false,
+        "petals": 900,
+        "dupe_petals_after_star5": 60,
+        "rub": 599,
+        "direct_after_days": 28,
+        "direct_from_day": 29,
+        "evergreen_from_day": null
+      },
+      "stars": {
+        "petals": [
+          60,
+          120,
+          180,
+          300
+        ],
+        "rub": [
+          49,
+          79,
+          119,
+          199
+        ]
+      },
+      "dyes": {
+        "free": [
+          "dye_1@5"
+        ],
+        "paid": []
+      },
+      "voice_lines": 4,
+      "touch": {
+        "zones": 5,
+        "reactions": 11
+      },
+      "plate": "rig+voice4",
+      "ult": {
+        "id": "mc_s_tea",
+        "ult_key": "ult.s.mc_s_tea",
+        "beats": 4,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "mc_s_serving",
+      "hero": "mc",
+      "tier": "s",
+      "hud": 0,
+      "theme": null,
+      "season": "S1",
+      "boldness": "B1",
+      "name_ru": "Зал прислуживания",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 6.9,
+        "delivery": "apk",
+        "cdn": "v1/mc/mc_s_serving/1.0.0"
+      },
+      "sources": {
+        "gacha": true,
+        "guest": false,
+        "pass": false,
+        "petals": 900,
+        "dupe_petals_after_star5": 60,
+        "rub": 599,
+        "direct_after_days": 28,
+        "direct_from_day": 29,
+        "evergreen_from_day": null
+      },
+      "stars": {
+        "petals": [
+          60,
+          120,
+          180,
+          300
+        ],
+        "rub": [
+          49,
+          79,
+          119,
+          199
+        ]
+      },
+      "dyes": {
+        "free": [
+          "dye_1@5"
+        ],
+        "paid": []
+      },
+      "voice_lines": 4,
+      "touch": {
+        "zones": 5,
+        "reactions": 11
+      },
+      "plate": "rig+voice4",
+      "ult": {
+        "id": "mc_s_serving",
+        "ult_key": "ult.s.mc_s_serving",
+        "beats": 4,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "rin_s_library",
+      "hero": "rin",
+      "tier": "s",
+      "hud": 0,
+      "theme": null,
+      "season": "S1",
+      "boldness": "B1",
+      "name_ru": "Библиотека",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 6.9,
+        "delivery": "apk",
+        "cdn": "v1/rin/rin_s_library/1.0.0"
+      },
+      "sources": {
+        "gacha": true,
+        "guest": false,
+        "pass": false,
+        "petals": 900,
+        "dupe_petals_after_star5": 60,
+        "rub": 599,
+        "direct_after_days": 28,
+        "direct_from_day": 29,
+        "evergreen_from_day": 1
+      },
+      "stars": {
+        "petals": [
+          60,
+          120,
+          180,
+          300
+        ],
+        "rub": [
+          49,
+          79,
+          119,
+          199
+        ]
+      },
+      "dyes": {
+        "free": [
+          "dye_1@5"
+        ],
+        "paid": []
+      },
+      "voice_lines": 4,
+      "touch": {
+        "zones": 5,
+        "reactions": 11
+      },
+      "plate": "rig+voice4",
+      "ult": {
+        "id": "rin_s_library",
+        "ult_key": "ult.s.rin_s_library",
+        "beats": 4,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "rin_s_officer",
+      "hero": "rin",
+      "tier": "s",
+      "hud": 0,
+      "theme": null,
+      "season": "S1",
+      "boldness": "B1",
+      "name_ru": "Офицер",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 6.9,
+        "delivery": "apk",
+        "cdn": "v1/rin/rin_s_officer/1.0.0"
+      },
+      "sources": {
+        "gacha": true,
+        "guest": false,
+        "pass": false,
+        "petals": 900,
+        "dupe_petals_after_star5": 60,
+        "rub": 599,
+        "direct_after_days": 28,
+        "direct_from_day": 29,
+        "evergreen_from_day": 1
+      },
+      "stars": {
+        "petals": [
+          60,
+          120,
+          180,
+          300
+        ],
+        "rub": [
+          49,
+          79,
+          119,
+          199
+        ]
+      },
+      "dyes": {
+        "free": [
+          "dye_1@5"
+        ],
+        "paid": []
+      },
+      "voice_lines": 4,
+      "touch": {
+        "zones": 5,
+        "reactions": 11
+      },
+      "plate": "rig+voice4",
+      "ult": {
+        "id": "rin_s_officer",
+        "ult_key": "ult.s.rin_s_officer",
+        "beats": 4,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "hana_s_track",
+      "hero": "hana",
+      "tier": "s",
+      "hud": 0,
+      "theme": null,
+      "season": "S1",
+      "boldness": "B1",
+      "name_ru": "Стадион",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 6.9,
+        "delivery": "apk",
+        "cdn": "v1/hana/hana_s_track/1.0.0"
+      },
+      "sources": {
+        "gacha": true,
+        "guest": false,
+        "pass": false,
+        "petals": 900,
+        "dupe_petals_after_star5": 60,
+        "rub": 599,
+        "direct_after_days": 28,
+        "direct_from_day": 29,
+        "evergreen_from_day": null
+      },
+      "stars": {
+        "petals": [
+          60,
+          120,
+          180,
+          300
+        ],
+        "rub": [
+          49,
+          79,
+          119,
+          199
+        ]
+      },
+      "dyes": {
+        "free": [
+          "dye_1@5"
+        ],
+        "paid": []
+      },
+      "voice_lines": 4,
+      "touch": {
+        "zones": 5,
+        "reactions": 11
+      },
+      "plate": "rig+voice4",
+      "ult": {
+        "id": "hana_s_track",
+        "ult_key": "ult.s.hana_s_track",
+        "beats": 4,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "yue_s_robe",
+      "hero": "yue",
+      "tier": "s",
+      "hud": 0,
+      "theme": null,
+      "season": "S1",
+      "boldness": "B1",
+      "name_ru": "Лунное окно",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 6.9,
+        "delivery": "apk",
+        "cdn": "v1/yue/yue_s_robe/1.0.0"
+      },
+      "sources": {
+        "gacha": true,
+        "guest": false,
+        "pass": false,
+        "petals": 900,
+        "dupe_petals_after_star5": 60,
+        "rub": 599,
+        "direct_after_days": 28,
+        "direct_from_day": 29,
+        "evergreen_from_day": 1
+      },
+      "stars": {
+        "petals": [
+          60,
+          120,
+          180,
+          300
+        ],
+        "rub": [
+          49,
+          79,
+          119,
+          199
+        ]
+      },
+      "dyes": {
+        "free": [
+          "dye_1@5"
+        ],
+        "paid": []
+      },
+      "voice_lines": 4,
+      "touch": {
+        "zones": 5,
+        "reactions": 11
+      },
+      "plate": "rig+voice4",
+      "ult": {
+        "id": "yue_s_robe",
+        "ult_key": "ult.s.yue_s_robe",
+        "beats": 4,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "nova_s_street",
+      "hero": "nova",
+      "tier": "s",
+      "hud": 0,
+      "theme": null,
+      "season": "S1",
+      "boldness": "B1",
+      "name_ru": "Крыша",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 6.9,
+        "delivery": "apk",
+        "cdn": "v1/nova/nova_s_street/1.0.0"
+      },
+      "sources": {
+        "gacha": true,
+        "guest": false,
+        "pass": false,
+        "petals": 900,
+        "dupe_petals_after_star5": 60,
+        "rub": 599,
+        "direct_after_days": 28,
+        "direct_from_day": 29,
+        "evergreen_from_day": null
+      },
+      "stars": {
+        "petals": [
+          60,
+          120,
+          180,
+          300
+        ],
+        "rub": [
+          49,
+          79,
+          119,
+          199
+        ]
+      },
+      "dyes": {
+        "free": [
+          "dye_1@5"
+        ],
+        "paid": []
+      },
+      "voice_lines": 4,
+      "touch": {
+        "zones": 5,
+        "reactions": 11
+      },
+      "plate": "rig+voice4",
+      "ult": {
+        "id": "nova_s_street",
+        "ult_key": "ult.s.nova_s_street",
+        "beats": 4,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "zlata_s_folk",
+      "hero": "zlata",
+      "tier": "s",
+      "hud": 0,
+      "theme": null,
+      "season": "S1",
+      "boldness": "B1",
+      "name_ru": "Лаковая сказка",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 6.9,
+        "delivery": "apk",
+        "cdn": "v1/zlata/zlata_s_folk/1.0.0"
+      },
+      "sources": {
+        "gacha": true,
+        "guest": false,
+        "pass": false,
+        "petals": 900,
+        "dupe_petals_after_star5": 60,
+        "rub": 599,
+        "direct_after_days": 28,
+        "direct_from_day": 29,
+        "evergreen_from_day": null
+      },
+      "stars": {
+        "petals": [
+          60,
+          120,
+          180,
+          300
+        ],
+        "rub": [
+          49,
+          79,
+          119,
+          199
+        ]
+      },
+      "dyes": {
+        "free": [
+          "dye_1@5"
+        ],
+        "paid": []
+      },
+      "voice_lines": 4,
+      "touch": {
+        "zones": 5,
+        "reactions": 11
+      },
+      "plate": "rig+voice4",
+      "ult": {
+        "id": "zlata_s_folk",
+        "ult_key": "ult.s.zlata_s_folk",
+        "beats": 4,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "tsubame_s_roof",
+      "hero": "tsubame",
+      "tier": "s",
+      "hud": 0,
+      "theme": null,
+      "season": "S1",
+      "boldness": "B1",
+      "name_ru": "Ночная крыша",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 6.9,
+        "delivery": "apk",
+        "cdn": "v1/tsubame/tsubame_s_roof/1.0.0"
+      },
+      "sources": {
+        "gacha": true,
+        "guest": false,
+        "pass": false,
+        "petals": 900,
+        "dupe_petals_after_star5": 60,
+        "rub": 599,
+        "direct_after_days": 28,
+        "direct_from_day": 29,
+        "evergreen_from_day": 1
+      },
+      "stars": {
+        "petals": [
+          60,
+          120,
+          180,
+          300
+        ],
+        "rub": [
+          49,
+          79,
+          119,
+          199
+        ]
+      },
+      "dyes": {
+        "free": [
+          "dye_1@5"
+        ],
+        "paid": []
+      },
+      "voice_lines": 4,
+      "touch": {
+        "zones": 5,
+        "reactions": 11
+      },
+      "plate": "rig+voice4",
+      "ult": {
+        "id": "tsubame_s_roof",
+        "ult_key": "ult.s.tsubame_s_roof",
+        "beats": 4,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "miel_s_baker",
+      "hero": "miel",
+      "tier": "s",
+      "hud": 0,
+      "theme": null,
+      "season": "S1",
+      "boldness": "B1",
+      "name_ru": "Кондитерская",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 6.9,
+        "delivery": "apk",
+        "cdn": "v1/miel/miel_s_baker/1.0.0"
+      },
+      "sources": {
+        "gacha": true,
+        "guest": false,
+        "pass": false,
+        "petals": 900,
+        "dupe_petals_after_star5": 60,
+        "rub": 599,
+        "direct_after_days": 28,
+        "direct_from_day": 29,
+        "evergreen_from_day": 1
+      },
+      "stars": {
+        "petals": [
+          60,
+          120,
+          180,
+          300
+        ],
+        "rub": [
+          49,
+          79,
+          119,
+          199
+        ]
+      },
+      "dyes": {
+        "free": [
+          "dye_1@5"
+        ],
+        "paid": []
+      },
+      "voice_lines": 4,
+      "touch": {
+        "zones": 5,
+        "reactions": 11
+      },
+      "plate": "rig+voice4",
+      "ult": {
+        "id": "miel_s_baker",
+        "ult_key": "ult.s.miel_s_baker",
+        "beats": 4,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "kohaku_s_festival",
+      "hero": "kohaku",
+      "tier": "s",
+      "hud": 0,
+      "theme": null,
+      "season": "S1",
+      "boldness": "B1",
+      "name_ru": "Праздник у святилища",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 6.9,
+        "delivery": "apk",
+        "cdn": "v1/kohaku/kohaku_s_festival/1.0.0"
+      },
+      "sources": {
+        "gacha": true,
+        "guest": false,
+        "pass": false,
+        "petals": 900,
+        "dupe_petals_after_star5": 60,
+        "rub": 599,
+        "direct_after_days": 28,
+        "direct_from_day": 29,
+        "evergreen_from_day": null
+      },
+      "stars": {
+        "petals": [
+          60,
+          120,
+          180,
+          300
+        ],
+        "rub": [
+          49,
+          79,
+          119,
+          199
+        ]
+      },
+      "dyes": {
+        "free": [
+          "dye_1@5"
+        ],
+        "paid": []
+      },
+      "voice_lines": 4,
+      "touch": {
+        "zones": 5,
+        "reactions": 11
+      },
+      "plate": "rig+voice4",
+      "ult": {
+        "id": "kohaku_s_festival",
+        "ult_key": "ult.s.kohaku_s_festival",
+        "beats": 4,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "shirin_s_oasis",
+      "hero": "shirin",
+      "tier": "s",
+      "hud": 0,
+      "theme": null,
+      "season": "S1",
+      "boldness": "B1",
+      "name_ru": "Оазис",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 6.9,
+        "delivery": "apk",
+        "cdn": "v1/shirin/shirin_s_oasis/1.0.0"
+      },
+      "sources": {
+        "gacha": true,
+        "guest": false,
+        "pass": false,
+        "petals": 900,
+        "dupe_petals_after_star5": 60,
+        "rub": 599,
+        "direct_after_days": 28,
+        "direct_from_day": 29,
+        "evergreen_from_day": null
+      },
+      "stars": {
+        "petals": [
+          60,
+          120,
+          180,
+          300
+        ],
+        "rub": [
+          49,
+          79,
+          119,
+          199
+        ]
+      },
+      "dyes": {
+        "free": [
+          "dye_1@5"
+        ],
+        "paid": []
+      },
+      "voice_lines": 4,
+      "touch": {
+        "zones": 5,
+        "reactions": 11
+      },
+      "plate": "rig+voice4",
+      "ult": {
+        "id": "shirin_s_oasis",
+        "ult_key": "ult.s.shirin_s_oasis",
+        "beats": 4,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "rin_ssr_bunnytea",
+      "hero": "rin",
+      "tier": "ssr",
+      "hud": 1,
+      "theme": "JADE",
+      "season": "S1",
+      "boldness": "B2",
+      "name_ru": "Кролик-чайница",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 12.3,
+        "delivery": "apk",
+        "cdn": "v1/rin/rin_ssr_bunnytea/1.0.0"
+      },
+      "sources": {
+        "gacha": true,
+        "guest": true,
+        "pass": false,
+        "headline_day57": false,
+        "petals": 1800,
+        "dupe_petals_after_star5": 150,
+        "rub": 1490,
+        "direct_after_days": 28,
+        "direct_from_day": 29,
+        "evergreen_from_day": null
+      },
+      "stars": {
+        "petals": [
+          60,
+          120,
+          180,
+          300
+        ],
+        "rub": [
+          49,
+          79,
+          119,
+          199
+        ]
+      },
+      "dyes": {
+        "free": [
+          "dye_1@3",
+          "dye_2@5"
+        ],
+        "paid": [
+          "dye_3"
+        ]
+      },
+      "voice_lines": 12,
+      "touch": {
+        "zones": 6,
+        "reactions": 20
+      },
+      "plate": "rig+video+voice12+scene",
+      "ult": {
+        "id": "rin_ssr_bunnytea",
+        "ult_key": "ult.ssr.rin_ssr_bunnytea",
+        "beats": 6,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "hana_ssr_beach",
+      "hero": "hana",
+      "tier": "ssr",
+      "hud": 1,
+      "theme": "TIDE",
+      "season": "S1",
+      "boldness": "B2",
+      "name_ru": "Пляж",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 12.3,
+        "delivery": "apk",
+        "cdn": "v1/hana/hana_ssr_beach/1.0.0"
+      },
+      "sources": {
+        "gacha": true,
+        "guest": true,
+        "pass": false,
+        "headline_day57": false,
+        "petals": 1800,
+        "dupe_petals_after_star5": 150,
+        "rub": 1490,
+        "direct_after_days": 28,
+        "direct_from_day": 29,
+        "evergreen_from_day": null
+      },
+      "stars": {
+        "petals": [
+          60,
+          120,
+          180,
+          300
+        ],
+        "rub": [
+          49,
+          79,
+          119,
+          199
+        ]
+      },
+      "dyes": {
+        "free": [
+          "dye_1@3",
+          "dye_2@5"
+        ],
+        "paid": [
+          "dye_3"
+        ]
+      },
+      "voice_lines": 12,
+      "touch": {
+        "zones": 6,
+        "reactions": 20
+      },
+      "plate": "rig+video+voice12+scene",
+      "ult": {
+        "id": "hana_ssr_beach",
+        "ult_key": "ult.ssr.hana_ssr_beach",
+        "beats": 6,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "yue_ssr_scalearmor",
+      "hero": "yue",
+      "tier": "ssr",
+      "hud": 1,
+      "theme": "JADE",
+      "season": "S1",
+      "boldness": "B2",
+      "name_ru": "Чешуя луны",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 12.3,
+        "delivery": "apk",
+        "cdn": "v1/yue/yue_ssr_scalearmor/1.0.0"
+      },
+      "sources": {
+        "gacha": true,
+        "guest": true,
+        "pass": false,
+        "headline_day57": false,
+        "petals": 1800,
+        "dupe_petals_after_star5": 150,
+        "rub": 1490,
+        "direct_after_days": 28,
+        "direct_from_day": 29,
+        "evergreen_from_day": null
+      },
+      "stars": {
+        "petals": [
+          60,
+          120,
+          180,
+          300
+        ],
+        "rub": [
+          49,
+          79,
+          119,
+          199
+        ]
+      },
+      "dyes": {
+        "free": [
+          "dye_1@3",
+          "dye_2@5"
+        ],
+        "paid": [
+          "dye_3"
+        ]
+      },
+      "voice_lines": 12,
+      "touch": {
+        "zones": 6,
+        "reactions": 20
+      },
+      "plate": "rig+video+voice12+scene",
+      "ult": {
+        "id": "yue_ssr_scalearmor",
+        "ult_key": "ult.ssr.yue_ssr_scalearmor",
+        "beats": 6,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "zlata_ssr_firebird",
+      "hero": "zlata",
+      "tier": "ssr",
+      "hud": 1,
+      "theme": "EMBER",
+      "season": "S1",
+      "boldness": "B2",
+      "name_ru": "Жар-птица",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 12.3,
+        "delivery": "apk",
+        "cdn": "v1/zlata/zlata_ssr_firebird/1.0.0"
+      },
+      "sources": {
+        "gacha": true,
+        "guest": false,
+        "pass": false,
+        "headline_day57": false,
+        "petals": 1800,
+        "dupe_petals_after_star5": 150,
+        "rub": 1490,
+        "direct_after_days": 28,
+        "direct_from_day": 29,
+        "evergreen_from_day": null
+      },
+      "stars": {
+        "petals": [
+          60,
+          120,
+          180,
+          300
+        ],
+        "rub": [
+          49,
+          79,
+          119,
+          199
+        ]
+      },
+      "dyes": {
+        "free": [
+          "dye_1@3",
+          "dye_2@5"
+        ],
+        "paid": [
+          "dye_3"
+        ]
+      },
+      "voice_lines": 12,
+      "touch": {
+        "zones": 6,
+        "reactions": 20
+      },
+      "plate": "rig+video+voice12+scene",
+      "ult": {
+        "id": "zlata_ssr_firebird",
+        "ult_key": "ult.ssr.zlata_ssr_firebird",
+        "beats": 6,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "mc_ssrp_dragonnight",
+      "hero": "mc",
+      "tier": "ssrp",
+      "hud": 2,
+      "theme": "INK",
+      "season": "S1",
+      "boldness": "B3",
+      "name_ru": "Ночной дракон",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 23.2,
+        "delivery": "pack",
+        "cdn": "v1/mc/mc_ssrp_dragonnight/1.0.0"
+      },
+      "sources": {
+        "gacha": true,
+        "guest": false,
+        "pass": false,
+        "petals": 3600,
+        "dupe_petals_after_star5": 300,
+        "rub": 2490,
+        "direct_after_days": 56,
+        "direct_from_day": 57,
+        "evergreen_from_day": null
+      },
+      "stars": {
+        "petals": [
+          90,
+          180,
+          270,
+          450
+        ],
+        "rub": [
+          69,
+          119,
+          179,
+          299
+        ]
+      },
+      "dyes": {
+        "free": [
+          "dye_1@3",
+          "dye_2@5"
+        ],
+        "paid": [
+          "dye_3"
+        ]
+      },
+      "voice_lines": 20,
+      "touch": {
+        "zones": 8,
+        "reactions": 38
+      },
+      "plate": "rig+video2+voice20+scene+hud_l2",
+      "ult": {
+        "id": "mc_ssrp_dragonnight",
+        "ult_key": "ult.ssrp.mc_ssrp_dragonnight",
+        "beats": 8,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "nova_ssrp_idolstage",
+      "hero": "nova",
+      "tier": "ssrp",
+      "hud": 2,
+      "theme": "NEON",
+      "season": "S1",
+      "boldness": "B3",
+      "name_ru": "Сцена идола",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 23.2,
+        "delivery": "pack",
+        "cdn": "v1/nova/nova_ssrp_idolstage/1.0.0"
+      },
+      "sources": {
+        "gacha": true,
+        "guest": false,
+        "pass": false,
+        "petals": 3600,
+        "dupe_petals_after_star5": 300,
+        "rub": 2490,
+        "direct_after_days": 56,
+        "direct_from_day": 57,
+        "evergreen_from_day": null
+      },
+      "stars": {
+        "petals": [
+          90,
+          180,
+          270,
+          450
+        ],
+        "rub": [
+          69,
+          119,
+          179,
+          299
+        ]
+      },
+      "dyes": {
+        "free": [
+          "dye_1@3",
+          "dye_2@5"
+        ],
+        "paid": [
+          "dye_3"
+        ]
+      },
+      "voice_lines": 20,
+      "touch": {
+        "zones": 8,
+        "reactions": 38
+      },
+      "plate": "rig+video2+voice20+scene+hud_l2",
+      "ult": {
+        "id": "nova_ssrp_idolstage",
+        "ult_key": "ult.ssrp.nova_ssrp_idolstage",
+        "beats": 8,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "tsubame_ssr_ninjarose",
+      "hero": "tsubame",
+      "tier": "ssr",
+      "hud": 1,
+      "theme": "INK",
+      "season": "S2",
+      "boldness": "B2",
+      "name_ru": "Роза-тень",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 12.3,
+        "delivery": "pack",
+        "cdn": "v1/tsubame/tsubame_ssr_ninjarose/1.0.0"
+      },
+      "sources": {
+        "gacha": true,
+        "guest": false,
+        "pass": false,
+        "headline_day57": true,
+        "petals": 1800,
+        "dupe_petals_after_star5": 150,
+        "rub": 1490,
+        "direct_after_days": 56,
+        "direct_from_day": 57,
+        "evergreen_from_day": null
+      },
+      "stars": {
+        "petals": [
+          60,
+          120,
+          180,
+          300
+        ],
+        "rub": [
+          49,
+          79,
+          119,
+          199
+        ]
+      },
+      "dyes": {
+        "free": [
+          "dye_1@3",
+          "dye_2@5"
+        ],
+        "paid": [
+          "dye_3"
+        ]
+      },
+      "voice_lines": 12,
+      "touch": {
+        "zones": 6,
+        "reactions": 20
+      },
+      "plate": "rig+video+voice12+scene",
+      "ult": {
+        "id": "tsubame_ssr_ninjarose",
+        "ult_key": "ult.ssr.tsubame_ssr_ninjarose",
+        "beats": 6,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "yue_s_snowqueen",
+      "hero": "yue",
+      "tier": "s",
+      "hud": 0,
+      "theme": null,
+      "season": "S2",
+      "boldness": "B1",
+      "name_ru": "Снежная королева",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 6.9,
+        "delivery": "pack",
+        "cdn": "v1/yue/yue_s_snowqueen/1.0.0"
+      },
+      "sources": {
+        "gacha": true,
+        "guest": false,
+        "pass": false,
+        "petals": 900,
+        "dupe_petals_after_star5": 60,
+        "rub": 599,
+        "direct_after_days": 28,
+        "direct_from_day": 29,
+        "evergreen_from_day": null
+      },
+      "stars": {
+        "petals": [
+          60,
+          120,
+          180,
+          300
+        ],
+        "rub": [
+          49,
+          79,
+          119,
+          199
+        ]
+      },
+      "dyes": {
+        "free": [
+          "dye_1@5"
+        ],
+        "paid": []
+      },
+      "voice_lines": 4,
+      "touch": {
+        "zones": 5,
+        "reactions": 11
+      },
+      "plate": "rig+voice4",
+      "ult": {
+        "id": "yue_s_snowqueen",
+        "ult_key": "ult.s.yue_s_snowqueen",
+        "beats": 4,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "hana_s_ski",
+      "hero": "hana",
+      "tier": "s",
+      "hud": 0,
+      "theme": null,
+      "season": "S2",
+      "boldness": "B1",
+      "name_ru": "Горнолыжка",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 6.9,
+        "delivery": "pack",
+        "cdn": "v1/hana/hana_s_ski/1.0.0"
+      },
+      "sources": {
+        "gacha": true,
+        "guest": false,
+        "pass": false,
+        "petals": 900,
+        "dupe_petals_after_star5": 60,
+        "rub": 599,
+        "direct_after_days": 28,
+        "direct_from_day": 29,
+        "evergreen_from_day": null
+      },
+      "stars": {
+        "petals": [
+          60,
+          120,
+          180,
+          300
+        ],
+        "rub": [
+          49,
+          79,
+          119,
+          199
+        ]
+      },
+      "dyes": {
+        "free": [
+          "dye_1@5"
+        ],
+        "paid": []
+      },
+      "voice_lines": 4,
+      "touch": {
+        "zones": 5,
+        "reactions": 11
+      },
+      "plate": "rig+voice4",
+      "ult": {
+        "id": "hana_s_ski",
+        "ult_key": "ult.s.hana_s_ski",
+        "beats": 4,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "miel_s_cocoa",
+      "hero": "miel",
+      "tier": "s",
+      "hud": 0,
+      "theme": null,
+      "season": "S2",
+      "boldness": "B2",
+      "name_ru": "Какао у камина",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 6.9,
+        "delivery": "pack",
+        "cdn": "v1/miel/miel_s_cocoa/1.0.0"
+      },
+      "sources": {
+        "gacha": true,
+        "guest": false,
+        "pass": false,
+        "petals": 900,
+        "dupe_petals_after_star5": 60,
+        "rub": 599,
+        "direct_after_days": 28,
+        "direct_from_day": 29,
+        "evergreen_from_day": null
+      },
+      "stars": {
+        "petals": [
+          60,
+          120,
+          180,
+          300
+        ],
+        "rub": [
+          49,
+          79,
+          119,
+          199
+        ]
+      },
+      "dyes": {
+        "free": [
+          "dye_1@5"
+        ],
+        "paid": []
+      },
+      "voice_lines": 4,
+      "touch": {
+        "zones": 5,
+        "reactions": 11
+      },
+      "plate": "rig+voice4",
+      "ult": {
+        "id": "miel_s_cocoa",
+        "ult_key": "ult.s.miel_s_cocoa",
+        "beats": 4,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "shirin_ssrp_oasislight",
+      "hero": "shirin",
+      "tier": "ssrp",
+      "hud": 2,
+      "theme": "TIDE",
+      "season": "S3",
+      "boldness": "B3",
+      "name_ru": "Огни оазиса",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 23.2,
+        "delivery": "pack",
+        "cdn": "v1/shirin/shirin_ssrp_oasislight/1.0.0"
+      },
+      "sources": {
+        "gacha": true,
+        "guest": false,
+        "pass": false,
+        "petals": 3600,
+        "dupe_petals_after_star5": 300,
+        "rub": 2490,
+        "direct_after_days": 56,
+        "direct_from_day": 57,
+        "evergreen_from_day": null
+      },
+      "stars": {
+        "petals": [
+          90,
+          180,
+          270,
+          450
+        ],
+        "rub": [
+          69,
+          119,
+          179,
+          299
+        ]
+      },
+      "dyes": {
+        "free": [
+          "dye_1@3",
+          "dye_2@5"
+        ],
+        "paid": [
+          "dye_3"
+        ]
+      },
+      "voice_lines": 20,
+      "touch": {
+        "zones": 8,
+        "reactions": 38
+      },
+      "plate": "rig+video2+voice20+scene+hud_l2",
+      "ult": {
+        "id": "shirin_ssrp_oasislight",
+        "ult_key": "ult.ssrp.shirin_ssrp_oasislight",
+        "beats": 8,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "kohaku_s_hanami",
+      "hero": "kohaku",
+      "tier": "s",
+      "hud": 0,
+      "theme": null,
+      "season": "S3",
+      "boldness": "B1",
+      "name_ru": "Ханами",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 6.9,
+        "delivery": "pack",
+        "cdn": "v1/kohaku/kohaku_s_hanami/1.0.0"
+      },
+      "sources": {
+        "gacha": true,
+        "guest": false,
+        "pass": false,
+        "petals": 900,
+        "dupe_petals_after_star5": 60,
+        "rub": 599,
+        "direct_after_days": 28,
+        "direct_from_day": 29,
+        "evergreen_from_day": null
+      },
+      "stars": {
+        "petals": [
+          60,
+          120,
+          180,
+          300
+        ],
+        "rub": [
+          49,
+          79,
+          119,
+          199
+        ]
+      },
+      "dyes": {
+        "free": [
+          "dye_1@5"
+        ],
+        "paid": []
+      },
+      "voice_lines": 4,
+      "touch": {
+        "zones": 5,
+        "reactions": 11
+      },
+      "plate": "rig+voice4",
+      "ult": {
+        "id": "kohaku_s_hanami",
+        "ult_key": "ult.s.kohaku_s_hanami",
+        "beats": 4,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "zlata_s_spring",
+      "hero": "zlata",
+      "tier": "s",
+      "hud": 0,
+      "theme": null,
+      "season": "S3",
+      "boldness": "B1",
+      "name_ru": "Кокошник-весна",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 6.9,
+        "delivery": "pack",
+        "cdn": "v1/zlata/zlata_s_spring/1.0.0"
+      },
+      "sources": {
+        "gacha": true,
+        "guest": false,
+        "pass": false,
+        "petals": 900,
+        "dupe_petals_after_star5": 60,
+        "rub": 599,
+        "direct_after_days": 28,
+        "direct_from_day": 29,
+        "evergreen_from_day": null
+      },
+      "stars": {
+        "petals": [
+          60,
+          120,
+          180,
+          300
+        ],
+        "rub": [
+          49,
+          79,
+          119,
+          199
+        ]
+      },
+      "dyes": {
+        "free": [
+          "dye_1@5"
+        ],
+        "paid": []
+      },
+      "voice_lines": 4,
+      "touch": {
+        "zones": 5,
+        "reactions": 11
+      },
+      "plate": "rig+voice4",
+      "ult": {
+        "id": "zlata_s_spring",
+        "ult_key": "ult.s.zlata_s_spring",
+        "beats": 4,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "nova_s_idolcasual",
+      "hero": "nova",
+      "tier": "s",
+      "hud": 0,
+      "theme": null,
+      "season": "S3",
+      "boldness": "B1",
+      "name_ru": "Репетиция",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 6.9,
+        "delivery": "pack",
+        "cdn": "v1/nova/nova_s_idolcasual/1.0.0"
+      },
+      "sources": {
+        "gacha": true,
+        "guest": false,
+        "pass": false,
+        "petals": 900,
+        "dupe_petals_after_star5": 60,
+        "rub": 599,
+        "direct_after_days": 28,
+        "direct_from_day": 29,
+        "evergreen_from_day": null
+      },
+      "stars": {
+        "petals": [
+          60,
+          120,
+          180,
+          300
+        ],
+        "rub": [
+          49,
+          79,
+          119,
+          199
+        ]
+      },
+      "dyes": {
+        "free": [
+          "dye_1@5"
+        ],
+        "paid": []
+      },
+      "voice_lines": 4,
+      "touch": {
+        "zones": 5,
+        "reactions": 11
+      },
+      "plate": "rig+voice4",
+      "ult": {
+        "id": "nova_s_idolcasual",
+        "ult_key": "ult.s.nova_s_idolcasual",
+        "beats": 4,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "miel_ssr_seaside",
+      "hero": "miel",
+      "tier": "ssr",
+      "hud": 1,
+      "theme": "SAKURA",
+      "season": "S4",
+      "boldness": "B2",
+      "name_ru": "Морская карамель",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 12.3,
+        "delivery": "pack",
+        "cdn": "v1/miel/miel_ssr_seaside/1.0.0"
+      },
+      "sources": {
+        "gacha": true,
+        "guest": false,
+        "pass": false,
+        "headline_day57": true,
+        "petals": 1800,
+        "dupe_petals_after_star5": 150,
+        "rub": 1490,
+        "direct_after_days": 56,
+        "direct_from_day": 57,
+        "evergreen_from_day": null
+      },
+      "stars": {
+        "petals": [
+          60,
+          120,
+          180,
+          300
+        ],
+        "rub": [
+          49,
+          79,
+          119,
+          199
+        ]
+      },
+      "dyes": {
+        "free": [
+          "dye_1@3",
+          "dye_2@5"
+        ],
+        "paid": [
+          "dye_3"
+        ]
+      },
+      "voice_lines": 12,
+      "touch": {
+        "zones": 6,
+        "reactions": 20
+      },
+      "plate": "rig+video+voice12+scene",
+      "ult": {
+        "id": "miel_ssr_seaside",
+        "ult_key": "ult.ssr.miel_ssr_seaside",
+        "beats": 6,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "mc_s_swim",
+      "hero": "mc",
+      "tier": "s",
+      "hud": 0,
+      "theme": null,
+      "season": "S4",
+      "boldness": "B2",
+      "name_ru": "Бассейн «Пять ветров»",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 6.9,
+        "delivery": "pack",
+        "cdn": "v1/mc/mc_s_swim/1.0.0"
+      },
+      "sources": {
+        "gacha": true,
+        "guest": false,
+        "pass": false,
+        "petals": 900,
+        "dupe_petals_after_star5": 60,
+        "rub": 599,
+        "direct_after_days": 28,
+        "direct_from_day": 29,
+        "evergreen_from_day": null
+      },
+      "stars": {
+        "petals": [
+          60,
+          120,
+          180,
+          300
+        ],
+        "rub": [
+          49,
+          79,
+          119,
+          199
+        ]
+      },
+      "dyes": {
+        "free": [
+          "dye_1@5"
+        ],
+        "paid": []
+      },
+      "voice_lines": 4,
+      "touch": {
+        "zones": 5,
+        "reactions": 11
+      },
+      "plate": "rig+voice4",
+      "ult": {
+        "id": "mc_s_swim",
+        "ult_key": "ult.s.mc_s_swim",
+        "beats": 4,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "tsubame_s_pool",
+      "hero": "tsubame",
+      "tier": "s",
+      "hud": 0,
+      "theme": null,
+      "season": "S4",
+      "boldness": "B2",
+      "name_ru": "Ночной бассейн",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 6.9,
+        "delivery": "pack",
+        "cdn": "v1/tsubame/tsubame_s_pool/1.0.0"
+      },
+      "sources": {
+        "gacha": true,
+        "guest": false,
+        "pass": false,
+        "petals": 900,
+        "dupe_petals_after_star5": 60,
+        "rub": 599,
+        "direct_after_days": 28,
+        "direct_from_day": 29,
+        "evergreen_from_day": null
+      },
+      "stars": {
+        "petals": [
+          60,
+          120,
+          180,
+          300
+        ],
+        "rub": [
+          49,
+          79,
+          119,
+          199
+        ]
+      },
+      "dyes": {
+        "free": [
+          "dye_1@5"
+        ],
+        "paid": []
+      },
+      "voice_lines": 4,
+      "touch": {
+        "zones": 5,
+        "reactions": 11
+      },
+      "plate": "rig+voice4",
+      "ult": {
+        "id": "tsubame_s_pool",
+        "ult_key": "ult.s.tsubame_s_pool",
+        "beats": 4,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "rin_s_yacht",
+      "hero": "rin",
+      "tier": "s",
+      "hud": 0,
+      "theme": null,
+      "season": "S4",
+      "boldness": "B1",
+      "name_ru": "Яхта",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 6.9,
+        "delivery": "pack",
+        "cdn": "v1/rin/rin_s_yacht/1.0.0"
+      },
+      "sources": {
+        "gacha": true,
+        "guest": false,
+        "pass": false,
+        "petals": 900,
+        "dupe_petals_after_star5": 60,
+        "rub": 599,
+        "direct_after_days": 28,
+        "direct_from_day": 29,
+        "evergreen_from_day": null
+      },
+      "stars": {
+        "petals": [
+          60,
+          120,
+          180,
+          300
+        ],
+        "rub": [
+          49,
+          79,
+          119,
+          199
+        ]
+      },
+      "dyes": {
+        "free": [
+          "dye_1@5"
+        ],
+        "paid": []
+      },
+      "voice_lines": 4,
+      "touch": {
+        "zones": 5,
+        "reactions": 11
+      },
+      "plate": "rig+voice4",
+      "ult": {
+        "id": "rin_s_yacht",
+        "ult_key": "ult.s.rin_s_yacht",
+        "beats": 4,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "kohaku_ssrp_moonfest",
+      "hero": "kohaku",
+      "tier": "ssrp",
+      "hud": 2,
+      "theme": "MOON",
+      "season": "S5",
+      "boldness": "B3",
+      "name_ru": "Лунный фестиваль",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 23.2,
+        "delivery": "pack",
+        "cdn": "v1/kohaku/kohaku_ssrp_moonfest/1.0.0"
+      },
+      "sources": {
+        "gacha": true,
+        "guest": false,
+        "pass": false,
+        "petals": 3600,
+        "dupe_petals_after_star5": 300,
+        "rub": 2490,
+        "direct_after_days": 56,
+        "direct_from_day": 57,
+        "evergreen_from_day": null
+      },
+      "stars": {
+        "petals": [
+          90,
+          180,
+          270,
+          450
+        ],
+        "rub": [
+          69,
+          119,
+          179,
+          299
+        ]
+      },
+      "dyes": {
+        "free": [
+          "dye_1@3",
+          "dye_2@5"
+        ],
+        "paid": [
+          "dye_3"
+        ]
+      },
+      "voice_lines": 20,
+      "touch": {
+        "zones": 8,
+        "reactions": 38
+      },
+      "plate": "rig+video2+voice20+scene+hud_l2",
+      "ult": {
+        "id": "kohaku_ssrp_moonfest",
+        "ult_key": "ult.ssrp.kohaku_ssrp_moonfest",
+        "beats": 8,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "zlata_s_harvest",
+      "hero": "zlata",
+      "tier": "s",
+      "hud": 0,
+      "theme": null,
+      "season": "S5",
+      "boldness": "B1",
+      "name_ru": "Жатва",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 6.9,
+        "delivery": "pack",
+        "cdn": "v1/zlata/zlata_s_harvest/1.0.0"
+      },
+      "sources": {
+        "gacha": true,
+        "guest": false,
+        "pass": false,
+        "petals": 900,
+        "dupe_petals_after_star5": 60,
+        "rub": 599,
+        "direct_after_days": 28,
+        "direct_from_day": 29,
+        "evergreen_from_day": null
+      },
+      "stars": {
+        "petals": [
+          60,
+          120,
+          180,
+          300
+        ],
+        "rub": [
+          49,
+          79,
+          119,
+          199
+        ]
+      },
+      "dyes": {
+        "free": [
+          "dye_1@5"
+        ],
+        "paid": []
+      },
+      "voice_lines": 4,
+      "touch": {
+        "zones": 5,
+        "reactions": 11
+      },
+      "plate": "rig+voice4",
+      "ult": {
+        "id": "zlata_s_harvest",
+        "ult_key": "ult.s.zlata_s_harvest",
+        "beats": 4,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "hana_s_onsen",
+      "hero": "hana",
+      "tier": "s",
+      "hud": 0,
+      "theme": null,
+      "season": "S5",
+      "boldness": "B2",
+      "name_ru": "Онсэн",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 6.9,
+        "delivery": "pack",
+        "cdn": "v1/hana/hana_s_onsen/1.0.0"
+      },
+      "sources": {
+        "gacha": true,
+        "guest": false,
+        "pass": false,
+        "petals": 900,
+        "dupe_petals_after_star5": 60,
+        "rub": 599,
+        "direct_after_days": 28,
+        "direct_from_day": 29,
+        "evergreen_from_day": null
+      },
+      "stars": {
+        "petals": [
+          60,
+          120,
+          180,
+          300
+        ],
+        "rub": [
+          49,
+          79,
+          119,
+          199
+        ]
+      },
+      "dyes": {
+        "free": [
+          "dye_1@5"
+        ],
+        "paid": []
+      },
+      "voice_lines": 4,
+      "touch": {
+        "zones": 5,
+        "reactions": 11
+      },
+      "plate": "rig+voice4",
+      "ult": {
+        "id": "hana_s_onsen",
+        "ult_key": "ult.s.hana_s_onsen",
+        "beats": 4,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "shirin_s_sleep",
+      "hero": "shirin",
+      "tier": "s",
+      "hud": 0,
+      "theme": null,
+      "season": "S5",
+      "boldness": "B2",
+      "name_ru": "Ночь в шатре",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 6.9,
+        "delivery": "pack",
+        "cdn": "v1/shirin/shirin_s_sleep/1.0.0"
+      },
+      "sources": {
+        "gacha": true,
+        "guest": false,
+        "pass": false,
+        "petals": 900,
+        "dupe_petals_after_star5": 60,
+        "rub": 599,
+        "direct_after_days": 28,
+        "direct_from_day": 29,
+        "evergreen_from_day": null
+      },
+      "stars": {
+        "petals": [
+          60,
+          120,
+          180,
+          300
+        ],
+        "rub": [
+          49,
+          79,
+          119,
+          199
+        ]
+      },
+      "dyes": {
+        "free": [
+          "dye_1@5"
+        ],
+        "paid": []
+      },
+      "voice_lines": 4,
+      "touch": {
+        "zones": 5,
+        "reactions": 11
+      },
+      "plate": "rig+voice4",
+      "ult": {
+        "id": "shirin_s_sleep",
+        "ult_key": "ult.s.shirin_s_sleep",
+        "beats": 4,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "mc_ssrp_goldtable",
+      "hero": "mc",
+      "tier": "ssrp",
+      "hud": 2,
+      "theme": "GILT",
+      "season": "S6",
+      "boldness": "B3",
+      "name_ru": "Золотой стол",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 23.2,
+        "delivery": "pack",
+        "cdn": "v1/mc/mc_ssrp_goldtable/1.0.0"
+      },
+      "sources": {
+        "gacha": true,
+        "guest": false,
+        "pass": false,
+        "petals": 3600,
+        "dupe_petals_after_star5": 300,
+        "rub": 2490,
+        "direct_after_days": 56,
+        "direct_from_day": 57,
+        "evergreen_from_day": null
+      },
+      "stars": {
+        "petals": [
+          90,
+          180,
+          270,
+          450
+        ],
+        "rub": [
+          69,
+          119,
+          179,
+          299
+        ]
+      },
+      "dyes": {
+        "free": [
+          "dye_1@3",
+          "dye_2@5"
+        ],
+        "paid": [
+          "dye_3"
+        ]
+      },
+      "voice_lines": 20,
+      "touch": {
+        "zones": 8,
+        "reactions": 38
+      },
+      "plate": "rig+video2+voice20+scene+hud_l2",
+      "ult": {
+        "id": "mc_ssrp_goldtable",
+        "ult_key": "ult.ssrp.mc_ssrp_goldtable",
+        "beats": 8,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "nova_s_sleep",
+      "hero": "nova",
+      "tier": "s",
+      "hud": 0,
+      "theme": null,
+      "season": "S6",
+      "boldness": "B2",
+      "name_ru": "Неоновая ночь",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 6.9,
+        "delivery": "pack",
+        "cdn": "v1/nova/nova_s_sleep/1.0.0"
+      },
+      "sources": {
+        "gacha": true,
+        "guest": false,
+        "pass": false,
+        "petals": 900,
+        "dupe_petals_after_star5": 60,
+        "rub": 599,
+        "direct_after_days": 28,
+        "direct_from_day": 29,
+        "evergreen_from_day": null
+      },
+      "stars": {
+        "petals": [
+          60,
+          120,
+          180,
+          300
+        ],
+        "rub": [
+          49,
+          79,
+          119,
+          199
+        ]
+      },
+      "dyes": {
+        "free": [
+          "dye_1@5"
+        ],
+        "paid": []
+      },
+      "voice_lines": 4,
+      "touch": {
+        "zones": 5,
+        "reactions": 11
+      },
+      "plate": "rig+voice4",
+      "ult": {
+        "id": "nova_s_sleep",
+        "ult_key": "ult.s.nova_s_sleep",
+        "beats": 4,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "yue_s_fantasy",
+      "hero": "yue",
+      "tier": "s",
+      "hud": 0,
+      "theme": null,
+      "season": "S6",
+      "boldness": "B1",
+      "name_ru": "Лунная жрица",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 6.9,
+        "delivery": "pack",
+        "cdn": "v1/yue/yue_s_fantasy/1.0.0"
+      },
+      "sources": {
+        "gacha": true,
+        "guest": false,
+        "pass": false,
+        "petals": 900,
+        "dupe_petals_after_star5": 60,
+        "rub": 599,
+        "direct_after_days": 28,
+        "direct_from_day": 29,
+        "evergreen_from_day": null
+      },
+      "stars": {
+        "petals": [
+          60,
+          120,
+          180,
+          300
+        ],
+        "rub": [
+          49,
+          79,
+          119,
+          199
+        ]
+      },
+      "dyes": {
+        "free": [
+          "dye_1@5"
+        ],
+        "paid": []
+      },
+      "voice_lines": 4,
+      "touch": {
+        "zones": 5,
+        "reactions": 11
+      },
+      "plate": "rig+voice4",
+      "ult": {
+        "id": "yue_s_fantasy",
+        "ult_key": "ult.s.yue_s_fantasy",
+        "beats": 4,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "tsubame_s_noir",
+      "hero": "tsubame",
+      "tier": "s",
+      "hud": 0,
+      "theme": null,
+      "season": "S6",
+      "boldness": "B1",
+      "name_ru": "Нуар",
+      "catalog_source": "main",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 6.9,
+        "delivery": "pack",
+        "cdn": "v1/tsubame/tsubame_s_noir/1.0.0"
+      },
+      "sources": {
+        "gacha": true,
+        "guest": false,
+        "pass": false,
+        "petals": 900,
+        "dupe_petals_after_star5": 60,
+        "rub": 599,
+        "direct_after_days": 28,
+        "direct_from_day": 29,
+        "evergreen_from_day": null
+      },
+      "stars": {
+        "petals": [
+          60,
+          120,
+          180,
+          300
+        ],
+        "rub": [
+          49,
+          79,
+          119,
+          199
+        ]
+      },
+      "dyes": {
+        "free": [
+          "dye_1@5"
+        ],
+        "paid": []
+      },
+      "voice_lines": 4,
+      "touch": {
+        "zones": 5,
+        "reactions": 11
+      },
+      "plate": "rig+voice4",
+      "ult": {
+        "id": "tsubame_s_noir",
+        "ult_key": "ult.s.tsubame_s_noir",
+        "beats": 4,
+        "in_ult_catalogue": true
+      }
+    },
+    {
+      "id": "miel_s_pass1",
+      "hero": "miel",
+      "tier": "s",
+      "hud": 0,
+      "theme": null,
+      "season": "S1",
+      "boldness": "B1",
+      "name_ru": "Сезонный наряд S1",
+      "catalog_source": "pass",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 6.9,
+        "delivery": "pack",
+        "cdn": "v1/miel/miel_s_pass1/1.0.0"
+      },
+      "sources": {
+        "gacha": false,
+        "guest": false,
+        "pass": true,
+        "pass_season": "S1",
+        "pass_level": 30,
+        "archive_after_seasons": 2,
+        "petals": 900,
+        "dupe_petals_after_star5": 60,
+        "rub": 599,
+        "direct_after_days": null,
+        "direct_from_day": null,
+        "evergreen_from_day": null
+      },
+      "stars": {
+        "petals": [
+          60,
+          120,
+          180,
+          300
+        ],
+        "rub": [
+          49,
+          79,
+          119,
+          199
+        ]
+      },
+      "dyes": {
+        "free": [
+          "dye_1@5"
+        ],
+        "paid": []
+      },
+      "voice_lines": 4,
+      "touch": {
+        "zones": 5,
+        "reactions": 11
+      },
+      "plate": "rig+voice4",
+      "ult": {
+        "id": "miel_s_pass1",
+        "ult_key": "ult.s.miel_s_pass1",
+        "beats": 4,
+        "in_ult_catalogue": false
+      }
+    },
+    {
+      "id": "kohaku_s_pass2",
+      "hero": "kohaku",
+      "tier": "s",
+      "hud": 0,
+      "theme": null,
+      "season": "S2",
+      "boldness": "B1",
+      "name_ru": "Сезонный наряд S2",
+      "catalog_source": "pass",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 6.9,
+        "delivery": "pack",
+        "cdn": "v1/kohaku/kohaku_s_pass2/1.0.0"
+      },
+      "sources": {
+        "gacha": false,
+        "guest": false,
+        "pass": true,
+        "pass_season": "S2",
+        "pass_level": 30,
+        "archive_after_seasons": 2,
+        "petals": 900,
+        "dupe_petals_after_star5": 60,
+        "rub": 599,
+        "direct_after_days": null,
+        "direct_from_day": null,
+        "evergreen_from_day": null
+      },
+      "stars": {
+        "petals": [
+          60,
+          120,
+          180,
+          300
+        ],
+        "rub": [
+          49,
+          79,
+          119,
+          199
+        ]
+      },
+      "dyes": {
+        "free": [
+          "dye_1@5"
+        ],
+        "paid": []
+      },
+      "voice_lines": 4,
+      "touch": {
+        "zones": 5,
+        "reactions": 11
+      },
+      "plate": "rig+voice4",
+      "ult": {
+        "id": "kohaku_s_pass2",
+        "ult_key": "ult.s.kohaku_s_pass2",
+        "beats": 4,
+        "in_ult_catalogue": false
+      }
+    },
+    {
+      "id": "shirin_s_pass3",
+      "hero": "shirin",
+      "tier": "s",
+      "hud": 0,
+      "theme": null,
+      "season": "S3",
+      "boldness": "B1",
+      "name_ru": "Сезонный наряд S3",
+      "catalog_source": "pass",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 6.9,
+        "delivery": "pack",
+        "cdn": "v1/shirin/shirin_s_pass3/1.0.0"
+      },
+      "sources": {
+        "gacha": false,
+        "guest": false,
+        "pass": true,
+        "pass_season": "S3",
+        "pass_level": 30,
+        "archive_after_seasons": 2,
+        "petals": 900,
+        "dupe_petals_after_star5": 60,
+        "rub": 599,
+        "direct_after_days": null,
+        "direct_from_day": null,
+        "evergreen_from_day": null
+      },
+      "stars": {
+        "petals": [
+          60,
+          120,
+          180,
+          300
+        ],
+        "rub": [
+          49,
+          79,
+          119,
+          199
+        ]
+      },
+      "dyes": {
+        "free": [
+          "dye_1@5"
+        ],
+        "paid": []
+      },
+      "voice_lines": 4,
+      "touch": {
+        "zones": 5,
+        "reactions": 11
+      },
+      "plate": "rig+voice4",
+      "ult": {
+        "id": "shirin_s_pass3",
+        "ult_key": "ult.s.shirin_s_pass3",
+        "beats": 4,
+        "in_ult_catalogue": false
+      }
+    },
+    {
+      "id": "miel_s_pass4",
+      "hero": "miel",
+      "tier": "s",
+      "hud": 0,
+      "theme": null,
+      "season": "S4",
+      "boldness": "B1",
+      "name_ru": "Сезонный наряд S4",
+      "catalog_source": "pass",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 6.9,
+        "delivery": "pack",
+        "cdn": "v1/miel/miel_s_pass4/1.0.0"
+      },
+      "sources": {
+        "gacha": false,
+        "guest": false,
+        "pass": true,
+        "pass_season": "S4",
+        "pass_level": 30,
+        "archive_after_seasons": 2,
+        "petals": 900,
+        "dupe_petals_after_star5": 60,
+        "rub": 599,
+        "direct_after_days": null,
+        "direct_from_day": null,
+        "evergreen_from_day": null
+      },
+      "stars": {
+        "petals": [
+          60,
+          120,
+          180,
+          300
+        ],
+        "rub": [
+          49,
+          79,
+          119,
+          199
+        ]
+      },
+      "dyes": {
+        "free": [
+          "dye_1@5"
+        ],
+        "paid": []
+      },
+      "voice_lines": 4,
+      "touch": {
+        "zones": 5,
+        "reactions": 11
+      },
+      "plate": "rig+voice4",
+      "ult": {
+        "id": "miel_s_pass4",
+        "ult_key": "ult.s.miel_s_pass4",
+        "beats": 4,
+        "in_ult_catalogue": false
+      }
+    },
+    {
+      "id": "kohaku_s_pass5",
+      "hero": "kohaku",
+      "tier": "s",
+      "hud": 0,
+      "theme": null,
+      "season": "S5",
+      "boldness": "B1",
+      "name_ru": "Сезонный наряд S5",
+      "catalog_source": "pass",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 6.9,
+        "delivery": "pack",
+        "cdn": "v1/kohaku/kohaku_s_pass5/1.0.0"
+      },
+      "sources": {
+        "gacha": false,
+        "guest": false,
+        "pass": true,
+        "pass_season": "S5",
+        "pass_level": 30,
+        "archive_after_seasons": 2,
+        "petals": 900,
+        "dupe_petals_after_star5": 60,
+        "rub": 599,
+        "direct_after_days": null,
+        "direct_from_day": null,
+        "evergreen_from_day": null
+      },
+      "stars": {
+        "petals": [
+          60,
+          120,
+          180,
+          300
+        ],
+        "rub": [
+          49,
+          79,
+          119,
+          199
+        ]
+      },
+      "dyes": {
+        "free": [
+          "dye_1@5"
+        ],
+        "paid": []
+      },
+      "voice_lines": 4,
+      "touch": {
+        "zones": 5,
+        "reactions": 11
+      },
+      "plate": "rig+voice4",
+      "ult": {
+        "id": "kohaku_s_pass5",
+        "ult_key": "ult.s.kohaku_s_pass5",
+        "beats": 4,
+        "in_ult_catalogue": false
+      }
+    },
+    {
+      "id": "shirin_s_pass6",
+      "hero": "shirin",
+      "tier": "s",
+      "hud": 0,
+      "theme": null,
+      "season": "S6",
+      "boldness": "B1",
+      "name_ru": "Сезонный наряд S6",
+      "catalog_source": "pass",
+      "pack": {
+        "ver": "1.0.0",
+        "disk_mb": 6.9,
+        "delivery": "pack",
+        "cdn": "v1/shirin/shirin_s_pass6/1.0.0"
+      },
+      "sources": {
+        "gacha": false,
+        "guest": false,
+        "pass": true,
+        "pass_season": "S6",
+        "pass_level": 30,
+        "archive_after_seasons": 2,
+        "petals": 900,
+        "dupe_petals_after_star5": 60,
+        "rub": 599,
+        "direct_after_days": null,
+        "direct_from_day": null,
+        "evergreen_from_day": null
+      },
+      "stars": {
+        "petals": [
+          60,
+          120,
+          180,
+          300
+        ],
+        "rub": [
+          49,
+          79,
+          119,
+          199
+        ]
+      },
+      "dyes": {
+        "free": [
+          "dye_1@5"
+        ],
+        "paid": []
+      },
+      "voice_lines": 4,
+      "touch": {
+        "zones": 5,
+        "reactions": 11
+      },
+      "plate": "rig+voice4",
+      "ult": {
+        "id": "shirin_s_pass6",
+        "ult_key": "ult.s.shirin_s_pass6",
+        "beats": 4,
+        "in_ult_catalogue": false
+      }
+    }
+  ]
+}

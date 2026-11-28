@@ -1,0 +1,540 @@
+{
+  "schema": 2,
+  "currency": "RUB",
+  "source_specs": [
+    "design/specs/MONETIZATION_PLAN.md",
+    "design/specs/SKIN_HUD_SYSTEM.md",
+    "design/specs/BATTLE_ULT_SPEC.md",
+    "design/specs/LIVEOPS_CALENDAR.md"
+  ],
+  "rules": {
+    "wish_cost_gems": 150,
+    "wish_10_cost_gems": 1500,
+    "props_wish_cost_gems": 100,
+    "moon_pack_multiple": 150,
+    "rub_per_wish_min": 37.0,
+    "rub_per_wish_max": 39.8,
+    "max_bundle_value_ratio": 1.12,
+    "max_pass_value_ratio": 2.2,
+    "second_confirm_min_rub": 4990,
+    "first_buy_bonus_max_moon": 6900,
+    "real_payments_enabled_default": false,
+    "outfit_stats_enabled_default": false,
+    "bond_stats_enabled_default": false
+  },
+  "gacha": {
+    "ssr_base_rate": 0.015,
+    "soft_pity": 60,
+    "soft_pity_step": 0.05,
+    "hard_pity": 80,
+    "candle_pity": 120,
+    "first_guest_hard_pity": 30,
+    "props_base_rate": 0.02,
+    "props_soft_pity": 45,
+    "props_soft_pity_step": 0.06,
+    "props_hard_pity": 60,
+    "gift_petals": 5,
+    "dupe_petals_after_star5": {
+      "s": 60,
+      "ssr": 150,
+      "ssrp": 300
+    }
+  },
+  "moon_packs": [
+    {
+      "sku_id": "tw_moon_79",
+      "store_type": "consumable",
+      "rub": 79,
+      "moon": 300,
+      "wishes": 2,
+      "rub_per_wish": 39.5,
+      "first_buy_x2": true,
+      "first_buy_moon": 600,
+      "first_buy_wishes": 4,
+      "first_buy_rub_per_wish": 19.8,
+      "second_confirm": false
+    },
+    {
+      "sku_id": "tw_moon_199",
+      "store_type": "consumable",
+      "rub": 199,
+      "moon": 750,
+      "wishes": 5,
+      "rub_per_wish": 39.8,
+      "first_buy_x2": true,
+      "first_buy_moon": 1500,
+      "first_buy_wishes": 10,
+      "first_buy_rub_per_wish": 19.9,
+      "second_confirm": false
+    },
+    {
+      "sku_id": "tw_moon_499",
+      "store_type": "consumable",
+      "rub": 499,
+      "moon": 1950,
+      "wishes": 13,
+      "rub_per_wish": 38.4,
+      "first_buy_x2": true,
+      "first_buy_moon": 3900,
+      "first_buy_wishes": 26,
+      "first_buy_rub_per_wish": 19.2,
+      "second_confirm": false
+    },
+    {
+      "sku_id": "tw_moon_990",
+      "store_type": "consumable",
+      "rub": 990,
+      "moon": 3900,
+      "wishes": 26,
+      "rub_per_wish": 38.1,
+      "first_buy_x2": true,
+      "first_buy_moon": 7800,
+      "first_buy_wishes": 52,
+      "first_buy_rub_per_wish": 19.0,
+      "second_confirm": false
+    },
+    {
+      "sku_id": "tw_moon_1990",
+      "store_type": "consumable",
+      "rub": 1990,
+      "moon": 7950,
+      "wishes": 53,
+      "rub_per_wish": 37.5,
+      "first_buy_x2": false,
+      "first_buy_moon": null,
+      "first_buy_wishes": null,
+      "first_buy_rub_per_wish": null,
+      "second_confirm": false
+    },
+    {
+      "sku_id": "tw_moon_2990",
+      "store_type": "consumable",
+      "rub": 2990,
+      "moon": 12000,
+      "wishes": 80,
+      "rub_per_wish": 37.4,
+      "first_buy_x2": false,
+      "first_buy_moon": null,
+      "first_buy_wishes": null,
+      "first_buy_rub_per_wish": null,
+      "second_confirm": false
+    },
+    {
+      "sku_id": "tw_moon_4990",
+      "store_type": "consumable",
+      "rub": 4990,
+      "moon": 20100,
+      "wishes": 134,
+      "rub_per_wish": 37.2,
+      "first_buy_x2": false,
+      "first_buy_moon": null,
+      "first_buy_wishes": null,
+      "first_buy_rub_per_wish": null,
+      "second_confirm": true
+    },
+    {
+      "sku_id": "tw_moon_9990",
+      "store_type": "consumable",
+      "rub": 9990,
+      "moon": 40350,
+      "wishes": 269,
+      "rub_per_wish": 37.1,
+      "first_buy_x2": false,
+      "first_buy_moon": null,
+      "first_buy_wishes": null,
+      "first_buy_rub_per_wish": null,
+      "second_confirm": true
+    },
+    {
+      "sku_id": "tw_moon_14990",
+      "store_type": "consumable",
+      "rub": 14990,
+      "moon": 60750,
+      "wishes": 405,
+      "rub_per_wish": 37.0,
+      "first_buy_x2": false,
+      "first_buy_moon": null,
+      "first_buy_wishes": null,
+      "first_buy_rub_per_wish": null,
+      "second_confirm": true
+    }
+  ],
+  "monthly_cards": [
+    {
+      "sku_id": "tw_card_jade",
+      "name_ru": "Нефритовый пропуск",
+      "store_type": "consumable",
+      "auto_renew": false,
+      "duration_days": 30,
+      "max_stack_days": 90,
+      "rub": 199,
+      "instant_moon": 150,
+      "daily_gems": 25,
+      "total_gems": 900,
+      "wishes": 6,
+      "rub_per_wish": 33.2
+    },
+    {
+      "sku_id": "tw_card_moon",
+      "name_ru": "Лунный пропуск",
+      "store_type": "consumable",
+      "auto_renew": false,
+      "duration_days": 30,
+      "max_stack_days": 90,
+      "rub": 449,
+      "instant_moon": 300,
+      "daily_gems": 60,
+      "total_gems": 2100,
+      "wishes": 14,
+      "rub_per_wish": 32.1
+    }
+  ],
+  "season_pass": {
+    "duration_days": 56,
+    "max_level": 40,
+    "xp_per_level": 100,
+    "buy_levels_allowed": false,
+    "free": {
+      "gems": 2000,
+      "tickets": 4,
+      "coins": 1200,
+      "petals": 300,
+      "overflow_petals": 5,
+      "overflow_coins": 50
+    },
+    "premium": {
+      "sku_pattern": "tw_pass_prem_s<N>",
+      "name_ru": "Премиум",
+      "store_type": "consumable",
+      "rub": 899,
+      "list_value_rub": 1840,
+      "value_ratio": 2.05,
+      "pass_s_skin_level": 30
+    },
+    "lux": {
+      "sku_pattern": "tw_pass_lux_s<N>",
+      "name_ru": "Люкс",
+      "store_type": "consumable",
+      "rub": 1990,
+      "upgrade_from_premium_rub": 1091,
+      "upgrade_list_value_rub": 2400,
+      "upgrade_value_ratio": 2.2
+    },
+    "archive": {
+      "after_seasons": 2,
+      "s_rub": 599,
+      "s_petals": 900
+    }
+  },
+  "funds": [
+    {
+      "sku_id": "tw_fund_path",
+      "name_ru": "Фонд Пути",
+      "store_type": "non_consumable",
+      "rub": 990,
+      "total_gems": 7500,
+      "wishes": 50,
+      "value_ratio": 1.89
+    },
+    {
+      "sku_id": "tw_fund_coll",
+      "name_ru": "Фонд Коллекции",
+      "store_type": "non_consumable",
+      "rub": 1490,
+      "total_gems": 9000,
+      "wishes": 60,
+      "milestones": [12, 20, 30, 40, 50, 60],
+      "value_ratio": 1.71
+    }
+  ],
+  "outfit_pricing": {
+    "base": {
+      "rub": null,
+      "petals": null,
+      "dupe_petals_after_star5": null,
+      "direct_from_day": null,
+      "direct_after_days": null,
+      "stars_rub": null,
+      "stars_rub_total": null,
+      "stars_petals": null,
+      "stars_petals_total": null,
+      "dye_3_rub": null,
+      "dye_3_petals": null
+    },
+    "vow": {
+      "rub": null,
+      "petals": null,
+      "dupe_petals_after_star5": null,
+      "direct_from_day": null,
+      "direct_after_days": null,
+      "stars_rub": [49, 79, 119, 199],
+      "stars_rub_total": 446,
+      "stars_petals": [60, 120, 180, 300],
+      "stars_petals_total": 660,
+      "dye_3_rub": null,
+      "dye_3_petals": null
+    },
+    "s_static": {
+      "rub": 359,
+      "petals": 540,
+      "dupe_petals_after_star5": 60,
+      "direct_from_day": 29,
+      "direct_after_days": 28,
+      "stars_rub": [49, 79, 119, 199],
+      "stars_rub_total": 446,
+      "stars_petals": [60, 120, 180, 300],
+      "stars_petals_total": 660,
+      "dye_3_rub": null,
+      "dye_3_petals": null
+    },
+    "s": {
+      "rub": 599,
+      "petals": 900,
+      "dupe_petals_after_star5": 60,
+      "direct_from_day": 29,
+      "direct_after_days": 28,
+      "stars_rub": [49, 79, 119, 199],
+      "stars_rub_total": 446,
+      "stars_petals": [60, 120, 180, 300],
+      "stars_petals_total": 660,
+      "dye_3_rub": null,
+      "dye_3_petals": null
+    },
+    "ssr": {
+      "rub": 1490,
+      "petals": 1800,
+      "dupe_petals_after_star5": 150,
+      "direct_from_day": 29,
+      "direct_after_days": 28,
+      "headline_direct_from_day": 57,
+      "headline_direct_after_days": 56,
+      "stars_rub": [49, 79, 119, 199],
+      "stars_rub_total": 446,
+      "stars_petals": [60, 120, 180, 300],
+      "stars_petals_total": 660,
+      "dye_3_rub": 199,
+      "dye_3_petals": 400
+    },
+    "ssrp": {
+      "rub": 2490,
+      "petals": 3600,
+      "dupe_petals_after_star5": 300,
+      "direct_from_day": 57,
+      "direct_after_days": 56,
+      "stars_rub": [69, 119, 179, 299],
+      "stars_rub_total": 666,
+      "stars_petals": [90, 180, 270, 450],
+      "stars_petals_total": 990,
+      "dye_3_rub": 199,
+      "dye_3_petals": 400
+    },
+    "champion": {
+      "sold": false,
+      "rub": null,
+      "petals": null,
+      "requires_star": 5,
+      "requires_bond": 8,
+      "requires_mastery_pairs": 2000,
+      "free_dye": "dye_g"
+    }
+  },
+  "cosmetics": [
+    {
+      "sku_pattern": "tw_ultdir_<skin>",
+      "name_ru": "Режиссёрская ульта",
+      "store_type": "non_consumable",
+      "rub": 590,
+      "petals": 1200,
+      "p1_enabled": false
+    },
+    {
+      "sku_pattern": "tw_prop_<hero>_<n>",
+      "name_ru": "Реквизит ульты «Шкатулка»",
+      "store_type": "non_consumable",
+      "rub": 1090,
+      "petals": 1800,
+      "direct_from_day": 29,
+      "p1_enabled": false
+    },
+    {
+      "sku_pattern": "tw_boudoir_<hero>",
+      "name_ru": "Люкс-будуар героини",
+      "store_type": "non_consumable",
+      "rub": 1290,
+      "petals": null,
+      "min_bond": 6,
+      "p1_enabled": true
+    },
+    {
+      "sku_pattern": "tw_decor_<season>",
+      "name_ru": "Декор сезона для Салона",
+      "store_type": "non_consumable",
+      "rub": 490,
+      "petals": 900,
+      "p1_enabled": true
+    },
+    {
+      "sku_pattern": "tw_pose_<hero>",
+      "name_ru": "Пак поз для фото-режима",
+      "store_type": "non_consumable",
+      "rub": 199,
+      "petals": 400,
+      "p1_enabled": true
+    },
+    {
+      "sku_pattern": "tw_frame_<id>",
+      "name_ru": "Рамка профиля/героини",
+      "store_type": "non_consumable",
+      "rub_min": 149,
+      "rub_max": 199,
+      "petals_min": 300,
+      "petals_max": 400,
+      "p1_enabled": true
+    },
+    {
+      "sku_pattern": "tw_title_<id>",
+      "name_ru": "Титул",
+      "store_type": "non_consumable",
+      "rub": 99,
+      "petals": 200,
+      "p1_enabled": true
+    },
+    {
+      "sku_pattern": "tw_fx_<id>",
+      "name_ru": "Эффект лобби / касания",
+      "store_type": "non_consumable",
+      "rub_min": 149,
+      "rub_max": 299,
+      "petals_min": 300,
+      "petals_max": 600,
+      "p1_enabled": true
+    },
+    {
+      "sku_pattern": "tw_hud_lux_<theme>",
+      "name_ru": "Люкс-тема HUD",
+      "store_type": "non_consumable",
+      "rub": 490,
+      "petals": null,
+      "p1_enabled": true
+    },
+    {
+      "sku_id": "tw_table_cloth",
+      "name_ru": "Лавка стола: сукно",
+      "store_type": "non_consumable",
+      "rub": 149,
+      "petals": 300,
+      "p1_enabled": true
+    },
+    {
+      "sku_id": "tw_table_tiles",
+      "name_ru": "Лавка стола: тайлы",
+      "store_type": "non_consumable",
+      "rub": 199,
+      "petals": 400,
+      "p1_enabled": true
+    },
+    {
+      "sku_id": "tw_table_fx",
+      "name_ru": "Лавка стола: эффекты",
+      "store_type": "non_consumable",
+      "rub": 99,
+      "petals": 200,
+      "p1_enabled": true
+    },
+    {
+      "sku_id": "tw_solitaire_plus",
+      "name_ru": "Пасьянс+",
+      "store_type": "non_consumable",
+      "rub": 399,
+      "petals": null,
+      "p1_enabled": true
+    },
+    {
+      "sku_pattern": "tw_patron_<tier>",
+      "name_ru": "Дар Дому",
+      "store_type": "consumable",
+      "rub_tiers": [2990, 9990, 29990],
+      "petals": null,
+      "p1_enabled": false
+    }
+  ],
+  "bundles": [
+    {
+      "sku_id": "tw_bundle_season",
+      "name_ru": "Набор сезона «Витрина»",
+      "store_type": "non_consumable",
+      "rub": 5390,
+      "list_value_rub": 6051,
+      "value_ratio": 1.12,
+      "direct_from_day": 57,
+      "is_event_pass": false
+    },
+    {
+      "sku_id": "tw_bundle_hero",
+      "name_ru": "Набор героини «Гардероб»",
+      "store_type": "non_consumable",
+      "rub": 2490,
+      "list_value_rub": 2734,
+      "value_ratio": 1.1,
+      "is_event_pass": false
+    },
+    {
+      "sku_id": "tw_bundle_prop",
+      "name_ru": "Набор «Шкатулка+режиссёр»",
+      "store_type": "non_consumable",
+      "rub": 1590,
+      "list_value_rub": 1680,
+      "value_ratio": 1.06,
+      "is_event_pass": false
+    },
+    {
+      "sku_id": "tw_event_pass_mini",
+      "name_ru": "Вечеринка-пропуск (мини)",
+      "store_type": "consumable",
+      "rub": 299,
+      "list_value_rub": 447,
+      "value_ratio": 1.5,
+      "is_event_pass": true
+    },
+    {
+      "sku_id": "tw_event_pass_mega",
+      "name_ru": "Вечеринка-пропуск (мега)",
+      "store_type": "consumable",
+      "rub": 399,
+      "list_value_rub": 640,
+      "value_ratio": 1.6,
+      "is_event_pass": true
+    }
+  ],
+  "forbidden_words": [
+    "выгоднее всего",
+    "лучшая цена",
+    "последний шанс",
+    "только сегодня",
+    "успей",
+    "не упусти",
+    "эксклюзив навсегда",
+    "school",
+    "student",
+    "minor",
+    "child",
+    "kid",
+    "teen",
+    "loli",
+    "nude",
+    "naked",
+    "nipple",
+    "topless",
+    "lingerie",
+    "cleavage",
+    "sexy",
+    "underboob",
+    "sideboob",
+    "seifuku",
+    "школьн",
+    "учениц",
+    "малолетк",
+    "нагая",
+    "голая"
+  ]
+}
