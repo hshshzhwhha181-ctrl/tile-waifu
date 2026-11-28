@@ -37,9 +37,9 @@ extends "res://scripts/screens/play.gd"
 signal tower_event(kind: String, data: Dictionary)
 
 const TR: = preload("res://scripts/v10/tower/tower_rules.gd")
-const P: = preload("res://scripts/v10/tower/pagoda.gd")
-const J: = preload("res://scripts/v10/tower/journey.gd")
-const M: = preload("res://scripts/v10/tower/mods.gd")
+const P: = preload("res://core/modes/tower/pagoda.gd")
+const J: = preload("res://core/modes/tower/journey.gd")
+const M: = preload("res://core/modes/tower/mods.gd")
 const UIT: = preload("res://scripts/v10/tower/ui/tower_ui.gd")
 const THUD: = preload("res://scripts/v10/tower/ui/tower_hud.gd")
 const CUT: = preload("res://scripts/v10/tower/ui/boss_cutin.gd")

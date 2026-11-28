@@ -24,16 +24,16 @@
     "scripts/screens/modes.gd",
     "scripts/v06/story/story_scene.gd",
     "scripts/v07/event/tourney_screen.gd",
-    "scripts/v07/room/room_data.gd",
+    "core/v07/room/room_data.gd",
     "scripts/v10/meta/afisha_card.gd",
     "scripts/v10/mj/classic/classic_screen.gd",
     "scripts/v10/mj/classic/memory.gd",
     "scripts/v10/mj/triples/triples_screen.gd",
     "scripts/v10/online/online_ui.gd",
-    "scripts/v10/profile/cosmetics.gd",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_home.gd",
-    "scripts/v10/wave1/w1_play.gd"
+    "core/profile/cosmetics.gd",
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_home.gd",
+    "core/wave1/w1_play.gd"
    ]
   },
   {
@@ -59,8 +59,8 @@
     "scripts/v10/online/online_ui.gd",
     "scripts/v10/rituals/ui/comeback_scene.gd",
     "scripts/v10/rituals/ui/player_bday_scene.gd",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_play.gd"
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_play.gd"
    ]
   },
   {
@@ -79,15 +79,15 @@
     "scripts/screens/modes.gd",
     "scripts/v06/story/story_scene.gd",
     "scripts/v07/event/tourney_screen.gd",
-    "scripts/v07/room/room_data.gd",
+    "core/v07/room/room_data.gd",
     "scripts/v10/meta/afisha_card.gd",
     "scripts/v10/mj/classic/classic_screen.gd",
     "scripts/v10/mj/classic/memory.gd",
     "scripts/v10/mj/triples/triples_screen.gd",
     "scripts/v10/online/online_ui.gd",
-    "scripts/v10/profile/cosmetics.gd",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_play.gd"
+    "core/profile/cosmetics.gd",
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_play.gd"
    ]
   },
   {
@@ -111,8 +111,8 @@
     "scripts/v10/mj/classic/memory.gd",
     "scripts/v10/mj/triples/triples_screen.gd",
     "scripts/v10/online/online_ui.gd",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_play.gd"
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_play.gd"
    ]
   },
   {
@@ -131,16 +131,16 @@
     "scripts/screens/modes.gd",
     "scripts/v06/story/story_scene.gd",
     "scripts/v07/event/tourney_screen.gd",
-    "scripts/v07/room/room_data.gd",
+    "core/v07/room/room_data.gd",
     "scripts/v10/duels/duel_screen.gd",
     "scripts/v10/meta/afisha_card.gd",
     "scripts/v10/mj/classic/classic_screen.gd",
     "scripts/v10/mj/classic/memory.gd",
     "scripts/v10/mj/triples/triples_screen.gd",
     "scripts/v10/online/online_ui.gd",
-    "scripts/v10/profile/cosmetics.gd",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_play.gd"
+    "core/profile/cosmetics.gd",
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_play.gd"
    ]
   },
   {
@@ -166,8 +166,8 @@
     "scripts/v10/mj/stage/stage_demo.gd",
     "scripts/v10/mj/triples/triples_screen.gd",
     "scripts/v10/online/online_ui.gd",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_play.gd"
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_play.gd"
    ]
   },
   {
@@ -191,10 +191,10 @@
     "scripts/v10/mj/classic/memory.gd",
     "scripts/v10/mj/triples/triples_screen.gd",
     "scripts/v10/online/online_ui.gd",
-    "scripts/v10/profile/cosmetics.gd",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_home.gd",
-    "scripts/v10/wave1/w1_play.gd"
+    "core/profile/cosmetics.gd",
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_home.gd",
+    "core/wave1/w1_play.gd"
    ]
   },
   {
@@ -213,7 +213,7 @@
     "scripts/screens/modes.gd",
     "scripts/v06/story/story_scene.gd",
     "scripts/v07/event/tourney_screen.gd",
-    "scripts/v07/room/room_data.gd",
+    "core/v07/room/room_data.gd",
     "scripts/v10/core/tables_hub.gd",
     "scripts/v10/duels/duel_screen.gd",
     "scripts/v10/meta/afisha_card.gd",
@@ -221,10 +221,10 @@
     "scripts/v10/mj/classic/memory.gd",
     "scripts/v10/mj/triples/triples_screen.gd",
     "scripts/v10/online/online_ui.gd",
-    "scripts/v10/profile/cosmetics.gd",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_home.gd",
-    "scripts/v10/wave1/w1_play.gd"
+    "core/profile/cosmetics.gd",
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_home.gd",
+    "core/wave1/w1_play.gd"
    ]
   },
   {
@@ -248,8 +248,8 @@
     "scripts/v10/mj/classic/memory.gd",
     "scripts/v10/mj/triples/triples_screen.gd",
     "scripts/v10/online/online_ui.gd",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_play.gd"
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_play.gd"
    ]
   },
   {
@@ -268,15 +268,15 @@
     "scripts/screens/modes.gd",
     "scripts/v06/story/story_scene.gd",
     "scripts/v07/event/tourney_screen.gd",
-    "scripts/v07/room/room_data.gd",
+    "core/v07/room/room_data.gd",
     "scripts/v10/meta/afisha_card.gd",
     "scripts/v10/mj/classic/classic_screen.gd",
     "scripts/v10/mj/classic/memory.gd",
     "scripts/v10/mj/triples/triples_screen.gd",
     "scripts/v10/online/online_ui.gd",
-    "scripts/v10/profile/cosmetics.gd",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_play.gd"
+    "core/profile/cosmetics.gd",
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_play.gd"
    ]
   },
   {
@@ -300,8 +300,8 @@
     "scripts/v10/mj/classic/memory.gd",
     "scripts/v10/mj/triples/triples_screen.gd",
     "scripts/v10/online/online_ui.gd",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_play.gd"
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_play.gd"
    ]
   },
   {
@@ -320,7 +320,7 @@
     "scripts/screens/modes.gd",
     "scripts/v06/story/story_scene.gd",
     "scripts/v07/event/tourney_screen.gd",
-    "scripts/v07/room/room_data.gd",
+    "core/v07/room/room_data.gd",
     "scripts/v10/juice/demo/juice_demo.gd",
     "scripts/v10/look/look_runner.gd",
     "scripts/v10/meta/afisha_card.gd",
@@ -329,11 +329,11 @@
     "scripts/v10/mj/stage/stage_demo.gd",
     "scripts/v10/mj/triples/triples_screen.gd",
     "scripts/v10/online/online_ui.gd",
-    "scripts/v10/profile/cosmetics.gd",
+    "core/profile/cosmetics.gd",
     "scripts/v10/rituals/ui/comeback_scene.gd",
     "scripts/v10/rituals/ui/rit_gallery.gd",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_play.gd"
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_play.gd"
    ]
   },
   {
@@ -360,8 +360,8 @@
     "scripts/v10/online/online_ui.gd",
     "scripts/v10/rituals/ui/bday_cake.gd",
     "scripts/v10/salon/salon_runner.gd",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_play.gd"
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_play.gd"
    ]
   },
   {
@@ -385,8 +385,8 @@
     "scripts/v10/mj/classic/memory.gd",
     "scripts/v10/mj/triples/triples_screen.gd",
     "scripts/v10/online/online_ui.gd",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_play.gd"
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_play.gd"
    ]
   },
   {
@@ -411,10 +411,10 @@
     "scripts/v10/mj/classic/memory.gd",
     "scripts/v10/mj/triples/triples_screen.gd",
     "scripts/v10/online/online_ui.gd",
-    "scripts/v10/profile/cosmetics.gd",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_home.gd",
-    "scripts/v10/wave1/w1_play.gd"
+    "core/profile/cosmetics.gd",
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_home.gd",
+    "core/wave1/w1_play.gd"
    ]
   },
   {
@@ -439,8 +439,8 @@
     "scripts/v10/mj/classic/memory.gd",
     "scripts/v10/mj/triples/triples_screen.gd",
     "scripts/v10/online/online_ui.gd",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_play.gd"
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_play.gd"
    ]
   },
   {
@@ -466,10 +466,10 @@
     "scripts/v10/mj/classic/memory.gd",
     "scripts/v10/mj/triples/triples_screen.gd",
     "scripts/v10/online/online_ui.gd",
-    "scripts/v10/profile/cosmetics.gd",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_home.gd",
-    "scripts/v10/wave1/w1_play.gd"
+    "core/profile/cosmetics.gd",
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_home.gd",
+    "core/wave1/w1_play.gd"
    ]
   },
   {
@@ -494,8 +494,8 @@
     "scripts/v10/mj/triples/triples_screen.gd",
     "scripts/v10/online/online_ui.gd",
     "scripts/v10/rituals/ui/rit_gallery.gd",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_play.gd"
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_play.gd"
    ]
   },
   {
@@ -520,8 +520,8 @@
     "scripts/v10/mj/classic/memory.gd",
     "scripts/v10/mj/triples/triples_screen.gd",
     "scripts/v10/online/online_ui.gd",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_play.gd"
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_play.gd"
    ]
   },
   {
@@ -545,8 +545,8 @@
     "scripts/v10/mj/classic/memory.gd",
     "scripts/v10/mj/triples/triples_screen.gd",
     "scripts/v10/online/online_ui.gd",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_play.gd"
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_play.gd"
    ]
   },
   {
@@ -909,11 +909,11 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/adventure/adventure_data.gd",
-    "scripts/v10/chat/chat_data.gd",
+    "core/modes/adventure/adventure_data.gd",
+    "core/chat/chat_data.gd",
     "scripts/v10/juice/demo/juice_demo.gd",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_mj.gd"
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_mj.gd"
    ]
   },
   {
@@ -929,22 +929,22 @@
    "referenced_by": [
     "scripts/main.gd",
     "scripts/v08/hud/art.gd",
-    "scripts/v10/adventure/adventure_data.gd",
-    "scripts/v10/chat/chat_data.gd",
+    "core/modes/adventure/adventure_data.gd",
+    "core/chat/chat_data.gd",
     "scripts/v10/duels/challenge/challenge_poster.gd",
     "scripts/v10/duels/duel_screen.gd",
-    "scripts/v10/mj/koikoi/book.gd",
+    "core/modes/koikoi/book.gd",
     "scripts/v10/mj/koikoi/koikoi_screen.gd",
     "scripts/v10/mj/riichi/fx.gd",
     "scripts/v10/mj/riichi/portrait.gd",
     "scripts/v10/mj/triples/triples_presence.gd",
     "scripts/v10/online/pvp_online_screen.gd",
-    "scripts/v10/rituals/rit_bridge.gd",
+    "core/rituals/rit_bridge.gd",
     "scripts/v10/tower/pagoda_screen.gd",
     "scripts/v10/tower/ui/journey_scroll.gd",
     "scripts/v10/ult/ult_video.gd",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_mj.gd"
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_mj.gd"
    ]
   },
   {
@@ -958,10 +958,10 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/adventure/adventure_data.gd",
-    "scripts/v10/chat/chat_data.gd",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_mj.gd"
+    "core/modes/adventure/adventure_data.gd",
+    "core/chat/chat_data.gd",
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_mj.gd"
    ]
   },
   {
@@ -975,10 +975,10 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/adventure/adventure_data.gd",
-    "scripts/v10/chat/chat_data.gd",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_mj.gd"
+    "core/modes/adventure/adventure_data.gd",
+    "core/chat/chat_data.gd",
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_mj.gd"
    ]
   },
   {
@@ -992,10 +992,10 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/adventure/adventure_data.gd",
-    "scripts/v10/chat/chat_data.gd",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_mj.gd"
+    "core/modes/adventure/adventure_data.gd",
+    "core/chat/chat_data.gd",
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_mj.gd"
    ]
   },
   {
@@ -1024,7 +1024,7 @@
    "status": "approved",
    "referenced_by": [
     "scripts/v08/hud/art.gd",
-    "scripts/v10/rituals/rit_bridge.gd",
+    "core/rituals/rit_bridge.gd",
     "scripts/v10/rituals/ui/rit_gallery.gd"
    ]
   },
@@ -1040,8 +1040,8 @@
    "status": "approved",
    "referenced_by": [
     "scripts/v08/hud/art.gd",
-    "scripts/v10/rituals/rit_bridge.gd",
-    "scripts/v10/rituals/rituals_selftest.gd",
+    "core/rituals/rit_bridge.gd",
+    "core/rituals/rituals_selftest.gd",
     "scripts/v10/rituals/ui/rit_gallery.gd"
    ]
   },
@@ -1057,7 +1057,7 @@
    "status": "approved",
    "referenced_by": [
     "scripts/v08/hud/art.gd",
-    "scripts/v10/rituals/rit_bridge.gd",
+    "core/rituals/rit_bridge.gd",
     "scripts/v10/rituals/ui/rit_gallery.gd"
    ]
   },
@@ -1073,7 +1073,7 @@
    "status": "approved",
    "referenced_by": [
     "scripts/v08/hud/art.gd",
-    "scripts/v10/rituals/rit_bridge.gd"
+    "core/rituals/rit_bridge.gd"
    ]
   },
   {
@@ -1088,7 +1088,7 @@
    "status": "approved",
    "referenced_by": [
     "scripts/v08/hud/art.gd",
-    "scripts/v10/rituals/rit_bridge.gd"
+    "core/rituals/rit_bridge.gd"
    ]
   },
   {
@@ -1146,7 +1146,7 @@
    "status": "approved",
    "referenced_by": [
     "scripts/v08/hud/art.gd",
-    "scripts/v10/rituals/rit_bridge.gd"
+    "core/rituals/rit_bridge.gd"
    ]
   },
   {
@@ -1189,8 +1189,8 @@
    "status": "approved",
    "referenced_by": [
     "scripts/v08/hud/art.gd",
-    "scripts/v10/rituals/rit_bridge.gd",
-    "scripts/v10/rituals/rituals_selftest.gd",
+    "core/rituals/rit_bridge.gd",
+    "core/rituals/rituals_selftest.gd",
     "scripts/v10/rituals/ui/rit_gallery.gd"
    ]
   },
@@ -1206,7 +1206,7 @@
    "status": "approved",
    "referenced_by": [
     "scripts/v08/hud/art.gd",
-    "scripts/v10/rituals/rit_bridge.gd",
+    "core/rituals/rit_bridge.gd",
     "scripts/v10/rituals/ui/rit_gallery.gd"
    ]
   },
@@ -1222,7 +1222,7 @@
    "status": "approved",
    "referenced_by": [
     "scripts/v08/hud/art.gd",
-    "scripts/v10/rituals/rit_bridge.gd"
+    "core/rituals/rit_bridge.gd"
    ]
   },
   {
@@ -1237,7 +1237,7 @@
    "status": "approved",
    "referenced_by": [
     "scripts/v08/hud/art.gd",
-    "scripts/v10/rituals/rit_bridge.gd"
+    "core/rituals/rit_bridge.gd"
    ]
   },
   {
@@ -1297,15 +1297,15 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v08/league/league_selftest.gd",
-    "scripts/v09/core/ults.gd",
+    "core/v08/league/league_selftest.gd",
+    "core/v09/core/ults.gd",
     "scripts/v09/core/ults_selftest.gd",
     "scripts/v10/duels/challenge/challenge_poster.gd",
     "scripts/v10/hud2/hud_match.gd",
     "scripts/v10/profile/card_editor.gd",
     "scripts/v10/profile/card_view.gd",
     "scripts/v10/shop/kit.gd",
-    "scripts/v10/wave1/w1_core.gd",
+    "core/wave1/w1_core.gd",
     "scripts/v10/wave1/w1_ults.gd"
    ]
   },
@@ -1320,14 +1320,14 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v08/league/league_selftest.gd",
-    "scripts/v09/core/ults.gd",
+    "core/v08/league/league_selftest.gd",
+    "core/v09/core/ults.gd",
     "scripts/v09/core/ults_selftest.gd",
     "scripts/v10/duels/challenge/challenge_poster.gd",
     "scripts/v10/profile/card_editor.gd",
     "scripts/v10/profile/card_view.gd",
     "scripts/v10/shop/kit.gd",
-    "scripts/v10/wave1/w1_core.gd",
+    "core/wave1/w1_core.gd",
     "scripts/v10/wave1/w1_ults.gd"
    ]
   },
@@ -1342,14 +1342,14 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v08/league/league_selftest.gd",
-    "scripts/v09/core/ults.gd",
+    "core/v08/league/league_selftest.gd",
+    "core/v09/core/ults.gd",
     "scripts/v09/core/ults_selftest.gd",
     "scripts/v10/duels/challenge/challenge_poster.gd",
     "scripts/v10/profile/card_editor.gd",
     "scripts/v10/profile/card_view.gd",
     "scripts/v10/shop/kit.gd",
-    "scripts/v10/wave1/w1_core.gd",
+    "core/wave1/w1_core.gd",
     "scripts/v10/wave1/w1_ults.gd"
    ]
   },
@@ -1364,15 +1364,15 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v08/league/league_selftest.gd",
-    "scripts/v09/core/ults.gd",
+    "core/v08/league/league_selftest.gd",
+    "core/v09/core/ults.gd",
     "scripts/v09/core/ults_selftest.gd",
     "scripts/v10/core/tables_hub.gd",
     "scripts/v10/duels/challenge/challenge_poster.gd",
     "scripts/v10/profile/card_editor.gd",
     "scripts/v10/profile/card_view.gd",
     "scripts/v10/shop/kit.gd",
-    "scripts/v10/wave1/w1_core.gd",
+    "core/wave1/w1_core.gd",
     "scripts/v10/wave1/w1_ults.gd"
    ]
   },
@@ -1387,14 +1387,14 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v08/league/league_selftest.gd",
-    "scripts/v09/core/ults.gd",
+    "core/v08/league/league_selftest.gd",
+    "core/v09/core/ults.gd",
     "scripts/v09/core/ults_selftest.gd",
     "scripts/v10/duels/challenge/challenge_poster.gd",
     "scripts/v10/profile/card_editor.gd",
     "scripts/v10/profile/card_view.gd",
     "scripts/v10/shop/kit.gd",
-    "scripts/v10/wave1/w1_core.gd",
+    "core/wave1/w1_core.gd",
     "scripts/v10/wave1/w1_ults.gd"
    ]
   },
@@ -1410,8 +1410,8 @@
    "status": "approved",
    "referenced_by": [
     "scripts/v08/hud/art.gd",
-    "scripts/v08/league/league_selftest.gd",
-    "scripts/v09/core/ults.gd",
+    "core/v08/league/league_selftest.gd",
+    "core/v09/core/ults.gd",
     "scripts/v09/core/ults_selftest.gd",
     "scripts/v09/ult/cutin.gd",
     "scripts/v10/duels/challenge/challenge_poster.gd",
@@ -1421,7 +1421,7 @@
     "scripts/v10/shop/kit.gd",
     "scripts/v10/shop/shop2_screen.gd",
     "scripts/v10/ult/ult_video.gd",
-    "scripts/v10/wave1/w1_core.gd",
+    "core/wave1/w1_core.gd",
     "scripts/v10/wave1/w1_ults.gd"
    ]
   },
@@ -1436,15 +1436,15 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v08/league/league_selftest.gd",
-    "scripts/v09/core/ults.gd",
+    "core/v08/league/league_selftest.gd",
+    "core/v09/core/ults.gd",
     "scripts/v09/core/ults_selftest.gd",
     "scripts/v10/duels/challenge/challenge_poster.gd",
     "scripts/v10/profile/card_editor.gd",
     "scripts/v10/profile/card_view.gd",
     "scripts/v10/shop/kit.gd",
     "scripts/v10/shop/shop2_screen.gd",
-    "scripts/v10/wave1/w1_core.gd",
+    "core/wave1/w1_core.gd",
     "scripts/v10/wave1/w1_ults.gd"
    ]
   },
@@ -1459,14 +1459,14 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v08/league/league_selftest.gd",
-    "scripts/v09/core/ults.gd",
+    "core/v08/league/league_selftest.gd",
+    "core/v09/core/ults.gd",
     "scripts/v09/core/ults_selftest.gd",
     "scripts/v10/duels/challenge/challenge_poster.gd",
     "scripts/v10/profile/card_editor.gd",
     "scripts/v10/profile/card_view.gd",
     "scripts/v10/shop/kit.gd",
-    "scripts/v10/wave1/w1_core.gd",
+    "core/wave1/w1_core.gd",
     "scripts/v10/wave1/w1_ults.gd"
    ]
   },
@@ -1481,8 +1481,8 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v08/league/league_selftest.gd",
-    "scripts/v09/core/ults.gd",
+    "core/v08/league/league_selftest.gd",
+    "core/v09/core/ults.gd",
     "scripts/v09/core/ults_selftest.gd",
     "scripts/v10/core/tables_hub.gd",
     "scripts/v10/duels/challenge/challenge_poster.gd",
@@ -1490,7 +1490,7 @@
     "scripts/v10/profile/card_view.gd",
     "scripts/v10/shop/kit.gd",
     "scripts/v10/shop/shop2_screen.gd",
-    "scripts/v10/wave1/w1_core.gd",
+    "core/wave1/w1_core.gd",
     "scripts/v10/wave1/w1_ults.gd"
    ]
   },
@@ -1505,14 +1505,14 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v08/league/league_selftest.gd",
-    "scripts/v09/core/ults.gd",
+    "core/v08/league/league_selftest.gd",
+    "core/v09/core/ults.gd",
     "scripts/v09/core/ults_selftest.gd",
     "scripts/v10/duels/challenge/challenge_poster.gd",
     "scripts/v10/profile/card_editor.gd",
     "scripts/v10/profile/card_view.gd",
     "scripts/v10/shop/kit.gd",
-    "scripts/v10/wave1/w1_core.gd",
+    "core/wave1/w1_core.gd",
     "scripts/v10/wave1/w1_ults.gd"
    ]
   },
@@ -1527,15 +1527,15 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v08/league/league_selftest.gd",
-    "scripts/v09/core/ults.gd",
+    "core/v08/league/league_selftest.gd",
+    "core/v09/core/ults.gd",
     "scripts/v09/core/ults_selftest.gd",
     "scripts/v10/duels/challenge/challenge_poster.gd",
     "scripts/v10/hud2/hud_match.gd",
     "scripts/v10/profile/card_editor.gd",
     "scripts/v10/profile/card_view.gd",
     "scripts/v10/shop/kit.gd",
-    "scripts/v10/wave1/w1_core.gd",
+    "core/wave1/w1_core.gd",
     "scripts/v10/wave1/w1_ults.gd"
    ]
   },
@@ -1550,14 +1550,14 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v08/league/league_selftest.gd",
-    "scripts/v09/core/ults.gd",
+    "core/v08/league/league_selftest.gd",
+    "core/v09/core/ults.gd",
     "scripts/v09/core/ults_selftest.gd",
     "scripts/v10/duels/challenge/challenge_poster.gd",
     "scripts/v10/profile/card_editor.gd",
     "scripts/v10/profile/card_view.gd",
     "scripts/v10/shop/kit.gd",
-    "scripts/v10/wave1/w1_core.gd",
+    "core/wave1/w1_core.gd",
     "scripts/v10/wave1/w1_ults.gd"
    ]
   },
@@ -1572,15 +1572,15 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v08/league/league_selftest.gd",
-    "scripts/v09/core/ults.gd",
+    "core/v08/league/league_selftest.gd",
+    "core/v09/core/ults.gd",
     "scripts/v09/core/ults_selftest.gd",
     "scripts/v10/core/tables_hub.gd",
     "scripts/v10/duels/challenge/challenge_poster.gd",
     "scripts/v10/profile/card_editor.gd",
     "scripts/v10/profile/card_view.gd",
     "scripts/v10/shop/kit.gd",
-    "scripts/v10/wave1/w1_core.gd",
+    "core/wave1/w1_core.gd",
     "scripts/v10/wave1/w1_ults.gd"
    ]
   },
@@ -1595,14 +1595,14 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v08/league/league_selftest.gd",
-    "scripts/v09/core/ults.gd",
+    "core/v08/league/league_selftest.gd",
+    "core/v09/core/ults.gd",
     "scripts/v09/core/ults_selftest.gd",
     "scripts/v10/duels/challenge/challenge_poster.gd",
     "scripts/v10/profile/card_editor.gd",
     "scripts/v10/profile/card_view.gd",
     "scripts/v10/shop/kit.gd",
-    "scripts/v10/wave1/w1_core.gd",
+    "core/wave1/w1_core.gd",
     "scripts/v10/wave1/w1_ults.gd"
    ]
   },
@@ -1617,14 +1617,14 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v08/league/league_selftest.gd",
-    "scripts/v09/core/ults.gd",
+    "core/v08/league/league_selftest.gd",
+    "core/v09/core/ults.gd",
     "scripts/v09/core/ults_selftest.gd",
     "scripts/v10/duels/challenge/challenge_poster.gd",
     "scripts/v10/profile/card_editor.gd",
     "scripts/v10/profile/card_view.gd",
     "scripts/v10/shop/kit.gd",
-    "scripts/v10/wave1/w1_core.gd",
+    "core/wave1/w1_core.gd",
     "scripts/v10/wave1/w1_ults.gd"
    ]
   },
@@ -1639,15 +1639,15 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v08/league/league_selftest.gd",
-    "scripts/v09/core/ults.gd",
+    "core/v08/league/league_selftest.gd",
+    "core/v09/core/ults.gd",
     "scripts/v09/core/ults_selftest.gd",
     "scripts/v10/duels/challenge/challenge_poster.gd",
     "scripts/v10/hud2/hud_match.gd",
     "scripts/v10/profile/card_editor.gd",
     "scripts/v10/profile/card_view.gd",
     "scripts/v10/shop/kit.gd",
-    "scripts/v10/wave1/w1_core.gd",
+    "core/wave1/w1_core.gd",
     "scripts/v10/wave1/w1_ults.gd"
    ]
   },
@@ -1662,14 +1662,14 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v08/league/league_selftest.gd",
-    "scripts/v09/core/ults.gd",
+    "core/v08/league/league_selftest.gd",
+    "core/v09/core/ults.gd",
     "scripts/v09/core/ults_selftest.gd",
     "scripts/v10/duels/challenge/challenge_poster.gd",
     "scripts/v10/profile/card_editor.gd",
     "scripts/v10/profile/card_view.gd",
     "scripts/v10/shop/kit.gd",
-    "scripts/v10/wave1/w1_core.gd",
+    "core/wave1/w1_core.gd",
     "scripts/v10/wave1/w1_ults.gd"
    ]
   },
@@ -1684,14 +1684,14 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v08/league/league_selftest.gd",
-    "scripts/v09/core/ults.gd",
+    "core/v08/league/league_selftest.gd",
+    "core/v09/core/ults.gd",
     "scripts/v09/core/ults_selftest.gd",
     "scripts/v10/duels/challenge/challenge_poster.gd",
     "scripts/v10/profile/card_editor.gd",
     "scripts/v10/profile/card_view.gd",
     "scripts/v10/shop/kit.gd",
-    "scripts/v10/wave1/w1_core.gd",
+    "core/wave1/w1_core.gd",
     "scripts/v10/wave1/w1_ults.gd"
    ]
   },
@@ -1706,14 +1706,14 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v08/league/league_selftest.gd",
-    "scripts/v09/core/ults.gd",
+    "core/v08/league/league_selftest.gd",
+    "core/v09/core/ults.gd",
     "scripts/v09/core/ults_selftest.gd",
     "scripts/v10/duels/challenge/challenge_poster.gd",
     "scripts/v10/profile/card_editor.gd",
     "scripts/v10/profile/card_view.gd",
     "scripts/v10/shop/kit.gd",
-    "scripts/v10/wave1/w1_core.gd",
+    "core/wave1/w1_core.gd",
     "scripts/v10/wave1/w1_ults.gd"
    ]
   },
@@ -1728,15 +1728,15 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v08/league/league_selftest.gd",
-    "scripts/v09/core/ults.gd",
+    "core/v08/league/league_selftest.gd",
+    "core/v09/core/ults.gd",
     "scripts/v09/core/ults_selftest.gd",
     "scripts/v10/duels/challenge/challenge_poster.gd",
     "scripts/v10/profile/card_editor.gd",
     "scripts/v10/profile/card_view.gd",
     "scripts/v10/shop/kit.gd",
     "scripts/v10/shop/shop2_screen.gd",
-    "scripts/v10/wave1/w1_core.gd",
+    "core/wave1/w1_core.gd",
     "scripts/v10/wave1/w1_ults.gd"
    ]
   },
@@ -1751,15 +1751,15 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v08/league/league_selftest.gd",
-    "scripts/v09/core/ults.gd",
+    "core/v08/league/league_selftest.gd",
+    "core/v09/core/ults.gd",
     "scripts/v09/core/ults_selftest.gd",
     "scripts/v10/duels/challenge/challenge_poster.gd",
     "scripts/v10/hud2/hud_match.gd",
     "scripts/v10/profile/card_editor.gd",
     "scripts/v10/profile/card_view.gd",
     "scripts/v10/shop/kit.gd",
-    "scripts/v10/wave1/w1_core.gd",
+    "core/wave1/w1_core.gd",
     "scripts/v10/wave1/w1_ults.gd"
    ]
   },
@@ -1774,14 +1774,14 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v08/league/league_selftest.gd",
-    "scripts/v09/core/ults.gd",
+    "core/v08/league/league_selftest.gd",
+    "core/v09/core/ults.gd",
     "scripts/v09/core/ults_selftest.gd",
     "scripts/v10/duels/challenge/challenge_poster.gd",
     "scripts/v10/profile/card_editor.gd",
     "scripts/v10/profile/card_view.gd",
     "scripts/v10/shop/kit.gd",
-    "scripts/v10/wave1/w1_core.gd",
+    "core/wave1/w1_core.gd",
     "scripts/v10/wave1/w1_ults.gd"
    ]
   },
@@ -1796,8 +1796,8 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v08/league/league_selftest.gd",
-    "scripts/v09/core/ults.gd",
+    "core/v08/league/league_selftest.gd",
+    "core/v09/core/ults.gd",
     "scripts/v09/core/ults_selftest.gd",
     "scripts/v10/core/tables_hub.gd",
     "scripts/v10/duels/challenge/challenge_poster.gd",
@@ -1806,7 +1806,7 @@
     "scripts/v10/profile/card_view.gd",
     "scripts/v10/shop/kit.gd",
     "scripts/v10/shop/shop2_screen.gd",
-    "scripts/v10/wave1/w1_core.gd",
+    "core/wave1/w1_core.gd",
     "scripts/v10/wave1/w1_ults.gd"
    ]
   },
@@ -4398,7 +4398,7 @@
    "status": "approved",
    "referenced_by": [
     "scripts/v07/event/event.gd",
-    "scripts/v09/core/ults.gd"
+    "core/v09/core/ults.gd"
    ]
   },
   {
@@ -4427,7 +4427,7 @@
    "status": "approved",
    "referenced_by": [
     "scripts/v07/event/event.gd",
-    "scripts/v09/core/ults.gd"
+    "core/v09/core/ults.gd"
    ]
   },
   {
@@ -4456,7 +4456,7 @@
    "status": "approved",
    "referenced_by": [
     "scripts/v07/event/event.gd",
-    "scripts/v09/core/ults.gd"
+    "core/v09/core/ults.gd"
    ]
   },
   {
@@ -4485,7 +4485,7 @@
    "status": "approved",
    "referenced_by": [
     "scripts/v07/event/event.gd",
-    "scripts/v09/core/ults.gd"
+    "core/v09/core/ults.gd"
    ]
   },
   {
@@ -4514,7 +4514,7 @@
    "status": "approved",
    "referenced_by": [
     "scripts/v07/event/event.gd",
-    "scripts/v09/core/ults.gd"
+    "core/v09/core/ults.gd"
    ]
   },
   {
@@ -4613,7 +4613,7 @@
    "status": "approved",
    "referenced_by": [
     "scripts/v07/room/room.gd",
-    "scripts/v07/room/room_data.gd",
+    "core/v07/room/room_data.gd",
     "scripts/v07/room/room_scene.gd"
    ]
   },
@@ -4629,7 +4629,7 @@
    "status": "approved",
    "referenced_by": [
     "scripts/v07/room/room.gd",
-    "scripts/v07/room/room_data.gd",
+    "core/v07/room/room_data.gd",
     "scripts/v07/room/room_scene.gd"
    ]
   },
@@ -4645,7 +4645,7 @@
    "status": "approved",
    "referenced_by": [
     "scripts/v07/room/room.gd",
-    "scripts/v07/room/room_data.gd",
+    "core/v07/room/room_data.gd",
     "scripts/v07/room/room_scene.gd"
    ]
   },
@@ -4754,8 +4754,8 @@
     "scripts/v10/mj/classic/classic_presence.gd",
     "scripts/v10/mj/cube/cube_presence.gd",
     "scripts/v10/tutorial/coach.gd",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_mj.gd"
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_mj.gd"
    ]
   },
   {
@@ -4772,8 +4772,8 @@
     "scripts/v10/mj/bridge/bridge_presence.gd",
     "scripts/v10/mj/classic/classic_presence.gd",
     "scripts/v10/mj/cube/cube_presence.gd",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_mj.gd"
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_mj.gd"
    ]
   },
   {
@@ -4790,8 +4790,8 @@
     "scripts/v10/mj/bridge/bridge_presence.gd",
     "scripts/v10/mj/classic/classic_presence.gd",
     "scripts/v10/mj/cube/cube_presence.gd",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_mj.gd"
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_mj.gd"
    ]
   },
   {
@@ -4808,8 +4808,8 @@
     "scripts/v10/mj/bridge/bridge_presence.gd",
     "scripts/v10/mj/classic/classic_presence.gd",
     "scripts/v10/mj/cube/cube_presence.gd",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_mj.gd"
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_mj.gd"
    ]
   },
   {
@@ -4826,8 +4826,8 @@
     "scripts/v10/mj/bridge/bridge_presence.gd",
     "scripts/v10/mj/classic/classic_presence.gd",
     "scripts/v10/mj/cube/cube_presence.gd",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_mj.gd"
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_mj.gd"
    ]
   },
   {
@@ -4845,8 +4845,8 @@
     "scripts/v10/mj/classic/classic_presence.gd",
     "scripts/v10/mj/cube/cube_presence.gd",
     "scripts/v10/tutorial/coach.gd",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_mj.gd"
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_mj.gd"
    ]
   },
   {
@@ -4863,8 +4863,8 @@
     "scripts/v10/mj/bridge/bridge_presence.gd",
     "scripts/v10/mj/classic/classic_presence.gd",
     "scripts/v10/mj/cube/cube_presence.gd",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_mj.gd"
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_mj.gd"
    ]
   },
   {
@@ -4881,8 +4881,8 @@
     "scripts/v10/mj/bridge/bridge_presence.gd",
     "scripts/v10/mj/classic/classic_presence.gd",
     "scripts/v10/mj/cube/cube_presence.gd",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_mj.gd"
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_mj.gd"
    ]
   },
   {
@@ -4899,8 +4899,8 @@
     "scripts/v10/mj/bridge/bridge_presence.gd",
     "scripts/v10/mj/classic/classic_presence.gd",
     "scripts/v10/mj/cube/cube_presence.gd",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_mj.gd"
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_mj.gd"
    ]
   },
   {
@@ -4917,8 +4917,8 @@
     "scripts/v10/mj/bridge/bridge_presence.gd",
     "scripts/v10/mj/classic/classic_presence.gd",
     "scripts/v10/mj/cube/cube_presence.gd",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_mj.gd"
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_mj.gd"
    ]
   },
   {
@@ -4936,8 +4936,8 @@
     "scripts/v10/mj/classic/classic_presence.gd",
     "scripts/v10/mj/cube/cube_presence.gd",
     "scripts/v10/tutorial/coach.gd",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_mj.gd"
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_mj.gd"
    ]
   },
   {
@@ -4954,8 +4954,8 @@
     "scripts/v10/mj/bridge/bridge_presence.gd",
     "scripts/v10/mj/classic/classic_presence.gd",
     "scripts/v10/mj/cube/cube_presence.gd",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_mj.gd"
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_mj.gd"
    ]
   },
   {
@@ -4972,8 +4972,8 @@
     "scripts/v10/mj/bridge/bridge_presence.gd",
     "scripts/v10/mj/classic/classic_presence.gd",
     "scripts/v10/mj/cube/cube_presence.gd",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_mj.gd"
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_mj.gd"
    ]
   },
   {
@@ -4990,8 +4990,8 @@
     "scripts/v10/mj/bridge/bridge_presence.gd",
     "scripts/v10/mj/classic/classic_presence.gd",
     "scripts/v10/mj/cube/cube_presence.gd",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_mj.gd"
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_mj.gd"
    ]
   },
   {
@@ -5008,8 +5008,8 @@
     "scripts/v10/mj/bridge/bridge_presence.gd",
     "scripts/v10/mj/classic/classic_presence.gd",
     "scripts/v10/mj/cube/cube_presence.gd",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_mj.gd"
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_mj.gd"
    ]
   },
   {
@@ -5027,8 +5027,8 @@
     "scripts/v10/mj/classic/classic_presence.gd",
     "scripts/v10/mj/cube/cube_presence.gd",
     "scripts/v10/tutorial/coach.gd",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_mj.gd"
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_mj.gd"
    ]
   },
   {
@@ -5045,8 +5045,8 @@
     "scripts/v10/mj/bridge/bridge_presence.gd",
     "scripts/v10/mj/classic/classic_presence.gd",
     "scripts/v10/mj/cube/cube_presence.gd",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_mj.gd"
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_mj.gd"
    ]
   },
   {
@@ -5063,8 +5063,8 @@
     "scripts/v10/mj/bridge/bridge_presence.gd",
     "scripts/v10/mj/classic/classic_presence.gd",
     "scripts/v10/mj/cube/cube_presence.gd",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_mj.gd"
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_mj.gd"
    ]
   },
   {
@@ -5081,8 +5081,8 @@
     "scripts/v10/mj/bridge/bridge_presence.gd",
     "scripts/v10/mj/classic/classic_presence.gd",
     "scripts/v10/mj/cube/cube_presence.gd",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_mj.gd"
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_mj.gd"
    ]
   },
   {
@@ -5099,8 +5099,8 @@
     "scripts/v10/mj/bridge/bridge_presence.gd",
     "scripts/v10/mj/classic/classic_presence.gd",
     "scripts/v10/mj/cube/cube_presence.gd",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_mj.gd"
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_mj.gd"
    ]
   },
   {
@@ -5118,8 +5118,8 @@
     "scripts/v10/mj/classic/classic_presence.gd",
     "scripts/v10/mj/cube/cube_presence.gd",
     "scripts/v10/tutorial/coach.gd",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_mj.gd"
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_mj.gd"
    ]
   },
   {
@@ -5136,8 +5136,8 @@
     "scripts/v10/mj/bridge/bridge_presence.gd",
     "scripts/v10/mj/classic/classic_presence.gd",
     "scripts/v10/mj/cube/cube_presence.gd",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_mj.gd"
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_mj.gd"
    ]
   },
   {
@@ -5154,8 +5154,8 @@
     "scripts/v10/mj/bridge/bridge_presence.gd",
     "scripts/v10/mj/classic/classic_presence.gd",
     "scripts/v10/mj/cube/cube_presence.gd",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_mj.gd"
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_mj.gd"
    ]
   },
   {
@@ -5172,8 +5172,8 @@
     "scripts/v10/mj/bridge/bridge_presence.gd",
     "scripts/v10/mj/classic/classic_presence.gd",
     "scripts/v10/mj/cube/cube_presence.gd",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_mj.gd"
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_mj.gd"
    ]
   },
   {
@@ -5190,8 +5190,8 @@
     "scripts/v10/mj/bridge/bridge_presence.gd",
     "scripts/v10/mj/classic/classic_presence.gd",
     "scripts/v10/mj/cube/cube_presence.gd",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_mj.gd"
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_mj.gd"
    ]
   },
   {
@@ -5205,7 +5205,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/mj/bridge/bridge_tiles.gd",
+    "core/modes/bridge/bridge_tiles.gd",
     "scripts/v10/mj/riichi/tile_view.gd",
     "scripts/v10/mj/sanma/sanma_screen.gd"
    ]
@@ -5765,7 +5765,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/profile/cosmetics.gd"
+    "core/profile/cosmetics.gd"
    ]
   },
   {
@@ -5780,7 +5780,7 @@
    "status": "approved",
    "referenced_by": [
     "scripts/v10/core/tables_hub.gd",
-    "scripts/v10/profile/cosmetics.gd"
+    "core/profile/cosmetics.gd"
    ]
   },
   {
@@ -6671,7 +6671,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v09/summon/summon_rules.gd",
+    "core/v09/summon/summon_rules.gd",
     "scripts/v10/hud2/hud_home.gd",
     "scripts/v10/tower/ui/tower_sheets.gd"
    ]
@@ -6687,7 +6687,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v09/summon/summon_rules.gd"
+    "core/v09/summon/summon_rules.gd"
    ]
   },
   {
@@ -6701,7 +6701,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v09/summon/summon_rules.gd"
+    "core/v09/summon/summon_rules.gd"
    ]
   },
   {
@@ -6746,7 +6746,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/adventure/adventure_data.gd"
+    "core/modes/adventure/adventure_data.gd"
    ]
   },
   {
@@ -6760,7 +6760,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/adventure/adventure_data.gd"
+    "core/modes/adventure/adventure_data.gd"
    ]
   },
   {
@@ -6774,7 +6774,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/adventure/adventure_data.gd"
+    "core/modes/adventure/adventure_data.gd"
    ]
   },
   {
@@ -6788,7 +6788,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/adventure/adventure_data.gd"
+    "core/modes/adventure/adventure_data.gd"
    ]
   },
   {
@@ -6802,7 +6802,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/adventure/adventure_data.gd"
+    "core/modes/adventure/adventure_data.gd"
    ]
   },
   {
@@ -6816,7 +6816,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/adventure/adventure_data.gd",
+    "core/modes/adventure/adventure_data.gd",
     "scripts/v10/core/tables_hub.gd"
    ]
   },
@@ -7392,7 +7392,7 @@
    "status": "approved",
    "referenced_by": [
     "scripts/v10/audio/v10_sfx_bank.gd",
-    "scripts/v10/chat/chat_data.gd"
+    "core/chat/chat_data.gd"
    ]
   },
   {
@@ -7863,8 +7863,8 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/adventure/adventure_data.gd",
-    "scripts/v10/chat/chat_data.gd",
+    "core/modes/adventure/adventure_data.gd",
+    "core/chat/chat_data.gd",
     "scripts/v10/salon/vip_boudoir_screen.gd"
    ]
   },
@@ -7880,7 +7880,7 @@
    "status": "approved",
    "referenced_by": [
     "scripts/main.gd",
-    "scripts/v06/story/story_scenes.gd",
+    "core/v06/story/story_scenes.gd",
     "scripts/v10/salon/vip_boudoir_screen.gd"
    ]
   },
@@ -7895,7 +7895,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v06/story/story_scenes.gd",
+    "core/v06/story/story_scenes.gd",
     "scripts/v10/salon/vip_boudoir_screen.gd"
    ]
   },
@@ -7910,9 +7910,9 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v06/story/story_scenes.gd",
-    "scripts/v10/adventure/adventure_data.gd",
-    "scripts/v10/chat/chat_data.gd",
+    "core/v06/story/story_scenes.gd",
+    "core/modes/adventure/adventure_data.gd",
+    "core/chat/chat_data.gd",
     "scripts/v10/salon/vip_boudoir_screen.gd",
     "scripts/v10/ult/ult_video.gd"
    ]
@@ -7940,8 +7940,8 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/adventure/adventure_data.gd",
-    "scripts/v10/chat/chat_data.gd",
+    "core/modes/adventure/adventure_data.gd",
+    "core/chat/chat_data.gd",
     "scripts/v10/salon/vip_boudoir_screen.gd"
    ]
   },
@@ -7968,9 +7968,9 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v06/story/story_scenes.gd",
-    "scripts/v10/adventure/adventure_data.gd",
-    "scripts/v10/chat/chat_data.gd",
+    "core/v06/story/story_scenes.gd",
+    "core/modes/adventure/adventure_data.gd",
+    "core/chat/chat_data.gd",
     "scripts/v10/salon/vip_boudoir_screen.gd"
    ]
   },
@@ -7985,8 +7985,8 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/adventure/adventure_data.gd",
-    "scripts/v10/chat/chat_data.gd",
+    "core/modes/adventure/adventure_data.gd",
+    "core/chat/chat_data.gd",
     "scripts/v10/salon/vip_boudoir_screen.gd"
    ]
   },
@@ -8501,7 +8501,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/gacha/data/banners.json"
+    "core/gacha/data/banners.json"
    ]
   },
   {
@@ -8515,7 +8515,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/gacha/data/banners.json"
+    "core/gacha/data/banners.json"
    ]
   },
   {
@@ -9453,7 +9453,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/look/hud_skin_data.gd"
+    "core/look/hud_skin_data.gd"
    ]
   },
   {
@@ -9467,7 +9467,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/look/hud_skin_data.gd"
+    "core/look/hud_skin_data.gd"
    ]
   },
   {
@@ -9481,7 +9481,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/look/hud_skin_data.gd"
+    "core/look/hud_skin_data.gd"
    ]
   },
   {
@@ -9495,7 +9495,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/look/hud_skin_data.gd"
+    "core/look/hud_skin_data.gd"
    ]
   },
   {
@@ -9509,7 +9509,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/look/hud_skin_data.gd"
+    "core/look/hud_skin_data.gd"
    ]
   },
   {
@@ -9538,7 +9538,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/look/hud_skin_data.gd"
+    "core/look/hud_skin_data.gd"
    ]
   },
   {
@@ -9552,7 +9552,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/look/hud_skin_data.gd",
+    "core/look/hud_skin_data.gd",
     "scripts/v10/look/look_runner.gd"
    ]
   },
@@ -9567,7 +9567,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/look/hud_skin_data.gd"
+    "core/look/hud_skin_data.gd"
    ]
   },
   {
@@ -9581,8 +9581,8 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/look/hud_skin_data.gd",
-    "scripts/v10/wave1/w1_home.gd",
+    "core/look/hud_skin_data.gd",
+    "core/wave1/w1_home.gd",
     "scripts/v10/wave1/wave1_selftest.gd"
    ]
   },
@@ -9597,7 +9597,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/look/hud_skin_data.gd"
+    "core/look/hud_skin_data.gd"
    ]
   },
   {
@@ -9611,7 +9611,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/look/hud_skin_data.gd"
+    "core/look/hud_skin_data.gd"
    ]
   },
   {
@@ -9625,7 +9625,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/look/hud_skin_data.gd"
+    "core/look/hud_skin_data.gd"
    ]
   },
   {
@@ -9639,7 +9639,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/look/hud_skin_data.gd"
+    "core/look/hud_skin_data.gd"
    ]
   },
   {
@@ -9667,7 +9667,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/look/hud_skin_data.gd"
+    "core/look/hud_skin_data.gd"
    ]
   },
   {
@@ -9751,7 +9751,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/mj/classic/classic_info.gd"
+    "core/modes/classic/classic_info.gd"
    ]
   },
   {
@@ -9765,7 +9765,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/mj/koikoi/koikoi_info.gd"
+    "core/modes/koikoi/koikoi_info.gd"
    ]
   },
   {
@@ -9779,7 +9779,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/mj/koikoi/deck_skins.gd"
+    "core/modes/koikoi/deck_skins.gd"
    ]
   },
   {
@@ -10429,7 +10429,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/mj/koikoi/koikoi_lines.gd"
+    "core/modes/koikoi/koikoi_lines.gd"
    ]
   },
   {
@@ -10443,7 +10443,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/mj/koikoi/koikoi_lines.gd"
+    "core/modes/koikoi/koikoi_lines.gd"
    ]
   },
   {
@@ -10457,7 +10457,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/mj/koikoi/koikoi_lines.gd"
+    "core/modes/koikoi/koikoi_lines.gd"
    ]
   },
   {
@@ -10471,7 +10471,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/mj/koikoi/koikoi_lines.gd"
+    "core/modes/koikoi/koikoi_lines.gd"
    ]
   },
   {
@@ -10485,7 +10485,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/mj/koikoi/koikoi_lines.gd"
+    "core/modes/koikoi/koikoi_lines.gd"
    ]
   },
   {
@@ -10499,7 +10499,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/mj/koikoi/koikoi_lines.gd"
+    "core/modes/koikoi/koikoi_lines.gd"
    ]
   },
   {
@@ -10513,7 +10513,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/mj/koikoi/koikoi_lines.gd"
+    "core/modes/koikoi/koikoi_lines.gd"
    ]
   },
   {
@@ -10527,7 +10527,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/mj/koikoi/koikoi_lines.gd"
+    "core/modes/koikoi/koikoi_lines.gd"
    ]
   },
   {
@@ -10541,7 +10541,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/mj/koikoi/koikoi_lines.gd"
+    "core/modes/koikoi/koikoi_lines.gd"
    ]
   },
   {
@@ -10555,7 +10555,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/mj/koikoi/koikoi_lines.gd"
+    "core/modes/koikoi/koikoi_lines.gd"
    ]
   },
   {
@@ -10569,7 +10569,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/mj/koikoi/koikoi_lines.gd"
+    "core/modes/koikoi/koikoi_lines.gd"
    ]
   },
   {
@@ -10583,7 +10583,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/mj/koikoi/koikoi_lines.gd"
+    "core/modes/koikoi/koikoi_lines.gd"
    ]
   },
   {
@@ -10597,7 +10597,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/mj/koikoi/koikoi_lines.gd"
+    "core/modes/koikoi/koikoi_lines.gd"
    ]
   },
   {
@@ -10611,7 +10611,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/mj/koikoi/koikoi_lines.gd"
+    "core/modes/koikoi/koikoi_lines.gd"
    ]
   },
   {
@@ -10625,7 +10625,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/mj/koikoi/koikoi_lines.gd"
+    "core/modes/koikoi/koikoi_lines.gd"
    ]
   },
   {
@@ -12681,7 +12681,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/mj/sanma/sanma_info.gd",
+    "core/modes/sanma/sanma_info.gd",
     "scripts/v10/mj/sanma/sanma_screen.gd"
    ]
   },
@@ -12710,7 +12710,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/mj/sanma/sanma_info.gd",
+    "core/modes/sanma/sanma_info.gd",
     "scripts/v10/mj/sanma/sanma_screen.gd"
    ]
   },
@@ -12725,7 +12725,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/mj/sanma/sanma_text.gd"
+    "core/modes/sanma/sanma_text.gd"
    ]
   },
   {
@@ -12739,7 +12739,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/mj/sanma/sanma_text.gd"
+    "core/modes/sanma/sanma_text.gd"
    ]
   },
   {
@@ -12753,7 +12753,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/mj/sanma/sanma_text.gd"
+    "core/modes/sanma/sanma_text.gd"
    ]
   },
   {
@@ -12767,7 +12767,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/mj/sanma/sanma_text.gd"
+    "core/modes/sanma/sanma_text.gd"
    ]
   },
   {
@@ -12781,7 +12781,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/mj/sanma/sanma_text.gd"
+    "core/modes/sanma/sanma_text.gd"
    ]
   },
   {
@@ -12795,7 +12795,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/mj/sanma/sanma_text.gd"
+    "core/modes/sanma/sanma_text.gd"
    ]
   },
   {
@@ -12809,7 +12809,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/mj/sanma/sanma_text.gd"
+    "core/modes/sanma/sanma_text.gd"
    ]
   },
   {
@@ -18129,7 +18129,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/rituals/bday.gd"
+    "core/rituals/bday.gd"
    ]
   },
   {
@@ -18143,8 +18143,8 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/rituals/bday.gd",
-    "scripts/v10/rituals/rit_bridge.gd"
+    "core/rituals/bday.gd",
+    "core/rituals/rit_bridge.gd"
    ]
   },
   {
@@ -18158,8 +18158,8 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/rituals/bday.gd",
-    "scripts/v10/wave1/w1_social.gd"
+    "core/rituals/bday.gd",
+    "core/wave1/w1_social.gd"
    ]
   },
   {
@@ -18173,8 +18173,8 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/rituals/bday.gd",
-    "scripts/v10/wave1/w1_social.gd"
+    "core/rituals/bday.gd",
+    "core/wave1/w1_social.gd"
    ]
   },
   {
@@ -18188,7 +18188,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/rituals/bday.gd"
+    "core/rituals/bday.gd"
    ]
   },
   {
@@ -18214,9 +18214,9 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/rituals/bday.gd",
-    "scripts/v10/rituals/rit_bridge.gd",
-    "scripts/v10/rituals/tray.gd"
+    "core/rituals/bday.gd",
+    "core/rituals/rit_bridge.gd",
+    "core/rituals/tray.gd"
    ]
   },
   {
@@ -18328,8 +18328,8 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/rituals/bday.gd",
-    "scripts/v10/rituals/bday_data.gd"
+    "core/rituals/bday.gd",
+    "core/rituals/bday_data.gd"
    ]
   },
   {
@@ -18343,8 +18343,8 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/rituals/bday.gd",
-    "scripts/v10/rituals/bday_data.gd"
+    "core/rituals/bday.gd",
+    "core/rituals/bday_data.gd"
    ]
   },
   {
@@ -18358,8 +18358,8 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/rituals/bday.gd",
-    "scripts/v10/rituals/bday_data.gd"
+    "core/rituals/bday.gd",
+    "core/rituals/bday_data.gd"
    ]
   },
   {
@@ -18373,8 +18373,8 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/rituals/bday.gd",
-    "scripts/v10/rituals/bday_data.gd"
+    "core/rituals/bday.gd",
+    "core/rituals/bday_data.gd"
    ]
   },
   {
@@ -18388,8 +18388,8 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/rituals/bday.gd",
-    "scripts/v10/rituals/bday_data.gd"
+    "core/rituals/bday.gd",
+    "core/rituals/bday_data.gd"
    ]
   },
   {
@@ -18403,7 +18403,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/rituals/bday.gd"
+    "core/rituals/bday.gd"
    ]
   },
   {
@@ -18524,7 +18524,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/salon/salon_data.gd"
+    "core/salon/salon_data.gd"
    ]
   },
   {
@@ -18562,7 +18562,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/salon/salon_data.gd"
+    "core/salon/salon_data.gd"
    ]
   },
   {
@@ -18576,7 +18576,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/salon/salon_data.gd"
+    "core/salon/salon_data.gd"
    ]
   },
   {
@@ -18626,7 +18626,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/salon/salon_data.gd"
+    "core/salon/salon_data.gd"
    ]
   },
   {
@@ -18946,7 +18946,7 @@
    "status": "approved",
    "referenced_by": [
     "scripts/v10/clarity/clarity_icon.gd",
-    "scripts/v10/core/registry_list.gd"
+    "core/base/registry_list.gd"
    ]
   },
   {
@@ -19481,8 +19481,8 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/adventure/adventure_data.gd",
-    "scripts/v10/chat/chat_data.gd"
+    "core/modes/adventure/adventure_data.gd",
+    "core/chat/chat_data.gd"
    ]
   },
   {
@@ -19496,7 +19496,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/adventure/adventure_data.gd",
+    "core/modes/adventure/adventure_data.gd",
     "scripts/v10/ult/ult_video.gd"
    ]
   },
@@ -19511,8 +19511,8 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/adventure/adventure_data.gd",
-    "scripts/v10/chat/chat_data.gd",
+    "core/modes/adventure/adventure_data.gd",
+    "core/chat/chat_data.gd",
     "scripts/v10/ult/ult_video.gd"
    ]
   },
@@ -19539,7 +19539,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/adventure/adventure_data.gd",
+    "core/modes/adventure/adventure_data.gd",
     "scripts/v10/ult/ult_video.gd"
    ]
   },
@@ -19554,8 +19554,8 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/adventure/adventure_data.gd",
-    "scripts/v10/chat/chat_data.gd"
+    "core/modes/adventure/adventure_data.gd",
+    "core/chat/chat_data.gd"
    ]
   },
   {
@@ -19595,8 +19595,8 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/adventure/adventure_data.gd",
-    "scripts/v10/chat/chat_data.gd"
+    "core/modes/adventure/adventure_data.gd",
+    "core/chat/chat_data.gd"
    ]
   },
   {
@@ -19610,7 +19610,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/adventure/adventure_data.gd",
+    "core/modes/adventure/adventure_data.gd",
     "scripts/v10/ult/ult_video.gd"
    ]
   },
@@ -19625,7 +19625,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/adventure/adventure_data.gd",
+    "core/modes/adventure/adventure_data.gd",
     "scripts/v10/ult/ult_video.gd"
    ]
   },
@@ -19640,8 +19640,8 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/adventure/adventure_data.gd",
-    "scripts/v10/chat/chat_data.gd"
+    "core/modes/adventure/adventure_data.gd",
+    "core/chat/chat_data.gd"
    ]
   },
   {
@@ -19669,7 +19669,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/adventure/adventure_data.gd",
+    "core/modes/adventure/adventure_data.gd",
     "scripts/v10/ult/ult_video.gd"
    ]
   },
@@ -19684,7 +19684,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/chat/chat_data.gd",
+    "core/chat/chat_data.gd",
     "scripts/v10/voice/v10_voice.gd"
    ]
   },
@@ -19783,7 +19783,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/chat/chat_data.gd",
+    "core/chat/chat_data.gd",
     "scripts/v10/voice/v10_voice.gd"
    ]
   },
@@ -20036,7 +20036,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/chat/chat_data.gd",
+    "core/chat/chat_data.gd",
     "scripts/v10/voice/v10_voice.gd"
    ]
   },
@@ -20135,7 +20135,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/chat/chat_data.gd",
+    "core/chat/chat_data.gd",
     "scripts/v10/voice/v10_voice.gd"
    ]
   },
@@ -20374,7 +20374,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/chat/chat_data.gd",
+    "core/chat/chat_data.gd",
     "scripts/v10/voice/v10_voice.gd"
    ]
   },
@@ -20473,7 +20473,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/chat/chat_data.gd",
+    "core/chat/chat_data.gd",
     "scripts/v10/voice/v10_voice.gd"
    ]
   },
@@ -20712,7 +20712,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/chat/chat_data.gd",
+    "core/chat/chat_data.gd",
     "scripts/v10/voice/v10_voice.gd"
    ]
   },
@@ -20811,7 +20811,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/chat/chat_data.gd",
+    "core/chat/chat_data.gd",
     "scripts/v10/voice/v10_voice.gd"
    ]
   },
@@ -21050,7 +21050,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/chat/chat_data.gd",
+    "core/chat/chat_data.gd",
     "scripts/v10/voice/v10_voice.gd"
    ]
   },
@@ -21149,7 +21149,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/chat/chat_data.gd",
+    "core/chat/chat_data.gd",
     "scripts/v10/voice/v10_voice.gd"
    ]
   },
@@ -21736,7 +21736,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/wave1/w1_audio.gd"
+    "core/wave1/w1_audio.gd"
    ]
   },
   {
@@ -21765,7 +21765,7 @@
     "scripts/screens/collection.gd",
     "scripts/v10/online/pvp_online_screen.gd",
     "scripts/v10/salon/vip_boudoir_screen.gd",
-    "scripts/v10/wave1/data/w1_art_cards.json"
+    "core/wave1/data/w1_art_cards.json"
    ]
   },
   {
@@ -21780,7 +21780,7 @@
    "status": "approved",
    "referenced_by": [
     "scripts/v10/online/pvp_online_screen.gd",
-    "scripts/v10/wave1/data/w1_art_cards.json"
+    "core/wave1/data/w1_art_cards.json"
    ]
   },
   {
@@ -21795,7 +21795,7 @@
    "status": "approved",
    "referenced_by": [
     "scripts/v10/online/pvp_online_screen.gd",
-    "scripts/v10/wave1/data/w1_art_cards.json"
+    "core/wave1/data/w1_art_cards.json"
    ]
   },
   {
@@ -21810,7 +21810,7 @@
    "status": "approved",
    "referenced_by": [
     "scripts/v10/online/pvp_online_screen.gd",
-    "scripts/v10/wave1/data/w1_art_cards.json"
+    "core/wave1/data/w1_art_cards.json"
    ]
   },
   {
@@ -21825,7 +21825,7 @@
    "status": "approved",
    "referenced_by": [
     "scripts/v10/online/pvp_online_screen.gd",
-    "scripts/v10/wave1/data/w1_art_cards.json"
+    "core/wave1/data/w1_art_cards.json"
    ]
   },
   {
@@ -21842,7 +21842,7 @@
     "scripts/screens/collection.gd",
     "scripts/v10/online/pvp_online_screen.gd",
     "scripts/v10/salon/vip_boudoir_screen.gd",
-    "scripts/v10/wave1/data/w1_art_cards.json"
+    "core/wave1/data/w1_art_cards.json"
    ]
   },
   {
@@ -21857,7 +21857,7 @@
    "status": "approved",
    "referenced_by": [
     "scripts/v10/online/pvp_online_screen.gd",
-    "scripts/v10/wave1/data/w1_art_cards.json"
+    "core/wave1/data/w1_art_cards.json"
    ]
   },
   {
@@ -21872,7 +21872,7 @@
    "status": "approved",
    "referenced_by": [
     "scripts/v10/online/pvp_online_screen.gd",
-    "scripts/v10/wave1/data/w1_art_cards.json"
+    "core/wave1/data/w1_art_cards.json"
    ]
   },
   {
@@ -21887,7 +21887,7 @@
    "status": "approved",
    "referenced_by": [
     "scripts/v10/online/pvp_online_screen.gd",
-    "scripts/v10/wave1/data/w1_art_cards.json"
+    "core/wave1/data/w1_art_cards.json"
    ]
   },
   {
@@ -21902,7 +21902,7 @@
    "status": "approved",
    "referenced_by": [
     "scripts/v10/online/pvp_online_screen.gd",
-    "scripts/v10/wave1/data/w1_art_cards.json"
+    "core/wave1/data/w1_art_cards.json"
    ]
   },
   {
@@ -21919,7 +21919,7 @@
     "scripts/screens/collection.gd",
     "scripts/v10/online/pvp_online_screen.gd",
     "scripts/v10/salon/vip_boudoir_screen.gd",
-    "scripts/v10/wave1/data/w1_art_cards.json"
+    "core/wave1/data/w1_art_cards.json"
    ]
   },
   {
@@ -21934,7 +21934,7 @@
    "status": "approved",
    "referenced_by": [
     "scripts/v10/online/pvp_online_screen.gd",
-    "scripts/v10/wave1/data/w1_art_cards.json"
+    "core/wave1/data/w1_art_cards.json"
    ]
   },
   {
@@ -21949,7 +21949,7 @@
    "status": "approved",
    "referenced_by": [
     "scripts/v10/online/pvp_online_screen.gd",
-    "scripts/v10/wave1/data/w1_art_cards.json"
+    "core/wave1/data/w1_art_cards.json"
    ]
   },
   {
@@ -21964,7 +21964,7 @@
    "status": "approved",
    "referenced_by": [
     "scripts/v10/online/pvp_online_screen.gd",
-    "scripts/v10/wave1/data/w1_art_cards.json"
+    "core/wave1/data/w1_art_cards.json"
    ]
   },
   {
@@ -21979,7 +21979,7 @@
    "status": "approved",
    "referenced_by": [
     "scripts/v10/online/pvp_online_screen.gd",
-    "scripts/v10/wave1/data/w1_art_cards.json"
+    "core/wave1/data/w1_art_cards.json"
    ]
   },
   {
@@ -21996,7 +21996,7 @@
     "scripts/screens/collection.gd",
     "scripts/v10/online/pvp_online_screen.gd",
     "scripts/v10/salon/vip_boudoir_screen.gd",
-    "scripts/v10/wave1/data/w1_art_cards.json"
+    "core/wave1/data/w1_art_cards.json"
    ]
   },
   {
@@ -22011,7 +22011,7 @@
    "status": "approved",
    "referenced_by": [
     "scripts/v10/online/pvp_online_screen.gd",
-    "scripts/v10/wave1/data/w1_art_cards.json"
+    "core/wave1/data/w1_art_cards.json"
    ]
   },
   {
@@ -22026,7 +22026,7 @@
    "status": "approved",
    "referenced_by": [
     "scripts/v10/online/pvp_online_screen.gd",
-    "scripts/v10/wave1/data/w1_art_cards.json"
+    "core/wave1/data/w1_art_cards.json"
    ]
   },
   {
@@ -22041,7 +22041,7 @@
    "status": "approved",
    "referenced_by": [
     "scripts/v10/online/pvp_online_screen.gd",
-    "scripts/v10/wave1/data/w1_art_cards.json"
+    "core/wave1/data/w1_art_cards.json"
    ]
   },
   {
@@ -22056,7 +22056,7 @@
    "status": "approved",
    "referenced_by": [
     "scripts/v10/online/pvp_online_screen.gd",
-    "scripts/v10/wave1/data/w1_art_cards.json"
+    "core/wave1/data/w1_art_cards.json"
    ]
   },
   {
@@ -22073,7 +22073,7 @@
     "scripts/screens/collection.gd",
     "scripts/v10/online/pvp_online_screen.gd",
     "scripts/v10/salon/vip_boudoir_screen.gd",
-    "scripts/v10/wave1/data/w1_art_cards.json"
+    "core/wave1/data/w1_art_cards.json"
    ]
   },
   {
@@ -22088,7 +22088,7 @@
    "status": "approved",
    "referenced_by": [
     "scripts/v10/online/pvp_online_screen.gd",
-    "scripts/v10/wave1/data/w1_art_cards.json"
+    "core/wave1/data/w1_art_cards.json"
    ]
   },
   {
@@ -22103,7 +22103,7 @@
    "status": "approved",
    "referenced_by": [
     "scripts/v10/online/pvp_online_screen.gd",
-    "scripts/v10/wave1/data/w1_art_cards.json"
+    "core/wave1/data/w1_art_cards.json"
    ]
   },
   {
@@ -22118,7 +22118,7 @@
    "status": "approved",
    "referenced_by": [
     "scripts/v10/online/pvp_online_screen.gd",
-    "scripts/v10/wave1/data/w1_art_cards.json"
+    "core/wave1/data/w1_art_cards.json"
    ]
   },
   {
@@ -22133,7 +22133,7 @@
    "status": "approved",
    "referenced_by": [
     "scripts/v10/online/pvp_online_screen.gd",
-    "scripts/v10/wave1/data/w1_art_cards.json"
+    "core/wave1/data/w1_art_cards.json"
    ]
   },
   {
@@ -22147,7 +22147,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/wave1/data/w1_banners.json"
+    "core/wave1/data/w1_banners.json"
    ]
   },
   {
@@ -22161,11 +22161,11 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/wave1/data/w1_art_rig.json",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_look.gd",
-    "scripts/v10/wave1/w1_mj.gd",
-    "scripts/v10/wave1/w1_social.gd"
+    "core/wave1/data/w1_art_rig.json",
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_look.gd",
+    "core/wave1/w1_mj.gd",
+    "core/wave1/w1_social.gd"
    ]
   },
   {
@@ -22179,11 +22179,11 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/wave1/data/w1_art_rig.json",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_look.gd",
-    "scripts/v10/wave1/w1_mj.gd",
-    "scripts/v10/wave1/w1_social.gd"
+    "core/wave1/data/w1_art_rig.json",
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_look.gd",
+    "core/wave1/w1_mj.gd",
+    "core/wave1/w1_social.gd"
    ]
   },
   {
@@ -22197,11 +22197,11 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/wave1/data/w1_art_rig.json",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_look.gd",
-    "scripts/v10/wave1/w1_mj.gd",
-    "scripts/v10/wave1/w1_social.gd"
+    "core/wave1/data/w1_art_rig.json",
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_look.gd",
+    "core/wave1/w1_mj.gd",
+    "core/wave1/w1_social.gd"
    ]
   },
   {
@@ -22215,11 +22215,11 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/wave1/data/w1_art_rig.json",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_look.gd",
-    "scripts/v10/wave1/w1_mj.gd",
-    "scripts/v10/wave1/w1_social.gd"
+    "core/wave1/data/w1_art_rig.json",
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_look.gd",
+    "core/wave1/w1_mj.gd",
+    "core/wave1/w1_social.gd"
    ]
   },
   {
@@ -22233,11 +22233,11 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/wave1/data/w1_art_rig.json",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_look.gd",
-    "scripts/v10/wave1/w1_mj.gd",
-    "scripts/v10/wave1/w1_social.gd"
+    "core/wave1/data/w1_art_rig.json",
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_look.gd",
+    "core/wave1/w1_mj.gd",
+    "core/wave1/w1_social.gd"
    ]
   },
   {
@@ -22251,7 +22251,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/wave1/w1_look.gd"
+    "core/wave1/w1_look.gd"
    ]
   },
   {
@@ -22265,7 +22265,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/wave1/w1_look.gd"
+    "core/wave1/w1_look.gd"
    ]
   },
   {
@@ -22279,7 +22279,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/wave1/w1_look.gd"
+    "core/wave1/w1_look.gd"
    ]
   },
   {
@@ -22293,7 +22293,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/wave1/w1_look.gd"
+    "core/wave1/w1_look.gd"
    ]
   },
   {
@@ -22308,9 +22308,9 @@
    "status": "approved",
    "referenced_by": [
     "scripts/v10/salon/vip_boudoir_screen.gd",
-    "scripts/v10/wave1/data/w1_art_cards.json",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_play.gd",
+    "core/wave1/data/w1_art_cards.json",
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_play.gd",
     "scripts/v10/wave1/w1_ults.gd"
    ]
   },
@@ -22325,8 +22325,8 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/wave1/data/w1_art_cards.json",
-    "scripts/v10/wave1/w1_core.gd",
+    "core/wave1/data/w1_art_cards.json",
+    "core/wave1/w1_core.gd",
     "scripts/v10/wave1/w1_ults.gd"
    ]
   },
@@ -22341,9 +22341,9 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/wave1/data/w1_art_cards.json",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_play.gd",
+    "core/wave1/data/w1_art_cards.json",
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_play.gd",
     "scripts/v10/wave1/w1_ults.gd"
    ]
   },
@@ -22359,8 +22359,8 @@
    "status": "approved",
    "referenced_by": [
     "scripts/v10/shop/shop2_screen.gd",
-    "scripts/v10/wave1/data/w1_art_cards.json",
-    "scripts/v10/wave1/w1_core.gd",
+    "core/wave1/data/w1_art_cards.json",
+    "core/wave1/w1_core.gd",
     "scripts/v10/wave1/w1_ults.gd"
    ]
   },
@@ -22376,10 +22376,10 @@
    "status": "approved",
    "referenced_by": [
     "scripts/v10/salon/vip_boudoir_screen.gd",
-    "scripts/v10/wave1/data/w1_art_cards.json",
-    "scripts/v10/wave1/data/w1_banners.json",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_play.gd",
+    "core/wave1/data/w1_art_cards.json",
+    "core/wave1/data/w1_banners.json",
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_play.gd",
     "scripts/v10/wave1/w1_ults.gd"
    ]
   },
@@ -22394,8 +22394,8 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/wave1/data/w1_art_cards.json",
-    "scripts/v10/wave1/w1_core.gd",
+    "core/wave1/data/w1_art_cards.json",
+    "core/wave1/w1_core.gd",
     "scripts/v10/wave1/w1_ults.gd"
    ]
   },
@@ -22410,9 +22410,9 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/wave1/data/w1_art_cards.json",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_play.gd",
+    "core/wave1/data/w1_art_cards.json",
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_play.gd",
     "scripts/v10/wave1/w1_ults.gd"
    ]
   },
@@ -22428,9 +22428,9 @@
    "status": "approved",
    "referenced_by": [
     "scripts/v10/salon/vip_boudoir_screen.gd",
-    "scripts/v10/wave1/data/w1_art_cards.json",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_play.gd",
+    "core/wave1/data/w1_art_cards.json",
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_play.gd",
     "scripts/v10/wave1/w1_ults.gd"
    ]
   },
@@ -22446,8 +22446,8 @@
    "status": "approved",
    "referenced_by": [
     "scripts/v10/shop/shop2_screen.gd",
-    "scripts/v10/wave1/data/w1_art_cards.json",
-    "scripts/v10/wave1/w1_core.gd",
+    "core/wave1/data/w1_art_cards.json",
+    "core/wave1/w1_core.gd",
     "scripts/v10/wave1/w1_ults.gd"
    ]
   },
@@ -22462,9 +22462,9 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/wave1/data/w1_art_cards.json",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_play.gd",
+    "core/wave1/data/w1_art_cards.json",
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_play.gd",
     "scripts/v10/wave1/w1_ults.gd"
    ]
   },
@@ -22479,8 +22479,8 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/wave1/data/w1_art_cards.json",
-    "scripts/v10/wave1/w1_core.gd",
+    "core/wave1/data/w1_art_cards.json",
+    "core/wave1/w1_core.gd",
     "scripts/v10/wave1/w1_ults.gd"
    ]
   },
@@ -22496,10 +22496,10 @@
    "status": "approved",
    "referenced_by": [
     "scripts/v10/salon/vip_boudoir_screen.gd",
-    "scripts/v10/wave1/data/w1_art_cards.json",
-    "scripts/v10/wave1/data/w1_banners.json",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_play.gd",
+    "core/wave1/data/w1_art_cards.json",
+    "core/wave1/data/w1_banners.json",
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_play.gd",
     "scripts/v10/wave1/w1_ults.gd"
    ]
   },
@@ -22514,8 +22514,8 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/wave1/data/w1_art_cards.json",
-    "scripts/v10/wave1/w1_core.gd",
+    "core/wave1/data/w1_art_cards.json",
+    "core/wave1/w1_core.gd",
     "scripts/v10/wave1/w1_ults.gd"
    ]
   },
@@ -22530,9 +22530,9 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/wave1/data/w1_art_cards.json",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_play.gd",
+    "core/wave1/data/w1_art_cards.json",
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_play.gd",
     "scripts/v10/wave1/w1_ults.gd"
    ]
   },
@@ -22548,9 +22548,9 @@
    "status": "approved",
    "referenced_by": [
     "scripts/v10/salon/vip_boudoir_screen.gd",
-    "scripts/v10/wave1/data/w1_art_cards.json",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_play.gd",
+    "core/wave1/data/w1_art_cards.json",
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_play.gd",
     "scripts/v10/wave1/w1_ults.gd"
    ]
   },
@@ -22565,8 +22565,8 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/wave1/data/w1_art_cards.json",
-    "scripts/v10/wave1/w1_core.gd",
+    "core/wave1/data/w1_art_cards.json",
+    "core/wave1/w1_core.gd",
     "scripts/v10/wave1/w1_ults.gd"
    ]
   },
@@ -22581,9 +22581,9 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/wave1/data/w1_art_cards.json",
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_play.gd",
+    "core/wave1/data/w1_art_cards.json",
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_play.gd",
     "scripts/v10/wave1/w1_ults.gd"
    ]
   },
@@ -22598,8 +22598,8 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/wave1/data/w1_art_cards.json",
-    "scripts/v10/wave1/w1_core.gd",
+    "core/wave1/data/w1_art_cards.json",
+    "core/wave1/w1_core.gd",
     "scripts/v10/wave1/w1_ults.gd"
    ]
   },
@@ -22617,7 +22617,7 @@
     "scripts/v10/ult/bottom_ult_stage.gd",
     "scripts/v10/ult/match_fx_hud.gd",
     "scripts/v10/ult/ult_video.gd",
-    "scripts/v10/wave1/data/w1_art_cards.json"
+    "core/wave1/data/w1_art_cards.json"
    ]
   },
   {
@@ -22631,7 +22631,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/wave1/data/w1_art_cards.json"
+    "core/wave1/data/w1_art_cards.json"
    ]
   },
   {
@@ -22645,7 +22645,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/wave1/data/w1_art_cards.json"
+    "core/wave1/data/w1_art_cards.json"
    ]
   },
   {
@@ -22662,7 +22662,7 @@
     "scripts/v10/ult/bottom_ult_stage.gd",
     "scripts/v10/ult/match_fx_hud.gd",
     "scripts/v10/ult/ult_video.gd",
-    "scripts/v10/wave1/data/w1_art_cards.json"
+    "core/wave1/data/w1_art_cards.json"
    ]
   },
   {
@@ -22679,7 +22679,7 @@
     "scripts/v10/ult/bottom_ult_stage.gd",
     "scripts/v10/ult/match_fx_hud.gd",
     "scripts/v10/ult/ult_video.gd",
-    "scripts/v10/wave1/data/w1_art_cards.json"
+    "core/wave1/data/w1_art_cards.json"
    ]
   },
   {
@@ -22693,7 +22693,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/wave1/data/w1_art_cards.json"
+    "core/wave1/data/w1_art_cards.json"
    ]
   },
   {
@@ -22707,7 +22707,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/wave1/data/w1_art_cards.json"
+    "core/wave1/data/w1_art_cards.json"
    ]
   },
   {
@@ -22721,7 +22721,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/wave1/data/w1_art_cards.json"
+    "core/wave1/data/w1_art_cards.json"
    ]
   },
   {
@@ -22738,7 +22738,7 @@
     "scripts/v10/ult/bottom_ult_stage.gd",
     "scripts/v10/ult/match_fx_hud.gd",
     "scripts/v10/ult/ult_video.gd",
-    "scripts/v10/wave1/data/w1_art_cards.json"
+    "core/wave1/data/w1_art_cards.json"
    ]
   },
   {
@@ -22752,7 +22752,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/wave1/data/w1_art_cards.json"
+    "core/wave1/data/w1_art_cards.json"
    ]
   },
   {
@@ -22766,7 +22766,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/wave1/data/w1_art_cards.json"
+    "core/wave1/data/w1_art_cards.json"
    ]
   },
   {
@@ -22783,7 +22783,7 @@
     "scripts/v10/ult/bottom_ult_stage.gd",
     "scripts/v10/ult/match_fx_hud.gd",
     "scripts/v10/ult/ult_video.gd",
-    "scripts/v10/wave1/data/w1_art_cards.json"
+    "core/wave1/data/w1_art_cards.json"
    ]
   },
   {
@@ -22797,7 +22797,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/wave1/data/w1_art_cards.json"
+    "core/wave1/data/w1_art_cards.json"
    ]
   },
   {
@@ -22811,7 +22811,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/wave1/data/w1_art_cards.json"
+    "core/wave1/data/w1_art_cards.json"
    ]
   },
   {
@@ -22828,7 +22828,7 @@
     "scripts/v10/ult/bottom_ult_stage.gd",
     "scripts/v10/ult/match_fx_hud.gd",
     "scripts/v10/ult/ult_video.gd",
-    "scripts/v10/wave1/data/w1_art_cards.json"
+    "core/wave1/data/w1_art_cards.json"
    ]
   },
   {
@@ -22845,7 +22845,7 @@
     "scripts/v10/ult/bottom_ult_stage.gd",
     "scripts/v10/ult/match_fx_hud.gd",
     "scripts/v10/ult/ult_video.gd",
-    "scripts/v10/wave1/data/w1_art_cards.json"
+    "core/wave1/data/w1_art_cards.json"
    ]
   },
   {
@@ -22859,7 +22859,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/wave1/data/w1_art_cards.json"
+    "core/wave1/data/w1_art_cards.json"
    ]
   },
   {
@@ -22873,7 +22873,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/wave1/data/w1_art_cards.json"
+    "core/wave1/data/w1_art_cards.json"
    ]
   },
   {
@@ -22890,7 +22890,7 @@
     "scripts/v10/ult/bottom_ult_stage.gd",
     "scripts/v10/ult/match_fx_hud.gd",
     "scripts/v10/ult/ult_video.gd",
-    "scripts/v10/wave1/data/w1_art_cards.json"
+    "core/wave1/data/w1_art_cards.json"
    ]
   },
   {
@@ -22916,7 +22916,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/wave1/w1_social.gd"
+    "core/wave1/w1_social.gd"
    ]
   },
   {
@@ -22930,7 +22930,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/wave1/w1_social.gd"
+    "core/wave1/w1_social.gd"
    ]
   },
   {
@@ -22944,7 +22944,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/wave1/w1_social.gd"
+    "core/wave1/w1_social.gd"
    ]
   },
   {
@@ -22958,7 +22958,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/wave1/w1_social.gd"
+    "core/wave1/w1_social.gd"
    ]
   },
   {
@@ -22972,7 +22972,7 @@
    "dup_of": null,
    "status": "approved",
    "referenced_by": [
-    "scripts/v10/wave1/w1_social.gd"
+    "core/wave1/w1_social.gd"
    ]
   },
   {

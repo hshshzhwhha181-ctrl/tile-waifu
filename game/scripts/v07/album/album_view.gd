@@ -4,7 +4,7 @@ extends Control
 
 
 
-const D: = preload("res://scripts/v07/album/album_data.gd")
+const D: = preload("res://core/v07/album/album_data.gd")
 const TABS: = [["stamps", "Марки"], ["sets", "Сервизы"], ["tables", "Столы"], ["photos", "Снимки"]]
 const HEAD_Y: = 24.0
 const TABS_Y: = HEAD_Y + 96.0 + 46.0

@@ -7,8 +7,8 @@ extends "res://scripts/screens/play.gd"
 # right before the deal, 4 slots and no outfit passives in ranked, V10DuelRun instead of V6Duel. The run node
 # then normalizes the helps (no prices), strips the specials and owns the exit (= loss) and the result.
 
-const C: = preload("res://scripts/v10/duels/duel_cfg.gd")
-const D: = preload("res://scripts/v10/duels/duel_state.gd")
+const C: = preload("res://core/modes/duels/duel_cfg.gd")
+const D: = preload("res://core/modes/duels/duel_state.gd")
 const RUN: = preload("res://scripts/v10/duels/duel_run.gd")
 
 

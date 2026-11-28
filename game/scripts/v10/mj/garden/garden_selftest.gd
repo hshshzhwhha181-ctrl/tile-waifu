@@ -134,17 +134,18 @@ func _t_extra() -> void:
 	check(V10MjGardenLook.TOK.night900 == V10DS.NIGHT_900 and V10MjGardenLook.ACCENT.yue[0] == V10DS.HEROES.yue.accent, "токены V10DS")
 	check(String(V10MjGardenInfo.INFO.get("title", "")) == "Сад" and (V10MjGardenInfo.INFO.get("HOW", []) as Array).size() == 3, "INFO title + HOW")
 	var raw_time: = 0
-	var da: = DirAccess.open("res://scripts/v10/mj/garden")
-	if da:
-		da.list_dir_begin()
-		var fn: = da.get_next()
-		while fn != "":
-			if fn.ends_with(".gd") and fn != "garden_selftest.gd":
-				var src: = FileAccess.get_file_as_string("res://scripts/v10/mj/garden/" + fn)
-				for pat in ["Time." + "get_unix_time_from_system", "Time." + "get_date_string_from_system", "Time." + "get_date_dict_from_system"]:
-					if src.find(pat) >= 0:
-						raw_time += 1
-			fn = da.get_next()
+	for scan_dir in ["res://scripts/v10/mj/garden", "res://core/modes/garden"]:
+		var da: = DirAccess.open(scan_dir)
+		if da:
+			da.list_dir_begin()
+			var fn: = da.get_next()
+			while fn != "":
+				if fn.ends_with(".gd") and fn != "garden_selftest.gd":
+					var src: = FileAccess.get_file_as_string(scan_dir.path_join(fn))
+					for pat in ["Time." + "get_unix_time_from_system", "Time." + "get_date_string_from_system", "Time." + "get_date_dict_from_system"]:
+						if src.find(pat) >= 0:
+							raw_time += 1
+				fn = da.get_next()
 	check(raw_time == 0, "ноль прямых Time.*_from_system в garden/*.gd")
 
 	var S_card: = {}

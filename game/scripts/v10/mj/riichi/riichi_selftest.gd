@@ -4,7 +4,7 @@ extends Node
 #   godot --headless --audio-driver Dummy --path game res://scripts/v10/mj/riichi/riichi_selftest.tscn -- --mj_riichi_selftest=1 [--games=200]
 # Last line: MJ_RIICHI ok/total; exit code 0 only when all pass. Watchdog 600 s.
 
-const D = preload("res://scripts/v10/mj/riichi/riichi_data.gd")
+const D = preload("res://core/modes/riichi/riichi_data.gd")
 const WATCHDOG_S: = 600.0
 
 var ok: = 0

@@ -7,12 +7,12 @@ extends RefCounted
 
 const P: = preload("res://scripts/v10/phone/phone.gd")
 const PUI: = preload("res://scripts/v10/phone/phone_ui.gd")
-const NAMES: = preload("res://scripts/v10/phone/names.gd")
-const C: = preload("res://scripts/v10/chat/chat.gd")
-const D: = preload("res://scripts/v10/chat/chat_data.gd")
-const FEED: = preload("res://scripts/v10/chat/chat_feed.gd")
-const L: = preload("res://scripts/v10/chat/chat_log.gd")
-const V: = preload("res://scripts/v10/chat/chat_validate.gd")
+const NAMES: = preload("res://core/phone/names.gd")
+const C: = preload("res://core/chat/chat.gd")
+const D: = preload("res://core/chat/chat_data.gd")
+const FEED: = preload("res://core/chat/chat_feed.gd")
+const L: = preload("res://core/chat/chat_log.gd")
+const V: = preload("res://core/chat/chat_validate.gd")
 const BUB: = preload("res://scripts/v10/phone/bubble.gd")
 
 const DIR: = "res://scripts/v10/phone/"
@@ -216,6 +216,9 @@ static func _src_files() -> Array:
 	for f in d.get_files():
 		if f.ends_with(".gd") and f != "phone_selftest.gd":
 			out.append(DIR + f)
+	for f in DirAccess.get_files_at("res://core/phone/"):  # WP3: UI-free phone files moved to core
+		if f.ends_with(".gd"):
+			out.append("res://core/phone/" + f)
 	return out
 
 

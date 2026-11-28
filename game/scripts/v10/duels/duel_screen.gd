@@ -8,14 +8,14 @@ extends Control
 signal finished(result: Dictionary)
 signal challenge_opened
 
-const U: = preload("res://scripts/v10/duels/duel_util.gd")
-const F: = preload("res://scripts/v10/duels/duel_forms.gd")
-const R: = preload("res://scripts/v10/duels/duel_rank.gd")
-const C: = preload("res://scripts/v10/duels/duel_cfg.gd")
-const D: = preload("res://scripts/v10/duels/duel_state.gd")
+const U: = preload("res://core/modes/duels/duel_util.gd")
+const F: = preload("res://core/modes/duels/duel_forms.gd")
+const R: = preload("res://core/modes/duels/duel_rank.gd")
+const C: = preload("res://core/modes/duels/duel_cfg.gd")
+const D: = preload("res://core/modes/duels/duel_state.gd")
 const RUN: = preload("res://scripts/v10/duels/duel_run.gd")
 const PLAY2: = preload("res://scripts/v10/duels/duel_play.gd")
-const INFO: = preload("res://scripts/v10/duels/duel_info.gd")
+const INFO: = preload("res://core/modes/duels/duel_info.gd")
 const VS: = preload("res://scripts/v10/duels/duel_vs.gd")
 const CH_U: = preload("res://scripts/v10/duels/challenge/challenge_util.gd")
 

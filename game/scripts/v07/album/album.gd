@@ -5,7 +5,7 @@ extends Node
 
 
 
-const D: = preload("res://scripts/v07/album/album_data.gd")
+const D: = preload("res://core/v07/album/album_data.gd")
 
 var dev: = {}
 

@@ -3,7 +3,7 @@
 
 Produces, for tsubame / miel / kohaku / shirin / zlata:
   game/assets/v10/wave1/hero/<hero>.png      848×1264 RGBA, standing figure, feet at y≈1240 (like assets/hero/<id>.png)
-  game/scripts/v10/wave1/data/w1_art_rig.json {<hero>: {file, source, fit, rig: {head_c: [x, y], …}}}
+  game/core/wave1/data/w1_art_rig.json {<hero>: {file, source, fit, rig: {head_c: [x, y], …}}}
 
 Pipeline (each stage is reproducible and cached):
   masks   rembg masks of the chosen source art (birefnet-general = crisp silhouette, isnet-anime = soft alpha

@@ -21,10 +21,10 @@ from typing import Iterable, List
 
 # Matches V10ContractSelftest.ALLOWED_GD (single sources of SKU/odds truth)
 CONTRACT_ALLOWED_SUFFIXES = (
-    "scripts/v10/core/sku.gd",
-    "scripts/v10/economy/econ_catalog.gd",
-    "scripts/v10/economy/econ_odds.gd",
-    "scripts/v10/gacha/rates.gd",
+    "core/base/sku.gd",
+    "core/economy/econ_catalog.gd",
+    "core/economy/econ_odds.gd",
+    "core/gacha/rates.gd",
 )
 
 # Legitimate single-place UI/font/odds exceptions where '₽' has no hardcoded price digits
@@ -36,8 +36,8 @@ RUB_NONDIGIT_ALLOWED_SUFFIXES = (
 
 # Wave-1 core resolver modules that implement the founder fallback themselves
 WAVE1_RESOLVER_SUFFIXES = (
-    "scripts/v10/wave1/w1_core.gd",
-    "scripts/v10/wave1/w1_mj.gd",
+    "core/wave1/w1_core.gd",
+    "core/wave1/w1_mj.gd",
 )
 
 STR_LITERAL_RE = re.compile(r'"((?:[^"\\]|\\.)*)"|\'((?:[^\'\\]|\\.)*)\'')
@@ -153,7 +153,7 @@ def lint_file(path: Path, repo_root: Path, include_tests: bool = False) -> List[
         not include_tests and is_test_or_demo_path(rel_posix)
     )
     skip_nondigit_rub = any(rel_posix.endswith(sfx) for sfx in RUB_NONDIGIT_ALLOWED_SUFFIXES)
-    in_salon = "/scripts/v10/salon/" in ("/" + rel_posix)
+    in_salon = "/scripts/v10/salon/" in ("/" + rel_posix) or "/core/salon/" in ("/" + rel_posix)
     skip_salon_test = path.name == "salon_selftest.gd" and not include_tests
     skip_wave1_resolver = any(rel_posix.endswith(sfx) for sfx in WAVE1_RESOLVER_SUFFIXES) or (
         not include_tests and is_test_or_demo_path(rel_posix)
@@ -260,7 +260,7 @@ def main() -> int:
     parser.add_argument(
         "paths",
         nargs="*",
-        help="Optional paths to check (defaults to <repo>/game/scripts/v10).",
+        help="Optional paths to check (defaults to <repo>/game/scripts/v10 and the v10 modules in <repo>/game/core).",
     )
     parser.add_argument(
         "--include-tests",
@@ -278,7 +278,11 @@ def main() -> int:
     if args.paths:
         targets = [Path(p) for p in args.paths]
     else:
-        targets = [repo_root / "game" / "scripts" / "v10"]
+        # WP3: v10 logic moved to game/core (core/v06..v09 are legacy generations, never linted by this contract)
+        core = repo_root / "game" / "core"
+        targets = [repo_root / "game" / "scripts" / "v10"] + sorted(
+            d for d in core.iterdir() if d.is_dir() and not re.fullmatch(r"v0\d", d.name)
+        )
 
     gd_files = iter_gd_files(targets)
     if not gd_files:

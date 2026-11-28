@@ -6,7 +6,7 @@ extends Node
 # Shots: lobby, table (selected tile + hint), riichi (ribbon), call buttons, win cut-in, tally, match end, seed,
 # square table. A bot plays the player's seat with the AI's choices; inserts are captured in real time.
 
-const D = preload("res://scripts/v10/mj/riichi/riichi_data.gd")
+const D = preload("res://core/modes/riichi/riichi_data.gd")
 
 var dir: = ""
 var scr: V10MjRiichiScreen

@@ -11,7 +11,7 @@ signal rename
 
 const P: = preload("res://scripts/v10/phone/phone.gd")
 const PUI: = preload("res://scripts/v10/phone/phone_ui.gd")
-const D: = preload("res://scripts/v10/chat/chat_data.gd")
+const D: = preload("res://core/chat/chat_data.gd")
 
 const ROW_H: = 118.0
 

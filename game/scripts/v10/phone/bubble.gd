@@ -7,7 +7,7 @@ extends Control
 
 const P: = preload("res://scripts/v10/phone/phone.gd")
 const PUI: = preload("res://scripts/v10/phone/phone_ui.gd")
-const D: = preload("res://scripts/v10/chat/chat_data.gd")
+const D: = preload("res://core/chat/chat_data.gd")
 
 const FS: = 22                 # Body (§6.3); notes, captions, transcripts and timings are Caption 18
 const FS_S: = 18

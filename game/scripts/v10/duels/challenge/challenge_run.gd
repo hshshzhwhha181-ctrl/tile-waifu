@@ -19,9 +19,9 @@ extends Control
 signal finished(res: Dictionary)
 
 const U: = preload("res://scripts/v10/duels/challenge/challenge_util.gd")
-const C: = preload("res://scripts/v10/duels/challenge/challenge_code.gd")
-const D: = preload("res://scripts/v10/duels/challenge/challenge_deal.gd")
-const ST: = preload("res://scripts/v10/duels/challenge/challenge_state.gd")
+const C: = preload("res://core/modes/duels/challenge/challenge_code.gd")
+const D: = preload("res://core/modes/duels/challenge/challenge_deal.gd")
+const ST: = preload("res://core/modes/duels/challenge/challenge_state.gd")
 const UI2: = preload("res://scripts/v10/duels/challenge/challenge_ui.gd")
 
 const STRIP_LEGACY: = Rect2(14, 124, 436, 46)  # the crystal pill of the 0.9 HUD (no currency in a match)

@@ -41,8 +41,8 @@ var _txt = null
 
 
 func _t(key: String, fallback: String) -> String:
-	if _txt == null and ResourceLoader.exists("res://scripts/v06/story/txt.gd"):
-		_txt = load("res://scripts/v06/story/txt.gd")
+	if _txt == null and ResourceLoader.exists("res://core/v06/story/txt.gd"):
+		_txt = load("res://core/v06/story/txt.gd")
 	if _txt:
 		var v = _txt.s(key)
 		if v is String and v != key and v != "":

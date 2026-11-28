@@ -17,7 +17,7 @@ const EVENTS: = ["pick", "pair", "combo", "motif", "danger", "signature", "wave"
 const JARGON: = ["гарант", "пити", "pity", "50/50", "гача", "ролл", "крутка", "фивер", "ивент", "квартал", "перк",
 	"ульта", "банер", "донат", "успей", "последний шанс", "топ-100", "x2 только сегодня"]
 const JARGON_EXACT: = ["SR", "SR+", "SSR+", "ХИТ", "ВЫГОДНО", "BEST", "NEW", "ID"]
-const LINT: = "res://scripts/v10/meta/lint.gd"
+const LINT: = "res://core/meta/lint.gd"
 const STAGE: = "res://scripts/v10/mj/stage/presence.gd"
 const LOOK: = "res://scripts/v10/mj/look/tile_material.gd"
 const TABLES: = "res://scripts/v10/mj/look/table_themes.gd"
@@ -938,10 +938,16 @@ func _words() -> void:
 	re.compile("\"([^\"\\\\]*[А-Яа-яЁё][^\"\\\\]*)\"")
 	var visible: Array = []
 	var dir: = "res://scripts/v10/mj/classic/"
-	for f in DirAccess.get_files_at(dir):
+	var core_dir: = "res://core/modes/classic/"  # UI-free files moved by WP3: scan both directories
+	var scan_files: = []
+	for d0 in [dir, core_dir]:
+		for f0 in DirAccess.get_files_at(d0):
+			scan_files.append(d0 + f0)
+	for fp in scan_files:
+		var f: String = String(fp).get_file()
 		if not f.ends_with(".gd") or f == "classic_selftest.gd":
 			continue
-		var txt: = FileAccess.get_file_as_string(dir + f)
+		var txt: = FileAccess.get_file_as_string(fp)
 		for line in txt.split("\n"):
 			if line.strip_edges().begins_with("#"):
 				continue

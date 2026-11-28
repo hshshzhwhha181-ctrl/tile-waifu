@@ -9,8 +9,8 @@ extends Node
 #
 # Prints «LEVELS SELFTEST OK ...» or «LEVELS SELFTEST FAIL ...» and quits with 0 / 1.
 
-const Gen = preload("res://scripts/v10/levels/level_gen.gd")
-const Sim = preload("res://scripts/v10/levels/level_sim.gd")
+const Gen = preload("res://core/levels/level_gen.gd")
+const Sim = preload("res://core/levels/level_sim.gd")
 
 const R_REG: = 40
 const R_NOV: = 8

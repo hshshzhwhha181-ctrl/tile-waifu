@@ -504,7 +504,7 @@ func _how() -> void:
 	var t: = V10MjClassicStyle.label("Как играть", 32, T.paper100, "title", 600)
 	t.position = Vector2(32, 26)
 	p.add_child(t)
-	var how: Array = load("res://scripts/v10/mj/classic/classic_info.gd").HOW
+	var how: Array = load("res://core/modes/classic/classic_info.gd").HOW
 	for i in how.size():
 		var gid: String = how[i][0]
 		var ic: = V10MjClassicStyle.Paint.new(func(c: Control): V10MjClassicStyle.glyph(c, gid, Vector2(24, 24), 20, T.gold300))

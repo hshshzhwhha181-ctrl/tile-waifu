@@ -9,10 +9,10 @@ extends RefCounted
 # Fields read / written on `play` (all exist in screens/play.gd 0.9): board (TrayBoard), partner, hint_n,
 # undo_n, shuffle_n, gold_mult, skill_charge, SKILL_NEED. Methods used only if present: _skill_ready(), _refresh().
 
-const U: = preload("res://scripts/v10/tower/tower_util.gd")
-const M: = preload("res://scripts/v10/tower/mods.gd")
-const P: = preload("res://scripts/v10/tower/pagoda.gd")
-const J: = preload("res://scripts/v10/tower/journey.gd")
+const U: = preload("res://core/modes/tower/tower_util.gd")
+const M: = preload("res://core/modes/tower/mods.gd")
+const P: = preload("res://core/modes/tower/pagoda.gd")
+const J: = preload("res://core/modes/tower/journey.gd")
 
 var mode: = "pagoda"      # pagoda | journey | practice
 var run: Dictionary

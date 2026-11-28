@@ -5,5 +5,5 @@ extends SceneTree
 # Prints «CHAT SELFTEST ok/total», exit code 0 when all pass.
 
 func _initialize() -> void:
-	var r: Array = preload("res://scripts/v10/chat/chat_selftest.gd").run()
+	var r: Array = preload("res://core/chat/chat_selftest.gd").run()
 	quit(0 if r[0] == r[1] else 1)

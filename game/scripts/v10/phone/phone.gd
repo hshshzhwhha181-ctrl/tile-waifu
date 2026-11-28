@@ -21,15 +21,15 @@ extends RefCounted
 #
 # Test hooks: day_shift (days added to the day key), bond_sink (Callable(h, n, src) -> int used instead of V10Bond).
 
-const C: = preload("res://scripts/v10/chat/chat.gd")
-const D: = preload("res://scripts/v10/chat/chat_data.gd")
-const FEED: = preload("res://scripts/v10/chat/chat_feed.gd")
-const TR: = preload("res://scripts/v10/chat/local_transport.gd")
-const NAMES: = preload("res://scripts/v10/phone/names.gd")
+const C: = preload("res://core/chat/chat.gd")
+const D: = preload("res://core/chat/chat_data.gd")
+const FEED: = preload("res://core/chat/chat_feed.gd")
+const TR: = preload("res://core/chat/local_transport.gd")
+const NAMES: = preload("res://core/phone/names.gd")
 const PUI: = preload("res://scripts/v10/phone/phone_ui.gd")
 
-const META_PATH: = "res://scripts/v10/meta/meta.gd"
-const BOND_PATH: = "res://scripts/v10/meta/bond.gd"
+const META_PATH: = "res://core/meta/meta.gd"
+const BOND_PATH: = "res://core/meta/bond.gd"
 const STICKER_DIR: = "res://assets/v10/phone/stickers/"
 const LOG_DIR: = "user://v10_logs/"
 const TABS: = ["feed", "chats", "mail"]

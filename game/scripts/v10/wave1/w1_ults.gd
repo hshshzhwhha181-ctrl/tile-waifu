@@ -72,7 +72,7 @@ extends RefCounted
 
 const HEROES: = ["tsubame", "miel", "kohaku", "shirin", "zlata"]
 const ART_DIR: = "res://assets/v10/wave1/outfits/"
-const CARDS_PATH: = "res://scripts/v10/wave1/data/w1_art_cards.json"
+const CARDS_PATH: = "res://core/wave1/data/w1_art_cards.json"
 # the wave-1 outfit cards are 850×1280 (founders 859×1280); the JSON's own `size` wins when it is there
 const ART_PX: = Vector2(850, 1280)
 const FACE_MIN: = 180.0

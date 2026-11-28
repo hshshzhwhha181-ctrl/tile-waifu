@@ -13,9 +13,9 @@ extends RefCounted
 #   win_peak(main, res)                     summit stamp «Вершин: N» (+ «Восходящая» step)
 # Buttons carry meta ux_role (primary / secondary / tertiary): one primary, ≤2 secondary, ≤2 tertiary per window.
 
-const Gen = preload("res://scripts/v10/levels/level_gen.gd")
-const State = preload("res://scripts/v10/path/path_state.gd")
-const Rules = preload("res://scripts/v10/path/path_rules.gd")
+const Gen = preload("res://core/levels/level_gen.gd")
+const State = preload("res://core/path/path_state.gd")
+const Rules = preload("res://core/path/path_rules.gd")
 const PFx = preload("res://scripts/v10/path/path_fx.gd")
 
 const ASSIST_LINES: = ["Давай я переложу стол чуть удобнее?", "Хочешь, я переложу стол чуть удобнее? Звёзды останутся твоими."]

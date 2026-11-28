@@ -8,9 +8,9 @@ extends Node
 # Output: one line per section, then «CHALLENGE_SELFTEST ok/total»; exit 0 only when all pass.
 
 const U: = preload("res://scripts/v10/duels/challenge/challenge_util.gd")
-const C: = preload("res://scripts/v10/duels/challenge/challenge_code.gd")
-const D: = preload("res://scripts/v10/duels/challenge/challenge_deal.gd")
-const ST: = preload("res://scripts/v10/duels/challenge/challenge_state.gd")
+const C: = preload("res://core/modes/duels/challenge/challenge_code.gd")
+const D: = preload("res://core/modes/duels/challenge/challenge_deal.gd")
+const ST: = preload("res://core/modes/duels/challenge/challenge_state.gd")
 const UI2: = preload("res://scripts/v10/duels/challenge/challenge_ui.gd")
 const P: = preload("res://scripts/v10/duels/challenge/challenge_poster.gd")
 const RUN: = preload("res://scripts/v10/duels/challenge/challenge_run.gd")
@@ -882,12 +882,18 @@ func _e2e() -> void:
 
 # ---------------------------------------------------------------- files: tokens only, clean strings
 
+static func _cp(f: String) -> String:
+	# WP3: challenge_code/deal/state live in res://core/modes/duels/challenge
+	var a: = "res://scripts/v10/duels/challenge/" + f
+	return a if FileAccess.file_exists(a) else "res://core/modes/duels/challenge/" + f
+
+
 func _files() -> void:
 	_begin("files")
 	var hex: = RegEx.create_from_string("Color\\(\\s*\"|Color8\\(|Color\\(0x|#[0-9A-Fa-f]{6}\\b")
 	var lit: = RegEx.create_from_string("\"([^\"\\\\]*[А-Яа-яЁё][^\"\\\\]*)\"")
 	for f in UI_FILES:
-		var src: = FileAccess.get_file_as_string("res://scripts/v10/duels/challenge/" + f)
+		var src: = FileAccess.get_file_as_string(_cp(f))
 		check(src != "", "%s readable" % f)
 		var hits: = []
 		for m in hex.search_all(src):
@@ -896,7 +902,7 @@ func _files() -> void:
 	var bad: = []
 	var n: = 0
 	for f in ALL_FILES:
-		var src2: = FileAccess.get_file_as_string("res://scripts/v10/duels/challenge/" + f)
+		var src2: = FileAccess.get_file_as_string(_cp(f))
 		var in_banned: = false
 		for line in src2.split("\n"):
 			var st_line: = line.strip_edges()
@@ -915,7 +921,7 @@ func _files() -> void:
 				if not b.is_empty():
 					bad.append("%s: «%s» %s" % [f, s, str(b)])
 	check(n > 60 and bad.is_empty(), "every Russian string literal passes V10Lint + UX §4 (%d strings) %s" % [n, str(bad)])
-	var src3: = FileAccess.get_file_as_string("res://scripts/v10/duels/challenge/challenge_deal.gd") + FileAccess.get_file_as_string("res://scripts/v10/duels/challenge/challenge_code.gd")
+	var src3: = FileAccess.get_file_as_string("res://core/modes/duels/challenge/challenge_deal.gd") + FileAccess.get_file_as_string("res://core/modes/duels/challenge/challenge_code.gd")
 	check(src3.find("randi()") < 0 and src3.find("randf()") < 0, "no global randomness in the code and the deal")
 	var src4: = FileAccess.get_file_as_string("res://scripts/v10/duels/challenge/challenge_screen.gd")
 	check(src4.count("U.clip_get()") == 1, "the clipboard is read in one place (the «Вставить» tap)")

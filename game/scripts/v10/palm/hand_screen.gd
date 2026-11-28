@@ -7,12 +7,12 @@ extends Control
 
 signal finished(result: Dictionary)
 
-const U: = preload("res://scripts/v10/palm/hand_util.gd")
-const GEN: = preload("res://scripts/v10/palm/hand_gen.gd")
-const ST: = preload("res://scripts/v10/palm/hand_state.gd")
-const T: = preload("res://scripts/v10/palm/hand_text.gd")
-const H: = preload("res://scripts/v10/palm/hand.gd")
-const L: = preload("res://scripts/v10/palm/hand_lessons.gd")
+const U: = preload("res://core/modes/palm/hand_util.gd")
+const GEN: = preload("res://core/modes/palm/hand_gen.gd")
+const ST: = preload("res://core/modes/palm/hand_state.gd")
+const T: = preload("res://core/modes/palm/hand_text.gd")
+const H: = preload("res://core/modes/palm/hand.gd")
+const L: = preload("res://core/modes/palm/hand_lessons.gd")
 const BOARD: = preload("res://scripts/v10/palm/hand_board.gd")
 
 const COL_W: = 720.0

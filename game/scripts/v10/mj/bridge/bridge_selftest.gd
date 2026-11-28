@@ -43,7 +43,7 @@ func _ready() -> void:
 		return
 	if args.has("bridge_compile"):
 		for f in ["bridge_tiles", "bridge_daily", "bridge_hand", "bridge_levels", "bridge_save", "bridge_info", "bridge_look", "bridge_icon", "bridge_tile", "bridge_presence", "bridge_daily_screen", "bridge_hand_screen", "bridge_screen"]:
-			var sc: = load("res://scripts/v10/mj/bridge/%s.gd" % f)
+			var sc: = load(("res://scripts/v10/mj/bridge/%s.gd" % f) if FileAccess.file_exists("res://scripts/v10/mj/bridge/%s.gd" % f) else ("res://core/modes/bridge/%s.gd" % f))
 			print("compile ", f, " ", sc != null and sc.can_instantiate())
 		get_tree().quit(0)
 		return
@@ -217,17 +217,18 @@ func _t_save_words_glossary() -> void:
 		bad_w += V10Lint.check(String(ln)).size() + V10Lint.ui_check(String(ln)).size()
 	check(bad_w == 0, "zero banned words in bridge texts (%d)" % bad_w)
 	var raw_time: = 0
-	var da: = DirAccess.open(DIR_PATH)
-	if da:
-		da.list_dir_begin()
-		var fn: = da.get_next()
-		while fn != "":
-			if fn.ends_with(".gd") and fn != "bridge_selftest.gd":
-				var src: = FileAccess.get_file_as_string(DIR_PATH + "/" + fn)
-				for pat in ["Time." + "get_unix_time_from_system", "Time." + "get_date_string_from_system", "Time." + "get_date_dict_from_system"]:
-					if src.find(pat) >= 0:
-						raw_time += 1
-			fn = da.get_next()
+	for scan_dir in [DIR_PATH, "res://core/modes/bridge"]:
+		var da: = DirAccess.open(scan_dir)
+		if da:
+			da.list_dir_begin()
+			var fn: = da.get_next()
+			while fn != "":
+				if fn.ends_with(".gd") and fn != "bridge_selftest.gd":
+					var src: = FileAccess.get_file_as_string(scan_dir.path_join(fn))
+					for pat in ["Time." + "get_unix_time_from_system", "Time." + "get_date_string_from_system", "Time." + "get_date_dict_from_system"]:
+						if src.find(pat) >= 0:
+							raw_time += 1
+				fn = da.get_next()
 	check(raw_time == 0, "zero raw Time.*_from_system in bridge/*.gd")
 
 

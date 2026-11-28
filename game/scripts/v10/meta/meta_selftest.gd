@@ -713,15 +713,18 @@ static func _grep(strict: bool) -> void:
 	_mod = "grep"
 	var files: = []
 	_list("res://scripts", files)
+	_list("res://core", files)  # WP3: UI-free meta/shop/... logic moved to core
 	var time_hits: = []
 	var aff_hits: = []
 	var own_bad: = []
 	var rub_hits: = []
 	for f in files:
 		var p: String = f
+		if p.begins_with("res://core/meta/"):
+			p = p.replace("res://core/meta/", "res://scripts/v10/meta/")  # keep the lane-meta path rules below valid
 		if p.ends_with("meta_selftest.gd"):
 			continue
-		var txt: = FileAccess.get_file_as_string(p)
+		var txt: = FileAccess.get_file_as_string(f)
 		var is_meta: = p.find("/v10/meta/") >= 0
 		var tcount: = txt.count("Time.get_unix_time_from_system") + txt.count("Time.get_date_string_from_system")
 		if tcount > 0 and not p.ends_with("/v10/meta/meta.gd"):

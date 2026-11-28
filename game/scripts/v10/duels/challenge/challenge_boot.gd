@@ -6,6 +6,8 @@ extends Node
 # (--challenge_selftest=1) or the demo runner (everything else).
 
 const ROOT: = "res://scripts/v10/duels/challenge/"
+const CORE_ROOT: = "res://core/modes/duels/challenge/"  # UI-free parts moved by WP3
+const CORE_PARTS: = ["challenge_code", "challenge_deal", "challenge_state"]
 const PARTS: = ["challenge_util", "challenge_code", "challenge_deal", "challenge_state", "challenge_ui", "challenge_poster",
 	"challenge_screen", "challenge_run", "challenge_play", "challenge_selftest", "challenge_demo"]
 
@@ -13,7 +15,7 @@ const PARTS: = ["challenge_util", "challenge_code", "challenge_deal", "challenge
 func _ready() -> void:
 	var bad: = []
 	for p in PARTS:
-		var s = load(ROOT + p + ".gd")
+		var s = load((CORE_ROOT if p in CORE_PARTS else ROOT) + p + ".gd")
 		if s == null or not (s as GDScript).can_instantiate():
 			bad.append(p)
 	if not bad.is_empty():

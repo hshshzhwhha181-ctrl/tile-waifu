@@ -10,7 +10,7 @@ extends RefCounted
 #   chest_open(chest_node, reward, parent)  spring + lid swap + petals + floating reward chips
 #   unlock_burst(parent, pos, col)          a node opens: ring + sparkles + chime
 
-const Rules = preload("res://scripts/v10/path/path_rules.gd")
+const Rules = preload("res://core/path/path_rules.gd")
 const FOG = preload("res://scripts/v10/path/path_fog.gdshader")
 
 

@@ -7,7 +7,7 @@ extends Control
 
 
 
-const D: = preload("res://scripts/v07/album/album_data.gd")
+const D: = preload("res://core/v07/album/album_data.gd")
 const FILTER: = preload("res://shaders/v07/album/photo_filter.gdshader")
 
 var play

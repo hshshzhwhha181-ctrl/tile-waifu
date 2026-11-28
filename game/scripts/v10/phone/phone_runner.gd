@@ -10,8 +10,8 @@ extends Control
 # The runner plays the role of `main` for the phone: W, H, overlay, show_chrome(), back(), go(), toast().
 
 const P: = preload("res://scripts/v10/phone/phone.gd")
-const C: = preload("res://scripts/v10/chat/chat.gd")
-const FEED: = preload("res://scripts/v10/chat/chat_feed.gd")
+const C: = preload("res://core/chat/chat.gd")
+const FEED: = preload("res://core/chat/chat_feed.gd")
 const ST: = preload("res://scripts/v10/phone/phone_selftest.gd")
 
 var W: = 720.0

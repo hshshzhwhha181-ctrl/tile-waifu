@@ -15,7 +15,7 @@ extends "res://scripts/screens/play.gd"
 # the overflow window is the run's sheet (one free «Вернуть 3 фишки»), the win is the run's result sheet.
 
 const CH_RUN: = preload("res://scripts/v10/duels/challenge/challenge_run.gd")
-const CH_DEAL: = preload("res://scripts/v10/duels/challenge/challenge_deal.gd")
+const CH_DEAL: = preload("res://core/modes/duels/challenge/challenge_deal.gd")
 const CH_UTIL: = preload("res://scripts/v10/duels/challenge/challenge_util.gd")
 
 var ch_src_mode: = ""
