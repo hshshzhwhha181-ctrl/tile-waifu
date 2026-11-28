@@ -10,3 +10,8 @@ date,batch_id,task_id,quote_ref,quoted_cr,actual_cr,balance_after,note
 2026-11-28,H0,height re-rolls nova x5 + yue x5 (new body table prompts),,10,10,,P50b round 2; 9:16 1k medium x1 each
 2026-11-28,P50b,round 2 total,,25.5,25.5,,P50b round 2; session total 76.5 cr (51 + 25.5)
 2026-11-28,H2,round 3 pilots x4 (fuller thighs, leg and bust focus: mc_base D, miel_evening D, hana_base D, yue_base E),,4,4,,P50b round 3; 2:3 1k medium; 0 refusals; session total 80.5 cr
+2026-11-28,H1,hana canon base/win/tease search (6 jobs sent with batch_size 3: 3 cr billed each but only 1 image returned = 18 cr for 6 images; then 10 more single 1k medium),,28,28,,art-hana worker; 16 images; batch_size param is billed but not honoured (12 cr wasted)
+2026-11-28,H2,hana 7 outfits x 5 pose candidates 1k medium,,35,35,,art-hana worker; 0 refusals
+2026-11-28,H1,hana canon finals 3 frames x 2 cand 2k high,,12,12,,art-hana worker
+2026-11-28,H2,hana 7 outfit finals x 2 cand 2k high + 4 re-rolls (robe B/E, seasonal x2) 2k high,,36,36,,art-hana worker; robe and seasonal finals re-rolled after cull
+2026-11-28,art-hana,worker total,,111,111,17511.38,image count 111 cr; account balance fell 161 from 17672.38 but the account is shared with parallel workers
