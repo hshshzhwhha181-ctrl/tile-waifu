@@ -83,12 +83,12 @@ func build(m, args: Dictionary) -> void :
 	for k in items.size():
 		var it: Dictionary = items[k]
 		if it.kind == "lv":
-			it.node = _boss_node(it) if G.LEVELS[it.level].get("boss", false) else _level_node(it)
+			it.node = _boss_node(it) if TWLevels.at(it.level).get("boss", false) else _level_node(it)
 		else:
 			it.node = _chest_node(it)
 	_build_marker()
 	_build_overlays()
-	V8Header.make(self, main, "Путь · " + G.LOCS[G.LEVELS[sel].loc].name, main.back, _help)
+	V8Header.make(self, main, "Путь · " + G.LOCS[TWLevels.at(sel).loc].name, main.back, _help)
 	_build_play_button()
 
 	var seen: = clampi(int(st.get("seen", int(G.S.unlocked))), 1, int(G.S.unlocked))
@@ -323,7 +323,7 @@ func _tap(c: Control, cb: Callable) -> void :
 
 func _level_node(it: Dictionary) -> Control:
 	var i: int = it.level
-	var lv: Dictionary = G.LEVELS[i]
+	var lv: Dictionary = TWLevels.at(i)
 	var c: = _node_root(it.pos, Vector2(128, 170), Vector2(64, 64))
 	var locked: = i > cur
 	var stars: = G.level_stars(i)
@@ -376,7 +376,7 @@ func _level_node(it: Dictionary) -> Control:
 
 func _boss_node(it: Dictionary) -> Control:
 	var i: int = it.level
-	var lv: Dictionary = G.LEVELS[i]
+	var lv: Dictionary = TWLevels.at(i)
 	var c: = _node_root(it.pos, Vector2(220, 300), Vector2(110, 132))
 	var locked: = i > cur
 	if not locked:
@@ -526,7 +526,7 @@ func _marker_pos(p: Vector2, boss: = false) -> Vector2:
 func _marker_rest(i: int) -> Array:
 	var it: Dictionary = items[level_item.get(i, 0)]
 	var p: Vector2 = it.pos
-	if G.LEVELS[i].get("boss", false):
+	if TWLevels.at(i).get("boss", false):
 		return [_marker_pos(p, true), PIN_DOWN]
 	var cands: = [
 		[p + Vector2(-45, -180), PIN_DOWN],
@@ -538,7 +538,7 @@ func _marker_rest(i: int) -> Array:
 	for j in [i - 2, i - 1, i + 1, i + 2]:
 		if j >= 0 and j < G.LEVELS.size() and level_item.has(j):
 			var np: Vector2 = items[level_item[j]].pos
-			var big: bool = G.LEVELS[j].get("boss", false)
+			var big: bool = TWLevels.at(j).get("boss", false)
 			others.append(Rect2(np - Vector2(100, 110), Vector2(200, 240)) if big else Rect2(np - Vector2(64, 86), Vector2(128, 222)))
 	var best: Array = cands[0]
 	var best_score: = INF
@@ -585,7 +585,7 @@ func _help() -> void :
 	p.add_child(l)
 
 func _build_play_button() -> void :
-	var lv: Dictionary = G.LEVELS[cur]
+	var lv: Dictionary = TWLevels.at(cur)
 	var boss: bool = lv.get("boss", false)
 	play_btn = JButton.make(("Босс %s" if boss else "Партия %s") % lv.code, "red" if boss else "pink", Rect2(W * 0.5 - 220, H - 132 - 134, 440, 104), null, 36)
 	play_btn.set_sub(G.LOCS[lv.loc].name, 19)
@@ -660,7 +660,7 @@ func _play_progress(from_i: int, to_i: int, pick: bool) -> void :
 		return
 	var d0: = _level_dist(from_i)
 	var d1: = _level_dist(to_i)
-	var boss_to: bool = G.LEVELS[to_i].get("boss", false)
+	var boss_to: bool = TWLevels.at(to_i).get("boss", false)
 	var to_it: Dictionary = items[level_item[to_i]]
 	var new_node: Control = to_it.node
 	if new_node:
@@ -685,8 +685,8 @@ func _play_progress(from_i: int, to_i: int, pick: bool) -> void :
 		Fx.ring(map_root, to_it.pos, Color(1, 0.9, 0.6), 2.0, 0.5)
 	Sfx.play("star1")
 
-	var w_from: int = G.LEVELS[from_i].loc
-	var w_to: int = G.LEVELS[to_i].loc
+	var w_from: int = TWLevels.at(from_i).loc
+	var w_to: int = TWLevels.at(to_i).loc
 	if w_to != w_from and w_to < panels.size():
 		var m: ShaderMaterial = panels[w_to].material
 		var ft: = create_tween().set_parallel()
@@ -702,7 +702,7 @@ func _play_progress(from_i: int, to_i: int, pick: bool) -> void :
 		rt.tween_callback(rib.queue_free)
 		await get_tree().create_timer(1.6).timeout
 	elif boss_to:
-		main.toast("Впереди босс: %s" % G.LEVELS[to_i].get("boss_title", ""), "star")
+		main.toast("Впереди босс: %s" % TWLevels.at(to_i).get("boss_title", ""), "star")
 	V6Worlds.state().seen = int(G.S.unlocked)
 	G.save()
 	_anim = false
@@ -720,10 +720,10 @@ func _refresh_states() -> void :
 
 func open_card(i: int) -> void :
 	if i > cur:
-		main.toast(_t("levels.locked", "Сначала сыграй партию %s") % G.LEVELS[i - 1].code, "star")
+		main.toast(_t("levels.locked", "Сначала сыграй партию %s") % TWLevels.at(i - 1).code, "star")
 		return
 	sel = i
-	var lv: Dictionary = G.LEVELS[i]
+	var lv: Dictionary = TWLevels.at(i)
 	var w: int = lv.loc
 	var look: Dictionary = V6Worlds.LOOK[w]
 	var boss: bool = lv.get("boss", false)
@@ -954,7 +954,7 @@ func pick_partner(level: int) -> void :
 		bonus.clip_text = true
 		row.add_child(bonus)
 		row.set_meta("b0", [row.mat.get_shader_parameter("border_top"), row.mat.get_shader_parameter("border_bottom")])
-		V7Passives.partner_row(row, h, G.LEVELS[level])
+		V7Passives.partner_row(row, h, TWLevels.at(level))
 		partner_rows[h] = row
 		row.gui_input.connect( func(e):
 			if e is InputEventMouseButton and e.pressed:

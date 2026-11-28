@@ -164,7 +164,7 @@ func table_unlocked(id: String) -> bool:
 		if u.begins_with("boss:"):
 			var w: = int(u.substr(5))
 			for i in G.LEVELS.size():
-				var lv: Dictionary = G.LEVELS[i]
+				var lv: Dictionary = TWLevels.at(i)
 				if int(lv.get("loc", -1)) == w and lv.get("boss", false) and G.level_stars(i) > 0:
 					return true
 		return false

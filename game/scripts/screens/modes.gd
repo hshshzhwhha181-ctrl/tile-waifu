@@ -149,7 +149,7 @@ func _tap(card: Control, cb: Callable) -> void :
 func _path_card(r: Rect2) -> Control:
 	var card: = _frame(r)
 	var cur: = clampi(int(G.S.unlocked) - 1, 0, G.LEVELS.size() - 1)
-	var lv: Dictionary = G.LEVELS[cur]
+	var lv: Dictionary = TWLevels.at(cur)
 	var look: Dictionary = V6Worlds.LOOK[clampi(int(lv.loc), 0, V6Worlds.LOOK.size() - 1)]
 	var art_path: = "res://assets/v06/map/%s.webp" % look.art
 	_art(card, art_path if ResourceLoader.exists(art_path) else "map_town", r, Vector2(0.5, 0.55), 0.05, 0.9)

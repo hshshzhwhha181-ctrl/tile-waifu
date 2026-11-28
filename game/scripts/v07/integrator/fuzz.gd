@@ -13,7 +13,7 @@ static func run(host: Node, reps: int) -> void :
 	var blocked_takes: = 0
 	for li in mini(48, G.LEVELS.size()):
 		for rep in reps:
-			var cfg: Dictionary = G.LEVELS[li].duplicate(true)
+			var cfg: Dictionary = TWLevels.at(li).duplicate(true)
 			cfg.seed = int(cfg.seed) + rep * 7919
 			seed(int(cfg.seed) + 17)
 			var b: = V6SpecialBoard.new()

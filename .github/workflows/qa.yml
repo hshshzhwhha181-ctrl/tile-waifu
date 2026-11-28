@@ -44,6 +44,11 @@ jobs:
         run: |
           python tools/lint_core_purity.py --selftest --check --by-file
 
+      # P19: the Path table is read through TWLevels.at(n); direct `G.LEVELS[...]` indexing returns lazy stubs (trial-mode bug)
+      - name: No direct G.LEVELS[...] indexing
+        run: |
+          python tools/lint_no_direct_levels.py --selftest --check
+
       - name: System packages (xvfb + GL for the rendering suites)
         run: |
           sudo apt-get update

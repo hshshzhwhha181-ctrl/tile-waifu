@@ -614,7 +614,7 @@ func _selftest() -> void :
 	var total: = 0
 	for li in mini(48, G.LEVELS.size()):
 		for rep in 5:
-			var cfg: Dictionary = G.LEVELS[li].duplicate(true)
+			var cfg: Dictionary = TWLevels.at(li).duplicate(true)
 			cfg.seed = int(cfg.seed) + rep * 7919
 			var b: = TrayBoard.new()
 			add_child(b)
