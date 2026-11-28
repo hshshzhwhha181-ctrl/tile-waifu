@@ -220,18 +220,18 @@
   },
   "economy": {
    "fast": {
-    "marker": "ECON_SELFTEST 358/358 (3.1 s)",
-    "ok": 358,
-    "secs": 8.9,
+    "marker": "ECON_SELFTEST 381/381 (4.8 s)",
+    "ok": 381,
+    "secs": 9.9,
     "status": "pass",
-    "total": 358
+    "total": 381
    },
    "full": {
-    "marker": "ECON_SELFTEST 358/358 (28.8 s)",
-    "ok": 358,
-    "secs": 34.5,
+    "marker": "ECON_SELFTEST 381/381 (26.3 s)",
+    "ok": 381,
+    "secs": 31.3,
     "status": "pass",
-    "total": 358
+    "total": 381
    }
   },
   "event": {
@@ -702,6 +702,22 @@
     "total": 10
    }
   },
+  "no_direct_wallet": {
+   "fast": {
+    "marker": "NO_DIRECT_WALLET RESULT: PASS (0 violations",
+    "ok": 24,
+    "secs": 2.0,
+    "status": "pass",
+    "total": 24
+   },
+   "full": {
+    "marker": "NO_DIRECT_WALLET RESULT: PASS (0 violations",
+    "ok": 24,
+    "secs": 2.1,
+    "status": "pass",
+    "total": 24
+   }
+  },
   "online": {
    "fast": {
     "marker": "ONLINE_SELFTEST 83/83 PASS",
@@ -812,18 +828,18 @@
   },
   "recovery": {
    "fast": {
-    "marker": "RECOVERY SELFTEST 66/66",
-    "ok": 66,
-    "secs": 14.0,
+    "marker": "RECOVERY SELFTEST 78/78",
+    "ok": 78,
+    "secs": 11.2,
     "status": "pass",
-    "total": 66
+    "total": 78
    },
    "full": {
-    "marker": "RECOVERY SELFTEST 66/66",
-    "ok": 66,
-    "secs": 13.5,
+    "marker": "RECOVERY SELFTEST 78/78",
+    "ok": 78,
+    "secs": 11.7,
     "status": "pass",
-    "total": 66
+    "total": 78
    }
   },
   "registry": {
