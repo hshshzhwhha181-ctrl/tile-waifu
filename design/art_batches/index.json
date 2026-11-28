@@ -1,0 +1,167 @@
+[
+ {
+  "batch_id": "H0",
+  "file": "H0_golden_composites.json",
+  "package": "P50",
+  "title": "Golden composites, tier Full: MC / Yue / Nova x 5 screens",
+  "nominal_cr": 180,
+  "task_quota_sum_cr": 180.0,
+  "tasks": 30,
+  "in_plan_ceiling": true,
+  "status": "ready_for_owner_approval"
+ },
+ {
+  "batch_id": "H1",
+  "file": "H1_canon_set.json",
+  "package": "P51",
+  "title": "Canon set, tier Full: 10 heroines x 3 frames (three-quarter base, win, tease)",
+  "nominal_cr": 330,
+  "task_quota_sum_cr": 330.0,
+  "tasks": 61,
+  "in_plan_ceiling": true,
+  "status": "ready_for_owner_approval"
+ },
+ {
+  "batch_id": "H2",
+  "file": "H2_wardrobe.json",
+  "package": "P55",
+  "title": "Wardrobe, tier Full: 10 heroines x 7 outfits (3 pose candidates + 1 final each)",
+  "nominal_cr": 350,
+  "task_quota_sum_cr": 350.0,
+  "tasks": 140,
+  "in_plan_ceiling": true,
+  "status": "ready_for_owner_approval"
+ },
+ {
+  "batch_id": "H3",
+  "file": "H3_combo_frames.json",
+  "package": "P56",
+  "title": "Combo T1/T2/T3 frames for 5 heroines (cut-outs), tier Full",
+  "nominal_cr": 150,
+  "task_quota_sum_cr": 150.0,
+  "tasks": 30,
+  "in_plan_ceiling": true,
+  "status": "ready_for_owner_approval"
+ },
+ {
+  "batch_id": "H4",
+  "file": "H4_ssr_keyart.json",
+  "package": "ART plan (H4)",
+  "title": "SSR key art 'First guest' (rin_ssr, hana_ssr, yue_ssr), tier Full",
+  "nominal_cr": 80,
+  "task_quota_sum_cr": 80.0,
+  "tasks": 7,
+  "in_plan_ceiling": false,
+  "status": "blocked_owner_decision"
+ },
+ {
+  "batch_id": "E0",
+  "file": "E0_lora_v2_training.json",
+  "package": "P52",
+  "title": "Train tw_master_v2 (H200, 4500 steps)",
+  "nominal_cr": 215,
+  "task_quota_sum_cr": 215.0,
+  "tasks": 1,
+  "in_plan_ceiling": true,
+  "status": "ready_for_owner_approval"
+ },
+ {
+  "batch_id": "E1",
+  "file": "E1_lora_production.json",
+  "package": "P53",
+  "title": "Production run LoRA v2: 24 table backgrounds, 10 salon zones, 12 koikoi months, tiles and FX",
+  "nominal_cr": 267.9,
+  "task_quota_sum_cr": 267.9,
+  "tasks": 63,
+  "in_plan_ceiling": true,
+  "status": "ready_for_owner_approval"
+ },
+ {
+  "batch_id": "E2",
+  "file": "E2_upscale_backgrounds.json",
+  "package": "P53",
+  "title": "Finalists upscale: 46 backgrounds",
+  "nominal_cr": 92,
+  "task_quota_sum_cr": 92.0,
+  "tasks": 46,
+  "in_plan_ceiling": true,
+  "status": "ready_for_owner_approval"
+ },
+ {
+  "batch_id": "U1",
+  "file": "UI_U1_ui_kit.json",
+  "package": "P54",
+  "title": "UI kit: 60 icons, 11 mode covers, 22 small items",
+  "nominal_cr": 372,
+  "task_quota_sum_cr": 372.0,
+  "tasks": 93,
+  "in_plan_ceiling": true,
+  "status": "ready_for_owner_approval"
+ },
+ {
+  "batch_id": "V1",
+  "file": "V1_blind_voice_test.json",
+  "package": "P46",
+  "title": "Blind test: JP voice, 3 models x 3 voices x 10 lines",
+  "nominal_cr": 17.4,
+  "task_quota_sum_cr": 17.4,
+  "tasks": 90,
+  "in_plan_ceiling": true,
+  "status": "ready_for_owner_approval"
+ },
+ {
+  "batch_id": "V2",
+  "file": "V2_beta24_voice.json",
+  "package": "P47",
+  "title": "Beta-24 x 10 heroines, 3 takes per line",
+  "nominal_cr": 144,
+  "task_quota_sum_cr": 144.0,
+  "tasks": 240,
+  "in_plan_ceiling": true,
+  "status": "ready_for_owner_approval"
+ },
+ {
+  "batch_id": "V3",
+  "file": "V3_launch60_flagships.json",
+  "package": "P47 (extension)",
+  "title": "Launch-60 remaining 36 lines for 3 flagships (mc, yue, zlata)",
+  "nominal_cr": 64.8,
+  "task_quota_sum_cr": 64.8,
+  "tasks": 108,
+  "in_plan_ceiling": false,
+  "status": "blocked_owner_decision"
+ },
+ {
+  "batch_id": "M1",
+  "file": "M1_music_priority.json",
+  "package": "P48",
+  "title": "Priority music: 12 tracks, 3 variants each, stems for the match tracks",
+  "nominal_cr": 298.5,
+  "task_quota_sum_cr": 298.48,
+  "tasks": 21,
+  "in_plan_ceiling": true,
+  "status": "ready_for_owner_approval"
+ },
+ {
+  "batch_id": "S1",
+  "file": "S1_sfx.json",
+  "package": "P49",
+  "title": "SFX: 40 sounds x 3 variants + 2 ambient loops of 30 s",
+  "nominal_cr": 105,
+  "task_quota_sum_cr": 105.0,
+  "tasks": 42,
+  "in_plan_ceiling": true,
+  "status": "ready_for_owner_approval"
+ },
+ {
+  "batch_id": "X1",
+  "file": "X1_video_pilots.json",
+  "package": "P57",
+  "title": "Video pilots: SSR ultimate (Kling 3.0 / Seedance 2.5) + memorial",
+  "nominal_cr": 190,
+  "task_quota_sum_cr": 190.0,
+  "tasks": 5,
+  "in_plan_ceiling": true,
+  "status": "ready_for_owner_approval"
+ }
+]

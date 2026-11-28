@@ -1,0 +1,105 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "tile-waifu/art_batch.schema.json",
+ "title": "Art batch package (P59)",
+ "description": "One file per art batch. The owner approves the NUMBERS (budget, candidates, ceiling), not the text. Semantic rules that a schema cannot express (quota sums, element ids, banned words, ART_BATCHES.md budget) live in tools/art/validate_batches.py.",
+ "type": "object",
+ "required": ["schema_version", "batch_id", "package", "title", "week", "section", "status", "in_plan_ceiling", "blocked_by", "depends_on",
+              "owner_gate", "budget", "candidates_policy", "selection", "pilot", "guards", "tasks", "totals"],
+ "properties": {
+  "schema_version": {"const": 1},
+  "batch_id": {"type": "string", "pattern": "^[A-Z][0-9]$"},
+  "package": {"type": "string", "minLength": 1},
+  "title": {"type": "string", "minLength": 3},
+  "week": {"type": "integer", "minimum": 1, "maximum": 8},
+  "section": {"type": "string"},
+  "status": {"enum": ["ready_for_owner_approval", "blocked_owner_decision", "approved", "running", "done", "cancelled"]},
+  "in_plan_ceiling": {"type": "boolean"},
+  "blocked_by": {"type": "array", "items": {"type": "string"}},
+  "depends_on": {"type": "array", "items": {"type": "string"}},
+  "owner_gate": {"type": "string", "minLength": 5},
+  "style_tail_id": {"type": ["string", "null"]},
+  "tier": {"enum": ["full"], "description": "Heroine art tier (design/ART_TIER_FULL.md). Present on H0-H4; the validator allows the Tier FULL costume words only in such files."},
+  "budget": {
+   "type": "object",
+   "required": ["currency", "nominal_cr", "hard_stop_cr", "hard_stop_rule", "assumptions"],
+   "properties": {
+    "currency": {"const": "higgsfield_credits"},
+    "nominal_cr": {"type": "number", "exclusiveMinimum": 0},
+    "hard_stop_cr": {"type": "number", "exclusiveMinimum": 0},
+    "hard_stop_rule": {"type": "string"},
+    "hard_stop_override_reason": {"type": "string"},
+    "assumptions": {"type": "array", "items": {"type": "string"}}
+   }
+  },
+  "candidates_policy": {"type": "string", "minLength": 5},
+  "selection": {
+   "type": "object",
+   "required": ["keep_per_task", "gate", "criteria"],
+   "properties": {
+    "keep_per_task": {"type": "integer", "minimum": 1},
+    "gate": {"type": "string", "minLength": 3},
+    "criteria": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 5}}
+   }
+  },
+  "pilot": {
+   "type": "object",
+   "required": ["task_ids", "max_cr", "go_rule"],
+   "properties": {
+    "task_ids": {"type": "array", "items": {"type": "string"}},
+    "candidates_per_task": {"type": ["integer", "null"], "minimum": 1},
+    "max_cr": {"type": "number", "minimum": 0},
+    "go_rule": {"type": "string"}
+   }
+  },
+  "tool_note": {"type": "string"},
+  "guards": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+  "notes": {"type": "array", "items": {"type": "string"}},
+  "tasks": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/task"}},
+  "totals": {
+   "type": "object",
+   "required": ["tasks", "task_quota_sum_cr", "candidates"],
+   "properties": {"tasks": {"type": "integer"}, "task_quota_sum_cr": {"type": "number"}, "candidates": {"type": "integer"}}
+  }
+ },
+ "$defs": {
+  "task": {
+   "type": "object",
+   "required": ["id", "stage", "kind", "media", "tool", "model", "prompt", "element_ids", "heroine", "lora", "size", "seed", "candidates",
+                "unit_cost_cr", "unit_cost_basis", "quota_cr", "max_credits", "status", "quote_ref", "output"],
+   "properties": {
+    "id": {"type": "string", "pattern": "^[A-Z][0-9]\\.[A-Za-z0-9_.]+$"},
+    "stage": {"type": "string"},
+    "kind": {"type": "string"},
+    "media": {"enum": ["image", "audio", "video", "post", "gpu"]},
+    "tool": {"type": "string"},
+    "model": {"type": "string"},
+    "prompt": {"type": "string", "minLength": 10},
+    "element_ids": {"type": "array", "items": {"type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"}},
+    "heroine": {"type": ["string", "null"]},
+    "lora": {"type": ["object", "null"], "properties": {"name": {"type": "string"}, "trigger": {"type": "string"}, "weight": {"type": "number"}}},
+    "size": {
+     "type": "object",
+     "required": ["aspect", "resolution", "width", "height"],
+     "properties": {"aspect": {"type": "string"}, "resolution": {"type": "string"}, "width": {"type": "integer", "minimum": 0}, "height": {"type": "integer", "minimum": 0}}
+    },
+    "seed": {"type": "integer", "minimum": 0, "maximum": 2147483647},
+    "candidates": {"type": "integer", "minimum": 1},
+    "unit_cost_cr": {"type": "number", "minimum": 0},
+    "unit_cost_basis": {"enum": ["quoted", "assumed"]},
+    "quota_cr": {"type": "number", "minimum": 0},
+    "max_credits": {"type": "number", "minimum": 0},
+    "status": {"enum": ["pending", "running", "done", "skipped"]},
+    "quote_ref": {"type": ["string", "null"]},
+    "tier": {"enum": ["full"]},
+    "prompt_variants": {"type": "array", "items": {"type": "string", "minLength": 10}, "description": "Wardrobe search tasks: candidate n uses prompt_variants[n] (three poses of one outfit); `prompt` equals variant 0."},
+    "depends_on_task": {"type": "string"},
+    "seed_policy": {"type": "string"},
+    "duration_s": {"type": "number", "minimum": 0},
+    "text": {"type": ["string", "null"]},
+    "text_status": {"type": "string"},
+    "output": {"type": "object", "required": ["dir", "name"], "properties": {"dir": {"type": "string"}, "name": {"type": "string"}}}
+   }
+  }
+ }
+}

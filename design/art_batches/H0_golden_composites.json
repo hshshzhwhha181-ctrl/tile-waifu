@@ -1,0 +1,1114 @@
+{
+ "schema_version": 1,
+ "package": "P50",
+ "title": "Golden composites, tier Full: MC / Yue / Nova x 5 screens",
+ "week": 2,
+ "section": "Heroines",
+ "status": "ready_for_owner_approval",
+ "in_plan_ceiling": true,
+ "blocked_by": [],
+ "depends_on": [],
+ "owner_gate": "Owner looks at the finals and approves the tier (design/golden_full/contact_sheet.jpg is the first pass); nothing is registered by the generator",
+ "budget": {
+  "currency": "higgsfield_credits",
+  "nominal_cr": 180,
+  "hard_stop_cr": 207.0,
+  "hard_stop_rule": "nominal + 15%: above that the run stops and the owner is asked",
+  "assumptions": [
+   "1k medium = 1 cr, 2k high = 2 cr per image (quoted by estimate_image_cost)"
+  ]
+ },
+ "candidates_policy": "search: 8 candidates per frame at 1k medium (1 cr); final: 2 candidates of the best prompt at 2k high (2 cr)",
+ "selection": {
+  "keep_per_task": 2,
+  "gate": "Full-tier look gate + GDD 11.4 a-e",
+  "criteria": [
+   "boldness at the owner's reference level (stockings with bands, deep neckline, playful pose), not tamer",
+   "hard lines: clearly adult face and 7-7.5 heads, nothing nude, no explicit act, no school or minor coding, no text",
+   "faces distinguishable on >= 3 of 5 traits across mc/yue/nova",
+   "heroine accent colour <= 20% of the frame area; Nova's neon lives only in outfit and FX",
+   "anatomy double audit passed: crops of hands, fingers, legs and feet show no extra or fused limbs",
+   "face reads as the canon heroine (>= 4 of 5 traits: eye shape, face width, nose/mouth, apparent age, brows) vs the element portrait",
+   "hair colour, signature items and outfit match the canon card; no drift (hair_never rules)",
+   "no text, no logos, no watermark, no garbled glyphs anywhere; mahjong tiles blank"
+  ]
+ },
+ "pilot": {
+  "task_ids": [
+   "H0.mc_match.search",
+   "H0.yue_tea.search",
+   "H0.nova_win.search"
+  ],
+  "candidates_per_task": 2,
+  "max_cr": 6.0,
+  "go_rule": "3 frames x 2 candidates: boldness at the reference level, faces clearly different, no text, hard lines intact"
+ },
+ "tool_note": "gpt_image_2_6 + Elements (<<<element_id>>> in the prompt; do not also pass the element in medias). Tail `v5f`. P50b ran this batch with 3 candidates per frame (not 8): see design/golden_full/REPORT.md.",
+ "guards": [
+  "Before each launch: estimate_*_cost -> quote_ref; abort the task when the quote is above max_credits.",
+  "Actual spend goes to design/art_batches/SPEND_LOG.csv; more than 15% over the batch nominal = stop and ask the owner.",
+  "Every output lands in assets/incoming, then double anatomy audit -> metadata scrub -> watermark pass -> manifest `approve`.",
+  "Prompts are untested: run the pilot tasks first (2-3 frames), look at them, only then release the rest."
+ ],
+ "notes": [],
+ "tier": "full",
+ "batch_id": "H0",
+ "tasks": [
+  {
+   "id": "H0.mc_match.search",
+   "seed": 932134,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "9:16",
+    "resolution": "1k",
+    "width": 584,
+    "height": 1024
+   },
+   "candidates": 8,
+   "unit_cost_cr": 1.0,
+   "heroine": "mc",
+   "element_ids": [
+    "7df3cc78-06be-4080-87f0-49d3c1da4ff0"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "golden_composite_full",
+   "tier": "full",
+   "prompt": "<<<7df3cc78-06be-4080-87f0-49d3c1da4ff0>>> is Mahjong-chan, an adult woman of 26, mahjong salon owner. Hair: light sakura-pink long glossy wavy hair worn in two high twin tails at the upper sides of the head, with long loose side strands and side-swept bangs. Eyes: rose-pink eyes with a soft gradient iris. Skin: fair warm peach skin with light rosy blush. Face: soft heart-shaped adult face, rounded cheeks, big warm slightly upturned eyes, wide open-mouth smile, soft brows. Signature items that must be present: pair of mint-jade looped knot hairpins with a small pink cherry blossom on each tail base; jade drop earrings; white ruffled wrist cuffs with a mint band. Body: medium height, soft shapely figure, defined waist, rounded hips, soft thighs, soft shoulders, a full natural bust in proportion. Outfit: black-and-gold long qipao with gold dragon embroidery, a plunging keyhole front with a gold frog-button collar, bare shoulders, black lace detached arm sleeves, a side slit up to the hip, sheer black thigh-high stockings with wide lace tops, black stiletto heels. Pose: perched on the edge of the mahjong table with her legs crossed, one hand on her hip and the other lifting her long hair, glancing at the viewer. Expression: confident teasing smile. Framing: thigh-up figure filling the lower 55% of a vertical mobile game frame, the upper 45% an empty clear dark field left for a tile board. Setting: night mahjong parlor: black lacquer pillars, warm paper lanterns, a lacquer mahjong table across the bottom of the frame, large empty center above her left clear for a tile board. Her signature accent color covers less than a fifth of the frame. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "medium",
+   "quota_cr": 8.0,
+   "max_credits": 8.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H0/mc_match.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H0.mc_match.final",
+   "seed": 661219,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "9:16",
+    "resolution": "2k",
+    "width": 1168,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "mc",
+   "element_ids": [
+    "7df3cc78-06be-4080-87f0-49d3c1da4ff0"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "golden_composite_full",
+   "tier": "full",
+   "prompt": "<<<7df3cc78-06be-4080-87f0-49d3c1da4ff0>>> is Mahjong-chan, an adult woman of 26, mahjong salon owner. Hair: light sakura-pink long glossy wavy hair worn in two high twin tails at the upper sides of the head, with long loose side strands and side-swept bangs. Eyes: rose-pink eyes with a soft gradient iris. Skin: fair warm peach skin with light rosy blush. Face: soft heart-shaped adult face, rounded cheeks, big warm slightly upturned eyes, wide open-mouth smile, soft brows. Signature items that must be present: pair of mint-jade looped knot hairpins with a small pink cherry blossom on each tail base; jade drop earrings; white ruffled wrist cuffs with a mint band. Body: medium height, soft shapely figure, defined waist, rounded hips, soft thighs, soft shoulders, a full natural bust in proportion. Outfit: black-and-gold long qipao with gold dragon embroidery, a plunging keyhole front with a gold frog-button collar, bare shoulders, black lace detached arm sleeves, a side slit up to the hip, sheer black thigh-high stockings with wide lace tops, black stiletto heels. Pose: perched on the edge of the mahjong table with her legs crossed, one hand on her hip and the other lifting her long hair, glancing at the viewer. Expression: confident teasing smile. Framing: thigh-up figure filling the lower 55% of a vertical mobile game frame, the upper 45% an empty clear dark field left for a tile board. Setting: night mahjong parlor: black lacquer pillars, warm paper lanterns, a lacquer mahjong table across the bottom of the frame, large empty center above her left clear for a tile board. Her signature accent color covers less than a fifth of the frame. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "high",
+   "depends_on_task": "H0.mc_match.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H0/mc_match.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H0.mc_tea.search",
+   "seed": 423821,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "9:16",
+    "resolution": "1k",
+    "width": 584,
+    "height": 1024
+   },
+   "candidates": 8,
+   "unit_cost_cr": 1.0,
+   "heroine": "mc",
+   "element_ids": [
+    "7df3cc78-06be-4080-87f0-49d3c1da4ff0"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "golden_composite_full",
+   "tier": "full",
+   "prompt": "<<<7df3cc78-06be-4080-87f0-49d3c1da4ff0>>> is Mahjong-chan, an adult woman of 26, mahjong salon owner. Hair: light sakura-pink long glossy wavy hair worn in two high twin tails at the upper sides of the head, with long loose side strands and side-swept bangs. Eyes: rose-pink eyes with a soft gradient iris. Skin: fair warm peach skin with light rosy blush. Face: soft heart-shaped adult face, rounded cheeks, big warm slightly upturned eyes, wide open-mouth smile, soft brows. Signature items that must be present: pair of mint-jade looped knot hairpins with a small pink cherry blossom on each tail base; jade drop earrings; white ruffled wrist cuffs with a mint band. Body: medium height, soft shapely figure, defined waist, rounded hips, soft thighs, soft shoulders, a full natural bust in proportion. Outfit: white-and-red floral cheongsam with gold trim, a heart-shaped chest cutout under a pink bow, bare shoulders, white detached wide sleeves with red knotted ribbons, a red sash with a flower brooch, a side slit up to the hip, white thigh-high stockings with a red ribbon-and-bell garter band, red high heels. Pose: leaning back against the edge of the mahjong table on one forearm, holding up a single blank mahjong tile in the other hand, weight on one leg, a wink. Expression: playful wink with a laughing open smile. Framing: full-body three-quarter view, camera at eye level, figure centered with space above for interface. Setting: night tea house: lacquered pillars, paper lanterns, a low tea table, a cushioned daybed, round moon window. Her signature accent color covers less than a fifth of the frame. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "medium",
+   "quota_cr": 8.0,
+   "max_credits": 8.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H0/mc_tea.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H0.mc_tea.final",
+   "seed": 519920,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "9:16",
+    "resolution": "2k",
+    "width": 1168,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "mc",
+   "element_ids": [
+    "7df3cc78-06be-4080-87f0-49d3c1da4ff0"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "golden_composite_full",
+   "tier": "full",
+   "prompt": "<<<7df3cc78-06be-4080-87f0-49d3c1da4ff0>>> is Mahjong-chan, an adult woman of 26, mahjong salon owner. Hair: light sakura-pink long glossy wavy hair worn in two high twin tails at the upper sides of the head, with long loose side strands and side-swept bangs. Eyes: rose-pink eyes with a soft gradient iris. Skin: fair warm peach skin with light rosy blush. Face: soft heart-shaped adult face, rounded cheeks, big warm slightly upturned eyes, wide open-mouth smile, soft brows. Signature items that must be present: pair of mint-jade looped knot hairpins with a small pink cherry blossom on each tail base; jade drop earrings; white ruffled wrist cuffs with a mint band. Body: medium height, soft shapely figure, defined waist, rounded hips, soft thighs, soft shoulders, a full natural bust in proportion. Outfit: white-and-red floral cheongsam with gold trim, a heart-shaped chest cutout under a pink bow, bare shoulders, white detached wide sleeves with red knotted ribbons, a red sash with a flower brooch, a side slit up to the hip, white thigh-high stockings with a red ribbon-and-bell garter band, red high heels. Pose: leaning back against the edge of the mahjong table on one forearm, holding up a single blank mahjong tile in the other hand, weight on one leg, a wink. Expression: playful wink with a laughing open smile. Framing: full-body three-quarter view, camera at eye level, figure centered with space above for interface. Setting: night tea house: lacquered pillars, paper lanterns, a low tea table, a cushioned daybed, round moon window. Her signature accent color covers less than a fifth of the frame. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "high",
+   "depends_on_task": "H0.mc_tea.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H0/mc_tea.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H0.mc_summon.search",
+   "seed": 821459,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "9:16",
+    "resolution": "1k",
+    "width": 584,
+    "height": 1024
+   },
+   "candidates": 8,
+   "unit_cost_cr": 1.0,
+   "heroine": "mc",
+   "element_ids": [
+    "7df3cc78-06be-4080-87f0-49d3c1da4ff0"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "golden_composite_full",
+   "tier": "full",
+   "prompt": "<<<7df3cc78-06be-4080-87f0-49d3c1da4ff0>>> is Mahjong-chan, an adult woman of 26, mahjong salon owner. Hair: light sakura-pink long glossy wavy hair worn in two high twin tails at the upper sides of the head, with long loose side strands and side-swept bangs. Eyes: rose-pink eyes with a soft gradient iris. Skin: fair warm peach skin with light rosy blush. Face: soft heart-shaped adult face, rounded cheeks, big warm slightly upturned eyes, wide open-mouth smile, soft brows. Signature items that must be present: pair of mint-jade looped knot hairpins with a small pink cherry blossom on each tail base; jade drop earrings; white ruffled wrist cuffs with a mint band. Body: medium height, soft shapely figure, defined waist, rounded hips, soft thighs, soft shoulders, a full natural bust in proportion. Outfit: black-and-gold long qipao with gold dragon embroidery, a plunging keyhole front with a gold frog-button collar, bare shoulders, black lace detached arm sleeves, a side slit up to the hip, sheer black thigh-high stockings with wide lace tops, black stiletto heels. Pose: standing with her weight on one leg, one hand on her hip and the other raised into her hair, the stocking top visible through the high side slit. Expression: playful teasing smile. Framing: full-body view, centered under the arch, camera at eye level. Setting: golden lantern altar arch: glowing lanterns, light rays, drifting petals, deep night ground. Her signature accent color covers less than a fifth of the frame. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "medium",
+   "quota_cr": 8.0,
+   "max_credits": 8.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H0/mc_summon.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H0.mc_summon.final",
+   "seed": 951236,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "9:16",
+    "resolution": "2k",
+    "width": 1168,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "mc",
+   "element_ids": [
+    "7df3cc78-06be-4080-87f0-49d3c1da4ff0"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "golden_composite_full",
+   "tier": "full",
+   "prompt": "<<<7df3cc78-06be-4080-87f0-49d3c1da4ff0>>> is Mahjong-chan, an adult woman of 26, mahjong salon owner. Hair: light sakura-pink long glossy wavy hair worn in two high twin tails at the upper sides of the head, with long loose side strands and side-swept bangs. Eyes: rose-pink eyes with a soft gradient iris. Skin: fair warm peach skin with light rosy blush. Face: soft heart-shaped adult face, rounded cheeks, big warm slightly upturned eyes, wide open-mouth smile, soft brows. Signature items that must be present: pair of mint-jade looped knot hairpins with a small pink cherry blossom on each tail base; jade drop earrings; white ruffled wrist cuffs with a mint band. Body: medium height, soft shapely figure, defined waist, rounded hips, soft thighs, soft shoulders, a full natural bust in proportion. Outfit: black-and-gold long qipao with gold dragon embroidery, a plunging keyhole front with a gold frog-button collar, bare shoulders, black lace detached arm sleeves, a side slit up to the hip, sheer black thigh-high stockings with wide lace tops, black stiletto heels. Pose: standing with her weight on one leg, one hand on her hip and the other raised into her hair, the stocking top visible through the high side slit. Expression: playful teasing smile. Framing: full-body view, centered under the arch, camera at eye level. Setting: golden lantern altar arch: glowing lanterns, light rays, drifting petals, deep night ground. Her signature accent color covers less than a fifth of the frame. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "high",
+   "depends_on_task": "H0.mc_summon.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H0/mc_summon.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H0.mc_shop.search",
+   "seed": 612506,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "9:16",
+    "resolution": "1k",
+    "width": 584,
+    "height": 1024
+   },
+   "candidates": 8,
+   "unit_cost_cr": 1.0,
+   "heroine": "mc",
+   "element_ids": [
+    "7df3cc78-06be-4080-87f0-49d3c1da4ff0"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "golden_composite_full",
+   "tier": "full",
+   "prompt": "<<<7df3cc78-06be-4080-87f0-49d3c1da4ff0>>> is Mahjong-chan, an adult woman of 26, mahjong salon owner. Hair: light sakura-pink long glossy wavy hair worn in two high twin tails at the upper sides of the head, with long loose side strands and side-swept bangs. Eyes: rose-pink eyes with a soft gradient iris. Skin: fair warm peach skin with light rosy blush. Face: soft heart-shaped adult face, rounded cheeks, big warm slightly upturned eyes, wide open-mouth smile, soft brows. Signature items that must be present: pair of mint-jade looped knot hairpins with a small pink cherry blossom on each tail base; jade drop earrings; white ruffled wrist cuffs with a mint band. Body: medium height, soft shapely figure, defined waist, rounded hips, soft thighs, soft shoulders, a full natural bust in proportion. Outfit: white-and-red floral cheongsam with gold trim, a heart-shaped chest cutout under a pink bow, bare shoulders, white detached wide sleeves with red knotted ribbons, a red sash with a flower brooch, a side slit up to the hip, white thigh-high stockings with a red ribbon-and-bell garter band, red high heels. Pose: leaning over the lacquer counter on both elbows, chin on one hand, one leg lifted behind her. Expression: sly smile, eyes on the viewer. Framing: full-length view with the counter at her side, camera at eye level. Setting: lantern-lit lacquer shop counter with shelves of blank jars, folded cloth and small boxes, no price tags, no signs. Her signature accent color covers less than a fifth of the frame. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "medium",
+   "quota_cr": 8.0,
+   "max_credits": 8.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H0/mc_shop.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H0.mc_shop.final",
+   "seed": 301698,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "9:16",
+    "resolution": "2k",
+    "width": 1168,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "mc",
+   "element_ids": [
+    "7df3cc78-06be-4080-87f0-49d3c1da4ff0"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "golden_composite_full",
+   "tier": "full",
+   "prompt": "<<<7df3cc78-06be-4080-87f0-49d3c1da4ff0>>> is Mahjong-chan, an adult woman of 26, mahjong salon owner. Hair: light sakura-pink long glossy wavy hair worn in two high twin tails at the upper sides of the head, with long loose side strands and side-swept bangs. Eyes: rose-pink eyes with a soft gradient iris. Skin: fair warm peach skin with light rosy blush. Face: soft heart-shaped adult face, rounded cheeks, big warm slightly upturned eyes, wide open-mouth smile, soft brows. Signature items that must be present: pair of mint-jade looped knot hairpins with a small pink cherry blossom on each tail base; jade drop earrings; white ruffled wrist cuffs with a mint band. Body: medium height, soft shapely figure, defined waist, rounded hips, soft thighs, soft shoulders, a full natural bust in proportion. Outfit: white-and-red floral cheongsam with gold trim, a heart-shaped chest cutout under a pink bow, bare shoulders, white detached wide sleeves with red knotted ribbons, a red sash with a flower brooch, a side slit up to the hip, white thigh-high stockings with a red ribbon-and-bell garter band, red high heels. Pose: leaning over the lacquer counter on both elbows, chin on one hand, one leg lifted behind her. Expression: sly smile, eyes on the viewer. Framing: full-length view with the counter at her side, camera at eye level. Setting: lantern-lit lacquer shop counter with shelves of blank jars, folded cloth and small boxes, no price tags, no signs. Her signature accent color covers less than a fifth of the frame. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "high",
+   "depends_on_task": "H0.mc_shop.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H0/mc_shop.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H0.mc_win.search",
+   "seed": 161078,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "9:16",
+    "resolution": "1k",
+    "width": 584,
+    "height": 1024
+   },
+   "candidates": 8,
+   "unit_cost_cr": 1.0,
+   "heroine": "mc",
+   "element_ids": [
+    "7df3cc78-06be-4080-87f0-49d3c1da4ff0"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "golden_composite_full",
+   "tier": "full",
+   "prompt": "<<<7df3cc78-06be-4080-87f0-49d3c1da4ff0>>> is Mahjong-chan, an adult woman of 26, mahjong salon owner. Hair: light sakura-pink long glossy wavy hair worn in two high twin tails at the upper sides of the head, with long loose side strands and side-swept bangs. Eyes: rose-pink eyes with a soft gradient iris. Skin: fair warm peach skin with light rosy blush. Face: soft heart-shaped adult face, rounded cheeks, big warm slightly upturned eyes, wide open-mouth smile, soft brows. Signature items that must be present: pair of mint-jade looped knot hairpins with a small pink cherry blossom on each tail base; jade drop earrings; white ruffled wrist cuffs with a mint band. Body: medium height, soft shapely figure, defined waist, rounded hips, soft thighs, soft shoulders, a full natural bust in proportion. Outfit: white-and-red floral cheongsam with gold trim, a heart-shaped chest cutout under a pink bow, bare shoulders, white detached wide sleeves with red knotted ribbons, a red sash with a flower brooch, a side slit up to the hip, white thigh-high stockings with a red ribbon-and-bell garter band, red high heels. Pose: leaning forward over the mahjong table with one hand pressing a single blank tile on the felt and the other arm thrown up in the air. Expression: joyful open-mouth laugh with a wink. Framing: full-body view, centered, generous empty space above. Setting: night sky with falling gold petals and a few blank ivory mahjong tiles drifting, warm glow behind her. Her signature accent color covers less than a fifth of the frame. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "medium",
+   "quota_cr": 8.0,
+   "max_credits": 8.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H0/mc_win.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H0.mc_win.final",
+   "seed": 626675,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "9:16",
+    "resolution": "2k",
+    "width": 1168,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "mc",
+   "element_ids": [
+    "7df3cc78-06be-4080-87f0-49d3c1da4ff0"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "golden_composite_full",
+   "tier": "full",
+   "prompt": "<<<7df3cc78-06be-4080-87f0-49d3c1da4ff0>>> is Mahjong-chan, an adult woman of 26, mahjong salon owner. Hair: light sakura-pink long glossy wavy hair worn in two high twin tails at the upper sides of the head, with long loose side strands and side-swept bangs. Eyes: rose-pink eyes with a soft gradient iris. Skin: fair warm peach skin with light rosy blush. Face: soft heart-shaped adult face, rounded cheeks, big warm slightly upturned eyes, wide open-mouth smile, soft brows. Signature items that must be present: pair of mint-jade looped knot hairpins with a small pink cherry blossom on each tail base; jade drop earrings; white ruffled wrist cuffs with a mint band. Body: medium height, soft shapely figure, defined waist, rounded hips, soft thighs, soft shoulders, a full natural bust in proportion. Outfit: white-and-red floral cheongsam with gold trim, a heart-shaped chest cutout under a pink bow, bare shoulders, white detached wide sleeves with red knotted ribbons, a red sash with a flower brooch, a side slit up to the hip, white thigh-high stockings with a red ribbon-and-bell garter band, red high heels. Pose: leaning forward over the mahjong table with one hand pressing a single blank tile on the felt and the other arm thrown up in the air. Expression: joyful open-mouth laugh with a wink. Framing: full-body view, centered, generous empty space above. Setting: night sky with falling gold petals and a few blank ivory mahjong tiles drifting, warm glow behind her. Her signature accent color covers less than a fifth of the frame. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "high",
+   "depends_on_task": "H0.mc_win.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H0/mc_win.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H0.yue_match.search",
+   "seed": 652994,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "9:16",
+    "resolution": "1k",
+    "width": 584,
+    "height": 1024
+   },
+   "candidates": 8,
+   "unit_cost_cr": 1.0,
+   "heroine": "yue",
+   "element_ids": [
+    "8edeacc2-f24b-4a41-a166-66896711f259"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "golden_composite_full",
+   "tier": "full",
+   "prompt": "<<<8edeacc2-f24b-4a41-a166-66896711f259>>> is Yue, an adult woman of 27, ruler of the Moon Palace. Hair: very long straight-to-wavy pale lavender hair down to the waist with a half-up crown section. Eyes: violet almond eyes with long lashes. Skin: pale porcelain skin. Face: long elegant adult face with slim high nose, narrow almond eyes, serene composed smile. Signature items that must be present: pair of curved pearly-gold dragon horns rising from the crown; gold crescent-moon forehead ornament; gold crescent drop earrings with lavender tassels; moon-phase folding fan (Yue only). Body: tall statuesque figure, long limbs, regal posture, defined waist, rounded hips, long thighs, a full natural bust in proportion. Outfit: lavender silk hanfu-style gown, off-the-shoulder with a deep plunging V front, sheer layered sleeves, gold moon-and-star embroidery, sash-cinched waist, skirt slit up to the hip, white lace-top thigh-high stockings with pearl garter straps, lavender high heels. Pose: seated sideways on the armrest of a lacquer chair at the table edge, legs crossed, the moon-phase fan held against her lips, glancing past the viewer. Expression: amused teasing smile. Framing: thigh-up figure filling the lower 55% of a vertical mobile game frame, the upper 45% an empty clear dark field left for a tile board. Setting: night mahjong parlor: black lacquer pillars, warm paper lanterns, a lacquer mahjong table across the bottom of the frame, large empty center above her left clear for a tile board. Her signature accent color covers less than a fifth of the frame. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "medium",
+   "quota_cr": 8.0,
+   "max_credits": 8.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H0/yue_match.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H0.yue_match.final",
+   "seed": 504669,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "9:16",
+    "resolution": "2k",
+    "width": 1168,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "yue",
+   "element_ids": [
+    "8edeacc2-f24b-4a41-a166-66896711f259"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "golden_composite_full",
+   "tier": "full",
+   "prompt": "<<<8edeacc2-f24b-4a41-a166-66896711f259>>> is Yue, an adult woman of 27, ruler of the Moon Palace. Hair: very long straight-to-wavy pale lavender hair down to the waist with a half-up crown section. Eyes: violet almond eyes with long lashes. Skin: pale porcelain skin. Face: long elegant adult face with slim high nose, narrow almond eyes, serene composed smile. Signature items that must be present: pair of curved pearly-gold dragon horns rising from the crown; gold crescent-moon forehead ornament; gold crescent drop earrings with lavender tassels; moon-phase folding fan (Yue only). Body: tall statuesque figure, long limbs, regal posture, defined waist, rounded hips, long thighs, a full natural bust in proportion. Outfit: lavender silk hanfu-style gown, off-the-shoulder with a deep plunging V front, sheer layered sleeves, gold moon-and-star embroidery, sash-cinched waist, skirt slit up to the hip, white lace-top thigh-high stockings with pearl garter straps, lavender high heels. Pose: seated sideways on the armrest of a lacquer chair at the table edge, legs crossed, the moon-phase fan held against her lips, glancing past the viewer. Expression: amused teasing smile. Framing: thigh-up figure filling the lower 55% of a vertical mobile game frame, the upper 45% an empty clear dark field left for a tile board. Setting: night mahjong parlor: black lacquer pillars, warm paper lanterns, a lacquer mahjong table across the bottom of the frame, large empty center above her left clear for a tile board. Her signature accent color covers less than a fifth of the frame. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "high",
+   "depends_on_task": "H0.yue_match.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H0/yue_match.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H0.yue_tea.search",
+   "seed": 875058,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "9:16",
+    "resolution": "1k",
+    "width": 584,
+    "height": 1024
+   },
+   "candidates": 8,
+   "unit_cost_cr": 1.0,
+   "heroine": "yue",
+   "element_ids": [
+    "8edeacc2-f24b-4a41-a166-66896711f259"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "golden_composite_full",
+   "tier": "full",
+   "prompt": "<<<8edeacc2-f24b-4a41-a166-66896711f259>>> is Yue, an adult woman of 27, ruler of the Moon Palace. Hair: very long straight-to-wavy pale lavender hair down to the waist with a half-up crown section. Eyes: violet almond eyes with long lashes. Skin: pale porcelain skin. Face: long elegant adult face with slim high nose, narrow almond eyes, serene composed smile. Signature items that must be present: pair of curved pearly-gold dragon horns rising from the crown; gold crescent-moon forehead ornament; gold crescent drop earrings with lavender tassels; moon-phase folding fan (Yue only). Body: tall statuesque figure, long limbs, regal posture, defined waist, rounded hips, long thighs, a full natural bust in proportion. Outfit: lavender silk hanfu-style gown, off-the-shoulder with a deep plunging V front, sheer layered sleeves, gold moon-and-star embroidery, sash-cinched waist, skirt slit up to the hip, white lace-top thigh-high stockings with pearl garter straps, lavender high heels. Pose: reclining on a moon-cushion divan, one leg crossed over the other, one arm stretched toward the viewer holding a small blank jade tile. Expression: serene teasing smile. Framing: full-body three-quarter view, camera at eye level, figure centered with space above for interface. Setting: night tea house: lacquered pillars, paper lanterns, a low tea table, a cushioned daybed, round moon window. Her signature accent color covers less than a fifth of the frame. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "medium",
+   "quota_cr": 8.0,
+   "max_credits": 8.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H0/yue_tea.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H0.yue_tea.final",
+   "seed": 523875,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "9:16",
+    "resolution": "2k",
+    "width": 1168,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "yue",
+   "element_ids": [
+    "8edeacc2-f24b-4a41-a166-66896711f259"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "golden_composite_full",
+   "tier": "full",
+   "prompt": "<<<8edeacc2-f24b-4a41-a166-66896711f259>>> is Yue, an adult woman of 27, ruler of the Moon Palace. Hair: very long straight-to-wavy pale lavender hair down to the waist with a half-up crown section. Eyes: violet almond eyes with long lashes. Skin: pale porcelain skin. Face: long elegant adult face with slim high nose, narrow almond eyes, serene composed smile. Signature items that must be present: pair of curved pearly-gold dragon horns rising from the crown; gold crescent-moon forehead ornament; gold crescent drop earrings with lavender tassels; moon-phase folding fan (Yue only). Body: tall statuesque figure, long limbs, regal posture, defined waist, rounded hips, long thighs, a full natural bust in proportion. Outfit: lavender silk hanfu-style gown, off-the-shoulder with a deep plunging V front, sheer layered sleeves, gold moon-and-star embroidery, sash-cinched waist, skirt slit up to the hip, white lace-top thigh-high stockings with pearl garter straps, lavender high heels. Pose: reclining on a moon-cushion divan, one leg crossed over the other, one arm stretched toward the viewer holding a small blank jade tile. Expression: serene teasing smile. Framing: full-body three-quarter view, camera at eye level, figure centered with space above for interface. Setting: night tea house: lacquered pillars, paper lanterns, a low tea table, a cushioned daybed, round moon window. Her signature accent color covers less than a fifth of the frame. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "high",
+   "depends_on_task": "H0.yue_tea.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H0/yue_tea.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H0.yue_summon.search",
+   "seed": 255802,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "9:16",
+    "resolution": "1k",
+    "width": 584,
+    "height": 1024
+   },
+   "candidates": 8,
+   "unit_cost_cr": 1.0,
+   "heroine": "yue",
+   "element_ids": [
+    "8edeacc2-f24b-4a41-a166-66896711f259"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "golden_composite_full",
+   "tier": "full",
+   "prompt": "<<<8edeacc2-f24b-4a41-a166-66896711f259>>> is Yue, an adult woman of 27, ruler of the Moon Palace. Hair: very long straight-to-wavy pale lavender hair down to the waist with a half-up crown section. Eyes: violet almond eyes with long lashes. Skin: pale porcelain skin. Face: long elegant adult face with slim high nose, narrow almond eyes, serene composed smile. Signature items that must be present: pair of curved pearly-gold dragon horns rising from the crown; gold crescent-moon forehead ornament; gold crescent drop earrings with lavender tassels; moon-phase folding fan (Yue only). Body: tall statuesque figure, long limbs, regal posture, defined waist, rounded hips, long thighs, a full natural bust in proportion. Outfit: lavender silk hanfu-style gown, off-the-shoulder with a deep plunging V front, sheer layered sleeves, gold moon-and-star embroidery, sash-cinched waist, skirt slit up to the hip, white lace-top thigh-high stockings with pearl garter straps, lavender high heels. Pose: standing in an S-curve with one hip tilted, one hand held out palm up toward the viewer, the fan resting on her hip. Expression: slow inviting half-smile. Framing: full-body view, centered under the arch, camera at eye level. Setting: golden lantern altar arch: glowing lanterns, light rays, drifting petals, deep night ground. Her signature accent color covers less than a fifth of the frame. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "medium",
+   "quota_cr": 8.0,
+   "max_credits": 8.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H0/yue_summon.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H0.yue_summon.final",
+   "seed": 111008,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "9:16",
+    "resolution": "2k",
+    "width": 1168,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "yue",
+   "element_ids": [
+    "8edeacc2-f24b-4a41-a166-66896711f259"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "golden_composite_full",
+   "tier": "full",
+   "prompt": "<<<8edeacc2-f24b-4a41-a166-66896711f259>>> is Yue, an adult woman of 27, ruler of the Moon Palace. Hair: very long straight-to-wavy pale lavender hair down to the waist with a half-up crown section. Eyes: violet almond eyes with long lashes. Skin: pale porcelain skin. Face: long elegant adult face with slim high nose, narrow almond eyes, serene composed smile. Signature items that must be present: pair of curved pearly-gold dragon horns rising from the crown; gold crescent-moon forehead ornament; gold crescent drop earrings with lavender tassels; moon-phase folding fan (Yue only). Body: tall statuesque figure, long limbs, regal posture, defined waist, rounded hips, long thighs, a full natural bust in proportion. Outfit: lavender silk hanfu-style gown, off-the-shoulder with a deep plunging V front, sheer layered sleeves, gold moon-and-star embroidery, sash-cinched waist, skirt slit up to the hip, white lace-top thigh-high stockings with pearl garter straps, lavender high heels. Pose: standing in an S-curve with one hip tilted, one hand held out palm up toward the viewer, the fan resting on her hip. Expression: slow inviting half-smile. Framing: full-body view, centered under the arch, camera at eye level. Setting: golden lantern altar arch: glowing lanterns, light rays, drifting petals, deep night ground. Her signature accent color covers less than a fifth of the frame. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "high",
+   "depends_on_task": "H0.yue_summon.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H0/yue_summon.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H0.yue_shop.search",
+   "seed": 585316,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "9:16",
+    "resolution": "1k",
+    "width": 584,
+    "height": 1024
+   },
+   "candidates": 8,
+   "unit_cost_cr": 1.0,
+   "heroine": "yue",
+   "element_ids": [
+    "8edeacc2-f24b-4a41-a166-66896711f259"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "golden_composite_full",
+   "tier": "full",
+   "prompt": "<<<8edeacc2-f24b-4a41-a166-66896711f259>>> is Yue, an adult woman of 27, ruler of the Moon Palace. Hair: very long straight-to-wavy pale lavender hair down to the waist with a half-up crown section. Eyes: violet almond eyes with long lashes. Skin: pale porcelain skin. Face: long elegant adult face with slim high nose, narrow almond eyes, serene composed smile. Signature items that must be present: pair of curved pearly-gold dragon horns rising from the crown; gold crescent-moon forehead ornament; gold crescent drop earrings with lavender tassels; moon-phase folding fan (Yue only). Body: tall statuesque figure, long limbs, regal posture, defined waist, rounded hips, long thighs, a full natural bust in proportion. Outfit: lavender silk hanfu-style gown, off-the-shoulder with a deep plunging V front, sheer layered sleeves, gold moon-and-star embroidery, sash-cinched waist, skirt slit up to the hip, white lace-top thigh-high stockings with pearl garter straps, lavender high heels. Pose: leaning on the counter with one elbow, one hand in her long hair, one knee bent, the fan in the other hand. Expression: lazy teasing smile, half-lidded eyes. Framing: full-length view with the counter at her side, camera at eye level. Setting: lantern-lit lacquer shop counter with shelves of blank jars, folded cloth and small boxes, no price tags, no signs. Her signature accent color covers less than a fifth of the frame. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "medium",
+   "quota_cr": 8.0,
+   "max_credits": 8.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H0/yue_shop.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H0.yue_shop.final",
+   "seed": 366365,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "9:16",
+    "resolution": "2k",
+    "width": 1168,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "yue",
+   "element_ids": [
+    "8edeacc2-f24b-4a41-a166-66896711f259"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "golden_composite_full",
+   "tier": "full",
+   "prompt": "<<<8edeacc2-f24b-4a41-a166-66896711f259>>> is Yue, an adult woman of 27, ruler of the Moon Palace. Hair: very long straight-to-wavy pale lavender hair down to the waist with a half-up crown section. Eyes: violet almond eyes with long lashes. Skin: pale porcelain skin. Face: long elegant adult face with slim high nose, narrow almond eyes, serene composed smile. Signature items that must be present: pair of curved pearly-gold dragon horns rising from the crown; gold crescent-moon forehead ornament; gold crescent drop earrings with lavender tassels; moon-phase folding fan (Yue only). Body: tall statuesque figure, long limbs, regal posture, defined waist, rounded hips, long thighs, a full natural bust in proportion. Outfit: lavender silk hanfu-style gown, off-the-shoulder with a deep plunging V front, sheer layered sleeves, gold moon-and-star embroidery, sash-cinched waist, skirt slit up to the hip, white lace-top thigh-high stockings with pearl garter straps, lavender high heels. Pose: leaning on the counter with one elbow, one hand in her long hair, one knee bent, the fan in the other hand. Expression: lazy teasing smile, half-lidded eyes. Framing: full-length view with the counter at her side, camera at eye level. Setting: lantern-lit lacquer shop counter with shelves of blank jars, folded cloth and small boxes, no price tags, no signs. Her signature accent color covers less than a fifth of the frame. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "high",
+   "depends_on_task": "H0.yue_shop.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H0/yue_shop.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H0.yue_win.search",
+   "seed": 429513,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "9:16",
+    "resolution": "1k",
+    "width": 584,
+    "height": 1024
+   },
+   "candidates": 8,
+   "unit_cost_cr": 1.0,
+   "heroine": "yue",
+   "element_ids": [
+    "8edeacc2-f24b-4a41-a166-66896711f259"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "golden_composite_full",
+   "tier": "full",
+   "prompt": "<<<8edeacc2-f24b-4a41-a166-66896711f259>>> is Yue, an adult woman of 27, ruler of the Moon Palace. Hair: very long straight-to-wavy pale lavender hair down to the waist with a half-up crown section. Eyes: violet almond eyes with long lashes. Skin: pale porcelain skin. Face: long elegant adult face with slim high nose, narrow almond eyes, serene composed smile. Signature items that must be present: pair of curved pearly-gold dragon horns rising from the crown; gold crescent-moon forehead ornament; gold crescent drop earrings with lavender tassels; moon-phase folding fan (Yue only). Body: tall statuesque figure, long limbs, regal posture, defined waist, rounded hips, long thighs, a full natural bust in proportion. Outfit: lavender silk hanfu-style gown, off-the-shoulder with a deep plunging V front, sheer layered sleeves, gold moon-and-star embroidery, sash-cinched waist, skirt slit up to the hip, white lace-top thigh-high stockings with pearl garter straps, lavender high heels. Pose: seated on a throne armrest with her legs crossed, the fan open beside her cheek, laughing, head turned toward the viewer. Expression: radiant delighted laugh. Framing: full-body view, centered, generous empty space above. Setting: night sky with falling gold petals and a few blank ivory mahjong tiles drifting, warm glow behind her. Her signature accent color covers less than a fifth of the frame. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "medium",
+   "quota_cr": 8.0,
+   "max_credits": 8.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H0/yue_win.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H0.yue_win.final",
+   "seed": 237440,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "9:16",
+    "resolution": "2k",
+    "width": 1168,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "yue",
+   "element_ids": [
+    "8edeacc2-f24b-4a41-a166-66896711f259"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "golden_composite_full",
+   "tier": "full",
+   "prompt": "<<<8edeacc2-f24b-4a41-a166-66896711f259>>> is Yue, an adult woman of 27, ruler of the Moon Palace. Hair: very long straight-to-wavy pale lavender hair down to the waist with a half-up crown section. Eyes: violet almond eyes with long lashes. Skin: pale porcelain skin. Face: long elegant adult face with slim high nose, narrow almond eyes, serene composed smile. Signature items that must be present: pair of curved pearly-gold dragon horns rising from the crown; gold crescent-moon forehead ornament; gold crescent drop earrings with lavender tassels; moon-phase folding fan (Yue only). Body: tall statuesque figure, long limbs, regal posture, defined waist, rounded hips, long thighs, a full natural bust in proportion. Outfit: lavender silk hanfu-style gown, off-the-shoulder with a deep plunging V front, sheer layered sleeves, gold moon-and-star embroidery, sash-cinched waist, skirt slit up to the hip, white lace-top thigh-high stockings with pearl garter straps, lavender high heels. Pose: seated on a throne armrest with her legs crossed, the fan open beside her cheek, laughing, head turned toward the viewer. Expression: radiant delighted laugh. Framing: full-body view, centered, generous empty space above. Setting: night sky with falling gold petals and a few blank ivory mahjong tiles drifting, warm glow behind her. Her signature accent color covers less than a fifth of the frame. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "high",
+   "depends_on_task": "H0.yue_win.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H0/yue_win.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H0.nova_match.search",
+   "seed": 313510,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "9:16",
+    "resolution": "1k",
+    "width": 584,
+    "height": 1024
+   },
+   "candidates": 8,
+   "unit_cost_cr": 1.0,
+   "heroine": "nova",
+   "element_ids": [
+    "0c657961-8e36-4535-a0c3-0059ce5df987"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "golden_composite_full",
+   "tier": "full",
+   "prompt": "<<<0c657961-8e36-4535-a0c3-0059ce5df987>>> is Nova, an adult woman of 23, white-hat hacker and street racer. Hair: chin-length asymmetric bob fading from cyan-blue at the roots to hot pink at the ends, side-swept bangs. Eyes: ice-blue eyes with a faint pink gradient under the lids and winged liner. Skin: fair pale cool-neutral porcelain-peach skin with a soft pink blush (not tanned, not dark). Face: small sharp adult oval face with a pointed chin, cat-like upturned eyes, thin arched brows, smug smile. Signature items that must be present: neon cat-ear headphones glowing cyan and pink (Nova only); small cyan face-marks on the cheek; black choker with a metal ring; transparent visor pushed up on the forehead in some outfits. Body: lean toned figure, slim waist, gently rounded hips, long legs, a natural bust in proportion. Outfit: strapless black corset bodice with neon cyan piping and a plunging sweetheart neckline, detached puffed black sleeves with neon trim, layered holographic tiered mini skirt with a big pink cat-badge bow at the hip, black fishnet thigh-highs with a neon cyan garter strap, black thigh-high lace-up platform boots with cyan laces. Pose: perched on the edge of the mahjong table with her boots crossed, one finger tapping her cat-ear headphones, a hip tilted. Expression: confident smirk. Framing: thigh-up figure filling the lower 55% of a vertical mobile game frame, the upper 45% an empty clear dark field left for a tile board. Setting: night mahjong parlor: black lacquer pillars, warm paper lanterns, a lacquer mahjong table across the bottom of the frame, large empty center above her left clear for a tile board. Her signature accent color covers less than a fifth of the frame. Her neon glow exists only on the outfit and a small effect. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "medium",
+   "quota_cr": 8.0,
+   "max_credits": 8.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H0/nova_match.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H0.nova_match.final",
+   "seed": 393660,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "9:16",
+    "resolution": "2k",
+    "width": 1168,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "nova",
+   "element_ids": [
+    "0c657961-8e36-4535-a0c3-0059ce5df987"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "golden_composite_full",
+   "tier": "full",
+   "prompt": "<<<0c657961-8e36-4535-a0c3-0059ce5df987>>> is Nova, an adult woman of 23, white-hat hacker and street racer. Hair: chin-length asymmetric bob fading from cyan-blue at the roots to hot pink at the ends, side-swept bangs. Eyes: ice-blue eyes with a faint pink gradient under the lids and winged liner. Skin: fair pale cool-neutral porcelain-peach skin with a soft pink blush (not tanned, not dark). Face: small sharp adult oval face with a pointed chin, cat-like upturned eyes, thin arched brows, smug smile. Signature items that must be present: neon cat-ear headphones glowing cyan and pink (Nova only); small cyan face-marks on the cheek; black choker with a metal ring; transparent visor pushed up on the forehead in some outfits. Body: lean toned figure, slim waist, gently rounded hips, long legs, a natural bust in proportion. Outfit: strapless black corset bodice with neon cyan piping and a plunging sweetheart neckline, detached puffed black sleeves with neon trim, layered holographic tiered mini skirt with a big pink cat-badge bow at the hip, black fishnet thigh-highs with a neon cyan garter strap, black thigh-high lace-up platform boots with cyan laces. Pose: perched on the edge of the mahjong table with her boots crossed, one finger tapping her cat-ear headphones, a hip tilted. Expression: confident smirk. Framing: thigh-up figure filling the lower 55% of a vertical mobile game frame, the upper 45% an empty clear dark field left for a tile board. Setting: night mahjong parlor: black lacquer pillars, warm paper lanterns, a lacquer mahjong table across the bottom of the frame, large empty center above her left clear for a tile board. Her signature accent color covers less than a fifth of the frame. Her neon glow exists only on the outfit and a small effect. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "high",
+   "depends_on_task": "H0.nova_match.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H0/nova_match.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H0.nova_tea.search",
+   "seed": 186197,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "9:16",
+    "resolution": "1k",
+    "width": 584,
+    "height": 1024
+   },
+   "candidates": 8,
+   "unit_cost_cr": 1.0,
+   "heroine": "nova",
+   "element_ids": [
+    "0c657961-8e36-4535-a0c3-0059ce5df987"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "golden_composite_full",
+   "tier": "full",
+   "prompt": "<<<0c657961-8e36-4535-a0c3-0059ce5df987>>> is Nova, an adult woman of 23, white-hat hacker and street racer. Hair: chin-length asymmetric bob fading from cyan-blue at the roots to hot pink at the ends, side-swept bangs. Eyes: ice-blue eyes with a faint pink gradient under the lids and winged liner. Skin: fair pale cool-neutral porcelain-peach skin with a soft pink blush (not tanned, not dark). Face: small sharp adult oval face with a pointed chin, cat-like upturned eyes, thin arched brows, smug smile. Signature items that must be present: neon cat-ear headphones glowing cyan and pink (Nova only); small cyan face-marks on the cheek; black choker with a metal ring; transparent visor pushed up on the forehead in some outfits. Body: lean toned figure, slim waist, gently rounded hips, long legs, a natural bust in proportion. Outfit: strapless black corset bodice with neon cyan piping and a plunging sweetheart neckline, detached puffed black sleeves with neon trim, layered holographic tiered mini skirt with a big pink cat-badge bow at the hip, black fishnet thigh-highs with a neon cyan garter strap, black thigh-high lace-up platform boots with cyan laces. Pose: reclining back on cushions propped on both hands, legs crossed at the ankle, a tea bowl on the table beside her. Expression: smug half-smile. Framing: full-body three-quarter view, camera at eye level, figure centered with space above for interface. Setting: night tea house: lacquered pillars, paper lanterns, a low tea table, a cushioned daybed, round moon window. Her signature accent color covers less than a fifth of the frame. Her neon glow exists only on the outfit and a small effect. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "medium",
+   "quota_cr": 8.0,
+   "max_credits": 8.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H0/nova_tea.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H0.nova_tea.final",
+   "seed": 517010,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "9:16",
+    "resolution": "2k",
+    "width": 1168,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "nova",
+   "element_ids": [
+    "0c657961-8e36-4535-a0c3-0059ce5df987"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "golden_composite_full",
+   "tier": "full",
+   "prompt": "<<<0c657961-8e36-4535-a0c3-0059ce5df987>>> is Nova, an adult woman of 23, white-hat hacker and street racer. Hair: chin-length asymmetric bob fading from cyan-blue at the roots to hot pink at the ends, side-swept bangs. Eyes: ice-blue eyes with a faint pink gradient under the lids and winged liner. Skin: fair pale cool-neutral porcelain-peach skin with a soft pink blush (not tanned, not dark). Face: small sharp adult oval face with a pointed chin, cat-like upturned eyes, thin arched brows, smug smile. Signature items that must be present: neon cat-ear headphones glowing cyan and pink (Nova only); small cyan face-marks on the cheek; black choker with a metal ring; transparent visor pushed up on the forehead in some outfits. Body: lean toned figure, slim waist, gently rounded hips, long legs, a natural bust in proportion. Outfit: strapless black corset bodice with neon cyan piping and a plunging sweetheart neckline, detached puffed black sleeves with neon trim, layered holographic tiered mini skirt with a big pink cat-badge bow at the hip, black fishnet thigh-highs with a neon cyan garter strap, black thigh-high lace-up platform boots with cyan laces. Pose: reclining back on cushions propped on both hands, legs crossed at the ankle, a tea bowl on the table beside her. Expression: smug half-smile. Framing: full-body three-quarter view, camera at eye level, figure centered with space above for interface. Setting: night tea house: lacquered pillars, paper lanterns, a low tea table, a cushioned daybed, round moon window. Her signature accent color covers less than a fifth of the frame. Her neon glow exists only on the outfit and a small effect. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "high",
+   "depends_on_task": "H0.nova_tea.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H0/nova_tea.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H0.nova_summon.search",
+   "seed": 789439,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "9:16",
+    "resolution": "1k",
+    "width": 584,
+    "height": 1024
+   },
+   "candidates": 8,
+   "unit_cost_cr": 1.0,
+   "heroine": "nova",
+   "element_ids": [
+    "0c657961-8e36-4535-a0c3-0059ce5df987"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "golden_composite_full",
+   "tier": "full",
+   "prompt": "<<<0c657961-8e36-4535-a0c3-0059ce5df987>>> is Nova, an adult woman of 23, white-hat hacker and street racer. Hair: chin-length asymmetric bob fading from cyan-blue at the roots to hot pink at the ends, side-swept bangs. Eyes: ice-blue eyes with a faint pink gradient under the lids and winged liner. Skin: fair pale cool-neutral porcelain-peach skin with a soft pink blush (not tanned, not dark). Face: small sharp adult oval face with a pointed chin, cat-like upturned eyes, thin arched brows, smug smile. Signature items that must be present: neon cat-ear headphones glowing cyan and pink (Nova only); small cyan face-marks on the cheek; black choker with a metal ring; transparent visor pushed up on the forehead in some outfits. Body: lean toned figure, slim waist, gently rounded hips, long legs, a natural bust in proportion. Outfit: strapless black corset bodice with neon cyan piping and a plunging sweetheart neckline, detached puffed black sleeves with neon trim, layered holographic tiered mini skirt with a big pink cat-badge bow at the hip, black fishnet thigh-highs with a neon cyan garter strap, black thigh-high lace-up platform boots with cyan laces. Pose: standing with a hip tilt, one hand on her hip and the other pointing a finger at the viewer, a small cyan hologram card floating beside her. Expression: playful wink with a smirk. Framing: full-body view, centered under the arch, camera at eye level. Setting: golden lantern altar arch: glowing lanterns, light rays, drifting petals, deep night ground. Her signature accent color covers less than a fifth of the frame. Her neon glow exists only on the outfit and a small effect. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "medium",
+   "quota_cr": 8.0,
+   "max_credits": 8.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H0/nova_summon.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H0.nova_summon.final",
+   "seed": 996484,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "9:16",
+    "resolution": "2k",
+    "width": 1168,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "nova",
+   "element_ids": [
+    "0c657961-8e36-4535-a0c3-0059ce5df987"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "golden_composite_full",
+   "tier": "full",
+   "prompt": "<<<0c657961-8e36-4535-a0c3-0059ce5df987>>> is Nova, an adult woman of 23, white-hat hacker and street racer. Hair: chin-length asymmetric bob fading from cyan-blue at the roots to hot pink at the ends, side-swept bangs. Eyes: ice-blue eyes with a faint pink gradient under the lids and winged liner. Skin: fair pale cool-neutral porcelain-peach skin with a soft pink blush (not tanned, not dark). Face: small sharp adult oval face with a pointed chin, cat-like upturned eyes, thin arched brows, smug smile. Signature items that must be present: neon cat-ear headphones glowing cyan and pink (Nova only); small cyan face-marks on the cheek; black choker with a metal ring; transparent visor pushed up on the forehead in some outfits. Body: lean toned figure, slim waist, gently rounded hips, long legs, a natural bust in proportion. Outfit: strapless black corset bodice with neon cyan piping and a plunging sweetheart neckline, detached puffed black sleeves with neon trim, layered holographic tiered mini skirt with a big pink cat-badge bow at the hip, black fishnet thigh-highs with a neon cyan garter strap, black thigh-high lace-up platform boots with cyan laces. Pose: standing with a hip tilt, one hand on her hip and the other pointing a finger at the viewer, a small cyan hologram card floating beside her. Expression: playful wink with a smirk. Framing: full-body view, centered under the arch, camera at eye level. Setting: golden lantern altar arch: glowing lanterns, light rays, drifting petals, deep night ground. Her signature accent color covers less than a fifth of the frame. Her neon glow exists only on the outfit and a small effect. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "high",
+   "depends_on_task": "H0.nova_summon.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H0/nova_summon.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H0.nova_shop.search",
+   "seed": 907173,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "9:16",
+    "resolution": "1k",
+    "width": 584,
+    "height": 1024
+   },
+   "candidates": 8,
+   "unit_cost_cr": 1.0,
+   "heroine": "nova",
+   "element_ids": [
+    "0c657961-8e36-4535-a0c3-0059ce5df987"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "golden_composite_full",
+   "tier": "full",
+   "prompt": "<<<0c657961-8e36-4535-a0c3-0059ce5df987>>> is Nova, an adult woman of 23, white-hat hacker and street racer. Hair: chin-length asymmetric bob fading from cyan-blue at the roots to hot pink at the ends, side-swept bangs. Eyes: ice-blue eyes with a faint pink gradient under the lids and winged liner. Skin: fair pale cool-neutral porcelain-peach skin with a soft pink blush (not tanned, not dark). Face: small sharp adult oval face with a pointed chin, cat-like upturned eyes, thin arched brows, smug smile. Signature items that must be present: neon cat-ear headphones glowing cyan and pink (Nova only); small cyan face-marks on the cheek; black choker with a metal ring; transparent visor pushed up on the forehead in some outfits. Body: lean toned figure, slim waist, gently rounded hips, long legs, a natural bust in proportion. Outfit: strapless black corset bodice with neon cyan piping and a plunging sweetheart neckline, detached puffed black sleeves with neon trim, layered holographic tiered mini skirt with a big pink cat-badge bow at the hip, black fishnet thigh-highs with a neon cyan garter strap, black thigh-high lace-up platform boots with cyan laces. Pose: leaning over the counter on one forearm, holding a glowing cyan card between two fingers, looking sideways at the viewer. Expression: teasing smirk. Framing: full-length view with the counter at her side, camera at eye level. Setting: lantern-lit lacquer shop counter with shelves of blank jars, folded cloth and small boxes, no price tags, no signs. Her signature accent color covers less than a fifth of the frame. Her neon glow exists only on the outfit and a small effect. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "medium",
+   "quota_cr": 8.0,
+   "max_credits": 8.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H0/nova_shop.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H0.nova_shop.final",
+   "seed": 887098,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "9:16",
+    "resolution": "2k",
+    "width": 1168,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "nova",
+   "element_ids": [
+    "0c657961-8e36-4535-a0c3-0059ce5df987"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "golden_composite_full",
+   "tier": "full",
+   "prompt": "<<<0c657961-8e36-4535-a0c3-0059ce5df987>>> is Nova, an adult woman of 23, white-hat hacker and street racer. Hair: chin-length asymmetric bob fading from cyan-blue at the roots to hot pink at the ends, side-swept bangs. Eyes: ice-blue eyes with a faint pink gradient under the lids and winged liner. Skin: fair pale cool-neutral porcelain-peach skin with a soft pink blush (not tanned, not dark). Face: small sharp adult oval face with a pointed chin, cat-like upturned eyes, thin arched brows, smug smile. Signature items that must be present: neon cat-ear headphones glowing cyan and pink (Nova only); small cyan face-marks on the cheek; black choker with a metal ring; transparent visor pushed up on the forehead in some outfits. Body: lean toned figure, slim waist, gently rounded hips, long legs, a natural bust in proportion. Outfit: strapless black corset bodice with neon cyan piping and a plunging sweetheart neckline, detached puffed black sleeves with neon trim, layered holographic tiered mini skirt with a big pink cat-badge bow at the hip, black fishnet thigh-highs with a neon cyan garter strap, black thigh-high lace-up platform boots with cyan laces. Pose: leaning over the counter on one forearm, holding a glowing cyan card between two fingers, looking sideways at the viewer. Expression: teasing smirk. Framing: full-length view with the counter at her side, camera at eye level. Setting: lantern-lit lacquer shop counter with shelves of blank jars, folded cloth and small boxes, no price tags, no signs. Her signature accent color covers less than a fifth of the frame. Her neon glow exists only on the outfit and a small effect. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "high",
+   "depends_on_task": "H0.nova_shop.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H0/nova_shop.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H0.nova_win.search",
+   "seed": 215886,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "9:16",
+    "resolution": "1k",
+    "width": 584,
+    "height": 1024
+   },
+   "candidates": 8,
+   "unit_cost_cr": 1.0,
+   "heroine": "nova",
+   "element_ids": [
+    "0c657961-8e36-4535-a0c3-0059ce5df987"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "golden_composite_full",
+   "tier": "full",
+   "prompt": "<<<0c657961-8e36-4535-a0c3-0059ce5df987>>> is Nova, an adult woman of 23, white-hat hacker and street racer. Hair: chin-length asymmetric bob fading from cyan-blue at the roots to hot pink at the ends, side-swept bangs. Eyes: ice-blue eyes with a faint pink gradient under the lids and winged liner. Skin: fair pale cool-neutral porcelain-peach skin with a soft pink blush (not tanned, not dark). Face: small sharp adult oval face with a pointed chin, cat-like upturned eyes, thin arched brows, smug smile. Signature items that must be present: neon cat-ear headphones glowing cyan and pink (Nova only); small cyan face-marks on the cheek; black choker with a metal ring; transparent visor pushed up on the forehead in some outfits. Body: lean toned figure, slim waist, gently rounded hips, long legs, a natural bust in proportion. Outfit: strapless black corset bodice with neon cyan piping and a plunging sweetheart neckline, detached puffed black sleeves with neon trim, layered holographic tiered mini skirt with a big pink cat-badge bow at the hip, black fishnet thigh-highs with a neon cyan garter strap, black thigh-high lace-up platform boots with cyan laces. Pose: idol pose on a concert stage, singing into a microphone, one hand pointing at the viewer, one leg stepped forward, winking, truss lights and glow sticks behind her. Expression: wink with a bright confident grin. Framing: full-body view, centered, generous empty space above. Setting: concert stage with truss lights, glow sticks in the dark crowd far behind her, drifting petals. Her signature accent color covers less than a fifth of the frame. Her neon glow exists only on the outfit and a small effect. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "medium",
+   "quota_cr": 8.0,
+   "max_credits": 8.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H0/nova_win.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H0.nova_win.final",
+   "seed": 803313,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "9:16",
+    "resolution": "2k",
+    "width": 1168,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "nova",
+   "element_ids": [
+    "0c657961-8e36-4535-a0c3-0059ce5df987"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "golden_composite_full",
+   "tier": "full",
+   "prompt": "<<<0c657961-8e36-4535-a0c3-0059ce5df987>>> is Nova, an adult woman of 23, white-hat hacker and street racer. Hair: chin-length asymmetric bob fading from cyan-blue at the roots to hot pink at the ends, side-swept bangs. Eyes: ice-blue eyes with a faint pink gradient under the lids and winged liner. Skin: fair pale cool-neutral porcelain-peach skin with a soft pink blush (not tanned, not dark). Face: small sharp adult oval face with a pointed chin, cat-like upturned eyes, thin arched brows, smug smile. Signature items that must be present: neon cat-ear headphones glowing cyan and pink (Nova only); small cyan face-marks on the cheek; black choker with a metal ring; transparent visor pushed up on the forehead in some outfits. Body: lean toned figure, slim waist, gently rounded hips, long legs, a natural bust in proportion. Outfit: strapless black corset bodice with neon cyan piping and a plunging sweetheart neckline, detached puffed black sleeves with neon trim, layered holographic tiered mini skirt with a big pink cat-badge bow at the hip, black fishnet thigh-highs with a neon cyan garter strap, black thigh-high lace-up platform boots with cyan laces. Pose: idol pose on a concert stage, singing into a microphone, one hand pointing at the viewer, one leg stepped forward, winking, truss lights and glow sticks behind her. Expression: wink with a bright confident grin. Framing: full-body view, centered, generous empty space above. Setting: concert stage with truss lights, glow sticks in the dark crowd far behind her, drifting petals. Her signature accent color covers less than a fifth of the frame. Her neon glow exists only on the outfit and a small effect. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "high",
+   "depends_on_task": "H0.nova_win.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H0/nova_win.final",
+    "name": "cand_{n:02d}"
+   }
+  }
+ ],
+ "totals": {
+  "tasks": 30,
+  "task_quota_sum_cr": 180.0,
+  "candidates": 150
+ },
+ "style_tail_id": "v5f"
+}

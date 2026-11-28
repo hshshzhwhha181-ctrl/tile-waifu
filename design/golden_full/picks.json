@@ -1,0 +1,19 @@
+{
+ "mc_match": "c1",
+ "mc_tea": "c1",
+ "mc_summon": "c2",
+ "mc_shop": "c2",
+ "mc_win": "c2",
+ "yue_match": "c1",
+ "yue_tea": "c1",
+ "yue_summon": "c2",
+ "yue_shop": "c1",
+ "yue_win": "c2",
+ "nova_match": "c0",
+ "nova_tea": "c1",
+ "nova_summon": "c0",
+ "nova_shop": "c1",
+ "nova_win": "c0",
+ "hana_pinup": "c0",
+ "_note": "extra frame beyond the 15; candidates c0..c2 are in candidates/ as jpg q88"
+}

@@ -1,0 +1,2196 @@
+{
+ "schema_version": 1,
+ "package": "P51",
+ "title": "Canon set, tier Full: 10 heroines x 3 frames (three-quarter base, win, tease)",
+ "week": 3,
+ "section": "Heroines",
+ "status": "ready_for_owner_approval",
+ "in_plan_ceiling": true,
+ "blocked_by": [],
+ "depends_on": [
+  "H0"
+ ],
+ "owner_gate": "owner approves the Full tier from the H0 frames; finals pass the anatomy audit and the 45-pair face matrix",
+ "budget": {
+  "currency": "higgsfield_credits",
+  "nominal_cr": 330,
+  "hard_stop_cr": 379.5,
+  "hard_stop_rule": "nominal + 15%: above that the run stops and the owner is asked",
+  "assumptions": [
+   "post pool: 30 x 1 cr is the plan figure (~10%); upscale_image / remove_background are not quoted"
+  ]
+ },
+ "candidates_policy": "search: 6 candidates per frame at 1k medium (1 cr); final: 2 candidates at 2k high (2 cr); post: 30 units of upscale / remove_background at ~1 cr",
+ "selection": {
+  "keep_per_task": 1,
+  "gate": "Full-tier look gate (design/ART_TIER_FULL.md section 7) + anatomy audit",
+  "criteria": [
+   "boldness at the owner's reference level (stockings with bands, deep neckline, playful pose), not tamer",
+   "hard lines: clearly adult face and 7-7.5 heads, nothing nude (no nipples, no genitals), no explicit act, no school or minor coding, no text",
+   "anatomy double audit passed: crops of hands, fingers, legs and feet show no extra or fused limbs",
+   "face reads as the canon heroine (>= 4 of 5 traits: eye shape, face width, nose/mouth, apparent age, brows) vs the element portrait",
+   "hair colour, signature items and outfit match the canon card; no drift (hair_never rules)",
+   "no text, no logos, no watermark, no garbled glyphs anywhere; mahjong tiles blank",
+   "face matrix: no two heroines share a face (pairwise >= 3 of 5 traits differ)",
+   "the base frame is usable as the three-quarter card of the heroine strip (cut at mid-thigh, hands visible)"
+  ]
+ },
+ "pilot": {
+  "task_ids": [
+   "H1.mc_base.search",
+   "H1.kohaku_tease.search",
+   "H1.miel_base.search"
+  ],
+  "candidates_per_task": 2,
+  "max_cr": 6.0,
+  "go_rule": "3 frames x 2 candidates; compare against the owner's reference images"
+ },
+ "tool_note": "gpt_image_2_6 + Elements, tail `v5f`, outfit = the base slot of the wardrobe table.",
+ "guards": [
+  "Before each launch: estimate_*_cost -> quote_ref; abort the task when the quote is above max_credits.",
+  "Actual spend goes to design/art_batches/SPEND_LOG.csv; more than 15% over the batch nominal = stop and ask the owner.",
+  "Every output lands in assets/incoming, then double anatomy audit -> metadata scrub -> watermark pass -> manifest `approve`.",
+  "Prompts are untested: run the pilot tasks first (2-3 frames), look at them, only then release the rest."
+ ],
+ "notes": [],
+ "tier": "full",
+ "batch_id": "H1",
+ "tasks": [
+  {
+   "id": "H1.mc_base.search",
+   "seed": 385568,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "1k",
+    "width": 680,
+    "height": 1024
+   },
+   "candidates": 6,
+   "unit_cost_cr": 1.0,
+   "heroine": "mc",
+   "element_ids": [
+    "7df3cc78-06be-4080-87f0-49d3c1da4ff0"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<7df3cc78-06be-4080-87f0-49d3c1da4ff0>>> is Mahjong-chan, an adult woman of 26, mahjong salon owner. Hair: light sakura-pink long glossy wavy hair worn in two high twin tails at the upper sides of the head, with long loose side strands and side-swept bangs. Eyes: rose-pink eyes with a soft gradient iris. Skin: fair warm peach skin with light rosy blush. Face: soft heart-shaped adult face, rounded cheeks, big warm slightly upturned eyes, wide open-mouth smile, soft brows. Signature items that must be present: pair of mint-jade looped knot hairpins with a small pink cherry blossom on each tail base; jade drop earrings; white ruffled wrist cuffs with a mint band. Body: medium height, soft shapely figure, defined waist, rounded hips, soft thighs, soft shoulders, a full natural bust in proportion. Outfit: black-and-gold long qipao with gold dragon embroidery, a plunging keyhole front with a gold frog-button collar, bare shoulders, black lace detached arm sleeves, a side slit up to the hip, sheer black thigh-high stockings with wide lace tops, black stiletto heels. Pose: standing with one hip tilted, one hand on her hip, the other hand touching her hair, eyes on the viewer. Expression: confident teasing smile. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward mint-jade green. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "medium",
+   "quota_cr": 6.0,
+   "max_credits": 6.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/mc_base.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.mc_base.final",
+   "seed": 905738,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "2k",
+    "width": 1368,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "mc",
+   "element_ids": [
+    "7df3cc78-06be-4080-87f0-49d3c1da4ff0"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<7df3cc78-06be-4080-87f0-49d3c1da4ff0>>> is Mahjong-chan, an adult woman of 26, mahjong salon owner. Hair: light sakura-pink long glossy wavy hair worn in two high twin tails at the upper sides of the head, with long loose side strands and side-swept bangs. Eyes: rose-pink eyes with a soft gradient iris. Skin: fair warm peach skin with light rosy blush. Face: soft heart-shaped adult face, rounded cheeks, big warm slightly upturned eyes, wide open-mouth smile, soft brows. Signature items that must be present: pair of mint-jade looped knot hairpins with a small pink cherry blossom on each tail base; jade drop earrings; white ruffled wrist cuffs with a mint band. Body: medium height, soft shapely figure, defined waist, rounded hips, soft thighs, soft shoulders, a full natural bust in proportion. Outfit: black-and-gold long qipao with gold dragon embroidery, a plunging keyhole front with a gold frog-button collar, bare shoulders, black lace detached arm sleeves, a side slit up to the hip, sheer black thigh-high stockings with wide lace tops, black stiletto heels. Pose: standing with one hip tilted, one hand on her hip, the other hand touching her hair, eyes on the viewer. Expression: confident teasing smile. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward mint-jade green. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "high",
+   "depends_on_task": "H1.mc_base.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/mc_base.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.mc_win.search",
+   "seed": 622270,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "1k",
+    "width": 680,
+    "height": 1024
+   },
+   "candidates": 6,
+   "unit_cost_cr": 1.0,
+   "heroine": "mc",
+   "element_ids": [
+    "7df3cc78-06be-4080-87f0-49d3c1da4ff0"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<7df3cc78-06be-4080-87f0-49d3c1da4ff0>>> is Mahjong-chan, an adult woman of 26, mahjong salon owner. Hair: light sakura-pink long glossy wavy hair worn in two high twin tails at the upper sides of the head, with long loose side strands and side-swept bangs. Eyes: rose-pink eyes with a soft gradient iris. Skin: fair warm peach skin with light rosy blush. Face: soft heart-shaped adult face, rounded cheeks, big warm slightly upturned eyes, wide open-mouth smile, soft brows. Signature items that must be present: pair of mint-jade looped knot hairpins with a small pink cherry blossom on each tail base; jade drop earrings; white ruffled wrist cuffs with a mint band. Body: medium height, soft shapely figure, defined waist, rounded hips, soft thighs, soft shoulders, a full natural bust in proportion. Outfit: black-and-gold long qipao with gold dragon embroidery, a plunging keyhole front with a gold frog-button collar, bare shoulders, black lace detached arm sleeves, a side slit up to the hip, sheer black thigh-high stockings with wide lace tops, black stiletto heels. Pose: leaning toward the viewer in a joyful victory pose, one hand holding up a single blank ivory mahjong tile, a wink. Expression: bright laugh with a wink. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward mint-jade green. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "medium",
+   "quota_cr": 6.0,
+   "max_credits": 6.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/mc_win.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.mc_win.final",
+   "seed": 465189,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "2k",
+    "width": 1368,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "mc",
+   "element_ids": [
+    "7df3cc78-06be-4080-87f0-49d3c1da4ff0"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<7df3cc78-06be-4080-87f0-49d3c1da4ff0>>> is Mahjong-chan, an adult woman of 26, mahjong salon owner. Hair: light sakura-pink long glossy wavy hair worn in two high twin tails at the upper sides of the head, with long loose side strands and side-swept bangs. Eyes: rose-pink eyes with a soft gradient iris. Skin: fair warm peach skin with light rosy blush. Face: soft heart-shaped adult face, rounded cheeks, big warm slightly upturned eyes, wide open-mouth smile, soft brows. Signature items that must be present: pair of mint-jade looped knot hairpins with a small pink cherry blossom on each tail base; jade drop earrings; white ruffled wrist cuffs with a mint band. Body: medium height, soft shapely figure, defined waist, rounded hips, soft thighs, soft shoulders, a full natural bust in proportion. Outfit: black-and-gold long qipao with gold dragon embroidery, a plunging keyhole front with a gold frog-button collar, bare shoulders, black lace detached arm sleeves, a side slit up to the hip, sheer black thigh-high stockings with wide lace tops, black stiletto heels. Pose: leaning toward the viewer in a joyful victory pose, one hand holding up a single blank ivory mahjong tile, a wink. Expression: bright laugh with a wink. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward mint-jade green. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "high",
+   "depends_on_task": "H1.mc_win.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/mc_win.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.mc_tease.search",
+   "seed": 592742,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "1k",
+    "width": 680,
+    "height": 1024
+   },
+   "candidates": 6,
+   "unit_cost_cr": 1.0,
+   "heroine": "mc",
+   "element_ids": [
+    "7df3cc78-06be-4080-87f0-49d3c1da4ff0"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<7df3cc78-06be-4080-87f0-49d3c1da4ff0>>> is Mahjong-chan, an adult woman of 26, mahjong salon owner. Hair: light sakura-pink long glossy wavy hair worn in two high twin tails at the upper sides of the head, with long loose side strands and side-swept bangs. Eyes: rose-pink eyes with a soft gradient iris. Skin: fair warm peach skin with light rosy blush. Face: soft heart-shaped adult face, rounded cheeks, big warm slightly upturned eyes, wide open-mouth smile, soft brows. Signature items that must be present: pair of mint-jade looped knot hairpins with a small pink cherry blossom on each tail base; jade drop earrings; white ruffled wrist cuffs with a mint band. Body: medium height, soft shapely figure, defined waist, rounded hips, soft thighs, soft shoulders, a full natural bust in proportion. Outfit: black-and-gold long qipao with gold dragon embroidery, a plunging keyhole front with a gold frog-button collar, bare shoulders, black lace detached arm sleeves, a side slit up to the hip, sheer black thigh-high stockings with wide lace tops, black stiletto heels. Pose: glancing back at the viewer over her shoulder, one fingertip at her lips, shoulders turned, hip tilted. Expression: playful flirty smile. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward mint-jade green. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "medium",
+   "quota_cr": 6.0,
+   "max_credits": 6.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/mc_tease.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.mc_tease.final",
+   "seed": 194355,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "2k",
+    "width": 1368,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "mc",
+   "element_ids": [
+    "7df3cc78-06be-4080-87f0-49d3c1da4ff0"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<7df3cc78-06be-4080-87f0-49d3c1da4ff0>>> is Mahjong-chan, an adult woman of 26, mahjong salon owner. Hair: light sakura-pink long glossy wavy hair worn in two high twin tails at the upper sides of the head, with long loose side strands and side-swept bangs. Eyes: rose-pink eyes with a soft gradient iris. Skin: fair warm peach skin with light rosy blush. Face: soft heart-shaped adult face, rounded cheeks, big warm slightly upturned eyes, wide open-mouth smile, soft brows. Signature items that must be present: pair of mint-jade looped knot hairpins with a small pink cherry blossom on each tail base; jade drop earrings; white ruffled wrist cuffs with a mint band. Body: medium height, soft shapely figure, defined waist, rounded hips, soft thighs, soft shoulders, a full natural bust in proportion. Outfit: black-and-gold long qipao with gold dragon embroidery, a plunging keyhole front with a gold frog-button collar, bare shoulders, black lace detached arm sleeves, a side slit up to the hip, sheer black thigh-high stockings with wide lace tops, black stiletto heels. Pose: glancing back at the viewer over her shoulder, one fingertip at her lips, shoulders turned, hip tilted. Expression: playful flirty smile. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward mint-jade green. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "high",
+   "depends_on_task": "H1.mc_tease.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/mc_tease.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.rin_base.search",
+   "seed": 665136,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "1k",
+    "width": 680,
+    "height": 1024
+   },
+   "candidates": 6,
+   "unit_cost_cr": 1.0,
+   "heroine": "rin",
+   "element_ids": [
+    "4d50001c-c2be-4758-a1e5-6d2c7d5f70be"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<4d50001c-c2be-4758-a1e5-6d2c7d5f70be>>> is Rin, an adult woman of 27, tea master of the Ice Pavilion. Hair: dark sage-green long glossy hair with a side parting and one thick loose braid falling over her left shoulder. Eyes: sage-green almond eyes with calm half-lowered lids. Skin: light warm beige skin. Face: long narrow adult oval face, high cheekbones, almond eyes, thin straight brows, small refined mouth, elegant long neck. Signature items that must be present: thin round gold wire glasses (worn in every image, Rin only); jade teardrop earrings; jade bangle; celadon tea bowl or tea set nearby. Body: tall slender figure, long neck and very long legs, slim waist, gently rounded hips, a natural bust in proportion. Outfit: sleeveless black cheongsam with gold-green phoenix embroidery, a deep plunging neckline, an open back, a skirt slit up to the hip, sheer black thigh-high stockings with lace tops and garter straps clipped to the hem, black stiletto heels, a jade bangle. Pose: standing with one hip tilted, one hand on her hip, the other hand touching her hair, eyes on the viewer. Expression: confident teasing smile. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward deep forest green. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "medium",
+   "quota_cr": 6.0,
+   "max_credits": 6.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/rin_base.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.rin_base.final",
+   "seed": 130222,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "2k",
+    "width": 1368,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "rin",
+   "element_ids": [
+    "4d50001c-c2be-4758-a1e5-6d2c7d5f70be"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<4d50001c-c2be-4758-a1e5-6d2c7d5f70be>>> is Rin, an adult woman of 27, tea master of the Ice Pavilion. Hair: dark sage-green long glossy hair with a side parting and one thick loose braid falling over her left shoulder. Eyes: sage-green almond eyes with calm half-lowered lids. Skin: light warm beige skin. Face: long narrow adult oval face, high cheekbones, almond eyes, thin straight brows, small refined mouth, elegant long neck. Signature items that must be present: thin round gold wire glasses (worn in every image, Rin only); jade teardrop earrings; jade bangle; celadon tea bowl or tea set nearby. Body: tall slender figure, long neck and very long legs, slim waist, gently rounded hips, a natural bust in proportion. Outfit: sleeveless black cheongsam with gold-green phoenix embroidery, a deep plunging neckline, an open back, a skirt slit up to the hip, sheer black thigh-high stockings with lace tops and garter straps clipped to the hem, black stiletto heels, a jade bangle. Pose: standing with one hip tilted, one hand on her hip, the other hand touching her hair, eyes on the viewer. Expression: confident teasing smile. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward deep forest green. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "high",
+   "depends_on_task": "H1.rin_base.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/rin_base.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.rin_win.search",
+   "seed": 799258,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "1k",
+    "width": 680,
+    "height": 1024
+   },
+   "candidates": 6,
+   "unit_cost_cr": 1.0,
+   "heroine": "rin",
+   "element_ids": [
+    "4d50001c-c2be-4758-a1e5-6d2c7d5f70be"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<4d50001c-c2be-4758-a1e5-6d2c7d5f70be>>> is Rin, an adult woman of 27, tea master of the Ice Pavilion. Hair: dark sage-green long glossy hair with a side parting and one thick loose braid falling over her left shoulder. Eyes: sage-green almond eyes with calm half-lowered lids. Skin: light warm beige skin. Face: long narrow adult oval face, high cheekbones, almond eyes, thin straight brows, small refined mouth, elegant long neck. Signature items that must be present: thin round gold wire glasses (worn in every image, Rin only); jade teardrop earrings; jade bangle; celadon tea bowl or tea set nearby. Body: tall slender figure, long neck and very long legs, slim waist, gently rounded hips, a natural bust in proportion. Outfit: sleeveless black cheongsam with gold-green phoenix embroidery, a deep plunging neckline, an open back, a skirt slit up to the hip, sheer black thigh-high stockings with lace tops and garter straps clipped to the hem, black stiletto heels, a jade bangle. Pose: leaning toward the viewer in a joyful victory pose, one hand holding up a single blank ivory mahjong tile, a wink. Expression: bright laugh with a wink. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward deep forest green. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "medium",
+   "quota_cr": 6.0,
+   "max_credits": 6.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/rin_win.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.rin_win.final",
+   "seed": 979378,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "2k",
+    "width": 1368,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "rin",
+   "element_ids": [
+    "4d50001c-c2be-4758-a1e5-6d2c7d5f70be"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<4d50001c-c2be-4758-a1e5-6d2c7d5f70be>>> is Rin, an adult woman of 27, tea master of the Ice Pavilion. Hair: dark sage-green long glossy hair with a side parting and one thick loose braid falling over her left shoulder. Eyes: sage-green almond eyes with calm half-lowered lids. Skin: light warm beige skin. Face: long narrow adult oval face, high cheekbones, almond eyes, thin straight brows, small refined mouth, elegant long neck. Signature items that must be present: thin round gold wire glasses (worn in every image, Rin only); jade teardrop earrings; jade bangle; celadon tea bowl or tea set nearby. Body: tall slender figure, long neck and very long legs, slim waist, gently rounded hips, a natural bust in proportion. Outfit: sleeveless black cheongsam with gold-green phoenix embroidery, a deep plunging neckline, an open back, a skirt slit up to the hip, sheer black thigh-high stockings with lace tops and garter straps clipped to the hem, black stiletto heels, a jade bangle. Pose: leaning toward the viewer in a joyful victory pose, one hand holding up a single blank ivory mahjong tile, a wink. Expression: bright laugh with a wink. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward deep forest green. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "high",
+   "depends_on_task": "H1.rin_win.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/rin_win.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.rin_tease.search",
+   "seed": 969947,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "1k",
+    "width": 680,
+    "height": 1024
+   },
+   "candidates": 6,
+   "unit_cost_cr": 1.0,
+   "heroine": "rin",
+   "element_ids": [
+    "4d50001c-c2be-4758-a1e5-6d2c7d5f70be"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<4d50001c-c2be-4758-a1e5-6d2c7d5f70be>>> is Rin, an adult woman of 27, tea master of the Ice Pavilion. Hair: dark sage-green long glossy hair with a side parting and one thick loose braid falling over her left shoulder. Eyes: sage-green almond eyes with calm half-lowered lids. Skin: light warm beige skin. Face: long narrow adult oval face, high cheekbones, almond eyes, thin straight brows, small refined mouth, elegant long neck. Signature items that must be present: thin round gold wire glasses (worn in every image, Rin only); jade teardrop earrings; jade bangle; celadon tea bowl or tea set nearby. Body: tall slender figure, long neck and very long legs, slim waist, gently rounded hips, a natural bust in proportion. Outfit: sleeveless black cheongsam with gold-green phoenix embroidery, a deep plunging neckline, an open back, a skirt slit up to the hip, sheer black thigh-high stockings with lace tops and garter straps clipped to the hem, black stiletto heels, a jade bangle. Pose: glancing back at the viewer over her shoulder, one fingertip at her lips, shoulders turned, hip tilted. Expression: playful flirty smile. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward deep forest green. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "medium",
+   "quota_cr": 6.0,
+   "max_credits": 6.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/rin_tease.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.rin_tease.final",
+   "seed": 117059,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "2k",
+    "width": 1368,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "rin",
+   "element_ids": [
+    "4d50001c-c2be-4758-a1e5-6d2c7d5f70be"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<4d50001c-c2be-4758-a1e5-6d2c7d5f70be>>> is Rin, an adult woman of 27, tea master of the Ice Pavilion. Hair: dark sage-green long glossy hair with a side parting and one thick loose braid falling over her left shoulder. Eyes: sage-green almond eyes with calm half-lowered lids. Skin: light warm beige skin. Face: long narrow adult oval face, high cheekbones, almond eyes, thin straight brows, small refined mouth, elegant long neck. Signature items that must be present: thin round gold wire glasses (worn in every image, Rin only); jade teardrop earrings; jade bangle; celadon tea bowl or tea set nearby. Body: tall slender figure, long neck and very long legs, slim waist, gently rounded hips, a natural bust in proportion. Outfit: sleeveless black cheongsam with gold-green phoenix embroidery, a deep plunging neckline, an open back, a skirt slit up to the hip, sheer black thigh-high stockings with lace tops and garter straps clipped to the hem, black stiletto heels, a jade bangle. Pose: glancing back at the viewer over her shoulder, one fingertip at her lips, shoulders turned, hip tilted. Expression: playful flirty smile. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward deep forest green. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "high",
+   "depends_on_task": "H1.rin_tease.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/rin_tease.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.hana_base.search",
+   "seed": 378340,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "1k",
+    "width": 680,
+    "height": 1024
+   },
+   "candidates": 6,
+   "unit_cost_cr": 1.0,
+   "heroine": "hana",
+   "element_ids": [
+    "ded72d02-6c3a-45e4-874a-0afdc3936c07"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<ded72d02-6c3a-45e4-874a-0afdc3936c07>>> is Hana, an adult woman of 24, relay team captain and gym coach. Hair: short tousled curly orange bob, chin-length with messy wavy ends. Eyes: warm amber eyes. Skin: warm light-tan skin with light freckles (one consistent skin tone in every image). Face: round-square adult face with a soft jaw, wide upturned eyes, thick expressive brows, wide toothy grin. Signature items that must be present: yellow sunflower hair clip above the right ear; light freckles across nose and cheeks; track jacket tied around the waist (most outfits); sport wristband. Body: athletic toned figure, bare midriff with a flat stomach, long toned legs, a natural bust in proportion, no visible muscle definition. Outfit: orange-striped sports crop top with a deep neckline and bare midriff, short orange-striped running shorts, an off-shoulder pink track jacket sliding down one shoulder, white over-the-knee striped socks with a small star, white-orange sneakers, sport wristband. Pose: standing with one hip tilted, one hand on her hip, the other hand touching her hair, eyes on the viewer. Expression: confident teasing smile. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward navy blue. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "medium",
+   "quota_cr": 6.0,
+   "max_credits": 6.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/hana_base.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.hana_base.final",
+   "seed": 515868,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "2k",
+    "width": 1368,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "hana",
+   "element_ids": [
+    "ded72d02-6c3a-45e4-874a-0afdc3936c07"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<ded72d02-6c3a-45e4-874a-0afdc3936c07>>> is Hana, an adult woman of 24, relay team captain and gym coach. Hair: short tousled curly orange bob, chin-length with messy wavy ends. Eyes: warm amber eyes. Skin: warm light-tan skin with light freckles (one consistent skin tone in every image). Face: round-square adult face with a soft jaw, wide upturned eyes, thick expressive brows, wide toothy grin. Signature items that must be present: yellow sunflower hair clip above the right ear; light freckles across nose and cheeks; track jacket tied around the waist (most outfits); sport wristband. Body: athletic toned figure, bare midriff with a flat stomach, long toned legs, a natural bust in proportion, no visible muscle definition. Outfit: orange-striped sports crop top with a deep neckline and bare midriff, short orange-striped running shorts, an off-shoulder pink track jacket sliding down one shoulder, white over-the-knee striped socks with a small star, white-orange sneakers, sport wristband. Pose: standing with one hip tilted, one hand on her hip, the other hand touching her hair, eyes on the viewer. Expression: confident teasing smile. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward navy blue. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "high",
+   "depends_on_task": "H1.hana_base.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/hana_base.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.hana_win.search",
+   "seed": 534184,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "1k",
+    "width": 680,
+    "height": 1024
+   },
+   "candidates": 6,
+   "unit_cost_cr": 1.0,
+   "heroine": "hana",
+   "element_ids": [
+    "ded72d02-6c3a-45e4-874a-0afdc3936c07"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<ded72d02-6c3a-45e4-874a-0afdc3936c07>>> is Hana, an adult woman of 24, relay team captain and gym coach. Hair: short tousled curly orange bob, chin-length with messy wavy ends. Eyes: warm amber eyes. Skin: warm light-tan skin with light freckles (one consistent skin tone in every image). Face: round-square adult face with a soft jaw, wide upturned eyes, thick expressive brows, wide toothy grin. Signature items that must be present: yellow sunflower hair clip above the right ear; light freckles across nose and cheeks; track jacket tied around the waist (most outfits); sport wristband. Body: athletic toned figure, bare midriff with a flat stomach, long toned legs, a natural bust in proportion, no visible muscle definition. Outfit: orange-striped sports crop top with a deep neckline and bare midriff, short orange-striped running shorts, an off-shoulder pink track jacket sliding down one shoulder, white over-the-knee striped socks with a small star, white-orange sneakers, sport wristband. Pose: leaning toward the viewer in a joyful victory pose, one hand holding up a single blank ivory mahjong tile, a wink. Expression: bright laugh with a wink. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward navy blue. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "medium",
+   "quota_cr": 6.0,
+   "max_credits": 6.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/hana_win.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.hana_win.final",
+   "seed": 606276,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "2k",
+    "width": 1368,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "hana",
+   "element_ids": [
+    "ded72d02-6c3a-45e4-874a-0afdc3936c07"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<ded72d02-6c3a-45e4-874a-0afdc3936c07>>> is Hana, an adult woman of 24, relay team captain and gym coach. Hair: short tousled curly orange bob, chin-length with messy wavy ends. Eyes: warm amber eyes. Skin: warm light-tan skin with light freckles (one consistent skin tone in every image). Face: round-square adult face with a soft jaw, wide upturned eyes, thick expressive brows, wide toothy grin. Signature items that must be present: yellow sunflower hair clip above the right ear; light freckles across nose and cheeks; track jacket tied around the waist (most outfits); sport wristband. Body: athletic toned figure, bare midriff with a flat stomach, long toned legs, a natural bust in proportion, no visible muscle definition. Outfit: orange-striped sports crop top with a deep neckline and bare midriff, short orange-striped running shorts, an off-shoulder pink track jacket sliding down one shoulder, white over-the-knee striped socks with a small star, white-orange sneakers, sport wristband. Pose: leaning toward the viewer in a joyful victory pose, one hand holding up a single blank ivory mahjong tile, a wink. Expression: bright laugh with a wink. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward navy blue. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "high",
+   "depends_on_task": "H1.hana_win.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/hana_win.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.hana_tease.search",
+   "seed": 751190,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "1k",
+    "width": 680,
+    "height": 1024
+   },
+   "candidates": 6,
+   "unit_cost_cr": 1.0,
+   "heroine": "hana",
+   "element_ids": [
+    "ded72d02-6c3a-45e4-874a-0afdc3936c07"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<ded72d02-6c3a-45e4-874a-0afdc3936c07>>> is Hana, an adult woman of 24, relay team captain and gym coach. Hair: short tousled curly orange bob, chin-length with messy wavy ends. Eyes: warm amber eyes. Skin: warm light-tan skin with light freckles (one consistent skin tone in every image). Face: round-square adult face with a soft jaw, wide upturned eyes, thick expressive brows, wide toothy grin. Signature items that must be present: yellow sunflower hair clip above the right ear; light freckles across nose and cheeks; track jacket tied around the waist (most outfits); sport wristband. Body: athletic toned figure, bare midriff with a flat stomach, long toned legs, a natural bust in proportion, no visible muscle definition. Outfit: orange-striped sports crop top with a deep neckline and bare midriff, short orange-striped running shorts, an off-shoulder pink track jacket sliding down one shoulder, white over-the-knee striped socks with a small star, white-orange sneakers, sport wristband. Pose: glancing back at the viewer over her shoulder, one fingertip at her lips, shoulders turned, hip tilted. Expression: playful flirty smile. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward navy blue. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "medium",
+   "quota_cr": 6.0,
+   "max_credits": 6.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/hana_tease.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.hana_tease.final",
+   "seed": 521463,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "2k",
+    "width": 1368,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "hana",
+   "element_ids": [
+    "ded72d02-6c3a-45e4-874a-0afdc3936c07"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<ded72d02-6c3a-45e4-874a-0afdc3936c07>>> is Hana, an adult woman of 24, relay team captain and gym coach. Hair: short tousled curly orange bob, chin-length with messy wavy ends. Eyes: warm amber eyes. Skin: warm light-tan skin with light freckles (one consistent skin tone in every image). Face: round-square adult face with a soft jaw, wide upturned eyes, thick expressive brows, wide toothy grin. Signature items that must be present: yellow sunflower hair clip above the right ear; light freckles across nose and cheeks; track jacket tied around the waist (most outfits); sport wristband. Body: athletic toned figure, bare midriff with a flat stomach, long toned legs, a natural bust in proportion, no visible muscle definition. Outfit: orange-striped sports crop top with a deep neckline and bare midriff, short orange-striped running shorts, an off-shoulder pink track jacket sliding down one shoulder, white over-the-knee striped socks with a small star, white-orange sneakers, sport wristband. Pose: glancing back at the viewer over her shoulder, one fingertip at her lips, shoulders turned, hip tilted. Expression: playful flirty smile. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward navy blue. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "high",
+   "depends_on_task": "H1.hana_tease.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/hana_tease.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.yue_base.search",
+   "seed": 236300,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "1k",
+    "width": 680,
+    "height": 1024
+   },
+   "candidates": 6,
+   "unit_cost_cr": 1.0,
+   "heroine": "yue",
+   "element_ids": [
+    "8edeacc2-f24b-4a41-a166-66896711f259"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<8edeacc2-f24b-4a41-a166-66896711f259>>> is Yue, an adult woman of 27, ruler of the Moon Palace. Hair: very long straight-to-wavy pale lavender hair down to the waist with a half-up crown section. Eyes: violet almond eyes with long lashes. Skin: pale porcelain skin. Face: long elegant adult face with slim high nose, narrow almond eyes, serene composed smile. Signature items that must be present: pair of curved pearly-gold dragon horns rising from the crown; gold crescent-moon forehead ornament; gold crescent drop earrings with lavender tassels; moon-phase folding fan (Yue only). Body: tall statuesque figure, long limbs, regal posture, defined waist, rounded hips, long thighs, a full natural bust in proportion. Outfit: lavender silk hanfu-style gown, off-the-shoulder with a deep plunging V front, sheer layered sleeves, gold moon-and-star embroidery, sash-cinched waist, skirt slit up to the hip, white lace-top thigh-high stockings with pearl garter straps, lavender high heels. Pose: standing with one hip tilted, one hand on her hip, the other hand touching her hair, eyes on the viewer. Expression: confident teasing smile. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward deep indigo. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "medium",
+   "quota_cr": 6.0,
+   "max_credits": 6.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/yue_base.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.yue_base.final",
+   "seed": 338060,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "2k",
+    "width": 1368,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "yue",
+   "element_ids": [
+    "8edeacc2-f24b-4a41-a166-66896711f259"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<8edeacc2-f24b-4a41-a166-66896711f259>>> is Yue, an adult woman of 27, ruler of the Moon Palace. Hair: very long straight-to-wavy pale lavender hair down to the waist with a half-up crown section. Eyes: violet almond eyes with long lashes. Skin: pale porcelain skin. Face: long elegant adult face with slim high nose, narrow almond eyes, serene composed smile. Signature items that must be present: pair of curved pearly-gold dragon horns rising from the crown; gold crescent-moon forehead ornament; gold crescent drop earrings with lavender tassels; moon-phase folding fan (Yue only). Body: tall statuesque figure, long limbs, regal posture, defined waist, rounded hips, long thighs, a full natural bust in proportion. Outfit: lavender silk hanfu-style gown, off-the-shoulder with a deep plunging V front, sheer layered sleeves, gold moon-and-star embroidery, sash-cinched waist, skirt slit up to the hip, white lace-top thigh-high stockings with pearl garter straps, lavender high heels. Pose: standing with one hip tilted, one hand on her hip, the other hand touching her hair, eyes on the viewer. Expression: confident teasing smile. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward deep indigo. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "high",
+   "depends_on_task": "H1.yue_base.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/yue_base.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.yue_win.search",
+   "seed": 220792,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "1k",
+    "width": 680,
+    "height": 1024
+   },
+   "candidates": 6,
+   "unit_cost_cr": 1.0,
+   "heroine": "yue",
+   "element_ids": [
+    "8edeacc2-f24b-4a41-a166-66896711f259"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<8edeacc2-f24b-4a41-a166-66896711f259>>> is Yue, an adult woman of 27, ruler of the Moon Palace. Hair: very long straight-to-wavy pale lavender hair down to the waist with a half-up crown section. Eyes: violet almond eyes with long lashes. Skin: pale porcelain skin. Face: long elegant adult face with slim high nose, narrow almond eyes, serene composed smile. Signature items that must be present: pair of curved pearly-gold dragon horns rising from the crown; gold crescent-moon forehead ornament; gold crescent drop earrings with lavender tassels; moon-phase folding fan (Yue only). Body: tall statuesque figure, long limbs, regal posture, defined waist, rounded hips, long thighs, a full natural bust in proportion. Outfit: lavender silk hanfu-style gown, off-the-shoulder with a deep plunging V front, sheer layered sleeves, gold moon-and-star embroidery, sash-cinched waist, skirt slit up to the hip, white lace-top thigh-high stockings with pearl garter straps, lavender high heels. Pose: leaning toward the viewer in a joyful victory pose, one hand holding up a single blank ivory mahjong tile, a wink. Expression: bright laugh with a wink. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward deep indigo. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "medium",
+   "quota_cr": 6.0,
+   "max_credits": 6.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/yue_win.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.yue_win.final",
+   "seed": 547912,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "2k",
+    "width": 1368,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "yue",
+   "element_ids": [
+    "8edeacc2-f24b-4a41-a166-66896711f259"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<8edeacc2-f24b-4a41-a166-66896711f259>>> is Yue, an adult woman of 27, ruler of the Moon Palace. Hair: very long straight-to-wavy pale lavender hair down to the waist with a half-up crown section. Eyes: violet almond eyes with long lashes. Skin: pale porcelain skin. Face: long elegant adult face with slim high nose, narrow almond eyes, serene composed smile. Signature items that must be present: pair of curved pearly-gold dragon horns rising from the crown; gold crescent-moon forehead ornament; gold crescent drop earrings with lavender tassels; moon-phase folding fan (Yue only). Body: tall statuesque figure, long limbs, regal posture, defined waist, rounded hips, long thighs, a full natural bust in proportion. Outfit: lavender silk hanfu-style gown, off-the-shoulder with a deep plunging V front, sheer layered sleeves, gold moon-and-star embroidery, sash-cinched waist, skirt slit up to the hip, white lace-top thigh-high stockings with pearl garter straps, lavender high heels. Pose: leaning toward the viewer in a joyful victory pose, one hand holding up a single blank ivory mahjong tile, a wink. Expression: bright laugh with a wink. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward deep indigo. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "high",
+   "depends_on_task": "H1.yue_win.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/yue_win.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.yue_tease.search",
+   "seed": 619104,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "1k",
+    "width": 680,
+    "height": 1024
+   },
+   "candidates": 6,
+   "unit_cost_cr": 1.0,
+   "heroine": "yue",
+   "element_ids": [
+    "8edeacc2-f24b-4a41-a166-66896711f259"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<8edeacc2-f24b-4a41-a166-66896711f259>>> is Yue, an adult woman of 27, ruler of the Moon Palace. Hair: very long straight-to-wavy pale lavender hair down to the waist with a half-up crown section. Eyes: violet almond eyes with long lashes. Skin: pale porcelain skin. Face: long elegant adult face with slim high nose, narrow almond eyes, serene composed smile. Signature items that must be present: pair of curved pearly-gold dragon horns rising from the crown; gold crescent-moon forehead ornament; gold crescent drop earrings with lavender tassels; moon-phase folding fan (Yue only). Body: tall statuesque figure, long limbs, regal posture, defined waist, rounded hips, long thighs, a full natural bust in proportion. Outfit: lavender silk hanfu-style gown, off-the-shoulder with a deep plunging V front, sheer layered sleeves, gold moon-and-star embroidery, sash-cinched waist, skirt slit up to the hip, white lace-top thigh-high stockings with pearl garter straps, lavender high heels. Pose: glancing back at the viewer over her shoulder, one fingertip at her lips, shoulders turned, hip tilted. Expression: playful flirty smile. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward deep indigo. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "medium",
+   "quota_cr": 6.0,
+   "max_credits": 6.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/yue_tease.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.yue_tease.final",
+   "seed": 697727,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "2k",
+    "width": 1368,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "yue",
+   "element_ids": [
+    "8edeacc2-f24b-4a41-a166-66896711f259"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<8edeacc2-f24b-4a41-a166-66896711f259>>> is Yue, an adult woman of 27, ruler of the Moon Palace. Hair: very long straight-to-wavy pale lavender hair down to the waist with a half-up crown section. Eyes: violet almond eyes with long lashes. Skin: pale porcelain skin. Face: long elegant adult face with slim high nose, narrow almond eyes, serene composed smile. Signature items that must be present: pair of curved pearly-gold dragon horns rising from the crown; gold crescent-moon forehead ornament; gold crescent drop earrings with lavender tassels; moon-phase folding fan (Yue only). Body: tall statuesque figure, long limbs, regal posture, defined waist, rounded hips, long thighs, a full natural bust in proportion. Outfit: lavender silk hanfu-style gown, off-the-shoulder with a deep plunging V front, sheer layered sleeves, gold moon-and-star embroidery, sash-cinched waist, skirt slit up to the hip, white lace-top thigh-high stockings with pearl garter straps, lavender high heels. Pose: glancing back at the viewer over her shoulder, one fingertip at her lips, shoulders turned, hip tilted. Expression: playful flirty smile. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward deep indigo. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "high",
+   "depends_on_task": "H1.yue_tease.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/yue_tease.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.nova_base.search",
+   "seed": 187887,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "1k",
+    "width": 680,
+    "height": 1024
+   },
+   "candidates": 6,
+   "unit_cost_cr": 1.0,
+   "heroine": "nova",
+   "element_ids": [
+    "0c657961-8e36-4535-a0c3-0059ce5df987"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<0c657961-8e36-4535-a0c3-0059ce5df987>>> is Nova, an adult woman of 23, white-hat hacker and street racer. Hair: chin-length asymmetric bob fading from cyan-blue at the roots to hot pink at the ends, side-swept bangs. Eyes: ice-blue eyes with a faint pink gradient under the lids and winged liner. Skin: fair pale cool-neutral porcelain-peach skin with a soft pink blush (not tanned, not dark). Face: small sharp adult oval face with a pointed chin, cat-like upturned eyes, thin arched brows, smug smile. Signature items that must be present: neon cat-ear headphones glowing cyan and pink (Nova only); small cyan face-marks on the cheek; black choker with a metal ring; transparent visor pushed up on the forehead in some outfits. Body: lean toned figure, slim waist, gently rounded hips, long legs, a natural bust in proportion. Outfit: strapless black corset bodice with neon cyan piping and a plunging sweetheart neckline, detached puffed black sleeves with neon trim, layered holographic tiered mini skirt with a big pink cat-badge bow at the hip, black fishnet thigh-highs with a neon cyan garter strap, black thigh-high lace-up platform boots with cyan laces. Pose: standing with one hip tilted, one hand on her hip, the other hand touching her hair, eyes on the viewer. Expression: confident teasing smile. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward hot pink. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "medium",
+   "quota_cr": 6.0,
+   "max_credits": 6.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/nova_base.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.nova_base.final",
+   "seed": 360409,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "2k",
+    "width": 1368,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "nova",
+   "element_ids": [
+    "0c657961-8e36-4535-a0c3-0059ce5df987"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<0c657961-8e36-4535-a0c3-0059ce5df987>>> is Nova, an adult woman of 23, white-hat hacker and street racer. Hair: chin-length asymmetric bob fading from cyan-blue at the roots to hot pink at the ends, side-swept bangs. Eyes: ice-blue eyes with a faint pink gradient under the lids and winged liner. Skin: fair pale cool-neutral porcelain-peach skin with a soft pink blush (not tanned, not dark). Face: small sharp adult oval face with a pointed chin, cat-like upturned eyes, thin arched brows, smug smile. Signature items that must be present: neon cat-ear headphones glowing cyan and pink (Nova only); small cyan face-marks on the cheek; black choker with a metal ring; transparent visor pushed up on the forehead in some outfits. Body: lean toned figure, slim waist, gently rounded hips, long legs, a natural bust in proportion. Outfit: strapless black corset bodice with neon cyan piping and a plunging sweetheart neckline, detached puffed black sleeves with neon trim, layered holographic tiered mini skirt with a big pink cat-badge bow at the hip, black fishnet thigh-highs with a neon cyan garter strap, black thigh-high lace-up platform boots with cyan laces. Pose: standing with one hip tilted, one hand on her hip, the other hand touching her hair, eyes on the viewer. Expression: confident teasing smile. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward hot pink. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "high",
+   "depends_on_task": "H1.nova_base.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/nova_base.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.nova_win.search",
+   "seed": 133581,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "1k",
+    "width": 680,
+    "height": 1024
+   },
+   "candidates": 6,
+   "unit_cost_cr": 1.0,
+   "heroine": "nova",
+   "element_ids": [
+    "0c657961-8e36-4535-a0c3-0059ce5df987"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<0c657961-8e36-4535-a0c3-0059ce5df987>>> is Nova, an adult woman of 23, white-hat hacker and street racer. Hair: chin-length asymmetric bob fading from cyan-blue at the roots to hot pink at the ends, side-swept bangs. Eyes: ice-blue eyes with a faint pink gradient under the lids and winged liner. Skin: fair pale cool-neutral porcelain-peach skin with a soft pink blush (not tanned, not dark). Face: small sharp adult oval face with a pointed chin, cat-like upturned eyes, thin arched brows, smug smile. Signature items that must be present: neon cat-ear headphones glowing cyan and pink (Nova only); small cyan face-marks on the cheek; black choker with a metal ring; transparent visor pushed up on the forehead in some outfits. Body: lean toned figure, slim waist, gently rounded hips, long legs, a natural bust in proportion. Outfit: strapless black corset bodice with neon cyan piping and a plunging sweetheart neckline, detached puffed black sleeves with neon trim, layered holographic tiered mini skirt with a big pink cat-badge bow at the hip, black fishnet thigh-highs with a neon cyan garter strap, black thigh-high lace-up platform boots with cyan laces. Pose: leaning toward the viewer in a joyful victory pose, one hand holding up a single blank ivory mahjong tile, a wink. Expression: bright laugh with a wink. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward hot pink. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "medium",
+   "quota_cr": 6.0,
+   "max_credits": 6.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/nova_win.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.nova_win.final",
+   "seed": 861312,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "2k",
+    "width": 1368,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "nova",
+   "element_ids": [
+    "0c657961-8e36-4535-a0c3-0059ce5df987"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<0c657961-8e36-4535-a0c3-0059ce5df987>>> is Nova, an adult woman of 23, white-hat hacker and street racer. Hair: chin-length asymmetric bob fading from cyan-blue at the roots to hot pink at the ends, side-swept bangs. Eyes: ice-blue eyes with a faint pink gradient under the lids and winged liner. Skin: fair pale cool-neutral porcelain-peach skin with a soft pink blush (not tanned, not dark). Face: small sharp adult oval face with a pointed chin, cat-like upturned eyes, thin arched brows, smug smile. Signature items that must be present: neon cat-ear headphones glowing cyan and pink (Nova only); small cyan face-marks on the cheek; black choker with a metal ring; transparent visor pushed up on the forehead in some outfits. Body: lean toned figure, slim waist, gently rounded hips, long legs, a natural bust in proportion. Outfit: strapless black corset bodice with neon cyan piping and a plunging sweetheart neckline, detached puffed black sleeves with neon trim, layered holographic tiered mini skirt with a big pink cat-badge bow at the hip, black fishnet thigh-highs with a neon cyan garter strap, black thigh-high lace-up platform boots with cyan laces. Pose: leaning toward the viewer in a joyful victory pose, one hand holding up a single blank ivory mahjong tile, a wink. Expression: bright laugh with a wink. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward hot pink. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "high",
+   "depends_on_task": "H1.nova_win.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/nova_win.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.nova_tease.search",
+   "seed": 840157,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "1k",
+    "width": 680,
+    "height": 1024
+   },
+   "candidates": 6,
+   "unit_cost_cr": 1.0,
+   "heroine": "nova",
+   "element_ids": [
+    "0c657961-8e36-4535-a0c3-0059ce5df987"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<0c657961-8e36-4535-a0c3-0059ce5df987>>> is Nova, an adult woman of 23, white-hat hacker and street racer. Hair: chin-length asymmetric bob fading from cyan-blue at the roots to hot pink at the ends, side-swept bangs. Eyes: ice-blue eyes with a faint pink gradient under the lids and winged liner. Skin: fair pale cool-neutral porcelain-peach skin with a soft pink blush (not tanned, not dark). Face: small sharp adult oval face with a pointed chin, cat-like upturned eyes, thin arched brows, smug smile. Signature items that must be present: neon cat-ear headphones glowing cyan and pink (Nova only); small cyan face-marks on the cheek; black choker with a metal ring; transparent visor pushed up on the forehead in some outfits. Body: lean toned figure, slim waist, gently rounded hips, long legs, a natural bust in proportion. Outfit: strapless black corset bodice with neon cyan piping and a plunging sweetheart neckline, detached puffed black sleeves with neon trim, layered holographic tiered mini skirt with a big pink cat-badge bow at the hip, black fishnet thigh-highs with a neon cyan garter strap, black thigh-high lace-up platform boots with cyan laces. Pose: glancing back at the viewer over her shoulder, one fingertip at her lips, shoulders turned, hip tilted. Expression: playful flirty smile. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward hot pink. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "medium",
+   "quota_cr": 6.0,
+   "max_credits": 6.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/nova_tease.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.nova_tease.final",
+   "seed": 251036,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "2k",
+    "width": 1368,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "nova",
+   "element_ids": [
+    "0c657961-8e36-4535-a0c3-0059ce5df987"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<0c657961-8e36-4535-a0c3-0059ce5df987>>> is Nova, an adult woman of 23, white-hat hacker and street racer. Hair: chin-length asymmetric bob fading from cyan-blue at the roots to hot pink at the ends, side-swept bangs. Eyes: ice-blue eyes with a faint pink gradient under the lids and winged liner. Skin: fair pale cool-neutral porcelain-peach skin with a soft pink blush (not tanned, not dark). Face: small sharp adult oval face with a pointed chin, cat-like upturned eyes, thin arched brows, smug smile. Signature items that must be present: neon cat-ear headphones glowing cyan and pink (Nova only); small cyan face-marks on the cheek; black choker with a metal ring; transparent visor pushed up on the forehead in some outfits. Body: lean toned figure, slim waist, gently rounded hips, long legs, a natural bust in proportion. Outfit: strapless black corset bodice with neon cyan piping and a plunging sweetheart neckline, detached puffed black sleeves with neon trim, layered holographic tiered mini skirt with a big pink cat-badge bow at the hip, black fishnet thigh-highs with a neon cyan garter strap, black thigh-high lace-up platform boots with cyan laces. Pose: glancing back at the viewer over her shoulder, one fingertip at her lips, shoulders turned, hip tilted. Expression: playful flirty smile. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward hot pink. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "high",
+   "depends_on_task": "H1.nova_tease.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/nova_tease.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.tsubame_base.search",
+   "seed": 969740,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "1k",
+    "width": 680,
+    "height": 1024
+   },
+   "candidates": 6,
+   "unit_cost_cr": 1.0,
+   "heroine": "tsubame",
+   "element_ids": [
+    "259cfc8a-2078-4aae-b99a-8670ac4ec5e1"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<259cfc8a-2078-4aae-b99a-8670ac4ec5e1>>> is Tsubame, an adult woman of 24, kunoichi courier between worlds. Hair: jet-black very long high ponytail tied with a crimson cord and tassels, long side-swept bangs framing the face. Eyes: crimson red narrow upturned eyes. Skin: light-medium neutral skin. Face: angular adult oval face with sharp cheekbones, narrow crimson eyes, long straight lashes, thin brows, small closed smile. Signature items that must be present: silver swallow-shaped kunai hairpin; long crimson scarf; messenger pouch with a swallow emblem; small brass bell on the obi cord. Body: lithe slender figure, long legs, slim waist, rounded hips, a natural bust in proportion. Outfit: short indigo wrap kimono-style dress with a deep plunging neckline and open sides, a wide obi with crimson rope, fishnet thigh-high stockings with crimson ribbon thigh bands, black split-toe tabi boots, fishnet arm guards, a long crimson scarf. Pose: standing with one hip tilted, one hand on her hip, the other hand touching her hair, eyes on the viewer. Expression: confident teasing smile. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward crimson. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "medium",
+   "quota_cr": 6.0,
+   "max_credits": 6.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/tsubame_base.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.tsubame_base.final",
+   "seed": 555305,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "2k",
+    "width": 1368,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "tsubame",
+   "element_ids": [
+    "259cfc8a-2078-4aae-b99a-8670ac4ec5e1"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<259cfc8a-2078-4aae-b99a-8670ac4ec5e1>>> is Tsubame, an adult woman of 24, kunoichi courier between worlds. Hair: jet-black very long high ponytail tied with a crimson cord and tassels, long side-swept bangs framing the face. Eyes: crimson red narrow upturned eyes. Skin: light-medium neutral skin. Face: angular adult oval face with sharp cheekbones, narrow crimson eyes, long straight lashes, thin brows, small closed smile. Signature items that must be present: silver swallow-shaped kunai hairpin; long crimson scarf; messenger pouch with a swallow emblem; small brass bell on the obi cord. Body: lithe slender figure, long legs, slim waist, rounded hips, a natural bust in proportion. Outfit: short indigo wrap kimono-style dress with a deep plunging neckline and open sides, a wide obi with crimson rope, fishnet thigh-high stockings with crimson ribbon thigh bands, black split-toe tabi boots, fishnet arm guards, a long crimson scarf. Pose: standing with one hip tilted, one hand on her hip, the other hand touching her hair, eyes on the viewer. Expression: confident teasing smile. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward crimson. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "high",
+   "depends_on_task": "H1.tsubame_base.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/tsubame_base.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.tsubame_win.search",
+   "seed": 368797,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "1k",
+    "width": 680,
+    "height": 1024
+   },
+   "candidates": 6,
+   "unit_cost_cr": 1.0,
+   "heroine": "tsubame",
+   "element_ids": [
+    "259cfc8a-2078-4aae-b99a-8670ac4ec5e1"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<259cfc8a-2078-4aae-b99a-8670ac4ec5e1>>> is Tsubame, an adult woman of 24, kunoichi courier between worlds. Hair: jet-black very long high ponytail tied with a crimson cord and tassels, long side-swept bangs framing the face. Eyes: crimson red narrow upturned eyes. Skin: light-medium neutral skin. Face: angular adult oval face with sharp cheekbones, narrow crimson eyes, long straight lashes, thin brows, small closed smile. Signature items that must be present: silver swallow-shaped kunai hairpin; long crimson scarf; messenger pouch with a swallow emblem; small brass bell on the obi cord. Body: lithe slender figure, long legs, slim waist, rounded hips, a natural bust in proportion. Outfit: short indigo wrap kimono-style dress with a deep plunging neckline and open sides, a wide obi with crimson rope, fishnet thigh-high stockings with crimson ribbon thigh bands, black split-toe tabi boots, fishnet arm guards, a long crimson scarf. Pose: leaning toward the viewer in a joyful victory pose, one hand holding up a single blank ivory mahjong tile, a wink. Expression: bright laugh with a wink. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward crimson. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "medium",
+   "quota_cr": 6.0,
+   "max_credits": 6.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/tsubame_win.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.tsubame_win.final",
+   "seed": 276407,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "2k",
+    "width": 1368,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "tsubame",
+   "element_ids": [
+    "259cfc8a-2078-4aae-b99a-8670ac4ec5e1"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<259cfc8a-2078-4aae-b99a-8670ac4ec5e1>>> is Tsubame, an adult woman of 24, kunoichi courier between worlds. Hair: jet-black very long high ponytail tied with a crimson cord and tassels, long side-swept bangs framing the face. Eyes: crimson red narrow upturned eyes. Skin: light-medium neutral skin. Face: angular adult oval face with sharp cheekbones, narrow crimson eyes, long straight lashes, thin brows, small closed smile. Signature items that must be present: silver swallow-shaped kunai hairpin; long crimson scarf; messenger pouch with a swallow emblem; small brass bell on the obi cord. Body: lithe slender figure, long legs, slim waist, rounded hips, a natural bust in proportion. Outfit: short indigo wrap kimono-style dress with a deep plunging neckline and open sides, a wide obi with crimson rope, fishnet thigh-high stockings with crimson ribbon thigh bands, black split-toe tabi boots, fishnet arm guards, a long crimson scarf. Pose: leaning toward the viewer in a joyful victory pose, one hand holding up a single blank ivory mahjong tile, a wink. Expression: bright laugh with a wink. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward crimson. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "high",
+   "depends_on_task": "H1.tsubame_win.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/tsubame_win.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.tsubame_tease.search",
+   "seed": 907355,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "1k",
+    "width": 680,
+    "height": 1024
+   },
+   "candidates": 6,
+   "unit_cost_cr": 1.0,
+   "heroine": "tsubame",
+   "element_ids": [
+    "259cfc8a-2078-4aae-b99a-8670ac4ec5e1"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<259cfc8a-2078-4aae-b99a-8670ac4ec5e1>>> is Tsubame, an adult woman of 24, kunoichi courier between worlds. Hair: jet-black very long high ponytail tied with a crimson cord and tassels, long side-swept bangs framing the face. Eyes: crimson red narrow upturned eyes. Skin: light-medium neutral skin. Face: angular adult oval face with sharp cheekbones, narrow crimson eyes, long straight lashes, thin brows, small closed smile. Signature items that must be present: silver swallow-shaped kunai hairpin; long crimson scarf; messenger pouch with a swallow emblem; small brass bell on the obi cord. Body: lithe slender figure, long legs, slim waist, rounded hips, a natural bust in proportion. Outfit: short indigo wrap kimono-style dress with a deep plunging neckline and open sides, a wide obi with crimson rope, fishnet thigh-high stockings with crimson ribbon thigh bands, black split-toe tabi boots, fishnet arm guards, a long crimson scarf. Pose: glancing back at the viewer over her shoulder, one fingertip at her lips, shoulders turned, hip tilted. Expression: playful flirty smile. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward crimson. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "medium",
+   "quota_cr": 6.0,
+   "max_credits": 6.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/tsubame_tease.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.tsubame_tease.final",
+   "seed": 181119,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "2k",
+    "width": 1368,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "tsubame",
+   "element_ids": [
+    "259cfc8a-2078-4aae-b99a-8670ac4ec5e1"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<259cfc8a-2078-4aae-b99a-8670ac4ec5e1>>> is Tsubame, an adult woman of 24, kunoichi courier between worlds. Hair: jet-black very long high ponytail tied with a crimson cord and tassels, long side-swept bangs framing the face. Eyes: crimson red narrow upturned eyes. Skin: light-medium neutral skin. Face: angular adult oval face with sharp cheekbones, narrow crimson eyes, long straight lashes, thin brows, small closed smile. Signature items that must be present: silver swallow-shaped kunai hairpin; long crimson scarf; messenger pouch with a swallow emblem; small brass bell on the obi cord. Body: lithe slender figure, long legs, slim waist, rounded hips, a natural bust in proportion. Outfit: short indigo wrap kimono-style dress with a deep plunging neckline and open sides, a wide obi with crimson rope, fishnet thigh-high stockings with crimson ribbon thigh bands, black split-toe tabi boots, fishnet arm guards, a long crimson scarf. Pose: glancing back at the viewer over her shoulder, one fingertip at her lips, shoulders turned, hip tilted. Expression: playful flirty smile. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward crimson. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "high",
+   "depends_on_task": "H1.tsubame_tease.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/tsubame_tease.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.miel_base.search",
+   "seed": 812102,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "1k",
+    "width": 680,
+    "height": 1024
+   },
+   "candidates": 6,
+   "unit_cost_cr": 1.0,
+   "heroine": "miel",
+   "element_ids": [
+    "25525e3b-fa65-4695-a1c7-3253d092582a"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<25525e3b-fa65-4695-a1c7-3253d092582a>>> is Miel, an adult woman of 25, patissiere of the western quarter. Hair: caramel-honey blonde long big loose curls gathered into a low side ponytail over the left shoulder with a large white satin bow. Eyes: warm amber eyes, soft slightly drooping gentle shape. Skin: fair warm skin with rosy cheeks. Face: round full-cheeked soft adult face with dimples, large gentle amber eyes, beauty mark below the lips. Signature items that must be present: large white satin hair bow; pink macaron hair clip; pearl drop earrings; small beauty mark just below the lower lip; whisk or piping bag as a prop. Body: medium-small height, soft pear-shaped figure with fuller hips and soft thighs, slim waist, a full natural bust in proportion. Outfit: cream off-shoulder puff-sleeve blouse with a plunging ruffled neckline, a fitted rose corset, a short frilled apron mini skirt with ribbons, brown thigh-high stockings with ribbon bow bands, rose high heels with bows. Pose: standing with one hip tilted, one hand on her hip, the other hand touching her hair, eyes on the viewer. Expression: confident teasing smile. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward caramel brown. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "medium",
+   "quota_cr": 6.0,
+   "max_credits": 6.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/miel_base.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.miel_base.final",
+   "seed": 983340,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "2k",
+    "width": 1368,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "miel",
+   "element_ids": [
+    "25525e3b-fa65-4695-a1c7-3253d092582a"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<25525e3b-fa65-4695-a1c7-3253d092582a>>> is Miel, an adult woman of 25, patissiere of the western quarter. Hair: caramel-honey blonde long big loose curls gathered into a low side ponytail over the left shoulder with a large white satin bow. Eyes: warm amber eyes, soft slightly drooping gentle shape. Skin: fair warm skin with rosy cheeks. Face: round full-cheeked soft adult face with dimples, large gentle amber eyes, beauty mark below the lips. Signature items that must be present: large white satin hair bow; pink macaron hair clip; pearl drop earrings; small beauty mark just below the lower lip; whisk or piping bag as a prop. Body: medium-small height, soft pear-shaped figure with fuller hips and soft thighs, slim waist, a full natural bust in proportion. Outfit: cream off-shoulder puff-sleeve blouse with a plunging ruffled neckline, a fitted rose corset, a short frilled apron mini skirt with ribbons, brown thigh-high stockings with ribbon bow bands, rose high heels with bows. Pose: standing with one hip tilted, one hand on her hip, the other hand touching her hair, eyes on the viewer. Expression: confident teasing smile. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward caramel brown. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "high",
+   "depends_on_task": "H1.miel_base.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/miel_base.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.miel_win.search",
+   "seed": 461688,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "1k",
+    "width": 680,
+    "height": 1024
+   },
+   "candidates": 6,
+   "unit_cost_cr": 1.0,
+   "heroine": "miel",
+   "element_ids": [
+    "25525e3b-fa65-4695-a1c7-3253d092582a"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<25525e3b-fa65-4695-a1c7-3253d092582a>>> is Miel, an adult woman of 25, patissiere of the western quarter. Hair: caramel-honey blonde long big loose curls gathered into a low side ponytail over the left shoulder with a large white satin bow. Eyes: warm amber eyes, soft slightly drooping gentle shape. Skin: fair warm skin with rosy cheeks. Face: round full-cheeked soft adult face with dimples, large gentle amber eyes, beauty mark below the lips. Signature items that must be present: large white satin hair bow; pink macaron hair clip; pearl drop earrings; small beauty mark just below the lower lip; whisk or piping bag as a prop. Body: medium-small height, soft pear-shaped figure with fuller hips and soft thighs, slim waist, a full natural bust in proportion. Outfit: cream off-shoulder puff-sleeve blouse with a plunging ruffled neckline, a fitted rose corset, a short frilled apron mini skirt with ribbons, brown thigh-high stockings with ribbon bow bands, rose high heels with bows. Pose: leaning toward the viewer in a joyful victory pose, one hand holding up a single blank ivory mahjong tile, a wink. Expression: bright laugh with a wink. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward caramel brown. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "medium",
+   "quota_cr": 6.0,
+   "max_credits": 6.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/miel_win.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.miel_win.final",
+   "seed": 583117,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "2k",
+    "width": 1368,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "miel",
+   "element_ids": [
+    "25525e3b-fa65-4695-a1c7-3253d092582a"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<25525e3b-fa65-4695-a1c7-3253d092582a>>> is Miel, an adult woman of 25, patissiere of the western quarter. Hair: caramel-honey blonde long big loose curls gathered into a low side ponytail over the left shoulder with a large white satin bow. Eyes: warm amber eyes, soft slightly drooping gentle shape. Skin: fair warm skin with rosy cheeks. Face: round full-cheeked soft adult face with dimples, large gentle amber eyes, beauty mark below the lips. Signature items that must be present: large white satin hair bow; pink macaron hair clip; pearl drop earrings; small beauty mark just below the lower lip; whisk or piping bag as a prop. Body: medium-small height, soft pear-shaped figure with fuller hips and soft thighs, slim waist, a full natural bust in proportion. Outfit: cream off-shoulder puff-sleeve blouse with a plunging ruffled neckline, a fitted rose corset, a short frilled apron mini skirt with ribbons, brown thigh-high stockings with ribbon bow bands, rose high heels with bows. Pose: leaning toward the viewer in a joyful victory pose, one hand holding up a single blank ivory mahjong tile, a wink. Expression: bright laugh with a wink. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward caramel brown. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "high",
+   "depends_on_task": "H1.miel_win.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/miel_win.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.miel_tease.search",
+   "seed": 308848,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "1k",
+    "width": 680,
+    "height": 1024
+   },
+   "candidates": 6,
+   "unit_cost_cr": 1.0,
+   "heroine": "miel",
+   "element_ids": [
+    "25525e3b-fa65-4695-a1c7-3253d092582a"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<25525e3b-fa65-4695-a1c7-3253d092582a>>> is Miel, an adult woman of 25, patissiere of the western quarter. Hair: caramel-honey blonde long big loose curls gathered into a low side ponytail over the left shoulder with a large white satin bow. Eyes: warm amber eyes, soft slightly drooping gentle shape. Skin: fair warm skin with rosy cheeks. Face: round full-cheeked soft adult face with dimples, large gentle amber eyes, beauty mark below the lips. Signature items that must be present: large white satin hair bow; pink macaron hair clip; pearl drop earrings; small beauty mark just below the lower lip; whisk or piping bag as a prop. Body: medium-small height, soft pear-shaped figure with fuller hips and soft thighs, slim waist, a full natural bust in proportion. Outfit: cream off-shoulder puff-sleeve blouse with a plunging ruffled neckline, a fitted rose corset, a short frilled apron mini skirt with ribbons, brown thigh-high stockings with ribbon bow bands, rose high heels with bows. Pose: glancing back at the viewer over her shoulder, one fingertip at her lips, shoulders turned, hip tilted. Expression: playful flirty smile. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward caramel brown. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "medium",
+   "quota_cr": 6.0,
+   "max_credits": 6.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/miel_tease.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.miel_tease.final",
+   "seed": 606677,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "2k",
+    "width": 1368,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "miel",
+   "element_ids": [
+    "25525e3b-fa65-4695-a1c7-3253d092582a"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<25525e3b-fa65-4695-a1c7-3253d092582a>>> is Miel, an adult woman of 25, patissiere of the western quarter. Hair: caramel-honey blonde long big loose curls gathered into a low side ponytail over the left shoulder with a large white satin bow. Eyes: warm amber eyes, soft slightly drooping gentle shape. Skin: fair warm skin with rosy cheeks. Face: round full-cheeked soft adult face with dimples, large gentle amber eyes, beauty mark below the lips. Signature items that must be present: large white satin hair bow; pink macaron hair clip; pearl drop earrings; small beauty mark just below the lower lip; whisk or piping bag as a prop. Body: medium-small height, soft pear-shaped figure with fuller hips and soft thighs, slim waist, a full natural bust in proportion. Outfit: cream off-shoulder puff-sleeve blouse with a plunging ruffled neckline, a fitted rose corset, a short frilled apron mini skirt with ribbons, brown thigh-high stockings with ribbon bow bands, rose high heels with bows. Pose: glancing back at the viewer over her shoulder, one fingertip at her lips, shoulders turned, hip tilted. Expression: playful flirty smile. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward caramel brown. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "high",
+   "depends_on_task": "H1.miel_tease.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/miel_tease.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.kohaku_base.search",
+   "seed": 691067,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "1k",
+    "width": 680,
+    "height": 1024
+   },
+   "candidates": 6,
+   "unit_cost_cr": 1.0,
+   "heroine": "kohaku",
+   "element_ids": [
+    "0b0bc9fd-fb9e-44c9-8f6b-bdb4899cacd8"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<0b0bc9fd-fb9e-44c9-8f6b-bdb4899cacd8>>> is Kohaku, an adult woman of 25, white fox shrine maiden of the Thousand Gates. Hair: long silver-white hair with vermilion-red gradient ends. Eyes: amber-gold slanted eyes with vermilion eyeliner. Skin: fair pale skin. Face: triangular fox-like adult face with a pointed chin, narrow slanted amber eyes, small fang when smiling. Signature items that must be present: pair of white fox ears with red inner fur; one big fluffy white fox tail with a red tip (nine tails only in the Kyubi outfit); white fox mask worn at the side of the head; small gold bell on a red cord at the neck; red-thonged geta. Body: medium height, soft athletic-soft figure, slim waist, long legs, rounded hips, a full natural bust in proportion. Outfit: white shrine-maiden top with a deep plunging neckline, detached wide sleeves and bare shoulders, a vermilion hakama skirt with a side slit to the hip, white thigh-high stockings with a red ribbon-and-bell thigh band, red-thonged geta. Pose: standing with one hip tilted, one hand on her hip, the other hand touching her hair, eyes on the viewer. Expression: confident teasing smile. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward vermilion red. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "medium",
+   "quota_cr": 6.0,
+   "max_credits": 6.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/kohaku_base.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.kohaku_base.final",
+   "seed": 497639,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "2k",
+    "width": 1368,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "kohaku",
+   "element_ids": [
+    "0b0bc9fd-fb9e-44c9-8f6b-bdb4899cacd8"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<0b0bc9fd-fb9e-44c9-8f6b-bdb4899cacd8>>> is Kohaku, an adult woman of 25, white fox shrine maiden of the Thousand Gates. Hair: long silver-white hair with vermilion-red gradient ends. Eyes: amber-gold slanted eyes with vermilion eyeliner. Skin: fair pale skin. Face: triangular fox-like adult face with a pointed chin, narrow slanted amber eyes, small fang when smiling. Signature items that must be present: pair of white fox ears with red inner fur; one big fluffy white fox tail with a red tip (nine tails only in the Kyubi outfit); white fox mask worn at the side of the head; small gold bell on a red cord at the neck; red-thonged geta. Body: medium height, soft athletic-soft figure, slim waist, long legs, rounded hips, a full natural bust in proportion. Outfit: white shrine-maiden top with a deep plunging neckline, detached wide sleeves and bare shoulders, a vermilion hakama skirt with a side slit to the hip, white thigh-high stockings with a red ribbon-and-bell thigh band, red-thonged geta. Pose: standing with one hip tilted, one hand on her hip, the other hand touching her hair, eyes on the viewer. Expression: confident teasing smile. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward vermilion red. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "high",
+   "depends_on_task": "H1.kohaku_base.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/kohaku_base.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.kohaku_win.search",
+   "seed": 138163,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "1k",
+    "width": 680,
+    "height": 1024
+   },
+   "candidates": 6,
+   "unit_cost_cr": 1.0,
+   "heroine": "kohaku",
+   "element_ids": [
+    "0b0bc9fd-fb9e-44c9-8f6b-bdb4899cacd8"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<0b0bc9fd-fb9e-44c9-8f6b-bdb4899cacd8>>> is Kohaku, an adult woman of 25, white fox shrine maiden of the Thousand Gates. Hair: long silver-white hair with vermilion-red gradient ends. Eyes: amber-gold slanted eyes with vermilion eyeliner. Skin: fair pale skin. Face: triangular fox-like adult face with a pointed chin, narrow slanted amber eyes, small fang when smiling. Signature items that must be present: pair of white fox ears with red inner fur; one big fluffy white fox tail with a red tip (nine tails only in the Kyubi outfit); white fox mask worn at the side of the head; small gold bell on a red cord at the neck; red-thonged geta. Body: medium height, soft athletic-soft figure, slim waist, long legs, rounded hips, a full natural bust in proportion. Outfit: white shrine-maiden top with a deep plunging neckline, detached wide sleeves and bare shoulders, a vermilion hakama skirt with a side slit to the hip, white thigh-high stockings with a red ribbon-and-bell thigh band, red-thonged geta. Pose: leaning toward the viewer in a joyful victory pose, one hand holding up a single blank ivory mahjong tile, a wink. Expression: bright laugh with a wink. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward vermilion red. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "medium",
+   "quota_cr": 6.0,
+   "max_credits": 6.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/kohaku_win.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.kohaku_win.final",
+   "seed": 388174,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "2k",
+    "width": 1368,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "kohaku",
+   "element_ids": [
+    "0b0bc9fd-fb9e-44c9-8f6b-bdb4899cacd8"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<0b0bc9fd-fb9e-44c9-8f6b-bdb4899cacd8>>> is Kohaku, an adult woman of 25, white fox shrine maiden of the Thousand Gates. Hair: long silver-white hair with vermilion-red gradient ends. Eyes: amber-gold slanted eyes with vermilion eyeliner. Skin: fair pale skin. Face: triangular fox-like adult face with a pointed chin, narrow slanted amber eyes, small fang when smiling. Signature items that must be present: pair of white fox ears with red inner fur; one big fluffy white fox tail with a red tip (nine tails only in the Kyubi outfit); white fox mask worn at the side of the head; small gold bell on a red cord at the neck; red-thonged geta. Body: medium height, soft athletic-soft figure, slim waist, long legs, rounded hips, a full natural bust in proportion. Outfit: white shrine-maiden top with a deep plunging neckline, detached wide sleeves and bare shoulders, a vermilion hakama skirt with a side slit to the hip, white thigh-high stockings with a red ribbon-and-bell thigh band, red-thonged geta. Pose: leaning toward the viewer in a joyful victory pose, one hand holding up a single blank ivory mahjong tile, a wink. Expression: bright laugh with a wink. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward vermilion red. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "high",
+   "depends_on_task": "H1.kohaku_win.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/kohaku_win.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.kohaku_tease.search",
+   "seed": 313495,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "1k",
+    "width": 680,
+    "height": 1024
+   },
+   "candidates": 6,
+   "unit_cost_cr": 1.0,
+   "heroine": "kohaku",
+   "element_ids": [
+    "0b0bc9fd-fb9e-44c9-8f6b-bdb4899cacd8"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<0b0bc9fd-fb9e-44c9-8f6b-bdb4899cacd8>>> is Kohaku, an adult woman of 25, white fox shrine maiden of the Thousand Gates. Hair: long silver-white hair with vermilion-red gradient ends. Eyes: amber-gold slanted eyes with vermilion eyeliner. Skin: fair pale skin. Face: triangular fox-like adult face with a pointed chin, narrow slanted amber eyes, small fang when smiling. Signature items that must be present: pair of white fox ears with red inner fur; one big fluffy white fox tail with a red tip (nine tails only in the Kyubi outfit); white fox mask worn at the side of the head; small gold bell on a red cord at the neck; red-thonged geta. Body: medium height, soft athletic-soft figure, slim waist, long legs, rounded hips, a full natural bust in proportion. Outfit: white shrine-maiden top with a deep plunging neckline, detached wide sleeves and bare shoulders, a vermilion hakama skirt with a side slit to the hip, white thigh-high stockings with a red ribbon-and-bell thigh band, red-thonged geta. Pose: glancing back at the viewer over her shoulder, one fingertip at her lips, shoulders turned, hip tilted. Expression: playful flirty smile. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward vermilion red. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "medium",
+   "quota_cr": 6.0,
+   "max_credits": 6.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/kohaku_tease.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.kohaku_tease.final",
+   "seed": 984680,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "2k",
+    "width": 1368,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "kohaku",
+   "element_ids": [
+    "0b0bc9fd-fb9e-44c9-8f6b-bdb4899cacd8"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<0b0bc9fd-fb9e-44c9-8f6b-bdb4899cacd8>>> is Kohaku, an adult woman of 25, white fox shrine maiden of the Thousand Gates. Hair: long silver-white hair with vermilion-red gradient ends. Eyes: amber-gold slanted eyes with vermilion eyeliner. Skin: fair pale skin. Face: triangular fox-like adult face with a pointed chin, narrow slanted amber eyes, small fang when smiling. Signature items that must be present: pair of white fox ears with red inner fur; one big fluffy white fox tail with a red tip (nine tails only in the Kyubi outfit); white fox mask worn at the side of the head; small gold bell on a red cord at the neck; red-thonged geta. Body: medium height, soft athletic-soft figure, slim waist, long legs, rounded hips, a full natural bust in proportion. Outfit: white shrine-maiden top with a deep plunging neckline, detached wide sleeves and bare shoulders, a vermilion hakama skirt with a side slit to the hip, white thigh-high stockings with a red ribbon-and-bell thigh band, red-thonged geta. Pose: glancing back at the viewer over her shoulder, one fingertip at her lips, shoulders turned, hip tilted. Expression: playful flirty smile. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward vermilion red. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "high",
+   "depends_on_task": "H1.kohaku_tease.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/kohaku_tease.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.shirin_base.search",
+   "seed": 469943,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "1k",
+    "width": 680,
+    "height": 1024
+   },
+   "candidates": 6,
+   "unit_cost_cr": 1.0,
+   "heroine": "shirin",
+   "element_ids": [
+    "33741746-8b6c-4e41-85a0-81a6adcd74db"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<33741746-8b6c-4e41-85a0-81a6adcd74db>>> is Shirin, an adult woman of 26, desert caravan dancer and fortune teller. Hair: very long hip-length plum-black wavy voluminous hair woven with gold coin chains. Eyes: honey-gold almond eyes with dark kohl liner. Skin: warm medium-brown skin (one consistent tone in every image). Face: broad soft adult oval face, large wide-set almond eyes with kohl, full lips, straight nose, mysterious half-smile. Signature items that must be present: gold chain forehead jewel; light teal chiffon veil; coin belt (monisto); gold arm bands and anklets with small bells; gold drop earrings. Body: tall soft shapely figure, defined waist, fuller hips, a full natural bust in proportion, bare midriff. Outfit: teal-and-gold choli top with a deep plunging neckline and sheer chiffon sleeves, a bare midriff, a low-slung plum skirt with a slit to the hip, a coin belt, gold arm bands, layered gold anklets, barefoot. Pose: standing with one hip tilted, one hand on her hip, the other hand touching her hair, eyes on the viewer. Expression: confident teasing smile. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward teal. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "medium",
+   "quota_cr": 6.0,
+   "max_credits": 6.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/shirin_base.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.shirin_base.final",
+   "seed": 209463,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "2k",
+    "width": 1368,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "shirin",
+   "element_ids": [
+    "33741746-8b6c-4e41-85a0-81a6adcd74db"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<33741746-8b6c-4e41-85a0-81a6adcd74db>>> is Shirin, an adult woman of 26, desert caravan dancer and fortune teller. Hair: very long hip-length plum-black wavy voluminous hair woven with gold coin chains. Eyes: honey-gold almond eyes with dark kohl liner. Skin: warm medium-brown skin (one consistent tone in every image). Face: broad soft adult oval face, large wide-set almond eyes with kohl, full lips, straight nose, mysterious half-smile. Signature items that must be present: gold chain forehead jewel; light teal chiffon veil; coin belt (monisto); gold arm bands and anklets with small bells; gold drop earrings. Body: tall soft shapely figure, defined waist, fuller hips, a full natural bust in proportion, bare midriff. Outfit: teal-and-gold choli top with a deep plunging neckline and sheer chiffon sleeves, a bare midriff, a low-slung plum skirt with a slit to the hip, a coin belt, gold arm bands, layered gold anklets, barefoot. Pose: standing with one hip tilted, one hand on her hip, the other hand touching her hair, eyes on the viewer. Expression: confident teasing smile. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward teal. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "high",
+   "depends_on_task": "H1.shirin_base.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/shirin_base.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.shirin_win.search",
+   "seed": 836483,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "1k",
+    "width": 680,
+    "height": 1024
+   },
+   "candidates": 6,
+   "unit_cost_cr": 1.0,
+   "heroine": "shirin",
+   "element_ids": [
+    "33741746-8b6c-4e41-85a0-81a6adcd74db"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<33741746-8b6c-4e41-85a0-81a6adcd74db>>> is Shirin, an adult woman of 26, desert caravan dancer and fortune teller. Hair: very long hip-length plum-black wavy voluminous hair woven with gold coin chains. Eyes: honey-gold almond eyes with dark kohl liner. Skin: warm medium-brown skin (one consistent tone in every image). Face: broad soft adult oval face, large wide-set almond eyes with kohl, full lips, straight nose, mysterious half-smile. Signature items that must be present: gold chain forehead jewel; light teal chiffon veil; coin belt (monisto); gold arm bands and anklets with small bells; gold drop earrings. Body: tall soft shapely figure, defined waist, fuller hips, a full natural bust in proportion, bare midriff. Outfit: teal-and-gold choli top with a deep plunging neckline and sheer chiffon sleeves, a bare midriff, a low-slung plum skirt with a slit to the hip, a coin belt, gold arm bands, layered gold anklets, barefoot. Pose: leaning toward the viewer in a joyful victory pose, one hand holding up a single blank ivory mahjong tile, a wink. Expression: bright laugh with a wink. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward teal. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "medium",
+   "quota_cr": 6.0,
+   "max_credits": 6.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/shirin_win.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.shirin_win.final",
+   "seed": 768183,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "2k",
+    "width": 1368,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "shirin",
+   "element_ids": [
+    "33741746-8b6c-4e41-85a0-81a6adcd74db"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<33741746-8b6c-4e41-85a0-81a6adcd74db>>> is Shirin, an adult woman of 26, desert caravan dancer and fortune teller. Hair: very long hip-length plum-black wavy voluminous hair woven with gold coin chains. Eyes: honey-gold almond eyes with dark kohl liner. Skin: warm medium-brown skin (one consistent tone in every image). Face: broad soft adult oval face, large wide-set almond eyes with kohl, full lips, straight nose, mysterious half-smile. Signature items that must be present: gold chain forehead jewel; light teal chiffon veil; coin belt (monisto); gold arm bands and anklets with small bells; gold drop earrings. Body: tall soft shapely figure, defined waist, fuller hips, a full natural bust in proportion, bare midriff. Outfit: teal-and-gold choli top with a deep plunging neckline and sheer chiffon sleeves, a bare midriff, a low-slung plum skirt with a slit to the hip, a coin belt, gold arm bands, layered gold anklets, barefoot. Pose: leaning toward the viewer in a joyful victory pose, one hand holding up a single blank ivory mahjong tile, a wink. Expression: bright laugh with a wink. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward teal. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "high",
+   "depends_on_task": "H1.shirin_win.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/shirin_win.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.shirin_tease.search",
+   "seed": 157603,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "1k",
+    "width": 680,
+    "height": 1024
+   },
+   "candidates": 6,
+   "unit_cost_cr": 1.0,
+   "heroine": "shirin",
+   "element_ids": [
+    "33741746-8b6c-4e41-85a0-81a6adcd74db"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<33741746-8b6c-4e41-85a0-81a6adcd74db>>> is Shirin, an adult woman of 26, desert caravan dancer and fortune teller. Hair: very long hip-length plum-black wavy voluminous hair woven with gold coin chains. Eyes: honey-gold almond eyes with dark kohl liner. Skin: warm medium-brown skin (one consistent tone in every image). Face: broad soft adult oval face, large wide-set almond eyes with kohl, full lips, straight nose, mysterious half-smile. Signature items that must be present: gold chain forehead jewel; light teal chiffon veil; coin belt (monisto); gold arm bands and anklets with small bells; gold drop earrings. Body: tall soft shapely figure, defined waist, fuller hips, a full natural bust in proportion, bare midriff. Outfit: teal-and-gold choli top with a deep plunging neckline and sheer chiffon sleeves, a bare midriff, a low-slung plum skirt with a slit to the hip, a coin belt, gold arm bands, layered gold anklets, barefoot. Pose: glancing back at the viewer over her shoulder, one fingertip at her lips, shoulders turned, hip tilted. Expression: playful flirty smile. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward teal. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "medium",
+   "quota_cr": 6.0,
+   "max_credits": 6.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/shirin_tease.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.shirin_tease.final",
+   "seed": 834756,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "2k",
+    "width": 1368,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "shirin",
+   "element_ids": [
+    "33741746-8b6c-4e41-85a0-81a6adcd74db"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<33741746-8b6c-4e41-85a0-81a6adcd74db>>> is Shirin, an adult woman of 26, desert caravan dancer and fortune teller. Hair: very long hip-length plum-black wavy voluminous hair woven with gold coin chains. Eyes: honey-gold almond eyes with dark kohl liner. Skin: warm medium-brown skin (one consistent tone in every image). Face: broad soft adult oval face, large wide-set almond eyes with kohl, full lips, straight nose, mysterious half-smile. Signature items that must be present: gold chain forehead jewel; light teal chiffon veil; coin belt (monisto); gold arm bands and anklets with small bells; gold drop earrings. Body: tall soft shapely figure, defined waist, fuller hips, a full natural bust in proportion, bare midriff. Outfit: teal-and-gold choli top with a deep plunging neckline and sheer chiffon sleeves, a bare midriff, a low-slung plum skirt with a slit to the hip, a coin belt, gold arm bands, layered gold anklets, barefoot. Pose: glancing back at the viewer over her shoulder, one fingertip at her lips, shoulders turned, hip tilted. Expression: playful flirty smile. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward teal. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "high",
+   "depends_on_task": "H1.shirin_tease.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/shirin_tease.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.zlata_base.search",
+   "seed": 628387,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "1k",
+    "width": 680,
+    "height": 1024
+   },
+   "candidates": 6,
+   "unit_cost_cr": 1.0,
+   "heroine": "zlata",
+   "element_ids": [
+    "ebdd5f33-3cc1-4d7e-afb6-13a698b1284f"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<ebdd5f33-3cc1-4d7e-afb6-13a698b1284f>>> is Zlata, an adult woman of 25, firebird tsarevna of a fairy-tale kingdom. Hair: one thick floor-length braid over her right shoulder shading from golden-blonde at the top to scarlet-orange at the tip with a glowing ember end, short curls at the temples. Eyes: amber-gold eyes with soft warm lids and fire glints. Skin: warm fair golden skin. Face: broad regal adult oval face, high forehead, strong cheekbones, large amber eyes, gentle strong chin, warm half-smile. Signature items that must be present: tall red-and-gold pearl-studded kokoshnik with a firebird feather; pearl and ruby choker with shoulder pearl chains; feather wing-cape or feather wing-sleeves in orange and gold; gold folk-painting floral ornament (original design). Body: tall statuesque figure, slim waist, broad regal shoulders, rounded hips, long legs, a full natural bust in proportion. Outfit: scarlet corset sarafan with gold folk ornament, a plunging sweetheart neckline, bare shoulders, feather wing-sleeves, a short front-slit skirt over sheer red lace-top thigh-high stockings with gold garter straps, red embroidered heeled boots. Pose: standing with one hip tilted, one hand on her hip, the other hand touching her hair, eyes on the viewer. Expression: confident teasing smile. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward warm gold. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "medium",
+   "quota_cr": 6.0,
+   "max_credits": 6.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/zlata_base.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.zlata_base.final",
+   "seed": 843049,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "2k",
+    "width": 1368,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "zlata",
+   "element_ids": [
+    "ebdd5f33-3cc1-4d7e-afb6-13a698b1284f"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<ebdd5f33-3cc1-4d7e-afb6-13a698b1284f>>> is Zlata, an adult woman of 25, firebird tsarevna of a fairy-tale kingdom. Hair: one thick floor-length braid over her right shoulder shading from golden-blonde at the top to scarlet-orange at the tip with a glowing ember end, short curls at the temples. Eyes: amber-gold eyes with soft warm lids and fire glints. Skin: warm fair golden skin. Face: broad regal adult oval face, high forehead, strong cheekbones, large amber eyes, gentle strong chin, warm half-smile. Signature items that must be present: tall red-and-gold pearl-studded kokoshnik with a firebird feather; pearl and ruby choker with shoulder pearl chains; feather wing-cape or feather wing-sleeves in orange and gold; gold folk-painting floral ornament (original design). Body: tall statuesque figure, slim waist, broad regal shoulders, rounded hips, long legs, a full natural bust in proportion. Outfit: scarlet corset sarafan with gold folk ornament, a plunging sweetheart neckline, bare shoulders, feather wing-sleeves, a short front-slit skirt over sheer red lace-top thigh-high stockings with gold garter straps, red embroidered heeled boots. Pose: standing with one hip tilted, one hand on her hip, the other hand touching her hair, eyes on the viewer. Expression: confident teasing smile. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward warm gold. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "high",
+   "depends_on_task": "H1.zlata_base.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/zlata_base.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.zlata_win.search",
+   "seed": 128221,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "1k",
+    "width": 680,
+    "height": 1024
+   },
+   "candidates": 6,
+   "unit_cost_cr": 1.0,
+   "heroine": "zlata",
+   "element_ids": [
+    "ebdd5f33-3cc1-4d7e-afb6-13a698b1284f"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<ebdd5f33-3cc1-4d7e-afb6-13a698b1284f>>> is Zlata, an adult woman of 25, firebird tsarevna of a fairy-tale kingdom. Hair: one thick floor-length braid over her right shoulder shading from golden-blonde at the top to scarlet-orange at the tip with a glowing ember end, short curls at the temples. Eyes: amber-gold eyes with soft warm lids and fire glints. Skin: warm fair golden skin. Face: broad regal adult oval face, high forehead, strong cheekbones, large amber eyes, gentle strong chin, warm half-smile. Signature items that must be present: tall red-and-gold pearl-studded kokoshnik with a firebird feather; pearl and ruby choker with shoulder pearl chains; feather wing-cape or feather wing-sleeves in orange and gold; gold folk-painting floral ornament (original design). Body: tall statuesque figure, slim waist, broad regal shoulders, rounded hips, long legs, a full natural bust in proportion. Outfit: scarlet corset sarafan with gold folk ornament, a plunging sweetheart neckline, bare shoulders, feather wing-sleeves, a short front-slit skirt over sheer red lace-top thigh-high stockings with gold garter straps, red embroidered heeled boots. Pose: leaning toward the viewer in a joyful victory pose, one hand holding up a single blank ivory mahjong tile, a wink. Expression: bright laugh with a wink. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward warm gold. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "medium",
+   "quota_cr": 6.0,
+   "max_credits": 6.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/zlata_win.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.zlata_win.final",
+   "seed": 392624,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "2k",
+    "width": 1368,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "zlata",
+   "element_ids": [
+    "ebdd5f33-3cc1-4d7e-afb6-13a698b1284f"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<ebdd5f33-3cc1-4d7e-afb6-13a698b1284f>>> is Zlata, an adult woman of 25, firebird tsarevna of a fairy-tale kingdom. Hair: one thick floor-length braid over her right shoulder shading from golden-blonde at the top to scarlet-orange at the tip with a glowing ember end, short curls at the temples. Eyes: amber-gold eyes with soft warm lids and fire glints. Skin: warm fair golden skin. Face: broad regal adult oval face, high forehead, strong cheekbones, large amber eyes, gentle strong chin, warm half-smile. Signature items that must be present: tall red-and-gold pearl-studded kokoshnik with a firebird feather; pearl and ruby choker with shoulder pearl chains; feather wing-cape or feather wing-sleeves in orange and gold; gold folk-painting floral ornament (original design). Body: tall statuesque figure, slim waist, broad regal shoulders, rounded hips, long legs, a full natural bust in proportion. Outfit: scarlet corset sarafan with gold folk ornament, a plunging sweetheart neckline, bare shoulders, feather wing-sleeves, a short front-slit skirt over sheer red lace-top thigh-high stockings with gold garter straps, red embroidered heeled boots. Pose: leaning toward the viewer in a joyful victory pose, one hand holding up a single blank ivory mahjong tile, a wink. Expression: bright laugh with a wink. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward warm gold. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "high",
+   "depends_on_task": "H1.zlata_win.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/zlata_win.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.zlata_tease.search",
+   "seed": 702081,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "1k",
+    "width": 680,
+    "height": 1024
+   },
+   "candidates": 6,
+   "unit_cost_cr": 1.0,
+   "heroine": "zlata",
+   "element_ids": [
+    "ebdd5f33-3cc1-4d7e-afb6-13a698b1284f"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<ebdd5f33-3cc1-4d7e-afb6-13a698b1284f>>> is Zlata, an adult woman of 25, firebird tsarevna of a fairy-tale kingdom. Hair: one thick floor-length braid over her right shoulder shading from golden-blonde at the top to scarlet-orange at the tip with a glowing ember end, short curls at the temples. Eyes: amber-gold eyes with soft warm lids and fire glints. Skin: warm fair golden skin. Face: broad regal adult oval face, high forehead, strong cheekbones, large amber eyes, gentle strong chin, warm half-smile. Signature items that must be present: tall red-and-gold pearl-studded kokoshnik with a firebird feather; pearl and ruby choker with shoulder pearl chains; feather wing-cape or feather wing-sleeves in orange and gold; gold folk-painting floral ornament (original design). Body: tall statuesque figure, slim waist, broad regal shoulders, rounded hips, long legs, a full natural bust in proportion. Outfit: scarlet corset sarafan with gold folk ornament, a plunging sweetheart neckline, bare shoulders, feather wing-sleeves, a short front-slit skirt over sheer red lace-top thigh-high stockings with gold garter straps, red embroidered heeled boots. Pose: glancing back at the viewer over her shoulder, one fingertip at her lips, shoulders turned, hip tilted. Expression: playful flirty smile. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward warm gold. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "medium",
+   "quota_cr": 6.0,
+   "max_credits": 6.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/zlata_tease.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.zlata_tease.final",
+   "seed": 126896,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "2k",
+    "width": 1368,
+    "height": 2048
+   },
+   "candidates": 2,
+   "unit_cost_cr": 2.0,
+   "heroine": "zlata",
+   "element_ids": [
+    "ebdd5f33-3cc1-4d7e-afb6-13a698b1284f"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "canon_frame_full",
+   "tier": "full",
+   "prompt": "<<<ebdd5f33-3cc1-4d7e-afb6-13a698b1284f>>> is Zlata, an adult woman of 25, firebird tsarevna of a fairy-tale kingdom. Hair: one thick floor-length braid over her right shoulder shading from golden-blonde at the top to scarlet-orange at the tip with a glowing ember end, short curls at the temples. Eyes: amber-gold eyes with soft warm lids and fire glints. Skin: warm fair golden skin. Face: broad regal adult oval face, high forehead, strong cheekbones, large amber eyes, gentle strong chin, warm half-smile. Signature items that must be present: tall red-and-gold pearl-studded kokoshnik with a firebird feather; pearl and ruby choker with shoulder pearl chains; feather wing-cape or feather wing-sleeves in orange and gold; gold folk-painting floral ornament (original design). Body: tall statuesque figure, slim waist, broad regal shoulders, rounded hips, long legs, a full natural bust in proportion. Outfit: scarlet corset sarafan with gold folk ornament, a plunging sweetheart neckline, bare shoulders, feather wing-sleeves, a short front-slit skirt over sheer red lace-top thigh-high stockings with gold garter straps, red embroidered heeled boots. Pose: glancing back at the viewer over her shoulder, one fingertip at her lips, shoulders turned, hip tilted. Expression: playful flirty smile. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward warm gold. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "high",
+   "depends_on_task": "H1.zlata_tease.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 4.0,
+   "max_credits": 4.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H1/zlata_tease.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H1.post_pool",
+   "seed": 275439,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "post",
+   "kind": "post_pool",
+   "media": "post",
+   "tool": "upscale_image|remove_background",
+   "model": "higgsfield_post",
+   "prompt": "Post-processing pool: upscale or remove_background for approved finals only. No prompt; the owner names the files.",
+   "candidates": 30,
+   "unit_cost_cr": 1.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "quota_cr": 30.0,
+   "max_credits": 30.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/H1/post_pool",
+    "name": "cand_{n:02d}"
+   }
+  }
+ ],
+ "totals": {
+  "tasks": 61,
+  "task_quota_sum_cr": 330.0,
+  "candidates": 240
+ },
+ "style_tail_id": "v5f"
+}

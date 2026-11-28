@@ -1,0 +1,735 @@
+{
+ "schema_version": 1,
+ "package": "P48",
+ "title": "Priority music: 12 tracks, 3 variants each, stems for the match tracks",
+ "week": 3,
+ "section": "Music",
+ "status": "ready_for_owner_approval",
+ "in_plan_ceiling": true,
+ "blocked_by": [],
+ "depends_on": [],
+ "owner_gate": "owner listens to the shortlist of each track after the seam gate (seam-flux/gate.py); key mismatches are accepted per track (the model keeps the key in 12 of 17 tracks)",
+ "budget": {
+  "currency": "higgsfield_credits",
+  "nominal_cr": 298.5,
+  "hard_stop_cr": 343.28,
+  "hard_stop_rule": "nominal + 15%: above that the run stops and the owner is asked",
+  "assumptions": [
+   "13.08 cr per 90 s = 0.1453 cr/s (quoted)",
+   "separate_stems is not quoted: 5 cr per track is an assumption",
+   "reserve 25% = 59.7 cr is one pool task"
+  ]
+ },
+ "candidates_policy": "3 variants per track (456 s of material x 3 variants x 0.1453 cr/s = 198.8 cr), stems for 8 tracks (assumed 5 cr), reserve 25% for re-takes",
+ "selection": {
+  "keep_per_task": 1,
+  "gate": "seam gate + LUFS -16 + listening",
+  "criteria": [
+   "loop seam inaudible (no click, no tail), starts on the groove",
+   "hook recognisable but does not distract in match tracks",
+   "key and tempo within the intended zone (log mismatches)",
+   "instrumental only, no vocals",
+   "no clipping, LUFS about -16"
+  ]
+ },
+ "pilot": {
+  "task_ids": [
+   "M1.summon_ssr",
+   "M1.event_fever"
+  ],
+  "candidates_per_task": 1,
+  "max_cr": 3.34,
+  "go_rule": "owner looks at the pilot frames; any red-line or drift failure -> fix the prompt before the full run"
+ },
+ "tool_note": "elevenlabs_music_v2_5 (force_instrumental true, batch_size = variants), then separate_stems(four) only for tracks flagged with stems. Prompts follow AUDIO_BIBLE 9.2.",
+ "guards": [
+  "Before each launch: estimate_*_cost -> quote_ref; abort the task when the quote is above max_credits.",
+  "Actual spend goes to design/art_batches/SPEND_LOG.csv; more than 15% over the batch nominal = stop and ask the owner.",
+  "Every output lands in assets/incoming, then double anatomy audit -> metadata scrub -> watermark pass -> manifest `approve`.",
+  "Prompts are untested: run the pilot tasks first (2-3 frames), look at them, only then release the rest."
+ ],
+ "notes": [],
+ "batch_id": "M1",
+ "tasks": [
+  {
+   "id": "M1.table_riichi",
+   "seed": 966567,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "music_track",
+   "media": "audio",
+   "tool": "generate_audio",
+   "model": "elevenlabs_music_v2_5",
+   "prompt": "Riichi table music, a focused premium mahjong table at night in a magical East-Asian teahouse. Calm, intense, grown-up, never aggressive. Lead melody on guzheng with a soft erhu answer, warm Rhodes piano chords, soft analog synth pads, soft lo-fi drums with brushed snare, warm upright-style bass, pizzicato strings and woodblock accents. Built on a short hummable five-note pentatonic hook. Anime-pop fusion with traditional Chinese instruments, 92 BPM, A minor pentatonic leaning major. Seamless loop: no intro, no fade-in, no fade-out, no ending, starts directly on the groove. Instrumental only.",
+   "force_instrumental": true,
+   "duration_s": 75,
+   "candidates": 3,
+   "unit_cost_cr": 10.8975,
+   "unit_cost_basis": "quoted",
+   "stems_planned": true,
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "output": {
+    "dir": "assets/incoming/M1/table_riichi",
+    "name": "v{n}"
+   },
+   "quota_cr": 32.69,
+   "max_credits": 32.69,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null
+  },
+  {
+   "id": "M1.match_finale",
+   "seed": 986512,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "music_track",
+   "media": "audio",
+   "tool": "generate_audio",
+   "model": "elevenlabs_music_v2_5",
+   "prompt": "Finale layer for a calm puzzle game, the last pairs of tiles, almost there. Sparkling anticipation, 8 bars. Rising guzheng runs over a pulsing synth bass, bell-like synth, light risers, warm piano chords, the same hook as a calm lo-fi puzzle loop at 88 BPM in A minor pentatonic leaning major. Tight ending that resolves on the tonic, no fade-out. Instrumental only.",
+   "force_instrumental": true,
+   "duration_s": 22,
+   "candidates": 3,
+   "unit_cost_cr": 3.1966,
+   "unit_cost_basis": "quoted",
+   "stems_planned": true,
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "output": {
+    "dir": "assets/incoming/M1/match_finale",
+    "name": "v{n}"
+   },
+   "quota_cr": 9.59,
+   "max_credits": 9.59,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null
+  },
+  {
+   "id": "M1.results_bed",
+   "seed": 167008,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "music_track",
+   "media": "audio",
+   "tool": "generate_audio",
+   "model": "elevenlabs_music_v2_5",
+   "prompt": "Results screen underscore, soft and rewarding, premium anime mobile game. Warm piano and gentle bell-like synth over a slow guzheng arpeggio, soft pad, very light brushed percussion, 84 BPM, D major pentatonic. Satisfied, calm, grown-up. Seamless loop: no intro, no fade-in, no fade-out, no ending. Instrumental only.",
+   "force_instrumental": true,
+   "duration_s": 30,
+   "candidates": 3,
+   "unit_cost_cr": 4.359,
+   "unit_cost_basis": "quoted",
+   "stems_planned": true,
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "output": {
+    "dir": "assets/incoming/M1/results_bed",
+    "name": "v{n}"
+   },
+   "quota_cr": 13.08,
+   "max_credits": 13.08,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null
+  },
+  {
+   "id": "M1.event_regular",
+   "seed": 595225,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "music_track",
+   "media": "audio",
+   "tool": "generate_audio",
+   "model": "elevenlabs_music_v2_5",
+   "prompt": "Seasonal event theme for a premium anime mahjong game in a festive lantern market. Joyful, warm, festive, grown-up, not childish. Lead melody on plucky koto and guzheng doubled by bell-like synth, erhu countermelody, bright piano chords, light anime-pop drums with shaker and hand claps, gentle bass, finger snaps. Instantly hummable five-note pentatonic hook. 110 BPM, G major pentatonic. Seamless loop: no intro, no fade-in, no fade-out, no ending. Instrumental only.",
+   "force_instrumental": true,
+   "duration_s": 60,
+   "candidates": 3,
+   "unit_cost_cr": 8.718,
+   "unit_cost_basis": "quoted",
+   "stems_planned": true,
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "output": {
+    "dir": "assets/incoming/M1/event_regular",
+    "name": "v{n}"
+   },
+   "quota_cr": 26.15,
+   "max_credits": 26.15,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null
+  },
+  {
+   "id": "M1.event_fever",
+   "seed": 979507,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "music_track",
+   "media": "audio",
+   "tool": "generate_audio",
+   "model": "elevenlabs_music_v2_5",
+   "prompt": "Short high-energy event fever sting-loop, festive lantern market at its peak. Driving 128 BPM four-on-the-floor kick, taiko accents, bright guzheng and synth lead, rising energy, anime-pop EDM costume, C major pentatonic. Joyful, energetic, never aggressive. Seamless loop. Instrumental only.",
+   "force_instrumental": true,
+   "duration_s": 17,
+   "candidates": 3,
+   "unit_cost_cr": 2.4701,
+   "unit_cost_basis": "quoted",
+   "stems_planned": false,
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "output": {
+    "dir": "assets/incoming/M1/event_fever",
+    "name": "v{n}"
+   },
+   "quota_cr": 7.41,
+   "max_credits": 7.41,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null
+  },
+  {
+   "id": "M1.memorial_mc",
+   "seed": 871838,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "music_track",
+   "media": "audio",
+   "tool": "generate_audio",
+   "model": "elevenlabs_music_v2_5",
+   "prompt": "Memorial scene theme for the mahjong salon owner, a heartfelt quiet moment at dawn in a teahouse. Tender, nostalgic, warm and grateful, never sad. Solo guzheng and warm piano with a soft erhu countermelody, light string pad, almost no percussion, 72 BPM, D major pentatonic. Gentle build to a warm resolution, soft ending, instrumental only.",
+   "force_instrumental": true,
+   "duration_s": 50,
+   "candidates": 3,
+   "unit_cost_cr": 7.265,
+   "unit_cost_basis": "quoted",
+   "stems_planned": true,
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "output": {
+    "dir": "assets/incoming/M1/memorial_mc",
+    "name": "v{n}"
+   },
+   "quota_cr": 21.8,
+   "max_credits": 21.8,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null
+  },
+  {
+   "id": "M1.memorial_yue",
+   "seed": 715603,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "music_track",
+   "media": "audio",
+   "tool": "generate_audio",
+   "model": "elevenlabs_music_v2_5",
+   "prompt": "Memorial scene theme for a serene moon-palace ruler, a hushed night under a silver moon. Elegant, mysterious, tender, never scary. Solo pipa and soft piano with a slow erhu line, airy synth pads and distant bells, no drums, 3/4 waltz feel at 80 BPM, B minor pentatonic. Gentle resolution, soft ending, instrumental only.",
+   "force_instrumental": true,
+   "duration_s": 50,
+   "candidates": 3,
+   "unit_cost_cr": 7.265,
+   "unit_cost_basis": "quoted",
+   "stems_planned": true,
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "output": {
+    "dir": "assets/incoming/M1/memorial_yue",
+    "name": "v{n}"
+   },
+   "quota_cr": 21.8,
+   "max_credits": 21.8,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null
+  },
+  {
+   "id": "M1.memorial_zlata",
+   "seed": 920411,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "music_track",
+   "media": "audio",
+   "tool": "generate_audio",
+   "model": "elevenlabs_music_v2_5",
+   "prompt": "Memorial scene theme for a firebird tsarevna of a fairy-tale kingdom, a warm glowing hearth at night. Proud, warm, nostalgic, never sad. Folk-inspired melody on gusli-like plucked strings and warm piano with a soft cello line, gentle pads, hand drum very soft, 78 BPM, E minor pentatonic leaning major. Gentle resolution, soft ending, instrumental only.",
+   "force_instrumental": true,
+   "duration_s": 50,
+   "candidates": 3,
+   "unit_cost_cr": 7.265,
+   "unit_cost_basis": "quoted",
+   "stems_planned": true,
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "output": {
+    "dir": "assets/incoming/M1/memorial_zlata",
+    "name": "v{n}"
+   },
+   "quota_cr": 21.8,
+   "max_credits": 21.8,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null
+  },
+  {
+   "id": "M1.motif_zlata",
+   "seed": 629514,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "music_track",
+   "media": "audio",
+   "tool": "generate_audio",
+   "model": "elevenlabs_music_v2_5",
+   "prompt": "Short leitmotif for a firebird tsarevna, regal and warm. Bright plucked gusli-like melody doubled by bells, warm piano chords, light hand drum, 108 BPM, E minor pentatonic leaning major. Instantly hummable hook stated twice. Seamless loop. Instrumental only.",
+   "force_instrumental": true,
+   "duration_s": 20,
+   "candidates": 3,
+   "unit_cost_cr": 2.906,
+   "unit_cost_basis": "quoted",
+   "stems_planned": false,
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "output": {
+    "dir": "assets/incoming/M1/motif_zlata",
+    "name": "v{n}"
+   },
+   "quota_cr": 8.72,
+   "max_credits": 8.72,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null
+  },
+  {
+   "id": "M1.motif_kohaku",
+   "seed": 159611,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "music_track",
+   "media": "audio",
+   "tool": "generate_audio",
+   "model": "elevenlabs_music_v2_5",
+   "prompt": "Short leitmotif for a white fox shrine maiden, playful and mysterious. Plucky koto melody with a shakuhachi answer, soft bells, light percussion with wood blocks, 104 BPM, A minor pentatonic leaning major. Instantly hummable hook stated twice. Seamless loop. Instrumental only.",
+   "force_instrumental": true,
+   "duration_s": 20,
+   "candidates": 3,
+   "unit_cost_cr": 2.906,
+   "unit_cost_basis": "quoted",
+   "stems_planned": false,
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "output": {
+    "dir": "assets/incoming/M1/motif_kohaku",
+    "name": "v{n}"
+   },
+   "quota_cr": 8.72,
+   "max_credits": 8.72,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null
+  },
+  {
+   "id": "M1.mode_classic",
+   "seed": 452733,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "music_track",
+   "media": "audio",
+   "tool": "generate_audio",
+   "model": "elevenlabs_music_v2_5",
+   "prompt": "Classic solitaire mode loop, serene tea garden. Calm, meditative, grown-up. Slow guzheng arpeggios and sparse warm piano, soft pad, no drums, 72 BPM, G major pentatonic. Seamless loop: no intro, no fade-in, no fade-out, no ending. Instrumental only.",
+   "force_instrumental": true,
+   "duration_s": 56,
+   "candidates": 3,
+   "unit_cost_cr": 8.1368,
+   "unit_cost_basis": "quoted",
+   "stems_planned": true,
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "output": {
+    "dir": "assets/incoming/M1/mode_classic",
+    "name": "v{n}"
+   },
+   "quota_cr": 24.41,
+   "max_credits": 24.41,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null
+  },
+  {
+   "id": "M1.summon_ssr",
+   "seed": 365425,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "music_track",
+   "media": "audio",
+   "tool": "generate_audio",
+   "model": "elevenlabs_music_v2_5",
+   "prompt": "Short rare-reveal sting for a premium gacha summon: silence-to-sparkle, rising bell-like synth and guzheng glissando into a golden major chord with a soft shimmer tail, C major. Resolves and rings out, no loop. Instrumental only.",
+   "force_instrumental": true,
+   "duration_s": 6,
+   "candidates": 3,
+   "unit_cost_cr": 0.8718,
+   "unit_cost_basis": "quoted",
+   "stems_planned": false,
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "output": {
+    "dir": "assets/incoming/M1/summon_ssr",
+    "name": "v{n}"
+   },
+   "quota_cr": 2.62,
+   "max_credits": 2.62,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null
+  },
+  {
+   "id": "M1.stems_table_riichi",
+   "seed": 603203,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "post",
+   "kind": "stems",
+   "media": "post",
+   "tool": "separate_stems",
+   "model": "separate_stems(four)",
+   "prompt": "Split the approved variant of table_riichi into 4 stems: base, tension, 'ardor' layer by the partner instrument, finale.",
+   "candidates": 1,
+   "unit_cost_cr": 5.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "depends_on_task": "M1.table_riichi",
+   "quota_cr": 5.0,
+   "max_credits": 5.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/M1/stems_table_riichi",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "M1.stems_match_finale",
+   "seed": 630324,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "post",
+   "kind": "stems",
+   "media": "post",
+   "tool": "separate_stems",
+   "model": "separate_stems(four)",
+   "prompt": "Split the approved variant of match_finale into 4 stems: base, tension, 'ardor' layer by the partner instrument, finale.",
+   "candidates": 1,
+   "unit_cost_cr": 5.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "depends_on_task": "M1.match_finale",
+   "quota_cr": 5.0,
+   "max_credits": 5.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/M1/stems_match_finale",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "M1.stems_event_regular",
+   "seed": 140951,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "post",
+   "kind": "stems",
+   "media": "post",
+   "tool": "separate_stems",
+   "model": "separate_stems(four)",
+   "prompt": "Split the approved variant of event_regular into 4 stems: base, tension, 'ardor' layer by the partner instrument, finale.",
+   "candidates": 1,
+   "unit_cost_cr": 5.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "depends_on_task": "M1.event_regular",
+   "quota_cr": 5.0,
+   "max_credits": 5.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/M1/stems_event_regular",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "M1.stems_mode_classic",
+   "seed": 991801,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "post",
+   "kind": "stems",
+   "media": "post",
+   "tool": "separate_stems",
+   "model": "separate_stems(four)",
+   "prompt": "Split the approved variant of mode_classic into 4 stems: base, tension, 'ardor' layer by the partner instrument, finale.",
+   "candidates": 1,
+   "unit_cost_cr": 5.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "depends_on_task": "M1.mode_classic",
+   "quota_cr": 5.0,
+   "max_credits": 5.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/M1/stems_mode_classic",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "M1.stems_memorial_mc",
+   "seed": 909999,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "post",
+   "kind": "stems",
+   "media": "post",
+   "tool": "separate_stems",
+   "model": "separate_stems(four)",
+   "prompt": "Split the approved variant of memorial_mc into 4 stems: base, tension, 'ardor' layer by the partner instrument, finale.",
+   "candidates": 1,
+   "unit_cost_cr": 5.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "depends_on_task": "M1.memorial_mc",
+   "quota_cr": 5.0,
+   "max_credits": 5.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/M1/stems_memorial_mc",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "M1.stems_memorial_yue",
+   "seed": 472503,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "post",
+   "kind": "stems",
+   "media": "post",
+   "tool": "separate_stems",
+   "model": "separate_stems(four)",
+   "prompt": "Split the approved variant of memorial_yue into 4 stems: base, tension, 'ardor' layer by the partner instrument, finale.",
+   "candidates": 1,
+   "unit_cost_cr": 5.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "depends_on_task": "M1.memorial_yue",
+   "quota_cr": 5.0,
+   "max_credits": 5.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/M1/stems_memorial_yue",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "M1.stems_memorial_zlata",
+   "seed": 360532,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "post",
+   "kind": "stems",
+   "media": "post",
+   "tool": "separate_stems",
+   "model": "separate_stems(four)",
+   "prompt": "Split the approved variant of memorial_zlata into 4 stems: base, tension, 'ardor' layer by the partner instrument, finale.",
+   "candidates": 1,
+   "unit_cost_cr": 5.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "depends_on_task": "M1.memorial_zlata",
+   "quota_cr": 5.0,
+   "max_credits": 5.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/M1/stems_memorial_zlata",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "M1.stems_results_bed",
+   "seed": 949585,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "post",
+   "kind": "stems",
+   "media": "post",
+   "tool": "separate_stems",
+   "model": "separate_stems(four)",
+   "prompt": "Split the approved variant of results_bed into 4 stems: base, tension, 'ardor' layer by the partner instrument, finale.",
+   "candidates": 1,
+   "unit_cost_cr": 5.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "depends_on_task": "M1.results_bed",
+   "quota_cr": 5.0,
+   "max_credits": 5.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/M1/stems_results_bed",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "M1.reserve_retakes",
+   "seed": 933005,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "reserve",
+   "kind": "reserve_pool",
+   "media": "post",
+   "tool": "generate_audio",
+   "model": "elevenlabs_music_v2_5",
+   "prompt": "Pool of 25% for re-takes of tracks that fail the seam gate. Spend only after the owner names the track.",
+   "candidates": 1,
+   "unit_cost_cr": 59.69,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "quota_cr": 59.69,
+   "max_credits": 59.69,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/M1/reserve_retakes",
+    "name": "cand_{n:02d}"
+   }
+  }
+ ],
+ "totals": {
+  "tasks": 21,
+  "task_quota_sum_cr": 298.48,
+  "candidates": 36
+ },
+ "style_tail_id": null
+}

@@ -1,0 +1,122 @@
+{
+ "mc_match": {
+  "accent_pct": 11.8,
+  "accent_loose_pct": 14.4,
+  "gold_pct": 0.6,
+  "heads": null,
+  "accent_ok": true,
+  "heads_ok": null
+ },
+ "mc_shop": {
+  "accent_pct": 22.9,
+  "accent_loose_pct": 27.2,
+  "gold_pct": 0.04,
+  "heads": null,
+  "accent_ok": false,
+  "heads_ok": null
+ },
+ "mc_summon": {
+  "accent_pct": 15.8,
+  "accent_loose_pct": 20.5,
+  "gold_pct": 1.49,
+  "heads": null,
+  "accent_ok": true,
+  "heads_ok": null
+ },
+ "mc_tea": {
+  "accent_pct": 28.9,
+  "accent_loose_pct": 34.0,
+  "gold_pct": 0.31,
+  "heads": null,
+  "accent_ok": false,
+  "heads_ok": null
+ },
+ "mc_win": {
+  "accent_pct": 23.1,
+  "accent_loose_pct": 24.4,
+  "gold_pct": 0.93,
+  "heads": null,
+  "accent_ok": false,
+  "heads_ok": null
+ },
+ "nova_match": {
+  "accent_pct": 1.8,
+  "accent_loose_pct": 6.4,
+  "gold_pct": 0.56,
+  "heads": null,
+  "accent_ok": true,
+  "heads_ok": null
+ },
+ "nova_shop": {
+  "accent_pct": 1.5,
+  "accent_loose_pct": 7.9,
+  "gold_pct": 0.12,
+  "heads": null,
+  "accent_ok": true,
+  "heads_ok": null
+ },
+ "nova_summon": {
+  "accent_pct": 1.1,
+  "accent_loose_pct": 15.4,
+  "gold_pct": 1.71,
+  "heads": null,
+  "accent_ok": true,
+  "heads_ok": null
+ },
+ "nova_tea": {
+  "accent_pct": 1.1,
+  "accent_loose_pct": 5.1,
+  "gold_pct": 0.12,
+  "heads": null,
+  "accent_ok": true,
+  "heads_ok": null
+ },
+ "nova_win": {
+  "accent_pct": 4.9,
+  "accent_loose_pct": 41.7,
+  "gold_pct": 0.0,
+  "heads": null,
+  "accent_ok": true,
+  "heads_ok": null
+ },
+ "yue_match": {
+  "accent_pct": 3.9,
+  "accent_loose_pct": 8.0,
+  "gold_pct": 0.11,
+  "heads": null,
+  "accent_ok": true,
+  "heads_ok": null
+ },
+ "yue_shop": {
+  "accent_pct": 11.3,
+  "accent_loose_pct": 11.3,
+  "gold_pct": 0.28,
+  "heads": null,
+  "accent_ok": true,
+  "heads_ok": null
+ },
+ "yue_summon": {
+  "accent_pct": 23.1,
+  "accent_loose_pct": 25.3,
+  "gold_pct": 0.11,
+  "heads": null,
+  "accent_ok": false,
+  "heads_ok": null
+ },
+ "yue_tea": {
+  "accent_pct": 5.3,
+  "accent_loose_pct": 6.2,
+  "gold_pct": 0.38,
+  "heads": null,
+  "accent_ok": true,
+  "heads_ok": null
+ },
+ "yue_win": {
+  "accent_pct": 19.1,
+  "accent_loose_pct": 19.5,
+  "gold_pct": 0.0,
+  "heads": null,
+  "accent_ok": true,
+  "heads_ok": null
+ }
+}
