@@ -3,14 +3,16 @@
   "name_ru": "Юэ",
   "age": "на вид 27",
   "role": "Правительница Лунного дворца",
-  "ssr_outfit_ref": "y_queen / yue_ssr_scalearmor",
-  "beta24_note": "24 строки Beta-24 по DEC-P44-1 + 8 строк SSR-костюма = 32",
+  "ssr_skin_id": "yue_ssr_scalearmor",
+  "ssr_outfit_ref": "y_duel / yue_ssr_scalearmor",
+  "beta24_note": "24 канонические строки Beta-24 (синхронизировано с design/voice/BETA24_TEXTS.md, DEC-P44-1) + 8 строк SSR-костюма с привязкой к skin_id = 32",
   "lines": [
     {
       "id": "yue_login_morning_1",
       "slot": "login_morning",
       "tier": "beta24",
-      "text": "Даже при утреннем свете луна помнит о тебе. Проходи.",
+      "pool": "login",
+      "text": "Утренняя луна тоже недурна. Ты пришёл вовремя.",
       "emotion": "regal",
       "max_words": 12
     },
@@ -18,7 +20,8 @@
       "id": "yue_login_evening_1",
       "slot": "login_evening",
       "tier": "beta24",
-      "text": "Полночь принадлежит нам. Присядешь к столу Лунного дворца?",
+      "pool": "login",
+      "text": "Луна взошла. Составишь мне компанию и этой ночью?",
       "emotion": "tease",
       "max_words": 12
     },
@@ -26,7 +29,8 @@
       "id": "yue_intro_summon_1",
       "slot": "intro_summon",
       "tier": "beta24",
-      "text": "Я Юэ. Триста лет без поражений — рискнёшь бросить вызов?",
+      "pool": "summon_intro",
+      "text": "Я Юэ, хозяйка Лунного дворца. Запомни это имя.",
       "emotion": "regal",
       "max_words": 12
     },
@@ -34,7 +38,8 @@
       "id": "yue_outfit_equip_1",
       "slot": "outfit_equip",
       "tier": "beta24",
-      "text": "Любопытно… Ты выбрал именно этот шёлк? У тебя отличный вкус.",
+      "pool": "outfit",
+      "text": "Этот наряд я выбрала для тебя.",
       "emotion": "tease",
       "max_words": 12
     },
@@ -42,7 +47,8 @@
       "id": "yue_idle_1",
       "slot": "idle_1",
       "tier": "beta24",
-      "text": "Сливовый чай ещё тёплый, а луна высоко. Удиви меня ходом.",
+      "pool": "idle",
+      "text": "Тихо. …Мне нравится это время.",
       "emotion": "neutral",
       "max_words": 12
     },
@@ -50,7 +56,8 @@
       "id": "yue_idle_2",
       "slot": "idle_2",
       "tier": "beta24",
-      "text": "За веером легко скрыть улыбку, но ты её всё равно видишь.",
+      "pool": "idle",
+      "text": "Скучно? Тогда составь мне компанию.",
       "emotion": "tease",
       "max_words": 12
     },
@@ -58,7 +65,8 @@
       "id": "yue_idle_warm_1",
       "slot": "idle_warm",
       "tier": "beta24",
-      "text": "Иногда я уступаю нарочно — лишь бы ты пришёл снова.",
+      "pool": "idle_warm",
+      "text": "Когда ты приходишь, луна кажется мне ярче.",
       "emotion": "warm",
       "max_words": 12
     },
@@ -66,7 +74,8 @@
       "id": "yue_touch_head_1",
       "slot": "touch_head",
       "tier": "beta24",
-      "text": "Смело… Прикоснуться к тиаре правительницы дозволено только тебе.",
+      "pool": "touch_head",
+      "text": "Класть руку мне на голову… дерзость. Но я прощаю.",
       "emotion": "surprised",
       "max_words": 12
     },
@@ -74,7 +83,8 @@
       "id": "yue_touch_hand_1",
       "slot": "touch_hand",
       "tier": "beta24",
-      "text": "Подаю руку как королева. Можешь задержать её чуть дольше.",
+      "pool": "touch_hand",
+      "text": "Руку… ну, возьми. Только этой ночью.",
       "emotion": "regal",
       "max_words": 12
     },
@@ -82,7 +92,8 @@
       "id": "yue_touch_hair_1",
       "slot": "touch_hair",
       "tier": "beta24",
-      "text": "Лавандовые пряди береги — в них вплетён лунный свет.",
+      "pool": "touch_hair",
+      "text": "Мои волосы — нити лунного света. Обращайся бережно.",
       "emotion": "warm",
       "max_words": 12
     },
@@ -90,7 +101,8 @@
       "id": "yue_touch_outfit_1",
       "slot": "touch_outfit",
       "tier": "beta24",
-      "text": "Мой веер раскрывается звёздами. Не отвлекайся от игры, смельчак.",
+      "pool": "touch_outfit",
+      "text": "Рукав помнётся. …Ну, не спеши.",
       "emotion": "tease",
       "max_words": 12
     },
@@ -98,7 +110,8 @@
       "id": "yue_touch_spam_1",
       "slot": "touch_spam",
       "tier": "beta24",
-      "text": "Какое нетерпение… Ещё шаг, и я слегка щёлкну тебя веером.",
+      "pool": "touch_spam",
+      "text": "Довольно. Ударю веером!",
       "emotion": "pout",
       "max_words": 12
     },
@@ -106,7 +119,8 @@
       "id": "yue_touch_bold_1",
       "slot": "touch_bold",
       "tier": "beta24",
-      "text": "Склонись ближе. Сегодня луна светит исключительно для тебя.",
+      "pool": "touch_bold",
+      "text": "Рядом с тобой я, пожалуй, готова проиграть.",
       "emotion": "tease",
       "max_words": 12
     },
@@ -114,7 +128,8 @@
       "id": "yue_gift_normal_1",
       "slot": "gift_normal",
       "tier": "beta24",
-      "text": "Подношение дворцу? Принимаю с благосклонной улыбкой.",
+      "pool": "gift",
+      "text": "Подарок? …Так и быть, приму. Благодарю.",
       "emotion": "happy",
       "max_words": 12
     },
@@ -122,7 +137,8 @@
       "id": "yue_gift_liked_1",
       "slot": "gift_liked",
       "tier": "beta24",
-      "text": "Любопытно… Ты угадал желание правительницы без единой подсказки.",
+      "pool": "gift",
+      "text": "Это… ты хорошо знаешь мои вкусы.",
       "emotion": "warm",
       "max_words": 12
     },
@@ -130,7 +146,8 @@
       "id": "yue_level_max_vow_1",
       "slot": "level_max_vow",
       "tier": "beta24",
-      "text": "Вечность казалась долгой, пока рядом не оказался ты.",
+      "pool": "vow",
+      "text": "Я дарю тебе свою луну. Навсегда.",
       "emotion": "warm",
       "max_words": 12
     },
@@ -138,23 +155,26 @@
       "id": "yue_combo_t2_1",
       "slot": "combo_t2",
       "tier": "beta24",
-      "text": "Любопытно…",
+      "pool": "combo",
+      "text": "Недурно.",
       "emotion": "tease",
-      "max_words": 12
+      "max_words": 3
     },
     {
       "id": "yue_combo_t3_1",
       "slot": "combo_t3",
       "tier": "beta24",
-      "text": "Достойно луны!",
+      "pool": "combo",
+      "text": "Великолепно.",
       "emotion": "regal",
-      "max_words": 12
+      "max_words": 3
     },
     {
       "id": "yue_clear_normal_1",
       "slot": "clear",
       "tier": "beta24",
-      "text": "Красивая партия. Ты действительно умеешь радовать правительницу.",
+      "pool": "clear",
+      "text": "Это было великолепно. Я тебя похвалю.",
       "emotion": "happy",
       "max_words": 12
     },
@@ -162,7 +182,8 @@
       "id": "yue_fail_1",
       "slot": "fail",
       "tier": "beta24",
-      "text": "Тень прошла по луне — не беда. Сыграем снова.",
+      "pool": "fail",
+      "text": "Луна лишь скрылась за облаком. Ну же, ещё раз.",
       "emotion": "neutral",
       "max_words": 12
     },
@@ -170,95 +191,115 @@
       "id": "yue_ult_cast_1",
       "slot": "ult_cast",
       "tier": "beta24",
-      "text": "Свет полумесяца!",
+      "pool": "ult",
+      "text": "Наполнись!",
       "emotion": "regal",
-      "max_words": 12
+      "max_words": 3
     },
     {
       "id": "yue_riichi_1",
       "slot": "riichi",
       "tier": "beta24",
-      "text": "Риичи. Смотри внимательно.",
+      "pool": "riichi",
+      "text": "Риичи.",
       "emotion": "regal",
-      "max_words": 12
+      "max_words": 3
     },
     {
       "id": "yue_ron_1",
       "slot": "ron",
       "tier": "beta24",
-      "text": "Рон. Весьма предсказуемо.",
+      "pool": "ron",
+      "text": "Рон.",
       "emotion": "tease",
-      "max_words": 12
+      "max_words": 3
     },
     {
       "id": "yue_tsumo_1",
       "slot": "tsumo",
       "tier": "beta24",
-      "text": "Цумо. Луна благосклонна.",
+      "pool": "tsumo",
+      "text": "Цумо.",
       "emotion": "regal",
-      "max_words": 12
+      "max_words": 4
     },
     {
-      "id": "yue_ssr_outfit_new",
+      "id": "yue.yue_ssr_scalearmor.outfit_new.01",
       "slot": "outfit_new",
       "tier": "ssr_outfit",
-      "text": "Королева ночи спустилась с трона — приглашаю на последний вальс.",
+      "skin_id": "yue_ssr_scalearmor",
+      "pool": "lobby",
+      "text": "Серебряная чешуя и лунная глефа. Сегодня я выхожу на поединок.",
       "emotion": "regal",
       "max_words": 12
     },
     {
-      "id": "yue_ssr_idle_2",
+      "id": "yue.yue_ssr_scalearmor.idle.02",
       "slot": "idle_2",
       "tier": "ssr_outfit",
-      "text": "Три четверти такта, серебро платья… И только твой шаг рядом.",
+      "skin_id": "yue_ssr_scalearmor",
+      "pool": "lobby",
+      "text": "Ночной храм тих, чешуя ловит лунный свет… И рядом твои шаги.",
       "emotion": "warm",
       "max_words": 12
     },
     {
-      "id": "yue_ssr_touch_2",
+      "id": "yue.yue_ssr_scalearmor.touch.02",
       "slot": "touch_2",
       "tier": "ssr_outfit",
-      "text": "Шлейф невесом, как облако. Коснись перчатки — начнём танец.",
+      "skin_id": "yue_ssr_scalearmor",
+      "pool": "lobby",
+      "text": "Не трогай лезвие глефы — порежешься. Лучше коснись моей перчатки.",
       "emotion": "tease",
       "max_words": 12
     },
     {
-      "id": "yue_ssr_level_vow",
+      "id": "yue.yue_ssr_scalearmor.level_vow.01",
       "slot": "level_vow",
       "tier": "ssr_outfit",
-      "text": "Отныне Лунный дворец делит корону с тобой одним.",
+      "skin_id": "yue_ssr_scalearmor",
+      "pool": "lobby",
+      "text": "Отныне Лунный дворец делит корону и честь лишь с тобой.",
       "emotion": "warm",
       "max_words": 12
     },
     {
-      "id": "yue_ssr_ult_cast_a",
+      "id": "yue_ssr_scalearmor_ult_cast_1",
       "slot": "ult_cast_a",
       "tier": "ssr_outfit",
-      "text": "Созвездие затмения!",
+      "skin_id": "yue_ssr_scalearmor",
+      "pool": "ult",
+      "text": "Серп луны.",
+      "emotion": "regal",
+      "max_words": 3
+    },
+    {
+      "id": "yue_ssr_scalearmor_ult_cast_2",
+      "slot": "ult_cast_b",
+      "tier": "ssr_outfit",
+      "skin_id": "yue_ssr_scalearmor",
+      "pool": "ult",
+      "text": "Склонись.",
+      "emotion": "confident",
+      "max_words": 3
+    },
+    {
+      "id": "yue.yue_ssr_scalearmor.equip.01",
+      "slot": "equip",
+      "tier": "ssr_outfit",
+      "skin_id": "yue_ssr_scalearmor",
+      "pool": "lobby",
+      "text": "Чешуя луны блестит в ночи. Не отводи взгляда от поединка.",
       "emotion": "regal",
       "max_words": 12
     },
     {
-      "id": "yue_ssr_ult_cast_b",
-      "slot": "ult_cast_b",
-      "tier": "ssr_outfit",
-      "text": "Выпад полумесяца!",
-      "emotion": "confident",
-      "max_words": 12
-    },
-    {
-      "id": "yue_ssr_equip",
-      "slot": "equip",
-      "tier": "ssr_outfit",
-      "text": "Серебро полуночи готово. Не отводи взгляда от своей королевы.",
-      "emotion": "tease",
-      "max_words": 12
-    },
-    {
-      "id": "yue_ssr_win",
+      "id": "yue.yue_ssr_scalearmor.win.01",
       "slot": "win",
       "tier": "ssr_outfit",
-      "text": "Блестящий финал под луной. Награда — ещё один вальс.",
+      "skin_id": "yue_ssr_scalearmor",
+      "pool": "lobby",
+      "text": "Безупречный исход под луной. Мой клинок склоняется в знак уважения.",
       "emotion": "happy",
       "max_words": 12
     }

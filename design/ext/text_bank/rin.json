@@ -3,14 +3,16 @@
   "name_ru": "Рин",
   "age": "27",
   "role": "Мастер чая, хозяйка «Ледяного павильона»",
-  "ssr_outfit_ref": "r_agent / rin_ssr_bunnytea",
-  "beta24_note": "24 строки Beta-24 по DEC-P44-1 + 8 строк SSR-костюма = 32",
+  "ssr_skin_id": "rin_ssr_bunnytea",
+  "ssr_outfit_ref": "r_idol / rin_ssr_bunnytea",
+  "beta24_note": "24 канонические строки Beta-24 (синхронизировано с design/voice/BETA24_TEXTS.md, DEC-P44-1) + 8 строк SSR-костюма с привязкой к skin_id = 32",
   "lines": [
     {
       "id": "rin_login_morning_1",
       "slot": "login_morning",
       "tier": "beta24",
-      "text": "Доброе утро. Чай нужной температуры — присаживайся за стол.",
+      "pool": "login",
+      "text": "Доброе утро. Я заварила чай. Присаживайся.",
       "emotion": "neutral",
       "max_words": 12
     },
@@ -18,7 +20,8 @@
       "id": "rin_login_evening_1",
       "slot": "login_evening",
       "tier": "beta24",
-      "text": "Вечер тихий. Позволь заварить тебе особую чашку на двоих.",
+      "pool": "login",
+      "text": "Добро пожаловать. Сегодняшний вечер, похоже, будет долгим.",
       "emotion": "warm",
       "max_words": 12
     },
@@ -26,7 +29,8 @@
       "id": "rin_intro_summon_1",
       "slot": "intro_summon",
       "tier": "beta24",
-      "text": "Я Рин, мастер чая. Посмотрим, достоин ли ты моего напитка.",
+      "pool": "summon_intro",
+      "text": "Приятно познакомиться, я Рин. Ни в чае, ни в игре не уступлю.",
       "emotion": "confident",
       "max_words": 12
     },
@@ -34,7 +38,8 @@
       "id": "rin_outfit_equip_1",
       "slot": "outfit_equip",
       "tier": "beta24",
-      "text": "Этот силуэт мне к лицу? …Твоё мнение удивительно важно.",
+      "pool": "outfit",
+      "text": "Этот наряд — тебе по вкусу?",
       "emotion": "shy",
       "max_words": 12
     },
@@ -42,7 +47,8 @@
       "id": "rin_idle_1",
       "slot": "idle_1",
       "tier": "beta24",
-      "text": "Чувства неэффективны… но чай почему-то вкуснее рядом с тобой.",
+      "pool": "idle",
+      "text": "Чай остынет. Передохни.",
       "emotion": "warm",
       "max_words": 12
     },
@@ -50,7 +56,8 @@
       "id": "rin_idle_2",
       "slot": "idle_2",
       "tier": "beta24",
-      "text": "Не торопи ход. Хороший настой требует терпения и внимания.",
+      "pool": "idle",
+      "text": "Эффективность — ещё не вся жизнь.",
       "emotion": "neutral",
       "max_words": 12
     },
@@ -58,7 +65,8 @@
       "id": "rin_idle_warm_1",
       "slot": "idle_warm",
       "tier": "beta24",
-      "text": "Для тебя в «Ледяном павильоне» всегда согрета лишняя пиала.",
+      "pool": "idle_warm",
+      "text": "В дни, когда ты не приходишь, остаётся лишний чай. …Только и всего.",
       "emotion": "warm",
       "max_words": 12
     },
@@ -66,7 +74,8 @@
       "id": "rin_touch_head_1",
       "slot": "touch_head",
       "tier": "beta24",
-      "text": "Позволь… Очки чуть сбились. Но отстраняться я не стану.",
+      "pool": "touch_head",
+      "text": "Гладишь по голове? Что за ветер переменился?",
       "emotion": "shy",
       "max_words": 12
     },
@@ -74,7 +83,8 @@
       "id": "rin_touch_hand_1",
       "slot": "touch_hand",
       "tier": "beta24",
-      "text": "Держи пиалу бережно. И пальцы мои можешь не спешить отпускать.",
+      "pool": "touch_hand",
+      "text": "Рука? …Хорошо. Ненадолго одолжу.",
       "emotion": "shy",
       "max_words": 12
     },
@@ -82,7 +92,8 @@
       "id": "rin_touch_hair_1",
       "slot": "touch_hair",
       "tier": "beta24",
-      "text": "Перекинула косу на другое плечо — так тебе удобнее любоваться?",
+      "pool": "touch_hair",
+      "text": "Причёска растреплется. Если уж — то бережно.",
       "emotion": "tease",
       "max_words": 12
     },
@@ -90,7 +101,8 @@
       "id": "rin_touch_outfit_1",
       "slot": "touch_outfit",
       "tier": "beta24",
-      "text": "Не поправляй мой воротник, иначе я собьюсь с чайного ритуала.",
+      "pool": "touch_outfit",
+      "text": "Дёргать за рукав — дурной тон.",
       "emotion": "shy_averted",
       "max_words": 12
     },
@@ -98,7 +110,8 @@
       "id": "rin_touch_spam_1",
       "slot": "touch_spam",
       "tier": "beta24",
-      "text": "Хватит суетиться. Ещё раз — и останешься без второй чашки.",
+      "pool": "touch_spam",
+      "text": "Успокойся. Чашка разобьётся.",
       "emotion": "pout",
       "max_words": 12
     },
@@ -106,7 +119,8 @@
       "id": "rin_touch_bold_1",
       "slot": "touch_bold",
       "tier": "beta24",
-      "text": "С тобой моя выдержка тает. Зови меня просто Рин.",
+      "pool": "touch_bold",
+      "text": "Ты неисправим. …Мне это не противно.",
       "emotion": "shy",
       "max_words": 12
     },
@@ -114,7 +128,8 @@
       "id": "rin_gift_normal_1",
       "slot": "gift_normal",
       "tier": "beta24",
-      "text": "Благодарю. Приятный жест, я оценю его за чаем.",
+      "pool": "gift",
+      "text": "О, мне? Спасибо. Буду беречь.",
       "emotion": "happy",
       "max_words": 12
     },
@@ -122,7 +137,8 @@
       "id": "rin_gift_liked_1",
       "slot": "gift_liked",
       "tier": "beta24",
-      "text": "Редкий выбор… Ты изучил мои вкусы лучше всех.",
+      "pool": "gift",
+      "text": "Это… как раз то, что я хотела. Как ты догадался?",
       "emotion": "warm",
       "max_words": 12
     },
@@ -130,7 +146,8 @@
       "id": "rin_level_max_vow_1",
       "slot": "level_max_vow",
       "tier": "beta24",
-      "text": "Я таю медленно, зато навсегда. Останься со мной, хорошо?",
+      "pool": "vow",
+      "text": "Позволь и дальше заваривать тебе чай. Всегда.",
       "emotion": "warm",
       "max_words": 12
     },
@@ -138,23 +155,26 @@
       "id": "rin_combo_t2_1",
       "slot": "combo_t2",
       "tier": "beta24",
-      "text": "Безупречный расчёт.",
+      "pool": "combo",
+      "text": "Превосходно.",
       "emotion": "confident",
-      "max_words": 12
+      "max_words": 3
     },
     {
       "id": "rin_combo_t3_1",
       "slot": "combo_t3",
       "tier": "beta24",
-      "text": "Изящная серия!",
+      "pool": "combo",
+      "text": "Великолепно.",
       "emotion": "happy",
-      "max_words": 12
+      "max_words": 3
     },
     {
       "id": "rin_clear_normal_1",
       "slot": "clear",
       "tier": "beta24",
-      "text": "Позволь поздравить. Ты заслужил лучшую заварку этого вечера.",
+      "pool": "clear",
+      "text": "Отличная работа. Как обещала, налью чай.",
       "emotion": "happy",
       "max_words": 12
     },
@@ -162,7 +182,8 @@
       "id": "rin_fail_1",
       "slot": "fail",
       "tier": "beta24",
-      "text": "Протру очки… Ошибка учтена. Сыграем ещё раз спокойно.",
+      "pool": "fail",
+      "text": "Не торопись. Ещё раз, вместе.",
       "emotion": "neutral",
       "max_words": 12
     },
@@ -170,95 +191,115 @@
       "id": "rin_ult_cast_1",
       "slot": "ult_cast",
       "tier": "beta24",
-      "text": "Чайная пауза!",
+      "pool": "ult",
+      "text": "Время чая.",
       "emotion": "confident",
-      "max_words": 12
+      "max_words": 3
     },
     {
       "id": "rin_riichi_1",
       "slot": "riichi",
       "tier": "beta24",
-      "text": "Риичи. Не спеши.",
+      "pool": "riichi",
+      "text": "Риичи.",
       "emotion": "confident",
-      "max_words": 12
+      "max_words": 3
     },
     {
       "id": "rin_ron_1",
       "slot": "ron",
       "tier": "beta24",
-      "text": "Рон. Позволь забрать.",
+      "pool": "ron",
+      "text": "Рон.",
       "emotion": "confident",
-      "max_words": 12
+      "max_words": 3
     },
     {
       "id": "rin_tsumo_1",
       "slot": "tsumo",
       "tier": "beta24",
-      "text": "Цумо. Безупречно.",
+      "pool": "tsumo",
+      "text": "Цумо.",
       "emotion": "happy",
-      "max_words": 12
+      "max_words": 4
     },
     {
-      "id": "rin_ssr_outfit_new",
+      "id": "rin.rin_ssr_bunnytea.outfit_new.01",
       "slot": "outfit_new",
       "tier": "ssr_outfit",
-      "text": "Нефрит и вечерний блеск… Надеюсь, этот образ стоил ожидания.",
+      "skin_id": "rin_ssr_bunnytea",
+      "pool": "lobby",
+      "text": "Чёрный фрак и свежий чай… Надеюсь, этот образ стоил ожидания.",
       "emotion": "confident",
       "max_words": 12
     },
     {
-      "id": "rin_ssr_idle_2",
+      "id": "rin.rin_ssr_bunnytea.idle.02",
       "slot": "idle_2",
       "tier": "ssr_outfit",
-      "text": "В этом зале тихо, а взгляд поверх очков — только твой.",
+      "skin_id": "rin_ssr_bunnytea",
+      "pool": "lobby",
+      "text": "В гостиной тихо, и я смотрю поверх очков лишь на тебя.",
       "emotion": "tease",
       "max_words": 12
     },
     {
-      "id": "rin_ssr_touch_2",
+      "id": "rin.rin_ssr_bunnytea.touch.02",
       "slot": "touch_2",
       "tier": "ssr_outfit",
-      "text": "Перчатки снимать не буду, но руку тебе подам с удовольствием.",
+      "skin_id": "rin_ssr_bunnytea",
+      "pool": "lobby",
+      "text": "Ушки не трогай, они сползут. Лучше прими чашку из моих рук.",
       "emotion": "shy",
       "max_words": 12
     },
     {
-      "id": "rin_ssr_level_vow",
+      "id": "rin.rin_ssr_bunnytea.level_vow.01",
       "slot": "level_vow",
       "tier": "ssr_outfit",
-      "text": "Сниму очки впервые — хочу видеть только твои глаза.",
+      "skin_id": "rin_ssr_bunnytea",
+      "pool": "lobby",
+      "text": "В этом зале весь вечер я подаю чай только тебе.",
       "emotion": "warm",
       "max_words": 12
     },
     {
-      "id": "rin_ssr_ult_cast_a",
+      "id": "rin_ssr_bunnytea_ult_cast_1",
       "slot": "ult_cast_a",
       "tier": "ssr_outfit",
-      "text": "Чистая операция!",
+      "skin_id": "rin_ssr_bunnytea",
+      "pool": "ult",
+      "text": "Час чая.",
       "emotion": "confident",
-      "max_words": 12
+      "max_words": 3
     },
     {
-      "id": "rin_ssr_ult_cast_b",
+      "id": "rin_ssr_bunnytea_ult_cast_2",
       "slot": "ult_cast_b",
       "tier": "ssr_outfit",
-      "text": "Тысяча листьев!",
+      "skin_id": "rin_ssr_bunnytea",
+      "pool": "ult",
+      "text": "Позволь, гость.",
       "emotion": "confident",
-      "max_words": 12
+      "max_words": 3
     },
     {
-      "id": "rin_ssr_equip",
+      "id": "rin.rin_ssr_bunnytea.equip.01",
       "slot": "equip",
       "tier": "ssr_outfit",
-      "text": "Особый вечер требует особого наряда. Пойдём к столу?",
+      "skin_id": "rin_ssr_bunnytea",
+      "pool": "lobby",
+      "text": "Поднос готов, фарфор согрет. Пройдём за чайный стол?",
       "emotion": "warm",
       "max_words": 12
     },
     {
-      "id": "rin_ssr_win",
+      "id": "rin.rin_ssr_bunnytea.win.01",
       "slot": "win",
       "tier": "ssr_outfit",
-      "text": "Партия завершена на бис. Позволь налить победную чашку.",
+      "skin_id": "rin_ssr_bunnytea",
+      "pool": "lobby",
+      "text": "Партия завершена безупречно. Позволь подать тебе победную чашку.",
       "emotion": "happy",
       "max_words": 12
     }

@@ -3,14 +3,16 @@
   "name_ru": "Ширин",
   "age": "26",
   "role": "Танцовщица и гадалка каравана «Семь колодцев»",
+  "ssr_skin_id": "shirin_ssrp_oasislight",
   "ssr_outfit_ref": "sh_sun / shirin_ssrp_oasislight",
-  "beta24_note": "24 строки Beta-24 по DEC-P44-1 + 8 строк SSR-костюма = 32",
+  "beta24_note": "24 канонические строки Beta-24 (синхронизировано с design/voice/BETA24_TEXTS.md, DEC-P44-1) + 8 строк SSR-костюма с привязкой к skin_id = 32",
   "lines": [
     {
       "id": "shirin_login_morning_1",
       "slot": "login_morning",
       "tier": "beta24",
-      "text": "М-м… Утро слишком рано. Дай проснуться — и погадаю тебе.",
+      "pool": "login",
+      "text": "Ааа… утром я не в форме. Потише, пожалуйста.",
       "emotion": "sleepy",
       "max_words": 12
     },
@@ -18,7 +20,8 @@
       "id": "shirin_login_evening_1",
       "slot": "login_evening",
       "tier": "beta24",
-      "text": "Звёзды взошли над барханами. Заходи в шатёр, мой гость.",
+      "pool": "login",
+      "text": "Звёзды вышли. Что-то они нам сегодня покажут?",
       "emotion": "tease",
       "max_words": 12
     },
@@ -26,7 +29,8 @@
       "id": "shirin_intro_summon_1",
       "slot": "intro_summon",
       "tier": "beta24",
-      "text": "Я Ширин из «Семи колодцев». Звёзды не лгут — мы встретились.",
+      "pool": "summon_intro",
+      "text": "Я Ширин. Звёзды снова свели нас.",
       "emotion": "confident",
       "max_words": 12
     },
@@ -34,7 +38,8 @@
       "id": "shirin_outfit_equip_1",
       "slot": "outfit_equip",
       "tier": "beta24",
-      "text": "Слышишь звон монет? Этот танец сегодня только для тебя.",
+      "pool": "outfit",
+      "text": "Похоже на ветер пустыни, правда? Тебе нравится?",
       "emotion": "tease",
       "max_words": 12
     },
@@ -42,7 +47,8 @@
       "id": "shirin_idle_1",
       "slot": "idle_1",
       "tier": "beta24",
-      "text": "Песок шепчет о твоём следующем ходе… Прислушаешься ко мне?",
+      "pool": "idle",
+      "text": "Песок течёт по зёрнышку. Не спеши.",
       "emotion": "neutral",
       "max_words": 12
     },
@@ -50,7 +56,8 @@
       "id": "shirin_idle_2",
       "slot": "idle_2",
       "tier": "beta24",
-      "text": "Караван может подождать, пока мы не доиграем эту раздачу.",
+      "pool": "idle",
+      "text": "Сегодня звёзды озорничают. Что-то случится.",
       "emotion": "warm",
       "max_words": 12
     },
@@ -58,7 +65,8 @@
       "id": "shirin_idle_warm_1",
       "slot": "idle_warm",
       "tier": "beta24",
-      "text": "Среди тысячи звёзд я всё равно ищу твой взгляд.",
+      "pool": "idle_warm",
+      "text": "Твоя звезда ярче всего сияет рядом со мной.",
       "emotion": "warm",
       "max_words": 12
     },
@@ -66,7 +74,8 @@
       "id": "shirin_touch_head_1",
       "slot": "touch_head",
       "tier": "beta24",
-      "text": "Звенят золотые монетки в волосах… Тебе нравится эта музыка?",
+      "pool": "touch_head",
+      "text": "Ой, украшение на голове звенит. Хи-хи, щекотно.",
       "emotion": "happy",
       "max_words": 12
     },
@@ -74,7 +83,8 @@
       "id": "shirin_touch_hand_1",
       "slot": "touch_hand",
       "tier": "beta24",
-      "text": "Дай ладонь… Вижу пару бамбуков и скорую встречу со мной.",
+      "pool": "touch_hand",
+      "text": "Посмотрю линии на ладони. …Судьба у тебя хорошая.",
       "emotion": "tease",
       "max_words": 12
     },
@@ -82,7 +92,8 @@
       "id": "shirin_touch_hair_1",
       "slot": "touch_hair",
       "tier": "beta24",
-      "text": "Не спутай налобную цепочку — она ловит для нас удачу.",
+      "pool": "touch_hair",
+      "text": "Заколки собьются. Нежнее.",
       "emotion": "shy",
       "max_words": 12
     },
@@ -90,7 +101,8 @@
       "id": "shirin_touch_outfit_1",
       "slot": "touch_outfit",
       "tier": "beta24",
-      "text": "Откину вуаль чуть-чуть… Не теряй голову раньше конца партии~",
+      "pool": "touch_outfit",
+      "text": "Не тяни вуаль. Её унесёт ветром.",
       "emotion": "tease",
       "max_words": 12
     },
@@ -98,7 +110,8 @@
       "id": "shirin_touch_spam_1",
       "slot": "touch_spam",
       "tier": "beta24",
-      "text": "Ох, нетерпеливый! Даже пустынный ветер касается нежнее!",
+      "pool": "touch_spam",
+      "text": "Хи-хи, я не монетка. Не звени так часто.",
       "emotion": "pout",
       "max_words": 12
     },
@@ -106,7 +119,8 @@
       "id": "shirin_touch_bold_1",
       "slot": "touch_bold",
       "tier": "beta24",
-      "text": "Не нужно гадать по песку — я и так знаю, чего ты хочешь.",
+      "pool": "touch_bold",
+      "text": "Наша с тобой линия судьбы очень длинная.",
       "emotion": "tease",
       "max_words": 12
     },
@@ -114,7 +128,8 @@
       "id": "shirin_gift_normal_1",
       "slot": "gift_normal",
       "tier": "beta24",
-      "text": "Щедрый дар, спасибо. Пусть оазис всегда будет на твоём пути.",
+      "pool": "gift",
+      "text": "Подарок. Спасибо, надо ещё и звёздам сказать спасибо.",
       "emotion": "happy",
       "max_words": 12
     },
@@ -122,7 +137,8 @@
       "id": "shirin_gift_liked_1",
       "slot": "gift_liked",
       "tier": "beta24",
-      "text": "Звёзды предсказали мне радость, но ты превзошёл пророчество!",
+      "pool": "gift",
+      "text": "Всё как в гадании. Ты удивительный человек.",
       "emotion": "excited",
       "max_words": 12
     },
@@ -130,7 +146,8 @@
       "id": "shirin_level_max_vow_1",
       "slot": "level_max_vow",
       "tier": "beta24",
-      "text": "Тысяча и одна ночь — мало, чтобы насмотреться на тебя.",
+      "pool": "vow",
+      "text": "Звёзды сдвинулись. С тобой я хочу путешествовать куда угодно.",
       "emotion": "warm",
       "max_words": 12
     },
@@ -138,23 +155,26 @@
       "id": "shirin_combo_t2_1",
       "slot": "combo_t2",
       "tier": "beta24",
-      "text": "Звонкий такт!",
+      "pool": "combo",
+      "text": "Звёзды сходятся.",
       "emotion": "happy",
-      "max_words": 12
+      "max_words": 3
     },
     {
       "id": "shirin_combo_t3_1",
       "slot": "combo_t3",
       "tier": "beta24",
-      "text": "Жар оазиса!",
+      "pool": "combo",
+      "text": "Дождь из монет!",
       "emotion": "excited",
-      "max_words": 12
+      "max_words": 3
     },
     {
       "id": "shirin_clear_normal_1",
       "slot": "clear",
       "tier": "beta24",
-      "text": "Звёзды сказали правду! Блестящая победа, мой спутник!",
+      "pool": "clear",
+      "text": "Всё, как сказали звёзды. Поздравляю.",
       "emotion": "happy",
       "max_words": 12
     },
@@ -162,7 +182,8 @@
       "id": "shirin_fail_1",
       "slot": "fail",
       "tier": "beta24",
-      "text": "Пески переменчивы… Вздохнём и перевернём судьбу новым ходом.",
+      "pool": "fail",
+      "text": "Пески переменчивы. …Погадаем ещё раз.",
       "emotion": "neutral",
       "max_words": 12
     },
@@ -170,95 +191,115 @@
       "id": "shirin_ult_cast_1",
       "slot": "ult_cast",
       "tier": "beta24",
-      "text": "Танец монет!",
+      "pool": "ult",
+      "text": "Звёзды, падайте!",
       "emotion": "confident",
-      "max_words": 12
+      "max_words": 3
     },
     {
       "id": "shirin_riichi_1",
       "slot": "riichi",
       "tier": "beta24",
-      "text": "Риичи! Звёзды сошлись!",
+      "pool": "riichi",
+      "text": "Риичи.",
       "emotion": "confident",
-      "max_words": 12
+      "max_words": 3
     },
     {
       "id": "shirin_ron_1",
       "slot": "ron",
       "tier": "beta24",
-      "text": "Рон! Как предсказано!",
+      "pool": "ron",
+      "text": "Рон, в точку.",
       "emotion": "tease",
-      "max_words": 12
+      "max_words": 3
     },
     {
       "id": "shirin_tsumo_1",
       "slot": "tsumo",
       "tier": "beta24",
-      "text": "Цумо! Дар пустыни!",
+      "pool": "tsumo",
+      "text": "Цумо, я это видела.",
       "emotion": "happy",
-      "max_words": 12
+      "max_words": 4
     },
     {
-      "id": "shirin_ssr_outfit_new",
+      "id": "shirin.shirin_ssrp_oasislight.outfit_new.01",
       "slot": "outfit_new",
       "tier": "ssr_outfit",
-      "text": "Свет оазиса в золоте и бирюзе. Готов к полуденному миражу?",
+      "skin_id": "shirin_ssrp_oasislight",
+      "pool": "lobby",
+      "text": "Огни оазиса сияют в бирюзе. Готов к вечернему миражу?",
       "emotion": "confident",
       "max_words": 12
     },
     {
-      "id": "shirin_ssr_idle_2",
+      "id": "shirin.shirin_ssrp_oasislight.idle.02",
       "slot": "idle_2",
       "tier": "ssr_outfit",
-      "text": "Под звёздным шатром танцую тихо — зритель сегодня только один.",
+      "skin_id": "shirin_ssrp_oasislight",
+      "pool": "lobby",
+      "text": "У воды фонари оазиса отражают звёзды — танцую сегодня для тебя.",
       "emotion": "warm",
       "max_words": 12
     },
     {
-      "id": "shirin_ssr_touch_2",
+      "id": "shirin.shirin_ssrp_oasislight.touch.02",
       "slot": "touch_2",
       "tier": "ssr_outfit",
-      "text": "Браслеты звенят в унисон с сердцем… Поймай шёлковый шлейф.",
+      "skin_id": "shirin_ssrp_oasislight",
+      "pool": "lobby",
+      "text": "Браслеты звенят в такт воде… Поймай край моей шёлковой вуали.",
       "emotion": "tease",
       "max_words": 12
     },
     {
-      "id": "shirin_ssr_level_vow",
+      "id": "shirin.shirin_ssrp_oasislight.level_vow.01",
       "slot": "level_vow",
       "tier": "ssr_outfit",
+      "skin_id": "shirin_ssrp_oasislight",
+      "pool": "lobby",
       "text": "Мой караван нашёл свой дом — там, где ждёшь ты.",
       "emotion": "warm",
       "max_words": 12
     },
     {
-      "id": "shirin_ssr_ult_cast_a",
+      "id": "shirin_ssrp_oasislight_ult_cast_1",
       "slot": "ult_cast_a",
       "tier": "ssr_outfit",
-      "text": "Солнечный диск!",
+      "skin_id": "shirin_ssrp_oasislight",
+      "pool": "ult",
+      "text": "Огни оазиса!",
       "emotion": "confident",
-      "max_words": 12
+      "max_words": 3
     },
     {
-      "id": "shirin_ssr_ult_cast_b",
+      "id": "shirin_ssrp_oasislight_ult_cast_2",
       "slot": "ult_cast_b",
       "tier": "ssr_outfit",
-      "text": "Звёздный шатёр!",
+      "skin_id": "shirin_ssrp_oasislight",
+      "pool": "ult",
+      "text": "Танец миража!",
       "emotion": "excited",
-      "max_words": 12
+      "max_words": 3
     },
     {
-      "id": "shirin_ssr_equip",
+      "id": "shirin.shirin_ssrp_oasislight.equip.01",
       "slot": "equip",
       "tier": "ssr_outfit",
-      "text": "Золотой шёлк поёт на ветру. Начнём нашу сказку?",
+      "skin_id": "shirin_ssrp_oasislight",
+      "pool": "lobby",
+      "text": "Бирюзовый шёлк поёт на ветру. Начнём нашу восточную сказку?",
       "emotion": "happy",
       "max_words": 12
     },
     {
-      "id": "shirin_ssr_win",
+      "id": "shirin.shirin_ssrp_oasislight.win.01",
       "slot": "win",
       "tier": "ssr_outfit",
-      "text": "Веер монет сияет в честь твоей победы! Браво!",
+      "skin_id": "shirin_ssrp_oasislight",
+      "pool": "lobby",
+      "text": "Фонари оазиса сияют в честь твоей победы! Браво!",
       "emotion": "excited",
       "max_words": 12
     }

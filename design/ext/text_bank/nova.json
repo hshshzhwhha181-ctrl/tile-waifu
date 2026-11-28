@@ -3,14 +3,16 @@
   "name_ru": "Нова",
   "age": "23",
   "role": "Специалист по кибербезопасности, гонщица",
-  "ssr_outfit_ref": "n_ssr / nova_ssrp_idolstage",
-  "beta24_note": "24 строки Beta-24 по DEC-P44-1 + 8 строк SSR-костюма = 32",
+  "ssr_skin_id": "nova_ssrp_idolstage",
+  "ssr_outfit_ref": "n_diva / nova_ssrp_idolstage",
+  "beta24_note": "24 канонические строки Beta-24 (синхронизировано с design/voice/BETA24_TEXTS.md, DEC-P44-1) + 8 строк SSR-костюма с привязкой к skin_id = 32",
   "lines": [
     {
       "id": "nova_login_morning_1",
       "slot": "login_morning",
       "tier": "beta24",
-      "text": "Лог: утро, связь стабильна. Ну что, разгоним новую партию?",
+      "pool": "login",
+      "text": "Запуск подтверждён. Доброе утро, напарник. Пополним журнал побед.",
       "emotion": "confident",
       "max_words": 12
     },
@@ -18,7 +20,8 @@
       "id": "nova_login_evening_1",
       "slot": "login_evening",
       "tier": "beta24",
-      "text": "Неон зажёгся, трафик упал. Самое время для ночного заезда.",
+      "pool": "login",
+      "text": "Вход подтверждён. Ночью тихо, играется легче.",
       "emotion": "tease",
       "max_words": 12
     },
@@ -26,7 +29,8 @@
       "id": "nova_intro_summon_1",
       "slot": "intro_summon",
       "tier": "beta24",
-      "text": "Скачано. Я Нова — проверю твою защиту на прочность.",
+      "pool": "summon_intro",
+      "text": "Я Нова. Загрузка завершена, рада знакомству, напарник.",
       "emotion": "confident",
       "max_words": 12
     },
@@ -34,7 +38,8 @@
       "id": "nova_outfit_equip_1",
       "slot": "outfit_equip",
       "tier": "beta24",
-      "text": "Новый билд загружен. Видишь, как сияет неон? Оценишь?",
+      "pool": "outfit",
+      "text": "Новый скин установлен. Ну как?",
       "emotion": "happy",
       "max_words": 12
     },
@@ -42,7 +47,8 @@
       "id": "nova_idle_1",
       "slot": "idle_1",
       "tier": "beta24",
-      "text": "Вывела твоё имя на табло квартала… Это тест уязвимости!",
+      "pool": "idle",
+      "text": "Посмотрела логи. Ты стал играть лучше, чем вчера.",
       "emotion": "shy",
       "max_words": 12
     },
@@ -50,7 +56,8 @@
       "id": "nova_idle_2",
       "slot": "idle_2",
       "tier": "beta24",
-      "text": "Пинг идеальный, голограмма фишки крутится. Жду твой клик.",
+      "pool": "idle",
+      "text": "Если скучно — поиграем? Взламывать ничего не буду.",
       "emotion": "neutral",
       "max_words": 12
     },
@@ -58,7 +65,8 @@
       "id": "nova_idle_warm_1",
       "slot": "idle_warm",
       "tier": "beta24",
-      "text": "В моих логах твоё имя помечено как приоритет номер один.",
+      "pool": "idle_warm",
+      "text": "Твои привычки я уже все выучила.",
       "emotion": "warm",
       "max_words": 12
     },
@@ -66,7 +74,8 @@
       "id": "nova_touch_head_1",
       "slot": "touch_head",
       "tier": "beta24",
-      "text": "Доступ запрещён! Наушники мигают — собьёшь мне частоту!",
+      "pool": "touch_head",
+      "text": "Эй, не трогай голову! Глючить же будет…",
       "emotion": "surprised",
       "max_words": 12
     },
@@ -74,7 +83,8 @@
       "id": "nova_touch_hand_1",
       "slot": "touch_hand",
       "tier": "beta24",
-      "text": "Лови голограмму фишки. И ладно, рукопожатие тоже логирую.",
+      "pool": "touch_hand",
+      "text": "Рука? …Держи. Соединение разрешаю.",
       "emotion": "tease",
       "max_words": 12
     },
@@ -82,7 +92,8 @@
       "id": "nova_touch_hair_1",
       "slot": "touch_hair",
       "tier": "beta24",
-      "text": "Эй, асимметрию не порти! Синий и розовый должны лежать ровно.",
+      "pool": "touch_hair",
+      "text": "Укладка собьётся. Ну хватит.",
       "emotion": "pout",
       "max_words": 12
     },
@@ -90,7 +101,8 @@
       "id": "nova_touch_outfit_1",
       "slot": "touch_outfit",
       "tier": "beta24",
-      "text": "Поднял мне визор? Вот и смотри в глаза без фильтров.",
+      "pool": "touch_outfit",
+      "text": "Не хватай за рукав. Датчики глючат.",
       "emotion": "shy",
       "max_words": 12
     },
@@ -98,7 +110,8 @@
       "id": "nova_touch_spam_1",
       "slot": "touch_spam",
       "tier": "beta24",
-      "text": "Алерт: DDoS-атака! Ещё тап — и забаню на пять секунд!",
+      "pool": "touch_spam",
+      "text": "Не долби! Это что, дидос?!",
       "emotion": "pout",
       "max_words": 12
     },
@@ -106,7 +119,8 @@
       "id": "nova_touch_bold_1",
       "slot": "touch_bold",
       "tier": "beta24",
-      "text": "Ты нашёл уязвимость в моём фаерволе… и я не патчу.",
+      "pool": "touch_bold",
+      "text": "Когда ты рядом, вентилятор не справляется с охлаждением.",
       "emotion": "shy",
       "max_words": 12
     },
@@ -114,7 +128,8 @@
       "id": "nova_gift_normal_1",
       "slot": "gift_normal",
       "tier": "beta24",
-      "text": "Пакет принят, хэш совпал. Спасибо, напарник!",
+      "pool": "gift",
+      "text": "О, подарок получен. Спасибо, пригодится.",
       "emotion": "happy",
       "max_words": 12
     },
@@ -122,7 +137,8 @@
       "id": "nova_gift_liked_1",
       "slot": "gift_liked",
       "tier": "beta24",
-      "text": "Вау, точное попадание! Ты взломал мой список желаний?",
+      "pool": "gift",
+      "text": "Это то, что я искала! Ты что, мои алгоритмы читаешь?",
       "emotion": "excited",
       "max_words": 12
     },
@@ -130,7 +146,8 @@
       "id": "nova_level_max_vow_1",
       "slot": "level_max_vow",
       "tier": "beta24",
-      "text": "Выдаю тебе root-доступ к моему сердцу. Без срока действия.",
+      "pool": "vow",
+      "text": "Мой рут-доступ — весь твой.",
       "emotion": "warm",
       "max_words": 12
     },
@@ -138,23 +155,26 @@
       "id": "nova_combo_t2_1",
       "slot": "combo_t2",
       "tier": "beta24",
-      "text": "Чистый коммит!",
+      "pool": "combo",
+      "text": "Отличная скорость обработки.",
       "emotion": "confident",
-      "max_words": 12
+      "max_words": 3
     },
     {
       "id": "nova_combo_t3_1",
       "slot": "combo_t3",
       "tier": "beta24",
-      "text": "Турбо-разгон!",
+      "pool": "combo",
+      "text": "Разгон частоты!",
       "emotion": "excited",
-      "max_words": 12
+      "max_words": 3
     },
     {
       "id": "nova_clear_normal_1",
       "slot": "clear",
       "tier": "beta24",
-      "text": "Скачано! Победа записана в лог, а ты крут!",
+      "pool": "clear",
+      "text": "Миссия выполнена. А ты хорош, напарник.",
       "emotion": "happy",
       "max_words": 12
     },
@@ -162,7 +182,8 @@
       "id": "nova_fail_1",
       "slot": "fail",
       "tier": "beta24",
-      "text": "…Баг. Не мой. Перезапускаем сессию и берём реванш.",
+      "pool": "fail",
+      "text": "Ошибка… перезагрузимся и ещё раз.",
       "emotion": "pout",
       "max_words": 12
     },
@@ -170,94 +191,114 @@
       "id": "nova_ult_cast_1",
       "slot": "ult_cast",
       "tier": "beta24",
-      "text": "Взлом яруса!",
+      "pool": "ult",
+      "text": "Взлом запущен!",
       "emotion": "confident",
-      "max_words": 12
+      "max_words": 3
     },
     {
       "id": "nova_riichi_1",
       "slot": "riichi",
       "tier": "beta24",
-      "text": "Риичи! Сигнал ушёл!",
+      "pool": "riichi",
+      "text": "Риичи, отправлено.",
       "emotion": "confident",
-      "max_words": 12
+      "max_words": 3
     },
     {
       "id": "nova_ron_1",
       "slot": "ron",
       "tier": "beta24",
-      "text": "Рон! Перехват выполнен!",
+      "pool": "ron",
+      "text": "Рон, попадание.",
       "emotion": "excited",
-      "max_words": 12
+      "max_words": 3
     },
     {
       "id": "nova_tsumo_1",
       "slot": "tsumo",
       "tier": "beta24",
-      "text": "Цумо! Файл скачан!",
+      "pool": "tsumo",
+      "text": "Цумо, готово.",
       "emotion": "happy",
-      "max_words": 12
+      "max_words": 4
     },
     {
-      "id": "nova_ssr_outfit_new",
+      "id": "nova.nova_ssrp_idolstage.outfit_new.01",
       "slot": "outfit_new",
       "tier": "ssr_outfit",
-      "text": "Неоновый форсаж активирован! Держись крепче, прокачу с ветерком!",
+      "skin_id": "nova_ssrp_idolstage",
+      "pool": "lobby",
+      "text": "Софиты зажглись, микрофон включён! Сцена идола готова к шоу!",
       "emotion": "excited",
       "max_words": 12
     },
     {
-      "id": "nova_ssr_idle_2",
+      "id": "nova.nova_ssrp_idolstage.idle.02",
       "slot": "idle_2",
       "tier": "ssr_outfit",
-      "text": "Сняла визор ради тебя… Давай просто побудем офлайн.",
+      "skin_id": "nova_ssrp_idolstage",
+      "pool": "lobby",
+      "text": "После концерта зал пустеет, и я пою на бис только тебе.",
       "emotion": "shy",
       "max_words": 12
     },
     {
-      "id": "nova_ssr_touch_2",
+      "id": "nova.nova_ssrp_idolstage.touch.02",
       "slot": "touch_2",
       "tier": "ssr_outfit",
-      "text": "Голо-сердечко качается на проводе — поймаешь или побоишься?",
+      "skin_id": "nova_ssrp_idolstage",
+      "pool": "lobby",
+      "text": "Не дёргай шнур микрофона, а то сорвёшь мне саундчек, напарник!",
       "emotion": "tease",
       "max_words": 12
     },
     {
-      "id": "nova_ssr_level_vow",
+      "id": "nova.nova_ssrp_idolstage.level_vow.01",
       "slot": "level_vow",
       "tier": "ssr_outfit",
-      "text": "С тобой мне не нужна сеть — лучший сигнал прямо рядом.",
+      "skin_id": "nova_ssrp_idolstage",
+      "pool": "lobby",
+      "text": "На любом стадионе мой главный трек всегда звучит ради тебя.",
       "emotion": "warm",
       "max_words": 12
     },
     {
-      "id": "nova_ssr_ult_cast_a",
+      "id": "nova_ssrp_idolstage_ult_cast_1",
       "slot": "ult_cast_a",
       "tier": "ssr_outfit",
-      "text": "Неоновый форсаж!",
+      "skin_id": "nova_ssrp_idolstage",
+      "pool": "ult",
+      "text": "Дроп!",
       "emotion": "excited",
-      "max_words": 12
+      "max_words": 3
     },
     {
-      "id": "nova_ssr_ult_cast_b",
+      "id": "nova_ssrp_idolstage_ult_cast_2",
       "slot": "ult_cast_b",
       "tier": "ssr_outfit",
-      "text": "Root-доступ открыт!",
+      "skin_id": "nova_ssrp_idolstage",
+      "pool": "ult",
+      "text": "Бас пошёл.",
       "emotion": "confident",
-      "max_words": 12
+      "max_words": 3
     },
     {
-      "id": "nova_ssr_equip",
+      "id": "nova.nova_ssrp_idolstage.equip.01",
       "slot": "equip",
       "tier": "ssr_outfit",
-      "text": "Топовый скин на месте. Сейчас зажжём эту сцену!",
+      "skin_id": "nova_ssrp_idolstage",
+      "pool": "lobby",
+      "text": "Сценический неон на максимуме. Сейчас зажжём этот зал!",
       "emotion": "confident",
       "max_words": 12
     },
     {
-      "id": "nova_ssr_win",
+      "id": "nova.nova_ssrp_idolstage.win.01",
       "slot": "win",
       "tier": "ssr_outfit",
+      "skin_id": "nova_ssrp_idolstage",
+      "pool": "lobby",
       "text": "Дроп на полную! Стадион наш, а победа — твоя!",
       "emotion": "excited",
       "max_words": 12
