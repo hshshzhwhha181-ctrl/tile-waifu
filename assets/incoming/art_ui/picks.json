@@ -1,0 +1,1097 @@
+{
+ "batch": "U1 (art-ui worker)",
+ "style": "gold monoline lacquer icons, plum lacquer inlay, rose-pink accent; currencies as gold-rimmed gems",
+ "picks": [
+  {
+   "group": "icons_nav",
+   "name": "tab_tea",
+   "file": "icons_nav/tab_tea.png",
+   "source_candidate": "pilot/tea_2",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_nav",
+   "name": "tab_heroines",
+   "file": "icons_nav/tab_heroines.png",
+   "source_candidate": "pilot/fan_1",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_nav",
+   "name": "tab_games",
+   "file": "icons_nav/tab_games.png",
+   "source_candidate": "nav/games",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_nav",
+   "name": "tab_wishes",
+   "file": "icons_nav/tab_wishes.png",
+   "source_candidate": "nav/wishes_lotus",
+   "size": [
+    512,
+    512
+   ],
+   "note": "owner-mock lotus"
+  },
+  {
+   "group": "icons_nav",
+   "name": "tab_wishes_alt_lantern",
+   "file": "icons_nav/tab_wishes_alt_lantern.png",
+   "source_candidate": "nav/wishes_lantern",
+   "size": [
+    512,
+    512
+   ],
+   "note": "batch version: lantern + star"
+  },
+  {
+   "group": "icons_nav",
+   "name": "tab_shop",
+   "file": "icons_nav/tab_shop.png",
+   "source_candidate": "nav/shop_awning",
+   "size": [
+    512,
+    512
+   ],
+   "note": "owner-mock shop front"
+  },
+  {
+   "group": "icons_nav",
+   "name": "tab_shop_alt_pouch",
+   "file": "icons_nav/tab_shop_alt_pouch.png",
+   "source_candidate": "nav/shop_pouch",
+   "size": [
+    512,
+    512
+   ],
+   "note": "batch version: pouch"
+  },
+  {
+   "group": "icons_currency",
+   "name": "cur_gems",
+   "file": "icons_currency/cur_gems.png",
+   "source_candidate": "cur/gems",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_currency",
+   "name": "cur_moon",
+   "file": "icons_currency/cur_moon.png",
+   "source_candidate": "icon/icon_cur_moon_c1",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_currency",
+   "name": "cur_coins",
+   "file": "icons_currency/cur_coins.png",
+   "source_candidate": "icon/icon_cur_coins_c2",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_currency",
+   "name": "cur_petals",
+   "file": "icons_currency/cur_petals.png",
+   "source_candidate": "icon/icon_cur_petals_c2",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_currency",
+   "name": "cur_ticket",
+   "file": "icons_currency/cur_ticket.png",
+   "source_candidate": "icon/icon_cur_ticket_c2",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_currency",
+   "name": "cur_candle",
+   "file": "icons_currency/cur_candle.png",
+   "source_candidate": "icon/icon_cur_candle_c1",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_currency",
+   "name": "cur_gems_alt",
+   "file": "icons_currency/cur_gems_alt.png",
+   "source_candidate": "icon/icon_cur_gems_c1",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_action",
+   "name": "act_undo",
+   "file": "icons_action/act_undo.png",
+   "source_candidate": "icon/icon_act_undo_c1",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_action",
+   "name": "act_shuffle",
+   "file": "icons_action/act_shuffle.png",
+   "source_candidate": "icon/icon_act_shuffle_c1",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_action",
+   "name": "act_hint",
+   "file": "icons_action/act_hint.png",
+   "source_candidate": "icon/icon_act_hint_c1",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_action",
+   "name": "act_slot",
+   "file": "icons_action/act_slot.png",
+   "source_candidate": "icon/icon_act_slot_c2",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_action",
+   "name": "act_pause",
+   "file": "icons_action/act_pause.png",
+   "source_candidate": "icon/icon_act_pause_c1",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_action",
+   "name": "act_play",
+   "file": "icons_action/act_play.png",
+   "source_candidate": "icon/icon_act_play_c1",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_action",
+   "name": "act_retry",
+   "file": "icons_action/act_retry.png",
+   "source_candidate": "icon/icon_act_retry_c2",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_action",
+   "name": "act_next",
+   "file": "icons_action/act_next.png",
+   "source_candidate": "icon/icon_act_next_c1",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_status",
+   "name": "st_star",
+   "file": "icons_status/st_star.png",
+   "source_candidate": "icon/icon_st_star_c1",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_status",
+   "name": "st_heart_bond",
+   "file": "icons_status/st_heart_bond.png",
+   "source_candidate": "icon/icon_st_heart_bond_c1",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_status",
+   "name": "st_lock",
+   "file": "icons_status/st_lock.png",
+   "source_candidate": "icon/icon_st_lock_c1",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_status",
+   "name": "st_check",
+   "file": "icons_status/st_check.png",
+   "source_candidate": "icon/icon_st_check_c1",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_status",
+   "name": "st_cross",
+   "file": "icons_status/st_cross.png",
+   "source_candidate": "icon/icon_st_cross_c1",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_status",
+   "name": "st_bell",
+   "file": "icons_status/st_bell.png",
+   "source_candidate": "icon/icon_st_bell_c1",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_status",
+   "name": "st_calendar",
+   "file": "icons_status/st_calendar.png",
+   "source_candidate": "icon/icon_st_calendar_c1",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_status",
+   "name": "st_timer",
+   "file": "icons_status/st_timer.png",
+   "source_candidate": "icon/icon_st_timer_c1",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_status",
+   "name": "st_trophy",
+   "file": "icons_status/st_trophy.png",
+   "source_candidate": "icon/icon_st_trophy_c2",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_status",
+   "name": "st_flag",
+   "file": "icons_status/st_flag.png",
+   "source_candidate": "icon/icon_st_flag_c1",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_system",
+   "name": "sys_settings",
+   "file": "icons_system/sys_settings.png",
+   "source_candidate": "icon/icon_sys_settings_c1",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_system",
+   "name": "sys_back",
+   "file": "icons_system/sys_back.png",
+   "source_candidate": "icon/icon_sys_back_c1",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_system",
+   "name": "sys_close",
+   "file": "icons_system/sys_close.png",
+   "source_candidate": "icon/icon_sys_close_c1",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_system",
+   "name": "sys_home",
+   "file": "icons_system/sys_home.png",
+   "source_candidate": "icon/icon_sys_home_c1",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_system",
+   "name": "sys_phone",
+   "file": "icons_system/sys_phone.png",
+   "source_candidate": "icon/icon_sys_phone_c1",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_system",
+   "name": "sys_mail",
+   "file": "icons_system/sys_mail.png",
+   "source_candidate": "icon/icon_sys_mail_c2",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_system",
+   "name": "sys_gift",
+   "file": "icons_system/sys_gift.png",
+   "source_candidate": "icon/icon_sys_gift_c1",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_system",
+   "name": "sys_chest",
+   "file": "icons_system/sys_chest.png",
+   "source_candidate": "icon/icon_sys_chest_c2",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_system",
+   "name": "sys_quests",
+   "file": "icons_system/sys_quests.png",
+   "source_candidate": "icon/icon_sys_quests_c1",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_system",
+   "name": "sys_gallery",
+   "file": "icons_system/sys_gallery.png",
+   "source_candidate": "icon/icon_sys_gallery_c1",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_system",
+   "name": "sys_wardrobe",
+   "file": "icons_system/sys_wardrobe.png",
+   "source_candidate": "icon/icon_sys_wardrobe_c1",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_system",
+   "name": "sys_salon",
+   "file": "icons_system/sys_salon.png",
+   "source_candidate": "icon/icon_sys_salon_c1",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_audio",
+   "name": "au_music",
+   "file": "icons_audio/au_music.png",
+   "source_candidate": "icon/icon_au_music_c1",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_audio",
+   "name": "au_sfx",
+   "file": "icons_audio/au_sfx.png",
+   "source_candidate": "icon/icon_au_sfx_c1",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_audio",
+   "name": "au_voice",
+   "file": "icons_audio/au_voice.png",
+   "source_candidate": "icon/icon_au_voice_c1",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_audio",
+   "name": "au_mute",
+   "file": "icons_audio/au_mute.png",
+   "source_candidate": "icon/icon_au_mute_c1",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_audio",
+   "name": "au_subtitles",
+   "file": "icons_audio/au_subtitles.png",
+   "source_candidate": "icon/icon_au_subtitles_c1",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_audio",
+   "name": "au_quiet",
+   "file": "icons_audio/au_quiet.png",
+   "source_candidate": "icon/icon_au_quiet_c1",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_mode",
+   "name": "md_path",
+   "file": "icons_mode/md_path.png",
+   "source_candidate": "icon/icon_md_path_c1",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_mode",
+   "name": "md_daily",
+   "file": "icons_mode/md_daily.png",
+   "source_candidate": "icon/icon_md_daily_c1",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_mode",
+   "name": "md_classic",
+   "file": "icons_mode/md_classic.png",
+   "source_candidate": "icon/icon_md_classic_c1",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_mode",
+   "name": "md_triples",
+   "file": "icons_mode/md_triples.png",
+   "source_candidate": "icon/icon_md_triples_c1",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_mode",
+   "name": "md_connect",
+   "file": "icons_mode/md_connect.png",
+   "source_candidate": "icon/icon_md_connect_c1",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_mode",
+   "name": "md_garden",
+   "file": "icons_mode/md_garden.png",
+   "source_candidate": "icon/icon_md_garden_c1",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_mode",
+   "name": "md_riichi",
+   "file": "icons_mode/md_riichi.png",
+   "source_candidate": "icon/icon_md_riichi_c1",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_mode",
+   "name": "md_koikoi",
+   "file": "icons_mode/md_koikoi.png",
+   "source_candidate": "icon/icon_md_koikoi_c1",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_mode",
+   "name": "md_palm",
+   "file": "icons_mode/md_palm.png",
+   "source_candidate": "icon/icon_md_palm_c1",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_mode",
+   "name": "md_duels",
+   "file": "icons_mode/md_duels.png",
+   "source_candidate": "icon/icon_md_duels_c1",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_mode",
+   "name": "md_adventure",
+   "file": "icons_mode/md_adventure.png",
+   "source_candidate": "icon/icon_md_adventure_c1",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_misc",
+   "name": "misc_share",
+   "file": "icons_misc/misc_share.png",
+   "source_candidate": "icon/icon_misc_share_c1",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "icons_misc",
+   "name": "misc_filter",
+   "file": "icons_misc/misc_filter.png",
+   "source_candidate": "icon/icon_misc_filter_c1",
+   "size": [
+    512,
+    512
+   ],
+   "note": ""
+  },
+  {
+   "group": "ornaments",
+   "name": "small_rarity_a_frame",
+   "file": "ornaments/small_rarity_a_frame.png",
+   "source_candidate": "small/small_rarity_a_frame_c1",
+   "size": [
+    758,
+    768
+   ],
+   "note": ""
+  },
+  {
+   "group": "ornaments",
+   "name": "small_rarity_s_frame",
+   "file": "ornaments/small_rarity_s_frame.png",
+   "source_candidate": "small/small_rarity_s_frame_c1",
+   "size": [
+    768,
+    763
+   ],
+   "note": ""
+  },
+  {
+   "group": "ornaments",
+   "name": "small_rarity_ssr_frame",
+   "file": "ornaments/small_rarity_ssr_frame.png",
+   "source_candidate": "small/small_rarity_ssr_frame_c2",
+   "size": [
+    747,
+    768
+   ],
+   "note": ""
+  },
+  {
+   "group": "ornaments",
+   "name": "small_avatar_frame_bamboo",
+   "file": "ornaments/small_avatar_frame_bamboo.png",
+   "source_candidate": "small/small_avatar_frame_bamboo_c1",
+   "size": [
+    768,
+    760
+   ],
+   "note": ""
+  },
+  {
+   "group": "ornaments",
+   "name": "small_avatar_frame_lacquer",
+   "file": "ornaments/small_avatar_frame_lacquer.png",
+   "source_candidate": "small/small_avatar_frame_lacquer_c1",
+   "size": [
+    758,
+    768
+   ],
+   "note": ""
+  },
+  {
+   "group": "ornaments",
+   "name": "small_avatar_frame_jade",
+   "file": "ornaments/small_avatar_frame_jade.png",
+   "source_candidate": "small/small_avatar_frame_jade_c2",
+   "size": [
+    768,
+    766
+   ],
+   "note": ""
+  },
+  {
+   "group": "ornaments",
+   "name": "small_avatar_frame_night",
+   "file": "ornaments/small_avatar_frame_night.png",
+   "source_candidate": "small/small_avatar_frame_night_c2",
+   "size": [
+    733,
+    768
+   ],
+   "note": ""
+  },
+  {
+   "group": "ornaments",
+   "name": "small_badge_silver",
+   "file": "ornaments/small_badge_silver.png",
+   "source_candidate": "small/small_badge_silver_c2",
+   "size": [
+    768,
+    767
+   ],
+   "note": ""
+  },
+  {
+   "group": "ornaments",
+   "name": "small_badge_gold",
+   "file": "ornaments/small_badge_gold.png",
+   "source_candidate": "small/small_badge_gold_c1",
+   "size": [
+    763,
+    768
+   ],
+   "note": ""
+  },
+  {
+   "group": "ornaments",
+   "name": "small_badge_perfect",
+   "file": "ornaments/small_badge_perfect.png",
+   "source_candidate": "small/small_badge_perfect_c1",
+   "size": [
+    765,
+    768
+   ],
+   "note": ""
+  },
+  {
+   "group": "ornaments",
+   "name": "small_ribbon_new",
+   "file": "ornaments/small_ribbon_new.png",
+   "source_candidate": "small/small_ribbon_new_c1",
+   "size": [
+    768,
+    753
+   ],
+   "note": ""
+  },
+  {
+   "group": "ornaments",
+   "name": "small_ribbon_limited",
+   "file": "ornaments/small_ribbon_limited.png",
+   "source_candidate": "small/small_ribbon_limited_c1",
+   "size": [
+    768,
+    728
+   ],
+   "note": ""
+  },
+  {
+   "group": "ornaments",
+   "name": "small_divider_lantern",
+   "file": "ornaments/small_divider_lantern.png",
+   "source_candidate": "small/small_divider_lantern_c1",
+   "size": [
+    768,
+    211
+   ],
+   "note": ""
+  },
+  {
+   "group": "ornaments",
+   "name": "small_divider_wave",
+   "file": "ornaments/small_divider_wave.png",
+   "source_candidate": "small/small_divider_wave_c2",
+   "size": [
+    768,
+    151
+   ],
+   "note": ""
+  },
+  {
+   "group": "ornaments",
+   "name": "small_panel_corner_gold",
+   "file": "ornaments/small_panel_corner_gold.png",
+   "source_candidate": "small/small_panel_corner_gold_c2",
+   "size": [
+    768,
+    717
+   ],
+   "note": ""
+  },
+  {
+   "group": "ornaments",
+   "name": "small_button_plate_lacquer",
+   "file": "ornaments/small_button_plate_lacquer.png",
+   "source_candidate": "small/small_button_plate_lacquer_c2",
+   "size": [
+    768,
+    243
+   ],
+   "note": ""
+  },
+  {
+   "group": "ornaments",
+   "name": "small_tab_underline",
+   "file": "ornaments/small_tab_underline.png",
+   "source_candidate": "small/small_tab_underline_c1",
+   "size": [
+    768,
+    74
+   ],
+   "note": ""
+  },
+  {
+   "group": "ornaments",
+   "name": "small_loading_ring",
+   "file": "ornaments/small_loading_ring.png",
+   "source_candidate": "small/small_loading_ring_c2",
+   "size": [
+    740,
+    768
+   ],
+   "note": ""
+  },
+  {
+   "group": "ornaments",
+   "name": "small_toast_plate",
+   "file": "ornaments/small_toast_plate.png",
+   "source_candidate": "small/small_toast_plate_c1",
+   "size": [
+    768,
+    169
+   ],
+   "note": ""
+  },
+  {
+   "group": "ornaments",
+   "name": "small_badge_bronze",
+   "file": "ornaments/small_badge_bronze.png",
+   "source_candidate": "small/rr_badge_bronze_c2",
+   "size": [
+    715,
+    768
+   ],
+   "note": "reroll: bronze tone"
+  },
+  {
+   "group": "ornaments",
+   "name": "small_panel_corner_jade",
+   "file": "ornaments/small_panel_corner_jade.png",
+   "source_candidate": "small/rr_panel_corner_jade_c2",
+   "size": [
+    768,
+    716
+   ],
+   "note": "reroll: jade tone"
+  },
+  {
+   "group": "ornaments",
+   "name": "small_button_plate_paper",
+   "file": "ornaments/small_button_plate_paper.png",
+   "source_candidate": "small/rr_button_plate_paper_c1",
+   "size": [
+    768,
+    276
+   ],
+   "note": "reroll: paper tone"
+  },
+  {
+   "group": "covers",
+   "name": "cover_path",
+   "file": "covers/cover_path.jpg",
+   "source_candidate": "cover/cover_path_c1",
+   "size": [
+    2336,
+    1744
+   ],
+   "note": ""
+  },
+  {
+   "group": "covers",
+   "name": "cover_daily",
+   "file": "covers/cover_daily.jpg",
+   "source_candidate": "cover/cover_daily_c1",
+   "size": [
+    2336,
+    1744
+   ],
+   "note": ""
+  },
+  {
+   "group": "covers",
+   "name": "cover_triples",
+   "file": "covers/cover_triples.jpg",
+   "source_candidate": "cover/cover_triples_c1",
+   "size": [
+    2336,
+    1744
+   ],
+   "note": ""
+  },
+  {
+   "group": "covers",
+   "name": "cover_connect",
+   "file": "covers/cover_connect.jpg",
+   "source_candidate": "cover/cover_connect_c1",
+   "size": [
+    2336,
+    1744
+   ],
+   "note": ""
+  },
+  {
+   "group": "covers",
+   "name": "cover_garden",
+   "file": "covers/cover_garden.jpg",
+   "source_candidate": "cover/cover_garden_c2",
+   "size": [
+    2336,
+    1744
+   ],
+   "note": ""
+  },
+  {
+   "group": "covers",
+   "name": "cover_riichi",
+   "file": "covers/cover_riichi.jpg",
+   "source_candidate": "cover/cover_riichi_c2",
+   "size": [
+    2336,
+    1744
+   ],
+   "note": ""
+  },
+  {
+   "group": "covers",
+   "name": "cover_koikoi",
+   "file": "covers/cover_koikoi.jpg",
+   "source_candidate": "cover/cover_koikoi_c1",
+   "size": [
+    2336,
+    1744
+   ],
+   "note": ""
+  },
+  {
+   "group": "covers",
+   "name": "cover_palm",
+   "file": "covers/cover_palm.jpg",
+   "source_candidate": "cover/cover_palm_c1",
+   "size": [
+    2336,
+    1744
+   ],
+   "note": ""
+  },
+  {
+   "group": "covers",
+   "name": "cover_duels",
+   "file": "covers/cover_duels.jpg",
+   "source_candidate": "cover/cover_duels_c3",
+   "size": [
+    2336,
+    1744
+   ],
+   "note": ""
+  },
+  {
+   "group": "covers",
+   "name": "cover_adventure",
+   "file": "covers/cover_adventure.jpg",
+   "source_candidate": "cover/cover_adventure_c2",
+   "size": [
+    2336,
+    1744
+   ],
+   "note": ""
+  },
+  {
+   "group": "covers",
+   "name": "cover_classic",
+   "file": "covers/cover_classic.jpg",
+   "source_candidate": "cover/rr_classic_c2",
+   "size": [
+    2336,
+    1744
+   ],
+   "note": "reroll: upright jade-backed tiles (batch version showed cubes)"
+  },
+  {
+   "group": "covers",
+   "name": "cover_classic_hero",
+   "file": "covers/cover_classic_hero.jpg",
+   "source_candidate": "cover/hero_mc_c1",
+   "size": [
+    2336,
+    1744
+   ],
+   "note": "with Mahjong-chan (element recipe)"
+  },
+  {
+   "group": "covers",
+   "name": "cover_palm_hero",
+   "file": "covers/cover_palm_hero.jpg",
+   "source_candidate": "cover/hero_yue_c1",
+   "size": [
+    2336,
+    1744
+   ],
+   "note": "with Yue (element recipe)"
+  },
+  {
+   "group": "covers",
+   "name": "cover_duels_hero",
+   "file": "covers/cover_duels_hero.jpg",
+   "source_candidate": "cover/hero_nova_c2",
+   "size": [
+    2336,
+    1744
+   ],
+   "note": "with Nova (element recipe)"
+  }
+ ],
+ "candidates_dir": "candidates/",
+ "candidate_count": 217
+}

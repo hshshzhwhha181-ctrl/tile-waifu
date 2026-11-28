@@ -10,3 +10,7 @@ date,batch_id,task_id,quote_ref,quoted_cr,actual_cr,balance_after,note
 2026-11-28,H0,height re-rolls nova x5 + yue x5 (new body table prompts),,10,10,,P50b round 2; 9:16 1k medium x1 each
 2026-11-28,P50b,round 2 total,,25.5,25.5,,P50b round 2; session total 76.5 cr (51 + 25.5)
 2026-11-28,H2,round 3 pilots x4 (fuller thighs, leg and bust focus: mc_base D, miel_evening D, hana_base D, yue_base E),,4,4,,P50b round 3; 2:3 1k medium; 0 refusals; session total 80.5 cr
+2026-11-28,U1,pilot: icon_tab_tea+icon_tab_heroines+ssr_frame x2 (transparent 1k medium) + cover_classic x2 (2k high),quote:WkFeNeDupQtt8vouX_itTQ,10,10,,art-ui worker; background=transparent works natively on gpt_image_2_6
+2026-11-28,U1,nav+gems first batch with batch_size=2-3 (param ignored: 1 image per job but charged 16),quote:3l1QhdW1BbbioPQByTPnWA,6,16,,art-ui worker; 10 cr wasted; never use batch_size with generate_image_batch
+2026-11-28,U1,queue of 186 images (60 icons x2 + 11 cur/act + 11 covers x3 + 22 small x2),quote:QmkwBOT1_IY64giF5LhoJg,219,219,,art-ui worker; 153 x 1 cr (1k medium transparent) + 33 covers x 2 cr (2k high 4:3)
+2026-11-28,U1,rerolls: hero covers mc/yue/nova x3 + bronze badge + jade corner + paper plate x2 + classic cover x2,,28,28,,art-ui worker; 9 hero covers (element recipe) x2 + 6 small x1 + 2 covers x2; balance deltas unusable (other workers share the account)
