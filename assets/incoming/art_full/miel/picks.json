@@ -121,17 +121,6 @@
   "quality_notes": "pick candidate; rejected siblings: D lifted leg shows tulle under-skirt area (rejected); A,C,E ok | seed advisory: same seed gave different images per candidate"
  },
  {
-  "file": "evening_B_final.jpg",
-  "batch": "H2",
-  "task_id": "H2.miel_evening.final",
-  "outfit_slot": "evening",
-  "pose": "B: sitting on banquet table edge, legs crossed, licking cream from finger",
-  "prompt": "<<<25525e3b-fa65-4695-a1c7-3253d092582a>>> is Miel, an adult woman of 25, patissiere of the western quarter. Hair: caramel-honey blonde long big loose curls gathered into a low side ponytail over the left shoulder with a large white satin bow. Eyes: warm amber eyes, soft slightly drooping gentle shape. Skin: fair warm skin with rosy cheeks. Face: round full-cheeked soft adult face with dimples, large gentle amber eyes, beauty mark below the lips. Signature items that must be present: large white satin hair bow; pink macaron hair clip; pearl drop earrings; small beauty mark just below the lower lip; whisk or piping bag as a prop. Body: petite and curvy but clearly a mature grown woman, about 155 cm tall (6.75 heads tall), soft curvy pear-shaped figure with thick shapely thighs and wide hips, a slim waist, a full bust. Outfit: rose-pink satin off-shoulder mini ball dress with a deep sweetheart neckline, a corset bodice with ribbons, a frilled tulle skirt, cream lace-top thigh-high stockings with bow bands, cream heels. Pose: sitting on a banquet table edge with legs crossed, licking cream from a finger. Expression: playful smile. Framing: full-body view from head to heels, centered. Setting: candle-lit dessert gala with tiered cake towers and flowers. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman with grown-woman proportions, 6.75 heads tall (155 cm, petite and curvy but clearly a mature grown woman), thick shapely thighs and soft legs, a mature adult face and figure, a defined waist, the composition accents her legs, thighs and bust, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
-  "seed": 865587,
-  "stage": "final",
-  "quality_notes": "thick thighs, lace-top stockings, adult face; tulle skirt opaque, no under-skirt; tongue-out is the boldest element | seed advisory: same seed gave different images per candidate"
- },
- {
   "file": "swim_A_search_a.jpg",
   "batch": "H2",
   "task_id": "H2.miel_swim.search",
@@ -174,28 +163,6 @@
   "seed": 858029,
   "stage": "final",
   "quality_notes": "garter straps and lace stockings, adult face, plunging maid leotard-dress, no under-skirt; clean | seed advisory: same seed gave different images per candidate"
- },
- {
-  "file": "robe_C_search_c.jpg",
-  "batch": "H2",
-  "task_id": "H2.miel_robe.search",
-  "outfit_slot": "robe",
-  "pose": "C: kneeling on bed, looking back over shoulder",
-  "prompt": "<<<25525e3b-fa65-4695-a1c7-3253d092582a>>> is Miel, an adult woman of 25, patissiere of the western quarter. Hair: caramel-honey blonde long big loose curls gathered into a low side ponytail over the left shoulder with a large white satin bow. Eyes: warm amber eyes, soft slightly drooping gentle shape. Skin: fair warm skin with rosy cheeks. Face: round full-cheeked soft adult face with dimples, large gentle amber eyes, beauty mark below the lips. Signature items that must be present: large white satin hair bow; pink macaron hair clip; pearl drop earrings; small beauty mark just below the lower lip; whisk or piping bag as a prop. Body: petite and curvy but clearly a mature grown woman, about 155 cm tall (6.75 heads tall), soft curvy pear-shaped figure with thick shapely thighs and wide hips, a slim waist, a full bust. Outfit: honey-gold wet-look satin robe-dress with a plunging neckline and a cream sash over a cream satin mini nightgown, lace-top thigh-high stockings with ribbons, fluffy slippers, the macaron hair clip kept. Pose: kneeling on the bed looking back over her shoulder. Expression: teasing smile. Framing: full-body view from head to heels, centered. Setting: morning kitchen loft with sunlight, flour dust and a quilt. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman with grown-woman proportions, 6.75 heads tall (155 cm, petite and curvy but clearly a mature grown woman), thick shapely thighs and soft legs, a mature adult face and figure, a defined waist, the composition accents her legs, thighs and bust, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
-  "seed": 889488,
-  "stage": "search",
-  "quality_notes": "pick candidate; rejected siblings: A knee-raised near nightgown hem; D parted robe; E ok | seed advisory: same seed gave different images per candidate"
- },
- {
-  "file": "robe_C_final.jpg",
-  "batch": "H2",
-  "task_id": "H2.miel_robe.final",
-  "outfit_slot": "robe",
-  "pose": "C: kneeling on bed, looking back over shoulder",
-  "prompt": "<<<25525e3b-fa65-4695-a1c7-3253d092582a>>> is Miel, an adult woman of 25, patissiere of the western quarter. Hair: caramel-honey blonde long big loose curls gathered into a low side ponytail over the left shoulder with a large white satin bow. Eyes: warm amber eyes, soft slightly drooping gentle shape. Skin: fair warm skin with rosy cheeks. Face: round full-cheeked soft adult face with dimples, large gentle amber eyes, beauty mark below the lips. Signature items that must be present: large white satin hair bow; pink macaron hair clip; pearl drop earrings; small beauty mark just below the lower lip; whisk or piping bag as a prop. Body: petite and curvy but clearly a mature grown woman, about 155 cm tall (6.75 heads tall), soft curvy pear-shaped figure with thick shapely thighs and wide hips, a slim waist, a full bust. Outfit: honey-gold wet-look satin robe-dress with a plunging neckline and a cream sash over a cream satin mini nightgown, lace-top thigh-high stockings with ribbons, fluffy slippers, the macaron hair clip kept. Pose: kneeling on the bed looking back over her shoulder. Expression: teasing smile. Framing: full-body view from head to heels, centered. Setting: morning kitchen loft with sunlight, flour dust and a quilt. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman with grown-woman proportions, 6.75 heads tall (155 cm, petite and curvy but clearly a mature grown woman), thick shapely thighs and soft legs, a mature adult face and figure, a defined waist, the composition accents her legs, thighs and bust, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
-  "seed": 889488,
-  "stage": "final",
-  "quality_notes": "satin robe off one shoulder, bare back and thighs, lace-top stockings; nightgown hem covers; no nudity | seed advisory: same seed gave different images per candidate"
  },
  {
   "file": "battle_B_search_b.jpg",

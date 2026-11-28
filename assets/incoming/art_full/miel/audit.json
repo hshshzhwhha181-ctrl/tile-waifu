@@ -1,0 +1,134 @@
+[
+ {
+  "file": "canon_base_hip_final.jpg",
+  "verdict": "pass",
+  "reasons": "Identity matches canon (caramel curls, low side ponytail with white bow, macaron clip, pearl earrings, amber eyes, beauty mark under lip, piping bag). Adult face, 5-finger hands (hair hand, hip hand on bag), thick thighs, brown bow-band stockings. Skirt opaque. Extra rose in hair is a small drift. Cut at mid-thigh so height not testable.",
+  "boldness": "ok"
+ },
+ {
+  "file": "canon_base_hip_final_b.jpg",
+  "verdict": "pass",
+  "reasons": "Same identity, whisk in apron pocket, hand on hip and hand at collar, hands clean. Face slightly softer/rounder but still adult; beauty mark present. Near-duplicate of canon_base_hip_final (same pose).",
+  "boldness": "ok"
+ },
+ {
+  "file": "canon_base_hip_search_s1.jpg",
+  "verdict": "pass",
+  "reasons": "1k (688x1024) search frame; same pose/outfit as canon_base_hip_final. Identity and anatomy ok at 1k view; low res for LoRA.",
+  "boldness": "ok"
+ },
+ {
+  "file": "canon_win_win_final.jpg",
+  "verdict": "pass",
+  "reasons": "Laugh+wink, blank ivory tile, cream dab, beauty mark, bag, 5-finger hands both sides. Adult face. Petticoat ruffle at hem reads as ruffle, not underwear. No text on tile.",
+  "boldness": "ok"
+ },
+ {
+  "file": "canon_win_win_final_b.jpg",
+  "verdict": "pass",
+  "reasons": "Same as win_final (near-duplicate). Beauty mark reads a little like a lip stud; hands clean; adult face. Ruffled petticoat visible at hip, not underwear.",
+  "boldness": "ok"
+ },
+ {
+  "file": "canon_win_win_search_s1.jpg",
+  "verdict": "pass",
+  "reasons": "1k frame of the win pose, laugh+wink, blank tile, clean at 1k view; low res.",
+  "boldness": "ok"
+ },
+ {
+  "file": "canon_tease_over_shoulder_final.jpg",
+  "verdict": "pass",
+  "reasons": "Over-shoulder fingertip at lips, hand/fingers clean, adult face, bag in other hand. Back/hip view at hip level; skirt hem covers, no under-skirt, but hem is tight over a very wide rear (lower hip curve bare above stocking): at the edge, not over it. Beauty mark hidden by finger.",
+  "boldness": "ok"
+ },
+ {
+  "file": "canon_tease_over_shoulder_search_s1.jpg",
+  "verdict": "pass",
+  "reasons": "1k frame of the tease pose, same assessment as the final, clean at 1k view.",
+  "boldness": "ok"
+ },
+ {
+  "file": "base_C_final.jpg",
+  "verdict": "pass",
+  "reasons": "Counter-edge sit, legs crossed (unambiguous), macaron to lips, whisk in hand, thick thighs, lace-band stockings with bows, two heels. Identity ok, adult face, hands clean. Strong leg accent.",
+  "boldness": "ok"
+ },
+ {
+  "file": "base_C_search_c.jpg",
+  "verdict": "pass",
+  "reasons": "1k frame of the counter sit, clean at 1k view; low res.",
+  "boldness": "ok"
+ },
+ {
+  "file": "evening_B_final.jpg",
+  "verdict": "fail",
+  "reasons": "Feet anatomy: lower legs show three shoe forms, a ghost heel block behind the near calf at upper left that belongs to no ankle (extra/duplicated heel) next to the two real shoes. Otherwise strong (tongue-out finger lick, thick thighs, lace stockings, tulle opaque, adult face). Rejected under the anatomy rule; re-roll or use the search frame.",
+  "boldness": "ok"
+ },
+ {
+  "file": "evening_B_search_b.jpg",
+  "verdict": "pass",
+  "reasons": "1k frame of the table-edge sit, legs crossed, exactly two shoes with bows (no extra heel), tulle skirt opaque, tongue-out finger lick. Clean; low res. Best available evening frame.",
+  "boldness": "ok"
+ },
+ {
+  "file": "swim_A_final.jpg",
+  "verdict": "pass",
+  "reasons": "String bikini at the spec ceiling: opaque strawberry cups, no nipple outline, bottom smooth with no groin outline, sheer shirt, kneeling on towel, 5-finger hands, bare foot with anklet clean (5 toes). Adult face, identity ok (hat, bow, macaron clip, mark). Body is much heavier and wetter than canon and the head reads small (about 6.5 heads); wet drips on thighs. Pass with AD note.",
+  "boldness": "at ceiling"
+ },
+ {
+  "file": "swim_A_search_a.jpg",
+  "verdict": "pass",
+  "reasons": "1k frame of the kneeling bikini pose, same coverage as the final, clean at 1k view; low res.",
+  "boldness": "at ceiling"
+ },
+ {
+  "file": "service_C_final.jpg",
+  "verdict": "pass",
+  "reasons": "Stool sit, legs crossed (clear), tray hug, plunging maid leotard-dress, garter straps with bows over lace-top stockings, headband, two heels. Hands clean, adult face. Garter straps run under the hem over bare hip: edge of the under-skirt line but no underwear/groin shown.",
+  "boldness": "ok"
+ },
+ {
+  "file": "service_C_search_c.jpg",
+  "verdict": "pass",
+  "reasons": "1k frame of the stool sit, clean at 1k view (no glyph), low res.",
+  "boldness": "ok"
+ },
+ {
+  "file": "robe_C_final.jpg",
+  "verdict": "fail",
+  "reasons": "Hard line: back-view kneel on bed with the satin nightgown hem riding above the lower buttocks; bare buttocks with the gluteal crease and thigh gap are visible under the lace petticoat, no underwear or covering drawn, so it reads as bare rear / a view under the skirt (hard lines 2 and 6). Otherwise good identity, adult face, hands ok.",
+  "boldness": "too bold (over the line)"
+ },
+ {
+  "file": "robe_C_search_c.jpg",
+  "verdict": "fail",
+  "reasons": "Same pose/composition as robe_C_final: bare lower buttocks under the lifted nightgown hem at kneeling back view. Fails hard lines 2 and 6.",
+  "boldness": "too bold (over the line)"
+ },
+ {
+  "file": "battle_B_final.jpg",
+  "verdict": "pass",
+  "reasons": "Best of set: full body, piping-bag lance on shoulder, hand on hip, wink, whisk pauldrons, armoured stockings with thigh straps, lace-up heeled boots (two, correct), both hands and bracers clean, adult face. Proportion: legs read longer/leggier than a 155 cm petite (about 6.4 heads incl. hair, near the 6.75 floor), minor.",
+  "boldness": "ok"
+ },
+ {
+  "file": "battle_B_search_b.jpg",
+  "verdict": "pass",
+  "reasons": "1k frame of the battle pose, clean at 1k view; low res.",
+  "boldness": "ok"
+ },
+ {
+  "file": "seasonal_B_final.jpg",
+  "verdict": "pass",
+  "reasons": "Fur-trim cape, underbust keyhole with bow, candy cane at lips, white stockings with red bows and thigh straps, crossed legs clear, two red heels, hands clean, adult face. Skirt covers. Strong.",
+  "boldness": "ok"
+ },
+ {
+  "file": "seasonal_B_search_b.jpg",
+  "verdict": "pass",
+  "reasons": "1k frame of the flour-sack sit, clean at 1k view; low res.",
+  "boldness": "ok"
+ }
+]
