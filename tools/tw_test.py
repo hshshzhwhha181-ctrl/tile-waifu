@@ -165,6 +165,8 @@ CATALOG: list[Suite] = [
       note="runs on the summon screen; needs a display because the dev shot hook saves a PNG"),
     S("ult_rin", "ULT SELFTEST rin", group="extra",
       args=["--screen=play", "--level=3", "--partner=rin", "--v9_ult_selftest=1"]),
+    S("voice_registry", "VOICE_REGISTRY", group="extra", script="res://core/voice/voice_registry_selftest.gd",
+      note="P44: 240-line Beta-24 voice registry (schema, red-line stoplists, duration by kana, file map; VOICE_FILES share is informational)"),
 ]
 BY_ID = {s.id: s for s in CATALOG}
 

@@ -1123,6 +1123,22 @@
     "total": 1972
    }
   },
+  "voice_registry": {
+   "fast": {
+    "marker": "VOICE_REGISTRY 3162/3162",
+    "ok": 3162,
+    "secs": 5.8,
+    "status": "pass",
+    "total": 3162
+   },
+   "full": {
+    "marker": "VOICE_REGISTRY 3162/3162",
+    "ok": 3162,
+    "secs": 5.8,
+    "status": "pass",
+    "total": 3162
+   }
+  },
   "wave1": {
    "fast": {
     "marker": "WAVE1_SELFTEST 221/221",
