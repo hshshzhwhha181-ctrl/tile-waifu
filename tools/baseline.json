@@ -865,6 +865,22 @@
     "total": 348
    }
   },
+  "screen_has_spec": {
+   "fast": {
+    "marker": "SCREEN_HAS_SPEC SELFTEST 7/7 PASS",
+    "ok": 7,
+    "secs": 0.2,
+    "status": "pass",
+    "total": 7
+   },
+   "full": {
+    "marker": "SCREEN_HAS_SPEC SELFTEST 7/7 PASS",
+    "ok": 7,
+    "secs": 0.2,
+    "status": "pass",
+    "total": 7
+   }
+  },
   "server_e2e": {
    "fast": {
     "marker": "E2E_OK",
@@ -1093,6 +1109,22 @@
     "secs": 14.7,
     "status": "pass",
     "total": 1997
+   }
+  },
+  "twnav": {
+   "fast": {
+    "marker": "TWNAV_SELFTEST 132/132",
+    "ok": 132,
+    "secs": 8.7,
+    "status": "pass",
+    "total": 132
+   },
+   "full": {
+    "marker": "TWNAV_SELFTEST 132/132",
+    "ok": 132,
+    "secs": 8.7,
+    "status": "pass",
+    "total": 132
    }
   },
   "ult_rin": {

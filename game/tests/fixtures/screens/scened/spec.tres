@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="ScreenSpec" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://shell/nav/screen_spec.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "scened"
+scene = "res://tests/fixtures/screens/scened/screen.tscn"

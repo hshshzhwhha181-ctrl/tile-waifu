@@ -98,6 +98,8 @@ CATALOG: list[Suite] = [
       note="P12: TWClock/TWSave/TWMigrate/TWState, golden saves v4..v8, 500-case save fuzz (+ parity with the legacy G.apply_state)"),
     S("twboard", "TWBOARD_SELFTEST", SV + "rules/tw_board_selftest.tscn", group="core",
       note="P16: TWRng, TWFree, TWBoardEvents, TWBoard (unified solitaire rules): scenarios, 1000 seeds, 200 Path levels (lockstep with V10LevelSim, certificate, solver bot), replay, shuffle, fuzz"),
+    S("twnav", "TWNAV_SELFTEST", "res://shell/nav/nav_selftest.tscn", group="core",
+      note="P23: ScreenSpec, TWScreen, TWScreens (go/back/history/tabs on 12 fake screens, 3 s watchdog), TWContext, TWBus"),
     S("ults", "ULTS", args=["--ults_selftest=1"], group="core"),
     S("letters", "LETTERS", args=["--letters_selftest=1"], group="core"),
     # ---- v10 registry modules (docs/INTEGRATION_0.10.md; ids == V10RegistryList ids) -----------------
@@ -188,6 +190,10 @@ EXTERNAL: list[Suite] = [
     # P19: the Path table is read through TWLevels.at(n) only; direct G.LEVELS[...] indexing is red
     Suite(id="no_direct_levels", kind="python", group="lint", marker="NO_DIRECT_LEVELS RESULT", timeout=60, fast=True,
           script="tools/lint_no_direct_levels.py", args=["--selftest", "--check"]),
+    # P23: a screen folder without spec.tres / a TWScreen outside shell/screens / a bad or duplicate ScreenSpec is red
+    Suite(id="screen_has_spec", kind="python", group="lint", marker="SCREEN_HAS_SPEC SELFTEST", timeout=60, fast=True,
+          script="tools/lint_screen_has_spec.py", args=["--selftest", "--check"],
+          note="SCREEN_HAS_SPEC: 7 synthetic trees + the repo has 0 violations"),
     # P45: loudness meter self-test on synthetic signals (python + numpy + ffmpeg; the corpus scan is a separate CLI run)
     Suite(id="audio_gate", kind="python", group="lint", marker="AUDIO_GATE SELFTEST", timeout=120, fast=True,
           script="tools/audio/lufs_gate.py", args=["--selftest", "--no-write"],
