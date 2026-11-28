@@ -17,33 +17,35 @@ SLOTS = ["base", "evening", "swim", "service", "robe", "battle", "seasonal"]
 # Body table (owner decision 2026-11-28): different heights and figures.  HARD floor: every heroine reads as a mature adult
 # woman (adult face, adult figure); heads never below HEADS_MIN; petite = a shorter adult woman, never a young-looking one.
 # ---------------------------------------------------------------------------------------------------------------------
-HEADS_MIN, HEADS_MAX = 6.75, 8.0
+HEADS_MIN, HEADS_MAX = 6.75, 7.0   # owner decision 2026-11-28 (PROPORTIONS, binding): 6.75-7.0 heads, crotch line at 45-48% of the height
+CROTCH_PCT = 46                     # the figure sentence of every prompt says "about 46% of her total height" (allowed window 45-48)
 HEIGHTS = {
-    "yue":     dict(cm=177, heads=7.9,  tag="very tall and statuesque", legs="very long statuesque legs with full thighs"),
-    "zlata":   dict(cm=176, heads=7.8,  tag="tall and statuesque", legs="long legs with full thighs"),
-    "rin":     dict(cm=172, heads=7.5,  tag="tall and slender", legs="long legs with full soft thighs"),
-    "mc":      dict(cm=170, heads=7.5,  tag="tall, soft and shapely", legs="long legs with full soft thighs"),
-    "hana":    dict(cm=168, heads=7.25, tag="athletic average height", legs="strong athletic legs with thick thighs"),
-    "tsubame": dict(cm=165, heads=7.25, tag="lithe average height", legs="slim toned shapely legs"),
-    "shirin":  dict(cm=163, heads=7.25, tag="average height with fuller curves", legs="long legs with full thighs"),
-    "kohaku":  dict(cm=160, heads=7.0,  tag="slightly petite but clearly a grown woman", legs="soft legs with full thighs"),
-    "nova":    dict(cm=158, heads=7.0,  tag="petite but clearly a grown woman", legs="slim toned shapely legs"),
-    "miel":    dict(cm=155, heads=6.75, tag="petite and curvy but clearly a mature grown woman", legs="thick shapely thighs and soft legs"),
+    # height is expressed by scale and framing, NOT by longer legs: every heroine has the same crotch-line rule (45-48% of height from the floor)
+    "yue":     dict(cm=177, heads=7.0,  tag="tall, regal and graceful", legs="proportionate legs with full thighs, a visible knee and a tapering calf"),
+    "zlata":   dict(cm=176, heads=7.0,  tag="tall and regal", legs="proportionate legs with full thighs, a visible knee and a tapering calf"),
+    "rin":     dict(cm=172, heads=6.9,  tag="tall and slender", legs="proportionate legs with full soft thighs, a visible knee and a tapering calf"),
+    "mc":      dict(cm=170, heads=6.85, tag="soft and shapely", legs="proportionate legs with full soft thighs, a visible knee and a tapering calf"),
+    "hana":    dict(cm=168, heads=6.8,  tag="athletic average height", legs="strong athletic legs with thick thighs, a visible knee and a tapering calf"),
+    "tsubame": dict(cm=165, heads=6.8,  tag="lithe average height", legs="slim toned shapely legs with a visible knee and a tapering calf"),
+    "shirin":  dict(cm=163, heads=6.75, tag="average height with fuller curves", legs="proportionate legs with full thighs, a visible knee and a tapering calf"),
+    "kohaku":  dict(cm=160, heads=6.75, tag="slightly petite but clearly a grown woman", legs="soft legs with full thighs, a visible knee and a tapering calf"),
+    "nova":    dict(cm=158, heads=6.75, tag="petite but clearly a grown woman", legs="slim toned shapely legs with a visible knee and a tapering calf"),
+    "miel":    dict(cm=155, heads=6.75, tag="petite and curvy but clearly a mature grown woman", legs="thick shapely thighs and soft legs with a visible knee and a tapering calf"),
 }
 
-# Figure descriptors (owner feedback round 3, 2026-11-28): fuller thighs on some heroines, accent on legs and bust, varied across the roster.
-# Exact approved body terms (Full files only; 'thick', 'full thighs', 'wide hips', 'curvy' are NOT hard-banned, minor / school words are).
+# Figure descriptors (owner feedback round 3 + proportions decision 2026-11-28): lush but proportional thighs (never wider than the pelvis, visible knee and
+# calf taper), compact torso, accent on legs and bust, varied across the roster.  Exact approved body terms (Full files only).
 FIGURE = {
-    "mc":      "soft shapely figure, full soft thighs, wide rounded hips, a defined waist, a full bust accented by the neckline",
-    "miel":    "soft curvy pear-shaped figure with thick shapely thighs and wide hips, a slim waist, a full bust",
-    "kohaku":  "soft athletic-soft figure with full soft thighs and rounded hips, a slim waist, a full bust",
-    "zlata":   "statuesque figure, full thighs on long legs, wide regal hips, a slim waist, a full bust",
-    "rin":     "slender figure with long legs and full soft thighs, rounded hips, a slim waist, a shapely bust",
-    "yue":     "statuesque figure with very long legs and full thighs, rounded hips, a defined waist, a full bust",
-    "shirin":  "soft shapely figure with long legs, full thighs and wide hips, a defined waist, a full bust, a bare midriff",
-    "hana":    "athletic toned figure with strong thick thighs and soft definition, a flat stomach, a shapely bust",
-    "tsubame": "lithe slim toned figure with shapely legs, rounded hips, a slim waist, a shapely bust",
-    "nova":    "lean slim toned figure with shapely legs, gently rounded hips, a slim waist, a shapely bust",
+    "mc":      "soft shapely figure with a compact torso, full soft thighs with a visible knee and calf taper, wide rounded hips, a defined waist, a full bust accented by the neckline",
+    "miel":    "soft curvy pear-shaped figure with a compact torso, thick shapely thighs with a visible knee and calf taper, wide hips, a slim waist, a full bust",
+    "kohaku":  "soft athletic-soft figure with a compact torso, full soft thighs with a visible knee and calf taper, rounded hips, a slim waist, a full bust",
+    "zlata":   "regal figure with a compact torso, full thighs with a visible knee and calf taper, wide regal hips, a slim waist, a full bust",
+    "rin":     "slender figure with a compact torso, full soft thighs with a visible knee and calf taper, rounded hips, a slim waist, a shapely bust",
+    "yue":     "graceful regal figure with a compact torso, full thighs with a visible knee and calf taper, rounded hips, a defined waist, a full bust",
+    "shirin":  "soft shapely figure with a compact torso, full thighs with a visible knee and calf taper, wide hips, a defined waist, a full bust, a bare midriff",
+    "hana":    "athletic toned figure with a compact torso, strong thick thighs and soft definition with a visible knee and calf taper, a flat stomach, a shapely bust",
+    "tsubame": "lithe slim toned figure with a compact torso, shapely thighs with a visible knee and calf taper, rounded hips, a slim waist, a shapely bust",
+    "nova":    "lean slim toned figure with a compact torso, shapely thighs with a visible knee and calf taper, gently rounded hips, a slim waist, a shapely bust",
 }
 
 # {hk: {slot: dict(name, outfit, setting, poses=[A,B,C], hero=[H1,H2])}}
@@ -51,7 +53,7 @@ W: dict[str, dict[str, dict]] = {}
 
 
 FR = {
-    "L": "low full-body view from knee level looking straight ahead (never below the hem, never up a skirt) that elongates the legs",
+    "L": "full-body standing view, portrait-lens camera at hip height looking straight ahead (never below the hem, never up a skirt, no wide-angle distortion and no from-below angle), the legs in natural proportion to the torso",
     "T": "thigh-focus three-quarter crop from the waist to the knees, the stocking bands and thighs filling the frame, camera at hip level",
     "S": "full-body seated view at eye level with the legs prominent in the foreground",
     "B": "close crop from the hip to the knees on the stocking band and garter, her smiling face partly in the frame, camera at eye level",
@@ -84,7 +86,7 @@ add("mc", "evening", "Tea floral cheongsam",
     "leaning over the mahjong table on one hand, holding up a single blank tile in the other hand, a wink // laughing open smile with a wink",
     "reclining sideways on a cushioned daybed propped on one elbow, one knee raised, holding a tea bowl // warm teasing smile",
     "kneeling on a cushion with an arched back and both hands in her long hair // dreamy flirty smile",
-    "lying on her side on the daybed with her head on one arm and one long leg stretched out, the ribbon-and-bell band in view // inviting smile",
+    "lying on her side on the daybed with her head on one arm and one leg stretched out, the ribbon-and-bell band in view // inviting smile",
     "leaning far forward over the table toward the viewer, both hands on the felt, hair falling forward // bright teasing wink")
 add("mc", "swim", "Blossom string bikini",
     "pink-and-white string bikini with jade-green ribbon ties at the hips and neck, a wet-look open white sheer shirt tied at the waist, a gold anklet, a straw sun hat with a pink ribbon",
@@ -653,7 +655,7 @@ add("zlata", "seasonal", "Winter-festival sarafan",
 # ---------------------------------------------------------------------------------------------------------------------
 # Round 3 (owner feedback): LEG-focus (pose D) and BUST-focus (pose E) shot types for every outfit, so each outfit has
 # poses A..E (5 search candidates) plus the 2 hero splash poses.  Built from slot templates and per-heroine props.
-# Camera stays at eye, hip or knee level: never below the hem, never up a skirt.
+# Camera stays at eye or hip level or higher (owner proportions decision 2026-11-28: no knee-level / from-below views, they stretch the legs): never below the hem, never up a skirt.
 # ---------------------------------------------------------------------------------------------------------------------
 PROPS = {  # band = the stocking / thigh detail, seat = furniture, hug = what she hugs, wpn = battle prop, neck = neckline term, mood = smile adjective
     "mc":      dict(band="lace stocking top and garter band", seat="the mahjong table", hug="a floral cushion", wpn="the war fan", neck="keyhole front", mood="playful"),
@@ -668,7 +670,7 @@ PROPS = {  # band = the stocking / thigh detail, seat = furniture, hug = what sh
     "zlata":   dict(band="lace stocking top and gold garter strap", seat="the gilded throne", hug="a feather pillow", wpn="the feathered spear", neck="sweetheart neckline", mood="regal"),
 }
 LEG_BUST = {  # slot -> (leg-focus template, bust-focus template); each is "pose // expression // framing code"
-    "base":     ("standing with one long leg stretched forward, a hand on her hip, the {band} in view // {mood} smirk // L",
+    "base":     ("standing with one leg stepped forward, a hand on her hip, the {band} in view // {mood} smirk // L",
                  "leaning forward with both hands on her knees toward the viewer, the {neck} in front // {mood} smile // F"),
     "evening":  ("perched on {seat} with one leg stretched out and the other drawn up, the {band} in view // {mood} smile // T",
                  "leaning forward on her forearms over {seat}, hugging {hug} to her chest, looking up // {mood} smile // F"),
@@ -678,7 +680,7 @@ LEG_BUST = {  # slot -> (leg-focus template, bust-focus template); each is "pose
                  "leaning forward with both hands on {seat}, the {neck} toward the viewer, ears tilted // {mood} wink // F"),
     "robe":     ("sitting on the bed edge with one leg stretched out, the robe parted over the {band} // {mood} half-lidded smile // B",
                  "kneeling on the bed hugging {hug} to her chest, leaning forward with an arched back // {mood} sleepy smile // F"),
-    "battle":   ("striding forward in a low knee-level view, the armoured stockings and thigh straps elongating her legs // {mood} grin // L",
+    "battle":   ("striding forward at hip-height camera level, the armoured stockings and thigh straps in view // {mood} grin // L",
                  "leaning forward on {wpn} with both hands, bust-forward toward the viewer // {mood} smile // F"),
     "seasonal": ("sitting with one leg lifted and crossed over the other, the {band} in view // {mood} smile // T",
                  "leaning forward with both hands on her knees, a playful look up, the {neck} in front // {mood} laugh // F"),

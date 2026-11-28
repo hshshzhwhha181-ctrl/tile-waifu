@@ -1,0 +1,3712 @@
+{
+ "version": "v6a",
+ "date": "2026-11-28",
+ "branch": "claude/art-recipe",
+ "purpose": "Pose library for the art factory v6 (owner feedback 2026-11-28: anatomy, continuous twist, more rear emphasis, variety, hotter). Each pose has a joint-by-joint text tuned against the observed failures (defects_1..3.json, BAKEOFF_VERDICT.md). Assembled into prompts by tools/art/recipe_v6.py.",
+ "yaw_convention": "yaw_deg is the rotation of the body part away from the camera: 0 = facing the camera, 90 = exact profile, 180 = back to the camera. A twist is physically continuous when pelvis >= shoulders >= head for a look-back (the head turns last).",
+ "camera_rule": "Always hip height or higher, portrait lens (long focal length), no wide-angle distortion, never from below the hem or the lap; raised knees and leg extensions run ALONG the image plane (profile), never toward the lens.",
+ "categories": {
+  "rear_hip": "standing, rear of the hips in view, over-the-shoulder / hip pop",
+  "rear_lean": "leaning forward on a table / rail / counter / wall / chair seen from behind-side",
+  "rear_walk": "walking away or pivoting with a glance back",
+  "leg_focus_seated": "seated poses where the legs are the subject (profile crossing, side-sit, perched)",
+  "leg_focus_standing": "standing poses where the legs are the subject (stride, lifted leg, wall, thigh band)",
+  "bust_focus": "waist-up or three-quarter figure with the bust-line as the subject",
+  "lying": "lying on the side / back / prone, legs run across the frame",
+  "kneeling": "upright, supported and half kneels (never all-fours)",
+  "dynamic": "canon base / win poses and action poses (twirl, lunge, leap, dance, straddle, squat)",
+  "portrait_tease": "bust-up portraits, hips not in frame"
+ },
+ "boldness_scale": {
+  "1": "tame (P50 level, not allowed as a final)",
+  "2": "mild",
+  "3": "bold: owner pin-up bar",
+  "4": "bolder: BD2 / Azur Lane splash level",
+  "5": "ceiling inside the hard lines (lying hip-up, prone arch, kneeling arch from behind-side; clothed, rear fully covered)"
+ },
+ "outfit_classes": {
+  "long": "long gown / qipao / hanfu / hakama with a slit",
+  "mini": "short skirt, short dress, shorts, short kimono / yukata",
+  "leo": "leotard, bodysuit, catsuit, armoured leotard-dress, bunny leotard",
+  "swim": "bikini or swimsuit with sarong / shirt",
+  "robe": "satin robe-dress over a mini nightgown"
+ },
+ "suited_values": {
+  "ok": "safe with the standard class rule block",
+  "cond": "allowed only with the class rule block and a reroll budget (4 candidates) plus a V4 hem edit as rescue; pilot first",
+  "no": "do not use in this class (unsafe: under-skirt view, bare-buttock risk, hard line)"
+ },
+ "contexts": "indoor | bed | beach_pool | outdoor | stage: the setting families a pose works in; prop gives the furniture sentence per context (default when missing)",
+ "counts": {
+  "rear_hip": 7,
+  "rear_lean": 5,
+  "rear_walk": 3,
+  "leg_focus_seated": 5,
+  "leg_focus_standing": 5,
+  "bust_focus": 9,
+  "lying": 7,
+  "kneeling": 7,
+  "dynamic": 12,
+  "portrait_tease": 5,
+  "total": 65,
+  "rear_emphasis": 21
+ },
+ "poses": [
+  {
+   "id": "R01_over_shoulder_s_curve",
+   "name": "Over-the-shoulder S-curve (back to camera)",
+   "category": "rear_hip",
+   "camera": "camera directly behind her at hip height",
+   "joints": {
+    "pelvis": "Her pelvis, buttocks and both legs face AWAY from the camera (pelvis turned about 170 degrees from the viewer), so the REAR of her hips and thighs is in view",
+    "spine": "the spine twists gradually at the waist and upper back: shoulders turned about 125 degrees, the head turned further to about 70 degrees, glancing back over her left shoulder with the face in three-quarter view looking at the viewer",
+    "legs": "weight on the right leg, the right thigh straight, the left knee slightly bent with the left heel lifted, feet about a shoulder width apart, a gentle S-curve through waist and hips, two clearly separate legs, each thigh narrower than the pelvis",
+    "arms": "right hand rests on her right hip, left hand raised to touch the end of her hair",
+    "head": "face in three-quarter view over the left shoulder"
+   },
+   "yaw_deg": {
+    "pelvis": 170,
+    "shoulders": 125,
+    "head": 70
+   },
+   "boldness": 4,
+   "suited": {
+    "long": "ok",
+    "mini": "cond",
+    "leo": "cond",
+    "swim": "cond",
+    "robe": "ok"
+   },
+   "contexts": [
+    "indoor",
+    "outdoor",
+    "stage",
+    "beach_pool"
+   ],
+   "prop": {},
+   "framing": "full-body from head to heels, centered",
+   "framing_code": "N",
+   "hips_in_frame": true,
+   "canon_ok": [
+    "tease"
+   ],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "torso_hip_twist_break",
+    "rear_not_rotated",
+    "thigh_oversize"
+   ],
+   "expression_hint": "confident teasing smile",
+   "youth_risk": "none",
+   "notes": "Bake-off pose a (V1h 2/3). The thigh-width clause is mandatory; a reroll or V4 thigh edit rescues the miss.",
+   "prompt": "POSE, joint by joint: camera directly behind her at hip height. Her pelvis, buttocks and both legs face AWAY from the camera (pelvis turned about 170 degrees from the viewer), so the REAR of her hips and thighs is in view. The spine twists gradually at the waist and upper back: shoulders turned about 125 degrees, the head turned further to about 70 degrees, glancing back over her left shoulder with the face in three-quarter view looking at the viewer. Weight on the right leg, the right thigh straight, the left knee slightly bent with the left heel lifted, feet about a shoulder width apart, a gentle S-curve through waist and hips, two clearly separate legs, each thigh narrower than the pelvis. Right hand rests on her right hip, left hand raised to touch the end of her hair. Head: face in three-quarter view over the left shoulder.",
+   "rear_emphasis": true,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "R02_hair_arms_up_back_arch",
+   "name": "Both hands in hair, back arched (rear view)",
+   "category": "rear_hip",
+   "camera": "camera directly behind her at hip height",
+   "joints": {
+    "pelvis": "pelvis, buttocks and both legs face AWAY from the camera (about 175 degrees), the rear of the hips and thighs fully in view",
+    "spine": "a small lumbar arch with the spine otherwise straight, shoulders square to the back (about 165 degrees), only the head and neck turn to a left profile (about 100 degrees) with the chin lifted",
+    "legs": "feet hip-width apart, weight even on both legs, knees soft, heels slightly lifted, two clearly separate legs with a thin gap between the thighs",
+    "arms": "both arms raised, elbows bent and wide, both hands in her hair at the nape (exactly two arms, two hands)",
+    "head": "profile of the face, chin lifted, eyes half-closed"
+   },
+   "yaw_deg": {
+    "pelvis": 175,
+    "shoulders": 165,
+    "head": 100
+   },
+   "boldness": 4,
+   "suited": {
+    "long": "ok",
+    "mini": "cond",
+    "leo": "cond",
+    "swim": "cond",
+    "robe": "ok"
+   },
+   "contexts": [
+    "indoor",
+    "outdoor",
+    "stage",
+    "beach_pool"
+   ],
+   "prop": {},
+   "framing": "full-body from head to heels, centered",
+   "framing_code": "N",
+   "hips_in_frame": true,
+   "canon_ok": [],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "extra_limb",
+    "thigh_oversize",
+    "rear_not_rotated"
+   ],
+   "expression_hint": "dreamy half-lidded smile",
+   "youth_risk": "none",
+   "notes": "",
+   "prompt": "POSE, joint by joint: camera directly behind her at hip height. Pelvis, buttocks and both legs face AWAY from the camera (about 175 degrees), the rear of the hips and thighs fully in view. A small lumbar arch with the spine otherwise straight, shoulders square to the back (about 165 degrees), only the head and neck turn to a left profile (about 100 degrees) with the chin lifted. Feet hip-width apart, weight even on both legs, knees soft, heels slightly lifted, two clearly separate legs with a thin gap between the thighs. Both arms raised, elbows bent and wide, both hands in her hair at the nape (exactly two arms, two hands). Head: profile of the face, chin lifted, eyes half-closed.",
+   "rear_emphasis": true,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "R03_hip_pop_rear_three_quarter",
+   "name": "Hip pop, rear three-quarter, look back",
+   "category": "rear_hip",
+   "camera": "camera at her left-rear three-quarter (about 135 degrees behind her front) at hip height",
+   "joints": {
+    "pelvis": "pelvis turned about 135 degrees from the camera, the right hip pushed out toward the viewer's right, the curve of the buttocks and the outer thigh in view from the rear-side",
+    "spine": "the spine counter-rotates smoothly: waist about 20 degrees back, shoulders about 100 degrees, the head turned to about 45 degrees looking back at the viewer",
+    "legs": "weight on the left leg, the right foot stepped slightly forward on its toe with the knee soft, a clear gap between the two legs, thighs full but narrower than the hip line",
+    "arms": "left hand on the left hip, right arm relaxed with fingers lightly curled beside the thigh",
+    "head": "looking back over the left shoulder, a teasing half-smile"
+   },
+   "yaw_deg": {
+    "pelvis": 135,
+    "shoulders": 100,
+    "head": 45
+   },
+   "boldness": 4,
+   "suited": {
+    "long": "ok",
+    "mini": "cond",
+    "leo": "cond",
+    "swim": "cond",
+    "robe": "ok"
+   },
+   "contexts": [
+    "indoor",
+    "outdoor",
+    "stage",
+    "beach_pool"
+   ],
+   "prop": {},
+   "framing": "full-body from head to heels, centered",
+   "framing_code": "N",
+   "hips_in_frame": true,
+   "canon_ok": [
+    "base",
+    "tease"
+   ],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "torso_hip_twist_break",
+    "thigh_oversize",
+    "rear_not_rotated"
+   ],
+   "expression_hint": "playful teasing smile",
+   "youth_risk": "none",
+   "notes": "",
+   "prompt": "POSE, joint by joint: camera at her left-rear three-quarter (about 135 degrees behind her front) at hip height. Pelvis turned about 135 degrees from the camera, the right hip pushed out toward the viewer's right, the curve of the buttocks and the outer thigh in view from the rear-side. The spine counter-rotates smoothly: waist about 20 degrees back, shoulders about 100 degrees, the head turned to about 45 degrees looking back at the viewer. Weight on the left leg, the right foot stepped slightly forward on its toe with the knee soft, a clear gap between the two legs, thighs full but narrower than the hip line. Left hand on the left hip, right arm relaxed with fingers lightly curled beside the thigh. Head: looking back over the left shoulder, a teasing half-smile.",
+   "rear_emphasis": true,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "R04_pillar_lean_back_view",
+   "name": "Shoulder against a pillar, back three-quarter",
+   "category": "rear_hip",
+   "camera": "camera behind and slightly to her right at hip height",
+   "joints": {
+    "pelvis": "pelvis turned about 160 degrees from the camera, hips and legs facing away, the rear of the hips in view",
+    "spine": "she leans her left shoulder against a pillar, the torso tilted about 10 degrees toward it, the shoulders turned about 120 degrees and the head turned back about 60 degrees to the viewer",
+    "legs": "weight on the right leg, the left leg stepped slightly behind and out to the side with the toe down and the knee bent, two clearly separate legs",
+    "arms": "left forearm resting along the pillar at head height, right hand on her hip",
+    "head": "looking back at the viewer past her shoulder"
+   },
+   "yaw_deg": {
+    "pelvis": 160,
+    "shoulders": 120,
+    "head": 60
+   },
+   "boldness": 3,
+   "suited": {
+    "long": "ok",
+    "mini": "cond",
+    "leo": "cond",
+    "swim": "ok",
+    "robe": "ok"
+   },
+   "contexts": [
+    "indoor",
+    "outdoor",
+    "stage",
+    "beach_pool"
+   ],
+   "prop": {
+    "default": "a lacquered pillar",
+    "beach_pool": "a wooden beach-bar pillar",
+    "stage": "a truss pillar",
+    "outdoor": "a wooden pillar"
+   },
+   "framing": "full-body from head to heels, centered",
+   "framing_code": "N",
+   "hips_in_frame": true,
+   "canon_ok": [],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "thigh_merge_cross",
+    "torso_hip_twist_break"
+   ],
+   "expression_hint": "sly sidelong smile",
+   "youth_risk": "none",
+   "notes": "",
+   "prompt": "POSE, joint by joint: camera behind and slightly to her right at hip height. Pelvis turned about 160 degrees from the camera, hips and legs facing away, the rear of the hips in view. She leans her left shoulder against a pillar, the torso tilted about 10 degrees toward it, the shoulders turned about 120 degrees and the head turned back about 60 degrees to the viewer. Weight on the right leg, the left leg stepped slightly behind and out to the side with the toe down and the knee bent, two clearly separate legs. Left forearm resting along the pillar at head height, right hand on her hip. Head: looking back at the viewer past her shoulder.",
+   "rear_emphasis": true,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "R05_hands_on_hips_look_back",
+   "name": "Hands on hips, glance back",
+   "category": "rear_hip",
+   "camera": "camera directly behind her at hip height",
+   "joints": {
+    "pelvis": "pelvis, buttocks and legs face away from the camera (about 175 degrees), the rear of the hips and thighs in view",
+    "spine": "shoulders turned about 140 degrees from the camera, the head turned about 75 degrees over the left shoulder, the twist continuous from the pelvis through the ribcage",
+    "legs": "feet shoulder-width apart, weight even with a slight hip sway to the left, knees straight, two separate legs, thighs narrower than the pelvis",
+    "arms": "both hands on her hips with the elbows out (exactly two arms)",
+    "head": "face in three-quarter view over the left shoulder"
+   },
+   "yaw_deg": {
+    "pelvis": 175,
+    "shoulders": 140,
+    "head": 75
+   },
+   "boldness": 3,
+   "suited": {
+    "long": "ok",
+    "mini": "cond",
+    "leo": "cond",
+    "swim": "cond",
+    "robe": "ok"
+   },
+   "contexts": [
+    "indoor",
+    "outdoor",
+    "stage",
+    "beach_pool"
+   ],
+   "prop": {},
+   "framing": "full-body from head to heels, centered",
+   "framing_code": "N",
+   "hips_in_frame": true,
+   "canon_ok": [
+    "tease"
+   ],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "rear_not_rotated",
+    "extra_limb"
+   ],
+   "expression_hint": "bright cheeky smile",
+   "youth_risk": "none",
+   "notes": "",
+   "prompt": "POSE, joint by joint: camera directly behind her at hip height. Pelvis, buttocks and legs face away from the camera (about 175 degrees), the rear of the hips and thighs in view. Shoulders turned about 140 degrees from the camera, the head turned about 75 degrees over the left shoulder, the twist continuous from the pelvis through the ribcage. Feet shoulder-width apart, weight even with a slight hip sway to the left, knees straight, two separate legs, thighs narrower than the pelvis. Both hands on her hips with the elbows out (exactly two arms). Head: face in three-quarter view over the left shoulder.",
+   "rear_emphasis": true,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "R06_smoothing_hem_rear",
+   "name": "Hand smoothing the hip line, rear view",
+   "category": "rear_hip",
+   "camera": "camera directly behind her at hip height",
+   "joints": {
+    "pelvis": "pelvis, buttocks and legs face away (about 165 degrees) so the fitted rear of the garment is in view",
+    "spine": "spine twists gradually: shoulders about 130 degrees, head turned about 65 degrees over the right shoulder",
+    "legs": "weight on the left leg, the right leg slightly out to the side with the toe pointed outward and the knee soft, a clear gap between the legs",
+    "arms": "the right hand lightly smooths the garment against the right hip (a flat palm on the side of the hip, not lifting any fabric), the left hand lifts her hair off the neck",
+    "head": "looking back over the right shoulder with a coy smile"
+   },
+   "yaw_deg": {
+    "pelvis": 165,
+    "shoulders": 130,
+    "head": 65
+   },
+   "boldness": 4,
+   "suited": {
+    "long": "ok",
+    "mini": "cond",
+    "leo": "cond",
+    "swim": "cond",
+    "robe": "ok"
+   },
+   "contexts": [
+    "indoor",
+    "outdoor",
+    "stage",
+    "beach_pool"
+   ],
+   "prop": {},
+   "framing": "full-body from head to heels, centered",
+   "framing_code": "N",
+   "hips_in_frame": true,
+   "canon_ok": [
+    "tease"
+   ],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "underwear_read",
+    "torso_hip_twist_break"
+   ],
+   "expression_hint": "coy half-smile",
+   "youth_risk": "none",
+   "notes": "Hand rests on the hip over fabric; never write 'lifting' or 'pulling' the hem.",
+   "prompt": "POSE, joint by joint: camera directly behind her at hip height. Pelvis, buttocks and legs face away (about 165 degrees) so the fitted rear of the garment is in view. Spine twists gradually: shoulders about 130 degrees, head turned about 65 degrees over the right shoulder. Weight on the left leg, the right leg slightly out to the side with the toe pointed outward and the knee soft, a clear gap between the legs. The right hand lightly smooths the garment against the right hip (a flat palm on the side of the hip, not lifting any fabric), the left hand lifts her hair off the neck. Head: looking back over the right shoulder with a coy smile.",
+   "rear_emphasis": true,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "R07_overhead_stretch_back",
+   "name": "Overhead stretch, back view",
+   "category": "rear_hip",
+   "camera": "camera directly behind her at hip height",
+   "joints": {
+    "pelvis": "pelvis, buttocks and legs face away (about 180 degrees), straight rear view of the hips",
+    "spine": "a gentle arch in the lower back, shoulders square to the back, the head turned to a left profile about 100 degrees looking up and back",
+    "legs": "feet hip-width apart, heels slightly lifted, weight even, knees straight, two clearly separate legs",
+    "arms": "both arms stretched overhead with the fingers interlaced and the elbows straight (exactly two arms)",
+    "head": "head turned to profile, chin up"
+   },
+   "yaw_deg": {
+    "pelvis": 180,
+    "shoulders": 170,
+    "head": 100
+   },
+   "boldness": 4,
+   "suited": {
+    "long": "ok",
+    "mini": "cond",
+    "leo": "cond",
+    "swim": "cond",
+    "robe": "ok"
+   },
+   "contexts": [
+    "indoor",
+    "outdoor",
+    "stage",
+    "beach_pool"
+   ],
+   "prop": {},
+   "framing": "full-body from head to heels, centered",
+   "framing_code": "N",
+   "hips_in_frame": true,
+   "canon_ok": [],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "extra_limb",
+    "thigh_oversize"
+   ],
+   "expression_hint": "blissful half-lidded smile",
+   "youth_risk": "none",
+   "notes": "",
+   "prompt": "POSE, joint by joint: camera directly behind her at hip height. Pelvis, buttocks and legs face away (about 180 degrees), straight rear view of the hips. A gentle arch in the lower back, shoulders square to the back, the head turned to a left profile about 100 degrees looking up and back. Feet hip-width apart, heels slightly lifted, weight even, knees straight, two clearly separate legs. Both arms stretched overhead with the fingers interlaced and the elbows straight (exactly two arms). Head: head turned to profile, chin up.",
+   "rear_emphasis": true,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "L01_lean_table_behind",
+   "name": "Leaning forward on a table, seen from behind-side",
+   "category": "rear_lean",
+   "camera": "camera behind her and slightly to her right side at hip height",
+   "joints": {
+    "pelvis": "she stands behind a low lacquered table and leans forward from the hips about 55 degrees; the pelvis is pushed back and up and the rear of the hips is in view; the garment hem stays in place over the hips",
+    "spine": "lower back arched, the twist continuous from the pelvis (rear in view) through the ribcage to the head, which turns back over her right shoulder toward the viewer",
+    "legs": "both legs nearly straight with the knees soft, feet shoulder-width apart, two clearly separate legs, thighs narrower than the pelvis",
+    "arms": "both forearms rest on the table with the elbows bent (exactly two arms)",
+    "head": "head turned back over the right shoulder with a teasing smile"
+   },
+   "yaw_deg": {
+    "pelvis": 150,
+    "shoulders": 100,
+    "head": 55
+   },
+   "boldness": 5,
+   "suited": {
+    "long": "ok",
+    "mini": "cond",
+    "leo": "cond",
+    "swim": "no",
+    "robe": "cond"
+   },
+   "contexts": [
+    "indoor",
+    "outdoor",
+    "stage",
+    "beach_pool"
+   ],
+   "prop": {
+    "default": "a low lacquered tea table",
+    "beach_pool": "a bar counter",
+    "stage": "a flight case",
+    "outdoor": "a waist-high stone parapet"
+   },
+   "framing": "full-body from head to heels, centered",
+   "framing_code": "N",
+   "hips_in_frame": true,
+   "canon_ok": [],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "underwear_read",
+    "torso_hip_twist_break",
+    "clothing_logic"
+   ],
+   "expression_hint": "teasing smile",
+   "youth_risk": "none",
+   "notes": "Bake-off pose b (V1h 3/3). Hem rule decisive. In swimwear the sarong must be tied on.",
+   "prompt": "POSE, joint by joint: camera behind her and slightly to her right side at hip height. She stands behind a low lacquered table and leans forward from the hips about 55 degrees; the pelvis is pushed back and up and the rear of the hips is in view; the garment hem stays in place over the hips. Lower back arched, the twist continuous from the pelvis (rear in view) through the ribcage to the head, which turns back over her right shoulder toward the viewer. Both legs nearly straight with the knees soft, feet shoulder-width apart, two clearly separate legs, thighs narrower than the pelvis. Both forearms rest on the table with the elbows bent (exactly two arms). Head: head turned back over the right shoulder with a teasing smile.",
+   "rear_emphasis": true,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [
+    "swim"
+   ],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "L02_rail_lean_foot_lifted",
+   "name": "Leaning on a balcony rail, one foot lifted behind",
+   "category": "rear_lean",
+   "camera": "camera behind her and slightly to her left at hip height",
+   "joints": {
+    "pelvis": "she stands at a waist-high rail with her pelvis turned about 150 degrees from the camera (rear three-quarter), hips and thighs toward the rear camera",
+    "spine": "the torso leans forward about 35 degrees with the forearms on the rail, the shoulders turned about 115 degrees, the head turned about 60 degrees back over the left shoulder",
+    "legs": "the left leg straight and carrying the weight, the right knee bent about 80 degrees with the shin angled back and the foot on its toe behind the left calf, never crossing in front, two separate legs",
+    "arms": "both forearms on the rail, fingers loosely clasped (exactly two arms)",
+    "head": "looking back over the left shoulder"
+   },
+   "yaw_deg": {
+    "pelvis": 150,
+    "shoulders": 115,
+    "head": 60
+   },
+   "boldness": 4,
+   "suited": {
+    "long": "ok",
+    "mini": "cond",
+    "leo": "cond",
+    "swim": "ok",
+    "robe": "cond"
+   },
+   "contexts": [
+    "indoor",
+    "outdoor",
+    "stage",
+    "beach_pool"
+   ],
+   "prop": {
+    "default": "a waist-high stone balcony rail",
+    "beach_pool": "a pool-side glass rail",
+    "indoor": "a waist-high gallery rail",
+    "stage": "a stage-edge safety rail",
+    "outdoor": "a waist-high stone rail"
+   },
+   "framing": "full-body from head to heels, centered",
+   "framing_code": "N",
+   "hips_in_frame": true,
+   "canon_ok": [],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "thigh_merge_cross",
+    "torso_hip_twist_break"
+   ],
+   "expression_hint": "cool sly smile",
+   "youth_risk": "none",
+   "notes": "",
+   "prompt": "POSE, joint by joint: camera behind her and slightly to her left at hip height. She stands at a waist-high rail with her pelvis turned about 150 degrees from the camera (rear three-quarter), hips and thighs toward the rear camera. The torso leans forward about 35 degrees with the forearms on the rail, the shoulders turned about 115 degrees, the head turned about 60 degrees back over the left shoulder. The left leg straight and carrying the weight, the right knee bent about 80 degrees with the shin angled back and the foot on its toe behind the left calf, never crossing in front, two separate legs. Both forearms on the rail, fingers loosely clasped (exactly two arms). Head: looking back over the left shoulder.",
+   "rear_emphasis": true,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "L03_counter_elbow_rear_three_quarter",
+   "name": "Elbow on a counter, hips toward the rear camera",
+   "category": "rear_lean",
+   "camera": "camera at her left-rear three-quarter at hip height",
+   "joints": {
+    "pelvis": "she stands side-on to a counter with the pelvis turned about 140 degrees from the camera, the hip nearest the viewer pushed out, the rear of the hip and thigh in view",
+    "spine": "the torso leans about 25 degrees onto the left elbow, the shoulders turned about 100 degrees, the head turned about 50 degrees toward the viewer",
+    "legs": "weight on the right leg, the left leg crossing behind only at the ankle with the toe down, a visible gap between the thighs, thighs narrower than the pelvis",
+    "arms": "left elbow on the counter with the chin resting lightly on the back of the left fingers, right hand on the hip",
+    "head": "sidelong look at the viewer, a lazy smile"
+   },
+   "yaw_deg": {
+    "pelvis": 140,
+    "shoulders": 100,
+    "head": 50
+   },
+   "boldness": 3,
+   "suited": {
+    "long": "ok",
+    "mini": "cond",
+    "leo": "cond",
+    "swim": "ok",
+    "robe": "cond"
+   },
+   "contexts": [
+    "indoor",
+    "outdoor",
+    "stage",
+    "beach_pool"
+   ],
+   "prop": {
+    "default": "a waist-high counter",
+    "beach_pool": "a waist-high bar counter",
+    "stage": "a mixing desk",
+    "outdoor": "a waist-high stall counter"
+   },
+   "framing": "full-body from head to heels, centered",
+   "framing_code": "N",
+   "hips_in_frame": true,
+   "canon_ok": [],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "thigh_merge_cross",
+    "thigh_oversize"
+   ],
+   "expression_hint": "lazy teasing smile",
+   "youth_risk": "none",
+   "notes": "",
+   "prompt": "POSE, joint by joint: camera at her left-rear three-quarter at hip height. She stands side-on to a counter with the pelvis turned about 140 degrees from the camera, the hip nearest the viewer pushed out, the rear of the hip and thigh in view. The torso leans about 25 degrees onto the left elbow, the shoulders turned about 100 degrees, the head turned about 50 degrees toward the viewer. Weight on the right leg, the left leg crossing behind only at the ankle with the toe down, a visible gap between the thighs, thighs narrower than the pelvis. Left elbow on the counter with the chin resting lightly on the back of the left fingers, right hand on the hip. Head: sidelong look at the viewer, a lazy smile.",
+   "rear_emphasis": true,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "L04_wall_arms_up_arch",
+   "name": "Palms on a wall, back arched, rear view",
+   "category": "rear_lean",
+   "camera": "camera directly behind her at hip height",
+   "joints": {
+    "pelvis": "she faces a wall with her back to the camera, pelvis, buttocks and legs facing away (about 175 degrees), the rear of the hips in view",
+    "spine": "both arms stretched up the wall, a lumbar arch of about 20 degrees, the shoulders square to the wall, only the head turns to a left profile (about 100 degrees)",
+    "legs": "weight on the right leg, the left knee bent with the toe resting on the floor, feet about a hip-width apart, two clearly separate legs",
+    "arms": "both palms flat on the wall above her head, elbows slightly bent (exactly two arms)",
+    "head": "head turned to a left profile"
+   },
+   "yaw_deg": {
+    "pelvis": 175,
+    "shoulders": 165,
+    "head": 100
+   },
+   "boldness": 4,
+   "suited": {
+    "long": "ok",
+    "mini": "cond",
+    "leo": "cond",
+    "swim": "ok",
+    "robe": "ok"
+   },
+   "contexts": [
+    "indoor",
+    "outdoor",
+    "stage",
+    "beach_pool"
+   ],
+   "prop": {
+    "default": "a plain wall",
+    "beach_pool": "a whitewashed wall",
+    "stage": "a backstage wall",
+    "outdoor": "a plain wall"
+   },
+   "framing": "full-body from head to heels, centered",
+   "framing_code": "N",
+   "hips_in_frame": true,
+   "canon_ok": [],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "extra_limb",
+    "rear_not_rotated"
+   ],
+   "expression_hint": "dreamy half-lidded smile",
+   "youth_risk": "none",
+   "notes": "",
+   "prompt": "POSE, joint by joint: camera directly behind her at hip height. She faces a wall with her back to the camera, pelvis, buttocks and legs facing away (about 175 degrees), the rear of the hips in view. Both arms stretched up the wall, a lumbar arch of about 20 degrees, the shoulders square to the wall, only the head turns to a left profile (about 100 degrees). Weight on the right leg, the left knee bent with the toe resting on the floor, feet about a hip-width apart, two clearly separate legs. Both palms flat on the wall above her head, elbows slightly bent (exactly two arms). Head: head turned to a left profile.",
+   "rear_emphasis": true,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "L05_chairback_lean_behind",
+   "name": "Leaning over a chair back, rear three-quarter",
+   "category": "rear_lean",
+   "camera": "camera behind her and to her right at hip height",
+   "joints": {
+    "pelvis": "she stands behind a chair and leans forward about 40 degrees; the pelvis is turned about 155 degrees from the camera, the rear of the hips and thighs in view",
+    "spine": "the shoulders turned about 120 degrees, the head turned back about 65 degrees over the right shoulder, the twist continuous from the pelvis to the head",
+    "legs": "both legs straight and slightly apart (a clear gap between the thighs), weight on the left leg with the right heel lifted",
+    "arms": "both hands holding the chair back with straight arms (exactly two arms)",
+    "head": "looking back over the right shoulder"
+   },
+   "yaw_deg": {
+    "pelvis": 155,
+    "shoulders": 120,
+    "head": 65
+   },
+   "boldness": 4,
+   "suited": {
+    "long": "ok",
+    "mini": "cond",
+    "leo": "cond",
+    "swim": "no",
+    "robe": "cond"
+   },
+   "contexts": [
+    "indoor",
+    "outdoor",
+    "stage",
+    "beach_pool"
+   ],
+   "prop": {
+    "default": "a high-backed lacquer chair",
+    "stage": "a stool",
+    "outdoor": "a wooden bench with a high back"
+   },
+   "framing": "full-body from head to heels, centered",
+   "framing_code": "N",
+   "hips_in_frame": true,
+   "canon_ok": [],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "underwear_read",
+    "torso_hip_twist_break"
+   ],
+   "expression_hint": "playful smirk",
+   "youth_risk": "none",
+   "notes": "",
+   "prompt": "POSE, joint by joint: camera behind her and to her right at hip height. She stands behind a chair and leans forward about 40 degrees; the pelvis is turned about 155 degrees from the camera, the rear of the hips and thighs in view. The shoulders turned about 120 degrees, the head turned back about 65 degrees over the right shoulder, the twist continuous from the pelvis to the head. Both legs straight and slightly apart (a clear gap between the thighs), weight on the left leg with the right heel lifted. Both hands holding the chair back with straight arms (exactly two arms). Head: looking back over the right shoulder.",
+   "rear_emphasis": true,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [
+    "swim"
+   ],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "W01_walking_away_glance",
+   "name": "Walking away, glancing back",
+   "category": "rear_walk",
+   "camera": "camera behind her at hip height, following her",
+   "joints": {
+    "pelvis": "pelvis turned about 165 degrees from the camera, rotating with the stride, the rear of the hips and thighs in view",
+    "spine": "the shoulders counter-rotate about 140 degrees, the head turns about 75 degrees back over the right shoulder; the twist is continuous from the pelvis to the head",
+    "legs": "mid-stride away from the camera: the left leg forward with the foot flat, the right leg behind with the heel lifted, a clear gap between the legs, knees soft",
+    "arms": "the right arm swings forward bent with the hand relaxed, the left arm back with the fingers loose (exactly two arms)",
+    "head": "glancing back with a smile"
+   },
+   "yaw_deg": {
+    "pelvis": 165,
+    "shoulders": 140,
+    "head": 75
+   },
+   "boldness": 4,
+   "suited": {
+    "long": "ok",
+    "mini": "cond",
+    "leo": "cond",
+    "swim": "cond",
+    "robe": "ok"
+   },
+   "contexts": [
+    "indoor",
+    "outdoor",
+    "stage",
+    "beach_pool"
+   ],
+   "prop": {},
+   "framing": "full-body from head to heels, centered",
+   "framing_code": "N",
+   "hips_in_frame": true,
+   "canon_ok": [
+    "tease"
+   ],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "torso_hip_twist_break",
+    "rear_not_rotated",
+    "thigh_merge_cross"
+   ],
+   "expression_hint": "flirty glance",
+   "youth_risk": "none",
+   "notes": "",
+   "prompt": "POSE, joint by joint: camera behind her at hip height, following her. Pelvis turned about 165 degrees from the camera, rotating with the stride, the rear of the hips and thighs in view. The shoulders counter-rotate about 140 degrees, the head turns about 75 degrees back over the right shoulder; the twist is continuous from the pelvis to the head. Mid-stride away from the camera: the left leg forward with the foot flat, the right leg behind with the heel lifted, a clear gap between the legs, knees soft. The right arm swings forward bent with the hand relaxed, the left arm back with the fingers loose (exactly two arms). Head: glancing back with a smile.",
+   "rear_emphasis": true,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "W02_runway_pivot",
+   "name": "Runway pivot, hand on hip",
+   "category": "rear_walk",
+   "camera": "camera behind her three-quarter at hip height",
+   "joints": {
+    "pelvis": "mid-pivot: the pelvis turned about 140 degrees from the camera, the hips swaying and the rear of the hip in view",
+    "spine": "the shoulders turned about 100 degrees, the head turned about 45 degrees toward the viewer, the twist continuous",
+    "legs": "weight on the right leg, the left foot stepping out to the side on its toe, a clear gap between the legs, the knees soft",
+    "arms": "the left hand on her hip, the right arm swinging loosely",
+    "head": "chin lifted, looking at the viewer past her shoulder"
+   },
+   "yaw_deg": {
+    "pelvis": 140,
+    "shoulders": 100,
+    "head": 45
+   },
+   "boldness": 4,
+   "suited": {
+    "long": "ok",
+    "mini": "cond",
+    "leo": "cond",
+    "swim": "ok",
+    "robe": "ok"
+   },
+   "contexts": [
+    "indoor",
+    "outdoor",
+    "stage",
+    "beach_pool"
+   ],
+   "prop": {},
+   "framing": "full-body from head to heels, centered",
+   "framing_code": "N",
+   "hips_in_frame": true,
+   "canon_ok": [],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "torso_hip_twist_break",
+    "thigh_oversize"
+   ],
+   "expression_hint": "confident smirk",
+   "youth_risk": "none",
+   "notes": "",
+   "prompt": "POSE, joint by joint: camera behind her three-quarter at hip height. Mid-pivot: the pelvis turned about 140 degrees from the camera, the hips swaying and the rear of the hip in view. The shoulders turned about 100 degrees, the head turned about 45 degrees toward the viewer, the twist continuous. Weight on the right leg, the left foot stepping out to the side on its toe, a clear gap between the legs, the knees soft. The left hand on her hip, the right arm swinging loosely. Head: chin lifted, looking at the viewer past her shoulder.",
+   "rear_emphasis": true,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "W03_side_stride_rear_glance",
+   "name": "Striding across the frame, rear three-quarter",
+   "category": "rear_walk",
+   "camera": "camera at her rear three-quarter (about 130 degrees) at hip height, she strides across the frame",
+   "joints": {
+    "pelvis": "pelvis turned about 130 degrees from the camera, the rear-side of the hips and thighs in view",
+    "spine": "the shoulders about 105 degrees, the head turned about 50 degrees back toward the viewer",
+    "legs": "stride parallel to the image plane: the near leg forward with the foot flat, the far leg back on its toe, both legs fully visible and separate",
+    "arms": "the near arm swings back holding the strap of a small bag or a lantern, the far arm swings forward (exactly two arms)",
+    "head": "looking back over the shoulder, hair swinging"
+   },
+   "yaw_deg": {
+    "pelvis": 130,
+    "shoulders": 105,
+    "head": 50
+   },
+   "boldness": 3,
+   "suited": {
+    "long": "ok",
+    "mini": "cond",
+    "leo": "cond",
+    "swim": "ok",
+    "robe": "ok"
+   },
+   "contexts": [
+    "indoor",
+    "outdoor",
+    "stage",
+    "beach_pool"
+   ],
+   "prop": {},
+   "framing": "full-body from head to heels, centered",
+   "framing_code": "N",
+   "hips_in_frame": true,
+   "canon_ok": [],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "torso_hip_twist_break",
+    "leg_length_perspective"
+   ],
+   "expression_hint": "bright playful smile",
+   "youth_risk": "none",
+   "notes": "",
+   "prompt": "POSE, joint by joint: camera at her rear three-quarter (about 130 degrees) at hip height, she strides across the frame. Pelvis turned about 130 degrees from the camera, the rear-side of the hips and thighs in view. The shoulders about 105 degrees, the head turned about 50 degrees back toward the viewer. Stride parallel to the image plane: the near leg forward with the foot flat, the far leg back on its toe, both legs fully visible and separate. The near arm swings back holding the strap of a small bag or a lantern, the far arm swings forward (exactly two arms). Head: looking back over the shoulder, hair swinging.",
+   "rear_emphasis": true,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "S01_chair_sideways_hips_to_camera",
+   "name": "Seated sideways on a chair, hips toward the camera",
+   "category": "leg_focus_seated",
+   "camera": "camera in front of her, three-quarter side view, at hip height or higher (never below the lap)",
+   "joints": {
+    "pelvis": "she sits sideways on the chair with her hips and thighs turned about 80 degrees to the camera, both thighs lying together on the seat in profile",
+    "spine": "the torso twists back about 55 degrees toward the viewer so the bust and the face turn to the camera, the spine upright and the twist continuous through the waist",
+    "legs": "both thighs together and parallel to the image plane, the near knee bent about 90 degrees with the shin vertical and the foot flat, the far leg a little behind it with the foot clearly visible, two clearly separate shins, both feet visible",
+    "arms": "the right hand rests on the chair back, the left hand lightly on her near thigh above the knee (exactly two arms)",
+    "head": "face turned to the viewer over the shoulder"
+   },
+   "yaw_deg": {
+    "pelvis": 80,
+    "shoulders": 25,
+    "head": 0
+   },
+   "boldness": 4,
+   "suited": {
+    "long": "ok",
+    "mini": "cond",
+    "leo": "ok",
+    "swim": "cond",
+    "robe": "ok"
+   },
+   "contexts": [
+    "indoor",
+    "outdoor",
+    "stage",
+    "beach_pool"
+   ],
+   "prop": {
+    "default": "a lacquer armchair",
+    "beach_pool": "a poolside lounge chair",
+    "stage": "a tall stool",
+    "outdoor": "a carved stone bench"
+   },
+   "framing": "full-body from head to heels, centered",
+   "framing_code": "N",
+   "hips_in_frame": true,
+   "canon_ok": [],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "thigh_merge_cross",
+    "leg_length_perspective",
+    "thigh_oversize"
+   ],
+   "expression_hint": "sly smile",
+   "youth_risk": "none",
+   "notes": "",
+   "prompt": "POSE, joint by joint: camera in front of her, three-quarter side view, at hip height or higher (never below the lap). She sits sideways on the chair with her hips and thighs turned about 80 degrees to the camera, both thighs lying together on the seat in profile. The torso twists back about 55 degrees toward the viewer so the bust and the face turn to the camera, the spine upright and the twist continuous through the waist. Both thighs together and parallel to the image plane, the near knee bent about 90 degrees with the shin vertical and the foot flat, the far leg a little behind it with the foot clearly visible, two clearly separate shins, both feet visible. The right hand rests on the chair back, the left hand lightly on her near thigh above the knee (exactly two arms). Head: face turned to the viewer over the shoulder.",
+   "rear_emphasis": false,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "S02_profile_knee_cross",
+   "name": "Seated profile, legs crossed at the knee",
+   "category": "leg_focus_seated",
+   "camera": "camera exactly at her side (90 degrees) at hip height or higher, so both shins stay parallel to the image plane",
+   "joints": {
+    "pelvis": "she sits upright in exact profile on a chair, the pelvis square to the seat",
+    "spine": "the torso upright with a small lean back, the head turned to the camera, the twist only in neck and head",
+    "legs": "the right thigh crossed over the left at the knee: the crossing is clearly readable, two separate thigh volumes, a visible gap between the shins; the top shin angled forward-down with the foot pointed, the lower shin vertical with the foot flat; both feet clearly separate; no foreshortening of either shin",
+    "arms": "both hands resting on the right knee, fingers relaxed (exactly two arms)",
+    "head": "head turned to the viewer"
+   },
+   "yaw_deg": {
+    "pelvis": 90,
+    "shoulders": 60,
+    "head": 20
+   },
+   "boldness": 4,
+   "suited": {
+    "long": "ok",
+    "mini": "cond",
+    "leo": "ok",
+    "swim": "cond",
+    "robe": "ok"
+   },
+   "contexts": [
+    "indoor",
+    "outdoor",
+    "stage",
+    "beach_pool"
+   ],
+   "prop": {
+    "default": "a cushioned armchair",
+    "beach_pool": "a poolside lounge chair",
+    "stage": "a stool",
+    "outdoor": "a wooden bench"
+   },
+   "framing": "full-body from head to heels, centered",
+   "framing_code": "N",
+   "hips_in_frame": true,
+   "canon_ok": [],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "thigh_merge_cross",
+    "leg_length_perspective",
+    "legs_too_long_vs_torso"
+   ],
+   "expression_hint": "knowing smile",
+   "youth_risk": "none",
+   "notes": "Crossed legs only in exact profile (observed: crossed legs in front view fused the thighs in 9 images).",
+   "prompt": "POSE, joint by joint: camera exactly at her side (90 degrees) at hip height or higher, so both shins stay parallel to the image plane. She sits upright in exact profile on a chair, the pelvis square to the seat. The torso upright with a small lean back, the head turned to the camera, the twist only in neck and head. The right thigh crossed over the left at the knee: the crossing is clearly readable, two separate thigh volumes, a visible gap between the shins; the top shin angled forward-down with the foot pointed, the lower shin vertical with the foot flat; both feet clearly separate; no foreshortening of either shin. Both hands resting on the right knee, fingers relaxed (exactly two arms). Head: head turned to the viewer.",
+   "rear_emphasis": false,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "S03_table_edge_leg_extended",
+   "name": "Perched on a table edge, one leg extended sideways",
+   "category": "leg_focus_seated",
+   "camera": "camera at her front-left three-quarter at hip height or higher",
+   "joints": {
+    "pelvis": "she perches on the table edge with the pelvis turned about 45 degrees from the camera",
+    "spine": "the torso leans back slightly on her arms, the shoulders turned about 25 degrees, the head tilted toward the viewer",
+    "legs": "the right leg extended diagonally ACROSS the frame (parallel to the image plane, not toward the camera) with the knee soft and the toe pointed, the left knee bent with the foot on the rung of a chair, the two thighs clearly separate and not opened toward the camera",
+    "arms": "both hands behind her on the table edge, the arms straight (exactly two arms)",
+    "head": "chin lifted, eyes on the viewer"
+   },
+   "yaw_deg": {
+    "pelvis": 45,
+    "shoulders": 25,
+    "head": 5
+   },
+   "boldness": 4,
+   "suited": {
+    "long": "cond",
+    "mini": "cond",
+    "leo": "ok",
+    "swim": "cond",
+    "robe": "cond"
+   },
+   "contexts": [
+    "indoor",
+    "outdoor",
+    "stage",
+    "beach_pool"
+   ],
+   "prop": {
+    "default": "the edge of the lacquer table",
+    "beach_pool": "the edge of a poolside bar",
+    "stage": "a flight case",
+    "outdoor": "a low stone wall"
+   },
+   "framing": "full-body from head to heels, centered",
+   "framing_code": "N",
+   "hips_in_frame": true,
+   "canon_ok": [],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "leg_length_perspective",
+    "thigh_oversize"
+   ],
+   "expression_hint": "smug smile",
+   "youth_risk": "none",
+   "notes": "Unsafe in short skirts if the camera drops below the table top; keep camera at hip height.",
+   "prompt": "POSE, joint by joint: camera at her front-left three-quarter at hip height or higher. She perches on the table edge with the pelvis turned about 45 degrees from the camera. The torso leans back slightly on her arms, the shoulders turned about 25 degrees, the head tilted toward the viewer. The right leg extended diagonally ACROSS the frame (parallel to the image plane, not toward the camera) with the knee soft and the toe pointed, the left knee bent with the foot on the rung of a chair, the two thighs clearly separate and not opened toward the camera. Both hands behind her on the table edge, the arms straight (exactly two arms). Head: chin lifted, eyes on the viewer.",
+   "rear_emphasis": false,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "S04_side_sit_floor_hip",
+   "name": "Side-sit on the floor, weight on one hip",
+   "category": "leg_focus_seated",
+   "camera": "camera at her front-right three-quarter, slightly above hip height",
+   "joints": {
+    "pelvis": "she sits on the cushion on her right hip, the pelvis turned about 70 degrees from the camera",
+    "spine": "the torso upright and turned toward the viewer about 30 degrees, one hand supporting her, the spine in a gentle S-curve",
+    "legs": "both knees together and bent, angled to the viewer's left, the shins sweeping out behind and to the left, the feet visible and separate, the thighs full, together, and not wider than the hips",
+    "arms": "the right hand planted on the cushion beside her hip, the left hand tucking her hair behind the ear (exactly two arms)",
+    "head": "head tilted to the viewer"
+   },
+   "yaw_deg": {
+    "pelvis": 70,
+    "shoulders": 40,
+    "head": 15
+   },
+   "boldness": 4,
+   "suited": {
+    "long": "ok",
+    "mini": "ok",
+    "leo": "ok",
+    "swim": "ok",
+    "robe": "ok"
+   },
+   "contexts": [
+    "indoor",
+    "outdoor",
+    "stage",
+    "beach_pool"
+   ],
+   "prop": {
+    "default": "a silk floor cushion",
+    "beach_pool": "a beach towel",
+    "stage": "the stage floor"
+   },
+   "framing": "full-body from head to heels, centered",
+   "framing_code": "N",
+   "hips_in_frame": true,
+   "canon_ok": [],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "thigh_oversize",
+    "thigh_merge_cross"
+   ],
+   "expression_hint": "dreamy smile",
+   "youth_risk": "low",
+   "notes": "Never wariza (knees in, feet out): it reads as childlike.",
+   "prompt": "POSE, joint by joint: camera at her front-right three-quarter, slightly above hip height. She sits on the cushion on her right hip, the pelvis turned about 70 degrees from the camera. The torso upright and turned toward the viewer about 30 degrees, one hand supporting her, the spine in a gentle S-curve. Both knees together and bent, angled to the viewer's left, the shins sweeping out behind and to the left, the feet visible and separate, the thighs full, together, and not wider than the hips. The right hand planted on the cushion beside her hip, the left hand tucking her hair behind the ear (exactly two arms). Head: head tilted to the viewer.",
+   "rear_emphasis": false,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "S05_stool_profile_heel_hook",
+   "name": "Bar stool in profile, heel hooked on the rung",
+   "category": "leg_focus_seated",
+   "camera": "camera at her side (90 degrees) at hip height or higher",
+   "joints": {
+    "pelvis": "she sits on the stool in profile with the pelvis square to the seat",
+    "spine": "the torso leans back slightly against one raised forearm, the head turned to the viewer",
+    "legs": "the near foot hooked on the stool rung with the knee bent about 90 degrees, the far leg extended forward-down with the toe pointed, both legs parallel to the image plane, two clearly separate legs and feet",
+    "arms": "the right forearm resting on the bar behind her, the left hand holding a glass or a cup (exactly two arms)",
+    "head": "chin lifted, glancing at the viewer"
+   },
+   "yaw_deg": {
+    "pelvis": 90,
+    "shoulders": 60,
+    "head": 20
+   },
+   "boldness": 3,
+   "suited": {
+    "long": "cond",
+    "mini": "cond",
+    "leo": "ok",
+    "swim": "cond",
+    "robe": "cond"
+   },
+   "contexts": [
+    "indoor",
+    "outdoor",
+    "stage",
+    "beach_pool"
+   ],
+   "prop": {
+    "default": "a tall bar stool at a counter",
+    "beach_pool": "a pool-bar stool",
+    "stage": "a tall stool",
+    "outdoor": "a tall wooden barrel stool at a stall"
+   },
+   "framing": "full-body from head to heels, centered",
+   "framing_code": "N",
+   "hips_in_frame": true,
+   "canon_ok": [],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "leg_length_perspective"
+   ],
+   "expression_hint": "cool sly smile",
+   "youth_risk": "none",
+   "notes": "",
+   "prompt": "POSE, joint by joint: camera at her side (90 degrees) at hip height or higher. She sits on the stool in profile with the pelvis square to the seat. The torso leans back slightly against one raised forearm, the head turned to the viewer. The near foot hooked on the stool rung with the knee bent about 90 degrees, the far leg extended forward-down with the toe pointed, both legs parallel to the image plane, two clearly separate legs and feet. The right forearm resting on the bar behind her, the left hand holding a glass or a cup (exactly two arms). Head: chin lifted, glancing at the viewer.",
+   "rear_emphasis": false,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "T01_side_stride_contrapposto",
+   "name": "Side stride, contrapposto, hand on hip",
+   "category": "leg_focus_standing",
+   "camera": "camera at her front-left three-quarter, portrait lens, at hip height",
+   "joints": {
+    "pelvis": "pelvis turned about 40 degrees from the camera with one hip lifted, weight on the back leg",
+    "spine": "the shoulders turned about 15 degrees the other way, the head toward the viewer",
+    "legs": "the near leg stepped out ACROSS the frame to the side (not toward the camera) with a soft knee and the foot flat, the weight leg straight, the two thighs clearly separate, each thigh narrower than the pelvis, a visible knee and a tapering calf",
+    "arms": "the right hand on the right hip, the left hand relaxed at her side",
+    "head": "eyes on the viewer"
+   },
+   "yaw_deg": {
+    "pelvis": 40,
+    "shoulders": 15,
+    "head": 0
+   },
+   "boldness": 3,
+   "suited": {
+    "long": "ok",
+    "mini": "cond",
+    "leo": "ok",
+    "swim": "ok",
+    "robe": "ok"
+   },
+   "contexts": [
+    "indoor",
+    "outdoor",
+    "stage",
+    "beach_pool"
+   ],
+   "prop": {},
+   "framing": "full-body from head to heels, centered",
+   "framing_code": "N",
+   "hips_in_frame": true,
+   "canon_ok": [
+    "base"
+   ],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "thigh_oversize",
+    "leg_length_perspective"
+   ],
+   "expression_hint": "confident smirk",
+   "youth_risk": "none",
+   "notes": "",
+   "prompt": "POSE, joint by joint: camera at her front-left three-quarter, portrait lens, at hip height. Pelvis turned about 40 degrees from the camera with one hip lifted, weight on the back leg. The shoulders turned about 15 degrees the other way, the head toward the viewer. The near leg stepped out ACROSS the frame to the side (not toward the camera) with a soft knee and the foot flat, the weight leg straight, the two thighs clearly separate, each thigh narrower than the pelvis, a visible knee and a tapering calf. The right hand on the right hip, the left hand relaxed at her side. Head: eyes on the viewer.",
+   "rear_emphasis": false,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "T02_one_leg_lifted_behind",
+   "name": "One leg lifted behind, hands in hair",
+   "category": "leg_focus_standing",
+   "camera": "camera in front of her at hip height",
+   "joints": {
+    "pelvis": "pelvis facing the camera, level, the weight on the left leg",
+    "spine": "the torso leans back about 10 degrees, the head tilted",
+    "legs": "she stands on the straight left leg with the foot flat; the right knee is bent about 100 degrees and the right shin lifted behind her with the foot raised no higher than knee height, the thighs proportionate and clearly separate",
+    "arms": "both hands raised to touch her hair (exactly two arms, two hands)",
+    "head": "head tilted, eyes on the viewer"
+   },
+   "yaw_deg": {
+    "pelvis": 0,
+    "shoulders": 0,
+    "head": 0
+   },
+   "boldness": 4,
+   "suited": {
+    "long": "cond",
+    "mini": "cond",
+    "leo": "ok",
+    "swim": "ok",
+    "robe": "cond"
+   },
+   "contexts": [
+    "indoor",
+    "outdoor",
+    "stage",
+    "beach_pool"
+   ],
+   "prop": {},
+   "framing": "full-body from head to heels, centered",
+   "framing_code": "N",
+   "hips_in_frame": true,
+   "canon_ok": [
+    "base",
+    "win"
+   ],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "thigh_oversize",
+    "impossible_pose",
+    "extra_limb"
+   ],
+   "expression_hint": "cheeky wink",
+   "youth_risk": "none",
+   "notes": "Bake-off pose f (V1h 3/3). The raised foot never rises above knee height of the standing leg.",
+   "prompt": "POSE, joint by joint: camera in front of her at hip height. Pelvis facing the camera, level, the weight on the left leg. The torso leans back about 10 degrees, the head tilted. She stands on the straight left leg with the foot flat; the right knee is bent about 100 degrees and the right shin lifted behind her with the foot raised no higher than knee height, the thighs proportionate and clearly separate. Both hands raised to touch her hair (exactly two arms, two hands). Head: head tilted, eyes on the viewer.",
+   "rear_emphasis": false,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "T03_knee_pop_wall_lean",
+   "name": "Back against a wall, one foot on the wall",
+   "category": "leg_focus_standing",
+   "camera": "camera in front of her at hip height, her profile three-quarter",
+   "joints": {
+    "pelvis": "her back and the pelvis against a wall, the pelvis turned about 30 degrees",
+    "spine": "the shoulders against the wall, the head tilted toward the viewer",
+    "legs": "the left leg straight and carrying the weight; the right foot placed flat on the wall behind, the knee bent and pointing out to the side (not toward the camera), the two thighs clearly separate",
+    "arms": "the hands tucked behind her, resting on the wall, or one hand in her hair (exactly two arms)",
+    "head": "head tilted, sly look"
+   },
+   "yaw_deg": {
+    "pelvis": 30,
+    "shoulders": 10,
+    "head": 0
+   },
+   "boldness": 4,
+   "suited": {
+    "long": "cond",
+    "mini": "no",
+    "leo": "ok",
+    "swim": "ok",
+    "robe": "cond"
+   },
+   "contexts": [
+    "indoor",
+    "outdoor",
+    "stage",
+    "beach_pool"
+   ],
+   "prop": {
+    "default": "a plain wall",
+    "beach_pool": "a whitewashed wall",
+    "stage": "a backstage wall",
+    "outdoor": "a plain wall"
+   },
+   "framing": "full-body from head to heels, centered",
+   "framing_code": "N",
+   "hips_in_frame": true,
+   "canon_ok": [],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "leg_length_perspective",
+    "underwear_read"
+   ],
+   "expression_hint": "sly smile",
+   "youth_risk": "none",
+   "notes": "Raised knee: unsafe in short skirts.",
+   "prompt": "POSE, joint by joint: camera in front of her at hip height, her profile three-quarter. Her back and the pelvis against a wall, the pelvis turned about 30 degrees. The shoulders against the wall, the head tilted toward the viewer. The left leg straight and carrying the weight; the right foot placed flat on the wall behind, the knee bent and pointing out to the side (not toward the camera), the two thighs clearly separate. The hands tucked behind her, resting on the wall, or one hand in her hair (exactly two arms). Head: head tilted, sly look.",
+   "rear_emphasis": false,
+   "unsafe_in_skirts": true,
+   "unsafe_classes": [
+    "mini"
+   ],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "T04_hand_on_thigh_band",
+   "name": "Hand tracing the stocking band, soft hip",
+   "category": "leg_focus_standing",
+   "camera": "camera in front of her, three-quarter, at hip height",
+   "joints": {
+    "pelvis": "pelvis turned about 35 degrees, the weight on the left leg, one hip lifted",
+    "spine": "the torso bent forward about 10 degrees toward the hand, the head turned to the viewer",
+    "legs": "the left leg straight, the right foot stepped forward on its toe with the knee turned slightly outward, the thighs close but two clearly separate legs; the stocking top or thigh band in view",
+    "arms": "the right hand rests lightly on the outer right thigh just above the stocking top, the left hand on the waist",
+    "head": "eyes on the viewer"
+   },
+   "yaw_deg": {
+    "pelvis": 35,
+    "shoulders": 15,
+    "head": 0
+   },
+   "boldness": 4,
+   "suited": {
+    "long": "ok",
+    "mini": "cond",
+    "leo": "ok",
+    "swim": "ok",
+    "robe": "ok"
+   },
+   "contexts": [
+    "indoor",
+    "outdoor",
+    "stage",
+    "beach_pool"
+   ],
+   "prop": {},
+   "framing": "full-body from head to heels, centered",
+   "framing_code": "N",
+   "hips_in_frame": true,
+   "canon_ok": [
+    "base"
+   ],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "thigh_merge_cross",
+    "underwear_read"
+   ],
+   "expression_hint": "teasing half-smile",
+   "youth_risk": "none",
+   "notes": "",
+   "prompt": "POSE, joint by joint: camera in front of her, three-quarter, at hip height. Pelvis turned about 35 degrees, the weight on the left leg, one hip lifted. The torso bent forward about 10 degrees toward the hand, the head turned to the viewer. The left leg straight, the right foot stepped forward on its toe with the knee turned slightly outward, the thighs close but two clearly separate legs; the stocking top or thigh band in view. The right hand rests lightly on the outer right thigh just above the stocking top, the left hand on the waist. Head: eyes on the viewer.",
+   "rear_emphasis": false,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "T05_profile_stride",
+   "name": "Exact profile stride, hair streaming",
+   "category": "leg_focus_standing",
+   "camera": "camera at her side (90 degrees) at hip height",
+   "joints": {
+    "pelvis": "pelvis in exact profile, level, rotating with the stride",
+    "spine": "the torso upright, the chest up, the head turned slightly toward the viewer",
+    "legs": "mid-stride: the front leg straight with the heel touching, the rear leg on its toe, both legs parallel to the image plane, a visible knee and a tapering calf on each, the thighs proportionate",
+    "arms": "the near arm swings back, the far arm forward (exactly two arms)",
+    "head": "head turned slightly to the viewer, a smile"
+   },
+   "yaw_deg": {
+    "pelvis": 90,
+    "shoulders": 80,
+    "head": 30
+   },
+   "boldness": 3,
+   "suited": {
+    "long": "ok",
+    "mini": "cond",
+    "leo": "ok",
+    "swim": "ok",
+    "robe": "ok"
+   },
+   "contexts": [
+    "indoor",
+    "outdoor",
+    "stage",
+    "beach_pool"
+   ],
+   "prop": {},
+   "framing": "full-body from head to heels, centered",
+   "framing_code": "N",
+   "hips_in_frame": true,
+   "canon_ok": [
+    "win"
+   ],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "leg_length_perspective"
+   ],
+   "expression_hint": "bright smile",
+   "youth_risk": "none",
+   "notes": "",
+   "prompt": "POSE, joint by joint: camera at her side (90 degrees) at hip height. Pelvis in exact profile, level, rotating with the stride. The torso upright, the chest up, the head turned slightly toward the viewer. Mid-stride: the front leg straight with the heel touching, the rear leg on its toe, both legs parallel to the image plane, a visible knee and a tapering calf on each, the thighs proportionate. The near arm swings back, the far arm forward (exactly two arms). Head: head turned slightly to the viewer, a smile.",
+   "rear_emphasis": false,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "B01_lean_hands_on_knees",
+   "name": "Leaning forward, hands on knees, bust-forward",
+   "category": "bust_focus",
+   "camera": "camera in front of her at chest height, portrait lens",
+   "joints": {
+    "pelvis": "pelvis square to the camera, pushed slightly back",
+    "spine": "she bends forward about 35 degrees from the hips, the back straight, the shoulders back, the head tilted toward the viewer",
+    "legs": "knees slightly bent and apart no wider than the hips",
+    "arms": "both hands on her knees with the elbows slightly bent (exactly two arms)",
+    "head": "eyes on the viewer"
+   },
+   "yaw_deg": {
+    "pelvis": 0,
+    "shoulders": 0,
+    "head": 0
+   },
+   "boldness": 4,
+   "suited": {
+    "long": "ok",
+    "mini": "ok",
+    "leo": "ok",
+    "swim": "ok",
+    "robe": "ok"
+   },
+   "contexts": [
+    "indoor",
+    "outdoor",
+    "stage",
+    "beach_pool"
+   ],
+   "prop": {},
+   "framing": "waist-up to hips, leaning toward the viewer",
+   "framing_code": "F",
+   "hips_in_frame": false,
+   "canon_ok": [
+    "win"
+   ],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "extra_limb"
+   ],
+   "expression_hint": "playful flirty smile",
+   "youth_risk": "none",
+   "notes": "",
+   "prompt": "POSE, joint by joint: camera in front of her at chest height, portrait lens. Pelvis square to the camera, pushed slightly back. She bends forward about 35 degrees from the hips, the back straight, the shoulders back, the head tilted toward the viewer. Knees slightly bent and apart no wider than the hips. Both hands on her knees with the elbows slightly bent (exactly two arms). Head: eyes on the viewer.",
+   "rear_emphasis": false,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "B02_forearm_on_counter_collar",
+   "name": "One forearm on a counter, hand at the collar line",
+   "category": "bust_focus",
+   "camera": "camera in front of her at chest height, three-quarter",
+   "joints": {
+    "pelvis": "pelvis turned about 30 degrees, the hip leaning on the counter",
+    "spine": "she leans on her left forearm, the torso turned about 25 degrees toward the viewer, the shoulders open",
+    "legs": "weight on the right leg, the left knee soft",
+    "arms": "the left forearm on the counter, the right fingertips resting at the edge of the neckline trim (the closure still covers the chest)",
+    "head": "head tilted, half-lidded eyes"
+   },
+   "yaw_deg": {
+    "pelvis": 30,
+    "shoulders": 25,
+    "head": 0
+   },
+   "boldness": 4,
+   "suited": {
+    "long": "ok",
+    "mini": "ok",
+    "leo": "ok",
+    "swim": "ok",
+    "robe": "ok"
+   },
+   "contexts": [
+    "indoor",
+    "outdoor",
+    "stage",
+    "beach_pool"
+   ],
+   "prop": {
+    "default": "a lacquer counter",
+    "beach_pool": "a bar counter",
+    "stage": "a mixing desk",
+    "outdoor": "a stall counter"
+   },
+   "framing": "waist-up to hips, leaning toward the viewer",
+   "framing_code": "F",
+   "hips_in_frame": false,
+   "canon_ok": [],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "clothing_logic"
+   ],
+   "expression_hint": "sly half-lidded smile",
+   "youth_risk": "none",
+   "notes": "",
+   "prompt": "POSE, joint by joint: camera in front of her at chest height, three-quarter. Pelvis turned about 30 degrees, the hip leaning on the counter. She leans on her left forearm, the torso turned about 25 degrees toward the viewer, the shoulders open. Weight on the right leg, the left knee soft. The left forearm on the counter, the right fingertips resting at the edge of the neckline trim (the closure still covers the chest). Head: head tilted, half-lidded eyes.",
+   "rear_emphasis": false,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "B03_arms_overhead_stretch_front",
+   "name": "Arms overhead stretch, chest lifted",
+   "category": "bust_focus",
+   "camera": "camera in front of her at chest height, portrait lens",
+   "joints": {
+    "pelvis": "pelvis square, slightly tilted, weight on one leg",
+    "spine": "both arms raised overhead with the fingers interlaced, a gentle back arch, the chest lifted, the shoulders back",
+    "legs": "the weight on the left leg, the right knee slightly bent",
+    "arms": "both arms stretched up with the elbows straight and the fingers interlaced (exactly two arms)",
+    "head": "head tilted back slightly, eyes half-closed"
+   },
+   "yaw_deg": {
+    "pelvis": 0,
+    "shoulders": 0,
+    "head": 0
+   },
+   "boldness": 4,
+   "suited": {
+    "long": "ok",
+    "mini": "ok",
+    "leo": "ok",
+    "swim": "ok",
+    "robe": "ok"
+   },
+   "contexts": [
+    "indoor",
+    "outdoor",
+    "stage",
+    "beach_pool"
+   ],
+   "prop": {},
+   "framing": "three-quarter figure from head to mid-thigh, centered",
+   "framing_code": "N",
+   "hips_in_frame": false,
+   "canon_ok": [
+    "base",
+    "win"
+   ],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "extra_limb"
+   ],
+   "expression_hint": "blissful smile",
+   "youth_risk": "none",
+   "notes": "",
+   "prompt": "POSE, joint by joint: camera in front of her at chest height, portrait lens. Pelvis square, slightly tilted, weight on one leg. Both arms raised overhead with the fingers interlaced, a gentle back arch, the chest lifted, the shoulders back. The weight on the left leg, the right knee slightly bent. Both arms stretched up with the elbows straight and the fingers interlaced (exactly two arms). Head: head tilted back slightly, eyes half-closed.",
+   "rear_emphasis": false,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "B04_hands_behind_head_elbows_wide",
+   "name": "Hands behind the head, elbows wide",
+   "category": "bust_focus",
+   "camera": "camera in front of her at chest height, three-quarter",
+   "joints": {
+    "pelvis": "pelvis turned about 25 degrees, one hip lifted",
+    "spine": "both hands behind the head, the elbows wide, the chest lifted, the shoulders back, the head turned slightly",
+    "legs": "weight on one leg, the other knee soft",
+    "arms": "both hands clasped behind the head with the elbows pointing out to the sides (exactly two arms)",
+    "head": "eyes on the viewer, a lazy smile"
+   },
+   "yaw_deg": {
+    "pelvis": 25,
+    "shoulders": 10,
+    "head": 0
+   },
+   "boldness": 4,
+   "suited": {
+    "long": "ok",
+    "mini": "ok",
+    "leo": "ok",
+    "swim": "ok",
+    "robe": "ok"
+   },
+   "contexts": [
+    "indoor",
+    "outdoor",
+    "stage",
+    "beach_pool"
+   ],
+   "prop": {},
+   "framing": "three-quarter figure from head to mid-thigh, centered",
+   "framing_code": "N",
+   "hips_in_frame": false,
+   "canon_ok": [
+    "base"
+   ],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "extra_limb"
+   ],
+   "expression_hint": "lazy teasing smile",
+   "youth_risk": "none",
+   "notes": "",
+   "prompt": "POSE, joint by joint: camera in front of her at chest height, three-quarter. Pelvis turned about 25 degrees, one hip lifted. Both hands behind the head, the elbows wide, the chest lifted, the shoulders back, the head turned slightly. Weight on one leg, the other knee soft. Both hands clasped behind the head with the elbows pointing out to the sides (exactly two arms). Head: eyes on the viewer, a lazy smile.",
+   "rear_emphasis": false,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "B05_neckline_edge_fingertip",
+   "name": "Fingertip at the neckline trim",
+   "category": "bust_focus",
+   "camera": "camera in front of her at chest height, three-quarter",
+   "joints": {
+    "pelvis": "pelvis turned about 25 degrees",
+    "spine": "the torso turned about 20 degrees, the shoulders back, the head tilted to the viewer",
+    "legs": "weight on the left leg",
+    "arms": "one fingertip hooks the edge of the neckline trim without moving it (the closure and the lined fabric still cover the chest), the other hand rests on the waist",
+    "head": "half-lidded eyes, parted lips"
+   },
+   "yaw_deg": {
+    "pelvis": 25,
+    "shoulders": 20,
+    "head": 0
+   },
+   "boldness": 4,
+   "suited": {
+    "long": "ok",
+    "mini": "ok",
+    "leo": "ok",
+    "swim": "ok",
+    "robe": "ok"
+   },
+   "contexts": [
+    "indoor",
+    "outdoor",
+    "stage",
+    "beach_pool"
+   ],
+   "prop": {},
+   "framing": "waist-up to hips, leaning toward the viewer",
+   "framing_code": "F",
+   "hips_in_frame": false,
+   "canon_ok": [],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "clothing_logic"
+   ],
+   "expression_hint": "flushed half-lidded smile",
+   "youth_risk": "none",
+   "notes": "",
+   "prompt": "POSE, joint by joint: camera in front of her at chest height, three-quarter. Pelvis turned about 25 degrees. The torso turned about 20 degrees, the shoulders back, the head tilted to the viewer. Weight on the left leg. One fingertip hooks the edge of the neckline trim without moving it (the closure and the lined fabric still cover the chest), the other hand rests on the waist. Head: half-lidded eyes, parted lips.",
+   "rear_emphasis": false,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "B06_forearms_under_bust",
+   "name": "Forearms crossed under the bust, shoulders back",
+   "category": "bust_focus",
+   "camera": "camera in front of her at chest height, portrait lens",
+   "joints": {
+    "pelvis": "pelvis square, one hip slightly tilted",
+    "spine": "the shoulders back, the chest forward, the head tilted",
+    "legs": "weight on one leg",
+    "arms": "both forearms crossed loosely under the bust (exactly two arms)",
+    "head": "chin down, eyes up at the viewer"
+   },
+   "yaw_deg": {
+    "pelvis": 0,
+    "shoulders": 0,
+    "head": 0
+   },
+   "boldness": 4,
+   "suited": {
+    "long": "ok",
+    "mini": "ok",
+    "leo": "ok",
+    "swim": "ok",
+    "robe": "ok"
+   },
+   "contexts": [
+    "indoor",
+    "outdoor",
+    "stage",
+    "beach_pool"
+   ],
+   "prop": {},
+   "framing": "waist-up to hips, leaning toward the viewer",
+   "framing_code": "F",
+   "hips_in_frame": false,
+   "canon_ok": [
+    "base"
+   ],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "extra_limb"
+   ],
+   "expression_hint": "smug smile",
+   "youth_risk": "none",
+   "notes": "",
+   "prompt": "POSE, joint by joint: camera in front of her at chest height, portrait lens. Pelvis square, one hip slightly tilted. The shoulders back, the chest forward, the head tilted. Weight on one leg. Both forearms crossed loosely under the bust (exactly two arms). Head: chin down, eyes up at the viewer.",
+   "rear_emphasis": false,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "B07_side_profile_arch",
+   "name": "Side profile, back arched, chest forward",
+   "category": "bust_focus",
+   "camera": "camera at her side (90 degrees) at chest height",
+   "joints": {
+    "pelvis": "pelvis in profile, a slight forward tilt",
+    "spine": "an arch in the upper back, the chest forward, the head turned to the viewer",
+    "legs": "weight on the near leg, the far knee soft",
+    "arms": "the near hand on the lower back, the far hand in her hair (exactly two arms)",
+    "head": "head turned to the viewer"
+   },
+   "yaw_deg": {
+    "pelvis": 90,
+    "shoulders": 80,
+    "head": 30
+   },
+   "boldness": 4,
+   "suited": {
+    "long": "ok",
+    "mini": "ok",
+    "leo": "ok",
+    "swim": "ok",
+    "robe": "ok"
+   },
+   "contexts": [
+    "indoor",
+    "outdoor",
+    "stage",
+    "beach_pool"
+   ],
+   "prop": {},
+   "framing": "three-quarter figure from head to mid-thigh, centered",
+   "framing_code": "N",
+   "hips_in_frame": false,
+   "canon_ok": [],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "extra_limb",
+    "torso_hip_twist_break"
+   ],
+   "expression_hint": "knowing smile",
+   "youth_risk": "none",
+   "notes": "",
+   "prompt": "POSE, joint by joint: camera at her side (90 degrees) at chest height. Pelvis in profile, a slight forward tilt. An arch in the upper back, the chest forward, the head turned to the viewer. Weight on the near leg, the far knee soft. The near hand on the lower back, the far hand in her hair (exactly two arms). Head: head turned to the viewer.",
+   "rear_emphasis": false,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "B08_pillar_arm_up_chest_open",
+   "name": "Leaning on a pillar, arm up, chest open",
+   "category": "bust_focus",
+   "camera": "camera in front of her at chest height, three-quarter",
+   "joints": {
+    "pelvis": "pelvis turned about 30 degrees, one hip tilted",
+    "spine": "the left arm raised along the pillar above the head, the torso opened toward the viewer, the head tilted",
+    "legs": "weight on the right leg, the left knee soft",
+    "arms": "the left forearm along the pillar, the right hand on the hip (exactly two arms)",
+    "head": "eyes on the viewer, a teasing half-smile"
+   },
+   "yaw_deg": {
+    "pelvis": 30,
+    "shoulders": 20,
+    "head": 0
+   },
+   "boldness": 4,
+   "suited": {
+    "long": "ok",
+    "mini": "ok",
+    "leo": "ok",
+    "swim": "ok",
+    "robe": "ok"
+   },
+   "contexts": [
+    "indoor",
+    "outdoor",
+    "stage",
+    "beach_pool"
+   ],
+   "prop": {
+    "default": "a lacquered pillar",
+    "beach_pool": "a beach-bar pillar",
+    "stage": "a truss pillar",
+    "outdoor": "a wooden pillar"
+   },
+   "framing": "three-quarter figure from head to mid-thigh, centered",
+   "framing_code": "N",
+   "hips_in_frame": false,
+   "canon_ok": [
+    "base"
+   ],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "extra_limb"
+   ],
+   "expression_hint": "teasing half-smile",
+   "youth_risk": "none",
+   "notes": "",
+   "prompt": "POSE, joint by joint: camera in front of her at chest height, three-quarter. Pelvis turned about 30 degrees, one hip tilted. The left arm raised along the pillar above the head, the torso opened toward the viewer, the head tilted. Weight on the right leg, the left knee soft. The left forearm along the pillar, the right hand on the hip (exactly two arms). Head: eyes on the viewer, a teasing half-smile.",
+   "rear_emphasis": false,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "B09_tea_sip_lean_glance",
+   "name": "Sipping tea, leaning in, glance over the rim",
+   "category": "bust_focus",
+   "camera": "camera in front of her at chest height, portrait lens",
+   "joints": {
+    "pelvis": "pelvis square, seated or standing at the table",
+    "spine": "she leans forward about 25 degrees with the forearms on the table, the chest toward the viewer, the head lowered, the eyes up",
+    "legs": "knees together under the table or standing straight",
+    "arms": "both hands cupping a small tea bowl at her lips, the forearms on the table (exactly two arms)",
+    "head": "eyes over the rim of the bowl"
+   },
+   "yaw_deg": {
+    "pelvis": 0,
+    "shoulders": 0,
+    "head": 0
+   },
+   "boldness": 3,
+   "suited": {
+    "long": "ok",
+    "mini": "ok",
+    "leo": "ok",
+    "swim": "ok",
+    "robe": "ok"
+   },
+   "contexts": [
+    "indoor",
+    "outdoor",
+    "stage",
+    "beach_pool"
+   ],
+   "prop": {
+    "default": "a low tea table and a small tea bowl",
+    "beach_pool": "a bar counter and a small cup",
+    "stage": "a small cup",
+    "outdoor": "a low outdoor tea table and a small tea bowl"
+   },
+   "framing": "waist-up, the bowl in the foreground",
+   "framing_code": "F",
+   "hips_in_frame": false,
+   "canon_ok": [],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "extra_limb"
+   ],
+   "expression_hint": "amused glance",
+   "youth_risk": "none",
+   "notes": "",
+   "prompt": "POSE, joint by joint: camera in front of her at chest height, portrait lens. Pelvis square, seated or standing at the table. She leans forward about 25 degrees with the forearms on the table, the chest toward the viewer, the head lowered, the eyes up. Knees together under the table or standing straight. Both hands cupping a small tea bowl at her lips, the forearms on the table (exactly two arms). Head: eyes over the rim of the bowl.",
+   "rear_emphasis": false,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "Y01_side_lying_hip_up_elbow",
+   "name": "Lying on the side, propped on an elbow, hip up",
+   "category": "lying",
+   "camera": "camera in front of her at about hip height of the lying figure or slightly above, looking across the body, never from the feet",
+   "joints": {
+    "pelvis": "she lies on her left side, the pelvis turned about 60 degrees toward the camera, the waist dipping and the upper hip rising in one smooth curve",
+    "spine": "the left forearm props the upper body, the shoulders turned about 40 degrees toward the viewer, the head tilted",
+    "legs": "legs stacked and extended ALONG the image plane to the viewer's right (never toward the camera): the lower leg extended, the upper leg bent forward at the knee in front of it, both feet visible, thighs full and soft and separate at the knee",
+    "arms": "the left forearm on the cushion, the right hand resting on the upper hip (exactly two arms)",
+    "head": "head tilted toward the viewer"
+   },
+   "yaw_deg": {
+    "pelvis": 60,
+    "shoulders": 40,
+    "head": 10
+   },
+   "boldness": 5,
+   "suited": {
+    "long": "ok",
+    "mini": "cond",
+    "leo": "ok",
+    "swim": "ok",
+    "robe": "ok"
+   },
+   "contexts": [
+    "indoor",
+    "bed",
+    "beach_pool"
+   ],
+   "prop": {
+    "default": "a chaise longue",
+    "beach_pool": "a sunbed",
+    "stage": "a stage riser with cushions"
+   },
+   "framing": "full-body from head to heels, centered",
+   "framing_code": "N",
+   "hips_in_frame": true,
+   "canon_ok": [],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "leg_length_perspective",
+    "thigh_oversize",
+    "thigh_merge_cross"
+   ],
+   "expression_hint": "lazy teasing smile",
+   "youth_risk": "none",
+   "notes": "Bake-off pose e (V1h 3/3; V2 mannequin made it worse). Legs run across the frame, never toward the lens (owner flagged Yue swim_C).",
+   "prompt": "POSE, joint by joint: camera in front of her at about hip height of the lying figure or slightly above, looking across the body, never from the feet. She lies on her left side, the pelvis turned about 60 degrees toward the camera, the waist dipping and the upper hip rising in one smooth curve. The left forearm props the upper body, the shoulders turned about 40 degrees toward the viewer, the head tilted. Legs stacked and extended ALONG the image plane to the viewer's right (never toward the camera): the lower leg extended, the upper leg bent forward at the knee in front of it, both feet visible, thighs full and soft and separate at the knee. The left forearm on the cushion, the right hand resting on the upper hip (exactly two arms). Head: head tilted toward the viewer.",
+   "rear_emphasis": false,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "Y02_side_lying_rear_look_back",
+   "name": "Lying on the side, hips toward the camera, looking back",
+   "category": "lying",
+   "camera": "camera behind her and above, at hip height of the lying figure, three-quarter rear",
+   "joints": {
+    "pelvis": "she lies on her right side with her back toward the camera, the pelvis turned about 130 degrees away, the rear of the hip and thigh in view as one smooth curve from the waist",
+    "spine": "the shoulders turned about 100 degrees, the head turned back about 50 degrees over the left shoulder, the twist continuous",
+    "legs": "legs together and slightly bent at the knees, extended ALONG the image plane to the viewer's left, both feet visible and separate",
+    "arms": "the right arm folded under the head, the left hand resting on her left hip (exactly two arms)",
+    "head": "looking back over the shoulder"
+   },
+   "yaw_deg": {
+    "pelvis": 130,
+    "shoulders": 100,
+    "head": 50
+   },
+   "boldness": 5,
+   "suited": {
+    "long": "ok",
+    "mini": "cond",
+    "leo": "cond",
+    "swim": "cond",
+    "robe": "ok"
+   },
+   "contexts": [
+    "indoor",
+    "bed",
+    "beach_pool"
+   ],
+   "prop": {
+    "default": "a daybed",
+    "beach_pool": "a sunbed",
+    "stage": "cushions"
+   },
+   "framing": "full-body from head to heels, centered",
+   "framing_code": "N",
+   "hips_in_frame": true,
+   "canon_ok": [],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "rear_not_rotated",
+    "underwear_read",
+    "leg_length_perspective"
+   ],
+   "expression_hint": "inviting smile",
+   "youth_risk": "none",
+   "notes": "",
+   "prompt": "POSE, joint by joint: camera behind her and above, at hip height of the lying figure, three-quarter rear. She lies on her right side with her back toward the camera, the pelvis turned about 130 degrees away, the rear of the hip and thigh in view as one smooth curve from the waist. The shoulders turned about 100 degrees, the head turned back about 50 degrees over the left shoulder, the twist continuous. Legs together and slightly bent at the knees, extended ALONG the image plane to the viewer's left, both feet visible and separate. The right arm folded under the head, the left hand resting on her left hip (exactly two arms). Head: looking back over the shoulder.",
+   "rear_emphasis": true,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "Y03_recline_back_knee_up_profile",
+   "name": "Reclining on pillows, one knee up in profile",
+   "category": "lying",
+   "camera": "camera at her side (about 80 degrees) at hip height or slightly above",
+   "joints": {
+    "pelvis": "she reclines on her back on cushions, the pelvis flat with the hips level",
+    "spine": "the upper body propped on cushions at about 40 degrees, the shoulders turned slightly to the viewer, the head tilted to the camera",
+    "legs": "the near leg extended along the daybed in profile; the far leg bent with the thigh vertical and the knee pointing up, in profile (never toward the camera), the two legs together at the knees, the feet visible",
+    "arms": "one arm behind the head, the other resting along the body (exactly two arms)",
+    "head": "head tilted to the viewer"
+   },
+   "yaw_deg": {
+    "pelvis": 80,
+    "shoulders": 55,
+    "head": 20
+   },
+   "boldness": 4,
+   "suited": {
+    "long": "ok",
+    "mini": "no",
+    "leo": "cond",
+    "swim": "cond",
+    "robe": "ok"
+   },
+   "contexts": [
+    "indoor",
+    "bed",
+    "beach_pool"
+   ],
+   "prop": {
+    "default": "a cushioned daybed",
+    "beach_pool": "a sunbed",
+    "stage": "a stack of cushions"
+   },
+   "framing": "full-body from head to heels, centered",
+   "framing_code": "N",
+   "hips_in_frame": true,
+   "canon_ok": [],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "leg_length_perspective",
+    "underwear_read"
+   ],
+   "expression_hint": "dreamy half-lidded smile",
+   "youth_risk": "none",
+   "notes": "Raised knee: unsafe in short skirts.",
+   "prompt": "POSE, joint by joint: camera at her side (about 80 degrees) at hip height or slightly above. She reclines on her back on cushions, the pelvis flat with the hips level. The upper body propped on cushions at about 40 degrees, the shoulders turned slightly to the viewer, the head tilted to the camera. The near leg extended along the daybed in profile; the far leg bent with the thigh vertical and the knee pointing up, in profile (never toward the camera), the two legs together at the knees, the feet visible. One arm behind the head, the other resting along the body (exactly two arms). Head: head tilted to the viewer.",
+   "rear_emphasis": false,
+   "unsafe_in_skirts": true,
+   "unsafe_classes": [
+    "mini"
+   ],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "Y04_prone_elbows_arched_rear",
+   "name": "Prone on the elbows, back arched, seen from behind-side",
+   "category": "lying",
+   "camera": "camera behind-side at hip height of the figure, slightly above",
+   "joints": {
+    "pelvis": "she lies prone with the pelvis resting on the bed, the hips level and the rear of the hips and thighs in view from the rear-side",
+    "spine": "the upper body propped on the forearms, the lower back gently arched, the head turned back about 60 degrees over the left shoulder",
+    "legs": "both legs straight and extended away from the camera along the bed, close together at the knees with a visible gap at the calves, the feet crossed only at the ankles or parallel",
+    "arms": "both forearms flat on the bed under the chest, the hands loosely clasped (exactly two arms)",
+    "head": "looking back over the shoulder"
+   },
+   "yaw_deg": {
+    "pelvis": 170,
+    "shoulders": 120,
+    "head": 60
+   },
+   "boldness": 5,
+   "suited": {
+    "long": "ok",
+    "mini": "cond",
+    "leo": "cond",
+    "swim": "cond",
+    "robe": "ok"
+   },
+   "contexts": [
+    "indoor",
+    "bed",
+    "beach_pool"
+   ],
+   "prop": {
+    "default": "a silk bed",
+    "beach_pool": "a sunbed",
+    "stage": "cushions"
+   },
+   "framing": "full-body from head to heels, centered",
+   "framing_code": "N",
+   "hips_in_frame": true,
+   "canon_ok": [],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "underwear_read",
+    "leg_length_perspective",
+    "clothing_logic"
+   ],
+   "expression_hint": "playful teasing smile",
+   "youth_risk": "none",
+   "notes": "The robe or sarong stays closed over the hips; the legs lie flat, never kicked up (kicking feet reads childlike).",
+   "prompt": "POSE, joint by joint: camera behind-side at hip height of the figure, slightly above. She lies prone with the pelvis resting on the bed, the hips level and the rear of the hips and thighs in view from the rear-side. The upper body propped on the forearms, the lower back gently arched, the head turned back about 60 degrees over the left shoulder. Both legs straight and extended away from the camera along the bed, close together at the knees with a visible gap at the calves, the feet crossed only at the ankles or parallel. Both forearms flat on the bed under the chest, the hands loosely clasped (exactly two arms). Head: looking back over the shoulder.",
+   "rear_emphasis": true,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "Y05_daybed_sprawl_arm_overhead",
+   "name": "Sprawled on a daybed, one arm overhead",
+   "category": "lying",
+   "camera": "camera in front of her at hip height of the figure, slightly above, three-quarter",
+   "joints": {
+    "pelvis": "she lies diagonally on her back with the pelvis turned about 30 degrees to the camera",
+    "spine": "one arm stretched overhead, the head tilted back toward the viewer",
+    "legs": "both legs extended along the daybed to the viewer's right, the ankles stacked, the knees slightly bent, thighs together, two feet visible",
+    "arms": "the right arm overhead on the cushion, the left hand resting on her waist (exactly two arms)",
+    "head": "head tilted, half-lidded eyes"
+   },
+   "yaw_deg": {
+    "pelvis": 30,
+    "shoulders": 20,
+    "head": 10
+   },
+   "boldness": 4,
+   "suited": {
+    "long": "ok",
+    "mini": "cond",
+    "leo": "ok",
+    "swim": "ok",
+    "robe": "ok"
+   },
+   "contexts": [
+    "indoor",
+    "bed",
+    "beach_pool"
+   ],
+   "prop": {
+    "default": "a cushioned daybed",
+    "beach_pool": "a sunbed",
+    "stage": "cushions"
+   },
+   "framing": "full-body from head to heels, centered",
+   "framing_code": "N",
+   "hips_in_frame": true,
+   "canon_ok": [],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "leg_length_perspective",
+    "thigh_oversize"
+   ],
+   "expression_hint": "dreamy flirty smile",
+   "youth_risk": "none",
+   "notes": "",
+   "prompt": "POSE, joint by joint: camera in front of her at hip height of the figure, slightly above, three-quarter. She lies diagonally on her back with the pelvis turned about 30 degrees to the camera. One arm stretched overhead, the head tilted back toward the viewer. Both legs extended along the daybed to the viewer's right, the ankles stacked, the knees slightly bent, thighs together, two feet visible. The right arm overhead on the cushion, the left hand resting on her waist (exactly two arms). Head: head tilted, half-lidded eyes.",
+   "rear_emphasis": false,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "Y06_pillow_hug_side_lying",
+   "name": "Hugging a pillow, lying on the side",
+   "category": "lying",
+   "camera": "camera in front and slightly above, at hip height of the figure",
+   "joints": {
+    "pelvis": "she lies on her side, the pelvis turned about 45 degrees to the camera",
+    "spine": "she hugs a large pillow against her chest with the face over it, the shoulders turned toward the viewer",
+    "legs": "knees drawn up gently, the thighs together and parallel to the image plane, the lower leg extended, both feet visible",
+    "arms": "both arms wrapped around the pillow (exactly two arms)",
+    "head": "eyes over the pillow"
+   },
+   "yaw_deg": {
+    "pelvis": 45,
+    "shoulders": 30,
+    "head": 5
+   },
+   "boldness": 3,
+   "suited": {
+    "long": "ok",
+    "mini": "ok",
+    "leo": "ok",
+    "swim": "ok",
+    "robe": "ok"
+   },
+   "contexts": [
+    "indoor",
+    "bed"
+   ],
+   "prop": {
+    "default": "a big cushion",
+    "beach_pool": "a beach bag as pillow"
+   },
+   "framing": "full-body from head to heels, centered",
+   "framing_code": "N",
+   "hips_in_frame": true,
+   "canon_ok": [],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "extra_limb"
+   ],
+   "expression_hint": "sleepy teasing smile",
+   "youth_risk": "low",
+   "notes": "Pillow hugging is allowed (3b); keep the face adult, never a pout.",
+   "prompt": "POSE, joint by joint: camera in front and slightly above, at hip height of the figure. She lies on her side, the pelvis turned about 45 degrees to the camera. She hugs a large pillow against her chest with the face over it, the shoulders turned toward the viewer. Knees drawn up gently, the thighs together and parallel to the image plane, the lower leg extended, both feet visible. Both arms wrapped around the pillow (exactly two arms). Head: eyes over the pillow.",
+   "rear_emphasis": false,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "Y07_sunbed_recline_legs_side",
+   "name": "Reclining on a sunbed, legs bent to one side",
+   "category": "lying",
+   "camera": "camera in front of her at hip height of the figure, slightly above",
+   "joints": {
+    "pelvis": "she reclines on the sunbed, the pelvis turned about 50 degrees, the hips leaning on the left",
+    "spine": "the upper body propped on the right hand, the shoulders turned toward the viewer, the head tilted",
+    "legs": "both knees together and bent, angled to the viewer's left, the shins and feet to the left, the thighs together and not wider than the hips",
+    "arms": "the right hand behind her on the sunbed, the left hand pushing the hair back (exactly two arms)",
+    "head": "eyes on the viewer"
+   },
+   "yaw_deg": {
+    "pelvis": 50,
+    "shoulders": 25,
+    "head": 5
+   },
+   "boldness": 4,
+   "suited": {
+    "long": "ok",
+    "mini": "cond",
+    "leo": "ok",
+    "swim": "ok",
+    "robe": "ok"
+   },
+   "contexts": [
+    "indoor",
+    "bed",
+    "beach_pool",
+    "outdoor"
+   ],
+   "prop": {
+    "default": "a sunbed",
+    "indoor": "a cushioned daybed"
+   },
+   "framing": "full-body from head to heels, centered",
+   "framing_code": "N",
+   "hips_in_frame": true,
+   "canon_ok": [],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "thigh_oversize",
+    "thigh_merge_cross"
+   ],
+   "expression_hint": "radiant half-lidded smile",
+   "youth_risk": "none",
+   "notes": "",
+   "prompt": "POSE, joint by joint: camera in front of her at hip height of the figure, slightly above. She reclines on the sunbed, the pelvis turned about 50 degrees, the hips leaning on the left. The upper body propped on the right hand, the shoulders turned toward the viewer, the head tilted. Both knees together and bent, angled to the viewer's left, the shins and feet to the left, the thighs together and not wider than the hips. The right hand behind her on the sunbed, the left hand pushing the hair back (exactly two arms). Head: eyes on the viewer.",
+   "rear_emphasis": false,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "K01_upright_kneel_hands_in_hair",
+   "name": "Upright kneel, both hands in hair",
+   "category": "kneeling",
+   "camera": "camera in front of her, three-quarter, at hip height of the kneeling figure",
+   "joints": {
+    "pelvis": "she kneels upright on a cushion, the pelvis turned about 30 degrees, the thighs near vertical, the hips resting slightly back",
+    "spine": "the spine in a gentle arch, the chest forward, the head tilted",
+    "legs": "knees hip-width apart (close enough that both thighs stay narrower than the pelvis), the shins flat on the cushion pointing back, the toes visible",
+    "arms": "both hands raised into her hair (exactly two arms)",
+    "head": "eyes on the viewer"
+   },
+   "yaw_deg": {
+    "pelvis": 30,
+    "shoulders": 15,
+    "head": 0
+   },
+   "boldness": 4,
+   "suited": {
+    "long": "ok",
+    "mini": "cond",
+    "leo": "ok",
+    "swim": "ok",
+    "robe": "ok"
+   },
+   "contexts": [
+    "indoor",
+    "bed",
+    "beach_pool",
+    "outdoor"
+   ],
+   "prop": {
+    "default": "a silk cushion",
+    "beach_pool": "a beach towel",
+    "stage": "a stage riser",
+    "outdoor": "a cushion on the ground"
+   },
+   "framing": "full-body from head to heels, centered",
+   "framing_code": "N",
+   "hips_in_frame": true,
+   "canon_ok": [],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "thigh_oversize",
+    "thigh_merge_cross"
+   ],
+   "expression_hint": "radiant half-lidded smile",
+   "youth_risk": "none",
+   "notes": "",
+   "prompt": "POSE, joint by joint: camera in front of her, three-quarter, at hip height of the kneeling figure. She kneels upright on a cushion, the pelvis turned about 30 degrees, the thighs near vertical, the hips resting slightly back. The spine in a gentle arch, the chest forward, the head tilted. Knees hip-width apart (close enough that both thighs stay narrower than the pelvis), the shins flat on the cushion pointing back, the toes visible. Both hands raised into her hair (exactly two arms). Head: eyes on the viewer.",
+   "rear_emphasis": false,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "K02_kneel_forearms_on_ottoman_rear",
+   "name": "Kneeling arch, forearms on an ottoman, seen from behind-side",
+   "category": "kneeling",
+   "camera": "camera behind-side at hip height of the kneeling figure",
+   "joints": {
+    "pelvis": "she kneels at a low ottoman, the pelvis turned about 140 degrees from the camera; the hips are raised and pushed back, the rear of the hips and thighs seen from the side-rear, the thighs near vertical",
+    "spine": "the torso inclined forward about 55 degrees, the lower back deeply arched, the twist continuous from the pelvis through the ribcage to the head, which turns back over the shoulder to the viewer",
+    "legs": "knees about hip-width apart on the cushion, the shins flat on the floor pointing back, thighs narrower than the shoulders, both feet visible",
+    "arms": "both forearms resting on the ottoman (not flat hands on the floor: this is a supported kneel, never all-fours) (exactly two arms)",
+    "head": "looking back over the shoulder"
+   },
+   "yaw_deg": {
+    "pelvis": 140,
+    "shoulders": 100,
+    "head": 55
+   },
+   "boldness": 5,
+   "suited": {
+    "long": "ok",
+    "mini": "cond",
+    "leo": "cond",
+    "swim": "cond",
+    "robe": "ok"
+   },
+   "contexts": [
+    "indoor",
+    "bed",
+    "beach_pool"
+   ],
+   "prop": {
+    "default": "a low cushioned ottoman",
+    "beach_pool": "a sunbed edge",
+    "stage": "a cushioned bench"
+   },
+   "framing": "full-body from head to heels, centered",
+   "framing_code": "N",
+   "hips_in_frame": true,
+   "canon_ok": [],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "underwear_read",
+    "thigh_oversize",
+    "torso_hip_twist_break",
+    "clothing_logic"
+   ],
+   "expression_hint": "teasing look",
+   "youth_risk": "none",
+   "notes": "Replaces bake-off pose d (hands flat on the floor reads as all-fours, hard-banned in 3b). Hem rule is decisive (bake-off d: 3/3 with it, 0/4 without).",
+   "prompt": "POSE, joint by joint: camera behind-side at hip height of the kneeling figure. She kneels at a low ottoman, the pelvis turned about 140 degrees from the camera; the hips are raised and pushed back, the rear of the hips and thighs seen from the side-rear, the thighs near vertical. The torso inclined forward about 55 degrees, the lower back deeply arched, the twist continuous from the pelvis through the ribcage to the head, which turns back over the shoulder to the viewer. Knees about hip-width apart on the cushion, the shins flat on the floor pointing back, thighs narrower than the shoulders, both feet visible. Both forearms resting on the ottoman (not flat hands on the floor: this is a supported kneel, never all-fours) (exactly two arms). Head: looking back over the shoulder.",
+   "rear_emphasis": true,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "K03_seiza_back_twist",
+   "name": "Seiza, torso twisted to look back",
+   "category": "kneeling",
+   "camera": "camera behind-side at hip height of the seated figure",
+   "joints": {
+    "pelvis": "she sits on her heels (seiza), the pelvis turned about 120 degrees from the camera, the rounded hips and thighs seen from the side-rear",
+    "spine": "the torso twisted about 70 degrees back toward the viewer at the waist, the spine tall, the head turned toward the camera",
+    "legs": "knees together on the cushion, the thighs lying together in profile, the shins and soles visible and separate",
+    "arms": "the left hand on the cushion beside the hip, the right hand touching her hair (exactly two arms)",
+    "head": "head turned to the viewer"
+   },
+   "yaw_deg": {
+    "pelvis": 120,
+    "shoulders": 60,
+    "head": 15
+   },
+   "boldness": 4,
+   "suited": {
+    "long": "ok",
+    "mini": "cond",
+    "leo": "ok",
+    "swim": "ok",
+    "robe": "ok"
+   },
+   "contexts": [
+    "indoor",
+    "bed",
+    "beach_pool",
+    "outdoor"
+   ],
+   "prop": {
+    "default": "a cushion on tatami",
+    "beach_pool": "a beach towel",
+    "stage": "the stage floor",
+    "outdoor": "a woven mat"
+   },
+   "framing": "full-body from head to heels, centered",
+   "framing_code": "N",
+   "hips_in_frame": true,
+   "canon_ok": [],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "torso_hip_twist_break",
+    "thigh_merge_cross"
+   ],
+   "expression_hint": "coy smile",
+   "youth_risk": "none",
+   "notes": "",
+   "prompt": "POSE, joint by joint: camera behind-side at hip height of the seated figure. She sits on her heels (seiza), the pelvis turned about 120 degrees from the camera, the rounded hips and thighs seen from the side-rear. The torso twisted about 70 degrees back toward the viewer at the waist, the spine tall, the head turned toward the camera. Knees together on the cushion, the thighs lying together in profile, the shins and soles visible and separate. The left hand on the cushion beside the hip, the right hand touching her hair (exactly two arms). Head: head turned to the viewer.",
+   "rear_emphasis": true,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "K04_half_kneel_profile",
+   "name": "Half-kneel in profile, leaning on the raised thigh",
+   "category": "kneeling",
+   "camera": "camera at her side (90 degrees) at hip height of the figure",
+   "joints": {
+    "pelvis": "she kneels on the left knee with the right knee raised, the pelvis in profile",
+    "spine": "the torso leans forward about 25 degrees onto the raised thigh, the head turned to the viewer",
+    "legs": "the left knee on the cushion with the shin lying back, the right foot flat with the shin vertical, the right knee pointing forward in profile (never toward the camera), thighs parallel to the image plane",
+    "arms": "the right forearm on the right knee, the left hand resting on the cushion (exactly two arms)",
+    "head": "head turned to the viewer"
+   },
+   "yaw_deg": {
+    "pelvis": 90,
+    "shoulders": 60,
+    "head": 20
+   },
+   "boldness": 3,
+   "suited": {
+    "long": "ok",
+    "mini": "no",
+    "leo": "ok",
+    "swim": "cond",
+    "robe": "ok"
+   },
+   "contexts": [
+    "indoor",
+    "bed",
+    "beach_pool",
+    "outdoor",
+    "stage"
+   ],
+   "prop": {
+    "default": "a cushion",
+    "beach_pool": "a sunbed edge",
+    "stage": "a riser",
+    "outdoor": "a cushion on the ground"
+   },
+   "framing": "full-body from head to heels, centered",
+   "framing_code": "N",
+   "hips_in_frame": true,
+   "canon_ok": [],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "leg_length_perspective",
+    "underwear_read"
+   ],
+   "expression_hint": "confident smirk",
+   "youth_risk": "none",
+   "notes": "Raised knee: unsafe in short skirts.",
+   "prompt": "POSE, joint by joint: camera at her side (90 degrees) at hip height of the figure. She kneels on the left knee with the right knee raised, the pelvis in profile. The torso leans forward about 25 degrees onto the raised thigh, the head turned to the viewer. The left knee on the cushion with the shin lying back, the right foot flat with the shin vertical, the right knee pointing forward in profile (never toward the camera), thighs parallel to the image plane. The right forearm on the right knee, the left hand resting on the cushion (exactly two arms). Head: head turned to the viewer.",
+   "rear_emphasis": false,
+   "unsafe_in_skirts": true,
+   "unsafe_classes": [
+    "mini"
+   ],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "K05_kneel_bed_back_to_camera",
+   "name": "Kneeling on a bed facing away, arched, looking back",
+   "category": "kneeling",
+   "camera": "camera behind her at hip height of the kneeling figure",
+   "joints": {
+    "pelvis": "she kneels on the bed facing the headboard, the pelvis turned about 170 degrees from the camera, hips and thighs facing away, the rear in view",
+    "spine": "the lower back arched, the shoulders turned about 130 degrees, the head turned about 75 degrees back over the right shoulder",
+    "legs": "knees hip-width apart, the thighs near vertical, the shins flat on the bed, the soles visible, two clearly separate legs",
+    "arms": "both hands on the headboard rail at shoulder height (exactly two arms)",
+    "head": "looking back over the shoulder"
+   },
+   "yaw_deg": {
+    "pelvis": 170,
+    "shoulders": 130,
+    "head": 75
+   },
+   "boldness": 5,
+   "suited": {
+    "long": "ok",
+    "mini": "cond",
+    "leo": "cond",
+    "swim": "cond",
+    "robe": "ok"
+   },
+   "contexts": [
+    "indoor",
+    "bed",
+    "beach_pool"
+   ],
+   "prop": {
+    "default": "a canopy bed with a headboard",
+    "beach_pool": "a sunbed backrest",
+    "stage": "a cushioned backrest"
+   },
+   "framing": "full-body from head to heels, centered",
+   "framing_code": "N",
+   "hips_in_frame": true,
+   "canon_ok": [],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "underwear_read",
+    "rear_not_rotated",
+    "thigh_oversize"
+   ],
+   "expression_hint": "inviting smile",
+   "youth_risk": "none",
+   "notes": "",
+   "prompt": "POSE, joint by joint: camera behind her at hip height of the kneeling figure. She kneels on the bed facing the headboard, the pelvis turned about 170 degrees from the camera, hips and thighs facing away, the rear in view. The lower back arched, the shoulders turned about 130 degrees, the head turned about 75 degrees back over the right shoulder. Knees hip-width apart, the thighs near vertical, the shins flat on the bed, the soles visible, two clearly separate legs. Both hands on the headboard rail at shoulder height (exactly two arms). Head: looking back over the shoulder.",
+   "rear_emphasis": true,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "K06_kneel_wring_hair",
+   "name": "Kneeling on a towel, wringing wet hair",
+   "category": "kneeling",
+   "camera": "camera in front of her, three-quarter, at hip height of the kneeling figure",
+   "joints": {
+    "pelvis": "she kneels on the towel, the pelvis turned about 60 degrees, the thighs near vertical",
+    "spine": "the torso twisted about 45 degrees, the head tilted to the viewer, the back arched slightly",
+    "legs": "knees together, the shins flat pointing back, the thighs proportionate, the feet visible",
+    "arms": "both hands wring the wet hair over the right shoulder (exactly two arms)",
+    "head": "eyes on the viewer, a laugh"
+   },
+   "yaw_deg": {
+    "pelvis": 60,
+    "shoulders": 25,
+    "head": 10
+   },
+   "boldness": 4,
+   "suited": {
+    "long": "cond",
+    "mini": "cond",
+    "leo": "ok",
+    "swim": "ok",
+    "robe": "ok"
+   },
+   "contexts": [
+    "beach_pool",
+    "indoor",
+    "outdoor"
+   ],
+   "prop": {
+    "default": "a striped towel on the sand",
+    "indoor": "a cushion",
+    "outdoor": "a cushion on the ground"
+   },
+   "framing": "full-body from head to heels, centered",
+   "framing_code": "N",
+   "hips_in_frame": true,
+   "canon_ok": [],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "thigh_oversize",
+    "extra_limb"
+   ],
+   "expression_hint": "radiant laugh",
+   "youth_risk": "none",
+   "notes": "",
+   "prompt": "POSE, joint by joint: camera in front of her, three-quarter, at hip height of the kneeling figure. She kneels on the towel, the pelvis turned about 60 degrees, the thighs near vertical. The torso twisted about 45 degrees, the head tilted to the viewer, the back arched slightly. Knees together, the shins flat pointing back, the thighs proportionate, the feet visible. Both hands wring the wet hair over the right shoulder (exactly two arms). Head: eyes on the viewer, a laugh.",
+   "rear_emphasis": false,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "K07_kneel_lean_back_on_hands",
+   "name": "Kneeling, leaning back on her hands",
+   "category": "kneeling",
+   "camera": "camera in front of her at hip height of the kneeling figure, three-quarter",
+   "joints": {
+    "pelvis": "she kneels with the knees together, the pelvis turned about 40 degrees, the hips pressed forward",
+    "spine": "the torso leans back about 30 degrees, supported by both hands on the cushion behind, the chest lifted, the head tilted back toward the viewer",
+    "legs": "knees together, the thighs proportionate and narrower than the pelvis, the shins flat, the feet visible",
+    "arms": "both arms straight behind her, the palms on the cushion (exactly two arms)",
+    "head": "eyes half-lidded, looking at the viewer"
+   },
+   "yaw_deg": {
+    "pelvis": 40,
+    "shoulders": 20,
+    "head": 10
+   },
+   "boldness": 4,
+   "suited": {
+    "long": "ok",
+    "mini": "no",
+    "leo": "ok",
+    "swim": "ok",
+    "robe": "ok"
+   },
+   "contexts": [
+    "indoor",
+    "bed",
+    "beach_pool",
+    "outdoor"
+   ],
+   "prop": {
+    "default": "a silk cushion",
+    "beach_pool": "a beach towel",
+    "stage": "a riser",
+    "outdoor": "a cushion on the ground"
+   },
+   "framing": "full-body from head to heels, centered",
+   "framing_code": "N",
+   "hips_in_frame": true,
+   "canon_ok": [],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "thigh_oversize"
+   ],
+   "expression_hint": "lazy teasing smile",
+   "youth_risk": "none",
+   "notes": "Unsafe in short skirts (hips forward).",
+   "prompt": "POSE, joint by joint: camera in front of her at hip height of the kneeling figure, three-quarter. She kneels with the knees together, the pelvis turned about 40 degrees, the hips pressed forward. The torso leans back about 30 degrees, supported by both hands on the cushion behind, the chest lifted, the head tilted back toward the viewer. Knees together, the thighs proportionate and narrower than the pelvis, the shins flat, the feet visible. Both arms straight behind her, the palms on the cushion (exactly two arms). Head: eyes half-lidded, looking at the viewer.",
+   "rear_emphasis": false,
+   "unsafe_in_skirts": true,
+   "unsafe_classes": [
+    "mini"
+   ],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "D01_hip_tilt_hand_in_hair_front",
+   "name": "Standing hip tilt, hand in hair (canon base)",
+   "category": "dynamic",
+   "camera": "camera in front of her, three-quarter, portrait lens at hip height",
+   "joints": {
+    "pelvis": "pelvis turned about 30 degrees with one hip lifted, weight on the right leg",
+    "spine": "the shoulders turned about 15 degrees the other way, the head toward the viewer",
+    "legs": "the right leg straight, the left knee soft with the foot stepped slightly out to the side, the legs separate, the thighs proportionate",
+    "arms": "the left hand on the hip, the right hand raised into her hair (exactly two arms)",
+    "head": "eyes on the viewer"
+   },
+   "yaw_deg": {
+    "pelvis": 30,
+    "shoulders": 15,
+    "head": 0
+   },
+   "boldness": 3,
+   "suited": {
+    "long": "ok",
+    "mini": "ok",
+    "leo": "ok",
+    "swim": "ok",
+    "robe": "ok"
+   },
+   "contexts": [
+    "indoor",
+    "outdoor",
+    "stage",
+    "beach_pool"
+   ],
+   "prop": {},
+   "framing": "full-body from head to heels, centered",
+   "framing_code": "N",
+   "hips_in_frame": true,
+   "canon_ok": [
+    "base"
+   ],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "thigh_oversize",
+    "leg_length_perspective"
+   ],
+   "expression_hint": "confident teasing smile",
+   "youth_risk": "none",
+   "notes": "Canon base fallback. In 3/4 close crops with the hip pushed out the thigh swelled (defects: all canon_*); keep the full figure in frame.",
+   "prompt": "POSE, joint by joint: camera in front of her, three-quarter, portrait lens at hip height. Pelvis turned about 30 degrees with one hip lifted, weight on the right leg. The shoulders turned about 15 degrees the other way, the head toward the viewer. The right leg straight, the left knee soft with the foot stepped slightly out to the side, the legs separate, the thighs proportionate. The left hand on the hip, the right hand raised into her hair (exactly two arms). Head: eyes on the viewer.",
+   "rear_emphasis": false,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "D02_win_lean_tile_laugh",
+   "name": "Joyful lean toward the viewer, holding up a blank tile",
+   "category": "dynamic",
+   "camera": "camera in front of her at hip height, three-quarter",
+   "joints": {
+    "pelvis": "pelvis square, pushed back slightly, the weight on both feet",
+    "spine": "she leans forward about 20 degrees toward the viewer, the shoulders open, laughing",
+    "legs": "feet shoulder-width apart, the knees soft, the thighs proportionate",
+    "arms": "the right hand holds up a single blank ivory mahjong tile beside her face, the left hand on her knee (exactly two arms)",
+    "head": "wide laugh with a wink"
+   },
+   "yaw_deg": {
+    "pelvis": 0,
+    "shoulders": 0,
+    "head": 0
+   },
+   "boldness": 3,
+   "suited": {
+    "long": "ok",
+    "mini": "ok",
+    "leo": "ok",
+    "swim": "ok",
+    "robe": "ok"
+   },
+   "contexts": [
+    "indoor",
+    "outdoor",
+    "stage",
+    "beach_pool"
+   ],
+   "prop": {},
+   "framing": "full-body from head to heels, centered",
+   "framing_code": "N",
+   "hips_in_frame": true,
+   "canon_ok": [
+    "win"
+   ],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "extra_limb"
+   ],
+   "expression_hint": "bright laugh with a wink",
+   "youth_risk": "none",
+   "notes": "",
+   "prompt": "POSE, joint by joint: camera in front of her at hip height, three-quarter. Pelvis square, pushed back slightly, the weight on both feet. She leans forward about 20 degrees toward the viewer, the shoulders open, laughing. Feet shoulder-width apart, the knees soft, the thighs proportionate. The right hand holds up a single blank ivory mahjong tile beside her face, the left hand on her knee (exactly two arms). Head: wide laugh with a wink.",
+   "rear_emphasis": false,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "D03_win_arms_up_cheer",
+   "name": "Victory cheer, both arms up",
+   "category": "dynamic",
+   "camera": "camera in front of her at hip height",
+   "joints": {
+    "pelvis": "pelvis square, the weight on the left leg, the right toe pointed",
+    "spine": "the torso arched slightly, the shoulders open, the head thrown back a little",
+    "legs": "the left leg straight, the right leg slightly out to the side on its toe, the thighs proportionate",
+    "arms": "both arms thrown up in a V (exactly two arms)",
+    "head": "mouth open in a laugh"
+   },
+   "yaw_deg": {
+    "pelvis": 0,
+    "shoulders": 0,
+    "head": 0
+   },
+   "boldness": 3,
+   "suited": {
+    "long": "ok",
+    "mini": "ok",
+    "leo": "ok",
+    "swim": "ok",
+    "robe": "ok"
+   },
+   "contexts": [
+    "indoor",
+    "outdoor",
+    "stage",
+    "beach_pool"
+   ],
+   "prop": {},
+   "framing": "full-body from head to heels, centered",
+   "framing_code": "N",
+   "hips_in_frame": true,
+   "canon_ok": [
+    "win"
+   ],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "extra_limb"
+   ],
+   "expression_hint": "radiant triumphant smile",
+   "youth_risk": "none",
+   "notes": "",
+   "prompt": "POSE, joint by joint: camera in front of her at hip height. Pelvis square, the weight on the left leg, the right toe pointed. The torso arched slightly, the shoulders open, the head thrown back a little. The left leg straight, the right leg slightly out to the side on its toe, the thighs proportionate. Both arms thrown up in a V (exactly two arms). Head: mouth open in a laugh.",
+   "rear_emphasis": false,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "D04_win_kiss_lean_hip",
+   "name": "Blowing a kiss, hip tilted",
+   "category": "dynamic",
+   "camera": "camera in front of her at hip height, three-quarter",
+   "joints": {
+    "pelvis": "pelvis turned about 30 degrees, one hip lifted, weight on the left leg",
+    "spine": "the shoulders open, the head tilted, a slight lean toward the viewer",
+    "legs": "the left leg straight, the right knee soft with the foot out to the side",
+    "arms": "the right hand at her lips blowing a kiss, the left hand on the hip (exactly two arms)",
+    "head": "eyes on the viewer"
+   },
+   "yaw_deg": {
+    "pelvis": 30,
+    "shoulders": 10,
+    "head": 0
+   },
+   "boldness": 3,
+   "suited": {
+    "long": "ok",
+    "mini": "ok",
+    "leo": "ok",
+    "swim": "ok",
+    "robe": "ok"
+   },
+   "contexts": [
+    "indoor",
+    "outdoor",
+    "stage",
+    "beach_pool"
+   ],
+   "prop": {},
+   "framing": "full-body from head to heels, centered",
+   "framing_code": "N",
+   "hips_in_frame": true,
+   "canon_ok": [
+    "base",
+    "win"
+   ],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "extra_limb"
+   ],
+   "expression_hint": "playful kiss",
+   "youth_risk": "none",
+   "notes": "",
+   "prompt": "POSE, joint by joint: camera in front of her at hip height, three-quarter. Pelvis turned about 30 degrees, one hip lifted, weight on the left leg. The shoulders open, the head tilted, a slight lean toward the viewer. The left leg straight, the right knee soft with the foot out to the side. The right hand at her lips blowing a kiss, the left hand on the hip (exactly two arms). Head: eyes on the viewer.",
+   "rear_emphasis": false,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "D05_arms_open_presenting",
+   "name": "Arms open, presenting, hip tilt",
+   "category": "dynamic",
+   "camera": "camera in front of her at hip height, three-quarter",
+   "joints": {
+    "pelvis": "pelvis turned about 25 degrees, one hip tilted",
+    "spine": "an arch in the upper back, the chest forward, the head tilted",
+    "legs": "the weight on the right leg, the left foot stepped slightly out to the side",
+    "arms": "both arms open wide at about 40 degrees below horizontal, the palms up (exactly two arms)",
+    "head": "radiant triumphant smile"
+   },
+   "yaw_deg": {
+    "pelvis": 25,
+    "shoulders": 5,
+    "head": 0
+   },
+   "boldness": 3,
+   "suited": {
+    "long": "ok",
+    "mini": "ok",
+    "leo": "ok",
+    "swim": "ok",
+    "robe": "ok"
+   },
+   "contexts": [
+    "indoor",
+    "outdoor",
+    "stage",
+    "beach_pool"
+   ],
+   "prop": {},
+   "framing": "full-body from head to heels, centered",
+   "framing_code": "N",
+   "hips_in_frame": true,
+   "canon_ok": [
+    "win"
+   ],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "extra_limb"
+   ],
+   "expression_hint": "radiant triumphant smile",
+   "youth_risk": "none",
+   "notes": "",
+   "prompt": "POSE, joint by joint: camera in front of her at hip height, three-quarter. Pelvis turned about 25 degrees, one hip tilted. An arch in the upper back, the chest forward, the head tilted. The weight on the right leg, the left foot stepped slightly out to the side. Both arms open wide at about 40 degrees below horizontal, the palms up (exactly two arms). Head: radiant triumphant smile.",
+   "rear_emphasis": false,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "D06_hair_flip_rear_arch",
+   "name": "Hair flip, arched back, rear three-quarter",
+   "category": "dynamic",
+   "camera": "camera at her left-rear three-quarter at hip height",
+   "joints": {
+    "pelvis": "pelvis turned about 140 degrees from the camera, the rear-side of the hips in view",
+    "spine": "the torso arched back about 15 degrees, the shoulders turned about 100 degrees, the head tossed to the side and turned about 55 degrees toward the viewer",
+    "legs": "weight on the left leg, the right knee soft with the foot out to the side on its toe, a gap between the legs",
+    "arms": "the right hand flips her hair over the shoulder, the left hand on the hip (exactly two arms)",
+    "head": "looking back over the shoulder"
+   },
+   "yaw_deg": {
+    "pelvis": 140,
+    "shoulders": 100,
+    "head": 55
+   },
+   "boldness": 4,
+   "suited": {
+    "long": "ok",
+    "mini": "cond",
+    "leo": "cond",
+    "swim": "cond",
+    "robe": "ok"
+   },
+   "contexts": [
+    "indoor",
+    "outdoor",
+    "stage",
+    "beach_pool"
+   ],
+   "prop": {},
+   "framing": "full-body from head to heels, centered",
+   "framing_code": "N",
+   "hips_in_frame": true,
+   "canon_ok": [
+    "tease"
+   ],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "torso_hip_twist_break",
+    "rear_not_rotated"
+   ],
+   "expression_hint": "bold smirk",
+   "youth_risk": "none",
+   "notes": "",
+   "prompt": "POSE, joint by joint: camera at her left-rear three-quarter at hip height. Pelvis turned about 140 degrees from the camera, the rear-side of the hips in view. The torso arched back about 15 degrees, the shoulders turned about 100 degrees, the head tossed to the side and turned about 55 degrees toward the viewer. Weight on the left leg, the right knee soft with the foot out to the side on its toe, a gap between the legs. The right hand flips her hair over the shoulder, the left hand on the hip (exactly two arms). Head: looking back over the shoulder.",
+   "rear_emphasis": true,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "D07_straddle_chair_backwards",
+   "name": "Straddling a chair backwards, arms on the backrest",
+   "category": "dynamic",
+   "camera": "camera in front of her at hip height, three-quarter",
+   "joints": {
+    "pelvis": "she sits astride the chair facing the backrest, the pelvis square to the chair, the thighs on the seat seen in three-quarter",
+    "spine": "the torso leaning forward about 20 degrees onto the backrest, the head tilted to the viewer",
+    "legs": "the knees hip-width apart and angled to the viewer's left (never opened toward the camera), the feet visible on either side of the chair",
+    "arms": "both forearms folded on the backrest, the chin resting on her arms (exactly two arms)",
+    "head": "eyes on the viewer"
+   },
+   "yaw_deg": {
+    "pelvis": 45,
+    "shoulders": 20,
+    "head": 0
+   },
+   "boldness": 4,
+   "suited": {
+    "long": "no",
+    "mini": "no",
+    "leo": "ok",
+    "swim": "ok",
+    "robe": "no"
+   },
+   "contexts": [
+    "indoor",
+    "beach_pool",
+    "stage"
+   ],
+   "prop": {
+    "default": "a lacquer chair",
+    "beach_pool": "a pool chair",
+    "stage": "a tall stool",
+    "outdoor": "a wooden chair"
+   },
+   "framing": "full-body from head to heels, centered",
+   "framing_code": "N",
+   "hips_in_frame": true,
+   "canon_ok": [],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "thigh_oversize",
+    "leg_length_perspective"
+   ],
+   "expression_hint": "sly smile",
+   "youth_risk": "none",
+   "notes": "Leotards, shorts, swimwear and bodysuits only (3b).",
+   "prompt": "POSE, joint by joint: camera in front of her at hip height, three-quarter. She sits astride the chair facing the backrest, the pelvis square to the chair, the thighs on the seat seen in three-quarter. The torso leaning forward about 20 degrees onto the backrest, the head tilted to the viewer. The knees hip-width apart and angled to the viewer's left (never opened toward the camera), the feet visible on either side of the chair. Both forearms folded on the backrest, the chin resting on her arms (exactly two arms). Head: eyes on the viewer.",
+   "rear_emphasis": false,
+   "unsafe_in_skirts": true,
+   "unsafe_classes": [
+    "long",
+    "mini",
+    "robe"
+   ],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "D08_lunge_weapon_profile",
+   "name": "Forward lunge in profile, prop held out",
+   "category": "dynamic",
+   "camera": "camera at her side (about 80 degrees) at hip height",
+   "joints": {
+    "pelvis": "pelvis in near-profile, low, the weight on the front leg",
+    "spine": "the torso upright, leaning slightly forward, the head turned to the viewer, hair flying back",
+    "legs": "a lunge parallel to the image plane: the front knee bent about 100 degrees with the shin vertical, the rear leg extended straight back on its toe, both legs fully visible and not foreshortened",
+    "arms": "the front hand holds the prop out toward the viewer's side, the rear hand behind her (exactly two arms)",
+    "head": "fierce confident grin"
+   },
+   "yaw_deg": {
+    "pelvis": 80,
+    "shoulders": 60,
+    "head": 30
+   },
+   "boldness": 3,
+   "suited": {
+    "long": "cond",
+    "mini": "no",
+    "leo": "ok",
+    "swim": "cond",
+    "robe": "no"
+   },
+   "contexts": [
+    "indoor",
+    "outdoor",
+    "stage",
+    "beach_pool"
+   ],
+   "prop": {
+    "default": "the battle prop of the outfit"
+   },
+   "framing": "full-body from head to heels, centered",
+   "framing_code": "N",
+   "hips_in_frame": true,
+   "canon_ok": [],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "leg_length_perspective",
+    "extra_limb"
+   ],
+   "expression_hint": "fierce confident grin",
+   "youth_risk": "none",
+   "notes": "Battle outfits only; skirts must be armoured and short-split with the leotard base.",
+   "prompt": "POSE, joint by joint: camera at her side (about 80 degrees) at hip height. Pelvis in near-profile, low, the weight on the front leg. The torso upright, leaning slightly forward, the head turned to the viewer, hair flying back. A lunge parallel to the image plane: the front knee bent about 100 degrees with the shin vertical, the rear leg extended straight back on its toe, both legs fully visible and not foreshortened. The front hand holds the prop out toward the viewer's side, the rear hand behind her (exactly two arms). Head: fierce confident grin.",
+   "rear_emphasis": false,
+   "unsafe_in_skirts": true,
+   "unsafe_classes": [
+    "mini",
+    "robe"
+   ],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "D09_leap_side_prop",
+   "name": "Mid-air leap in profile, one knee up",
+   "category": "dynamic",
+   "camera": "camera at her side (about 85 degrees) at hip height",
+   "joints": {
+    "pelvis": "pelvis in profile, level, mid-air",
+    "spine": "the torso upright, the head turned to the viewer, hair and ribbons streaming",
+    "legs": "the front knee drawn up with the thigh parallel to the image plane, the rear leg extended back, both legs fully visible, no foreshortening",
+    "arms": "the front arm extended with the prop, the rear arm back (exactly two arms)",
+    "head": "fierce radiant grin"
+   },
+   "yaw_deg": {
+    "pelvis": 90,
+    "shoulders": 70,
+    "head": 30
+   },
+   "boldness": 3,
+   "suited": {
+    "long": "no",
+    "mini": "no",
+    "leo": "ok",
+    "swim": "no",
+    "robe": "no"
+   },
+   "contexts": [
+    "indoor",
+    "outdoor",
+    "stage",
+    "beach_pool"
+   ],
+   "prop": {
+    "default": "the battle prop of the outfit"
+   },
+   "framing": "full-body from head to heels, centered",
+   "framing_code": "N",
+   "hips_in_frame": true,
+   "canon_ok": [],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "leg_length_perspective",
+    "impossible_pose"
+   ],
+   "expression_hint": "fierce radiant grin",
+   "youth_risk": "none",
+   "notes": "Leotard battle outfits only.",
+   "prompt": "POSE, joint by joint: camera at her side (about 85 degrees) at hip height. Pelvis in profile, level, mid-air. The torso upright, the head turned to the viewer, hair and ribbons streaming. The front knee drawn up with the thigh parallel to the image plane, the rear leg extended back, both legs fully visible, no foreshortening. The front arm extended with the prop, the rear arm back (exactly two arms). Head: fierce radiant grin.",
+   "rear_emphasis": false,
+   "unsafe_in_skirts": true,
+   "unsafe_classes": [
+    "long",
+    "mini",
+    "swim",
+    "robe"
+   ],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "D10_dance_hip_sway",
+   "name": "Dancer pose, hip sway, one arm up",
+   "category": "dynamic",
+   "camera": "camera in front of her at hip height, three-quarter",
+   "joints": {
+    "pelvis": "pelvis turned about 35 degrees, the hips swayed to the viewer's right",
+    "spine": "the torso counter-tilted, the right arm raised, the head tilted toward the raised arm",
+    "legs": "weight on the left leg, the right foot pointed to the side on its toe with the knee soft, the legs clearly separate",
+    "arms": "the right arm raised with a flowing wrist, the left hand on the hip (exactly two arms)",
+    "head": "a mysterious smile"
+   },
+   "yaw_deg": {
+    "pelvis": 35,
+    "shoulders": 10,
+    "head": 0
+   },
+   "boldness": 4,
+   "suited": {
+    "long": "ok",
+    "mini": "cond",
+    "leo": "ok",
+    "swim": "ok",
+    "robe": "ok"
+   },
+   "contexts": [
+    "indoor",
+    "outdoor",
+    "stage",
+    "beach_pool"
+   ],
+   "prop": {},
+   "framing": "full-body from head to heels, centered",
+   "framing_code": "N",
+   "hips_in_frame": true,
+   "canon_ok": [
+    "base",
+    "win"
+   ],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "thigh_oversize",
+    "extra_limb"
+   ],
+   "expression_hint": "mysterious smile",
+   "youth_risk": "none",
+   "notes": "",
+   "prompt": "POSE, joint by joint: camera in front of her at hip height, three-quarter. Pelvis turned about 35 degrees, the hips swayed to the viewer's right. The torso counter-tilted, the right arm raised, the head tilted toward the raised arm. Weight on the left leg, the right foot pointed to the side on its toe with the knee soft, the legs clearly separate. The right arm raised with a flowing wrist, the left hand on the hip (exactly two arms). Head: a mysterious smile.",
+   "rear_emphasis": false,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "D11_squat_three_quarter_knees_together",
+   "name": "Squat in three-quarter view, knees together",
+   "category": "dynamic",
+   "camera": "camera in front of her, three-quarter, at hip height or higher (never below the knees)",
+   "joints": {
+    "pelvis": "she squats with the pelvis turned about 45 degrees, the hips low and the knees together, the near knee forward",
+    "spine": "the torso leaning forward about 20 degrees, the head tilted toward the viewer",
+    "legs": "the knees together and angled to the viewer's left, never open toward the camera, the thighs pressed together, both feet flat and visible",
+    "arms": "the right forearm on the right thigh, the left hand in a claw gesture beside the face (exactly two arms)",
+    "head": "wink"
+   },
+   "yaw_deg": {
+    "pelvis": 45,
+    "shoulders": 30,
+    "head": 5
+   },
+   "boldness": 4,
+   "suited": {
+    "long": "no",
+    "mini": "no",
+    "leo": "ok",
+    "swim": "cond",
+    "robe": "no"
+   },
+   "contexts": [
+    "indoor",
+    "outdoor",
+    "stage",
+    "beach_pool"
+   ],
+   "prop": {},
+   "framing": "full-body from head to heels, centered",
+   "framing_code": "N",
+   "hips_in_frame": true,
+   "canon_ok": [],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "leg_length_perspective",
+    "thigh_merge_cross"
+   ],
+   "expression_hint": "wink",
+   "youth_risk": "none",
+   "notes": "Bodysuits, leotards and bikinis only (3b: squat is three-quarter with knees together).",
+   "prompt": "POSE, joint by joint: camera in front of her, three-quarter, at hip height or higher (never below the knees). She squats with the pelvis turned about 45 degrees, the hips low and the knees together, the near knee forward. The torso leaning forward about 20 degrees, the head tilted toward the viewer. The knees together and angled to the viewer's left, never open toward the camera, the thighs pressed together, both feet flat and visible. The right forearm on the right thigh, the left hand in a claw gesture beside the face (exactly two arms). Head: wink.",
+   "rear_emphasis": false,
+   "unsafe_in_skirts": true,
+   "unsafe_classes": [
+    "long",
+    "mini",
+    "robe"
+   ],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "D12_standing_lean_back_hands_on_hips",
+   "name": "Standing lean-back, hands on hips, chest forward",
+   "category": "dynamic",
+   "camera": "camera in front of her at hip height, portrait lens",
+   "joints": {
+    "pelvis": "pelvis square, pushed slightly forward, weight even",
+    "spine": "she leans back about 15 degrees from the hips, the chest forward, the head tilted back a little",
+    "legs": "feet shoulder-width apart, the knees soft, the thighs proportionate",
+    "arms": "both hands on the hips with the elbows out (exactly two arms)",
+    "head": "a defiant smile"
+   },
+   "yaw_deg": {
+    "pelvis": 0,
+    "shoulders": 0,
+    "head": 0
+   },
+   "boldness": 3,
+   "suited": {
+    "long": "ok",
+    "mini": "ok",
+    "leo": "ok",
+    "swim": "ok",
+    "robe": "ok"
+   },
+   "contexts": [
+    "indoor",
+    "outdoor",
+    "stage",
+    "beach_pool"
+   ],
+   "prop": {},
+   "framing": "full-body from head to heels, centered",
+   "framing_code": "N",
+   "hips_in_frame": true,
+   "canon_ok": [
+    "base",
+    "win"
+   ],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "extra_limb"
+   ],
+   "expression_hint": "defiant smile",
+   "youth_risk": "none",
+   "notes": "",
+   "prompt": "POSE, joint by joint: camera in front of her at hip height, portrait lens. Pelvis square, pushed slightly forward, weight even. She leans back about 15 degrees from the hips, the chest forward, the head tilted back a little. Feet shoulder-width apart, the knees soft, the thighs proportionate. Both hands on the hips with the elbows out (exactly two arms). Head: a defiant smile.",
+   "rear_emphasis": false,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "P01_fingertip_at_lips_closeup",
+   "name": "Close-up, fingertip at the lips",
+   "category": "portrait_tease",
+   "camera": "camera in front of her at eye level, portrait lens",
+   "joints": {
+    "pelvis": "not in frame",
+    "spine": "the shoulders turned about 20 degrees, the head tilted",
+    "legs": "not in frame",
+    "arms": "the right fingertip rests at the lips, the left hand out of frame",
+    "head": "half-lidded eyes, flushed cheeks"
+   },
+   "yaw_deg": {
+    "pelvis": 0,
+    "shoulders": 20,
+    "head": 0
+   },
+   "boldness": 3,
+   "suited": {
+    "long": "ok",
+    "mini": "ok",
+    "leo": "ok",
+    "swim": "ok",
+    "robe": "ok"
+   },
+   "contexts": [
+    "indoor",
+    "outdoor",
+    "stage",
+    "beach_pool"
+   ],
+   "prop": {},
+   "framing": "bust-up portrait, face and shoulders",
+   "framing_code": "P",
+   "hips_in_frame": false,
+   "canon_ok": [
+    "tease"
+   ],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "extra_limb"
+   ],
+   "expression_hint": "flirty half-lidded smile",
+   "youth_risk": "none",
+   "notes": "",
+   "prompt": "POSE, joint by joint: camera in front of her at eye level, portrait lens. The shoulders turned about 20 degrees, the head tilted. The right fingertip rests at the lips, the left hand out of frame. Head: half-lidded eyes, flushed cheeks.",
+   "rear_emphasis": false,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "P02_over_shoulder_back_portrait",
+   "name": "Over-the-shoulder back portrait (open back, hair swept)",
+   "category": "portrait_tease",
+   "camera": "camera behind her at shoulder height, portrait lens",
+   "joints": {
+    "pelvis": "not in frame",
+    "spine": "the back and bare shoulder to the camera, the shoulders turned about 120 degrees, the head turned about 70 degrees back, the twist continuous through the neck",
+    "legs": "not in frame",
+    "arms": "the left hand sweeps the hair off the shoulder, the right arm down",
+    "head": "looking back with a teasing smile"
+   },
+   "yaw_deg": {
+    "pelvis": 180,
+    "shoulders": 120,
+    "head": 70
+   },
+   "boldness": 4,
+   "suited": {
+    "long": "ok",
+    "mini": "ok",
+    "leo": "ok",
+    "swim": "ok",
+    "robe": "ok"
+   },
+   "contexts": [
+    "indoor",
+    "outdoor",
+    "stage",
+    "beach_pool"
+   ],
+   "prop": {},
+   "framing": "waist-up from behind, the back and shoulder in view",
+   "framing_code": "P",
+   "hips_in_frame": false,
+   "canon_ok": [
+    "tease"
+   ],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "torso_hip_twist_break"
+   ],
+   "expression_hint": "teasing smile",
+   "youth_risk": "none",
+   "notes": "",
+   "prompt": "POSE, joint by joint: camera behind her at shoulder height, portrait lens. The back and bare shoulder to the camera, the shoulders turned about 120 degrees, the head turned about 70 degrees back, the twist continuous through the neck. The left hand sweeps the hair off the shoulder, the right arm down. Head: looking back with a teasing smile.",
+   "rear_emphasis": false,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "P03_tea_sip_glance",
+   "name": "Tea bowl at the lips, glance over the rim",
+   "category": "portrait_tease",
+   "camera": "camera in front of her at eye level, portrait lens",
+   "joints": {
+    "pelvis": "not in frame",
+    "spine": "the shoulders turned about 25 degrees, the head tilted",
+    "legs": "not in frame",
+    "arms": "both hands hold a small tea bowl at her lips (exactly two hands)",
+    "head": "eyes over the rim, one brow raised"
+   },
+   "yaw_deg": {
+    "pelvis": 0,
+    "shoulders": 25,
+    "head": 0
+   },
+   "boldness": 3,
+   "suited": {
+    "long": "ok",
+    "mini": "ok",
+    "leo": "ok",
+    "swim": "ok",
+    "robe": "ok"
+   },
+   "contexts": [
+    "indoor",
+    "outdoor",
+    "stage",
+    "beach_pool"
+   ],
+   "prop": {},
+   "framing": "bust-up portrait, face and shoulders",
+   "framing_code": "P",
+   "hips_in_frame": false,
+   "canon_ok": [
+    "tease"
+   ],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "extra_limb"
+   ],
+   "expression_hint": "amused glance",
+   "youth_risk": "none",
+   "notes": "",
+   "prompt": "POSE, joint by joint: camera in front of her at eye level, portrait lens. The shoulders turned about 25 degrees, the head tilted. Both hands hold a small tea bowl at her lips (exactly two hands). Head: eyes over the rim, one brow raised.",
+   "rear_emphasis": false,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "P04_chin_on_shoulder_look",
+   "name": "Chin on the shoulder, sidelong look",
+   "category": "portrait_tease",
+   "camera": "camera at her side-front at eye level, portrait lens",
+   "joints": {
+    "pelvis": "not in frame",
+    "spine": "the shoulders turned about 60 degrees, the chin resting near the raised shoulder, the head turned to the viewer",
+    "legs": "not in frame",
+    "arms": "one hand lightly touching the collarbone",
+    "head": "sidelong look, lazy smile"
+   },
+   "yaw_deg": {
+    "pelvis": 0,
+    "shoulders": 60,
+    "head": 20
+   },
+   "boldness": 3,
+   "suited": {
+    "long": "ok",
+    "mini": "ok",
+    "leo": "ok",
+    "swim": "ok",
+    "robe": "ok"
+   },
+   "contexts": [
+    "indoor",
+    "outdoor",
+    "stage",
+    "beach_pool"
+   ],
+   "prop": {},
+   "framing": "bust-up portrait, face and shoulders",
+   "framing_code": "P",
+   "hips_in_frame": false,
+   "canon_ok": [
+    "tease"
+   ],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "extra_limb"
+   ],
+   "expression_hint": "lazy sidelong smile",
+   "youth_risk": "none",
+   "notes": "",
+   "prompt": "POSE, joint by joint: camera at her side-front at eye level, portrait lens. The shoulders turned about 60 degrees, the chin resting near the raised shoulder, the head turned to the viewer. One hand lightly touching the collarbone. Head: sidelong look, lazy smile.",
+   "rear_emphasis": false,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  },
+  {
+   "id": "P05_hair_tuck_half_lidded",
+   "name": "Hair tuck, half-lidded gaze",
+   "category": "portrait_tease",
+   "camera": "camera in front of her at eye level, portrait lens",
+   "joints": {
+    "pelvis": "not in frame",
+    "spine": "the shoulders turned about 15 degrees, the head tilted",
+    "legs": "not in frame",
+    "arms": "one hand tucking a strand of hair behind the ear",
+    "head": "half-lidded eyes, parted lips, a faint blush"
+   },
+   "yaw_deg": {
+    "pelvis": 0,
+    "shoulders": 15,
+    "head": 0
+   },
+   "boldness": 3,
+   "suited": {
+    "long": "ok",
+    "mini": "ok",
+    "leo": "ok",
+    "swim": "ok",
+    "robe": "ok"
+   },
+   "contexts": [
+    "indoor",
+    "outdoor",
+    "stage",
+    "beach_pool"
+   ],
+   "prop": {},
+   "framing": "bust-up portrait, face and shoulders",
+   "framing_code": "P",
+   "hips_in_frame": false,
+   "canon_ok": [
+    "tease"
+   ],
+   "body_fit": {
+    "petite": "ok",
+    "tall": "ok"
+   },
+   "failure_guards": [
+    "extra_limb"
+   ],
+   "expression_hint": "soft inviting smile",
+   "youth_risk": "none",
+   "notes": "",
+   "prompt": "POSE, joint by joint: camera in front of her at eye level, portrait lens. The shoulders turned about 15 degrees, the head tilted. One hand tucking a strand of hair behind the ear. Head: half-lidded eyes, parted lips, a faint blush.",
+   "rear_emphasis": false,
+   "unsafe_in_skirts": false,
+   "unsafe_classes": [],
+   "camera_rule": "hip height or higher, portrait lens, never from below the hem"
+  }
+ ]
+}

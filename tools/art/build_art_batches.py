@@ -149,7 +149,7 @@ CULL_ANATOMY = [
     "face reads as the canon heroine (>= 4 of 5 traits: eye shape, face width, nose/mouth, apparent age, brows) vs the element portrait",
     "hair colour, signature items and outfit match the canon card; no drift (hair_never rules)",
     "no text, no logos, no watermark, no garbled glyphs anywhere; mahjong tiles blank",
-    "adult proportions about 7-7.5 heads; garment opaque and in place; eye-level camera; no red-line pose",
+    "proportions: crotch line at 45-48% of height, leg length no longer than shoulder-to-crotch plus one head, 6.75-7.0 heads, adult face (a young look is a fail); garment opaque and in place; hip-level or higher camera; no red-line pose",
 ]
 
 GUARDS_COMMON = [
@@ -214,7 +214,7 @@ FULL_TAIL = (
     "Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult "
     "fashion pin-up styling. {figure} a direct "
     "teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated "
-    "colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric "
+    "colors with a slightly softened supporting background, portrait-lens camera with a long focal length at hip height or higher and no wide-angle distortion, thin warm-colored lineart with soft cel-painted shading, fabric "
     "texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult "
     "mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, "
     "no logos, no watermark."
@@ -266,7 +266,7 @@ FULL_H1_FRAMES = {
     "base": ("standing with one hip tilted, one hand on her hip, the other hand touching her hair, eyes on the viewer", "confident teasing smile", None),
     "win": ("leaning toward the viewer in a joyful victory pose, one hand holding up a single blank ivory mahjong tile, a wink", "bright laugh with a wink", None),
     "tease": ("glancing back at the viewer over her shoulder, one fingertip at her lips, shoulders turned, hip tilted", "playful flirty smile", None),
-    "leg": ("perched on the edge of a low table with one long leg stretched out and the other drawn up, the stocking band or thigh strap in view, a hand on her knee", "teasing half-lidded smile", WD.FR["T"]),
+    "leg": ("perched on the edge of a low table with one leg stretched out and the other drawn up, the stocking band or thigh strap in view, a hand on her knee", "teasing half-lidded smile", WD.FR["T"]),
     "bust": ("leaning forward toward the viewer with both hands on her knees and an arched back, hair falling forward", "playful flirty smile", WD.FR["F"]),
 }
 
@@ -285,10 +285,13 @@ def body_line(hk: str) -> str:
 
 
 def figure_line(hk: str) -> str:
-    """Per-heroine figure sentence of the tail.  Hard floor: a mature adult face and a grown woman's figure, never below WD.HEADS_MIN heads."""
+    """Per-heroine figure sentence of the tail.  Hard floor: a mature adult face and a grown woman's figure, never below WD.HEADS_MIN heads.
+    Proportions rule (owner decision 2026-11-28, binding): the crotch line sits at about WD.CROTCH_PCT% of the total height (window 45-48), the leg
+    length is no longer than shoulder-to-crotch plus one head; height differences come from scale and framing, never from longer legs."""
     b = WD.HEIGHTS[hk]
-    return (f"Adult woman with grown-woman proportions, {b['heads']} heads tall ({b['cm']} cm, {b['tag']}), {b['legs']}, a mature adult face "
-            f"and figure, a defined waist, the composition accents her legs, thighs and bust,")
+    return (f"Adult woman with grown-woman proportions, {b['heads']} heads tall ({b['cm']} cm, {b['tag']}), a compact torso and balanced proportions: "
+            f"the crotch line sits at about {WD.CROTCH_PCT}% of her total height and her leg length from crotch to floor is no longer than her shoulder-to-crotch "
+            f"length plus one head, {b['legs']}, a mature adult face and figure, a defined waist, the composition accents her legs, thighs and bust,")
 
 
 def full_prompt(h: dict, outfit: str, pose: str, expr: str, framing: str, setting: str, extra: str = "") -> str:
@@ -298,13 +301,13 @@ def full_prompt(h: dict, outfit: str, pose: str, expr: str, framing: str, settin
             f"Setting: {setting}. {extra} {tail}").replace("  ", " ").strip()
 
 
-HERO_FRAMING = "dynamic splash-art composition, three-quarter figure from head to knees, strong diagonal, camera at eye level to slightly low"
+HERO_FRAMING = "dynamic splash-art composition, three-quarter figure from head to knees, strong diagonal, portrait-lens camera at eye level or hip height, never from below"
 
 
 def full_selection(extra_criteria=()):
     return {"keep_per_task": 1, "gate": "Full-tier look gate (design/ART_TIER_FULL.md section 7) + anatomy audit",
             "criteria": ["boldness at the owner's reference level (stockings with bands, deep neckline, playful pose), not tamer",
-                         "hard lines: clearly adult face and 7-7.5 heads, nothing nude (no nipples, no genitals), no explicit act, no school or minor coding, no text"]
+                         "hard lines: clearly adult face (a young look is a fail) and 6.75-7.0 heads with the crotch line at 45-48% of height, nothing nude (no nipples, no genitals), no explicit act, no school or minor coding, no text"]
                         + CULL_ANATOMY[:4] + list(extra_criteria)}
 
 
@@ -318,7 +321,7 @@ def build_H0(H, tail=None):
         candidates_policy="search: 8 candidates per frame at 1k medium (1 cr); final: 2 candidates of the best prompt at 2k high (2 cr)",
         selection={"keep_per_task": 2, "gate": "Full-tier look gate + GDD 11.4 a-e",
                    "criteria": ["boldness at the owner's reference level (stockings with bands, deep neckline, playful pose), not tamer",
-                                "hard lines: clearly adult face and 7-7.5 heads, nothing nude, no explicit act, no school or minor coding, no text",
+                                "hard lines: clearly adult face (a young look is a fail) and 6.75-7.0 heads with the crotch line at 45-48% of height, nothing nude, no explicit act, no school or minor coding, no text",
                                 "faces distinguishable on >= 3 of 5 traits across mc/yue/nova",
                                 "heroine accent colour <= 20% of the frame area; Nova's neon lives only in outfit and FX"] + CULL_ANATOMY[:4]},
         tool_note="gpt_image_2_6 + Elements (<<<element_id>>> in the prompt; do not also pass the element in medias). Tail `v5f`. P50b ran this batch with 3 candidates per frame (not 8): see design/golden_full/REPORT.md.",
@@ -411,8 +414,8 @@ H3_HEROINES = ["mc", "rin", "hana", "yue", "nova"]
 H3_TIERS = {
     "t1": ("T1 edge (x5): short quick reaction", "leaning in from the side toward the viewer with a wink, bust-forward, one hand on her hip and a tiny wave of the other",
            "playful wink, small smile", "waist-up to hips view cropped at the thighs, slightly off-center"),
-    "t2": ("T2 exit (x10): confident step", "stepping forward in three-quarter view with one long leg forward and a hip tilted, one hand on her hip, the other pointing at the viewer, the stocking band in view",
-           "confident grin, eyes on the viewer", "three-quarter figure cut at mid-thigh, low camera at knee level that elongates the legs, centered"),
+    "t2": ("T2 exit (x10): confident step", "stepping forward in three-quarter view with one leg forward and a hip tilted, one hand on her hip, the other pointing at the viewer, the stocking band in view",
+           "confident grin, eyes on the viewer", "three-quarter figure cut at mid-thigh, portrait-lens camera at hip height (no from-below angle), centered"),
     "t3": ("T3 showcase (x20): big finish", "arms open wide in a proud presenting gesture with an arched back and a hip tilt, hair and ribbons flowing in a breeze",
            "radiant triumphant smile, eyes on the viewer", "three-quarter figure cut at mid-thigh with clear headroom, centered"),
 }

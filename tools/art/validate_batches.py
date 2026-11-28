@@ -51,6 +51,13 @@ FULL_ALLOWED = {"garter", "stockings", "bikini", "bunny", "curvy", "hourglass", 
 HARD_BANNED_FULL = ["school", "schoolgirl", "seifuku", "student", "teacher", "classroom", "uniform", "minor", "underage", "child", "kid", "teen", "loli", "shota",
                     "nude", "naked", "nipple", "areola", "topless", "bottomless", "genital", "pussy", "vagina", "penis", "sex", "cum", "semen", "orgasm", "fellatio",
                     "sideboob", "underboob", "cameltoe", "lingerie", "panties", "upskirt", "cleavage", "sexy", "thicc", "busty"]
+# Proportions rule (owner decision 2026-11-28, binding): the old "tall and statuesque, very long legs" wording is forbidden in Tier FULL image prompts;
+# height is expressed by scale and framing, never by longer legs.  Camera must not be from below / wide-angle (it stretches the legs).
+PROPORTION_BANNED = ["very long legs", "long legs", "long legged", "elongat", "statuesque", "leggy", "endless legs", "legs for days", "knee-level", "knee level",
+                     "worm's-eye", "wide-angle lens", "fisheye"]
+# a from-below / low-angle camera is banned unless the prompt negates it ("never from below", "no from-below angle")
+RE_PROP = re.compile("|".join(re.escape(w) for w in PROPORTION_BANNED) + r"|(?<!never )(?<!no )(?<!not )(?:from[- ]below|\blow[- ]angle)", re.I)
+PROP_REQUIRED = ["crotch line", "shoulder-to-crotch"]   # every Tier FULL heroine prompt carries the proportion rule
 PROMPT_FIELDS = ("prompt", "text_ref")
 NOTEXT_RE = re.compile(r"\bno (text|letters|lettering)\b|absolutely no text", re.I)
 HEADS_RE = re.compile(r"(\d+(?:\.\d+)?) heads tall", re.I)
@@ -195,6 +202,9 @@ def validate(batches: dict, schema: dict, md_rows, plan_nom, plan_ceil, quiet=Fa
                         if not (WD.HEADS_MIN <= x <= WD.HEADS_MAX): errs.append(f"{tid}: {x} heads tall in {f} is outside the hard range {WD.HEADS_MIN}-{WD.HEADS_MAX}")
                         elif abs(x - want_h) > 0.011: errs.append(f"{tid}: {x} heads tall in {f} but the body table says {want_h} for {t['heroine']}")
                     if "mature adult face" not in v: errs.append(f"{tid}: {f} does not state a mature adult face")
+                    for m in RE_PROP.finditer(v): errs.append(f"{tid}: proportion-banned phrase '{m.group(0)}' in {f} (owner proportions decision 2026-11-28)")
+                    for need in PROP_REQUIRED:
+                        if need not in v: errs.append(f"{tid}: {f} lacks the proportion rule phrase '{need}'")
                     if WD.FIGURE[t["heroine"]] not in v: errs.append(f"{tid}: {f} lacks the approved figure descriptor of {t['heroine']} (body table, leg fullness and bust)")
             if tier_full and t["media"] == "image":
                 for i, v in enumerate(list(t.get("prompt_variants") or []) + list(t.get("hero_prompt_variants") or [])):
@@ -314,7 +324,15 @@ def selftest(batches, schema, md_rows, pn, pc):
     mut("heads below the hard floor in a Tier FULL prompt", lambda c: first(c, "H1_canon_set.json", lambda t: t.get("heroine") == "miel").__setitem__(
         "prompt", first(c, "H1_canon_set.json", lambda t: t.get("heroine") == "miel")["prompt"].replace("6.75 heads tall", "6.0 heads tall")), "hard range")
     mut("heads differ from the body table", lambda c: first(c, "H0_golden_composites.json", lambda t: t.get("heroine") == "yue").__setitem__(
-        "prompt", first(c, "H0_golden_composites.json", lambda t: t.get("heroine") == "yue")["prompt"].replace("7.9 heads tall", "7.25 heads tall")), "body table")
+        "prompt", first(c, "H0_golden_composites.json", lambda t: t.get("heroine") == "yue")["prompt"].replace("7.0 heads tall", "6.9 heads tall")), "body table")
+    mut("heads above the new ceiling in a Tier FULL prompt", lambda c: first(c, "H1_canon_set.json", lambda t: t.get("heroine") == "yue").__setitem__(
+        "prompt", first(c, "H1_canon_set.json", lambda t: t.get("heroine") == "yue")["prompt"].replace("7.0 heads tall", "7.5 heads tall")), "hard range")
+    mut("'long legs' in a Tier FULL prompt", lambda c: append_prompt(c, "H1_canon_set.json", lambda t: t.get("heroine"), " with very long legs"), "proportion-banned")
+    mut("'statuesque' in a Tier FULL wardrobe variant", lambda c: first(c, "H2_wardrobe.json", lambda t: t.get("prompt_variants")).__setitem__(
+        "prompt_variants", [v + " statuesque" for v in first(c, "H2_wardrobe.json", lambda t: t.get("prompt_variants"))["prompt_variants"]]), "proportion-banned")
+    mut("low knee-level camera that elongates the legs", lambda c: append_prompt(c, "H3_combo_frames.json", lambda t: t.get("heroine"), " low camera at knee level that elongates the legs"), "proportion-banned")
+    mut("crotch-line rule dropped from a Tier FULL prompt", lambda c: first(c, "H0_golden_composites.json", lambda t: t.get("heroine")).__setitem__(
+        "prompt", first(c, "H0_golden_composites.json", lambda t: t.get("heroine"))["prompt"].replace("the crotch line sits", "the waist sits")), "proportion rule")
     mut("banned word in a hero splash variant", lambda c: first(c, "H2_wardrobe.json", lambda t: t.get("hero_prompt_variants")).__setitem__(
         "hero_prompt_variants", [v + " fully nude" for v in first(c, "H2_wardrobe.json", lambda t: t.get("hero_prompt_variants"))["hero_prompt_variants"]]), "banned word")
     mut("adult-face statement dropped", lambda c: first(c, "H3_combo_frames.json", lambda t: t.get("heroine")).__setitem__(
