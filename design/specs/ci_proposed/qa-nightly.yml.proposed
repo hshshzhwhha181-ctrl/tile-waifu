@@ -1,0 +1,69 @@
+name: qa-nightly
+# PROPOSAL (design/specs/UNIFIED_QA_PLAN.md section 17). Not active: lives outside .github/.
+
+on:
+  schedule:
+    - cron: "0 2 * * *"
+  workflow_dispatch: {}
+
+env:
+  GODOT_VERSION: "4.5.1"
+
+concurrency:
+  group: qa-nightly
+  cancel-in-progress: false
+
+jobs:
+  nightly:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - uses: actions/setup-node@v4
+        with: { node-version: "24" }
+      - name: QA tool-belt
+        run: |
+          python -m pip install --quiet numpy pillow
+          python tools/qa/run_qa_tools.py
+      - name: System packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends xvfb libgl1 libgl1-mesa-dri libxcursor1 libxinerama1 libxi6 libxrandr2 libxkbcommon0 libasound2t64 libfontconfig1 unzip
+      - name: Godot
+        run: |
+          mkdir -p "$HOME/godot"
+          curl -fsSL -o "$HOME/godot/g.zip" "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          unzip -q -o "$HOME/godot/g.zip" -d "$HOME/godot"
+          chmod +x "$HOME/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64"
+          echo "GODOT_BIN=$HOME/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64" >> "$GITHUB_ENV"
+      - uses: actions/cache@v4
+        with:
+          path: game/.godot
+          key: godot-import-${{ env.GODOT_VERSION }}-${{ hashFiles('game/project.godot', 'game/**/*.import') }}
+      - run: python tools/tw_test.py --import
+      - name: Full suites (compared with tools/baseline.json)
+        run: python tools/tw_test.py -j 4 --no-mask-rc --json nightly-results.json --logs nightly-logs
+      - name: Long skin soak (3000 swaps)
+        run: |
+          cd game && $GODOT_BIN --headless --path . res://tests/skin_swap_soak/skin_swap_soak.tscn -- --soak_swaps=3000 | tee ../soak3000.log
+          grep -q "TWSKINSOAK_SELFTEST .* OK" ../soak3000.log
+      - name: Palette audit of every shipped image (trend, not a gate until D1)
+        continue-on-error: true
+        run: |
+          python tools/qa/palette_audit.py game/assets --exclude '/incoming/' --json palette-nightly.json --quiet | tail -20
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: qa-nightly
+          path: |
+            nightly-results.json
+            nightly-logs/
+            soak3000.log
+            palette-nightly.json
+          retention-days: 30
+      - name: Open an issue when red
+        if: failure()
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: gh issue create --title "qa-nightly red $(date -u +%F)" --body "Run ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" --label qa

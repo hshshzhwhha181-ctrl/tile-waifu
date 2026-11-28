@@ -49,6 +49,12 @@ jobs:
         run: |
           python tools/lint_no_direct_levels.py --selftest --check
 
+      # QA plan (design/specs/UNIFIED_QA_PLAN.md): palette_audit / skin_lint / skin schema + palette_ramps in sync with tokens.json, pure Python, ~5 s
+      - name: QA tool-belt (palette_audit + skin_lint unit tests, schema/ramps sync)
+        run: |
+          python -m pip install --quiet numpy pillow
+          python tools/qa/run_qa_tools.py
+
       - name: System packages (xvfb + GL for the rendering suites)
         run: |
           sudo apt-get update
