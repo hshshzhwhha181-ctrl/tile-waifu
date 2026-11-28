@@ -21,7 +21,8 @@ const RING: = 64
 const MAX_QUEUE: = 4096        # events one publish() call may deliver (nested ones included); a handler loop is cut here
 
 var _subs: Dictionary = {}     # kind -> Array of token
-var _by_token: Dictionary = {} # token -> {kind, cb, owner}
+var _by_token: Dictionary = {} # token -> {kind, cb, owner, owner_id}
+var _owner_exits: Dictionary = {} # owner_id -> {node, cb, count}
 var _next_token: = 1
 var _queue: Array = []
 var _dispatching: = false
@@ -33,13 +34,27 @@ var published: = 0
 func subscribe(kind: String, cb: Callable, owner: Object = null) -> int:
 	var tok: = _next_token
 	_next_token += 1
-	_by_token[tok] = {"kind": kind, "cb": cb, "owner": owner}
+	var oid: int = owner.get_instance_id() if is_instance_valid(owner) else 0
+	_by_token[tok] = {"kind": kind, "cb": cb, "owner": owner, "owner_id": oid}
 	if not _subs.has(kind):
 		_subs[kind] = []
 	(_subs[kind] as Array).append(tok)
 	if owner is Node:
-		(owner as Node).tree_exiting.connect(unsubscribe.bind(tok), CONNECT_ONE_SHOT)
+		var node: Node = owner as Node
+		if not _owner_exits.has(oid):
+			var exit_cb: Callable = _on_owner_exiting.bind(oid)
+			node.tree_exiting.connect(exit_cb, CONNECT_ONE_SHOT)
+			_owner_exits[oid] = {"node": node, "cb": exit_cb, "count": 1}
+		else:
+			_owner_exits[oid].count += 1
 	return tok
+
+
+func _on_owner_exiting(oid: int) -> void:
+	_owner_exits.erase(oid)
+	for tok in _by_token.keys():
+		if int(_by_token[tok].owner_id) == oid:
+			unsubscribe(tok)
 
 
 func unsubscribe(tok: int) -> void:
@@ -51,12 +66,26 @@ func unsubscribe(tok: int) -> void:
 	arr.erase(tok)
 	if arr.is_empty():
 		_subs.erase(rec.kind)
+	var oid: int = int(rec.owner_id)
+	if oid != 0 and _owner_exits.has(oid):
+		var oe: Dictionary = _owner_exits[oid]
+		oe.count -= 1
+		if int(oe.count) <= 0:
+			_owner_exits.erase(oid)
+			var node = oe.node
+			if node != null and is_instance_valid(node) and (node as Node).tree_exiting.is_connected(oe.cb):
+				(node as Node).tree_exiting.disconnect(oe.cb)
 
 
 func unsubscribe_owner(owner: Object) -> int:
 	var n: = 0
+	var target_id: int = owner.get_instance_id() if owner != null and is_instance_valid(owner) else 0
 	for tok in _by_token.keys():
-		if _by_token[tok].owner == owner:
+		var rec: Dictionary = _by_token[tok]
+		if int(rec.owner_id) != 0 and not is_instance_valid(rec.owner):
+			unsubscribe(tok)
+			continue
+		if target_id != 0 and int(rec.owner_id) == target_id:
 			unsubscribe(tok)
 			n += 1
 	return n
@@ -79,8 +108,24 @@ func publish(ev: Dictionary) -> void:
 		dropped += 1
 		return
 	_queue.append(ev)
-	if _dispatching:
-		return
+	if not _dispatching:
+		_drain()
+
+
+func publish_all(events: Array) -> void:
+	var any: = false
+	for ev in events:
+		if ev is Dictionary:
+			if _queue.size() >= MAX_QUEUE:
+				dropped += 1
+			else:
+				_queue.append(ev)
+				any = true
+	if any and not _dispatching:
+		_drain()
+
+
+func _drain() -> void:
 	_dispatching = true
 	var n: = 0
 	while not _queue.is_empty():
@@ -91,12 +136,6 @@ func publish(ev: Dictionary) -> void:
 			break
 		_deliver(_queue.pop_front())
 	_dispatching = false
-
-
-func publish_all(events: Array) -> void:
-	for ev in events:
-		if ev is Dictionary:
-			publish(ev)
 
 
 func recent(n: int = RING) -> Array:
@@ -120,6 +159,9 @@ func _deliver(ev: Dictionary) -> void:
 		var rec = _by_token.get(tok)
 		if rec == null:
 			continue                    # unsubscribed by an earlier handler of this very event
+		if int(rec.owner_id) != 0 and not is_instance_valid(rec.owner):
+			unsubscribe(tok)            # owner freed without exiting tree
+			continue
 		var cb: Callable = rec.cb
 		if not cb.is_valid():
 			unsubscribe(tok)            # target freed

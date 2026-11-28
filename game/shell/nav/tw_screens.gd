@@ -224,16 +224,16 @@ func go(id: String, params: Dictionary = {}, opts: Dictionary = {}) -> Signal:
 	# history: decided before the old screen goes away
 	if back_move:
 		pass
-	elif spec.is_tab_root:
+	elif spec.is_tab_root or bool(opts.get("clear_history", false)):
 		history.clear()
 	elif current != null and not bool(opts.get("replace", false)) and from_id != id and _keeps_history(from_id):
 		history.append({"id": from_id, "params": current_params})
 		while history.size() > HISTORY_MAX:
 			history.pop_front()
-	# teardown + mount
+	# teardown + mount: unmount outgoing screen before clearing modals so exit() cannot leak a modal onto the next screen
+	_unmount()
 	if modals != null and modals.has_method("clear_all"):
 		modals.clear_all("go:" + id)
-	_unmount()
 	state = State.TRANSITIONING
 	_started_ms = now_ms()
 	_gen += 1
@@ -335,13 +335,11 @@ func go_tab(t: String, params: Dictionary = {}) -> Signal:
 	var id: String = str(target.get("id", ""))
 	if id == "" or not registry.has(id):
 		id = tab_root(t)
-	var nav: = _Nav.new(_pending)
 	if id == "":
-		return _reject(nav, t, "unknown")
+		return _reject(_Nav.new(_pending), t, "unknown")
 	if state == State.IDLE and id == current_id and t == tab:
-		return _reject(nav, id, "same")
-	history.clear()
-	return go(id, params if not params.is_empty() else target.get("params", {}), {"replace": true})
+		return _reject(_Nav.new(_pending), id, "same")
+	return go(id, params if not params.is_empty() else target.get("params", {}), {"replace": true, "clear_history": true})
 
 
 func back() -> String:
