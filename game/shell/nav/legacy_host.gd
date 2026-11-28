@@ -97,6 +97,11 @@ func _build_v11() -> void:
 	ctx = TWContext.build(st, clk, TWBus.new(), tw_screens)
 	tw_screens.ctx = ctx
 	ctx.provide("legacy_host", self)
+	# P30 (added before the ModalStack, which must stay the last child): the v11 audio bus (not an autoload): screens ask ctx.service("audio"); legacy screens keep Sfx / V10Music untouched
+	var tw_audio: = TWAudio.new()
+	tw_audio.name = "TWAudio"
+	add_child(tw_audio)
+	ctx.provide("audio", tw_audio)
 	modals = ModalStack.new()
 	modals.visible = false
 	modals.changed.connect(func(d: int) -> void: modals.visible = d > 0)

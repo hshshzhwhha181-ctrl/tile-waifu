@@ -1404,6 +1404,22 @@
     "status": "pass",
     "total": 221
    }
+  },
+  "twaudio": {
+   "fast": {
+    "marker": "TWAUDIO_SELFTEST 392/392",
+    "ok": 392,
+    "secs": 5.8,
+    "status": "pass",
+    "total": 392
+   },
+   "full": {
+    "marker": "TWAUDIO_SELFTEST 392/392",
+    "ok": 392,
+    "secs": 5.8,
+    "status": "pass",
+    "total": 392
+   }
   }
  },
  "updated": "2026-11-28",
