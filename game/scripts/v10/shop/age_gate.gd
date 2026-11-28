@@ -63,7 +63,7 @@ func build() -> void:
 	h.size = Vector2(cw, 56)
 	add_child(h)
 	y += 64
-	var body: = V10ShopKit.wrap(V10ShopKit.lbl("В игре есть флирт и откровенные наряды. Укажи год рождения — от него зависят доступ и лимиты покупок. Год остаётся только на этом телефоне.", "ui", 22, V10DS.PAPER_300, true), 4)
+	var body: = V10ShopKit.wrap(V10ShopKit.lbl("В игре есть романтический флирт и пляжные/вечерние наряды. Укажи год рождения — от него зависят доступ 18+ и лимиты покупок. Подробнее об обработке данных — в Политике конфиденциальности.", "ui", 22, V10DS.PAPER_300, true), 4)
 	body.position = Vector2(cx, y)
 	var lines: = V10Type.lines_needed(body.text, "ui", 22, cw)
 	body.size = Vector2(cw, 32 * mini(lines, 4))

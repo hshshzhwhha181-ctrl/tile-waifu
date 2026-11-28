@@ -1,181 +1,172 @@
 class_name TWLegalConsent
 extends RefCounted
 
-# TWLegalConsent (P108 / MP PM21 / §10.4): append-only consent journal with offer_ver tracking.
-# Persists under TWState.data["legal_consents"] using modular version TWState.set_module_ver("legal", MODULE_VER)
-# so TWState.SAVE_VER stays at 8 (UNIFIED_QA_PLAN / DECISIONS rule: never bump SAVE_VER for new modules).
+# TWLegalConsent (P108 / MP PM21 / §10.4): shell adapter over the SINGLE unified core TWConsent journal.
+# Shares TWConsent.STATE_KEY ("tw_consents"), canonical kind names ("offer", "privacy", "pdn", "age_18", "analytics"),
+# monotonic seq/ts (TWClock.safe_now()), founding-entry-safe rotation, and unified MSK export format.
+# Records mod_ver.legal = 1 alongside mod_ver.consent = 1 without bumping SAVE_VER (stays 8).
+# Enforces 152-FZ separation: PDn consent and 18+ confirmation (gated by adult TWAge) are separate explicit acts
+# and require the underlying documents to have been opened and validated.
 
 const MODULE_ID: String = "legal"
 const MODULE_VER: int = 1
-const STATE_KEY: String = "legal_consents"
-const MAX_ENTRIES: int = 512
+const STATE_KEY: String = TWConsent.STATE_KEY
+const MAX_ENTRIES: int = TWConsent.MAX_ENTRIES
 
+var core: TWConsent = null
 var _state: TWState = null
-var _store: Dictionary = {}
-var _clock: TWClock = null
 var _bus: TWBus = null
 
 
 func _init(state: TWState = null, clock: TWClock = null, bus: TWBus = null, store_override: Dictionary = {}) -> void:
 	_state = state
-	_clock = clock if clock != null else (state.clock if state != null else TWClock.new())
 	_bus = bus
-	if _state != null:
-		_ensure_in(_state.data)
-	else:
-		_store = store_override
-		_ensure_in(_store)
+	core = TWConsent.new(clock, state, store_override)
 
 
-func _root() -> Dictionary:
-	var target: Dictionary = _state.data if _state != null else _store
-	return _ensure_in(target)
+func core_journal() -> TWConsent:
+	return core
 
 
-static func _ensure_in(data: Dictionary) -> Dictionary:
-	if not (data.get(STATE_KEY) is Dictionary):
-		data[STATE_KEY] = {"mod_ver": MODULE_VER, "offer_ver_accepted": "", "entries": []}
-	var box: Dictionary = data[STATE_KEY]
-	if not (box.get("entries") is Array):
-		box["entries"] = []
-	if not box.has("offer_ver_accepted"):
-		box["offer_ver_accepted"] = ""
-	box["mod_ver"] = MODULE_VER
-	return box
-
-
-func _touch_state(urgent: bool = true) -> void:
+func _touch_legal_mod_ver() -> void:
 	if _state != null:
 		_state.set_module_ver(MODULE_ID, MODULE_VER)
-		_state.mark_dirty(urgent)
+		_state.mark_dirty(true)
 
 
-func record_consent(kind: String, doc_ver: String, offer_ver: String, doc_hash: String = "", accepted: bool = true, source: String = "legal_screen") -> Dictionary:
-	var box: Dictionary = _root()
-	var ts: int = _clock.now() if _clock != null else 0
-	var seq: int = (box["entries"] as Array).size() + 1
-	var entry: Dictionary = {
-		"seq": seq,
-		"kind": kind,
-		"ver": doc_ver,
-		"offer_ver": offer_ver,
-		"doc_hash": doc_hash,
-		"accepted": accepted,
-		"ts": ts,
-		"source": source,
-	}
-	(box["entries"] as Array).append(entry)
-	while (box["entries"] as Array).size() > MAX_ENTRIES:
-		(box["entries"] as Array).pop_front()
-	if kind == "offer":
-		box["offer_ver_accepted"] = offer_ver if accepted else ""
-	_touch_state(true)
-	if _bus != null:
+func _publish_event(entry: Dictionary) -> void:
+	if _bus != null and not entry.is_empty():
 		var ev: Dictionary = entry.duplicate(true)
 		ev["t"] = "legal.consent_recorded"
 		_bus.publish(ev)
-	return entry.duplicate(true)
 
 
-func record_required_bundle(data: TWLegalData, source: String = "legal_screen", include_analytics: bool = false) -> Array:
-	if data == null or not data.is_loaded():
-		return []
+func record_consent(kind: String, doc_ver: String, offer_ver: String, doc_hash: String = "", accepted: bool = true, source: String = "legal_screen") -> Dictionary:
+	var entry: Dictionary = core.record(kind, doc_ver, offer_ver, accepted, source, doc_hash)
+	if entry.is_empty():
+		return {}
+	_touch_legal_mod_ver()
+	_publish_event(entry)
+	return entry
+
+
+# Records consent for ONE validated document. For age_18_full_tier / age_18, requires a verified adult TWAge.
+func record_doc_consent(data: TWLegalData, doc_id: String, source: String = "legal_screen", age_gate: TWAge = null) -> Dictionary:
+	if data == null or not data.is_valid() or not data.has_doc(doc_id):
+		return {}
+	if TWConsent.normalize_kind(doc_id) == TWConsent.KIND_AGE_18:
+		if age_gate == null or not age_gate.is_adult():
+			return {}
+	var meta: Dictionary = data.find_doc(doc_id)
 	var ov: String = data.offer_version()
+	var dv: String = str(meta.get("version", ov))
+	var dh: String = data.doc_hash_short(doc_id)
+	return record_consent(doc_id, dv, ov, dh, true, source)
+
+
+# Step 1: Offer & Privacy Policy acceptance (requires both documents opened; never bundles PDn or 18+).
+func record_offer_and_privacy(data: TWLegalData, opened_docs: Dictionary, source: String = "legal_screen") -> Array:
+	if data == null or not data.is_valid():
+		return []
+	if not bool(opened_docs.get("offer", false)) or not bool(opened_docs.get("privacy", false)):
+		return []
+	var out: Array = []
+	out.append(record_doc_consent(data, "offer", source))
+	out.append(record_doc_consent(data, "privacy", source))
+	return out
+
+
+# Step 2 (152-FZ): Separate explicit PDn processing consent (requires pdn_consent opened; never bundles analytics).
+func record_pdn_consent(data: TWLegalData, opened_docs: Dictionary, source: String = "legal_screen") -> Dictionary:
+	if data == null or not data.is_valid():
+		return {}
+	if not bool(opened_docs.get("pdn_consent", false)):
+		return {}
+	return record_doc_consent(data, "pdn_consent", source)
+
+
+# Step 3: 18+ confirmation requires BOTH opening age_18_full_tier AND an adult TWAge verification.
+func record_age_18_consent(data: TWLegalData, opened_docs: Dictionary, age_gate: TWAge, source: String = "legal_screen") -> Dictionary:
+	if data == null or not data.is_valid():
+		return {}
+	if not bool(opened_docs.get("age_18_full_tier", false)):
+		return {}
+	if age_gate == null or not age_gate.is_adult():
+		return {}
+	return record_doc_consent(data, "age_18_full_tier", source, age_gate)
+
+
+# Separate voluntary analytics toggle (never stamped with pdn_consent hash, never bundled into offer).
+func set_analytics_consent(data: TWLegalData, enabled: bool, source: String = "legal_screen") -> Dictionary:
+	if data == null or not data.is_valid():
+		return {}
+	var ov: String = data.offer_version()
+	return record_consent(TWConsent.KIND_ANALYTICS, ov, ov, "", enabled, source)
+
+
+# Guarded bundle recorder: FAILS CLOSED unless confirmed_acts proves every required document was opened,
+# 152-FZ PDn consent was explicitly confirmed separately, and adult TWAge is verified.
+func record_required_bundle(data: TWLegalData, source: String = "legal_screen", include_analytics: bool = false, confirmed_acts: Dictionary = {}) -> Array:
+	if data == null or not data.is_valid():
+		return []
+	var opened: Variant = confirmed_acts.get("opened_docs", {})
+	if not (opened is Dictionary):
+		return []
+	var opened_d: Dictionary = opened as Dictionary
+	for doc_id in TWLegalData.REQUIRED_CONSENT_IDS:
+		if not bool(opened_d.get(doc_id, false)):
+			return []
+	if not bool(confirmed_acts.get("pdn_separate_confirmed", false)):
+		return []
+	var age_v: Variant = confirmed_acts.get("age_gate", null)
+	if not (age_v is TWAge) or not (age_v as TWAge).is_adult():
+		return []
 	var recorded: Array = []
 	for doc_id in TWLegalData.REQUIRED_CONSENT_IDS:
-		var meta: Dictionary = data.find_doc(doc_id)
-		var dv: String = str(meta.get("version", ov))
-		var dh: String = data.doc_hash_short(doc_id)
-		recorded.append(record_consent(doc_id, dv, ov, dh, true, source))
-	var pdn_meta: Dictionary = data.find_doc("pdn_consent")
-	recorded.append(record_consent(
-		"analytics",
-		str(pdn_meta.get("version", ov)),
-		ov,
-		data.doc_hash_short("pdn_consent"),
-		include_analytics,
-		source
-	))
+		var e: Dictionary = record_doc_consent(data, doc_id, source, age_v as TWAge)
+		if e.is_empty():
+			return []
+		recorded.append(e)
+	if bool(confirmed_acts.get("record_analytics_choice", false)):
+		recorded.append(set_analytics_consent(data, include_analytics, source))
 	return recorded
 
 
 func entries() -> Array:
-	var box: Dictionary = _root()
-	var out: Array = []
-	for e in box["entries"]:
-		if e is Dictionary:
-			out.append((e as Dictionary).duplicate(true))
-	return out
+	return core.entries()
 
 
 func entry_count() -> int:
-	return (_root()["entries"] as Array).size()
+	return core.entry_count()
 
 
 func latest_for(kind: String) -> Dictionary:
-	var list: Array = _root()["entries"]
-	for i in range(list.size() - 1, -1, -1):
-		var e: Variant = list[i]
-		if e is Dictionary and str((e as Dictionary).get("kind", "")) == kind:
-			return (e as Dictionary).duplicate(true)
-	return {}
+	return core.latest_for(kind)
 
 
 func latest_by_kind() -> Dictionary:
-	var out: Dictionary = {}
-	for e in _root()["entries"]:
-		if e is Dictionary:
-			var k: String = str((e as Dictionary).get("kind", ""))
-			if k != "":
-				out[k] = (e as Dictionary).duplicate(true)
-	return out
+	return core.latest_by_kind()
 
 
 func accepted_offer_version() -> String:
-	var last_offer: Dictionary = latest_for("offer")
-	if last_offer.is_empty() or not bool(last_offer.get("accepted", false)):
-		return ""
-	return str(last_offer.get("offer_ver", ""))
+	return core.accepted_offer_version()
 
 
 func has_accepted(kind: String, required_offer_ver: String = "") -> bool:
-	var last_e: Dictionary = latest_for(kind)
-	if last_e.is_empty() or not bool(last_e.get("accepted", false)):
-		return false
-	if required_offer_ver != "" and str(last_e.get("offer_ver", "")) != required_offer_ver:
-		return false
-	return true
+	return core.has_accepted(kind, required_offer_ver)
 
 
 func has_all_required(required_offer_ver: String) -> bool:
-	for k in TWLegalData.REQUIRED_CONSENT_IDS:
-		if not has_accepted(k, required_offer_ver):
-			return false
-	return true
+	return core.has_required_consents(required_offer_ver)
+
+
+func analytics_enabled() -> bool:
+	return core.analytics_enabled()
 
 
 func needs_reconsent(kind: String, current_offer_ver: String) -> bool:
-	return not has_accepted(kind, current_offer_ver)
+	return core.needs_reconsent(kind, current_offer_ver)
 
 
 func export_text() -> String:
-	var lines: PackedStringArray = PackedStringArray()
-	lines.append("Журнал согласий Tile Waifu")
-	var ov: String = accepted_offer_version()
-	lines.append("Принятая версия оферты: %s" % (ov if ov != "" else "не принята"))
-	var list: Array = entries()
-	lines.append("Всего записей: %d" % list.size())
-	for e in list:
-		var action_s: String = "принято" if bool(e.get("accepted", false)) else "отозвано/отклонено"
-		var ts_i: int = int(e.get("ts", 0))
-		var dt_s: String = Time.get_datetime_string_from_unix_time(ts_i, true)
-		lines.append("#%d | %s | %s | вер. док. %s | оферта %s | %s | %s" % [
-			int(e.get("seq", 0)),
-			str(e.get("kind", "")),
-			action_s,
-			str(e.get("ver", "")),
-			str(e.get("offer_ver", "")),
-			dt_s,
-			str(e.get("source", "")),
-		])
-	return "\n".join(lines)
+	return core.export_text()

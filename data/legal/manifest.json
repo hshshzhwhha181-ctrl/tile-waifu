@@ -18,8 +18,8 @@
       "category": "core",
       "required_for_consent": true,
       "has_refund_clause": true,
-      "sha256": "66724c4264d67fb9254d731f7aff622f4c7f9614b9decd5a98cb10253fd1b1c1",
-      "bytes": 10628,
+      "sha256": "bb447b8738b5e192afb544e2e916c63dcde0bfbf3bd1fc69ceecb2413004e166",
+      "bytes": 11089,
       "template_status": "шаблон, не юридическая консультация, нужна проверка юристом"
     },
     {
@@ -32,8 +32,8 @@
       "category": "privacy",
       "required_for_consent": true,
       "has_refund_clause": false,
-      "sha256": "043bb874ac9085f03cdbc57e3e6d3712c44074ecb2382baf45fb48ef573a8c18",
-      "bytes": 7388,
+      "sha256": "05eff5cdd382c838cf34b7e8436d9152f5137335b009248efec8349cc1490ad9",
+      "bytes": 7870,
       "template_status": "шаблон, не юридическая консультация, нужна проверка юристом"
     },
     {
@@ -46,8 +46,8 @@
       "category": "privacy",
       "required_for_consent": true,
       "has_refund_clause": false,
-      "sha256": "d98b319871ccc912607f1eca783024aee6cded17ed0a8b22325e4e0d06d4feee",
-      "bytes": 4751,
+      "sha256": "695476d191c58d5b8fd54b05724c1a3720b12d8ef64167263df20372cdef9f7c",
+      "bytes": 5050,
       "template_status": "шаблон, не юридическая консультация, нужна проверка юристом"
     },
     {
@@ -74,8 +74,8 @@
       "category": "monetization",
       "required_for_consent": false,
       "has_refund_clause": true,
-      "sha256": "0ac7e9b99c4660ab8f60038be42d8881e7f83343a3e9610b1e7686fad5d56bc4",
-      "bytes": 6094,
+      "sha256": "13414fbb2dda80420637dd7c179711a3fca77e559aa6f1229d92df36ba16d14f",
+      "bytes": 6101,
       "template_status": "шаблон, не юридическая консультация, нужна проверка юристом"
     },
     {
@@ -144,8 +144,8 @@
       "category": "content",
       "required_for_consent": false,
       "has_refund_clause": false,
-      "sha256": "c531eae19ffee791e3b26a13b898695743d9916f25aba512fb991b3664c6a27b",
-      "bytes": 4363,
+      "sha256": "3cfcdb381821a29396a0b1d366833f918899d980cd616e6b6d914a0613b28828",
+      "bytes": 4370,
       "template_status": "шаблон, не юридическая консультация, нужна проверка юристом"
     },
     {
@@ -158,8 +158,8 @@
       "category": "core",
       "required_for_consent": false,
       "has_refund_clause": false,
-      "sha256": "c77e55d39ef90db37677a515f91eefd2a6b08db45b6b4f6997903cafee63a321",
-      "bytes": 3551,
+      "sha256": "4f02b9fcce3449df14eece00d2f0193e9ee5b1f2a5003941e93e63c9ee076abd",
+      "bytes": 3636,
       "template_status": "шаблон, не юридическая консультация, нужна проверка юристом"
     },
     {
@@ -172,8 +172,8 @@
       "category": "content",
       "required_for_consent": true,
       "has_refund_clause": false,
-      "sha256": "98df76663cf4dca7c19cb0df7b2b9ba8f55d5693918c9203229077b9f430c916",
-      "bytes": 4996,
+      "sha256": "afc6a44896cf20096a6850616baaa4bc0dcda4d1dbe2e34a4b889b34c63c1ecd",
+      "bytes": 5583,
       "template_status": "шаблон, не юридическая консультация, нужна проверка юристом"
     },
     {
@@ -186,8 +186,8 @@
       "category": "beta",
       "required_for_consent": false,
       "has_refund_clause": false,
-      "sha256": "eed5d801ed9141b110bc5a108151493da1807f225a9664598e90d1ecbed82f0b",
-      "bytes": 5400,
+      "sha256": "a8e304a8158f38a87d2fbfae9b0df580dd283b241e1f124a44a5b92d14d78871",
+      "bytes": 5407,
       "template_status": "шаблон, не юридическая консультация, нужна проверка юристом"
     }
   ]

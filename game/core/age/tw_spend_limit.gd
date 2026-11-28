@@ -5,11 +5,12 @@ extends RefCounted
 # Pure core spending protection:
 #   - Default monthly cap: 5000 rub per rolling 30 days (DECISIONS №5, pending Q-R06).
 #   - Lowering cap applies immediately; raising or removing cap applies after 24 hours (DP-07).
-#   - Voluntary pause: 1 / 7 / 30 days on TWClock (DP-08).
+#   - Voluntary pause: 1 / 7 / 30 days on TWClock.safe_now() (DP-08).
 #   - Irreversible self-exclusion: 30 / 90 / 180 days (DP-08).
 #   - Emergency threshold (C13): >= 30000 rub / 30d OR >= 10000 rub / 24h -> 24h pause + user ack (even with no limit).
 #   - Pause / self-exclusion blocks payments, wishes, and price display, NEVER the Full visual tier (C14).
-#   - Integrates with TWAge (DENY_AGE / DENY_MINOR / DENY_LINK) and TWConsent (DENY_CONSENT).
+#   - Unified purchase gate check_purchase() FAILS CLOSED if age, consent, or required_offer_ver are missing.
+#   - record_purchase() is idempotent on order_id and uses order-independent 366d retention pruning.
 # Note: zero currency symbols or percent-digit literals (UX_LINT / CONTRACT_SELFTEST compliant).
 
 const MODULE_ID: String = "spend_limit"
@@ -77,9 +78,13 @@ func _touch_state(urgent: bool = true) -> void:
 		_state.mark_dirty(urgent)
 
 
+func _safe_now() -> int:
+	return clock.safe_now()
+
+
 func _apply_pending() -> void:
 	var d: Dictionary = _root()
-	if int(d["pending_limit"]) >= 0 and clock.now() >= int(d["limit_effective_at"]):
+	if int(d["pending_limit"]) >= 0 and _safe_now() >= int(d["limit_effective_at"]):
 		d["limit"] = int(d["pending_limit"])
 		d["pending_limit"] = -1
 		d["limit_effective_at"] = 0
@@ -105,7 +110,7 @@ func limit_effective_at() -> int:
 
 func spent_window(window_sec: int) -> int:
 	var d: Dictionary = _root()
-	var t0: int = clock.now() - window_sec
+	var t0: int = _safe_now() - window_sec
 	var total: int = 0
 	for h in d["hist"]:
 		if h is Dictionary and not bool((h as Dictionary).get("refunded", false)):
@@ -131,7 +136,7 @@ func room() -> int:
 
 
 func is_paused() -> bool:
-	return clock.now() < int(_root()["pause_until"])
+	return _safe_now() < int(_root()["pause_until"])
 
 
 func pause_until() -> int:
@@ -139,7 +144,7 @@ func pause_until() -> int:
 
 
 func is_self_excluded() -> bool:
-	return clock.now() < int(_root()["exclude_until"])
+	return _safe_now() < int(_root()["exclude_until"])
 
 
 func exclude_until() -> int:
@@ -148,7 +153,7 @@ func exclude_until() -> int:
 
 func is_emergency_paused() -> bool:
 	var d: Dictionary = _root()
-	return clock.now() < int(d["emergency_until"]) or bool(d["emergency_ack_needed"])
+	return _safe_now() < int(d["emergency_until"]) or bool(d["emergency_ack_needed"])
 
 
 func emergency_until() -> int:
@@ -189,7 +194,7 @@ func set_limit(rub: int, confirm_unlimited: bool = false) -> Dictionary:
 		_touch_state(true)
 		return {"ok": true, "code": "OK", "immediate": true, "limit": rub}
 	# Raising or removing own limit takes 24h
-	var eff: int = clock.now() + LIMIT_RAISE_DELAY_SEC
+	var eff: int = _safe_now() + LIMIT_RAISE_DELAY_SEC
 	d["pending_limit"] = rub
 	d["limit_effective_at"] = eff
 	_touch_state(true)
@@ -200,7 +205,7 @@ func set_pause(days: int) -> Dictionary:
 	if not PAUSE_DAYS.has(days):
 		return {"ok": false, "code": "DENY_INVALID_PAUSE_DAYS"}
 	var d: Dictionary = _root()
-	var until: int = maxi(int(d["pause_until"]), clock.now() + days * DAY_SEC)
+	var until: int = maxi(int(d["pause_until"]), _safe_now() + days * DAY_SEC)
 	d["pause_until"] = until
 	_touch_state(true)
 	return {"ok": true, "code": "OK", "pause_until": until}
@@ -210,7 +215,7 @@ func set_self_exclusion(days: int) -> Dictionary:
 	if not EXCLUDE_DAYS.has(days):
 		return {"ok": false, "code": "DENY_INVALID_EXCLUDE_DAYS"}
 	var d: Dictionary = _root()
-	var until: int = maxi(int(d["exclude_until"]), clock.now() + days * DAY_SEC)
+	var until: int = maxi(int(d["exclude_until"]), _safe_now() + days * DAY_SEC)
 	d["exclude_until"] = until
 	_touch_state(true)
 	return {"ok": true, "code": "OK", "exclude_until": until}
@@ -218,26 +223,33 @@ func set_self_exclusion(days: int) -> Dictionary:
 
 func acknowledge_emergency_pause() -> Dictionary:
 	var d: Dictionary = _root()
-	if clock.now() < int(d["emergency_until"]):
+	if _safe_now() < int(d["emergency_until"]):
 		return {"ok": false, "code": "DENY_EMERGENCY_WAIT", "until": int(d["emergency_until"])}
 	d["emergency_ack_needed"] = false
 	_touch_state(true)
 	return {"ok": true, "code": "OK"}
 
 
-# ---- purchase gate & recording ----------------------------------------------------------------------------
+# ---- purchase gate & recording (FAIL CLOSED) --------------------------------------------------------------
 
-func check_purchase(rub: int, age: TWAge = null, consent: TWConsent = null, required_offer_ver: String = "") -> Dictionary:
-	if age != null:
-		var age_res: Dictionary = age.can_purchase()
-		if not bool(age_res.get("ok", false)):
-			return age_res
-	if consent != null and required_offer_ver != "":
-		if not consent.has_required_consents(required_offer_ver):
-			return {"ok": false, "code": "DENY_CONSENT", "offer_ver": required_offer_ver}
+func check_purchase(rub: int, age: TWAge = null, consent: TWConsent = null, required_offer_ver: String = "", real_payments_enabled: bool = true) -> Dictionary:
+	if not real_payments_enabled:
+		return {"ok": false, "code": "DENY_PAYMENTS_DISABLED"}
+	if age == null:
+		return {"ok": false, "code": "DENY_AGE", "reason": "age_gate_missing"}
+	var age_res: Dictionary = age.can_purchase()
+	if not bool(age_res.get("ok", false)):
+		return age_res
+	if consent == null:
+		return {"ok": false, "code": "DENY_CONSENT", "reason": "consent_journal_missing"}
+	var req_ver: String = required_offer_ver.strip_edges()
+	if req_ver == "":
+		return {"ok": false, "code": "DENY_CONSENT", "reason": "offer_ver_missing"}
+	if not consent.has_required_consents(req_ver):
+		return {"ok": false, "code": "DENY_CONSENT", "offer_ver": req_ver}
 	if rub <= 0:
 		return {"ok": false, "code": "DENY_AMOUNT"}
-	var now: int = clock.now()
+	var now: int = _safe_now()
 	var d: Dictionary = _root()
 	if now < int(d["exclude_until"]):
 		return {"ok": false, "code": "DENY_SELF_EXCLUDED", "until": int(d["exclude_until"])}
@@ -270,13 +282,32 @@ func check_purchase(rub: int, age: TWAge = null, consent: TWConsent = null, requ
 
 
 func record_purchase(rub: int, order_id: String) -> Dictionary:
+	var oid: String = order_id.strip_edges()
+	if oid == "":
+		return {"ok": false, "code": "DENY_ORDER_ID"}
 	var d: Dictionary = _root()
-	var now: int = clock.now()
 	var hist: Array = d["hist"]
-	hist.append({"t": now, "rub": maxi(0, rub), "oid": order_id, "refunded": false})
+	# Idempotency guard: replaying the same order_id (reconcile / restore) never double-counts spend.
+	for existing in hist:
+		if existing is Dictionary and str((existing as Dictionary).get("oid", "")) == oid:
+			return {
+				"ok": true,
+				"code": "DUPLICATE",
+				"duplicate": true,
+				"spent_30d": spent_30d(),
+				"spent_24h": spent_24h(),
+				"emergency_triggered": false,
+				"emergency_until": int(d["emergency_until"]),
+			}
+	var now: int = _safe_now()
+	hist.append({"t": now, "rub": maxi(0, rub), "oid": oid, "refunded": false})
+	# Order-independent retention pruning (safe even if entries are out of timestamp order after clock drift).
 	var cutoff: int = now - KEEP_HISTORY_SEC
-	while not hist.is_empty() and int((hist[0] as Dictionary).get("t", 0)) < cutoff:
-		hist.pop_front()
+	var kept: Array = []
+	for item in hist:
+		if item is Dictionary and int((item as Dictionary).get("t", 0)) >= cutoff:
+			kept.append(item)
+	d["hist"] = kept
 	var s30: int = spent_30d()
 	var s24: int = spent_24h()
 	var triggered_emergency: bool = false
@@ -287,6 +318,8 @@ func record_purchase(rub: int, order_id: String) -> Dictionary:
 	_touch_state(true)
 	return {
 		"ok": true,
+		"code": "OK",
+		"duplicate": false,
 		"spent_30d": s30,
 		"spent_24h": s24,
 		"emergency_triggered": triggered_emergency,
@@ -295,10 +328,13 @@ func record_purchase(rub: int, order_id: String) -> Dictionary:
 
 
 func mark_refunded(order_id: String) -> bool:
+	var oid: String = order_id.strip_edges()
+	if oid == "":
+		return false
 	var d: Dictionary = _root()
 	var found: bool = false
 	for h in d["hist"]:
-		if h is Dictionary and str((h as Dictionary).get("oid", "")) == order_id:
+		if h is Dictionary and str((h as Dictionary).get("oid", "")) == oid:
 			(h as Dictionary)["refunded"] = true
 			found = true
 	if found:

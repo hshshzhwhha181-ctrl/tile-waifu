@@ -48,6 +48,7 @@ func run() -> Array:
 	_test_emergency_threshold_and_self_exclusion()
 	_test_pull_history_365d()
 	_test_twstate_persistence_save_ver_8()
+	_test_round1_core_regressions()
 	_wipe_dir(TEST_SAVE_DIR)
 	print("TWAGE_SELFTEST %d/%d %s" % [checks - fails, checks, "OK" if fails == 0 else "FAILED"])
 	return [checks - fails, checks]
@@ -128,10 +129,13 @@ func _test_dob_and_msk() -> void:
 	ok(str(TWAge.validate_dob(2007, 2, 29, msk_midnight)["code"]) == "DENY_DOB_INVALID",
 		"2007-02-29 rejected as invalid calendar date")
 
-	# 4. 1900 boundary, below 1900, future dates, invalid calendar dates
+	# 4. 1900 boundary (MAX_AGE=120 rejects age 126), below 1900, future dates, invalid calendar dates
 	var v1900: Dictionary = TWAge.validate_dob(1900, 1, 1, msk_midnight)
-	ok(bool(v1900["ok"]) and int(v1900["age"]) == 126,
-		"1900-01-01 accepted at MIN_YEAR boundary (age 126)")
+	ok(not bool(v1900["ok"]) and str(v1900["code"]) == "DENY_DOB_RANGE",
+		"1900-01-01 (age 126 > MAX_AGE) rejected with DENY_DOB_RANGE")
+	var v1906: Dictionary = TWAge.validate_dob(1906, 5, 15, msk_midnight)
+	ok(bool(v1906["ok"]) and int(v1906["age"]) == 120,
+		"1906-05-15 accepted at MAX_AGE boundary (age 120)")
 	ok(str(TWAge.validate_dob(1899, 12, 31, msk_midnight)["code"]) == "DENY_DOB_RANGE",
 		"1899-12-31 rejected with DENY_DOB_RANGE")
 	ok(str(TWAge.validate_dob(0, 1, 1, msk_midnight)["code"]) == "DENY_DOB_RANGE",
@@ -183,10 +187,19 @@ func _test_minor_lockout_and_full_tier() -> void:
 	ok(not bool(cheat["ok"]) and str(cheat["code"]) == "DENY_MINOR_LOCKED",
 		"adult DOB refused during 30-day minor lockout (DENY_MINOR_LOCKED)")
 
-	# Support override lifts minor block early
-	age.clear_minor_block_by_support()
-	ok(age.current_state() == TWAge.STATE_UNSET and not age.is_minor_blocked(),
-		"support override clears BLOCKED_MINOR")
+	# Support override requires configured support verifier and valid ticket/token
+	var sup_unconf: Dictionary = age.clear_minor_block_by_support()
+	ok(not bool(sup_unconf["ok"]) and str(sup_unconf["code"]) == "DENY_SUPPORT_UNCONFIGURED" and age.is_minor_blocked(),
+		"clear_minor_block_by_support without verifier fails closed")
+	age.set_support_verifier(func(ticket_id: String, tok: String) -> bool:
+		return ticket_id == "SUP-42" and tok == "signed-ok-token"
+	)
+	var sup_bad: Dictionary = age.clear_minor_block_by_support("SUP-42", "wrong-token")
+	ok(not bool(sup_bad["ok"]) and str(sup_bad["code"]) == "DENY_SUPPORT_AUTH" and age.is_minor_blocked(),
+		"clear_minor_block_by_support with bad token fails closed")
+	var sup_ok: Dictionary = age.clear_minor_block_by_support("SUP-42", "signed-ok-token")
+	ok(bool(sup_ok["ok"]) and age.current_state() == TWAge.STATE_UNSET and not age.is_minor_blocked(),
+		"authenticated support override clears BLOCKED_MINOR")
 
 	# Re-block and let full 30 days expire on fake clock
 	age.submit_dob(2011, 5, 5)
@@ -231,24 +244,33 @@ func _test_account_link_and_consent() -> void:
 	ok(not bool(lim_unlinked["ok"]) and str(lim_unlinked["code"]) == "DENY_LINK",
 		"TWSpendLimit.check_purchase without account link returns DENY_LINK")
 
-	# Invalid provider rejected
-	ok(str(age.link_account("telegram_unlisted", "u1")["code"]) == "DENY_PROVIDER",
+	# Invalid provider / uid / unverified token rejected
+	ok(str(age.link_account("telegram_unlisted", "u1", "tok")["code"]) == "DENY_PROVIDER",
 		"unsupported link provider rejected")
-	ok(str(age.link_account("vk", "")["code"]) == "DENY_UID",
+	ok(str(age.link_account("vk", "", "tok")["code"]) == "DENY_UID",
 		"empty uid rejected on link_account")
+	ok(str(age.link_account("email", "not-an-email", "tok")["code"]) == "DENY_UID",
+		"malformed email rejected on link_account")
+	ok(str(age.link_account("vk", "vk_user_42", "tok")["code"]) == "DENY_LINK_UNCONFIGURED",
+		"link_account without link_verifier fails closed")
 
-	# Link with vk / yandex / email
-	ok(bool(age.link_account("vk", "vk_user_42")["ok"]) and age.is_linked() and age.linked_provider() == "vk",
-		"link_account('vk') succeeds")
+	# Configure verifier and link with vk / yandex / email
+	age.set_link_verifier(func(_p: String, _u: String, tok: String) -> bool:
+		return tok == "verified-oauth-proof"
+	)
+	ok(str(age.link_account("vk", "vk_user_42", "bad-proof")["code"]) == "DENY_LINK_UNVERIFIED",
+		"link_account with rejected verification token fails closed")
+	ok(bool(age.link_account("vk", "vk_user_42", "verified-oauth-proof")["ok"]) and age.is_linked() and age.linked_provider() == "vk",
+		"verified link_account('vk') succeeds")
 	ok(bool(age.can_purchase()["ok"]),
-		"can_purchase() OK after adult + link")
+		"can_purchase() OK after adult + verified link")
 
 	# Consent check before accepting offer -> DENY_CONSENT
 	ok(str(lim.check_purchase(499, age, consent, "1.0")["code"]) == "DENY_CONSENT",
 		"check_purchase without consent returns DENY_CONSENT")
 
 	# Accept required consents (offer, privacy, pdn, age_18) + analytics off
-	var rec: Array = consent.accept_required("1.0", false, "s02")
+	var rec: Array = consent.accept_required("1.0", false, "s02", age)
 	ok(rec.size() == 5 and consent.has_required_consents("1.0"),
 		"TWConsent.accept_required records 4 required + 1 analytics entry")
 	ok(not consent.analytics_enabled(), "analytics starts disabled when false")
@@ -257,6 +279,8 @@ func _test_account_link_and_consent() -> void:
 		"offer version bump triggers needs_reconsent")
 	ok(bool(lim.check_purchase(499, age, consent, "1.0")["ok"]),
 		"check_purchase OK after adult + link + consent")
+	ok(str(lim.check_purchase(499, age, consent, "1.0", false)["code"]) == "DENY_PAYMENTS_DISABLED",
+		"check_purchase returns DENY_PAYMENTS_DISABLED when real_payments_enabled=false")
 
 	# Separate analytics toggle & revocation
 	consent.set_analytics(true, "1.0", "settings")
@@ -271,36 +295,39 @@ func _test_account_link_and_consent() -> void:
 	age.unlink_account()
 	ok(str(age.can_purchase()["code"]) == "DENY_LINK",
 		"unlink_account restores DENY_LINK")
-	ok(bool(age.link_account("yandex", "ya_99")["ok"]) and bool(age.link_account("email", "a@b.ru")["ok"]),
-		"yandex and email providers accepted")
+	ok(bool(age.link_account("yandex", "ya_99", "verified-oauth-proof")["ok"]) and bool(age.link_account("email", "player@tilewaifu.invalid", "verified-oauth-proof")["ok"]),
+		"verified yandex and email providers accepted")
 
 
 func _test_spend_limit_and_pause() -> void:
 	var clk: TWClock = TWClock.fake(_utc(2026, 8, 1, 12, 0, 0), 180)
 	var age: TWAge = TWAge.new(clk)
+	age.set_link_verifier(func(_p: String, _u: String, tok: String) -> bool: return tok == "ok-tok")
 	age.submit_dob(1992, 10, 5)
 	age.set_full_tier(true)
-	age.link_account("vk", "u_lim")
+	age.link_account("vk", "u_lim", "ok-tok")
+	var consent: TWConsent = TWConsent.new(clk)
+	consent.accept_required("1.0", false, "s02", age)
 	var lim: TWSpendLimit = TWSpendLimit.new(clk)
 
 	# 1. Default 5000 rub/month cap
 	ok(lim.current_limit() == 5000, "default monthly limit is 5000 rub")
 	ok(lim.room() == 5000 and lim.spent_30d() == 0, "fresh room is 5000, spent_30d is 0")
-	ok(str(lim.check_purchase(5001, age)["code"]) == "DENY_LIMIT",
+	ok(str(lim.check_purchase(5001, age, consent, "1.0")["code"]) == "DENY_LIMIT",
 		"single purchase > 5000 denied by default limit")
-	ok(bool(lim.check_purchase(3000, age)["ok"]), "3000 within 5000 allowed")
+	ok(bool(lim.check_purchase(3000, age, consent, "1.0")["ok"]), "3000 within 5000 allowed")
 	lim.record_purchase(3000, "ord_1")
 	ok(lim.spent_30d() == 3000 and lim.room() == 2000, "spent_30d=3000, room=2000")
-	ok(bool(lim.check_purchase(2000, age)["ok"]), "3000 + 2000 == 5000 allowed")
+	ok(bool(lim.check_purchase(2000, age, consent, "1.0")["ok"]), "3000 + 2000 == 5000 allowed")
 	lim.record_purchase(2000, "ord_2")
 	ok(lim.spent_30d() == 5000 and lim.room() == 0, "spent_30d=5000, room=0")
-	ok(str(lim.check_purchase(1, age)["code"]) == "DENY_LIMIT",
+	ok(str(lim.check_purchase(1, age, consent, "1.0")["code"]) == "DENY_LIMIT",
 		"5000 + 1 denied with DENY_LIMIT")
 
 	# 2. Refund restores room
 	ok(lim.mark_refunded("ord_2") and lim.spent_30d() == 3000 and lim.room() == 2000,
 		"refunded order excluded from spent_30d")
-	ok(bool(lim.check_purchase(2000, age)["ok"]), "purchase succeeds after refund restores room")
+	ok(bool(lim.check_purchase(2000, age, consent, "1.0")["ok"]), "purchase succeeds after refund restores room")
 
 	# 3. Rolling 30-day window on fake clock
 	clk.advance(29.0 * 86400.0)
@@ -338,23 +365,26 @@ func _test_spend_limit_and_pause() -> void:
 	for days in [1, 7, 30]:
 		var rp: Dictionary = lim.set_pause(days)
 		ok(bool(rp["ok"]) and lim.is_paused(), "set_pause(%d) activates pause" % days)
-		ok(str(lim.check_purchase(100, age)["code"]) == "DENY_PAUSED",
+		ok(str(lim.check_purchase(100, age, consent, "1.0")["code"]) == "DENY_PAUSED",
 			"purchase blocked during %d-day pause" % days)
 		ok(lim.blocks_prices_and_wishes() and not lim.blocks_full_tier() and age.is_full_tier_enabled(),
 			"C14: %d-day pause blocks prices/wishes but NOT Full tier" % days)
 		clk.advance(float(days) * 86400.0 - 1.0)
 		ok(lim.is_paused(), "still paused 1 sec before %d-day expiry" % days)
 		clk.advance(1.0)
-		ok(not lim.is_paused() and bool(lim.check_purchase(100, age)["ok"]),
+		ok(not lim.is_paused() and bool(lim.check_purchase(100, age, consent, "1.0")["ok"]),
 			"%d-day pause lifts automatically on TWClock.fake" % days)
 
 
 func _test_emergency_threshold_and_self_exclusion() -> void:
 	var clk: TWClock = TWClock.fake(_utc(2026, 9, 1, 10, 0, 0), 180)
 	var age: TWAge = TWAge.new(clk)
+	age.set_link_verifier(func(_p: String, _u: String, tok: String) -> bool: return tok == "ok-tok")
 	age.submit_dob(1990, 2, 14)
 	age.set_full_tier(true)
-	age.link_account("yandex", "ya_whale")
+	age.link_account("yandex", "ya_whale", "ok-tok")
+	var consent: TWConsent = TWConsent.new(clk)
+	consent.accept_required("1.0", false, "s02", age)
 	var lim: TWSpendLimit = TWSpendLimit.new(clk)
 
 	# Switch to "No own limit" (0) to verify C13 emergency threshold still fires
@@ -366,14 +396,14 @@ func _test_emergency_threshold_and_self_exclusion() -> void:
 	var r_em: Dictionary = lim.record_purchase(10000, "big_1")
 	ok(bool(r_em["emergency_triggered"]) and lim.is_emergency_paused(),
 		"C13: >= 10000 rub in 24h triggers emergency pause even with no limit")
-	ok(str(lim.check_purchase(100, age)["code"]) == "DENY_EMERGENCY_PAUSE",
+	ok(str(lim.check_purchase(100, age, consent, "1.0")["code"]) == "DENY_EMERGENCY_PAUSE",
 		"purchase blocked during 24h emergency pause")
 	ok(str(lim.acknowledge_emergency_pause()["code"]) == "DENY_EMERGENCY_WAIT",
 		"cannot acknowledge emergency pause before 24h elapses")
 	clk.advance(86400.0)
-	ok(str(lim.check_purchase(100, age)["code"]) == "DENY_EMERGENCY_PAUSE",
+	ok(str(lim.check_purchase(100, age, consent, "1.0")["code"]) == "DENY_EMERGENCY_PAUSE",
 		"after 24h still blocked until user explicitly acknowledges (C13)")
-	ok(bool(lim.acknowledge_emergency_pause()["ok"]) and bool(lim.check_purchase(100, age)["ok"]),
+	ok(bool(lim.acknowledge_emergency_pause()["ok"]) and bool(lim.check_purchase(100, age, consent, "1.0")["ok"]),
 		"user ack after 24h lifts emergency pause")
 
 	# 30d emergency threshold (>= 30000 in 30d across separate days)
@@ -397,12 +427,12 @@ func _test_emergency_threshold_and_self_exclusion() -> void:
 	var prev_ex: int = lim.exclude_until()
 	lim.set_self_exclusion(30)
 	ok(lim.exclude_until() == prev_ex, "self-exclusion cannot be shortened from 90d to 30d")
-	ok(str(lim.check_purchase(100, age)["code"]) == "DENY_SELF_EXCLUDED",
+	ok(str(lim.check_purchase(100, age, consent, "1.0")["code"]) == "DENY_SELF_EXCLUDED",
 		"purchase blocked during self-exclusion")
 	ok(not lim.blocks_full_tier() and age.is_full_tier_enabled(),
 		"C14: self-exclusion does NOT block Full tier")
 	clk.advance(90.0 * 86400.0)
-	ok(not lim.is_self_excluded() and bool(lim.check_purchase(100, age)["ok"]),
+	ok(not lim.is_self_excluded() and bool(lim.check_purchase(100, age, consent, "1.0")["ok"]),
 		"self-exclusion lifts after full 90 days")
 
 
@@ -506,10 +536,11 @@ func _test_twstate_persistence_save_ver_8() -> void:
 	var lim: TWSpendLimit = TWSpendLimit.new(clk, st)
 	var hist: PullHistory = PullHistory.new(clk, st)
 
+	age.set_link_verifier(func(_p: String, _u: String, tok: String) -> bool: return tok == "ok-tok")
 	age.submit_dob(1994, 11, 22)
 	age.set_full_tier(true)
-	age.link_account("email", "player@example.ru")
-	consent.accept_required("1.0", true, "s02")
+	age.link_account("email", "player@tilewaifu.invalid", "ok-tok")
+	consent.accept_required("1.0", true, "s02", age)
 	lim.record_purchase(1490, "ord_persist")
 	hist.record_pull({"banner_id": "b_moon_a", "rarity": "SSR", "item_id": "hana_ssr_beach", "odds_hash": "99887766"})
 
@@ -532,6 +563,154 @@ func _test_twstate_persistence_save_ver_8() -> void:
 		"reloaded TWSpendLimit retains spent_30d and default cap")
 	ok(hist2.count() == 1 and hist2.export_text().contains("hana_ssr_beach"),
 		"reloaded PullHistory retains pull entry")
+
+
+func _test_round1_core_regressions() -> void:
+	# [M1] revoke_age() must NOT bypass BLOCKED_MINOR; clear_minor_block_by_support() must fail closed without auth
+	var t0: int = _utc(2026, 6, 1, 10, 0, 0)
+	var clk1: TWClock = TWClock.fake(t0, 180)
+	var age1: TWAge = TWAge.new(clk1)
+	age1.submit_dob(2012, 3, 10)
+	ok(age1.is_minor_blocked(), "[M1] minor DOB enters BLOCKED_MINOR")
+	age1.revoke_age()
+	ok(age1.current_state() == TWAge.STATE_BLOCKED_MINOR and age1.is_minor_blocked(),
+		"[M1] revoke_age() does NOT unlock active BLOCKED_MINOR")
+	var bypass_try: Dictionary = age1.submit_dob(1995, 1, 1)
+	ok(not bool(bypass_try["ok"]) and str(bypass_try["code"]) == "DENY_MINOR_LOCKED",
+		"[M1] submit_dob after revoke_age() during lock still returns DENY_MINOR_LOCKED")
+	age1.clear_minor_block_by_support()
+	ok(age1.current_state() == TWAge.STATE_BLOCKED_MINOR and age1.is_minor_blocked(),
+		"[M1] unauthenticated clear_minor_block_by_support() fails closed and keeps BLOCKED_MINOR")
+
+	# [M2] TWSpendLimit.check_purchase() must FAIL CLOSED when age/consent/required_offer_ver are omitted
+	var clk2: TWClock = TWClock.fake(t0, 180)
+	var age2: TWAge = TWAge.new(clk2)
+	age2.set_link_verifier(func(_p: String, _u: String, tok: String) -> bool: return tok == "ok-tok")
+	age2.submit_dob(1995, 5, 5)
+	age2.link_account("vk", "vk_m2_user", "ok-tok")
+	var consent2: TWConsent = TWConsent.new(clk2)
+	var lim2: TWSpendLimit = TWSpendLimit.new(clk2)
+	ok(not bool(lim2.check_purchase(499)["ok"]),
+		"[M2] check_purchase(499) with null age/consent fails closed")
+	ok(not bool(lim2.check_purchase(499, age2)["ok"]),
+		"[M2] check_purchase(499, age) with null consent fails closed")
+	ok(not bool(lim2.check_purchase(499, age2, consent2, "")["ok"]),
+		"[M2] check_purchase(499, age, consent, '') with empty offer_ver fails closed")
+
+	# [M7] PullHistory.prune() must resist phone clock forward jump + record_pull ignores caller ts
+	var clk7: TWClock = TWClock.fake(t0, 180)
+	var ph7: PullHistory = PullHistory.new(clk7)
+	var r7: Dictionary = ph7.record_pull({
+		"ts": t0 - 500 * 86400,
+		"banner_id": "b_moon_a",
+		"family": "outfit",
+		"rarity": "SSR",
+		"item_id": "hana_ssr",
+		"cost_cur": "gems",
+		"cost_amt": 150,
+		"odds_hash": "abcd1234",
+	})
+	ok(int(r7["ts"]) == t0,
+		"[M7] record_pull ignores caller-supplied ts and stamps clock time")
+	# Simulate phone clock moved forward 400 days (wall clock jump without monotonic passage)
+	clk7.set_wall(t0 + 400 * 86400)
+	ph7.record_pull({
+		"banner_id": "b_moon_a",
+		"family": "outfit",
+		"rarity": "S",
+		"item_id": "rin_s",
+		"cost_cur": "gems",
+		"cost_amt": 150,
+		"odds_hash": "abcd1234",
+	})
+	ok(ph7.count() == 2,
+		"[M7] forward phone clock jump (>365d) does NOT wipe PullHistory")
+
+	# [m1] 512-entry cap must preserve founding required consents and keep seq strictly unique/increasing
+	var clk_m1: TWClock = TWClock.fake(t0, 180)
+	var c_m1: TWConsent = TWConsent.new(clk_m1)
+	c_m1.accept_required("1.0", false, "gate")
+	for i in range(560):
+		clk_m1.advance(1.0)
+		c_m1.set_analytics((i % 2) == 0, "1.0", "settings")
+	ok(c_m1.has_required_consents("1.0"),
+		"[m1] founding required consents survive >512 analytics toggles")
+	var seqs: Dictionary = {}
+	var dup_seq: bool = false
+	var prev_seq: int = 0
+	var mono_seq: bool = true
+	for e in c_m1.entries():
+		var sq: int = int(e.get("seq", 0))
+		if seqs.has(sq):
+			dup_seq = true
+		seqs[sq] = true
+		if sq <= prev_seq:
+			mono_seq = false
+		prev_seq = sq
+	ok(not dup_seq and mono_seq and prev_seq > TWConsent.MAX_ENTRIES,
+		"[m1] consent seq stays unique and monotonically increasing past 512 (last=%d)" % prev_seq)
+
+	# [m2] record_purchase idempotency on order_id + out-of-order 366d pruning
+	var clk_m2: TWClock = TWClock.fake(t0, 180)
+	var lim_m2: TWSpendLimit = TWSpendLimit.new(clk_m2)
+	lim_m2.record_purchase(3000, "ord_idem_1")
+	lim_m2.record_purchase(3000, "ord_idem_1")
+	ok(lim_m2.spent_30d() == 3000,
+		"[m2] duplicate record_purchase(ord_idem_1) is idempotent (spent=%d)" % lim_m2.spent_30d())
+	# Out-of-order older entry behind a newer entry should still be pruned after 366d
+	var st_m2: Dictionary = {}
+	var clk_m2b: TWClock = TWClock.fake(t0 + 400 * 86400, 180)
+	var lim_m2b: TWSpendLimit = TWSpendLimit.new(clk_m2b, null, st_m2)
+	st_m2[TWSpendLimit.STATE_KEY]["hist"] = [
+		{"t": t0 + 390 * 86400, "rub": 500, "oid": "ord_new", "refunded": false},
+		{"t": t0, "rub": 900, "oid": "ord_ancient", "refunded": false},
+	]
+	lim_m2b.record_purchase(100, "ord_trigger_prune")
+	var hist_m2b: Array = st_m2[TWSpendLimit.STATE_KEY]["hist"]
+	var has_ancient: bool = false
+	for h in hist_m2b:
+		if str((h as Dictionary).get("oid", "")) == "ord_ancient":
+			has_ancient = true
+	ok(not has_ancient and hist_m2b.size() == 2,
+		"[m2] out-of-order entry >366d old is pruned without dropping newer entry")
+
+	# [m3] PullHistory.record_pull must NOT fabricate cost 150 gems or rarity 'gift' when omitted
+	var clk_m3: TWClock = TWClock.fake(t0, 180)
+	var ph_m3: PullHistory = PullHistory.new(clk_m3)
+	var r_m3: Dictionary = ph_m3.record_pull({"banner_id": "b_test", "item_id": "item_1"})
+	ok(str(r_m3.get("cost_cur", "")) == "" and int(r_m3.get("cost_amt", -1)) == 0,
+		"[m3] omitted cost does NOT fabricate 150 gems (got %s %s)" % [str(r_m3.get("cost_amt")), str(r_m3.get("cost_cur"))])
+	ok(str(r_m3.get("rarity", "")) == "",
+		"[m3] omitted rarity does NOT fabricate 'gift' (got '%s')" % str(r_m3.get("rarity")))
+
+	# [m4] TWConsent must not allow backdating ts via phone clock reversal
+	var clk_m4: TWClock = TWClock.fake(t0, 180)
+	clk_m4.tick()
+	var c_m4: TWConsent = TWConsent.new(clk_m4)
+	var e1_m4: Dictionary = c_m4.record("offer", "1.0", "1.0", true, "gate")
+	clk_m4.set_wall(t0 - 30 * 86400)
+	var e2_m4: Dictionary = c_m4.record("privacy", "1.0", "1.0", true, "gate")
+	ok(int(e2_m4["ts"]) >= int(e1_m4["ts"]),
+		"[m4] consent ts cannot be backdated when phone clock moves backward")
+
+	# [m7] Vladivostok 18th birthday midnight (UTC+10), 1900 DOB age 126 rejected, unverified link_account rejected
+	# 2026-05-15 00:30:00 VLAT (UTC+10, bias=600) == 2026-05-14 14:30:00 UTC (17:30 MSK, still May 14 in MSK!)
+	var vlat_bday: int = _utc(2026, 5, 14, 14, 30, 0)
+	var clk_vlat: TWClock = TWClock.fake(vlat_bday, 600)
+	var age_vlat: TWAge = TWAge.new(clk_vlat)
+	var r_vlat: Dictionary = age_vlat.submit_dob(2008, 5, 15)
+	ok(bool(r_vlat["ok"]) and age_vlat.is_adult(),
+		"[m7] Vladivostok user at 00:30 local on 18th birthday is accepted (not hard-blocked for 30d)")
+
+	var v1900_rej: Dictionary = TWAge.validate_dob(1900, 1, 1, _utc(2026, 5, 14, 21, 0, 0))
+	ok(not bool(v1900_rej["ok"]) and str(v1900_rej["code"]) == "DENY_DOB_RANGE",
+		"[m7] 1900-01-01 (age 126 > MAX_AGE) rejected with DENY_DOB_RANGE")
+
+	var age_unv: TWAge = TWAge.new(TWClock.fake(t0, 180))
+	age_unv.submit_dob(1995, 1, 1)
+	var r_link_unv: Dictionary = age_unv.link_account("vk", "arbitrary_unverified_uid")
+	ok(not bool(r_link_unv["ok"]) and not age_unv.is_linked(),
+		"[m7] unverified link_account without verifier/token fails closed")
 
 
 static func _wipe_dir(dir_path: String) -> void:
