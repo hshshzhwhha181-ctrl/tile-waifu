@@ -1,0 +1,128 @@
+[
+ {
+  "file": "canon_base_final.jpg",
+  "verdict": "pass",
+  "reasons": "identity matches canon (pale lavender waist-length hair, violet eyes, gold crescent forehead ornament, curved horns, crescent tassel earrings, moon fan); hands (hip hand, hair hand, fan hand) have correct finger counts; lace-top thigh-high, pearl garter, satin underskirt covers hip; adult face; no text; thigh-up crop so height not checkable, thighs full and long per table. Lavender is most of the figure (accent over 20%) but teal/amber background offsets it.",
+  "boldness": "ok"
+ },
+ {
+  "file": "canon_base_final_alt.jpg",
+  "verdict": "pass",
+  "reasons": "identity matches canon (pale lavender waist-length hair, violet eyes, gold crescent forehead ornament, curved horns, crescent tassel earrings, moon fan); hand on hip and hand in hair clean, fan at hip, garter and lace stocking top fine, hip covered; adult.",
+  "boldness": "ok"
+ },
+ {
+  "file": "canon_win_final.jpg",
+  "verdict": "pass",
+  "reasons": "identity matches canon (pale lavender waist-length hair, violet eyes, gold crescent forehead ornament, curved horns, crescent tassel earrings, moon fan); wink + open laugh adult and on-model; tile hand and fan hand have clean fingers; hip covered by satin underskirt; blank tile, no text.",
+  "boldness": "ok"
+ },
+ {
+  "file": "canon_tease_final.jpg",
+  "verdict": "pass",
+  "reasons": "identity matches canon (pale lavender waist-length hair, violet eyes, gold crescent forehead ornament, curved horns, crescent tassel earrings, moon fan); over-shoulder, fingertip at lips, fan hand clean; stocking top and pearl garter fine; hip covered.",
+  "boldness": "ok"
+ },
+ {
+  "file": "base_A_final.jpg",
+  "verdict": "pass",
+  "reasons": "identity matches canon (pale lavender waist-length hair, violet eyes, gold crescent forehead ornament, curved horns, crescent tassel earrings, moon fan); reclining divan, crossed long legs read statuesque (about 7.8 heads), full thighs; hand with jade tile and fan hand clean; pearl-anklet heels correct; satin mini and lace tops cover, no under-skirt view; blank tile.",
+  "boldness": "bold, good"
+ },
+ {
+  "file": "evening_C_final.jpg",
+  "verdict": "fail",
+  "reasons": "Hard-line: sill pose with raised knee shows a lavender panty-like triangle under the lace-scalloped satin hem between the thighs (lap crop), i.e. view under the skirt that reads as underwear. Face, hands and feet are otherwise fine.",
+  "boldness": "bold but crosses the under-skirt line"
+ },
+ {
+  "file": "swim_C_final.jpg",
+  "verdict": "pass",
+  "reasons": "identity matches canon (pale lavender waist-length hair, violet eyes, gold crescent forehead ornament, curved horns, crescent tassel earrings, moon fan); reclining on cushion, long legs, bare feet have correct toes, anklets fine; fan hand and cheek hand ok; small bikini bottom plus sheer sarong, thigh and knee cover the crotch, no outline, no nipples (top covers). Closest to the nudity line among passes (sheer plus very small bottom) but compliant.",
+  "boldness": "very bold, ok"
+ },
+ {
+  "file": "service_B_final.jpg",
+  "verdict": "pass",
+  "reasons": "identity matches canon (pale lavender waist-length hair, violet eyes, gold crescent forehead ornament, curved horns, crescent tassel earrings, moon fan); bunny ears over horns, leg lifted behind, stiletto feet correct, forearm and cuff hand clean, thigh straps; rear view of high-cut leotard over hosiery: no outline, compliant but near the line; proportion about 7.8 heads standing leg.",
+  "boldness": "bold, ok"
+ },
+ {
+  "file": "robe_B_final.jpg",
+  "verdict": "fail",
+  "reasons": "Hard-line: kneeling with thighs together, a lavender wedge shows between the thighs just under the satin mini hem (lap crop) and reads as panties. Face, hands, shoes good; otherwise strong (full thighs).",
+  "boldness": "bold, but under-skirt read"
+ },
+ {
+  "file": "battle_C_final.jpg",
+  "verdict": "pass",
+  "reasons": "identity matches canon (pale lavender waist-length hair, violet eyes, gold crescent forehead ornament, curved horns, crescent tassel earrings, moon fan); scale armour, glove hands holding glaive and fan have plausible fingers (fan-hand slightly stiff), scale thigh-highs, armoured skirt covers, kneeling heels correct; very large bust is exaggerated but adult.",
+  "boldness": "bold, good"
+ },
+ {
+  "file": "seasonal_B_final.jpg",
+  "verdict": "pass",
+  "reasons": "identity matches canon (pale lavender waist-length hair, violet eyes, gold crescent forehead ornament, curved horns, crescent tassel earrings, moon fan); mooncake hand and lantern hand clean, long crossed legs, silver heels correct; skirt hem sits to one side and the thigh is bare up to the hip, raised knee hides the crotch: no underwear or outline visible, compliant with caution.",
+  "boldness": "bold, ok"
+ },
+ {
+  "file": "canon_base_search_c3.jpg",
+  "verdict": "pass",
+  "reasons": "688x1024 search candidate; same composition and checks as canon_base_final.jpg (identity ok, anatomy ok at 688px, hard lines ok). Near-duplicate of its final (the final was reference-conditioned on it), so adds no new composition for LoRA; low-res.",
+  "boldness": "same as final"
+ },
+ {
+  "file": "canon_win_search_c2.jpg",
+  "verdict": "pass",
+  "reasons": "688x1024 search candidate; same composition and checks as canon_win_final.jpg (identity ok, anatomy ok at 688px, hard lines ok). Near-duplicate of its final (the final was reference-conditioned on it), so adds no new composition for LoRA; low-res.",
+  "boldness": "same as final"
+ },
+ {
+  "file": "canon_tease_search_c3.jpg",
+  "verdict": "pass",
+  "reasons": "688x1024 search candidate; same composition and checks as canon_tease_final.jpg (identity ok, anatomy ok at 688px, hard lines ok). Near-duplicate of its final (the final was reference-conditioned on it), so adds no new composition for LoRA; low-res.",
+  "boldness": "same as final"
+ },
+ {
+  "file": "base_A_search.jpg",
+  "verdict": "pass",
+  "reasons": "688x1024 search candidate; same composition and checks as base_A_final.jpg (identity ok, anatomy ok at 688px, hard lines ok). Near-duplicate of its final (the final was reference-conditioned on it), so adds no new composition for LoRA; low-res.",
+  "boldness": "same as final"
+ },
+ {
+  "file": "swim_C_search.jpg",
+  "verdict": "pass",
+  "reasons": "688x1024 search candidate; same composition and checks as swim_C_final.jpg (identity ok, anatomy ok at 688px, hard lines ok). Near-duplicate of its final (the final was reference-conditioned on it), so adds no new composition for LoRA; low-res.",
+  "boldness": "same as final"
+ },
+ {
+  "file": "service_B_search.jpg",
+  "verdict": "pass",
+  "reasons": "688x1024 search candidate; same composition and checks as service_B_final.jpg (identity ok, anatomy ok at 688px, hard lines ok). Near-duplicate of its final (the final was reference-conditioned on it), so adds no new composition for LoRA; low-res.",
+  "boldness": "same as final"
+ },
+ {
+  "file": "battle_C_search.jpg",
+  "verdict": "pass",
+  "reasons": "688x1024 search candidate; same composition and checks as battle_C_final.jpg (identity ok, anatomy ok at 688px, hard lines ok). Near-duplicate of its final (the final was reference-conditioned on it), so adds no new composition for LoRA; low-res.",
+  "boldness": "same as final"
+ },
+ {
+  "file": "evening_C_search.jpg",
+  "verdict": "fail",
+  "reasons": "Same under-skirt panty-like lavender triangle between thighs under the lace hem as evening_C_final.",
+  "boldness": "under-skirt read"
+ },
+ {
+  "file": "robe_B_search.jpg",
+  "verdict": "fail",
+  "reasons": "Same lavender wedge under the mini hem between the kneeling thighs as robe_B_final.",
+  "boldness": "under-skirt read"
+ },
+ {
+  "file": "seasonal_B_search.jpg",
+  "verdict": "fail",
+  "reasons": "Seated crossed-leg frame shows bare thigh to the seat with a dark crotch-side crease under the lap and little skirt coverage; reads as exposed upper-thigh/groin area (the final hides it behind the raised knee).",
+  "boldness": "too close to the line"
+ }
+]

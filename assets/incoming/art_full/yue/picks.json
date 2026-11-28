@@ -112,20 +112,6 @@
   "quality_notes": "pose A of 5; reclining on moon-cushion divan, crossed legs, blank jade tile offered, hip covered by drape; lavender-heavy palette (original prompt, before the contrast clause)"
  },
  {
-  "file": "evening_C_search.jpg",
-  "batch": "H2",
-  "task_id": "H2.yue_evening.search",
-  "outfit_slot": "evening",
-  "pose": "C_sill_knee_raised_look_back",
-  "prompt": "<<<8edeacc2-f24b-4a41-a166-66896711f259>>> is Yue, an adult woman of 27, ruler of the Moon Palace. Hair: very long straight-to-wavy pale lavender hair down to the waist with a half-up crown section. Eyes: violet almond eyes with long lashes. Skin: pale porcelain skin. Face: long elegant adult face with slim high nose, narrow almond eyes, serene composed smile. Signature items that must be present: pair of curved pearly-gold dragon horns rising from the crown; gold crescent-moon forehead ornament; gold crescent drop earrings with lavender tassels; moon-phase folding fan (Yue only). Body: very tall and statuesque, about 177 cm tall (7.9 heads tall), statuesque figure with very long legs and full thighs, rounded hips, a defined waist, a full bust. Outfit: sheer layered lavender wet-look robe-dress with a deep plunging neckline and a crescent sash over a lavender satin mini nightgown, lace-top thigh-high stockings with crystal garter charms, silver heels. Pose: sitting on the sill with one knee raised, looking back at the moon. Expression: dreamy half-smile. Framing: full-body view from head to heels, centered. Setting: moonlit window of a palace bedchamber with sheer curtains. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman with grown-woman proportions, 7.9 heads tall (177 cm, very tall and statuesque), very long statuesque legs with full thighs, a mature adult face and figure, a defined waist, the composition accents her legs, thighs and bust, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
-  "prompt_delta": "none (original batch prompt)",
-  "seed": null,
-  "higgsfield_job_id": "784a3864-7ff7-4bb8-98ef-c53949a56e7d",
-  "reference_job_id": null,
-  "stage": "search",
-  "quality_notes": "pose C of 5; sitting on sill, knee raised, lace-top stockings with crystal garter charms, satin mini hem covers hip; picked over D (lying, leg up) as D sits too close to the under-hem line"
- },
- {
   "file": "swim_C_search.jpg",
   "batch": "H2",
   "task_id": "H2.yue_swim.search",
@@ -168,20 +154,6 @@
   "quality_notes": "PICK. Reclining on divan, crossed long legs, lace-top stockings + pearl garter, anklet heels, tile offered, fan, satin underskirt covers hip, full identity, teal/amber background"
  },
  {
-  "file": "evening_C_final.jpg",
-  "batch": "H2",
-  "task_id": "H2.yue_evening.final",
-  "outfit_slot": "evening",
-  "pose": "C_sill_knee_raised_look_back",
-  "prompt": "<<<8edeacc2-f24b-4a41-a166-66896711f259>>> is Yue, an adult woman of 27, ruler of the Moon Palace. Hair: very long straight-to-wavy pale lavender hair down to the waist with a half-up crown section. Eyes: violet almond eyes with long lashes. Skin: pale porcelain skin. Face: long elegant adult face with slim high nose, narrow almond eyes, serene composed smile. Signature items that must be present: pair of curved pearly-gold dragon horns rising from the crown; gold crescent-moon forehead ornament; gold crescent drop earrings with lavender tassels; moon-phase folding fan (Yue only). Body: very tall and statuesque, about 177 cm tall (7.9 heads tall), statuesque figure with very long legs and full thighs, rounded hips, a defined waist, a full bust. Outfit: sheer layered lavender wet-look robe-dress with a deep plunging neckline and a crescent sash over a lavender satin mini nightgown, lace-top thigh-high stockings with crystal garter charms, silver heels. Pose: sitting on the sill with one knee raised, looking back at the moon. Expression: dreamy half-smile. Framing: full-body view from head to heels, centered. Setting: moonlit window of a palace bedchamber with sheer curtains. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman with grown-woman proportions, 7.9 heads tall (177 cm, very tall and statuesque), very long statuesque legs with full thighs, a mature adult face and figure, a defined waist, the composition accents her legs, thighs and bust, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
-  "prompt_delta": "Final = same prompt at 2k high with the chosen search candidate as image_references (no seed parameter in the generator). Setting appended \", deep teal-blue night with warm amber lantern glow, high contrast, the lavender kept on the character only\".",
-  "seed": null,
-  "higgsfield_job_id": "db598db9-fc8a-47a5-805f-541778ab91c7",
-  "reference_job_id": "784a3864-7ff7-4bb8-98ef-c53949a56e7d",
-  "stage": "final",
-  "quality_notes": "PICK. Sitting on sill, knee raised, lace-top stocking with crystal garter charms, sheer wet-look robe over satin mini. Watch item: lace-scalloped satin hem with a raised thigh is the closest frame to the under-skirt line; hem fully covers, no underwear read at normal view"
- },
- {
   "file": "swim_C_final.jpg",
   "batch": "H2",
   "task_id": "H2.yue_swim.final",
@@ -210,20 +182,6 @@
   "quality_notes": "PICK. Bunny leotard with underbust cut-out, thigh strap, pantyhose, stilettos, leg lifted behind, ears over horns; high-cut leotard fully covers"
  },
  {
-  "file": "robe_B_search.jpg",
-  "batch": "H2",
-  "task_id": "H2.yue_robe.search",
-  "outfit_slot": "robe",
-  "pose": "B_kneeling_on_bed_hand_in_hair",
-  "prompt": "<<<8edeacc2-f24b-4a41-a166-66896711f259>>> is Yue, an adult woman of 27, ruler of the Moon Palace. Hair: very long straight-to-wavy pale lavender hair down to the waist with a half-up crown section. Eyes: violet almond eyes with long lashes. Skin: pale porcelain skin. Face: long elegant adult face with slim high nose, narrow almond eyes, serene composed smile. Signature items that must be present: pair of curved pearly-gold dragon horns rising from the crown; gold crescent-moon forehead ornament; gold crescent drop earrings with lavender tassels; moon-phase folding fan (Yue only). Body: very tall and statuesque, about 177 cm tall (7.9 heads tall), statuesque figure with very long legs and full thighs, rounded hips, a defined waist, a full bust. Outfit: pearl-white wet-look silk robe-dress with a plunging neckline and a crescent sash, a lavender satin mini nightgown under it, lace-top thigh-high stockings, a gold crescent forehead ornament kept. Pose: kneeling on the bed with a hand in her hair, looking at the viewer. Expression: inviting smile. Framing: full-body view from head to heels, centered. Setting: canopy bed in a moonlit chamber with petals on the sheets. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman with grown-woman proportions, 7.9 heads tall (177 cm, very tall and statuesque), very long statuesque legs with full thighs, a mature adult face and figure, a defined waist, the composition accents her legs, thighs and bust, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
-  "prompt_delta": "Setting appended \", deep teal-blue night with warm amber lantern glow, high contrast, the lavender kept on the character only\".",
-  "seed": null,
-  "higgsfield_job_id": "1ceed053-eaa0-4ef4-84ea-8dbbb65cbfad",
-  "reference_job_id": null,
-  "stage": "search",
-  "quality_notes": "pose B of 5; kneeling on bed, hand in hair, fan, pearl robe over lavender satin mini, legs together; picked over A/D (leg-up) as safer and full face visible"
- },
- {
   "file": "battle_C_search.jpg",
   "batch": "H2",
   "task_id": "H2.yue_battle.search",
@@ -236,34 +194,6 @@
   "reference_job_id": null,
   "stage": "search",
   "quality_notes": "pose C of 5; kneeling on one knee, moon glaive, scale thigh-highs with gold garter bands, armoured skirt covers; A rejected (pink area under the hem reads like underwear), B lunge with open legs, D/E fine alternatives"
- },
- {
-  "file": "seasonal_B_search.jpg",
-  "batch": "H2",
-  "task_id": "H2.yue_seasonal.search",
-  "outfit_slot": "seasonal",
-  "pose": "B_sitting_stone_bench_legs_crossed_mooncake",
-  "prompt": "<<<8edeacc2-f24b-4a41-a166-66896711f259>>> is Yue, an adult woman of 27, ruler of the Moon Palace. Hair: very long straight-to-wavy pale lavender hair down to the waist with a half-up crown section. Eyes: violet almond eyes with long lashes. Skin: pale porcelain skin. Face: long elegant adult face with slim high nose, narrow almond eyes, serene composed smile. Signature items that must be present: pair of curved pearly-gold dragon horns rising from the crown; gold crescent-moon forehead ornament; gold crescent drop earrings with lavender tassels; moon-phase folding fan (Yue only). Body: very tall and statuesque, about 177 cm tall (7.9 heads tall), statuesque figure with very long legs and full thighs, rounded hips, a defined waist, a full bust. Outfit: short white-and-lavender festival hanfu with a deep neckline, a rabbit-motif sash, off-shoulder sheer sleeves, white thigh-high stockings with lavender ribbons and thigh straps, silver heels, a lantern held in one hand. Pose: sitting on a stone bench with legs crossed, a mooncake in her fingers. Expression: warm smile. Framing: full-body view from head to heels, centered. Setting: mid-autumn lantern garden with a huge moon and mooncake stalls. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman with grown-woman proportions, 7.9 heads tall (177 cm, very tall and statuesque), very long statuesque legs with full thighs, a mature adult face and figure, a defined waist, the composition accents her legs, thighs and bust, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
-  "prompt_delta": "Setting appended \", deep teal-blue night with warm amber lantern glow, high contrast, the lavender kept on the character only\".",
-  "seed": null,
-  "higgsfield_job_id": "e509c27b-2ce6-4a83-a49f-564db189623e",
-  "reference_job_id": null,
-  "stage": "search",
-  "quality_notes": "pose B of 5; seated on stone bench, legs crossed, mooncake, ribbon thigh straps, flared white mini covers"
- },
- {
-  "file": "robe_B_final.jpg",
-  "batch": "H2",
-  "task_id": "H2.yue_robe.final",
-  "outfit_slot": "robe",
-  "pose": "B_kneeling_on_bed_hand_in_hair",
-  "prompt": "<<<8edeacc2-f24b-4a41-a166-66896711f259>>> is Yue, an adult woman of 27, ruler of the Moon Palace. Hair: very long straight-to-wavy pale lavender hair down to the waist with a half-up crown section. Eyes: violet almond eyes with long lashes. Skin: pale porcelain skin. Face: long elegant adult face with slim high nose, narrow almond eyes, serene composed smile. Signature items that must be present: pair of curved pearly-gold dragon horns rising from the crown; gold crescent-moon forehead ornament; gold crescent drop earrings with lavender tassels; moon-phase folding fan (Yue only). Body: very tall and statuesque, about 177 cm tall (7.9 heads tall), statuesque figure with very long legs and full thighs, rounded hips, a defined waist, a full bust. Outfit: pearl-white wet-look silk robe-dress with a plunging neckline and a crescent sash, a lavender satin mini nightgown under it, lace-top thigh-high stockings, a gold crescent forehead ornament kept. Pose: kneeling on the bed with a hand in her hair, looking at the viewer. Expression: inviting smile. Framing: full-body view from head to heels, centered. Setting: canopy bed in a moonlit chamber with petals on the sheets. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman with grown-woman proportions, 7.9 heads tall (177 cm, very tall and statuesque), very long statuesque legs with full thighs, a mature adult face and figure, a defined waist, the composition accents her legs, thighs and bust, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
-  "prompt_delta": "Final = same prompt at 2k high with the chosen search candidate as image_references (no seed parameter in the generator). Setting appended \", deep teal-blue night with warm amber lantern glow, high contrast, the lavender kept on the character only\".",
-  "seed": null,
-  "higgsfield_job_id": "c288ec2a-77e8-4854-a154-7b243d1dd700",
-  "reference_job_id": "1ceed053-eaa0-4ef4-84ea-8dbbb65cbfad",
-  "stage": "final",
-  "quality_notes": "PICK. Kneeling on bed, legs together, hand in hair, fan, pearl wet-look robe over lavender satin mini, lace-top thigh-highs, heels with anklets; full thighs, face matches"
  },
  {
   "file": "battle_C_final.jpg",
