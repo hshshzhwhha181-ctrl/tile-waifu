@@ -111,6 +111,8 @@ CATALOG: list[Suite] = [
       note="P29: TWAssets registry (direct + composite ids: every manifest asset and every resolver id loads, 0 missing), release gate (not approved -> null + code), dev flagged placeholder"),
     S("twwidgets", "TWWIDGETS_SELFTEST", "res://shell/design/widgets_selftest.tscn", group="core", timeout=600,
       note="P28: TWButton/TWPlate/TWSheet/TWHeader/TWTabBar/TWToast/TWCurrencyChip/TWSkin: carried hud2 suite (854) + press curve per tick, p95 tap response, skins, 3 resolutions"),
+    S("twpresence", "TWPRESENCE_SELFTEST", "res://shell/stage/presence_selftest.tscn", group="core", timeout=600,
+      note="P34: TWPresence over V10LiveRig: strip <= 28% on 3 aspects, 160 px medallion, never over the board, touches off, 7 reactions from core events < 100 ms, stub for heroines without a rig, draw/texture budget"),
     S("ults", "ULTS", args=["--ults_selftest=1"], group="core"),
     S("letters", "LETTERS", args=["--letters_selftest=1"], group="core"),
     # ---- v10 registry modules (docs/INTEGRATION_0.10.md; ids == V10RegistryList ids) -----------------

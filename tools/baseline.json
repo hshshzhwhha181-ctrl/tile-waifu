@@ -1209,6 +1209,22 @@
     "total": 7001
    }
   },
+  "twpresence": {
+   "fast": {
+    "marker": "TWPRESENCE_SELFTEST 628/628",
+    "ok": 628,
+    "secs": 7.3,
+    "status": "pass",
+    "total": 628
+   },
+   "full": {
+    "marker": "TWPRESENCE_SELFTEST 628/628",
+    "ok": 628,
+    "secs": 7.3,
+    "status": "pass",
+    "total": 628
+   }
+  },
   "twwidgets": {
    "fast": {
     "marker": "TWWIDGETS_SELFTEST 1396/1396",
