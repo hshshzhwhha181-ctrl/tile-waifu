@@ -5,3 +5,24 @@
 - Type scale at 720: 64 / 44 / 34 / 30 / 26 + 36 in-match subtitles. Hit target `HIT_TARGET_MIN` 96, `HIT_TARGET_BIG` 112 (Undo/Hint/Shuffle), hand tile 46 x >=100 is the documented exception.
 - Lints: `python tools/lint_tokens.py` (NO_RAW_HEX, NO_RAW_FONT_SIZE, TYPE_SCALE_MAX_4, HIT_TARGET_MIN; enforcing on `game/shell`, report-only ratchet on legacy, baseline in `tools/lint_tokens_baseline.json`; `--selftest`).
 - Legacy `V10DS` (`game/scripts/v10/hud2/tokens.gd`) keeps its names inside TWTokens (NIGHT_900, GOLD_500, ... T_IN, HAIR_A) so aliasing it later is mechanical.
+
+## Widgets (P28 / WP9b)
+
+One widget family on `TWTokens`; the "lacquer" look is drawn as vectors (no textures). Skins are token overrides (`TWSkin`), not per-widget recolouring.
+
+| class | file | role |
+|---|---|---|
+| `TWButton` | `tw_button.gd` | THE button: kinds `play` / `cash` / `secondary` / `quiet`; press down 90 ms to 0.94, up 160 ms spring to 1.0 (`advance(dt)`-stepped, `down_scale` / `up_scale` pure); hit rect >= 96 (`big` = 112); `pressed`, `denied` |
+| `TWPlate` | `tw_plate.gd` | plate family S 48 / M 80 / L 160, width modules, closed-scale text fit, ping, same press feel, 96 px tap band |
+| `TWCurrencyChip` | `tw_currency_chip.gd` | S plate with a glyph (`moon` / `coin` / `ticket`) and a number that rolls in `T_ROLL`; `TWCurrencyChip.create(kind, n)` |
+| `TWHeader` | `tw_header.gd` | sub-screen header, 104 + top inset; `compute(vs, insets)` is the pure geometry |
+| `TWTabBar` | `tw_tabbar.gd` | bottom bar, 112 + bottom inset; `tab_selected(id)`, badges |
+| `TWSheet` | `tw_sheet.gd` | bottom sheet panel, 240 ms open / 180 ms close QUINT OUT; the scrim belongs to the hosting `TWModal` |
+| `TWToast` | `tw_toast.gd` | one-at-a-time toast under the top inset, queue of 3, tap to dismiss |
+| `TWSkin` | `tw_skin.gd` | `TWSkin.apply(id, {"TOKEN": Color})` / `reset()`; widgets read colours via `TWSkin.c("TOKEN")` |
+| `TWDraw` | `tw_draw.gd` | shared drawing kit (`rr_pts`, `grad_cols`, `hairline`, `lacquer`, `plate_surface`), text fit on the closed scale, `box_h` / `label_h` |
+
+* Every `compute(...)` is a pure function of (viewport, safe insets) and is what `widgets_selftest` checks on 720x1280, 720x1600 and 1536x2048.
+* Fonts still come from `V10Type` (TWType is a later package); icons from `V10Icons`; insets bridge to `V10Hud2Util` until TWLayout.
+* Compat shims (no caller edits): `V10Button extends TWButton`, `V10Plate extends TWPlate` (`game/scripts/v10/hud2/`). `JButton` is NOT re-based yet (its callers use `box`/`lbl`/`sub`/`art`); its lacquer faces already draw through `TWDraw` via the `V10Button.lacquer` forwarder.
+* Selftest: `res://shell/design/widgets_selftest.tscn` prints `TWWIDGETS_SELFTEST ok/total` (tw_test.py suite `twwidgets`). Section 0 carries the whole hud2 suite (854 checks) over the shimmed widgets.

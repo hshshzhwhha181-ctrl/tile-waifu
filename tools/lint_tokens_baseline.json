@@ -1,8 +1,8 @@
 {
- "HIT_TARGET_MIN": 6,
- "NO_RAW_COLOR_CTOR": 1255,
+ "HIT_TARGET_MIN": 5,
+ "NO_RAW_COLOR_CTOR": 1254,
  "NO_RAW_FONT_SIZE": 41,
- "NO_RAW_HEX": 445,
+ "NO_RAW_HEX": 444,
  "TYPE_SCALE_MAX_4_files": 0,
  "mode": "report-only legacy, ratchet (count may only fall)"
 }

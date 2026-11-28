@@ -104,6 +104,8 @@ CATALOG: list[Suite] = [
       note="P24: TWModal, ModalStack (scrim owned by the modal, on_close exactly once, clear_all), Android back table (4 rows), 500-sequence property test"),
     S("twassets", "TWASSETS_SELFTEST", "res://shell/assets/assets_selftest.tscn", group="core", timeout=600,
       note="P29: TWAssets registry (direct + composite ids: every manifest asset and every resolver id loads, 0 missing), release gate (not approved -> null + code), dev flagged placeholder"),
+    S("twwidgets", "TWWIDGETS_SELFTEST", "res://shell/design/widgets_selftest.tscn", group="core", timeout=600,
+      note="P28: TWButton/TWPlate/TWSheet/TWHeader/TWTabBar/TWToast/TWCurrencyChip/TWSkin: carried hud2 suite (854) + press curve per tick, p95 tap response, skins, 3 resolutions"),
     S("ults", "ULTS", args=["--ults_selftest=1"], group="core"),
     S("letters", "LETTERS", args=["--letters_selftest=1"], group="core"),
     # ---- v10 registry modules (docs/INTEGRATION_0.10.md; ids == V10RegistryList ids) -----------------

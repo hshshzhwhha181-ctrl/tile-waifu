@@ -1177,6 +1177,22 @@
     "total": 132
    }
   },
+  "twwidgets": {
+   "fast": {
+    "marker": "TWWIDGETS_SELFTEST 1396/1396",
+    "ok": 1396,
+    "secs": 8.0,
+    "status": "pass",
+    "total": 1396
+   },
+   "full": {
+    "marker": "TWWIDGETS_SELFTEST 1396/1396",
+    "ok": 1396,
+    "secs": 8.0,
+    "status": "pass",
+    "total": 1396
+   }
+  },
   "ult_rin": {
    "fast": {
     "marker": "ULT SELFTEST rin 22/22",
