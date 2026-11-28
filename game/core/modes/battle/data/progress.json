@@ -1,0 +1,163 @@
+{
+  "schema": 1,
+  "version": "1.0",
+  "spec_ref": "design/specs/BATTLE_ULT_SPEC.md#2,Appendix-R-W15",
+  "bp_scale": 10000,
+  "hero_shards_enabled": false,
+  "xp_scrolls": {
+    "S": {"id": "xp_scroll_s", "name_ru": "Малый свиток опыта", "xp": 200},
+    "M": {"id": "xp_scroll_m", "name_ru": "Средний свиток опыта", "xp": 1000},
+    "L": {"id": "xp_scroll_l", "name_ru": "Большой свиток опыта", "xp": 5000}
+  },
+  "level_coin_divisor": 10,
+  "ascensions": [
+    {"stage": 0, "level_cap": 20, "seals_cost": 0,  "coins_cost": 0},
+    {"stage": 1, "level_cap": 30, "seals_cost": 4,  "coins_cost": 500},
+    {"stage": 2, "level_cap": 40, "seals_cost": 8,  "coins_cost": 1200},
+    {"stage": 3, "level_cap": 50, "seals_cost": 12, "coins_cost": 2500},
+    {"stage": 4, "level_cap": 60, "seals_cost": 20, "coins_cost": 5000},
+    {"stage": 5, "level_cap": 70, "seals_cost": 24, "coins_cost": 8000,  "release_milestone": "m4"},
+    {"stage": 6, "level_cap": 80, "seals_cost": 28, "coins_cost": 12000, "release_milestone": "m8"},
+    {"stage": 7, "level_cap": 90, "seals_cost": 32, "coins_cost": 16000, "release_milestone": "m12"}
+  ],
+  "skills": {
+    "coin_per_scroll": 20,
+    "ult": {
+      "max_level": 10,
+      "hero_level_divisor": 6,
+      "dmg_step_bp": 600,
+      "rider_step_bp": 400,
+      "costs": [
+        {"to_level": 2,  "tier": "T1", "scrolls": 3},
+        {"to_level": 3,  "tier": "T1", "scrolls": 5},
+        {"to_level": 4,  "tier": "T1", "scrolls": 8},
+        {"to_level": 5,  "tier": "T2", "scrolls": 4},
+        {"to_level": 6,  "tier": "T2", "scrolls": 6},
+        {"to_level": 7,  "tier": "T2", "scrolls": 8},
+        {"to_level": 8,  "tier": "T2", "scrolls": 12},
+        {"to_level": 9,  "tier": "T3", "scrolls": 6},
+        {"to_level": 10, "tier": "T3", "scrolls": 12}
+      ]
+    },
+    "passive": {
+      "max_level": 10,
+      "hero_level_divisor": 6,
+      "effect_step_bp": 400,
+      "costs": [
+        {"to_level": 2,  "tier": "T1", "scrolls": 2},
+        {"to_level": 3,  "tier": "T1", "scrolls": 3},
+        {"to_level": 4,  "tier": "T1", "scrolls": 5},
+        {"to_level": 5,  "tier": "T2", "scrolls": 2},
+        {"to_level": 6,  "tier": "T2", "scrolls": 4},
+        {"to_level": 7,  "tier": "T2", "scrolls": 5},
+        {"to_level": 8,  "tier": "T2", "scrolls": 7},
+        {"to_level": 9,  "tier": "T3", "scrolls": 4},
+        {"to_level": 10, "tier": "T3", "scrolls": 7}
+      ]
+    },
+    "leader": {
+      "max_level": 5,
+      "unlock_hero_level": 30,
+      "effect_step_bp": 800,
+      "costs": [
+        {"to_level": 2, "tier": "T2", "scrolls": 3},
+        {"to_level": 3, "tier": "T2", "scrolls": 5},
+        {"to_level": 4, "tier": "T2", "scrolls": 7},
+        {"to_level": 5, "tier": "T2", "scrolls": 9}
+      ]
+    }
+  },
+  "talismans": {
+    "powder_cost_factor": 10,
+    "substat_max_ratio_bp": 3000,
+    "slots": [
+      {"id": "comb",    "name_ru": "Гребень",  "main_stat": "atk_bp"},
+      {"id": "pendant", "name_ru": "Подвеска", "main_stat": "hp_bp"},
+      {"id": "ribbon",  "name_ru": "Лента",    "main_stat": "energy_or_crit_bp"},
+      {"id": "charm",   "name_ru": "Оберег",   "main_stat": "special_bp"}
+    ],
+    "rarities": {
+      "common": {
+        "id": "common",
+        "name_ru": "Обычный",
+        "palette_token": "JADE.T3",
+        "max_level": 12,
+        "main_stat_max_bp": 1200,
+        "substat_slots": 0,
+        "total_powder": 6500
+      },
+      "rare": {
+        "id": "rare",
+        "name_ru": "Редкий",
+        "palette_token": "MOON.T3",
+        "max_level": 16,
+        "main_stat_max_bp": 1600,
+        "substat_slots": 2,
+        "total_powder": 14960
+      },
+      "epic": {
+        "id": "epic",
+        "name_ru": "Эпический",
+        "palette_token": "RARITY_SSR",
+        "max_level": 20,
+        "main_stat_max_bp": 2000,
+        "substat_slots": 4,
+        "total_powder": 28700
+      }
+    },
+    "substat_pool": [
+      "atk_bp",
+      "hp_bp",
+      "energy_bp",
+      "gold_crit_bp",
+      "shield_bp",
+      "heal_bp",
+      "barrier_bp",
+      "ult_dmg_bp"
+    ],
+    "sets": {
+      "east_wind": {
+        "id": "east_wind",
+        "name_ru": "Ветер Востока",
+        "bonus_2pc": {"energy_gain_bp": 800},
+        "bonus_4pc": {"ult_dmg_bp": 1200}
+      },
+      "moon_circle": {
+        "id": "moon_circle",
+        "name_ru": "Лунный круг",
+        "bonus_2pc": {"hp_bp": 800},
+        "bonus_4pc": {"heal_bp": 1500, "barrier_bp": 1000}
+      },
+      "crimson_thread": {
+        "id": "crimson_thread",
+        "name_ru": "Багровая нить",
+        "bonus_2pc": {"atk_bp": 800},
+        "bonus_4pc": {"fever_extra_pairs": 2}
+      },
+      "bamboo_silence": {
+        "id": "bamboo_silence",
+        "name_ru": "Бамбуковая тишина",
+        "bonus_2pc": {"shield_dmg_bp": 1000},
+        "bonus_4pc": {"break_extra_stun": 1}
+      }
+    },
+    "workshop_pity": {
+      "base_rates_bp": {"common": 7000, "rare": 2600, "epic": 400},
+      "soft_pity_start_run": 15,
+      "soft_pity_step_bp": 200,
+      "hard_pity_run": 24,
+      "weekly_focus_weight_mult": 2,
+      "reset_on_epic": true
+    }
+  },
+  "catchup": {
+    "enabled": true,
+    "lag_levels_threshold": 10,
+    "xp_mult_bp": 20000,
+    "powder_mult_bp": 20000,
+    "sync_new_hero_to_squad_avg": true,
+    "pre_cap_raise_gift_days_before": 7,
+    "pre_cap_raise_gift_xp": 60000,
+    "paid_accelerators_allowed": false
+  }
+}
