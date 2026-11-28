@@ -6,6 +6,7 @@
 | gate | suites | how it is judged |
 | --- | --- | --- |
 | Godot selftests | 57 (10 core (8 flags + `state` + `twboard`), 43 v10 registry modules, `registry`, `spec`, `summon`, `ult_rin`) | marker line of each suite (`ECON_SELFTEST 384/384`, `V10VOICE OK`, ...) |
+| Godot selftest `twparity` | 1 (core, P17) | `TWPARITY_SELFTEST n/n`: TWBoard vs the legacy TrayBoard. 500 recorded games (`game/tests/fixtures/replays/corpus_NN.json`, written from the REAL TrayBoard by `scripts/v10/rules/parity_record.tscn`) replayed on TWBoard with 0 divergences of legality / outcome, the stored layouts == `TWFree.positions`, 1000/1000 level certificates replay on TWBoard, live fuzz of 5000 operations in lockstep with a real TrayBoard (free set: legacy `is_free` == TWBoard counters == `TWFree.is_free`). `--fast` = 100 games, 200 levels, 1000 fuzz operations |
 | `server/e2e_test.mjs` | `server_e2e` | `E2E_OK`, `N passed, 0 failed` (skipped with a reason if node or `node:sqlite` is missing) |
 | `lint_screen_has_spec.py` | `screen_has_spec` (P23) | `SCREEN_HAS_SPEC SELFTEST 7/7` + repo has 0 violations (a screen folder without `spec.tres`, bad/duplicate ScreenSpec, a `TWScreen` outside `shell/screens/`) |
 | `lint_modal_only_via_stack.py` | `modal_only_via_stack` (P24) | `MODAL_ONLY_VIA_STACK SELFTEST 14/14` + shell has 0 violations + the legacy overlay-scan sites (report mode, 39) do not grow vs `tools/lint_modal_baseline.json` |
