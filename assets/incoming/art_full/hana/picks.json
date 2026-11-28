@@ -225,21 +225,6 @@
   "quality": "high"
  },
  {
-  "file": "assets/incoming/art_full/hana/robe_E_search_e.jpg",
-  "batch": "H2",
-  "task_id": "H2.hana_robe.search",
-  "outfit_slot": "robe",
-  "pose": "E",
-  "prompt": "<<<ded72d02-6c3a-45e4-874a-0afdc3936c07>>> is Hana, an adult woman of 24, relay team captain and gym coach. Hair: short tousled curly orange bob, chin-length with messy wavy ends. Eyes: warm amber eyes. Skin: warm light-tan skin with light freckles (one consistent skin tone in every image). Face: round-square adult face with a soft jaw, wide upturned eyes, thick expressive brows, wide toothy grin. Signature items that must be present: yellow sunflower hair clip above the right ear; light freckles across nose and cheeks; track jacket tied around the waist (most outfits); sport wristband. Body: athletic average height, about 168 cm tall (7.25 heads tall), athletic toned figure with strong thick thighs and soft definition, a flat stomach, a shapely bust. Outfit: short orange satin robe with white piping tied loosely at the waist over a satin sleep tank and shorts, sheer tan thigh-high stockings, fluffy slippers. Pose: kneeling on the bed hugging a gym towel to her chest, leaning forward with an arched back. Expression: cheeky sleepy smile. Framing: waist-up to hips view leaning toward the viewer, bust-forward, camera at eye level. Setting: morning gym lounge with sunlight, a bench and a towel rack. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman with grown-woman proportions, 7.25 heads tall (168 cm, athletic average height), strong athletic legs with thick thighs, a mature adult face and figure, a defined waist, the composition accents her legs, thighs and bust, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
-  "seed": 111665,
-  "stage": "search",
-  "quality_notes": "pick candidate; task seed 111665 nominal; the model exposes no seed parameter, so the image is not reproducible by seed",
-  "job_id": "d0bbf176-bc89-423b-9629-278a82668b96",
-  "model": "gpt_image_2_6",
-  "resolution": "1k",
-  "quality": "medium"
- },
- {
   "file": "assets/incoming/art_full/hana/robe_E_final.jpg",
   "batch": "H2",
   "task_id": "H2.hana_robe.final",
@@ -283,21 +268,6 @@
   "model": "gpt_image_2_6",
   "resolution": "2k",
   "quality": "high"
- },
- {
-  "file": "assets/incoming/art_full/hana/seasonal_C_search_c.jpg",
-  "batch": "H2",
-  "task_id": "H2.hana_seasonal.search",
-  "outfit_slot": "seasonal",
-  "pose": "C",
-  "prompt": "<<<ded72d02-6c3a-45e4-874a-0afdc3936c07>>> is Hana, an adult woman of 24, relay team captain and gym coach. Hair: short tousled curly orange bob, chin-length with messy wavy ends. Eyes: warm amber eyes. Skin: warm light-tan skin with light freckles (one consistent skin tone in every image). Face: round-square adult face with a soft jaw, wide upturned eyes, thick expressive brows, wide toothy grin. Signature items that must be present: yellow sunflower hair clip above the right ear; light freckles across nose and cheeks; track jacket tied around the waist (most outfits); sport wristband. Body: athletic average height, about 168 cm tall (7.25 heads tall), athletic toned figure with strong thick thighs and soft definition, a flat stomach, a shapely bust. Outfit: short orange puffer jacket worn off one shoulder over a white crop sweater, a flared white skater mini skirt, white thigh-high stockings with orange stripes and thigh straps, white ice skates, a knitted headband. Pose: leaning back on the rink barrier with legs crossed. Expression: cheeky smile. Framing: full-body view from head to heels, centered. Setting: ice rink under string lights with falling snow. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman with grown-woman proportions, 7.25 heads tall (168 cm, athletic average height), strong athletic legs with thick thighs, a mature adult face and figure, a defined waist, the composition accents her legs, thighs and bust, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
-  "seed": 338830,
-  "stage": "search",
-  "quality_notes": "pick candidate; task seed 338830 nominal; the model exposes no seed parameter, so the image is not reproducible by seed",
-  "job_id": "782ebe0e-b609-4022-872d-39d7106815a5",
-  "model": "gpt_image_2_6",
-  "resolution": "1k",
-  "quality": "medium"
  },
  {
   "file": "assets/incoming/art_full/hana/seasonal_C_final.jpg",

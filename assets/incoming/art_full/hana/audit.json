@@ -1,0 +1,128 @@
+[
+ {
+  "file": "assets/incoming/art_full/hana/canon_base_final.jpg",
+  "verdict": "pass",
+  "reasons": "Identity matches canon (short curly orange bob, amber eyes, freckles, sunflower clip on her right, wristband, star socks, pink off-shoulder jacket tied at waist). Hands on hip and in hair have correct fingers; thighs thick, athletic; adult face; shorts opaque, no outline, no text. 3/4 crop at mid-thigh so head count not measurable.",
+  "boldness": "ok"
+ },
+ {
+  "file": "assets/incoming/art_full/hana/canon_base_final_alt.jpg",
+  "verdict": "pass",
+  "reasons": "Same identity and outfit as canon_base_final, clean hands, adult face, star socks; near-duplicate pose of the primary final (limited LoRA diversity value). Shorts hem opaque.",
+  "boldness": "ok"
+ },
+ {
+  "file": "assets/incoming/art_full/hana/canon_win_final.jpg",
+  "verdict": "pass",
+  "reasons": "Wink, blank ivory tile, fist; fingers clean; adult. Minor continuity drift: tied cloth at the waist is orange while the worn off-shoulder jacket is pink (two jackets), so caption it as drift.",
+  "boldness": "ok"
+ },
+ {
+  "file": "assets/incoming/art_full/hana/canon_tease_final.jpg",
+  "verdict": "pass",
+  "reasons": "Back-view over-shoulder, finger at lips, clean hands, adult face; tied jacket covers hips, shorts hem reads as shorts (not underwear). Same two-jacket colour drift (orange tie vs pink jacket). Hip-focus is at the edge of the rule but opaque and covered.",
+  "boldness": "ok"
+ },
+ {
+  "file": "assets/incoming/art_full/hana/base_C_final.jpg",
+  "verdict": "pass",
+  "reasons": "Kneeling stretch, arms up with interlocked hands (slightly blobby but 5 fingers readable), sneakers and star socks correct, thick thighs, adult face, canon pink jacket. No view under shorts.",
+  "boldness": "ok"
+ },
+ {
+  "file": "assets/incoming/art_full/hana/evening_B_final.jpg",
+  "verdict": "pass",
+  "reasons": "Seated on balustrade, legs crossed; legs, knees, ankle-strap sandals with sunflower and toes are correct; hands correct; gala dress hem covers, sheer tan thigh-highs, plunging neckline closes over chest. Identity items present (clip, freckles, wristband). Tiny stocking-line ambiguity on the far shin only.",
+  "boldness": "bold"
+ },
+ {
+  "file": "assets/incoming/art_full/hana/swim_A_final.jpg",
+  "verdict": "pass",
+  "reasons": "Kneeling fists-under-chin wink, matches owner ref 16 pose and identity; hands correct, bare feet ok; opaque string bikini under wet sheer shirt (no nipple or groin outline seen at zoom, jacket sleeve covers the centre); thighs full; adult.",
+  "boldness": "bold"
+ },
+ {
+  "file": "assets/incoming/art_full/hana/service_C_final.jpg",
+  "verdict": "pass",
+  "reasons": "Bartender bunny on stool, legs crossed (groin hidden), thigh strap, shaker and chin-hand correct, platform sneakers fine, bunny ears plus sunflower clip, underbust cut-out closes properly; adult face, opaque pantyhose. Strong glamour.",
+  "boldness": "bold"
+ },
+ {
+  "file": "assets/incoming/art_full/hana/robe_E_final.jpg",
+  "verdict": "pass",
+  "reasons": "Kneeling on bed hugging a gym towel; hands ok, slipper foot ok, orange satin shorts read as shorts (re-roll fixed the white-shorts underwear problem), stockings thick; adult. Plainest of the set: mostly covered satin, little leg line.",
+  "boldness": "slightly tame"
+ },
+ {
+  "file": "assets/incoming/art_full/hana/battle_A_final.jpg",
+  "verdict": "pass",
+  "reasons": "Sprint-start crouch with relay bodysuit, jacket tied over hips hides the crotch; three shoes visible but they resolve to two legs (one trailing behind the knee); right hand spread fingers fine; baton hand ok; adult. Arms and shoulders heavily muscled (off the athletic-soft canon note) and the bust is smaller than in the other frames.",
+  "boldness": "ok"
+ },
+ {
+  "file": "assets/incoming/art_full/hana/seasonal_C_final.jpg",
+  "verdict": "pass",
+  "reasons": "Leaning on rink barrier, crossed ankles, ice skates and hands correct, head about 7.1 heads (matches 7.25 table), ruffled smooth skater skirt (no pleats), no underwear visible but skirt underside is visible from a slightly low hip camera; bust oversized relative to other frames and sweater-vest plus white mini plus thigh-highs is the nearest to school coding in the set (kept because ruffled and not pleated).",
+  "boldness": "ok"
+ },
+ {
+  "file": "assets/incoming/art_full/hana/canon_base_search_c.jpg",
+  "verdict": "pass",
+  "reasons": "1k candidate of canon base: clean hand on hip and in hair, identity and outfit correct, opaque shorts, adult. Low-res duplicate of the final's composition.",
+  "boldness": "ok"
+ },
+ {
+  "file": "assets/incoming/art_full/hana/canon_win_search_e.jpg",
+  "verdict": "pass",
+  "reasons": "1k wink + tile + fist, pink jacket tied correctly (better than the final on colour continuity), hands clean, adult.",
+  "boldness": "ok"
+ },
+ {
+  "file": "assets/incoming/art_full/hana/canon_tease_search_c.jpg",
+  "verdict": "pass",
+  "reasons": "1k back view, finger at lips; shorts hem reads as shorts, jacket tied covers hip; bust drawn very large and the rear crop is tight (still covered).",
+  "boldness": "ok"
+ },
+ {
+  "file": "assets/incoming/art_full/hana/base_C_search_c.jpg",
+  "verdict": "pass",
+  "reasons": "1k kneeling stretch, clasped hands ok, sneakers and socks ok, adult.",
+  "boldness": "ok"
+ },
+ {
+  "file": "assets/incoming/art_full/hana/evening_B_search_b.jpg",
+  "verdict": "pass",
+  "reasons": "1k gala balustrade, legs crossed, sandals and toes correct, hem covers, adult.",
+  "boldness": "bold"
+ },
+ {
+  "file": "assets/incoming/art_full/hana/swim_A_search_a.jpg",
+  "verdict": "pass",
+  "reasons": "1k kneeling bikini frame, opaque bikini front with the jacket sleeve over the centre, no outline seen at zoom, hands and feet ok.",
+  "boldness": "bold"
+ },
+ {
+  "file": "assets/incoming/art_full/hana/service_C_search_c.jpg",
+  "verdict": "pass",
+  "reasons": "1k bunny stool frame, legs crossed, shaker hand fine; leotard crotch edge is slightly visible at the hip but reads as leotard.",
+  "boldness": "bold"
+ },
+ {
+  "file": "assets/incoming/art_full/hana/battle_A_search_a.jpg",
+  "verdict": "pass",
+  "reasons": "1k sprint crouch, jacket tied covers hips, hands ok, adult; strongly muscled arms.",
+  "boldness": "ok"
+ },
+ {
+  "file": "assets/incoming/art_full/hana/robe_E_search_e.jpg",
+  "verdict": "fail",
+  "reasons": "Cream satin sleep shorts with drawstring and small embroidery read as underwear/panties (round-3 rule: reject anything that looks like underwear; the worker culled this for the robe D finals). Also tangled folded lower legs behind the knees.",
+  "boldness": "ok"
+ },
+ {
+  "file": "assets/incoming/art_full/hana/seasonal_C_search_c.jpg",
+  "verdict": "fail",
+  "reasons": "White pleated mini skirt with trim lines plus sweater vest, headband and knee-high socks reads as a school/tennis uniform: school coding (hard line). The worker re-rolled the final for exactly this reason; this search candidate is the pleated version.",
+  "boldness": "ok"
+ }
+]
