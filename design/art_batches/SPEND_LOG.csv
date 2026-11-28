@@ -10,3 +10,6 @@ date,batch_id,task_id,quote_ref,quoted_cr,actual_cr,balance_after,note
 2026-11-28,H0,height re-rolls nova x5 + yue x5 (new body table prompts),,10,10,,P50b round 2; 9:16 1k medium x1 each
 2026-11-28,P50b,round 2 total,,25.5,25.5,,P50b round 2; session total 76.5 cr (51 + 25.5)
 2026-11-28,H2,round 3 pilots x4 (fuller thighs, leg and bust focus: mc_base D, miel_evening D, hana_base D, yue_base E),,4,4,,P50b round 3; 2:3 1k medium; 0 refusals; session total 80.5 cr
+2026-11-28,A6-hana,search 17 slots x6 candidates (gpt_image_2_6 2:3 1k medium via quote refs),,102,102,,art6-hana; 1 nsfw refusal (swim K07 cand 0; possibly not billed) so 101 images
+2026-11-28,A6-hana,rerolls battle0 x12 (leotard seat then racing skirt overlay) + battle1 x6 (boyshort seat) + seasonal0 x6 (longer hem),,24,24,,art6-hana; first-round leotard/short-skirt versions showed lower buttock or crotch outline
+2026-11-28,A6-hana,finals x17 bytedance_image_upscale 2k of the picked 1k frames,,34,34,,art6-hana; own total about 160 cr (balance shared with parallel workers so not reported)
