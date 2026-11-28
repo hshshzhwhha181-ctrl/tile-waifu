@@ -93,6 +93,16 @@ func _build_v11() -> void:
 	add_child(modals)
 	modals.bind_screens(tw_screens)
 	ctx.provide("modals", modals)
+	# v11 screens live next to their spec (shell/screens/<id>/spec.tres): the registry is the directory scan, nothing else
+	tw_screens.scan()
+	if "--v11_match=1" in OS.get_cmdline_user_args():
+		_open_match.call_deferred()
+
+
+# dev entry (P31): `godot --path game -- --shell=v11 --v11_match=1` opens the v11 match screen on a default board
+func _open_match() -> void:
+	if tw_screens != null and tw_screens.has_screen("match"):
+		tw_screens.go("match", {})
 
 
 # a v11 modal swallows the press first; with none open this is the v10 chain, byte for byte

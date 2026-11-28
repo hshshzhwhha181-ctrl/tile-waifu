@@ -1161,6 +1161,22 @@
     "total": 1997
    }
   },
+  "twboardview": {
+   "fast": {
+    "marker": "TWBOARDVIEW_SELFTEST 130/130",
+    "ok": 130,
+    "secs": 14.5,
+    "status": "pass",
+    "total": 130
+   },
+   "full": {
+    "marker": "TWBOARDVIEW_SELFTEST 130/130",
+    "ok": 130,
+    "secs": 17.5,
+    "status": "pass",
+    "total": 130
+   }
+  },
   "twmodal": {
    "fast": {
     "marker": "TWMODAL_SELFTEST 83/83",
