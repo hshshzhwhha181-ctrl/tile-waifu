@@ -1,0 +1,100 @@
+{
+ "schema_version": 1,
+ "package": "P52",
+ "title": "Train tw_master_v2 (H200, 4500 steps)",
+ "week": 1,
+ "section": "Environments (LoRA v2)",
+ "status": "ready_for_owner_approval",
+ "in_plan_ceiling": true,
+ "blocked_by": [],
+ "depends_on": [],
+ "owner_gate": "M3: owner clicks gpu_rent (H200) and ONE gpu_rental_exec (lora-v2/MORNING.md); before that gpu_my to avoid touching someone else's box",
+ "budget": {
+  "currency": "higgsfield_credits",
+  "nominal_cr": 215,
+  "hard_stop_cr": 270,
+  "hard_stop_rule": "nominal + 15%: above that the run stops and the owner is asked",
+  "hard_stop_override_reason": "measured fork of the GPU session cost is 160-270 cr (v1 cost 248 cr); 270 is the upper end, not nominal + 15%",
+  "assumptions": [
+   "fork 160-270 cr; v1 cost 248 cr for the whole session; 215 is the middle",
+   "134 cr/h H200; expected 70-100 min training + eval"
+  ]
+ },
+ "candidates_policy": "no candidates: one training run; checkpoints s3000/s4000/final are evaluated, 5 tags x 80 images",
+ "selection": {
+  "keep_per_task": 1,
+  "gate": "SPEC_V2 section 8 gates G1-G5",
+  "criteria": [
+   "G1 identity (10 tokens hold hair/eyes/signature)",
+   "G2 proportions (no exaggerated bust/hips)",
+   "G3 palette via image_stats.py (pink/lavender share and saturation near base model)",
+   "G4 no garbled text in UI outputs (OCR gate)",
+   "G5 red lines (HEROINES, LEGWEAR)",
+   "pick s3000 or s4000; later steps over-bake (v1 lesson)"
+  ]
+ },
+ "pilot": {
+  "task_ids": [],
+  "candidates_per_task": null,
+  "max_cr": 0.0,
+  "go_rule": "no pilot; the 5% rule does not apply to a training job; the 270 cr hard stop is the upper end of the measured fork"
+ },
+ "tool_note": "GPU job, not an image prompt. The prepared kit (dataset on CloudFront, launch_v2.sh, EXEC_COMMAND_V2.txt, MORNING.md) lives in the research workspace lora-v2/, not in this repo. Upload slots in the exec command expire 24 h after 2026-11-27 23:13 UTC.",
+ "guards": [
+  "Before each launch: estimate_*_cost -> quote_ref; abort the task when the quote is above max_credits.",
+  "Actual spend goes to design/art_batches/SPEND_LOG.csv; more than 15% over the batch nominal = stop and ask the owner.",
+  "Every output lands in assets/incoming, then double anatomy audit -> metadata scrub -> watermark pass -> manifest `approve`.",
+  "Prompts are untested: run the pilot tasks first (2-3 frames), look at them, only then release the rest."
+ ],
+ "notes": [],
+ "batch_id": "E0",
+ "tasks": [
+  {
+   "id": "E0.train",
+   "seed": 510983,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "train",
+   "kind": "gpu_training",
+   "media": "gpu",
+   "tool": "gpu_rent+gpu_rental_exec",
+   "model": "tw_master_v2 (Z-Image Turbo + ostris adapter v2)",
+   "prompt": "Launch tw_master_v2 training with lora-v2/EXEC_COMMAND_V2.txt via ONE gpu_rental_exec: rank 128, 4500 steps, trigger 'twmaster2 style', dataset 348 images used. Poll gpu_rental_logs every 10 minutes for DONE_V2 / FAILED_V2, hard deadline 150 minutes, then gpu_rental_stop. Eval pack: 5 tags x 80 images.",
+   "candidates": 1,
+   "unit_cost_cr": 215.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "n/a",
+    "resolution": "n/a",
+    "width": 0,
+    "height": 0
+   },
+   "gpu": {
+    "type": "H200",
+    "count": 1,
+    "max_credits_per_hour": 134,
+    "auto_pause_minutes": 30,
+    "expected_hours": 1.6,
+    "range_cr": [
+     160,
+     270
+    ]
+   },
+   "quota_cr": 215.0,
+   "max_credits": 215.0,
+   "element_ids": [],
+   "lora": null,
+   "heroine": null,
+   "output": {
+    "dir": "assets/incoming/E0/train",
+    "name": "cand_{n:02d}"
+   }
+  }
+ ],
+ "totals": {
+  "tasks": 1,
+  "task_quota_sum_cr": 215.0,
+  "candidates": 0
+ },
+ "style_tail_id": null
+}

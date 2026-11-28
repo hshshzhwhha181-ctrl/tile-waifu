@@ -1,0 +1,224 @@
+{
+ "schema_version": 1,
+ "package": "P57",
+ "title": "Video pilots: SSR ultimate (Kling 3.0 / Seedance 2.5) + memorial",
+ "week": 4,
+ "section": "Video",
+ "status": "ready_for_owner_approval",
+ "in_plan_ceiling": true,
+ "blocked_by": [
+  "approved start frames (H1 / H4)",
+  "P38 pipeline"
+ ],
+ "depends_on": [
+  "H1",
+  "H4"
+ ],
+ "owner_gate": "M-gate: owner approves the start frames and the pilot clips; face-similarity and size gates after encoding",
+ "budget": {
+  "currency": "higgsfield_credits",
+  "nominal_cr": 190,
+  "hard_stop_cr": 218.5,
+  "hard_stop_rule": "nominal + 15%: above that the run stops and the owner is asked",
+  "assumptions": [
+   "video prices come from R2/PS and are not re-quoted tonight",
+   "start frames are placeholders until H1/H4 finals are approved"
+  ]
+ },
+ "candidates_policy": "ultimate: 2 Kling prompts x 3 attempts (6 x 10 cr) + 1 Seedance prompt x 2 attempts (2 x 35 cr); memorial: 2 Kling prompts x 3 attempts (6 x 10 cr)",
+ "selection": {
+  "keep_per_task": 1,
+  "gate": "face similarity to the start frame + final .ogv size <= 0.9 MB",
+  "criteria": [
+   "no redraw of the frame (the main failure of seedance_2_5 omni_reference in the earlier pilot)",
+   "no extra blink / double wink; anatomy stays 5/5",
+   "seam: first and last frame match for loops (drift check)",
+   "no text appears; style and colors identical to the key frame"
+  ]
+ },
+ "pilot": {
+  "task_ids": [
+   "X1.kling_ult_a"
+  ],
+  "candidates_per_task": 1,
+  "max_cr": 10.0,
+  "go_rule": "one 10 cr Kling attempt on the approved start frame before the rest"
+ },
+ "tool_note": "Plan prices: Kling 3.0 10 cr per 5 s, Seedance 2.5 35 cr per 5 s (R2/PS). VIDEO_BIBLE lists different prices (kling3_0 7 cr, kling4_0 15 cr per 4 s, seedance_2_5 64 cr) and `kling4_0` as the loop winner: run estimate_video_cost before every task and re-plan if the quote exceeds max_credits.",
+ "guards": [
+  "Before each launch: estimate_*_cost -> quote_ref; abort the task when the quote is above max_credits.",
+  "Actual spend goes to design/art_batches/SPEND_LOG.csv; more than 15% over the batch nominal = stop and ask the owner.",
+  "Every output lands in assets/incoming, then double anatomy audit -> metadata scrub -> watermark pass -> manifest `approve`.",
+  "Prompts are untested: run the pilot tasks first (2-3 frames), look at them, only then release the rest."
+ ],
+ "notes": [],
+ "batch_id": "X1",
+ "tasks": [
+  {
+   "id": "X1.kling_ult_a",
+   "seed": 837059,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "video_ult",
+   "media": "video",
+   "tool": "generate_video",
+   "model": "kling3_0",
+   "heroine": "yue",
+   "prompt": "2D anime character ultimate cut-in animation in the style of a premium gacha game: the heroine raises the moon-phase fan, crescent light gathers and a pearly gold energy ring expands behind her, hair and ribbons sway upward with the energy, a bright flash at the peak, then she smiles at the viewer. Camera slowly pushes in, no cuts. Keep exact face, art style, colors and line art of the start frame, no redraw, anatomy unchanged. No text.",
+   "duration_s": 5,
+   "start_frame": "H4.yue_ssr.final (approved)",
+   "candidates": 3,
+   "unit_cost_cr": 10.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "9:16",
+    "resolution": "1080p",
+    "width": 1080,
+    "height": 1920
+   },
+   "output": {
+    "dir": "assets/incoming/X1/ult_a",
+    "name": "kling_{n:02d}"
+   },
+   "quota_cr": 30.0,
+   "max_credits": 30.0,
+   "element_ids": [],
+   "lora": null
+  },
+  {
+   "id": "X1.kling_ult_b",
+   "seed": 903897,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "video_ult",
+   "media": "video",
+   "tool": "generate_video",
+   "model": "kling3_0",
+   "heroine": "yue",
+   "prompt": "2D anime character ultimate animation in the style of a premium gacha game: calm focus, eyes narrow, the heroine sweeps one hand in a wide arc, petals and gold sparks follow the arc and swirl around her, a soft light bloom, ends with a confident smile at the viewer. Camera completely still. Keep exact face, art style, colors and line art of the start frame, anatomy unchanged. No text.",
+   "duration_s": 5,
+   "start_frame": "H4.yue_ssr.final (approved)",
+   "candidates": 3,
+   "unit_cost_cr": 10.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "9:16",
+    "resolution": "1080p",
+    "width": 1080,
+    "height": 1920
+   },
+   "output": {
+    "dir": "assets/incoming/X1/ult_b",
+    "name": "kling_{n:02d}"
+   },
+   "quota_cr": 30.0,
+   "max_credits": 30.0,
+   "element_ids": [],
+   "lora": null
+  },
+  {
+   "id": "X1.seedance_ult_a",
+   "seed": 509267,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "video_ult",
+   "media": "video",
+   "tool": "generate_video",
+   "model": "seedance_2_5",
+   "heroine": "yue",
+   "prompt": "2D anime character ultimate cut-in animation in the style of a premium gacha game: the heroine raises the moon-phase fan, crescent light gathers and a pearly gold energy ring expands behind her, hair and ribbons sway upward with the energy, a bright flash at the peak, then she smiles at the viewer. Camera slowly pushes in, no cuts. Keep exact face, art style, colors and line art of the start frame, no redraw, anatomy unchanged. No text.",
+   "duration_s": 5,
+   "start_frame": "H4.yue_ssr.final (approved)",
+   "candidates": 2,
+   "unit_cost_cr": 35.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "9:16",
+    "resolution": "720p",
+    "width": 720,
+    "height": 1280
+   },
+   "output": {
+    "dir": "assets/incoming/X1/seedance_ult_a",
+    "name": "seed_{n:02d}"
+   },
+   "quota_cr": 70.0,
+   "max_credits": 70.0,
+   "element_ids": [],
+   "lora": null
+  },
+  {
+   "id": "X1.kling_mem_a",
+   "seed": 607829,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "video_memorial",
+   "media": "video",
+   "tool": "generate_video",
+   "model": "kling3_0",
+   "heroine": "mc",
+   "prompt": "2D anime character memorial scene animation in the style of a premium gacha game: dawn light slowly rises in a quiet tea house, the heroine stands by a window and breathes softly, a faint warm smile, steam from a cup, curtains move gently, lantern lights fade as sunlight comes in. Camera completely still. Keep exact face, art style, colors and line art of the start frame. No text.",
+   "duration_s": 5,
+   "start_frame": "H1.mc_base.final (approved)",
+   "candidates": 3,
+   "unit_cost_cr": 10.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "9:16",
+    "resolution": "1080p",
+    "width": 1080,
+    "height": 1920
+   },
+   "output": {
+    "dir": "assets/incoming/X1/mem_a",
+    "name": "kling_{n:02d}"
+   },
+   "quota_cr": 30.0,
+   "max_credits": 30.0,
+   "element_ids": [],
+   "lora": null
+  },
+  {
+   "id": "X1.kling_mem_b",
+   "seed": 159983,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "generate",
+   "kind": "video_memorial",
+   "media": "video",
+   "tool": "generate_video",
+   "model": "kling3_0",
+   "heroine": "mc",
+   "prompt": "2D anime character memorial scene animation in the style of a premium gacha game: the heroine turns her head slowly toward the viewer, eyes soften, a tender smile, a few cherry petals drift past, hair and ribbons follow with slight delay, a soft golden glow. Camera completely still. Keep exact face, art style, colors and line art of the start frame. No text.",
+   "duration_s": 5,
+   "start_frame": "H1.mc_base.final (approved)",
+   "candidates": 3,
+   "unit_cost_cr": 10.0,
+   "unit_cost_basis": "assumed",
+   "size": {
+    "aspect": "9:16",
+    "resolution": "1080p",
+    "width": 1080,
+    "height": 1920
+   },
+   "output": {
+    "dir": "assets/incoming/X1/mem_b",
+    "name": "kling_{n:02d}"
+   },
+   "quota_cr": 30.0,
+   "max_credits": 30.0,
+   "element_ids": [],
+   "lora": null
+  }
+ ],
+ "totals": {
+  "tasks": 5,
+  "task_quota_sum_cr": 190.0,
+  "candidates": 14
+ },
+ "style_tail_id": null
+}
