@@ -118,6 +118,8 @@ CATALOG: list[Suite] = [
     S("twboardview", "TWBOARDVIEW_SELFTEST", "res://shell/screens/match/board_view_selftest.tscn", group="core", render=True, res="720x1280",
       timeout=900, fast_args=["--games_n=40"],
       note="P31: TWBoardView + TWMatchScreen: layout (field >= 92% x 60%, tile 56/64/72/80), 20/20 events animated, 100 games with and without the view = same events and state hash, mirror == board, pixel contrast, 60-tile frame cost, screen API"),
+    S("twresult", "TWRESULT_SELFTEST", "res://shell/screens/match/match_selftest.tscn", group="core", render=True, res="720x1280", timeout=600,
+      note="P33: victory screen: TWResultChain (milestones, fast <= 3 s / chain <= 20 s timeline, tap + Skip state machine, 500 random sequences) + TWResultModal on the ModalStack (fixed button rects, one primary, Skip always visible, 0 banned words) + real-time <= 3 s + pixels + TWMatchScreen hook"),
     S("ults", "ULTS", args=["--ults_selftest=1"], group="core"),
     S("letters", "LETTERS", args=["--letters_selftest=1"], group="core"),
     # ---- v10 registry modules (docs/INTEGRATION_0.10.md; ids == V10RegistryList ids) -----------------

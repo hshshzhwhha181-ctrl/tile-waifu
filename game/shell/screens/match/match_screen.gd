@@ -16,6 +16,7 @@ extends TWScreen
 
 signal round_ended(result: Dictionary)
 signal back_requested
+signal result_action(action: String, info: Dictionary)   # the victory modal closed: "next" | "map" (P33); with no listener "next" restarts a default board
 
 const DEFAULT_CFG: = {"cols": 6, "rows": 8, "layers": 3, "fill": 0.7, "faces": 12, "seed": 1, "shape": "rect", "gold": 3, "ice": 2,
 	"hidden": true, "shard": "", "plan": {}}
@@ -24,6 +25,20 @@ var board: TWBoard = null
 var view: TWBoardView = null
 var combo_max: = 0
 var ended: = false
+# P33 / WP10c: the victory modal. params: show_result (default true; needs a ModalStack in ctx), result_facts (TWResultChain facts), round_mode,
+# round_cfg, round_state (TWRound.resolve inputs), boosters_used. The modal is opened ONCE when the board is cleared; with a "wallet" service
+# in ctx the grants of the TWRoundResult are paid exactly once.
+var show_result: = true
+var result_facts: Dictionary = {}
+var round_mode: = ""
+var round_cfg: Dictionary = {}
+var round_state: Dictionary = {}
+var round_result: TWRoundResult = null
+var result_modal: TWResultModal = null
+var _boosters_used: = 0
+var _t0: = 0.0
+var _paid: = false
+var _cfg_in: Dictionary = {}
 
 
 func enter(p: Dictionary) -> void:
@@ -39,6 +54,14 @@ func enter(p: Dictionary) -> void:
 	if ctx != null and ctx.clock != null and not board.clock.is_valid():
 		var clk: = ctx.clock
 		board.clock = func() -> float: return float(clk.mono_msec()) / 1000.0
+	show_result = bool(p.get("show_result", true))
+	result_facts = p.get("result_facts", {})
+	round_mode = String(p.get("round_mode", ""))
+	round_cfg = p.get("round_cfg", {})
+	round_state = p.get("round_state", {})
+	_boosters_used = int(p.get("boosters_used", 0))
+	_cfg_in = p.get("cfg", {}) if p.get("cfg") is Dictionary else {}
+	_t0 = board.now()
 	view = TWBoardView.new()
 	view.name = "BoardView"
 	view.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -119,6 +142,7 @@ func _commit(events: Array) -> Array:
 	elif board.cleared:
 		ended = true
 		round_ended.emit(result())
+		_show_result()
 	else:
 		ended = false
 	return events
@@ -157,3 +181,59 @@ func on_back() -> bool:
 		return false
 	back_requested.emit()
 	return true
+
+
+# ---- the victory screen (P33) --------------------------------------------------------------------------------------------
+
+func _modal_stack() -> ModalStack:
+	if ctx == null:
+		return null
+	var m = ctx.service("modals")
+	if m is ModalStack:
+		return m
+	if ctx.screens != null and ctx.screens.modals is ModalStack:
+		return ctx.screens.modals
+	return null
+
+
+func _round_stats() -> Dictionary:
+	return {"event": "clear", "win": true, "level": int(round_cfg.get("level", 0)), "seed": board.deal_seed, "hero": String(result_facts.get("partner", "")),
+		"secs": maxf(0.0, board.now() - _t0), "tiles": board.n, "fails": 0, "boosters_used": _boosters_used, "max_combo": combo_max,
+		"last_combo": board.combo, "denies": 0, "max_tray": board.max_tray}
+
+
+func _show_result() -> void:
+	var stack: = _modal_stack()
+	if not show_result or stack == null or result_modal != null or round_result != null:
+		return
+	var st: = round_state.duplicate()
+	if not st.has("partner"):
+		st["partner"] = String(result_facts.get("partner", ""))
+	round_result = TWRound.resolve(st, round_mode, round_cfg, _round_stats())
+	if not TWResultChain.is_win(round_result):
+		return
+	var w = ctx.service("wallet")
+	if w is TWWallet and not _paid:
+		_paid = true
+		round_result.pay(w)
+	var m: = TWResultModal.make(round_result, result_facts, {"audio": ctx.service("audio")})
+	m.on_close = _on_result_closed
+	result_modal = m
+	stack.open(m)
+
+
+func _on_result_closed(res: Variant, _reason: String) -> void:
+	result_modal = null
+	var act: = ""
+	if res is Dictionary:
+		act = String(res.get("action", ""))
+	if act == "":
+		return                                     # cleared by a screen change: nothing to do
+	var info: Dictionary = res
+	if get_signal_connection_list("result_action").is_empty():
+		if act == "next" and ctx != null and ctx.screens != null:
+			var cfg: = (_cfg_in if not _cfg_in.is_empty() else DEFAULT_CFG).duplicate()
+			cfg["seed"] = int(cfg.get("seed", 1)) + 1
+			ctx.screens.go.call_deferred("match", {"cfg": cfg, "result_facts": result_facts})
+		return
+	result_action.emit(act, info)
