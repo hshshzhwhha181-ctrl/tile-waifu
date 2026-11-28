@@ -189,8 +189,8 @@
    - **Экран победы (`win.gd` / `V10HudVictory`):** нужно сверить 1-в-1 с эталоном `04_victory.webp`.
    - **Призыв (`wish_screen.gd`):** сверить 1-в-1 с эталоном `05_summon.webp`, проверить все баннеры (включая волну 1) на 20:9 и 9:16.
    - **Комбо-витрина (`V10ComboShowcase`):** проверить наличие витрин `hud2/combo/` для всех 5 богинь волны 1 (сейчас там 15 PNG — только 5 основательниц × t1/t2/t3!).
-4. **Проваленный старый тест `--ults_selftest` (`662/682`, 20 ошибок):**
-   - После активации волны 1 в `0.12.0` наряды `tb_base`..`zl_vow` (и героини `tsubame`..`zlata`) не зарегистрированы в legacy-модуле `V9Ults` (`g.gd:843`), хотя у волны 1 есть свой `V10W1Ults`. Нужно чисто объединить реестр, чтобы `--ults_selftest` выдавал 100% PASS.
+4. **Статус `--ults_selftest=1` (ЗАКРЫТО в P87 — 100% PASS):**
+   - После разделения основательниц (`V9Ults`) и волны 1 (`V10W1Ults`, коммит `cfc6356`, `704/704`) и внедрения единого чистого реестра `TWUltRegistry` + `TWUltPolicy` + 58-позиционного каталога `data/ult_catalogue.json` (P87) тест `--ults_selftest=1` проходит **1093/1093 (100% PASS)** с маркером `ULT COVERAGE ids=58 covered=58` (плюс автономный `res://tests/ult/ult_selftest.tscn` — `TWULT_SELFTEST 134/134`).
 5. **Онлайн-сервер (`server/`) пока только локальный:**
    - Бэкенд полностью написан и проходит `60/60 E2E`, но ещё не задеплоен на боевой HTTPS/WSS-сервер, нет реальных ключей OAuth (Яндекс, Google, VK, Telegram), а `V10OnlineCfg` указывает на локальный URL по умолчанию.
 6. **Сборка `0.13.0` не проверена на живом Android-устройстве после правок:**
@@ -242,8 +242,8 @@
 - Полностью отвязать `home.gd` и `hero.gd` от старых 0.5 плоских спрайтов `game/assets/hero/{mc,rin,hana,yue,nova}.png`.
 - **Критерий приёмки:** все 10/10 богинь в Чайном доме и Будуаре живые (`Skeleton2D`), с плавным дыханием, морганием, отслеживанием взгляда, бликом на чулке и уникальными жестами `POSES_HOT.md`; `rig_selftest` 100% PASS.
 
-#### Задача P0-4: Закрыть баг `--ults_selftest` (`662/682`) и провести живую сквозную приёмку (Playtest)
-- Починить регистрацию нарядов волны 1 (`tb_base`..`zl_vow`, `tsubame`..`zlata`) в `V9Ults` / `V10W1Ults` (`g.gd:843`), чтобы `--ults_selftest` стал **100% PASS**.
+#### Задача P0-4: Провести живую сквозную приёмку (Playtest) и оптимизировать `.ogv` (`--ults_selftest=1` уже 100% PASS)
+- ~~Починить регистрацию нарядов волны 1 в `V9Ults` / `V10W1Ults`~~ — **выполнено в P87**: единый чистый реестр `TWUltRegistry` (`game/core/ult/ult_registry.gd`) + `TWUltPolicy` + 58 id каталога `data/ult_catalogue.json`, `--ults_selftest=1` проходит **1093/1093 (100% PASS)**, `ULT COVERAGE ids=58 covered=58`.
 - Оптимизировать тяжёлые `.ogv` ролики волны 1 (ужать `tsubame.ogv`, `zlata.ogv`, `shirin.ogv`, `kohaku.ogv`, `o_dragon.ogv` с 2–3.3 МБ до ~600–900 КБ без потери чёткости и без фризов на мобильном Android, используя `media_forge.py` / FFmpeg Theora).
 - Прогнать **полный живой сквозной сценарий** на 20:9 (и по возможности через `adb` на Android):
   1. Первый запуск → обучение (`tut_id`) → первая партия → победа → награды.
@@ -314,7 +314,7 @@
    - Для `--export-debug` / `--export-release Android` **ОБЯЗАТЕЛЬНО** использовать настоящий `%APPDATA%` (где лежат `editor_settings-4.5.tres` с путями к Android SDK/JDK/debug keystore и шаблоны экспорта `export_templates/4.5.1.stable/`).
    - `exclude_filter` в `export_presets.cfg` теперь генерирует `python tools/assets/export_filter.py --apply`: он исключает тесты/демо/раннеры/утилиты, но оставляет всё, на что `main.gd`/`g.gd`/экраны ссылаются по `class_name`/`preload` (17 selftest-файлов), поэтому `--main-pack x.pck --pt=fresh` продолжает работать. Руками `*selftest*` не исключать. Описание конвейера: `tools/assets/README.md`.
 4. **Обязательный гейт перед любой выдачей APK:**
-   - `godot_qa.ps1` (все 13 сьютов + починенный `--ults_selftest` + `--fuzz=3`),
+   - `godot_qa.ps1` / `python tools/tw_test.py --fast` (все сьюты + `--ults_selftest=1` 1093/1093 + `ULT COVERAGE ids=58 covered=58` + `--fuzz=3`),
    - `python .agents/skills/tw-godot-qa/ux_lint.py` → `0 violations`,
    - `node server/e2e_test.mjs` → `60/60 E2E_OK`,
    - `--export-pack` → запуск с `--main-pack <file.pck> --pt=fresh` → `PT OK` (защита от белого экрана на Android),
@@ -334,8 +334,10 @@
    # E2E бэкенда (Node 24+, zero-dep)
    node server/e2e_test.mjs
 
-   # Проверка ults_selftest (который нужно довести с 662/682 до 100%)
-   & "C:\Users\ADMIN\.gemini\antigravity\scratch\tw-tools\godot\Godot_v4.5.1-stable_win64_console.exe" --headless --path game -- --ults_selftest
+   # Проверка ults_selftest (100% PASS: 1093/1093 + ULT COVERAGE ids=58 covered=58)
+   & "C:\Users\ADMIN\.gemini\antigravity\scratch\tw-tools\godot\Godot_v4.5.1-stable_win64_console.exe" --headless --audio-driver Dummy --path game -- --ults_selftest=1
+   # Автономный P87 selftest реестра/политики (TWULT_SELFTEST 134/134 + ULT COVERAGE ids=58 covered=58)
+   & "C:\Users\ADMIN\.gemini\antigravity\scratch\tw-tools\godot\Godot_v4.5.1-stable_win64_console.exe" --headless --audio-driver Dummy --path game res://tests/ult/ult_selftest.tscn
    ```
 
 ---
