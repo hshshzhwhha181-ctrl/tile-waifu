@@ -10,3 +10,8 @@ date,batch_id,task_id,quote_ref,quoted_cr,actual_cr,balance_after,note
 2026-11-28,H0,height re-rolls nova x5 + yue x5 (new body table prompts),,10,10,,P50b round 2; 9:16 1k medium x1 each
 2026-11-28,P50b,round 2 total,,25.5,25.5,,P50b round 2; session total 76.5 cr (51 + 25.5)
 2026-11-28,H2,round 3 pilots x4 (fuller thighs, leg and bust focus: mc_base D, miel_evening D, hana_base D, yue_base E),,4,4,,P50b round 3; 2:3 1k medium; 0 refusals; session total 80.5 cr
+2026-11-28,A6-rin,search canon_base x3 jobs (batch_size=2 mistake),,3,6,,art6-rin; gpt_image_2_6 2:3 1k medium; batch_size param billed 2/job but returned 1 image (3 visible); 3 candidates
+2026-11-28,A6-rin,search 15 slots x6 candidates (via quote refs in generate_image_batch),,90,90,,art6-rin; gpt_image_2_6 2:3 1k medium; 0 refusals
+2026-11-28,A6-rin,search swim R07 reroll x6 (opaque lined wrap skirt),,6,6,,art6-rin; first 6 had sheer sarong reading as underwear
+2026-11-28,A6-rin,search canon_win/canon_tease counted in the 15 slots above,,0,0,,art6-rin
+2026-11-28,A6-rin,finals x17 bytedance_image_upscale 2k of the picked 1k frames,,34,34,16630.88,art6-rin; balance 16772.88 -> 16630.88 = 142 cr total
