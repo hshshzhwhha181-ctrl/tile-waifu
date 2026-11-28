@@ -10,3 +10,7 @@ date,batch_id,task_id,quote_ref,quoted_cr,actual_cr,balance_after,note
 2026-11-28,H0,height re-rolls nova x5 + yue x5 (new body table prompts),,10,10,,P50b round 2; 9:16 1k medium x1 each
 2026-11-28,P50b,round 2 total,,25.5,25.5,,P50b round 2; session total 76.5 cr (51 + 25.5)
 2026-11-28,H2,round 3 pilots x4 (fuller thighs, leg and bust focus: mc_base D, miel_evening D, hana_base D, yue_base E),,4,4,,P50b round 3; 2:3 1k medium; 0 refusals; session total 80.5 cr
+2026-11-28,A6-yue,search 17 slots x6 candidates (gpt_image_2_6 2:3 1k medium via quote refs),,102,106,,art6-yue; includes 4 cr wasted on first call (batch_size 3 inside generate_image_batch bills 3 but returns 1 image per job)
+2026-11-28,A6-yue,rerolls swim0 x12 (sheer sarong read as bare skin; opaque sarong fixed) + service1 x12 (high-cut leotard rear read as bare buttock; boy-leg opaque seat fixed),,24,24,,art6-yue; slots 7 and 10 outfit adapted for coverage
+2026-11-28,A6-yue,V4 hem edit pass x5 on base1 (slit to mid-thigh),,5,5,,art6-yue
+2026-11-28,A6-yue,finals x17 bytedance_image_upscale 2k of the picked 1k frames (+1 duplicate upscale of seasonal0),,36,36,,art6-yue; own total 171 cr (balance shared with parallel workers so not reported); 0 refusals
