@@ -11,7 +11,7 @@ Rules (static, pure Python, comments and string literals are ignored)
   ADD     `overlay.add_child(`                                                                a view added straight to the layer
   SHELL   in game/shell/** (ENFORCING, 0 allowed): any SCAN / INDEX / ADD, any `.overlay` member access, and any `add_child(` on
           the modal layer (`modals.` / `modal_stack.` / `modal_layer.`); the only files allowed are shell/nav/modal_stack.gd and
-          shell/nav/tw_modal.gd (the stack itself) and the selftests under shell/nav/ that probe the layer
+          shell/nav/tw_modal.gd (the stack itself) and the selftests under shell/nav/ that probe the layer (modal_selftest.gd, legacy_host_selftest.gd)
 
 Scope of the legacy rules: game/**/*.gd outside game/shell/. REPORT MODE: they are counted per file and compared with
 tools/lint_modal_baseline.json as a ratchet (a file may not gain a site, a new file may not appear); losing sites is fine and is
@@ -41,7 +41,7 @@ INDEX = re.compile(r"\boverlay\.get_child\s*\(")
 ADD = re.compile(r"\boverlay\.add_child\s*\(")
 MEMBER = re.compile(r"\.overlay\b")
 LAYER_ADD = re.compile(r"\b(?:modals|modal_stack|modal_layer)\.add_child\s*\(")
-SHELL_ALLOWED = ("shell/nav/modal_stack.gd", "shell/nav/tw_modal.gd", "shell/nav/modal_selftest.gd")
+SHELL_ALLOWED = ("shell/nav/modal_stack.gd", "shell/nav/tw_modal.gd", "shell/nav/modal_selftest.gd", "shell/nav/legacy_host_selftest.gd")
 KINDS = ("scan", "index", "add")
 
 

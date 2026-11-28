@@ -68,7 +68,7 @@ func build(m, args: Dictionary) -> void :
 	var bb: = V10Layout.bleed_rect(self)
 	bgc.position = bb.position
 	bgc.size = bb.size
-	var nw: = V6Worlds.world_count()
+	var nw: = mini(V6Worlds.world_count(), V6Worlds.LOOK.size())  # P25: the legacy map has art for LOOK.size() worlds only (G.LEVELS is 1000 long now)
 	map_h = SH * nw + BOTTOM_PAD
 	map_root = Control.new()
 	map_root.size = Vector2(W, map_h)

@@ -358,6 +358,22 @@
     "total": 1131
    }
   },
+  "legacy_host": {
+   "fast": {
+    "marker": "LEGACY_HOST_SELFTEST 314/314  (screens 46, legacy teardown noise 9)",
+    "ok": 314,
+    "secs": 58.6,
+    "status": "pass",
+    "total": 314
+   },
+   "full": {
+    "marker": "LEGACY_HOST_SELFTEST 314/314  (screens 46, legacy teardown noise 9)",
+    "ok": 314,
+    "secs": 58.6,
+    "status": "pass",
+    "total": 314
+   }
+  },
   "letters": {
    "fast": {
     "expected_fail": [

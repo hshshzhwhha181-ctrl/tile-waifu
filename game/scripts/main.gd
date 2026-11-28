@@ -53,7 +53,21 @@ var CR: = Rect2(0, 0, 720, 1280)
 var safe_top: = 0.0
 var safe_bottom: = 0.0
 
+const V11_SCENE: = "res://shell/main_v11.tscn"
+
+# 0.11 (P25): `--shell=v11` (user arg) or ProjectSettings tw/shell = "v11" boots the v11 shell, whose root is a LegacyHost
+# extending this very script, instead. Default OFF: without the flag nothing below the first `if` of _ready changes.
+# LegacyHost overrides this to false.
+func _shell_redirect() -> bool:
+	if "--shell=v11" in OS.get_cmdline_user_args() or str(ProjectSettings.get_setting("tw/shell", "v10")) == "v11":
+		if ResourceLoader.exists(V11_SCENE):
+			get_tree().change_scene_to_file.call_deferred(V11_SCENE)
+			return true
+	return false
+
 func _ready() -> void :
+	if _shell_redirect():
+		return
 	# 0.10: screens of the wired modules (V10Registry) join the table (a const dict cannot grow)
 	SCREENS.merge(V10Registry.screens())
 	var vs: = get_viewport_rect().size
