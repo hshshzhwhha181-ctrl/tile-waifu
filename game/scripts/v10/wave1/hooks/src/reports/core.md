@@ -96,7 +96,7 @@ The old→new pairs below were applied mechanically to a scratch copy; each matc
   - `event_screen.gd:328`: an avatar row of 100 px each.
   - `profile_ui` `AvatarRow`: still works, but avatars shrink to about 52 px.
 - **Ults selftest path check:** `ults_selftest` expects `ref_img == res://assets/outfits/<img>.webp`. It must accept `V10W1Core.outfit_webp(img)` instead.
-- **0.9 gacha pool:** the old `G.pull` would put SSR `zl_*` outfits straight into the standard pool after release. `V10Gacha2` (the 0.10 gacha) or the gacha lane's `limited_now` handles this.
+- **0.9 gacha pool:** the old 0.9 pull proxy in `g.gd` would put SSR `zl_*` outfits straight into the standard pool after release. `V10Gacha2` (the 0.10 gacha) or the gacha lane's `limited_now` handles this.
 
 ### Verification in a scratch copy
 Placeholder founder art was copied into the wave-1 paths, with a test rig and cards JSON. The run used `--wave1=1` and `xvfb`.

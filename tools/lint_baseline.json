@@ -1,15 +1,15 @@
 {
  "version": 1,
- "N": 564,
+ "N": 546,
  "by_rule": {
   "NODE_BASE": 0,
   "NODE_API": 57,
   "AUDIO_FX": 0,
-  "AUTOLOAD_G": 464,
+  "AUTOLOAD_G": 446,
   "ROOT_PATH": 1,
   "SHELL_DEP": 42
  },
- "core_files": 268,
+ "core_files": 271,
  "files": {
   "game/core/auth/auth.gd": {
    "AUTOLOAD_G": 19,
@@ -271,7 +271,7 @@
   },
   "game/core/v09/summon/summon_selftest.gd": {
    "NODE_API": 1,
-   "AUTOLOAD_G": 24,
+   "AUTOLOAD_G": 6,
    "SHELL_DEP": 1
   },
   "game/core/wave1/w1_audio.gd": {

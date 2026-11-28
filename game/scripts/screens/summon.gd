@@ -177,27 +177,10 @@ func _pull_cost(n: int) -> int:
 func _can_pull(n: int) -> bool:
 	return seq != null or V10Money.bal("gems") >= _pull_cost(n)
 
-func _pull(n: int) -> void :
-	if seq != null:
-		return
-	var b: Dictionary = G.BANNERS[banner_i]
-	var newbie: bool = b.get("newbie", false)
-	var free: bool = n == 10 and G.S.free10 and not newbie
-	var cost: = _pull_cost(n)
-	if V10Money.bal("gems") < cost:
-		V9Feel.deny(pull1_btn if n == 1 else pull10_btn)
-		main.toast(V6Txt.s("summon.no_gems"), "gem")
-		return
-	if free:
-		G.S.free10 = false
-	V10Money.spend({"gems": cost}, "summon")
-	main.refresh_currency(true)
-	# 0.9: the pity counter and guarantee are replayed card by card during the sequence, from their pre-pull values
-	var ctx: = {"pity": int(G.S.pity), "guar": bool(G.S.guar), "newbie_left": int(G.S.get("newbie_left", 0)),
-		"skip": V9Summon.can_skip(int(G.S.pulls))}
-	var res: = G.pull(n, b, free)
-	last_n = n
-	_sequence(res, ctx)
+func _pull(_n: int) -> void :
+	# P09: the 0.9 screen's own purchase (it paid gems itself and then called the old g.gd proxy: a second payment path) is gone. The screen the
+	# game shows is V10WishScreen, which overrides this and buys through TWGacha.pull.
+	pass
 
 
 # ---- 0.9 §E: the three-stage summon (lantern → colour → cards). Rules and timings: scripts/v09/summon/summon_rules.gd

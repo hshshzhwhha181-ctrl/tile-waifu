@@ -48,8 +48,8 @@ python .agents/skills/tw-godot-qa/scripts/ux_lint.py game/scripts/v10/salon game
 ```
 
 Checked rules:
-1. **`PCT_DIGIT`**: Bare `%` adjacent to digits in string literals (`CONTRACT_SELFTEST` violation; single source of odds is `V10Rates` / `V10Odds`).
-2. **`RUB_LITERAL`**: Currency symbol `₽` in string literals outside `V10Sku` / `V10Catalog` / `V10Odds` / `V10Rates`.
+1. **`PCT_DIGIT`**: Bare `%` adjacent to digits in string literals (`CONTRACT_SELFTEST` violation; single source of odds is `V10Rates`).
+2. **`RUB_LITERAL`**: Currency symbol `₽` in string literals outside `V10Sku` / `V10Catalog` / `V10Rates`.
 3. **`SALON_ADD_AFF`**: Forbidden direct `G.add_aff` inside `game/scripts/v10/salon/` (must route through `V10Salon.bond_cb` / `V10Bond`).
 4. **`RAW_HERO_PNG`**: Raw hardcoded `"res://assets/hero/%s.png"` without `V10W1Core.hero_art` / `V10W1Core.hero_png` or a `ResourceLoader.exists(...)` guard (Wave-1 heroines live under `res://assets/v10/wave1/hero/`).
 

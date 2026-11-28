@@ -2,7 +2,7 @@ class_name V10Gacha2
 extends RefCounted
 
 # V10Gacha2 — gacha v2 rules for M4 (spec Г1, Г3, Г4, Г5, Г7). Pure logic over the save dict S and a V10GachaBank.
-# The 0.9 three-stage lantern reveal plays the results (V10WishScreen); G.roll/G.pull become thin proxies (hooks).
+# The 0.9 three-stage lantern reveal plays the results (V10WishScreen). The one way to buy a wish is TWGacha.pull (P09).
 #
 # Counters: phase banners share S.pity / S.sr_pity / S.guar (carried between phases); «Пять ветров» and «Первый
 # гость» use S.pity_std / S.s_pity_std. S.rates_ver: 1 (0.9 curve) until the first SSR after the update, then 2.
@@ -12,7 +12,8 @@ extends RefCounted
 #   g.ensure()                                        idempotent defaults + one-time 0.9 migration (newbie_left 50−(20−old))
 #   g.banners() -> Array                              banners of the Wishes screen (V10Banners.shown)
 #   g.cost(b, n) -> int ; g.split(b, n) -> Dictionary ; g.can_pull(b, n) -> bool
-#   g.pull(b, n) -> Array[result]                     pays, rolls, grants, logs. result: {id, rar(A/S/SSR), item, new,
+#   g.pull(b, n, free = false) -> Array[result]       pays (free: gifted, nothing is paid, never on «Первый гость»), rolls, grants, logs.
+#                                                     Callers go through TWGacha.pull. result: {id, rar(A/S/SSR), item, new,
 #                                                     star, star_up, petals, gems, featured, won, guaranteed, pity, guar,
 #                                                     banner, candles}
 #   g.pity_left(b) -> int ; g.guar(b) -> bool ; g.newbie_left() -> int
@@ -173,11 +174,13 @@ func guar(b: Dictionary) -> bool:
 
 
 # ---------------------------------------------------------------- the pull
-func pull(b: Dictionary, n: int) -> Array:
+func pull(b: Dictionary, n: int, free: bool = false) -> Array:
 	if n <= 0:
 		return []
-	var sp: = split(b, n)
-	if not bank.pay(sp):
+	if free:
+		if b.kind == "newbie":
+			return []       # a gift never eats the 50 discounted wishes of «Первый гость»
+	elif not bank.pay(split(b, n)):
 		return []
 	var keys: = _ctr_keys(b)
 	var c: = {"p": int(S[keys[0]]), "s": int(S[keys[1]])}

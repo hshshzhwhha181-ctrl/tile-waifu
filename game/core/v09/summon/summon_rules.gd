@@ -17,7 +17,7 @@ extends RefCounted
 #   V9Summon.rank(rar) -> int                              0 R, 1 SR, 2 SSR
 #   V9Summon.lantern_tex(rar) -> Texture2D | null          lantern art when the file exists (code lantern otherwise)
 #   V9Summon.can_skip(pulls_before) -> bool                skip from the second summon on
-#   V9Summon.pity_track(pity_before, res) -> Array[int]    S.pity after each card (mirrors G.roll / G.pull)
+#   V9Summon.pity_track(pity_before, res) -> Array[int]    S.pity after each card (mirrors the pity of V10Gacha2 / TWGacha.pull)
 #   V9Summon.guar_track(guar_before, res, item, newbie)    S.guar after each card (50/50 lost → guaranteed next)
 #   V9Summon.left(pity) -> int                             wishes left to the hard SSR guarantee
 #   V9Summon.climb_time(best) -> float                     seconds from lighting to the lantern opening

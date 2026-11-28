@@ -88,7 +88,7 @@ flock /tmp/tw-godot.lock xvfb-run -a /opt/tw-tools/godot --path game --rendering
 | H6 | board (`game_started` / `pair_taken`) | `var ov = V10Rituals.deal_overlay({ranked, faces, seed})`; for each tile whose `face in ov.faces`: `V10BdaySigDecor.apply(tile, ov.icon, face_rect)` and hide the face art; on a pair: `V10Rituals.on_pair(face, ov)` → `V10BdayGoalChip.bump(n)` |
 | H7 | economy | `V10RitBridge.set_sink(func(rewards, src): V10Wallet.grant(rewards, src))` once the wallet is in (fallback writes `G.S.gems/coins/tickets/petals`; items to `G.S.v10_items`) |
 | H8 | play HUD | `V10RestedBar` under the ult ring while `V10Comeback.rested() > 0`; mastery: `pairs_doubled = V10Rituals.mastery_pairs(pairs, ranked)` at the end of the game |
-| H9 | odds | `V10LadderScreen.odds_requested` → `V10Odds.open("tickets")` |
+| H9 | odds | `V10LadderScreen.odds_requested` → `V10OddsScreen.open_args(parent, {"source": "tickets"})` |
 | H10 | settings | row `V10PlayerBday.settings_text()`; «Удалить» → `V10PlayerBday.delete()`; notifications: `V10Comeback.notify_plan(last_unix, cats.comeback)`, `V10Bday.notify_at(key)` via `V10Notify` |
 | H11 | profile | frames `tea_master_1/2`, `bday_<h>_<year>`, `my_bday_<year>`, `back_at_table` are registered in `V10ProfileCos` by `V10RitBridge.register_frame`; badge `tea_bowl_master` uses `assets/v10/rituals/bowl_master.webp`; title `year_at_table` |
 | H12 | old `S.streak` | set to 0 in the SAVE_VER 8 migration (spec Р3); `V10Tele.add("touches"/"gifts"/"replies"/"floors"/"outfits"/"daily"/"tasks")` from those modules |

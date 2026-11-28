@@ -11,8 +11,6 @@
 | `econ_catalog.gd` | `V10Catalog` | Все числа: валюты, шансы, баннеры, SKU с ценами в ₽, пропуск, лимиты трат. `validate()` проверяет правила магазина |
 | `econ_clock.gd` | `V10Clock` | Время экономики с базовой защитой от подкрутки часов. Сутки по Москве для всех |
 | `econ_wallet.gd` | `V10Wallet` | Кошелёк с инвариантом учёта, долгом после возврата и журналом операций |
-| `econ_gacha.gd` | `V10Gacha` | Крутки A/S/SSR, гарант, 50/50, Свеча желаний, Воск, первая SSR на выбор, баннер новичка, история за 90 дней |
-| `econ_odds.gd` | `V10Odds` | Точные шансы через цепи Маркова и данные для единого экрана шансов (строки на русском) |
 | `econ_pay.gd` | `V10PaymentProvider` | Интерфейс платёжки (сюда встанет RuStore Pay) |
 | `econ_pay_stub.gd` | `V10StubPay` | Заглушка. В релизной сборке не работает |
 | `econ_shop.gd` | `V10Shop` | Витрина, покупка, чеки, сверка, возвраты, восстановление, абонемент |
@@ -219,15 +217,14 @@ econ = {
    Формат: `{"id", "rar": A|S|SSR (R→A, SR→S), "kind": "outfit", "hero"}`. Темы и фоны, если остаются в гаче,
    передать с `kind: "hero"`, чтобы они выпадали без условия владения, или ввести отдельный `kind`.
 3. **summon.gd**
-   - Цена: `econ.pull_cost(bid, n)`, проверка: `econ.can_summon`, крутка: `econ.summon(bid, n)`.
+   - (P09) Крутка и цена — только `TWGacha.pull(G.S, banner, n, {gacha})`; в `V10Econ` крутки больше нет (был дубль движка).
    - Результат: `{rar: A|S|SSR, id, kind, featured, won, guaranteed, new, star?, petals?, pity}`.
      Для `V9Summon` и фонарей перевести `A→R`, `S→SR`.
    - На экран: «до гаранта» — `gacha.pity_left(bid)`, свечи — `gacha.candles(bid)`, кнопка Свечи —
-     `gacha.can_spark` / `econ.spark`.
-   - Кнопка «Шансы» открывает экран по `V10Odds.disclosure(bid, econ.gacha)`: строки `lines`, предметы `items`,
-     история `live.history`.
+     `gacha.can_spark` / `gacha.spark` (V10Gacha2).
+   - Кнопка «Шансы» открывает `V10OddsScreen` по `V10Rates` (числа) и `V10Gacha2.odds(b)` (предметы); история — `gacha.history()`.
    - До первой крутки показать экран «Кто будет хозяйкой твоего стола?» из `gacha.first_options()` →
-     `econ.choose_first(id)`. Полноэкранное предложение после него не показывать.
+     `gacha.choose_first(id)`. Полноэкранное предложение после него не показывать.
 4. **shop.gd**
    - `_buy()` и прямые `G.S.gems += …` удалить. Витрина строится из `econ.shop.offers()`: `price`, `per_pull`,
      `first`, `until`, `available`, `reason`.

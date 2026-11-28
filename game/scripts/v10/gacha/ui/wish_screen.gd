@@ -863,8 +863,9 @@ func _pull_go(n: int) -> void:
 		"newbie_ssr": bool(G.S.get("newbie_ssr", false)), "skip": V9Summon.can_skip(int(G.S.pulls)),
 		"left": gacha.pity_left(cur_b)}
 	_candles_before = int(G.S.candles)
-	var res: = gacha.pull(cur_b, n)
-	if res.is_empty():
+	var out: = TWGacha.pull(G.S, cur_b, n, {"gacha": gacha})     # P09: the one way to buy a wish (pays, rolls, grants, journals)
+	var res: Array = out.res
+	if not bool(out.ok):
 		return
 	G.save()
 	main.refresh_currency(true)

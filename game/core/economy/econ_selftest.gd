@@ -4,11 +4,11 @@ extends RefCounted
 # Economy core selftest. Run headless:
 #   flock /tmp/tw-godot.lock /opt/tw-tools/godot --headless --path game res://scripts/v10/economy/econ_selftest.tscn -- --econ_selftest=1
 # prints «ECON_SELFTEST ok/total» (exit code 0 only when every check passed) and every failed check.
-# --econ_mc=N scales the Monte-Carlo sample (default 1 = 400 000 standard pulls, 300 000 limited, 20 000 beginner runs).
+# --econ_mc=N is kept for the runner's fast mode (the gacha Monte-Carlo moved to TWGACHA_SELFTEST / GACHA_SELFTEST in P09).
 #
-# Sections: catalog & store rules · clock anti-cheat · wallet · gacha rules · Monte-Carlo vs advertised odds ·
-# odds disclosure · shop purchase flow (stub provider) · refunds · restore · spending protection · pass · summon flow ·
-# save/seal/migration.
+# Sections: catalog & store rules · clock anti-cheat · wallet · shop purchase flow (stub provider) · refunds · restore ·
+# spending protection · pass · Constellation stars · save/seal/migration. The summon engine (rules, odds, payment) is
+# TWGacha.pull over V10Gacha2: see TWGACHA_SELFTEST and GACHA_SELFTEST.
 
 static var ok: = 0
 static var total: = 0
@@ -42,9 +42,6 @@ static func run(scale: float = 1.0) -> int:
 	_wallet()
 	_tw_wallet()
 	_tw_wallet_property()
-	_gacha_rules()
-	_monte_carlo()
-	_odds()
 	_shop()
 	_refunds_restore()
 	_spend()
@@ -101,7 +98,6 @@ static func _catalog() -> void:
 	_near(V10Catalog.ssr_rate(46), 0.076, 1e-9, "soft pity: 7.6 % at pull 46")
 	_near(V10Catalog.ssr_rate(59), 0.856, 1e-9, "soft pity: 85.6 % at pull 59")
 	_near(V10Catalog.ssr_rate(60), 1.0, 1e-9, "hard pity at 60")
-	_near(V10Gacha.rate_at(50, 50), 1.0, 1e-9, "beginner hard pity at 50")
 	_check(V10Catalog.fmt_rub(4990) == "4 990 ₽" and V10Catalog.fmt_rub(79) == "79 ₽", "ruble format")
 	var tot: = V10Catalog.pass_track_total(true)
 	_check(int(tot.get("wish", 0)) == 5 and int(tot.get("crystal", 0)) == 1000, "premium track total 1000 crystals + 5 wishes (spec Л5): %s" % str(tot))
@@ -344,365 +340,6 @@ static func _tw_wallet_property() -> void:
 	TWWallet.forget()
 
 
-# ================================================================= gacha rules
-static func _gacha() -> V10Gacha:
-	var g: = V10Gacha.new({}, null)
-	g.rng.seed = 12345
-	return g
-
-
-static func _gacha_rules() -> void:
-	var g: = _gacha()
-	var c: = g.counter("std")
-	# pity: 2 000 pulls never go 60 without an SSR or 10 without S+
-	var since: = 0
-	var since_s: = 0
-	var maxg: = 0
-	var maxs: = 0
-	for i in 2000:
-		var r: = g.roll_rar(c)
-		since += 1
-		since_s += 1
-		if r == "SSR":
-			maxg = maxi(maxg, since)
-			since = 0
-		if r != "A":
-			maxs = maxi(maxs, since_s)
-			since_s = 0
-	_check(maxg <= 60 and maxs <= 10, "hard pity 60 / S every 10 (%d, %d)" % [maxg, maxs])
-	# forced: pity counter at 59 → next is SSR
-	c.p = 59
-	_check(g.roll_rar(c) == "SSR" and int(c.p) == 0, "pull #60 is SSR")
-	c.s = 9
-	c.p = 0
-	g.rng.seed = 7
-	var r10: = g.roll_rar(c)
-	_check(r10 != "A" and int(c.s) == 0, "10th pull without S+ is S or SSR")
-	# limited: lost 50/50 → next SSR featured
-	var lg: = _gacha()
-	var lc: = lg.counter("limited")
-	var lost: = false
-	var after_loss_ok: = true
-	var cnt: = 0
-	for i in 6000:
-		var res: = lg.pull("lim_zlata", 1)
-		var x: Dictionary = res[0]
-		if x.rar != "SSR":
-			continue
-		cnt += 1
-		if lost and not x.featured:
-			after_loss_ok = false
-		lost = not x.featured
-		if not x.featured:
-			_check(x.id != "zlata" and x.id in ["minamo", "kira", "vesper", "sigrid"], "off-banner SSR from the standard SSR pool (%s)" % x.id)
-	_check(after_loss_ok and cnt > 100, "after a lost 50/50 the next SSR is the featured one (%d SSR)" % cnt)
-	_check(lg.candles("lim_zlata") == 6000, "one candle per limited pull")
-	_check(lg.candles("std") == 0, "standard banner has no candles")
-	# spark
-	var cand0: = lg.candles("lim_zlata")
-	var p_before: = int(lc.p)
-	var sp: = lg.spark("lim_zlata", "zlata")
-	_check(sp.get("id", "") == "zlata" and lg.candles("lim_zlata") == cand0 - 200 and int(lc.p) == p_before, "spark: 200 candles → featured SSR, pity untouched")
-	_check(lg.spark("lim_zlata", "kira").is_empty(), "spark only gives a featured SSR")
-	var sg: = _gacha()
-	sg.pull("lim_zlata", 10)
-	_check(not sg.can_spark("lim_zlata") and sg.spark("lim_zlata", "zlata").is_empty(), "no spark below 200 candles")
-	# rerun 3+3: target
-	var rg: = _gacha()
-	_check(rg.target("rerun_night") == "vesper", "rerun defaults to the first featured")
-	_check(rg.set_target("rerun_night", "sigrid") and rg.target("rerun_night") == "sigrid", "player picks the rerun target")
-	_check(not rg.set_target("rerun_night", "zlata"), "target must be featured on that banner")
-	var feats: = {}
-	for i in 3000:
-		for x in rg.pull("rerun_night", 1):
-			if x.featured:
-				feats[x.id] = true
-	_check(feats.keys() == ["sigrid"], "a won 50/50 gives the chosen target only: %s" % str(feats.keys()))
-	_check(rg.counter("limited") == rg.st.ctr.limited and rg.st.ctr.size() == 1, "limited banners share one pity counter")
-	# banner end → candles become wax, banner closed, idempotent
-	var eg: = _gacha()
-	eg.clock = V10Clock.new({})
-	eg.clock.set_manual(T0, 0)
-	var bs: Array = V10Catalog.BANNERS.duplicate(true)
-	for b in bs:
-		if b.id == "lim_zlata":
-			b.end = T0 + 3600
-	eg.banners = bs
-	eg.pull("lim_zlata", 37)
-	_check(eg.ended().is_empty(), "banner running")
-	eg.clock.set_manual(T0 + 3600, 3600000)
-	_check(eg.ended() == ["lim_zlata"], "banner ended by its calendar date")
-	_check(eg.pull("lim_zlata", 1).is_empty(), "no pulls on an ended banner")
-	_check(eg.close("lim_zlata") == 37 and eg.candles("lim_zlata") == 0, "37 unspent candles → 37 wax")
-	_check(eg.close("lim_zlata") == 0, "closing twice gives nothing")
-	# beginner banner: 50 pulls, SSR within them, then closed
-	var ng: = _gacha()
-	var got_ssr: = false
-	for i in 5:
-		for x in ng.pull("newbie", 10):
-			got_ssr = got_ssr or x.rar == "SSR"
-	_check(got_ssr and ng.newbie_left() == 0, "beginner: SSR within 50, 50 pulls used")
-	_check(ng.pull("newbie", 1).is_empty() and not ng.is_open(ng.banner("newbie")), "beginner banner closes after 50")
-	var ng2: = _gacha()
-	ng2.pull("newbie", 45)
-	_check(ng2.pull("newbie", 10).is_empty(), "cannot overshoot the 50-pull limit")
-	# first SSR of choice
-	var fg: = _gacha()
-	_check(fg.first_options() == V10Catalog.FIRST_SSR_CHOICES, "three first-SSR options")
-	_check(not fg.choose_first("zlata"), "first SSR only from the offered list")
-	_check(fg.choose_first("y_queen") and fg.st.first == "y_queen", "first SSR chosen")
-	_check(not fg.choose_first("n_ssr") and fg.first_options().is_empty(), "first SSR choice is final and once")
-	var og: = V10Gacha.new({}, null)
-	og.owns = func(id): return id == "o_dragon"
-	_check(not ("o_dragon" in og.first_options()), "already owned outfit not offered")
-	# outfit drops only for owned heroines
-	var pg: = V10Gacha.new({}, null, [{"id": "z_gown", "rar": "SSR", "kind": "outfit", "hero": "zlata"}])
-	_check(pg.eligible("SSR").filter(func(x): return x.id == "z_gown").is_empty(), "outfit of a heroine you do not own never drops")
-	pg.owns = func(id): return id == "zlata"
-	_check(not pg.eligible("SSR").filter(func(x): return x.id == "z_gown").is_empty(), "outfit drops once the heroine is owned")
-	# history 90 days
-	var hg: = _gacha()
-	hg.clock = V10Clock.new({})
-	hg.clock.set_manual(T0, 0)
-	hg.pull("std", 10)
-	hg.clock.new_session(T0 + 89 * 86400)
-	hg.pull("std", 5)
-	_check(hg.history("std").size() == 15, "history keeps 90 days")
-	hg.clock.new_session(T0 + 91 * 86400)
-	_check(hg.history().size() == 5, "history older than 90 days pruned")
-	# rule change: a running counter keeps its rules; after an SSR + notice period it adopts the new ones
-	var ug: = _gacha()
-	ug.clock = V10Clock.new({})
-	ug.clock.set_manual(T0, 0)
-	ug.counter("limited").rules = "r0"
-	ug.rules_current = "r1"
-	ug.rules_announced = T0
-	var uc: = ug.counter("limited")
-	uc.p = 59
-	ug.roll_rar(uc)
-	_check(uc.rules == "r0", "new rules wait for the 14-day notice")
-	ug.clock.new_session(T0 + 14 * 86400)
-	uc.p = 30
-	var rr: = ug.roll_rar(uc)
-	_check(rr == "SSR" or uc.rules == "r0", "a running counter keeps its rules")
-	uc.p = 59
-	ug.roll_rar(uc)
-	_check(uc.rules == "r1", "after the notice, a counter adopts new rules only when it resets")
-	_check(g.audit().is_empty() and lg.audit().is_empty(), "gacha audits clean")
-	lg.st.candles["lim_zlata"] = 999999
-	_check(not lg.audit().is_empty(), "candles beyond pulls detected")
-
-
-# ================================================================= Monte-Carlo vs the advertised odds
-static func _monte_carlo() -> void:
-	var N: = int(400000 * mc_scale)
-	var g: = _gacha()
-	g.rng.seed = 20271
-	var c: = g.counter("std")
-	var base_trials: = 0
-	var base_ssr: = 0
-	var s_trials: = 0
-	var s_hits: = 0
-	var ssr: = 0
-	var srr: = 0
-	var gaps: = []
-	var gap: = 0
-	var gap_s: = 0
-	var max_gap: = 0
-	var max_gap_s: = 0
-	var bins: = [0, 0, 0, 0, 0, 0, 0]
-	var edges: = [10, 20, 30, 45, 50, 55, 60]
-	var a_items: = {}
-	for i in N:
-		var p_next: = int(c.p) + 1
-		var s_next: = int(c.s) + 1
-		var r: = g.roll_rar(c)
-		gap += 1
-		gap_s += 1
-		if p_next < V10Catalog.SOFT_FROM:
-			base_trials += 1
-			if r == "SSR":
-				base_ssr += 1
-			if s_next < V10Catalog.S_HARD:
-				s_trials += 1
-				if r == "S":
-					s_hits += 1
-		if r == "SSR":
-			ssr += 1
-			gaps.append(gap)
-			max_gap = maxi(max_gap, gap)
-			for k in edges.size():
-				if gap <= edges[k]:
-					bins[k] += 1
-					break
-			gap = 0
-		elif r == "S":
-			srr += 1
-		if r != "A":
-			max_gap_s = maxi(max_gap_s, gap_s)
-			gap_s = 0
-		elif i < 50000:
-			var it: = g._pick(g.eligible("A"))
-			a_items[it.id] = int(a_items.get(it.id, 0)) + 1
-	# advertised base rates (before soft pity / S guarantee)
-	var pb: = float(base_ssr) / float(base_trials)
-	_near(pb, 0.016, 5.0 * sqrt(0.016 * 0.984 / base_trials), "MC base SSR rate 1.6 %")
-	var ps: = float(s_hits) / float(s_trials)
-	_near(ps, 0.13, 5.0 * sqrt(0.13 * 0.87 / s_trials), "MC base S rate 13 %")
-	# pity bounds
-	_check(max_gap <= 60, "MC: never more than 60 pulls without SSR (%d)" % max_gap)
-	_check(max_gap_s <= 10, "MC: never more than 10 pulls without S+ (%d)" % max_gap_s)
-	# mean pulls per SSR vs the analytic distribution (5σ of the sample mean)
-	var dist: = V10Odds.first_ssr_dist()
-	var mu: = V10Odds.expected_to_ssr()
-	var var_: = 0.0
-	for k in dist.size():
-		var_ += float(dist[k]) * pow(float(k + 1) - mu, 2)
-	var m: = 0.0
-	for x in gaps:
-		m += float(x)
-	m /= float(gaps.size())
-	_near(m, mu, 5.0 * sqrt(var_ / gaps.size()), "MC mean pulls per SSR vs analytic %.3f" % mu)
-	# consolidated rates vs the stationary chain
-	var cons: = V10Odds.consolidated()
-	var cs: = float(ssr) / N
-	_near(cs, float(cons.SSR), 5.0 * sqrt(var_ / gaps.size()) / (mu * mu) + 1e-4, "MC consolidated SSR")
-	var cS: = float(srr) / N
-	_near(cS, float(cons.S), 6.0 * sqrt(float(cons.S) * (1.0 - float(cons.S)) / N), "MC consolidated S")
-	_near(1.0 / mu, float(cons.SSR), 1e-6, "chain SSR share = 1 / mean pulls")
-	# chi-square of when the first SSR lands
-	var exp_bins: = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-	for k in dist.size():
-		for b in edges.size():
-			if k + 1 <= edges[b]:
-				exp_bins[b] += float(dist[k]) * gaps.size()
-				break
-	var chi: = 0.0
-	for b in bins.size():
-		chi += pow(float(bins[b]) - exp_bins[b], 2) / exp_bins[b]
-	_check(chi < 30.0, "MC SSR position distribution matches (χ² %.2f, df 6)" % chi)
-	# items of one rarity equally likely
-	var na: = 0
-	for k in a_items:
-		na += a_items[k]
-	var chi_i: = 0.0
-	var ei: = float(na) / a_items.size()
-	for k in a_items:
-		chi_i += pow(float(a_items[k]) - ei, 2) / ei
-	_check(a_items.size() == 5 and chi_i < 25.0, "A items uniform (χ² %.2f, df 4)" % chi_i)
-	# limited banner: featured share 2/3 of SSRs, at most 120 pulls per featured
-	var L: = int(300000 * mc_scale)
-	var lg: = _gacha()
-	lg.rng.seed = 777
-	var lssr: = 0
-	var lfeat: = 0
-	var since: = 0
-	var max_f: = 0
-	var fgaps: = 0.0
-	var fsq: = 0.0
-	var nf: = 0
-	var lc: = lg.counter("limited")
-	for i in L:
-		var p_next: = int(lc.p) + 1
-		var rar: = lg.roll_rar(lc)
-		since += 1
-		if rar != "SSR":
-			continue
-		lssr += 1
-		var win: = bool(lc.g) or lg.rng.randf() < 0.5
-		if win:
-			lc.g = false
-			lfeat += 1
-			max_f = maxi(max_f, since)
-			fgaps += since
-			fsq += since * since
-			nf += 1
-			since = 0
-		else:
-			lc.g = true
-	var share: = float(lfeat) / lssr
-	_near(share, 2.0 / 3.0, 5.0 * sqrt((2.0 / 9.0) / lssr), "MC featured share of SSRs = 2/3")
-	_check(max_f <= V10Odds.featured_worst(), "MC: featured within %d pulls (%d)" % [V10Odds.featured_worst(), max_f])
-	var fm: = fgaps / nf
-	_near(fm, V10Odds.featured_expected(), 5.0 * sqrt(maxf(1.0, fsq / nf - fm * fm) / nf), "MC mean pulls per featured")
-	# the real pull() path agrees (smaller run, includes item choice)
-	var rg: = _gacha()
-	rg.rng.seed = 99
-	var rf: = 0
-	var rs: = 0
-	for i in int(60000 * mc_scale) / 10:
-		for x in rg.pull("lim_zlata", 10):
-			if x.rar == "SSR":
-				rs += 1
-				if x.featured:
-					rf += 1
-	_near(float(rf) / rs, 2.0 / 3.0, 5.0 * sqrt((2.0 / 9.0) / rs), "pull(): featured share 2/3")
-	# beginner banner: every run of 50 has an SSR
-	var R: = int(20000 * mc_scale)
-	var bad: = 0
-	var first_at: = 0.0
-	for i in R:
-		var ng: = V10Gacha.new({}, null)
-		ng.rng.seed = 5000 + i
-		var res: = ng.pull("newbie", 50)
-		var k: = -1
-		for j in res.size():
-			if res[j].rar == "SSR":
-				k = j
-				break
-		if k < 0:
-			bad += 1
-		else:
-			first_at += k + 1
-	_check(bad == 0, "MC beginner: SSR within 50 in all %d runs" % R)
-	var exp_nb: = V10Odds.expected_to_ssr(50)
-	var dn: = V10Odds.first_ssr_dist(50)
-	var vn: = 0.0
-	for k in dn.size():
-		vn += float(dn[k]) * pow(float(k + 1) - exp_nb, 2)
-	_near(first_at / R, exp_nb, 5.0 * sqrt(vn / R), "MC beginner mean first SSR vs analytic %.2f" % exp_nb)
-
-
-# ================================================================= odds disclosure
-static func _odds() -> void:
-	var mu: = V10Odds.expected_to_ssr()
-	_check(mu > 20.0 and mu < 40.0, "expected pulls per SSR plausible (%.2f)" % mu)
-	var cons: = V10Odds.consolidated()
-	_near(float(cons.SSR) + float(cons.S) + float(cons.A), 1.0, 1e-9, "consolidated rates sum to 1")
-	_check(float(cons.S) > 0.13, "S consolidated above base thanks to the 10-pull guarantee (%.4f)" % float(cons.S))
-	var sum_d: = 0.0
-	for x in V10Odds.first_ssr_dist():
-		sum_d += float(x)
-	_near(sum_d, 1.0, 1e-9, "first-SSR distribution sums to 1")
-	_check(V10Odds.featured_worst() == 120, "worst case featured: 120 pulls")
-	for b in V10Catalog.BANNERS:
-		var d: = V10Odds.disclosure(b.id)
-		_check(not d.is_empty() and d.lines.size() >= 5, "%s: odds lines (%d)" % [b.id, d.get("lines", []).size()])
-		var s: = 0.0
-		var sb: = 0.0
-		for it in d.items:
-			s += float(it.rate)
-			sb += float(it.base)
-		_near(s, 1.0, 1e-6, "%s: per-item consolidated rates sum to 1" % b.id)
-		_near(sb, 1.0, 1e-6, "%s: per-item base rates sum to 1" % b.id)
-		_check(float(d.worst_rub[0]) > 0 and float(d.worst_rub[1]) >= float(d.worst_rub[0]), "%s: worst case in ₽" % b.id)
-		var txt: = "\n".join(d.lines)
-		_check("₽" in txt and "%" in txt, "%s: lines show ₽ and %%" % b.id)
-	var dl: = V10Odds.disclosure("lim_zlata")
-	_check(dl.worst == 120 and dl.spark == 200, "limited disclosure: worst 120, spark 200")
-	_check(dl.items[0].id == "zlata" and dl.items[0].featured, "featured listed first")
-	var dn: = V10Odds.disclosure("newbie")
-	_check(dn.worst == 50 and dn.hard == 50, "beginner disclosure: SSR within 50")
-	_near(float(dn.rub_per_pull[1]), V10Catalog.base_rub_per_pull() * 0.8, 1e-6, "beginner pull shown at -20 % in ₽")
-	# live data
-	var g: = _gacha()
-	g.pull("lim_zlata", 12)
-	var live: = V10Odds.disclosure("lim_zlata", g)
-	_check(live.live.candles == 12 and live.live.history.size() == 12, "live: candles and 90-day history on the odds screen")
-	_check(int(live.live.pity_left) == 60 - int(g.counter("limited").p), "live: pulls left to the guarantee")
-	print("ECON odds: %s" % " | ".join(V10Odds.disclosure("lim_zlata").lines))
-
-
 # ================================================================= shop & purchase flow
 static func _shop() -> void:
 	var p: = _stub()
@@ -919,72 +556,15 @@ static func _pass() -> void:
 	_check(e2.pass_.tier() == 10 and e2.wallet.balance("moon") == 300, "deluxe: +10 tiers and moonstone")
 
 
-# ================================================================= summon flow (payment + grants)
+# ================================================================= Constellation stars (the summon flow itself lives in TWGacha: TWGACHA_SELFTEST)
 static func _summon_flow() -> void:
-	var e: = _econ()
-	e.gacha.rng.seed = 4242
-	var c: = e.can_summon("std", 10)
-	_check(not c.ok and c.reason == "no_crystals" and int(c.need) == 1500, "not enough crystals → need 1500")
-	e.wallet.add("wish", 3, "t")
-	e.wallet.add("crystal", 600, "t")
-	e.wallet.add("moon", 600, "t")
-	var r: = e.summon("std", 10)
-	_check(r.ok and r.res.size() == 10, "10-pull")
-	_check(e.wallet.balance("wish") == 0 and e.wallet.balance("crystal") == 0 and e.wallet.balance("moon") == 150, "paid with wishes, then crystals, then moonstone")
-	_check(e.pass_.st.xp == 0, "no pass XP without a season")
-	var granted: = 0
-	for x in r.res:
-		if x.new:
-			granted += 1
-	_check(granted > 0 and e.st.inv.size() == granted, "new items granted")
-	# newbie: wishes not used, 120 each
-	e.wallet.add("wish", 5, "t")
-	e.wallet.add("crystal", 1200, "t")
-	var rn: = e.summon("newbie", 10)
-	_check(rn.ok and e.wallet.balance("wish") == 5 and e.wallet.balance("crystal") == 0, "beginner: 120 per pull, no tickets")
-	# duplicates
 	var d: = _econ()
-	d.st.inv["tsubame"] = true
-	var x: = {"id": "tsubame", "rar": "A", "kind": "hero"}
-	d._apply(x, "t")
-	_check(not x.new and int(x.star) == 1 and int(d.st.const.tsubame) == 1, "duplicate heroine → Constellation ★1")
-	d.st.const["tsubame"] = 5
-	var y: = {"id": "tsubame", "rar": "A", "kind": "hero"}
-	d._apply(y, "t")
-	_check(int(y.petals) == 5 and d.wallet.balance("petal") == 5, "past ★5 → petals")
-	var z: = {"id": "o_x", "rar": "SSR", "kind": "outfit"}
-	d.st.inv["o_x"] = true
-	d._apply(z, "t")
-	_check(int(z.petals) == 60, "duplicate SSR outfit → 60 petals")
 	d.st.inv["kohaku"] = true
+	d.wallet.add("petal", 65, "t")
 	_check(d.buy_star("kohaku") and int(d.st.const.kohaku) == 1 and d.wallet.balance("petal") == 5, "star bought for 60 petals")
 	_check(not d.buy_star("kohaku"), "not enough petals")
 	_check(not d.buy_star("vesper"), "no star for a heroine you do not own")
-	# first SSR
-	var f: = _econ()
-	var got: = []
-	f.item_granted.connect(func(id, _s): got.append(id))
-	_check(f.choose_first("n_ssr") and got == ["n_ssr"] and not f.choose_first("o_dragon"), "first SSR granted once")
-	# spark + wax through the facade
-	var s: = _econ()
-	s.gacha.rng.seed = 1
-	s.wallet.add("crystal", 150 * 200, "t")
-	s.summon("lim_zlata", 100)
-	s.summon("lim_zlata", 100)
-	var sk: = s.spark("lim_zlata", "zlata")
-	_check(sk.ok and s.gacha.candles("lim_zlata") == 0, "facade spark")
-	s.wallet.add("crystal", 150 * 13, "t")
-	s.summon("lim_zlata", 13)
-	var bs: Array = V10Catalog.BANNERS.duplicate(true)
-	for b in bs:
-		if b.id == "lim_zlata":
-			b.end = T0 + 10
-	s.gacha.banners = bs
-	_adv(s, 11)
-	_check(s.tick().wax == 13 and s.wallet.balance("wax") == 13, "ended banner: candles → wax in the wallet")
-	_check(s.tick().wax == 0, "wax once")
-	_check(s.can_summon("lim_zlata", 1).reason == "closed", "closed banner refuses pulls")
-	_check(s.audit().is_empty(), "audit clean after summons: %s" % str(s.audit()))
+	_check(d.audit().is_empty(), "audit clean after a star: %s" % str(d.audit()))
 
 
 # ================================================================= save / seal / migration
@@ -993,8 +573,6 @@ static func _save() -> void:
 	var e: = _econ(p)
 	e.shop.caps.server_wallet = true
 	e.wallet.add("crystal", 3000, "t")
-	e.gacha.rng.seed = 3
-	e.summon("lim_zlata", 10)
 	e.shop.buy("moon_180")
 	var d: = e.save_dict()
 	var txt: = JSON.stringify(d)
@@ -1003,8 +581,7 @@ static func _save() -> void:
 	var e2: = V10Econ.load_dict(back, p, [], "tw-econ-v1:5e1f0c2a9b", e.clock._m_wall)
 	_check(e2.wallet.balance("crystal") == e.wallet.balance("crystal") and e2.wallet.balance("moon") == 120, "balances restored")
 	_check(typeof(e2.st.wallet.bal.crystal) == TYPE_INT, "numbers normalised to int on load")
-	_check(e2.gacha.candles("lim_zlata") == 10, "candles restored")
-	_check(e2.shop.st.receipts.size() == 1 and e2.gacha.counter("limited").p == e.gacha.counter("limited").p, "receipts and pity restored")
+	_check(e2.shop.st.receipts.size() == 1, "receipts restored")
 	_check(e2.audit().is_empty(), "restored state audits clean: %s" % str(e2.audit()))
 	# tamper
 	var bad = JSON.parse_string(txt)
@@ -1023,9 +600,10 @@ static func _save() -> void:
 	var em: = V10Econ.new(ms, null, [], T0)
 	_check(em.wallet.balance("crystal") == 4321 and em.wallet.balance("moon") == 0, "legacy gems stay free crystals, moonstone starts at 0")
 	_check(em.wallet.balance("coin") == 2400, "coins carried")
-	var lc: = em.gacha.counter("limited")
+	# the legacy counters are kept in the (inert) economy subtree so the save format and its hashes do not move
+	var lc: Dictionary = em.st.gacha.ctr.limited
 	_check(int(lc.p) == 37 and int(lc.s) == 4 and bool(lc.g) and lc.rules == "r0", "pity, S pity and 50/50 guarantee carried with their old rules")
-	_check(em.gacha.newbie_left() == 35 and bool(em.gacha.st.newbie.ssr), "beginner: 15 used of 50, SSR already had")
+	_check(int(em.st.gacha.newbie.n) == 15 and bool(em.st.gacha.newbie.ssr), "beginner: 15 used of 50, SSR already had")
 	_check(em.pass_.tier() == 9 and bool(em.pass_.st.prem) and em.pass_.claimable().size() == 10, "pass progress and claims carried")
 	_check(em.shop.month_days_left() == 10, "month card days carried (%d)" % em.shop.month_days_left())
 	_check(em.shop.is_first(V10Catalog.sku("moon_180")), "fake 0.8 purchases do not burn the first-purchase bonus")
@@ -1037,22 +615,9 @@ static func _save() -> void:
 
 # ================================================================= review fixes (edge cases)
 static func _review() -> void:
-	# a migrated 0.9 save with beginner pulls used and no SSR yet still gets its SSR within the 50
-	var all_ok: = true
-	for seed in 300:
-		var ms: = V10Econ.from_legacy({"gems": 0, "newbie_left": 10, "newbie_ssr": false}, T0)
-		var em: = V10Econ.new(ms, null, [], T0)
-		em.gacha.rng.seed = seed
-		var got: = false
-		for r in em.gacha.pull("newbie", em.gacha.newbie_left()):
-			got = got or r.rar == "SSR"
-		all_ok = all_ok and got and em.gacha.newbie_left() == 0
-	_check(all_ok, "migrated beginner banner (10 used, no SSR) keeps the SSR-within-50 promise")
 	var e: = _econ()
 	e.wallet.add("crystal", 500, "t")
-	# zero / negative pull counts
-	_check(not e.summon("std", 0).ok and not e.summon("std", -3).ok and e.wallet.balance("crystal") == 500, "0 or negative pulls refused")
-	_check(not e.summon_free("newbie", 10).ok and e.gacha.newbie_left() == V10Catalog.NEWBIE_PULLS, "gifted pulls never use the beginner banner")
+	_check(e.audit().is_empty(), "a fresh economy audits clean")
 	# an order the store never answered stops blocking the SKU after ORDER_STALE_SEC; a late payment is still delivered
 	var p: = _stub()
 	var e2: = _econ(p)
@@ -1064,13 +629,3 @@ static func _review() -> void:
 	_check(e2.shop.can_buy("month_449").ok, "stale unanswered order no longer locks the SKU")
 	p.flush()
 	_check(e2.shop.st.orders[b1.oid].st == "delivered" and e2.shop.month_days_left() == 30, "late payment of the stale order still delivered")
-	# odds: the renewal computation equals 1 / mean pulls per SSR; beginner disclosure uses its own 50-pull guarantee
-	var c60: = V10Odds.consolidated(60)
-	_near(float(c60.SSR), 1.0 / V10Odds.expected_to_ssr(60), 1e-12, "consolidated SSR = 1 / E[pulls per SSR]")
-	var dn: = V10Odds.disclosure("newbie")
-	_near(float(dn.consolidated.SSR), 1.0 / V10Odds.expected_to_ssr(50), 1e-12, "beginner odds use the 50-pull guarantee")
-	var t: = Time.get_ticks_usec()
-	V10Odds._cache.clear()
-	V10Odds.consolidated(60)
-	var ms_: = float(Time.get_ticks_usec() - t) / 1000.0
-	_check(ms_ < 20.0, "odds chain is cheap (%.2f ms)" % ms_)

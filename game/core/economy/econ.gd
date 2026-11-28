@@ -1,16 +1,13 @@
 class_name V10Econ
 extends RefCounted
 
-# V10Econ — the economy core in one object: clock, wallet, gacha, pass, spending protection, shop.
+# V10Econ — the economy core in one object: clock, wallet, pass, spending protection, shop. (The summon engine is TWGacha.pull / V10Gacha2:
+# P09 removed the second one that lived here.)
 # Pure logic, no nodes, no UI, no disk: the owner (G) keeps econ.st inside its save and calls save_dict()/load.
 #
 #   var e := V10Econ.new(state_dict_or_empty, provider_or_null, extra_pool_items)
-#   e.summon(banner_id, n)        pay (wishes → crystals → moonstone) + pull + grant; {ok, res | reason}
-#   e.spark(banner_id, pick)      200 candles → featured SSR
-#   e.choose_first(id)            first SSR of choice (free, once)
-#   e.tick()                      close ended banners (candles → wax); call on start/resume and on the shop screen
 #   e.grant(g, src) / e.revoke(g, src)   apply a reward/refund dict {currency: n, "items": [ids]}
-#   e.audit() -> Array            plausibility problems (wallet invariant, candles vs pulls, ranges, receipts, seal)
+#   e.audit() -> Array            plausibility problems (wallet invariant, ranges, receipts, seal)
 #   e.save_dict(key) / V10Econ.verify(d, key)      HMAC-SHA256 seal over the canonical JSON of the state
 #   V10Econ.from_legacy(G.S, now)  econ state from a 0.8/0.9 save (save v7), see README «Миграция»
 #
@@ -28,19 +25,19 @@ const LOCAL_KEY: = "tw-econ-v1:5e1f0c2a9b"    # deterrent only; the server issue
 var st: Dictionary
 var clock: V10Clock
 var wallet: V10Wallet
-var gacha: V10Gacha
 var pass_: V10Pass
 var spend: V10Spend
 var shop: V10Shop
 var owns: Callable
 var season_outfit: = ""         # what pass tier 30 «@season_outfit» resolves to this season
-var pass_xp_per_pull: = 0
 
 
 # t0 > 0: a manual clock starting at t0 (selftests, replays); 0 = real clock
-func _init(state: Dictionary = {}, provider: V10PaymentProvider = null, items: Array = [], t0: int = 0) -> void:
+func _init(state: Dictionary = {}, provider: V10PaymentProvider = null, _items: Array = [], t0: int = 0) -> void:
 	st = state
 	st["ver"] = int(st.get("ver", VER))
+	# "gacha" stays an (inert) subtree of the sealed economy state: the legacy counters from_legacy wrote there are kept so the
+	# save format and its golden hashes do not move; the live counters belong to V10Gacha2 (S.pity, S.guar ...)
 	for k in ["clock", "wallet", "gacha", "pass", "spend", "shop", "inv", "const", "flags"]:
 		if not (st.get(k) is Dictionary):
 			st[k] = {}
@@ -49,8 +46,6 @@ func _init(state: Dictionary = {}, provider: V10PaymentProvider = null, items: A
 	if t0 > 0:
 		clock.set_manual(t0, 0)
 	wallet = V10Wallet.new(st.wallet, clock)
-	gacha = V10Gacha.new(st.gacha, clock, items)
-	gacha.owns = _owns_proxy
 	pass_ = V10Pass.new(st.pass, clock)
 	spend = V10Spend.new(st.spend, clock)
 	shop = V10Shop.new(st.shop, clock, spend, pass_)
@@ -65,10 +60,6 @@ func _init(state: Dictionary = {}, provider: V10PaymentProvider = null, items: A
 # method callables (not lambdas) so the economy holds no reference cycle to itself
 func _owns_local(id: String) -> bool:
 	return st.inv.has(id)
-
-
-func _owns_proxy(id: String) -> bool:
-	return owns.call(id)
 
 
 func _on_wallet(_c: String) -> void:
@@ -106,96 +97,6 @@ func revoke(g: Dictionary, src: String = "refund") -> void:
 	changed.emit()
 
 
-# ---------------------------------------------------------------- summons
-func pull_cost(bid: String, n: int) -> Dictionary:
-	var b: = gacha.banner(bid)
-	if b.is_empty():
-		return {}
-	var wishes: = 0 if b.kind == "newbie" else mini(wallet.balance("wish"), n)
-	return {"wish": wishes, "premium": (n - wishes) * int(b.cost)}
-
-
-func can_summon(bid: String, n: int) -> Dictionary:
-	var b: = gacha.banner(bid)
-	if b.is_empty():
-		return {"ok": false, "reason": "unknown"}
-	if n <= 0:
-		return {"ok": false, "reason": "bad_count"}
-	if not gacha.is_open(b):
-		return {"ok": false, "reason": "closed"}
-	if b.kind == "newbie" and n > gacha.newbie_left():
-		return {"ok": false, "reason": "newbie_limit", "left": gacha.newbie_left()}
-	var c: = pull_cost(bid, n)
-	if wallet.premium() < int(c.premium):
-		return {"ok": false, "reason": "no_crystals", "need": int(c.premium) - wallet.premium()}
-	return {"ok": true, "cost": c}
-
-
-func summon(bid: String, n: int) -> Dictionary:
-	var ok: = can_summon(bid, n)
-	if not ok.ok:
-		return ok
-	var c: Dictionary = ok.cost
-	if int(c.wish) > 0:
-		wallet.spend("wish", int(c.wish), "pull:" + bid)
-	var paid: = wallet.spend_premium(int(c.premium), "pull:" + bid)
-	var res: = gacha.pull(bid, n)
-	for r in res:
-		_apply(r, "pull:" + bid)
-	pass_.add_xp(pass_xp_per_pull * n)
-	changed.emit()
-	return {"ok": true, "res": res, "paid": paid, "wish": int(c.wish)}
-
-
-# gifted pulls (login calendar, return ladder): no payment, same rules
-func summon_free(bid: String, n: int) -> Dictionary:
-	if gacha.banner(bid).get("kind", "") == "newbie":
-		return {"ok": false, "reason": "closed"}     # gifted pulls never eat the 50 discounted beginner pulls
-	var res: = gacha.pull(bid, n)
-	if res.is_empty():
-		return {"ok": false, "reason": "closed"}
-	for r in res:
-		_apply(r, "gift:" + bid)
-	changed.emit()
-	return {"ok": true, "res": res}
-
-
-func _apply(r: Dictionary, src: String) -> void:
-	var id: = String(r.get("id", ""))
-	if id == "":
-		r["new"] = false
-		return
-	if not owns.call(id):
-		r["new"] = true
-		grant({"items": [id]}, src)
-		return
-	r["new"] = false
-	var rar: = String(r.rar)
-	if String(r.get("kind", "hero")) == "hero" and int(st.const.get(id, 0)) < V10Catalog.CONST_MAX:
-		st.const[id] = int(st.const.get(id, 0)) + 1
-		r["star"] = int(st.const[id])
-	else:
-		var pet: = int(V10Catalog.DUP_PETALS.get(rar, 5))
-		wallet.add("petal", pet, src)
-		r["petals"] = pet
-
-
-func spark(bid: String, pick: String) -> Dictionary:
-	var r: = gacha.spark(bid, pick)
-	if r.is_empty():
-		return {"ok": false, "reason": "no_spark"}
-	_apply(r, "spark:" + bid)
-	changed.emit()
-	return {"ok": true, "res": [r]}
-
-
-func choose_first(id: String) -> bool:
-	if not gacha.choose_first(id):
-		return false
-	grant({"items": [id]}, "first_ssr")
-	return true
-
-
 # a Constellation star bought with petals (guaranteed path, CEO_PLAN №12)
 func buy_star(hero: String) -> bool:
 	if not owns.call(hero) or int(st.const.get(hero, 0)) >= V10Catalog.CONST_MAX:
@@ -207,21 +108,10 @@ func buy_star(hero: String) -> bool:
 	return true
 
 
-func tick() -> Dictionary:
-	var wax: = 0
-	for bid in gacha.ended():
-		var w: = gacha.close(bid)
-		if w > 0:
-			wallet.add("wax", w, "candles:" + bid)
-			wax += w
-	return {"wax": wax}
-
-
 # ---------------------------------------------------------------- integrity
 func audit() -> Array:
 	var bad: = []
 	bad.append_array(wallet.audit())
-	bad.append_array(gacha.audit())
 	bad.append_array(shop.audit())
 	if bool(st.flags.get("tampered", false)):
 		bad.append("seal mismatch on load")
