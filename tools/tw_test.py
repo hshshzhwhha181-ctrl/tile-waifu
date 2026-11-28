@@ -113,6 +113,9 @@ CATALOG: list[Suite] = [
       note="P28: TWButton/TWPlate/TWSheet/TWHeader/TWTabBar/TWToast/TWCurrencyChip/TWSkin: carried hud2 suite (854) + press curve per tick, p95 tap response, skins, 3 resolutions"),
     S("twpresence", "TWPRESENCE_SELFTEST", "res://shell/stage/presence_selftest.tscn", group="core", timeout=600,
       note="P34: TWPresence over V10LiveRig: strip <= 28% on 3 aspects, 160 px medallion, never over the board, touches off, 7 reactions from core events < 100 ms, stub for heroines without a rig, draw/texture budget"),
+    S("twboardview", "TWBOARDVIEW_SELFTEST", "res://shell/screens/match/board_view_selftest.tscn", group="core", render=True, res="720x1280",
+      timeout=900, fast_args=["--games_n=40"],
+      note="P31: TWBoardView + TWMatchScreen: layout (field >= 92% x 60%, tile 56/64/72/80), 20/20 events animated, 100 games with and without the view = same events and state hash, mirror == board, pixel contrast, 60-tile frame cost, screen API"),
     S("ults", "ULTS", args=["--ults_selftest=1"], group="core"),
     S("letters", "LETTERS", args=["--letters_selftest=1"], group="core"),
     # ---- v10 registry modules (docs/INTEGRATION_0.10.md; ids == V10RegistryList ids) -----------------

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ScreenSpec" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://shell/nav/screen_spec.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "match"
+script_path = "res://shell/screens/match/match_screen.gd"
+back_target = "home"
+tut_ids = PackedStringArray("match_field", "match_tray", "match_free_tile")
+keep_history = false
