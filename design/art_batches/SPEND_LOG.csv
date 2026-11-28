@@ -14,3 +14,4 @@ date,batch_id,task_id,quote_ref,quoted_cr,actual_cr,balance_after,note
 2026-11-28,U1,nav+gems first batch with batch_size=2-3 (param ignored: 1 image per job but charged 16),quote:3l1QhdW1BbbioPQByTPnWA,6,16,,art-ui worker; 10 cr wasted; never use batch_size with generate_image_batch
 2026-11-28,U1,queue of 186 images (60 icons x2 + 11 cur/act + 11 covers x3 + 22 small x2),quote:QmkwBOT1_IY64giF5LhoJg,219,219,,art-ui worker; 153 x 1 cr (1k medium transparent) + 33 covers x 2 cr (2k high 4:3)
 2026-11-28,U1,rerolls: hero covers mc/yue/nova x3 + bronze badge + jade corner + paper plate x2 + classic cover x2,,28,28,,art-ui worker; 9 hero covers (element recipe) x2 + 6 small x1 + 2 covers x2; balance deltas unusable (other workers share the account)
+2026-11-28,U1,audit regen: md_riichi x2 + au_subtitles x2 (1k medium transparent) + Yue hero cover x3 (2k high 4:3),,10,10,,audit-ui worker; replaced 3 audit failures; 0 refusals

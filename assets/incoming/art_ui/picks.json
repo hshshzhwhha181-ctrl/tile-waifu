@@ -534,12 +534,12 @@
    "group": "icons_audio",
    "name": "au_subtitles",
    "file": "icons_audio/au_subtitles.png",
-   "source_candidate": "icon/icon_au_subtitles_c1",
+   "source_candidate": "audit regen",
    "size": [
     512,
     512
    ],
-   "note": ""
+   "note": "replaced in audit (see audit.json)"
   },
   {
    "group": "icons_audio",
@@ -622,12 +622,12 @@
    "group": "icons_mode",
    "name": "md_riichi",
    "file": "icons_mode/md_riichi.png",
-   "source_candidate": "icon/icon_md_riichi_c1",
+   "source_candidate": "audit regen",
    "size": [
     512,
     512
    ],
-   "note": ""
+   "note": "replaced in audit (see audit.json)"
   },
   {
    "group": "icons_mode",
@@ -1073,12 +1073,12 @@
    "group": "covers",
    "name": "cover_palm_hero",
    "file": "covers/cover_palm_hero.jpg",
-   "source_candidate": "cover/hero_yue_c1",
+   "source_candidate": "audit regen",
    "size": [
     2336,
     1744
    ],
-   "note": "with Yue (element recipe)"
+   "note": "with Yue (element recipe) | replaced in audit (see audit.json)"
   },
   {
    "group": "covers",

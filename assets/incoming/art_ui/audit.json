@@ -1,0 +1,497 @@
+[
+ {
+  "file": "assets/incoming/art_ui/icons_nav/tab_tea.png",
+  "verdict": "pass",
+  "reasons": "Consistent gold line on plum lacquer, no text, transparent bg, legible at 96 and 48 px."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_nav/tab_heroines.png",
+  "verdict": "pass",
+  "reasons": "Consistent gold line on plum lacquer, no text, transparent bg, legible at 96 and 48 px."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_nav/tab_games.png",
+  "verdict": "warn",
+  "reasons": "Cream filled tiles stand out from the plum/gold line language; still reads."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_nav/tab_wishes.png",
+  "verdict": "pass",
+  "reasons": "Consistent gold line on plum lacquer, no text, transparent bg, legible at 96 and 48 px."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_nav/tab_wishes_alt_lantern.png",
+  "verdict": "pass",
+  "reasons": "Consistent gold line on plum lacquer, no text, transparent bg, legible at 96 and 48 px."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_nav/tab_shop.png",
+  "verdict": "pass",
+  "reasons": "Consistent gold line on plum lacquer, no text, transparent bg, legible at 96 and 48 px."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_nav/tab_shop_alt_pouch.png",
+  "verdict": "pass",
+  "reasons": "Consistent gold line on plum lacquer, no text, transparent bg, legible at 96 and 48 px."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_currency/cur_gems.png",
+  "verdict": "pass",
+  "reasons": "Consistent gold line on plum lacquer, no text, transparent bg, legible at 96 and 48 px."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_currency/cur_moon.png",
+  "verdict": "pass",
+  "reasons": "Consistent gold line on plum lacquer, no text, transparent bg, legible at 96 and 48 px."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_currency/cur_coins.png",
+  "verdict": "warn",
+  "reasons": "Rendered jewel style by design, red-dominant; heavier than line icons."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_currency/cur_petals.png",
+  "verdict": "pass",
+  "reasons": "Consistent gold line on plum lacquer, no text, transparent bg, legible at 96 and 48 px."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_currency/cur_ticket.png",
+  "verdict": "warn",
+  "reasons": "Rendered jewel style by design, purple/magenta heavier than line icons."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_currency/cur_candle.png",
+  "verdict": "warn",
+  "reasons": "Rendered jewel style by design, fine detail soft at 48 px."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_currency/cur_gems_alt.png",
+  "verdict": "warn",
+  "reasons": "Near duplicate of cur_gems; keep one."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_action/act_undo.png",
+  "verdict": "pass",
+  "reasons": "Consistent gold line on plum lacquer, no text, transparent bg, legible at 96 and 48 px."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_action/act_shuffle.png",
+  "verdict": "pass",
+  "reasons": "Consistent gold line on plum lacquer, no text, transparent bg, legible at 96 and 48 px."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_action/act_hint.png",
+  "verdict": "warn",
+  "reasons": "Hazy light beam under the lantern, softer than the line-icon family."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_action/act_slot.png",
+  "verdict": "pass",
+  "reasons": "Consistent gold line on plum lacquer, no text, transparent bg, legible at 96 and 48 px."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_action/act_pause.png",
+  "verdict": "pass",
+  "reasons": "Consistent gold line on plum lacquer, no text, transparent bg, legible at 96 and 48 px."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_action/act_play.png",
+  "verdict": "pass",
+  "reasons": "Consistent gold line on plum lacquer, no text, transparent bg, legible at 96 and 48 px."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_action/act_retry.png",
+  "verdict": "pass",
+  "reasons": "Consistent gold line on plum lacquer, no text, transparent bg, legible at 96 and 48 px."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_action/act_next.png",
+  "verdict": "pass",
+  "reasons": "Consistent gold line on plum lacquer, no text, transparent bg, legible at 96 and 48 px."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_status/st_star.png",
+  "verdict": "pass",
+  "reasons": "Consistent gold line on plum lacquer, no text, transparent bg, legible at 96 and 48 px."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_status/st_heart_bond.png",
+  "verdict": "pass",
+  "reasons": "Consistent gold line on plum lacquer, no text, transparent bg, legible at 96 and 48 px."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_status/st_lock.png",
+  "verdict": "pass",
+  "reasons": "Consistent gold line on plum lacquer, no text, transparent bg, legible at 96 and 48 px."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_status/st_check.png",
+  "verdict": "pass",
+  "reasons": "Consistent gold line on plum lacquer, no text, transparent bg, legible at 96 and 48 px."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_status/st_cross.png",
+  "verdict": "warn",
+  "reasons": "Duplicate of sys_close semantics; keep for status use."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_status/st_bell.png",
+  "verdict": "pass",
+  "reasons": "Consistent gold line on plum lacquer, no text, transparent bg, legible at 96 and 48 px."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_status/st_calendar.png",
+  "verdict": "pass",
+  "reasons": "Consistent gold line on plum lacquer, no text, transparent bg, legible at 96 and 48 px."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_status/st_timer.png",
+  "verdict": "pass",
+  "reasons": "Consistent gold line on plum lacquer, no text, transparent bg, legible at 96 and 48 px."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_status/st_trophy.png",
+  "verdict": "pass",
+  "reasons": "Consistent gold line on plum lacquer, no text, transparent bg, legible at 96 and 48 px."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_status/st_flag.png",
+  "verdict": "pass",
+  "reasons": "Consistent gold line on plum lacquer, no text, transparent bg, legible at 96 and 48 px."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_system/sys_settings.png",
+  "verdict": "pass",
+  "reasons": "Consistent gold line on plum lacquer, no text, transparent bg, legible at 96 and 48 px."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_system/sys_back.png",
+  "verdict": "pass",
+  "reasons": "Consistent gold line on plum lacquer, no text, transparent bg, legible at 96 and 48 px."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_system/sys_close.png",
+  "verdict": "pass",
+  "reasons": "Consistent gold line on plum lacquer, no text, transparent bg, legible at 96 and 48 px."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_system/sys_home.png",
+  "verdict": "pass",
+  "reasons": "Consistent gold line on plum lacquer, no text, transparent bg, legible at 96 and 48 px."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_system/sys_phone.png",
+  "verdict": "warn",
+  "reasons": "Thin outline, lighter stroke weight than the rest of the kit; empty body."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_system/sys_mail.png",
+  "verdict": "pass",
+  "reasons": "Consistent gold line on plum lacquer, no text, transparent bg, legible at 96 and 48 px."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_system/sys_gift.png",
+  "verdict": "pass",
+  "reasons": "Consistent gold line on plum lacquer, no text, transparent bg, legible at 96 and 48 px."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_system/sys_chest.png",
+  "verdict": "pass",
+  "reasons": "Consistent gold line on plum lacquer, no text, transparent bg, legible at 96 and 48 px."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_system/sys_quests.png",
+  "verdict": "pass",
+  "reasons": "Consistent gold line on plum lacquer, no text, transparent bg, legible at 96 and 48 px."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_system/sys_gallery.png",
+  "verdict": "warn",
+  "reasons": "Generic empty frame, weak meaning at 48 px."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_system/sys_wardrobe.png",
+  "verdict": "pass",
+  "reasons": "Consistent gold line on plum lacquer, no text, transparent bg, legible at 96 and 48 px."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_system/sys_salon.png",
+  "verdict": "pass",
+  "reasons": "Consistent gold line on plum lacquer, no text, transparent bg, legible at 96 and 48 px."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_audio/au_music.png",
+  "verdict": "pass",
+  "reasons": "Consistent gold line on plum lacquer, no text, transparent bg, legible at 96 and 48 px."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_audio/au_sfx.png",
+  "verdict": "pass",
+  "reasons": "Consistent gold line on plum lacquer, no text, transparent bg, legible at 96 and 48 px."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_audio/au_voice.png",
+  "verdict": "pass",
+  "reasons": "Consistent gold line on plum lacquer, no text, transparent bg, legible at 96 and 48 px."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_audio/au_mute.png",
+  "verdict": "pass",
+  "reasons": "Consistent gold line on plum lacquer, no text, transparent bg, legible at 96 and 48 px."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_audio/au_subtitles.png",
+  "verdict": "pass",
+  "reasons": "REPLACED after audit: original was an empty pill with no meaning; new speech bubble with two bars (no letters)."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_audio/au_quiet.png",
+  "verdict": "pass",
+  "reasons": "Consistent gold line on plum lacquer, no text, transparent bg, legible at 96 and 48 px."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_mode/md_path.png",
+  "verdict": "pass",
+  "reasons": "Consistent gold line on plum lacquer, no text, transparent bg, legible at 96 and 48 px."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_mode/md_daily.png",
+  "verdict": "pass",
+  "reasons": "Consistent gold line on plum lacquer, no text, transparent bg, legible at 96 and 48 px."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_mode/md_classic.png",
+  "verdict": "pass",
+  "reasons": "Consistent gold line on plum lacquer, no text, transparent bg, legible at 96 and 48 px."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_mode/md_triples.png",
+  "verdict": "pass",
+  "reasons": "Consistent gold line on plum lacquer, no text, transparent bg, legible at 96 and 48 px."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_mode/md_connect.png",
+  "verdict": "warn",
+  "reasons": "Two small diamonds, thin and low mass at 48 px."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_mode/md_garden.png",
+  "verdict": "pass",
+  "reasons": "Consistent gold line on plum lacquer, no text, transparent bg, legible at 96 and 48 px."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_mode/md_riichi.png",
+  "verdict": "pass",
+  "reasons": "REPLACED after audit: original was a bare stick, unreadable at 48 px; new thicker bar with blossom and pink dot."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_mode/md_koikoi.png",
+  "verdict": "pass",
+  "reasons": "Consistent gold line on plum lacquer, no text, transparent bg, legible at 96 and 48 px."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_mode/md_palm.png",
+  "verdict": "pass",
+  "reasons": "Consistent gold line on plum lacquer, no text, transparent bg, legible at 96 and 48 px."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_mode/md_duels.png",
+  "verdict": "pass",
+  "reasons": "Consistent gold line on plum lacquer, no text, transparent bg, legible at 96 and 48 px."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_mode/md_adventure.png",
+  "verdict": "pass",
+  "reasons": "Consistent gold line on plum lacquer, no text, transparent bg, legible at 96 and 48 px."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_misc/misc_share.png",
+  "verdict": "pass",
+  "reasons": "Consistent gold line on plum lacquer, no text, transparent bg, legible at 96 and 48 px."
+ },
+ {
+  "file": "assets/incoming/art_ui/icons_misc/misc_filter.png",
+  "verdict": "pass",
+  "reasons": "Consistent gold line on plum lacquer, no text, transparent bg, legible at 96 and 48 px."
+ },
+ {
+  "file": "assets/incoming/art_ui/ornaments/small_rarity_a_frame.png",
+  "verdict": "pass",
+  "reasons": "Plum lacquer and gold ornament, transparent bg, no text."
+ },
+ {
+  "file": "assets/incoming/art_ui/ornaments/small_rarity_s_frame.png",
+  "verdict": "pass",
+  "reasons": "Plum lacquer and gold ornament, transparent bg, no text."
+ },
+ {
+  "file": "assets/incoming/art_ui/ornaments/small_rarity_ssr_frame.png",
+  "verdict": "pass",
+  "reasons": "Plum lacquer and gold ornament, transparent bg, no text."
+ },
+ {
+  "file": "assets/incoming/art_ui/ornaments/small_avatar_frame_bamboo.png",
+  "verdict": "pass",
+  "reasons": "Plum lacquer and gold ornament, transparent bg, no text."
+ },
+ {
+  "file": "assets/incoming/art_ui/ornaments/small_avatar_frame_lacquer.png",
+  "verdict": "pass",
+  "reasons": "Plum lacquer and gold ornament, transparent bg, no text."
+ },
+ {
+  "file": "assets/incoming/art_ui/ornaments/small_avatar_frame_jade.png",
+  "verdict": "pass",
+  "reasons": "Plum lacquer and gold ornament, transparent bg, no text."
+ },
+ {
+  "file": "assets/incoming/art_ui/ornaments/small_avatar_frame_night.png",
+  "verdict": "pass",
+  "reasons": "Plum lacquer and gold ornament, transparent bg, no text."
+ },
+ {
+  "file": "assets/incoming/art_ui/ornaments/small_badge_silver.png",
+  "verdict": "pass",
+  "reasons": "Plum lacquer and gold ornament, transparent bg, no text."
+ },
+ {
+  "file": "assets/incoming/art_ui/ornaments/small_badge_gold.png",
+  "verdict": "pass",
+  "reasons": "Plum lacquer and gold ornament, transparent bg, no text."
+ },
+ {
+  "file": "assets/incoming/art_ui/ornaments/small_badge_perfect.png",
+  "verdict": "pass",
+  "reasons": "Plum lacquer and gold ornament, transparent bg, no text."
+ },
+ {
+  "file": "assets/incoming/art_ui/ornaments/small_ribbon_new.png",
+  "verdict": "warn",
+  "reasons": "Saturated pure red, off the plum palette."
+ },
+ {
+  "file": "assets/incoming/art_ui/ornaments/small_ribbon_limited.png",
+  "verdict": "pass",
+  "reasons": "Plum lacquer and gold ornament, transparent bg, no text."
+ },
+ {
+  "file": "assets/incoming/art_ui/ornaments/small_divider_lantern.png",
+  "verdict": "pass",
+  "reasons": "Plum lacquer and gold ornament, transparent bg, no text."
+ },
+ {
+  "file": "assets/incoming/art_ui/ornaments/small_divider_wave.png",
+  "verdict": "pass",
+  "reasons": "Plum lacquer and gold ornament, transparent bg, no text."
+ },
+ {
+  "file": "assets/incoming/art_ui/ornaments/small_panel_corner_gold.png",
+  "verdict": "pass",
+  "reasons": "Plum lacquer and gold ornament, transparent bg, no text."
+ },
+ {
+  "file": "assets/incoming/art_ui/ornaments/small_button_plate_lacquer.png",
+  "verdict": "pass",
+  "reasons": "Plum lacquer and gold ornament, transparent bg, no text."
+ },
+ {
+  "file": "assets/incoming/art_ui/ornaments/small_tab_underline.png",
+  "verdict": "pass",
+  "reasons": "Plum lacquer and gold ornament, transparent bg, no text."
+ },
+ {
+  "file": "assets/incoming/art_ui/ornaments/small_loading_ring.png",
+  "verdict": "pass",
+  "reasons": "Plum lacquer and gold ornament, transparent bg, no text."
+ },
+ {
+  "file": "assets/incoming/art_ui/ornaments/small_toast_plate.png",
+  "verdict": "pass",
+  "reasons": "Plum lacquer and gold ornament, transparent bg, no text."
+ },
+ {
+  "file": "assets/incoming/art_ui/ornaments/small_badge_bronze.png",
+  "verdict": "warn",
+  "reasons": "Orange-bronze metal leans off palette; acceptable for tiering."
+ },
+ {
+  "file": "assets/incoming/art_ui/ornaments/small_panel_corner_jade.png",
+  "verdict": "pass",
+  "reasons": "Plum lacquer and gold ornament, transparent bg, no text."
+ },
+ {
+  "file": "assets/incoming/art_ui/ornaments/small_button_plate_paper.png",
+  "verdict": "pass",
+  "reasons": "Plum lacquer and gold ornament, transparent bg, no text."
+ },
+ {
+  "file": "assets/incoming/art_ui/covers/cover_path.jpg",
+  "verdict": "pass",
+  "reasons": "Backdrop empty lower third, no text, palette ok."
+ },
+ {
+  "file": "assets/incoming/art_ui/covers/cover_daily.jpg",
+  "verdict": "pass",
+  "reasons": "Backdrop empty lower third, no text, palette ok."
+ },
+ {
+  "file": "assets/incoming/art_ui/covers/cover_triples.jpg",
+  "verdict": "pass",
+  "reasons": "Backdrop empty lower third, no text, palette ok."
+ },
+ {
+  "file": "assets/incoming/art_ui/covers/cover_connect.jpg",
+  "verdict": "pass",
+  "reasons": "Backdrop empty lower third, no text, palette ok."
+ },
+ {
+  "file": "assets/incoming/art_ui/covers/cover_garden.jpg",
+  "verdict": "pass",
+  "reasons": "Backdrop empty lower third, no text, palette ok."
+ },
+ {
+  "file": "assets/incoming/art_ui/covers/cover_riichi.jpg",
+  "verdict": "pass",
+  "reasons": "Backdrop empty lower third, no text, palette ok."
+ },
+ {
+  "file": "assets/incoming/art_ui/covers/cover_koikoi.jpg",
+  "verdict": "pass",
+  "reasons": "Backdrop empty lower third, no text, palette ok."
+ },
+ {
+  "file": "assets/incoming/art_ui/covers/cover_palm.jpg",
+  "verdict": "warn",
+  "reasons": "Cropped hand with three tiles, no heroine; acceptable."
+ },
+ {
+  "file": "assets/incoming/art_ui/covers/cover_duels.jpg",
+  "verdict": "pass",
+  "reasons": "Backdrop empty lower third, no text, palette ok."
+ },
+ {
+  "file": "assets/incoming/art_ui/covers/cover_adventure.jpg",
+  "verdict": "pass",
+  "reasons": "Backdrop empty lower third, no text, palette ok."
+ },
+ {
+  "file": "assets/incoming/art_ui/covers/cover_classic.jpg",
+  "verdict": "pass",
+  "reasons": "Backdrop empty lower third, no text, palette ok."
+ },
+ {
+  "file": "assets/incoming/art_ui/covers/cover_classic_hero.jpg",
+  "verdict": "pass",
+  "reasons": "Backdrop empty lower third, no text, palette ok."
+ },
+ {
+  "file": "assets/incoming/art_ui/covers/cover_palm_hero.jpg",
+  "verdict": "pass",
+  "reasons": "REPLACED after audit: original crossed-leg frame showed a white lace/pearl garter tab reading as underwear on the inner thigh (hard line). New frame seated upright, skirt over thighs, no garter, clean; adult face."
+ },
+ {
+  "file": "assets/incoming/art_ui/covers/cover_duels_hero.jpg",
+  "verdict": "pass",
+  "reasons": "Backdrop empty lower third, no text, palette ok."
+ }
+]
