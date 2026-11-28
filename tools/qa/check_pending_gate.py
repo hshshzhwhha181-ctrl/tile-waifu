@@ -48,11 +48,19 @@ def parse_pending_deadline(thresholds_path: Path) -> dt.date:
     raise ValueError(f"Could not find ISO date X in 'golden PENDING' row of {thresholds_path}")
 
 
+def _expand_log_paths(log_paths: list[Path]) -> list[Path]:
+    expanded: list[Path] = []
+    for p in log_paths:
+        if p.is_file():
+            expanded.append(p)
+        elif p.is_dir():
+            expanded.extend(sorted(f for f in p.rglob("*") if f.is_file()))
+    return expanded
+
+
 def scan_pending_lines(log_paths: list[Path]) -> list[dict[str, Any]]:
     hits: list[dict[str, Any]] = []
-    for p in log_paths:
-        if not p.is_file():
-            continue
+    for p in _expand_log_paths(log_paths):
         for idx, raw in enumerate(p.read_text(encoding="utf-8", errors="replace").splitlines(), 1):
             line = raw.strip()
             if PENDING_LINE_RE.search(line):

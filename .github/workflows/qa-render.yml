@@ -31,6 +31,9 @@ on:
         default: "300"
         type: string
 
+permissions:
+  contents: read
+
 concurrency:
   group: qa-render-${{ github.ref }}
   cancel-in-progress: true
@@ -40,20 +43,20 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
 
       - name: Build pinned qa-render image (xvfb + Mesa llvmpipe + Godot 4.5.1 + fonts)
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6.19.2
         with:
           context: docker/qa-render
           file: docker/qa-render/Dockerfile
           load: true
           tags: tw-qa-render:ci
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=qa-render-${{ hashFiles('docker/qa-render/Dockerfile') }}
+          cache-to: ${{ github.event_name == 'push' && format('type=gha,mode=max,scope=qa-render-{0}', hashFiles('docker/qa-render/Dockerfile')) || '' }}
 
       - name: Verify pinned rendering image & capture env.json fingerprint
         run: |
@@ -63,11 +66,12 @@ jobs:
           docker run --rm --entrypoint cat tw-qa-render:ci /etc/tw-qa-render/env.json > qa-render-out/env.json
 
       - name: Cache Godot import (keyed to pinned image + project)
-        uses: actions/cache@v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: game/.godot
-          key: godot-render-import-${{ hashFiles('docker/qa-render/Dockerfile', 'game/project.godot', 'game/**/*.import') }}
-          restore-keys: godot-render-import-
+          key: godot-render-import-${{ hashFiles('docker/qa-render/Dockerfile') }}-${{ hashFiles('game/project.godot', 'game/**/*.import') }}
+          restore-keys: |
+            godot-render-import-${{ hashFiles('docker/qa-render/Dockerfile') }}-
 
       - name: Import Godot assets inside pinned container
         run: |
@@ -113,19 +117,19 @@ jobs:
         run: |
           STRICT_FLAG=""
           if [ "$STRICT_PENDING" = "true" ]; then STRICT_FLAG="--strict"; fi
-          # Verify pixel/golden logs against Date X in docs/qa/THRESHOLDS.md
-          grep -E "PIXEL_CHECK|GOLDEN" qa-render-out/skin_swap_soak.log > qa-render-out/golden_scan.log || true
+          # Scan raw skin_swap_soak.log and render-suites logs directly (no lossy grep filter)
+          # so every TWSKINSOAK PENDING / GOLDEN PENDING line is enforced against Date X.
           docker run --rm -v "${{ github.workspace }}:/workspace" -w /workspace tw-qa-render:ci \
             python3 tools/qa/check_pending_gate.py \
               --require-render-image \
               --thresholds docs/qa/THRESHOLDS.md \
               $STRICT_FLAG \
-              --logs qa-render-out/golden_scan.log \
+              --logs qa-render-out/skin_swap_soak.log qa-render-out/logs \
               --json qa-render-out/pending-gate.json
 
       - name: Upload rendering QA artifacts
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: qa-render-artifacts
           path: |

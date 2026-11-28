@@ -160,6 +160,95 @@ class TestDesignLint(unittest.TestCase):
             self.assertFalse(rep.ok)
             self.assertIn("FILES-EXIST", {e["code"] for e in rep.errors})
 
+    def test_gacha_odds_drift_against_mp_fails(self) -> None:
+        with make_sandbox() as tmp:
+            root = Path(tmp)
+            p = root / "data/shop.json"
+            doc = json.loads(p.read_text(encoding="utf-8"))
+            doc["gacha"]["soft_pity"] = 50
+            p.write_text(json.dumps(doc, ensure_ascii=False, indent=2), encoding="utf-8")
+            rep = dl.run_lint(root)
+            self.assertFalse(rep.ok, "Editing gacha.soft_pity to 50 must fail design_lint")
+            self.assertIn("MP-3.2-GACHA-ODDS", {e["code"] for e in rep.errors})
+
+        with make_sandbox() as tmp:
+            root = Path(tmp)
+            p = root / "data/shop.json"
+            doc = json.loads(p.read_text(encoding="utf-8"))
+            doc["gacha"]["props_hard_pity"] = 55
+            p.write_text(json.dumps(doc, ensure_ascii=False, indent=2), encoding="utf-8")
+            rep = dl.run_lint(root)
+            self.assertFalse(rep.ok, "Editing gacha.props_hard_pity to 55 must fail design_lint")
+            self.assertIn("MP-3.2-GACHA-ODDS", {e["code"] for e in rep.errors})
+
+    def test_gacha_rates_must_be_int_bp_not_floats(self) -> None:
+        shop = json.loads((REPO_ROOT / "data/shop.json").read_text(encoding="utf-8"))
+        gacha = shop["gacha"]
+        for k in ("ssr_base_rate_bp", "soft_pity_step_bp", "props_base_rate_bp", "props_soft_pity_step_bp"):
+            self.assertIn(k, gacha, f"data/shop.json gacha must use integer {k}")
+            self.assertIsInstance(gacha[k], int)
+        for bad_float_k in ("ssr_base_rate", "soft_pity_step", "props_base_rate", "props_soft_pity_step"):
+            self.assertNotIn(bad_float_k, gacha, f"data/shop.json gacha must not store float {bad_float_k}")
+
+        with make_sandbox() as tmp:
+            root = Path(tmp)
+            p = root / "data/shop.json"
+            doc = json.loads(p.read_text(encoding="utf-8"))
+            doc["gacha"]["ssr_base_rate"] = 0.015
+            p.write_text(json.dumps(doc, ensure_ascii=False, indent=2), encoding="utf-8")
+            rep = dl.run_lint(root)
+            self.assertFalse(rep.ok, "Float rate field in gacha must fail design_lint")
+            self.assertIn("JSON-GACHA-INT-BP", {e["code"] for e in rep.errors})
+
+    def test_rules_drift_against_mp_fails(self) -> None:
+        for field, bad_val in [
+            ("wish_cost_gems", 160),
+            ("rub_per_wish_min", 35.0),
+            ("max_pass_value_ratio", 2.5),
+        ]:
+            with make_sandbox() as tmp:
+                root = Path(tmp)
+                p = root / "data/shop.json"
+                doc = json.loads(p.read_text(encoding="utf-8"))
+                doc["rules"][field] = bad_val
+                p.write_text(json.dumps(doc, ensure_ascii=False, indent=2), encoding="utf-8")
+                rep = dl.run_lint(root)
+                self.assertFalse(rep.ok, f"Drifted rules.{field}={bad_val} must fail design_lint")
+                self.assertIn("MP-RULES-SYNC", {e["code"] for e in rep.errors})
+
+    def test_forbidden_words_in_funds_and_season_pass_fail(self) -> None:
+        with make_sandbox() as tmp:
+            root = Path(tmp)
+            p = root / "data/shop.json"
+            doc = json.loads(p.read_text(encoding="utf-8"))
+            doc["funds"][0]["name_ru"] = "Последний шанс: Фонд Пути"
+            p.write_text(json.dumps(doc, ensure_ascii=False, indent=2), encoding="utf-8")
+            rep = dl.run_lint(root)
+            self.assertFalse(rep.ok, "Forbidden word in funds.name_ru must fail SHOP-SL-TXT")
+            self.assertIn("SHOP-SL-TXT", {e["code"] for e in rep.errors})
+
+        with make_sandbox() as tmp:
+            root = Path(tmp)
+            p = root / "data/shop.json"
+            doc = json.loads(p.read_text(encoding="utf-8"))
+            doc["season_pass"]["premium"]["name_ru"] = "Успей: Премиум"
+            p.write_text(json.dumps(doc, ensure_ascii=False, indent=2), encoding="utf-8")
+            rep = dl.run_lint(root)
+            self.assertFalse(rep.ok, "Forbidden word in season_pass.premium.name_ru must fail SHOP-SL-TXT")
+            self.assertIn("SHOP-SL-TXT", {e["code"] for e in rep.errors})
+
+    def test_mega_event_pass_ratio_drift_fails(self) -> None:
+        with make_sandbox() as tmp:
+            root = Path(tmp)
+            p = root / "design/specs/MONETIZATION_PLAN.md"
+            txt = p.read_text(encoding="utf-8")
+            # Simulate stale single ratio "1,5" (which disagreed with mega 640/399 = 1.6)
+            mutated = txt.replace("| 447 / 640 | 1,5 / 1,6 |", "| 447 / 640 | 1,5 |", 1)
+            p.write_text(mutated, encoding="utf-8")
+            rep = dl.run_lint(root)
+            self.assertFalse(rep.ok, "Single '1,5' ratio for mini/mega (1.5 / 1.6) must fail MP-4.7-BUNDLES")
+            self.assertIn("MP-4.7-BUNDLES", {e["code"] for e in rep.errors})
+
 
 if __name__ == "__main__":
     unittest.main()

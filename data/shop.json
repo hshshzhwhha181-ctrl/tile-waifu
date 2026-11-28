@@ -23,15 +23,15 @@
     "bond_stats_enabled_default": false
   },
   "gacha": {
-    "ssr_base_rate": 0.015,
+    "ssr_base_rate_bp": 150,
     "soft_pity": 60,
-    "soft_pity_step": 0.05,
+    "soft_pity_step_bp": 500,
     "hard_pity": 80,
     "candle_pity": 120,
     "first_guest_hard_pity": 30,
-    "props_base_rate": 0.02,
+    "props_base_rate_bp": 200,
     "props_soft_pity": 45,
-    "props_soft_pity_step": 0.06,
+    "props_soft_pity_step_bp": 600,
     "props_hard_pity": 60,
     "gift_petals": 5,
     "dupe_petals_after_star5": {

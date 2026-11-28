@@ -27,6 +27,8 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import base64
+import binascii
 import fnmatch
 import io
 import os
@@ -66,6 +68,21 @@ PEM_FORBIDDEN_MARKERS = (
     "BEGIN CERTIFICATE",
     "BEGIN RSA PRIVATE KEY",
     "BEGIN EC PRIVATE KEY",
+)
+RSA_ENCRYPTION_OID = b"\x2a\x86\x48\x86\xf7\x0d\x01\x01\x01"  # 1.2.840.113549.1.1.1
+MIN_RSA_KEY_BITS = 2048
+SKINS_DL_PROBES = (
+    "skins_dl/sample_skin/1.0/manifest.json",
+    "skins_dl/sample_skin/1.0/albedo.png",
+    "skins_dl/sample_skin/1.0/albedo.png.ctex",
+    "skins_dl/sample_skin/1.0/rig.webp",
+    "skins_dl/sample_skin/1.0/theme.tres",
+    "skins_dl/sample_skin/1.0/audio.ogg",
+    "skins_dl/sample_skin/1.0/data.bin",
+)
+SKINS_BASE_PROBES = (
+    "skins_base/hana_base/manifest.json",
+    "skins_base/hana_base/albedo.png",
 )
 
 
@@ -256,6 +273,21 @@ def apply_filters_to_cfg(cfg_text: str, computed_excl: list[str]) -> str:
     return out
 
 
+def _has_skins_dl_dir_exclusion(excl_items: list[str]) -> bool:
+    """Require a directory-scoped skins_dl/** (or skins_dl/*) glob that excludes ALL file types under skins_dl/."""
+    has_dir_glob = False
+    for pat in excl_items:
+        g = pat.strip().lstrip("/")
+        if g.startswith("res://"):
+            g = g[6:]
+        if g in (SKINS_DL_GLOB, "skins_dl/*"):
+            has_dir_glob = True
+            break
+    if not has_dir_glob:
+        return False
+    return all(_pattern_matches(probe, excl_items) for probe in SKINS_DL_PROBES)
+
+
 def audit_presets_cfg(
     cfg_text: str,
     computed_excl: list[str] | None = None,
@@ -275,12 +307,12 @@ def audit_presets_cfg(
         excl_items = _split_filter_csv(p["exclude_filter"])
         inc_items = _split_filter_csv(p["include_filter"])
 
-        # T3: skins_dl/** must be excluded in every preset
-        if SKINS_DL_GLOB not in excl_items and not _pattern_matches("skins_dl/sample_skin/1.0/manifest.json", excl_items):
+        # T3: skins_dl/** must be excluded in every preset across all asset types (not satisfied by '*.json')
+        if not _has_skins_dl_dir_exclusion(excl_items):
             errors.append(f"T3_SKINS_DL_NOT_EXCLUDED: preset '{pname}' exclude_filter does not exclude '{SKINS_DL_GLOB}'")
 
         # T3: skins_base/ must NOT be excluded
-        if _pattern_matches("skins_base/hana_base/manifest.json", excl_items):
+        if any(_pattern_matches(probe, excl_items) for probe in SKINS_BASE_PROBES):
             errors.append(f"T3_SKINS_BASE_EXCLUDED: preset '{pname}' exclude_filter wrongly excludes skins_base/")
 
         # T12: pack_pub.pub must be matched by include_filter in every preset
@@ -299,6 +331,91 @@ def audit_presets_cfg(
     return errors
 
 
+def _read_der_tlv(buf: bytes, offset: int) -> tuple[int, bytes, int]:
+    """Parse one ASN.1 DER Tag-Length-Value at offset; returns (tag, value_bytes, next_offset)."""
+    if offset >= len(buf):
+        raise ValueError("unexpected end of DER buffer")
+    tag = buf[offset]
+    offset += 1
+    if offset >= len(buf):
+        raise ValueError("truncated DER length")
+    first_len = buf[offset]
+    offset += 1
+    if first_len < 0x80:
+        length = first_len
+    else:
+        num_octets = first_len & 0x7F
+        if num_octets == 0 or num_octets > 4 or offset + num_octets > len(buf):
+            raise ValueError("invalid DER indefinite/long length")
+        len_bytes = buf[offset:offset + num_octets]
+        if len_bytes[0] == 0:
+            raise ValueError("non-minimal DER length encoding")
+        length = int.from_bytes(len_bytes, "big")
+        if length < 0x80:
+            raise ValueError("non-minimal DER length encoding")
+        offset += num_octets
+    end = offset + length
+    if end > len(buf):
+        raise ValueError("DER value exceeds buffer")
+    return tag, buf[offset:end], end
+
+
+def _parse_der_positive_int(val: bytes) -> int:
+    if not val:
+        raise ValueError("empty ASN.1 INTEGER")
+    if val[0] & 0x80:
+        raise ValueError("negative ASN.1 INTEGER")
+    if len(val) > 1 and val[0] == 0x00 and (val[1] & 0x80) == 0:
+        raise ValueError("non-minimal ASN.1 INTEGER padding")
+    return int.from_bytes(val, "big")
+
+
+def _validate_rsa_spki_der(der: bytes, source: str) -> list[str]:
+    """Validate ASN.1 DER SubjectPublicKeyInfo for an RSA >= 2048-bit public key (Godot CryptoKey.load compatible)."""
+    try:
+        tag, spki_body, end = _read_der_tlv(der, 0)
+        if tag != 0x30 or end != len(der):
+            return [f"T12_INVALID_ASN1_PUB_KEY: {source} outer element is not a single DER SEQUENCE"]
+
+        alg_tag, alg_body, pos = _read_der_tlv(spki_body, 0)
+        if alg_tag != 0x30:
+            return [f"T12_INVALID_ASN1_PUB_KEY: {source} missing AlgorithmIdentifier SEQUENCE"]
+        oid_tag, oid_val, alg_pos = _read_der_tlv(alg_body, 0)
+        if oid_tag != 0x06 or oid_val != RSA_ENCRYPTION_OID:
+            return [f"T12_UNSUPPORTED_KEY_ALG: {source} expected rsaEncryption OID (1.2.840.113549.1.1.1)"]
+        if alg_pos < len(alg_body):
+            null_tag, null_val, alg_pos2 = _read_der_tlv(alg_body, alg_pos)
+            if null_tag != 0x05 or null_val != b"" or alg_pos2 != len(alg_body):
+                return [f"T12_INVALID_ASN1_PUB_KEY: {source} invalid AlgorithmIdentifier parameters"]
+
+        bs_tag, bs_val, pos2 = _read_der_tlv(spki_body, pos)
+        if bs_tag != 0x03 or pos2 != len(spki_body) or len(bs_val) < 2 or bs_val[0] != 0x00:
+            return [f"T12_INVALID_ASN1_PUB_KEY: {source} invalid subjectPublicKey BIT STRING"]
+
+        rsa_der = bs_val[1:]
+        rtag, rbody, rend = _read_der_tlv(rsa_der, 0)
+        if rtag != 0x30 or rend != len(rsa_der):
+            return [f"T12_INVALID_ASN1_PUB_KEY: {source} subjectPublicKey is not an RSAPublicKey SEQUENCE"]
+
+        ntag, nval, rpos = _read_der_tlv(rbody, 0)
+        etag, eval_, rpos2 = _read_der_tlv(rbody, rpos)
+        if ntag != 0x02 or etag != 0x02 or rpos2 != len(rbody):
+            return [f"T12_INVALID_ASN1_PUB_KEY: {source} RSAPublicKey must contain exactly (modulus, publicExponent)"]
+
+        modulus = _parse_der_positive_int(nval)
+        exponent = _parse_der_positive_int(eval_)
+    except ValueError as exc:
+        return [f"T12_INVALID_ASN1_PUB_KEY: {source} malformed ASN.1 DER ({exc})"]
+
+    if modulus.bit_length() < MIN_RSA_KEY_BITS:
+        return [f"T12_WEAK_RSA_PUB_KEY: {source} RSA modulus is {modulus.bit_length()} bits (minimum {MIN_RSA_KEY_BITS})"]
+    if (modulus & 1) == 0:
+        return [f"T12_INVALID_ASN1_PUB_KEY: {source} RSA modulus must be odd"]
+    if exponent < 3 or (exponent & 1) == 0:
+        return [f"T12_INVALID_ASN1_PUB_KEY: {source} invalid RSA public exponent {exponent}"]
+    return []
+
+
 def validate_pub_key_bytes(data: bytes, source: str = PACK_PUB_REL) -> list[str]:
     if not data or not data.strip():
         return [f"T12_EMPTY_PUB_KEY: {source} is empty"]
@@ -309,13 +426,21 @@ def validate_pub_key_bytes(data: bytes, source: str = PACK_PUB_REL) -> list[str]
     for bad in PEM_FORBIDDEN_MARKERS:
         if bad in text:
             return [f"T12_FORBIDDEN_KEY_TYPE: {source} contains '{bad}' (expected PEM PUBLIC KEY, not .crt or private key)"]
-    if PEM_PUB_BEGIN not in text or PEM_PUB_END not in text:
-        return [f"T12_INVALID_PEM_PUB_KEY: {source} missing '{PEM_PUB_BEGIN}' / '{PEM_PUB_END}'"]
-    # Verify non-empty base64 body between BEGIN and END
-    body = text.split(PEM_PUB_BEGIN, 1)[1].split(PEM_PUB_END, 1)[0].strip()
-    if len(body) < 32:
-        return [f"T12_TRUNCATED_PUB_KEY: {source} PEM body too short ({len(body)} chars)"]
-    return []
+    if text.count(PEM_PUB_BEGIN) != 1 or text.count(PEM_PUB_END) != 1:
+        return [f"T12_INVALID_PEM_PUB_KEY: {source} must contain exactly one '{PEM_PUB_BEGIN}' / '{PEM_PUB_END}' block"]
+    begin_idx = text.index(PEM_PUB_BEGIN)
+    end_idx = text.index(PEM_PUB_END)
+    if end_idx <= begin_idx:
+        return [f"T12_INVALID_PEM_PUB_KEY: {source} PEM END marker precedes BEGIN marker"]
+    body = text[begin_idx + len(PEM_PUB_BEGIN):end_idx]
+    b64_compact = "".join(body.split())
+    if not b64_compact:
+        return [f"T12_EMPTY_PUB_KEY: {source} PEM body is empty"]
+    try:
+        der = base64.b64decode(b64_compact, validate=True)
+    except (binascii.Error, ValueError) as exc:
+        return [f"T12_INVALID_PEM_BASE64: {source} invalid base64 in PEM body ({exc})"]
+    return _validate_rsa_spki_der(der, source)
 
 
 def check_pub_key_file(game_dir: str = GAME, rel_path: str = PACK_PUB_REL) -> list[str]:
@@ -472,12 +597,37 @@ def _build_synthetic_pck(entries: dict[str, bytes]) -> bytes:
     return header + dir_bytes + b"".join(data_chunks)
 
 
-SAMPLE_VALID_PUB_PEM = (
-    "-----BEGIN PUBLIC KEY-----\n"
-    "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtwP92SyntheticKey000\n"
-    "0000000000000000000000000000000000000000000000000000000000000000\n"
-    "-----END PUBLIC KEY-----\n"
-).encode("utf-8")
+def _encode_der_len(n: int) -> bytes:
+    if n < 0x80:
+        return bytes([n])
+    raw = n.to_bytes((n.bit_length() + 7) // 8, "big")
+    return bytes([0x80 | len(raw)]) + raw
+
+
+def _encode_der_tlv(tag: int, body: bytes) -> bytes:
+    return bytes([tag]) + _encode_der_len(len(body)) + body
+
+
+def _encode_der_int(val: int) -> bytes:
+    raw = val.to_bytes((val.bit_length() + 7) // 8, "big")
+    if raw[0] & 0x80:
+        raw = b"\x00" + raw
+    return _encode_der_tlv(0x02, raw)
+
+
+def _build_test_rsa_spki_pem(bits: int = 2048) -> bytes:
+    """Build a deterministic, structurally valid ASN.1 DER RSA-N SubjectPublicKeyInfo PEM (test fixture only, no private key)."""
+    # Deterministic odd N-bit integer with MSB set so bit_length == bits
+    modulus = (1 << (bits - 1)) | int("a55a" * (bits // 16), 16) % (1 << (bits - 1)) | 1
+    rsa_pub = _encode_der_tlv(0x30, _encode_der_int(modulus) + _encode_der_int(65537))
+    alg_id = _encode_der_tlv(0x30, _encode_der_tlv(0x06, RSA_ENCRYPTION_OID) + b"\x05\x00")
+    spki = _encode_der_tlv(0x30, alg_id + _encode_der_tlv(0x03, b"\x00" + rsa_pub))
+    b64 = base64.b64encode(spki).decode("ascii")
+    lines = [b64[i:i + 64] for i in range(0, len(b64), 64)]
+    return (f"{PEM_PUB_BEGIN}\n" + "\n".join(lines) + f"\n{PEM_PUB_END}\n").encode("utf-8")
+
+
+SAMPLE_VALID_PUB_PEM = _build_test_rsa_spki_pem(2048)
 
 SAMPLE_CERT_PEM = (
     "-----BEGIN CERTIFICATE-----\n"
@@ -661,6 +811,28 @@ def selftest() -> tuple[int, int]:
         fixed_cfg = apply_filters_to_cfg(broken_cfg, res["final"])
         e_fixed = audit_presets_cfg(fixed_cfg, computed_excl=res["final"], require_exact_excl=True)
         case("apply: apply_filters_to_cfg repairs all 3 presets to pass strict audit (GREEN)", not e_fixed, str(e_fixed))
+
+        # 15. Garbage '!!!!...' and weak RSA-1024 keys rejected (RED)
+        bang_pem = f"{PEM_PUB_BEGIN}\n{'!' * 40}\n{PEM_PUB_END}\n".encode("utf-8")
+        e_bang = validate_pub_key_bytes(bang_pem, PACK_PUB_REL)
+        e_weak = validate_pub_key_bytes(_build_test_rsa_spki_pem(1024), PACK_PUB_REL)
+        case(
+            "pub_key validation: rejects non-base64 garbage and RSA-1024 (<2048) (RED)",
+            any("T12_INVALID_PEM_BASE64" in e for e in e_bang) and any("T12_WEAK_RSA_PUB_KEY" in e for e in e_weak),
+            f"bang={e_bang} weak={e_weak}",
+        )
+
+        # 16. Unrelated '*.json' glob does NOT satisfy T3 skins_dl/** check (RED)
+        cfg_star_json = _sample_presets_cfg(include_pub=True, exclude_skins_dl=False).replace(
+            'exclude_filter="assets/manifest/assets.json"',
+            'exclude_filter="*.json"',
+        )
+        e_star_json = audit_presets_cfg(cfg_star_json)
+        case(
+            "presets: unrelated '*.json' glob fails T3_SKINS_DL_NOT_EXCLUDED across all 3 presets (RED)",
+            sum("T3_SKINS_DL_NOT_EXCLUDED" in e for e in e_star_json) == 3,
+            str(e_star_json),
+        )
 
     return sum(results), len(results)
 

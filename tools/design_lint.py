@@ -83,6 +83,22 @@ def parse_all_ints(text: str) -> list[int]:
     return [int(x) for x in re.findall(r"\d+", s)]
 
 
+def parse_all_floats(text: str) -> list[float]:
+    s = re.sub(r"(?<=\d)[\s\u00a0](?=\d{3}\b)", "", text).replace(",", ".")
+    return [float(x) for x in re.findall(r"-?\d+(?:\.\d+)?", s)]
+
+
+def _fmt_ru_dec(val: float) -> str:
+    s = f"{val:g}"
+    if "." not in s and isinstance(val, float):
+        s = f"{val:.1f}"
+    return s.replace(".", ",")
+
+
+def _fmt_ru_int(val: int) -> str:
+    return f"{val:,}".replace(",", " ")
+
+
 def strip_md(cell: str) -> str:
     return cell.strip().strip("*").strip("`").strip()
 
@@ -188,8 +204,24 @@ def lint_json_sources(
                 f"star sum mismatch for {tcode}: rub={op.get('stars_rub')} total={op.get('stars_rub_total')}",
             )
 
-    # Verify gacha dupes & gift petals match skins.tiers
+    # Verify gacha integer basis-point convention (no float RNG rates) & dupes/gift petals
     gacha = shop_doc.get("gacha", {})
+    gacha_int_errs: list[str] = []
+    req_bp_keys = ("ssr_base_rate_bp", "soft_pity_step_bp", "props_base_rate_bp", "props_soft_pity_step_bp")
+    req_int_keys = ("soft_pity", "hard_pity", "candle_pity", "first_guest_hard_pity", "props_soft_pity", "props_hard_pity", "gift_petals")
+    for k in req_bp_keys:
+        v = gacha.get(k)
+        if not isinstance(v, int) or isinstance(v, bool) or not (0 < v <= 10000):
+            gacha_int_errs.append(f"gacha.{k} must be int in (0, 10000], got {v!r}")
+    for k in req_int_keys:
+        v = gacha.get(k)
+        if not isinstance(v, int) or isinstance(v, bool) or v <= 0:
+            gacha_int_errs.append(f"gacha.{k} must be positive int, got {v!r}")
+    for k, v in gacha.items():
+        if isinstance(v, float) or k in ("ssr_base_rate", "soft_pity_step", "props_base_rate", "props_soft_pity_step"):
+            gacha_int_errs.append(f"gacha.{k}={v!r} uses forbidden float rate (must use integer *_bp)")
+    rep.check("JSON-GACHA-INT-BP", not gacha_int_errs, "; ".join(gacha_int_errs[:5]))
+
     dupes = gacha.get("dupe_petals_after_star5", {})
     rep.check(
         "JSON-SYNC-DUPES",
@@ -290,6 +322,23 @@ def lint_json_sources(
         sl_num_errors.append("season_pass: prem + upgrade != lux")
     if sp.get("buy_levels_allowed") is not False:
         sl_num_errors.append("season_pass: buy_levels_allowed must be false")
+    for tier_key in ("premium", "lux"):
+        sp_tier = sp.get(tier_key, {})
+        sp_name = sp_tier.get("name_ru", "")
+        sp_sku = sp_tier.get("sku_pattern", "")
+        for fw in forbidden:
+            if fw in sp_name.lower() or fw in sp_sku.lower():
+                forbidden_hits.append(f"season_pass.{tier_key} ({sp_name}) matches {fw!r}")
+
+    for fund in shop_doc.get("funds", []):
+        for fw in forbidden:
+            if fw in fund.get("name_ru", "").lower() or fw in fund.get("sku_id", "").lower():
+                forbidden_hits.append(f"fund {fund.get('sku_id')} ({fund.get('name_ru')}) matches {fw!r}")
+
+    for p in shop_doc.get("moon_packs", []):
+        for fw in forbidden:
+            if fw in p.get("sku_id", "").lower():
+                forbidden_hits.append(f"moon_pack {p.get('sku_id')} matches {fw!r}")
 
     for b in shop_doc.get("bundles", []):
         calc_ratio = round(b["list_value_rub"] / b["rub"], 2)
@@ -359,6 +408,62 @@ def lint_monetization_plan(
         "MP Red Line 6 ult thresholds do not match skins.json ult_rules",
     )
 
+    # §3.2 banner odds & pity table <-> shop.json gacha + rules
+    gacha = shop_doc["gacha"]
+    rules = shop_doc["rules"]
+    s31 = extract_section(mp_text, r"### 3\.1 ")
+    s32 = extract_section(mp_text, r"### 3\.2 ")
+    s33 = extract_section(mp_text, r"### 3\.3 ")
+    t32 = parse_md_table(s32, 0)
+    md32 = {strip_md(r[0]): r for r in t32[1:]}
+    g_errs: list[str] = []
+    if not md32:
+        g_errs.append("missing §3.2 banner table")
+    else:
+        bf = md32.get("b_first")
+        if not bf:
+            g_errs.append("missing b_first row")
+        else:
+            if round(parse_float(bf[5]) * 100) != gacha.get("ssr_base_rate_bp"):
+                g_errs.append(f"b_first base_rate {bf[5]} != {gacha.get('ssr_base_rate_bp')} bp")
+            if parse_int(bf[6]) != gacha.get("first_guest_hard_pity"):
+                g_errs.append(f"b_first hard_pity {bf[6]} != {gacha.get('first_guest_hard_pity')}")
+            if rules.get("wish_cost_gems") not in parse_all_ints(bf[9]):
+                g_errs.append(f"b_first wish_cost {bf[9]} missing {rules.get('wish_cost_gems')}")
+
+        for bid in ("b_std", "b_moon_a", "b_moon_b", "b_ward", "b_rot"):
+            r = md32.get(bid)
+            if not r:
+                g_errs.append(f"missing {bid} row")
+                continue
+            if round(parse_float(r[5]) * 100) != gacha.get("ssr_base_rate_bp"):
+                g_errs.append(f"{bid} base_rate {r[5]} != {gacha.get('ssr_base_rate_bp')} bp")
+            want_pity = [gacha.get("soft_pity"), (gacha.get("soft_pity_step_bp") or 0) // 100, gacha.get("hard_pity")]
+            got_pity = parse_all_ints(r[6])
+            if got_pity != want_pity:
+                g_errs.append(f"{bid} pity {got_pity} != {want_pity}")
+            if bid != "b_std" and parse_int(r[8]) != gacha.get("candle_pity"):
+                g_errs.append(f"{bid} candle_pity {r[8]} != {gacha.get('candle_pity')}")
+            if parse_int(r[9]) != rules.get("wish_cost_gems"):
+                g_errs.append(f"{bid} wish_cost {r[9]} != {rules.get('wish_cost_gems')}")
+
+        bp = md32.get("b_props")
+        if not bp:
+            g_errs.append("missing b_props row")
+        else:
+            if round(parse_float(bp[5]) * 100) != gacha.get("props_base_rate_bp"):
+                g_errs.append(f"b_props base_rate {bp[5]} != {gacha.get('props_base_rate_bp')} bp")
+            want_ppity = [gacha.get("props_soft_pity"), (gacha.get("props_soft_pity_step_bp") or 0) // 100, gacha.get("props_hard_pity")]
+            got_ppity = parse_all_ints(bp[6])
+            if got_ppity != want_ppity:
+                g_errs.append(f"b_props pity {got_ppity} != {want_ppity}")
+            if parse_int(bp[9]) != rules.get("props_wish_cost_gems"):
+                g_errs.append(f"b_props wish_cost {bp[9]} != {rules.get('props_wish_cost_gems')}")
+
+        if f"+ {gacha.get('gift_petals')} лепестков" not in s33:
+            g_errs.append(f"§3.3 gift_petals missing '+ {gacha.get('gift_petals')} лепестков'")
+    rep.check("MP-3.2-GACHA-ODDS", not g_errs, "; ".join(g_errs[:6]))
+
     # §3.5 dupe petals after star 5
     s35 = extract_section(mp_text, r"### 3\.5 ")
     dupes = shop_doc["gacha"]["dupe_petals_after_star5"]
@@ -370,6 +475,39 @@ def lint_monetization_plan(
         )),
         f"MP §3.5 dupe petals do not match {dupes}",
     )
+
+    # Cross-check shop.json rules <-> MONETIZATION_PLAN.md (§1.3, §3.1, §3.5, §4.1, §4.3, §4.7, Red Line 6)
+    s13 = extract_section(mp_text, r"### 1\.3 ")
+    s41_txt = extract_section(mp_text, r"### 4\.1 ")
+    s43_txt = extract_section(mp_text, r"### 4\.3 ")
+    s47_txt = extract_section(mp_text, r"### 4\.7 ")
+    r_errs: list[str] = []
+    if f"**{rules['wish_cost_gems']} кр**" not in s31:
+        r_errs.append(f"§3.1 missing wish_cost_gems={rules['wish_cost_gems']}")
+    if f"({rules['props_wish_cost_gems']} кр" not in s31:
+        r_errs.append(f"§3.1 missing props_wish_cost_gems={rules['props_wish_cost_gems']}")
+    t35 = parse_md_table(s35, 0)
+    x10_row = next((r for r in t35[1:] if "×10" in r[0]), None)
+    if not x10_row or [rules["wish_cost_gems"], 10, rules["wish_10_cost_gems"]] != parse_all_ints(x10_row[1])[:3]:
+        r_errs.append(f"§3.5 x10 cost mismatch for wish_10_cost_gems={rules['wish_10_cost_gems']}")
+    if rules["moon_pack_multiple"] != rules["wish_cost_gems"]:
+        r_errs.append(f"moon_pack_multiple {rules['moon_pack_multiple']} != wish_cost_gems {rules['wish_cost_gems']}")
+    rpw_span = f"{_fmt_ru_dec(rules['rub_per_wish_min'])}–{_fmt_ru_dec(rules['rub_per_wish_max'])}"
+    if rpw_span not in s13 or rpw_span not in s47_txt:
+        r_errs.append(f"rub_per_wish range {rpw_span} missing in §1.3 / §4.7")
+    if f"≤{_fmt_ru_dec(rules['max_bundle_value_ratio'])}" not in s47_txt:
+        r_errs.append(f"§4.7 missing max_bundle_value_ratio ≤{_fmt_ru_dec(rules['max_bundle_value_ratio'])}")
+    if f"Потолок ratio для дорожек — **{_fmt_ru_dec(rules['max_pass_value_ratio'])}**" not in s43_txt:
+        r_errs.append(f"§4.3 missing max_pass_value_ratio {_fmt_ru_dec(rules['max_pass_value_ratio'])}")
+    if f"≥{_fmt_ru_int(rules['second_confirm_min_rub'])} ₽" not in s41_txt:
+        r_errs.append(f"§4.1 missing second_confirm_min_rub ≥{_fmt_ru_int(rules['second_confirm_min_rub'])}")
+    if f"{_fmt_ru_int(rules['first_buy_bonus_max_moon'])} камня" not in s41_txt:
+        r_errs.append(f"§4.1 missing first_buy_bonus_max_moon {_fmt_ru_int(rules['first_buy_bonus_max_moon'])}")
+    if f"outfit_stats_enabled={str(rules['outfit_stats_enabled_default']).lower()}" not in rl_sec:
+        r_errs.append("Red Line 6 outfit_stats_enabled_default mismatch")
+    if f"bond_stats_enabled={str(rules['bond_stats_enabled_default']).lower()}" not in rl_sec:
+        r_errs.append("Red Line 6 bond_stats_enabled_default mismatch")
+    rep.check("MP-RULES-SYNC", not r_errs, "; ".join(r_errs[:6]))
 
     # §3.6 direct sale windows & prices
     s36 = extract_section(mp_text, r"### 3\.6 ")
@@ -583,6 +721,9 @@ def lint_monetization_plan(
             b_errs.append(f"event pass rub {ev_row[2]} != {[mini['rub'], mega['rub']]}")
         if parse_all_ints(ev_row[4]) != [mini["list_value_rub"], mega["list_value_rub"]]:
             b_errs.append(f"event pass list {ev_row[4]} != {[mini['list_value_rub'], mega['list_value_rub']]}")
+        ev_ratios = parse_all_floats(ev_row[5])
+        if len(ev_ratios) != 2 or abs(ev_ratios[0] - mini["value_ratio"]) > 0.02 or abs(ev_ratios[1] - mega["value_ratio"]) > 0.02:
+            b_errs.append(f"event pass ratio {ev_row[5]} != {[mini['value_ratio'], mega['value_ratio']]}")
     rep.check("MP-4.7-BUNDLES", not b_errs, "; ".join(b_errs[:5]))
 
     # Appendix R W17 consistency line
@@ -1106,6 +1247,11 @@ def run_selftest(repo_root: Path) -> tuple[int, int, list[str]]:
         ("lc_pass_s_drift", "design/specs/LIVEOPS_CALENDAR.md", "`miel_s_pass1`", "`miel_s_pass9`", "LC-1.1-CALENDAR-PASS-S"),
         ("mp_moon_pack_drift", "design/specs/MONETIZATION_PLAN.md", "| `tw_moon_499` | 499 | 1 950 |", "| `tw_moon_499` | 549 | 1 950 |", "MP-4.1-MOON-PACKS"),
         ("shop_sl_num", "data/shop.json", '"moon": 300,', '"moon": 310,', "SHOP-SL-NUM"),
+        ("gacha_soft_pity_drift", "data/shop.json", '"soft_pity": 60,', '"soft_pity": 50,', "MP-3.2-GACHA-ODDS"),
+        ("gacha_float_rate", "data/shop.json", '"ssr_base_rate_bp": 150,', '"ssr_base_rate": 0.015,', "JSON-GACHA-INT-BP"),
+        ("rules_max_pass_ratio", "data/shop.json", '"max_pass_value_ratio": 2.2,', '"max_pass_value_ratio": 2.5,', "MP-RULES-SYNC"),
+        ("fund_forbidden_word", "data/shop.json", '"name_ru": "Фонд Пути",', '"name_ru": "Успей Фонд Пути",', "SHOP-SL-TXT"),
+        ("mega_event_pass_ratio", "design/specs/MONETIZATION_PLAN.md", "| 447 / 640 | 1,5 / 1,6 |", "| 447 / 640 | 1,5 |", "MP-4.7-BUNDLES"),
     ]
     for name, rel, old, new, expected_code in mutations:
         total += 1

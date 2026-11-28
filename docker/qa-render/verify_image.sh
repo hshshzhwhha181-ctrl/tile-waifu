@@ -44,6 +44,7 @@ fc_sha = hashlib.sha256(fc_conf.read_bytes()).hexdigest()[:16] if fc_conf.exists
 
 env_doc = {
     "profile": os.environ.get("TW_QA_RENDER_PROFILE", "llvmpipe-gl33-v1"),
+    "apt_snapshot": os.environ.get("TW_QA_APT_SNAPSHOT", ""),
     "godot_version": godot_ver,
     "renderer": renderer,
     "opengl_version": gl_version,
@@ -51,6 +52,7 @@ env_doc = {
     "packages": {
         "libgl1-mesa-dri": dpkg_ver("libgl1-mesa-dri"),
         "libglx-mesa0": dpkg_ver("libglx-mesa0"),
+        "libegl-mesa0": dpkg_ver("libegl-mesa0"),
         "libllvm18": dpkg_ver("libllvm18"),
         "xvfb": dpkg_ver("xvfb"),
         "fontconfig": dpkg_ver("fontconfig"),
@@ -66,7 +68,7 @@ env_doc = {
     "fontconfig_local_sha256_16": fc_sha,
 }
 
-# Hard assertions for valid rendering QA image
+# Hard assertions for valid rendering QA image (including pinned package versions)
 errors = []
 if not godot_ver.startswith("4.5.1"):
     errors.append(f"expected Godot 4.5.1*, got {godot_ver!r}")
@@ -74,6 +76,20 @@ if "llvmpipe" not in renderer.lower():
     errors.append(f"expected llvmpipe OpenGL renderer, got {renderer!r}")
 if env_doc["packages"]["xvfb"] == "missing":
     errors.append("xvfb missing")
+pin_checks = [
+    ("libgl1-mesa-dri", os.environ.get("TW_QA_PIN_MESA", "")),
+    ("libglx-mesa0", os.environ.get("TW_QA_PIN_MESA", "")),
+    ("libegl-mesa0", os.environ.get("TW_QA_PIN_MESA", "")),
+    ("libllvm18", os.environ.get("TW_QA_PIN_LLVM18", "")),
+    ("xvfb", os.environ.get("TW_QA_PIN_XVFB", "")),
+    ("fontconfig", os.environ.get("TW_QA_PIN_FONTCONFIG", "")),
+    ("fonts-dejavu-core", os.environ.get("TW_QA_PIN_FONTS_DEJAVU", "")),
+    ("fonts-noto-core", os.environ.get("TW_QA_PIN_FONTS_NOTO", "")),
+]
+for pkg, expected in pin_checks:
+    actual = env_doc["packages"].get(pkg, "missing")
+    if expected and actual != expected:
+        errors.append(f"pinned package drift for {pkg}: expected {expected!r}, got {actual!r}")
 
 if manifest_out:
     Path(manifest_out).write_text(json.dumps(env_doc, indent=2, sort_keys=True) + "\n", encoding="utf-8")
