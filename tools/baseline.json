@@ -1008,34 +1008,11 @@
     "total": 704
    },
    "full": {
-    "expected_fail": [
-     "SCRIPT ERROR: Invalid access to property or key 'tsubame' on a base object of type 'Dictionary'.",
-     "ULTS FAIL: ULTS has ko_base",
-     "ULTS FAIL: ULTS has ko_kyubi",
-     "ULTS FAIL: ULTS has ko_matsuri",
-     "ULTS FAIL: ULTS has ko_vow",
-     "ULTS FAIL: ULTS has me_base",
-     "ULTS FAIL: ULTS has me_gala",
-     "ULTS FAIL: ULTS has me_parlor",
-     "ULTS FAIL: ULTS has sh_base",
-     "ULTS FAIL: ULTS has sh_night",
-     "ULTS FAIL: ULTS has sh_oasis",
-     "ULTS FAIL: ULTS has sh_sun",
-     "ULTS FAIL: ULTS has tb_base",
-     "ULTS FAIL: ULTS has tb_crimson",
-     "ULTS FAIL: ULTS has tb_post",
-     "ULTS FAIL: ULTS has zl_base",
-     "ULTS FAIL: ULTS has zl_ember",
-     "ULTS FAIL: ULTS has zl_fair",
-     "ULTS FAIL: ULTS has zl_vow",
-     "ULTS FAIL: core for tsubame",
-     "ULTS FAIL: targets per §2 { \"mc\": \"pair\", \"rin\": \"none\", \"hana\": \"swipe\", \"yue\": \"row\", \"nova\": \"tier\", \"tsubame\": \"pair\", \"miel\": \"pair\", \"kohaku\": \"pair\", \"sh"
-    ],
-    "marker": "ULTS SELFTEST 662/682",
-    "ok": 662,
-    "secs": 13.2,
-    "status": "fail",
-    "total": 682
+    "marker": "ULTS SELFTEST 704/704",
+    "ok": 704,
+    "secs": 13.0,
+    "status": "pass",
+    "total": 704
    }
   },
   "ux_lint": {
