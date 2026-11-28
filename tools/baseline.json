@@ -913,6 +913,22 @@
     "total": 288
    }
   },
+  "state": {
+   "fast": {
+    "marker": "STATE_SELFTEST 182/182",
+    "ok": 182,
+    "secs": 14.0,
+    "status": "pass",
+    "total": 182
+   },
+   "full": {
+    "marker": "STATE_SELFTEST 182/182",
+    "ok": 182,
+    "secs": 14.0,
+    "status": "pass",
+    "total": 182
+   }
+  },
   "summon": {
    "fast": {
     "expected_fail": [

@@ -1,0 +1,1046 @@
+{
+	"a11y_calm": false,
+	"aff": {
+		"hana": 60,
+		"mc": 220,
+		"nova": 0,
+		"rin": 140,
+		"yue": 10
+	},
+	"blitz_best": 21,
+	"candles": 0,
+	"coins": 98765,
+	"cutins": true,
+	"daily_day": "2026-03-02",
+	"dailymap": {
+		"done": [
+			1,
+			2,
+			5
+		],
+		"month": "2026-03"
+	},
+	"deco_fonts": true,
+	"econ": {
+		"clock": {
+			"fwd": 0,
+			"hw": 1795000000,
+			"in_rb": false,
+			"jumps": 0,
+			"rollbacks": 0
+		},
+		"const": {
+
+		},
+		"flags": {
+			"migrated_from": 7
+		},
+		"gacha": {
+			"bpulls": {
+
+			},
+			"candles": {
+
+			},
+			"closed": {
+
+			},
+			"ctr": {
+				"limited": {
+					"g": true,
+					"n": 87,
+					"p": 21,
+					"rules": "r0",
+					"s": 4
+				}
+			},
+			"first": "",
+			"hist": [],
+			"newbie": {
+				"n": 17,
+				"ssr": true
+			},
+			"sparks": {
+
+			},
+			"target": {
+
+			},
+			"total": 87
+		},
+		"inv": {
+
+		},
+		"pass": {
+			"cf": 7,
+			"cp": 7,
+			"deluxe": false,
+			"end": 0,
+			"oid": "",
+			"prem": true,
+			"season": "legacy",
+			"start": 0,
+			"xp": 340
+		},
+		"shop": {
+			"bought": {
+
+			},
+			"install": 1768000000,
+			"month": {
+				"end": 20544,
+				"last": -1
+			},
+			"orders": {
+
+			},
+			"receipts": [],
+			"seq": 0
+		},
+		"spend": {
+			"age_ok": false,
+			"cool_on": false,
+			"cool_until": 0,
+			"hist": [],
+			"limit": 0,
+			"limit_at": 0,
+			"limit_next": -1,
+			"pause_until": 0
+		},
+		"ver": 1,
+		"wallet": {
+			"bal": {
+				"coin": 98765,
+				"crystal": 23456,
+				"moon": 0,
+				"petal": 0,
+				"wax": 0,
+				"wish": 0
+			},
+			"debt": {
+				"coin": 0,
+				"crystal": 0,
+				"moon": 0,
+				"petal": 0,
+				"wax": 0,
+				"wish": 0
+			},
+			"earned": {
+				"coin": 98765,
+				"crystal": 23456,
+				"moon": 0,
+				"petal": 0,
+				"wax": 0,
+				"wish": 0
+			},
+			"log": [],
+			"revoked": {
+				"coin": 0,
+				"crystal": 0,
+				"moon": 0,
+				"petal": 0,
+				"wax": 0,
+				"wish": 0
+			},
+			"spent": {
+				"coin": 0,
+				"crystal": 0,
+				"moon": 0,
+				"petal": 0,
+				"wax": 0,
+				"wish": 0
+			}
+		}
+	},
+	"ex": 0,
+	"first_buy": {
+		"pack1": true
+	},
+	"first_pick": "",
+	"first_pick_t": 0,
+	"free10": false,
+	"fx_level": "mid",
+	"gems": 23456,
+	"guar": true,
+	"hero_combo": "full",
+	"intro_done": true,
+	"level_partner": "rin",
+	"login": {
+		"last": "2026-11-20",
+		"n": 12
+	},
+	"look": {
+		"frame": "auto",
+		"hud": "auto",
+		"table": "auto",
+		"tile": "auto"
+	},
+	"mastery": {
+
+	},
+	"modest": false,
+	"month_card": {
+		"last": "2026-03-02",
+		"until": "2026-04-01"
+	},
+	"music": false,
+	"newbie_left": 33,
+	"newbie_ssr": true,
+	"next_great": false,
+	"ostars": {
+		"o_base": 1,
+		"o_cafe": 1,
+		"o_dragon": 1,
+		"r_after": 1,
+		"r_agent": 1,
+		"r_base": 1,
+		"r_maid": 1
+	},
+	"outfit": {
+		"mc": "o_base"
+	},
+	"owned": {
+		"o_base": true,
+		"o_cafe": true,
+		"o_dragon": true,
+		"r_after": true,
+		"r_agent": true,
+		"r_base": true,
+		"r_maid": true,
+		"s_sakura": true
+	},
+	"partner": "rin",
+	"pass": {
+		"claimed": 3,
+		"owned": true,
+		"xp": 340
+	},
+	"pet": {
+		"day": "2026-03-02",
+		"n": 2
+	},
+	"petals": 0,
+	"pity": 21,
+	"pity_std": 0,
+	"player_lv": 12,
+	"profile": {
+		"avatar": "rin",
+		"created": 1768000000,
+		"frame": "",
+		"id": "5a1c0de5",
+		"nick": "Сакура Тян"
+	},
+	"profile_done": true,
+	"pulls": 87,
+	"rates_ver": 1,
+	"rp": 1777,
+	"s_pity_std": 0,
+	"seven": {
+		"claimed": [
+			false,
+			false,
+			false,
+			false,
+			false,
+			false,
+			false
+		],
+		"days": []
+	},
+	"shards": {
+		"hana": 1,
+		"rin": 3
+	},
+	"side": "f",
+	"skin": "s_sakura",
+	"sound": true,
+	"sr_pity": 4,
+	"stars": {
+		"0": 1,
+		"11": 3,
+		"13": 1,
+		"15": 2,
+		"17": 3,
+		"19": 1,
+		"2": 2,
+		"21": 2,
+		"23": 3,
+		"25": 1,
+		"27": 2,
+		"29": 3,
+		"32": 1,
+		"34": 2,
+		"36": 3,
+		"38": 1,
+		"4": 3,
+		"40": 2,
+		"42": 3,
+		"44": 1,
+		"46": 2,
+		"48": 3,
+		"51": 1,
+		"53": 2,
+		"55": 3,
+		"56": 1,
+		"59": 2,
+		"6": 1,
+		"61": 3,
+		"63": 1,
+		"65": 2,
+		"66": 3,
+		"70": 1,
+		"72": 2,
+		"74": 3,
+		"76": 1,
+		"78": 2,
+		"8": 2,
+		"80": 3,
+		"82": 1,
+		"84": 2,
+		"86": 3,
+		"88": 1,
+		"91": 2,
+		"93": 3,
+		"95": 1,
+		"96": 2,
+		"99": 3
+	},
+	"stats": {
+		"duel": {
+			"games": 6,
+			"rp": 40,
+			"wins": 2
+		},
+		"path": {
+			"games": 40,
+			"rp": 420,
+			"wins": 31
+		}
+	},
+	"streak": 0,
+	"targets": {
+
+	},
+	"tasks": {
+		"claimed": [
+			true,
+			false,
+			false
+		],
+		"combo5": 1,
+		"day": "2026-03-02",
+		"levels": 2,
+		"pairs": 14
+	},
+	"tickets": 0,
+	"tut_done": true,
+	"ult_cutin": "short",
+	"unlocked": 101,
+	"v10_adventure": {
+		"best_raid_dmg": 0,
+		"best_stage": 0,
+		"cleared": [],
+		"damage_total": 0,
+		"defeats": 0,
+		"raid_stage_best": {
+
+		},
+		"shield_breaks": 0,
+		"squad": [
+			"mc",
+			"rin",
+			"yue"
+		],
+		"squad_custom": false,
+		"stage": 0,
+		"wins": 0
+	},
+	"v10_afisha": {
+		"day": "",
+		"played": {
+
+		}
+	},
+	"v10_auth": {
+		"consent": {
+			"at": 0,
+			"doc": "",
+			"pd152": false
+		},
+		"created_at": 0,
+		"deletion": {
+
+		},
+		"last_login": 0,
+		"linked": {
+
+		},
+		"logged_out": false,
+		"login_count": 0,
+		"migrated_from": "",
+		"onboarded": false,
+		"player_id": "",
+		"provider": "",
+		"ver": 1
+	},
+	"v10_bday": {
+		"player": {
+			"asked": false,
+			"change_key": "",
+			"consent_key": "",
+			"d": 0,
+			"declined": false,
+			"last_gift_year": 0,
+			"m": 0,
+			"set_key": "",
+			"skip_year": 0
+		},
+		"prog": {
+			"h": "",
+			"key": "",
+			"n": 0
+		},
+		"seen_key": "",
+		"year_done": {
+
+		}
+	},
+	"v10_boosters": {
+		"flame": 0,
+		"lantern": 0,
+		"scroll": 0,
+		"wind": 0
+	},
+	"v10_challenge": {
+		"day": {
+			"key": "",
+			"n": 0
+		},
+		"list": [],
+		"own": [],
+		"paid": [],
+		"stats": {
+			"sent": 0,
+			"taken": 0,
+			"wins": 0
+		},
+		"ver": 1
+	},
+	"v10_clarity": {
+		"asked": false,
+		"big": false,
+		"marks": "auto",
+		"seen": {
+
+		},
+		"tips": {
+
+		}
+	},
+	"v10_comeback": {
+		"gap": 0,
+		"ladder": {
+
+		},
+		"ladder_start_key": "",
+		"last_seen_key": "",
+		"last_tier_key": "",
+		"notify": [],
+		"rested": 0,
+		"scene": ""
+	},
+	"v10_cos_owned": {
+
+	},
+	"v10_cos_seen": {
+		"b_first_win": true,
+		"cb_ice": true,
+		"cb_salon": true,
+		"cb_shrine": true,
+		"fr_default": true,
+		"fr_g_mc": true,
+		"fr_g_rin": true,
+		"fr_rank_0": true,
+		"fr_rank_1": true,
+		"fr_rank_2": true,
+		"fr_rank_3": true,
+		"fr_rank_4": true,
+		"t_guest": true,
+		"t_rank_0": true,
+		"t_rank_1": true,
+		"t_rank_2": true,
+		"t_rank_3": true,
+		"t_rank_4": true
+	},
+	"v10_dates": {
+
+	},
+	"v10_duel": {
+		"best_dr": 1000,
+		"casual_by": {
+
+		},
+		"casual_wins": 0,
+		"dr": 1000,
+		"draws": 0,
+		"games": 0,
+		"history": [],
+		"last_result": {
+
+		},
+		"losses": 0,
+		"migrated": true,
+		"offers": {
+			"day": "",
+			"dr": 0,
+			"list": [],
+			"roll": 0
+		},
+		"peak_dr": 1000,
+		"peak_tier": 1,
+		"pending": {
+
+		},
+		"season": 741,
+		"season_claimed": {
+
+		},
+		"season_games": 0,
+		"season_reward": {
+
+		},
+		"started": 0,
+		"used": {
+			"day": "2026-11-18",
+			"keys": {
+
+			}
+		},
+		"ver": 1,
+		"weekly": {
+			"claimed": false,
+			"games": 0,
+			"rival": "kohaku",
+			"week": 2967,
+			"wins": 0
+		},
+		"wins": 0,
+		"wins_today": {
+			"day": "2026-11-18",
+			"friendly": 0,
+			"ranked": 0
+		}
+	},
+	"v10_feats": {
+		"done": {
+
+		},
+		"stats": {
+
+		}
+	},
+	"v10_feed": {
+		"at": {
+
+		},
+		"liked": {
+
+		},
+		"next": -1,
+		"replied": {
+
+		},
+		"seen_max": -1
+	},
+	"v10_gacha": {
+		"mig": true
+	},
+	"v10_gifts": {
+		"gift_jade_pin": 0,
+		"gift_silk_fan": 0,
+		"gift_tea_set": 0
+	},
+	"v10_hand": {
+		"best_streak": 0,
+		"correct": false,
+		"cos": [],
+		"day": "",
+		"done": false,
+		"gems": 0,
+		"hidden_at_guess": 0,
+		"hist": [],
+		"intro": false,
+		"kind": -1,
+		"lessons": {
+
+		},
+		"mult": 1,
+		"played": 0,
+		"school": 0,
+		"streak": 0,
+		"today": {
+			"closed": false,
+			"key": "",
+			"taken": []
+		},
+		"total_correct": 0,
+		"ver": 1
+	},
+	"v10_journey": {
+		"attempts": 0,
+		"best": {
+			"boards": 0,
+			"score": 0
+		},
+		"claimed": {
+
+		},
+		"run": {
+
+		},
+		"week": 2967
+	},
+	"v10_levels": {
+		"adjusted": {
+
+		},
+		"arc_end": {
+
+		},
+		"chests": {
+
+		},
+		"cos": [],
+		"daily_full": {
+			"day": "",
+			"n": 0
+		},
+		"fails": {
+
+		},
+		"legend": {
+
+		},
+		"mig48": true,
+		"peaks": {
+
+		},
+		"seen_mech": [],
+		"summits": 0
+	},
+	"v10_meta": {
+		"bond": {
+			"h": {
+
+			},
+			"key": ""
+		},
+		"consent": {
+			"asked_unix": 0,
+			"bday": false,
+			"push": false,
+			"push_asked": false
+		},
+		"days_seen": 12,
+		"last_key": "2026-11-18",
+		"max_unix": 1795000000,
+		"notify": {
+			"cats": {
+				"bday": true,
+				"comeback": false,
+				"feed": true,
+				"salon": true
+			},
+			"last_unix": 0,
+			"queued": {
+
+			}
+		},
+		"pending": [],
+		"scenes_seen": {
+
+		},
+		"srv_offset": 0
+	},
+	"v10_mj_bridge": {
+		"best_streak": 0,
+		"days": {
+
+		},
+		"fans": {
+
+		},
+		"hand_best": 0,
+		"hand_level": 1,
+		"hand_plays": 0,
+		"hand_stars": {
+
+		},
+		"hand_wins": 0,
+		"last_day": "",
+		"played": 0,
+		"riichi_open": false,
+		"solved": 0,
+		"streak": 0,
+		"ver": 1
+	},
+	"v10_mj_classic": {
+		"best_time": {
+
+		},
+		"cosmetics": [],
+		"daily": {
+			"date": "",
+			"done": false,
+			"form": "",
+			"time": 0
+		},
+		"diff": "normal",
+		"first_day": "",
+		"first_win_day": "",
+		"hearts": [],
+		"last_form": "turtle",
+		"memory": {
+
+		},
+		"plays": 0,
+		"ranks_paid": 0,
+		"stars": {
+
+		},
+		"ver": 1,
+		"view": "3d",
+		"wins": 0
+	},
+	"v10_mj_connect": {
+		"best": 0,
+		"best_time": {
+
+		},
+		"cosmetics": [],
+		"level": 1,
+		"plays": 0,
+		"ranks_paid": 0,
+		"stars": {
+
+		},
+		"ver": 1,
+		"wins": 0
+	},
+	"v10_mj_cube": {
+		"best": 0,
+		"level": 1,
+		"moves": {
+
+		},
+		"plays": 0,
+		"relics": [],
+		"stars": {
+
+		},
+		"wins": 0
+	},
+	"v10_mj_garden": {
+		"ambient": "rain",
+		"best_score": 0,
+		"best_series": 0,
+		"best_waves": 0,
+		"day": {
+			"key": "",
+			"paid": 0
+		},
+		"night": false,
+		"pairs_total": 0,
+		"pending": {
+			"coins": 0,
+			"tea": 0,
+			"waves": 0
+		},
+		"plays": 0,
+		"run": {
+
+		},
+		"waves_total": 0,
+		"week": {
+			"key": "",
+			"score": 0,
+			"series": 0,
+			"waves": 0
+		}
+	},
+	"v10_online": {
+		"last_status": "unknown",
+		"last_sync": 0,
+		"local_elo": 1000,
+		"local_losses": 0,
+		"local_wins": 0,
+		"save_version": 0,
+		"token": "",
+		"url": "http://127.0.0.1:8787",
+		"user": {
+
+		}
+	},
+	"v10_pagoda": {
+		"best": {
+
+		},
+		"best_score": 0,
+		"cos": [],
+		"migrated": true,
+		"miles": [],
+		"run": {
+
+		},
+		"runs": 0,
+		"week": {
+			"floors": 0,
+			"heat": 0,
+			"id": -1,
+			"offered": 0,
+			"score": 0
+		}
+	},
+	"v10_phone": {
+		"chat": {
+			"chats": {
+
+			},
+			"fired": {
+
+			},
+			"flags": {
+
+			},
+			"last": {
+
+			},
+			"new_daily": 0,
+			"new_key": -1,
+			"new_n": 0,
+			"queue": [],
+			"react": {
+
+			},
+			"st_key": -1,
+			"st_n": {
+
+			},
+			"v": 1
+		},
+		"intro": false,
+		"name": {
+			"g": "m",
+			"nom": "",
+			"voc": ""
+		},
+		"named": false,
+		"recent_st": [],
+		"tab": "chats"
+	},
+	"v10_salon": {
+		"intro": false,
+		"inv": {
+
+		},
+		"last_line": {
+
+		},
+		"lobby_bg": "",
+		"photos": [],
+		"spent": 0,
+		"zones": {
+			"z1": {
+				"chest": false,
+				"done": false,
+				"done_day": "",
+				"jp": {
+
+				},
+				"scene_seen": false,
+				"t": {
+
+				}
+			},
+			"z2": {
+				"chest": false,
+				"done": false,
+				"done_day": "",
+				"jp": {
+
+				},
+				"scene_seen": false,
+				"t": {
+
+				}
+			},
+			"z3": {
+				"chest": false,
+				"done": false,
+				"done_day": "",
+				"jp": {
+
+				},
+				"scene_seen": false,
+				"t": {
+
+				}
+			}
+		}
+	},
+	"v10_shop": {
+		"ads": {
+			"day": -1,
+			"n": 0,
+			"slots": {
+
+			}
+		},
+		"age": {
+			"band": "",
+			"set_t": 0,
+			"year": 0
+		},
+		"cool_asked": false,
+		"crystal_noask": false,
+		"gift": {
+
+		},
+		"offers": {
+			"last_day": -1,
+			"shown": 0
+		}
+	},
+	"v10_streak": {
+		"best": 0,
+		"checked_key": "",
+		"events": [],
+		"gift": false,
+		"got": [],
+		"hist": {
+
+		},
+		"last_win_key": "",
+		"leaf_new_key": "",
+		"leaf_week": "",
+		"leaves": 0,
+		"n": 0,
+		"pending": [],
+		"repair": {
+
+		}
+	},
+	"v10_tele": {
+		"cur": {
+
+		},
+		"first_key": "",
+		"prev": {
+
+		},
+		"prev_week": "",
+		"sent_week": "",
+		"week": ""
+	},
+	"v10_tray": {
+		"claimed": {
+
+		},
+		"day": ""
+	},
+	"v10_tut": {
+		"entries": 0,
+		"first_day": 20775,
+		"first_match": true,
+		"forced": {
+
+		},
+		"funnel": {
+
+		},
+		"hints": true,
+		"large": false,
+		"legacy": true,
+		"seen": {
+			"heroines_first": true,
+			"heroines_partner": true,
+			"home_first": true,
+			"lantern_salon": true,
+			"lantern_today": true,
+			"m_a": true,
+			"m_b": true,
+			"m_danger": true,
+			"m_fail": true,
+			"m_free": true,
+			"m_left": true,
+			"m_tray": true,
+			"m_ult": true,
+			"mode_classic": true,
+			"mode_connect": true,
+			"mode_cube": true,
+			"mode_daily_task": true,
+			"mode_dragon": true,
+			"mode_duels": true,
+			"mode_etudes": true,
+			"mode_garden": true,
+			"mode_hand": true,
+			"mode_journey": true,
+			"mode_koikoi": true,
+			"mode_pagoda": true,
+			"mode_palm": true,
+			"mode_riichi": true,
+			"mode_shift": true,
+			"mode_triples": true,
+			"path_boosters": true,
+			"phone_first": true,
+			"tables_first": true,
+			"tables_tourney": true,
+			"v_home": true,
+			"v_stars": true,
+			"wishes_first": true
+		},
+		"skipped": false,
+		"t0": 1795000000,
+		"v": 2
+	},
+	"v10_welcome7": {
+
+	},
+	"v10_wheel": {
+
+	},
+	"v6_fx": {
+		"flash": false,
+		"shake": false
+	},
+	"v6_map": {
+		"chests": {
+			"0": true,
+			"1": true,
+			"3": true
+		},
+		"seen": 48
+	},
+	"v7_room": {
+		"items": [
+			"lamp",
+			"rug"
+		],
+		"notes": [
+			"Привет! «Кавычки», ёлка, 漢字 и эмодзи ✨"
+		],
+		"pos": {
+			"lamp": [
+				120,
+				340
+			]
+		}
+	},
+	"ver": 8,
+	"voice": true,
+	"xp": 55,
+	"yaku_seen": {
+		"calm": true,
+		"clean": true
+	}
+}

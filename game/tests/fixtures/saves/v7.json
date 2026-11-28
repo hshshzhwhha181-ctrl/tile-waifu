@@ -1,0 +1,198 @@
+{
+	"aff": {
+		"hana": 60,
+		"mc": 220,
+		"nova": 0,
+		"rin": 140,
+		"yue": 10
+	},
+	"blitz_best": 21,
+	"coins": 98765,
+	"cutins": true,
+	"daily_day": "2026-03-02",
+	"dailymap": {
+		"done": [
+			1,
+			2,
+			5
+		],
+		"month": "2026-03"
+	},
+	"ex": 2,
+	"first_buy": {
+		"pack1": true
+	},
+	"free10": true,
+	"fx_level": "mid",
+	"gems": 23456,
+	"guar": true,
+	"intro_done": true,
+	"level_partner": "rin",
+	"login": {
+		"last": "2026-11-20",
+		"n": 12
+	},
+	"modest": false,
+	"month_card": {
+		"last": "2026-03-02",
+		"until": "2026-04-01"
+	},
+	"music": false,
+	"newbie_left": 3,
+	"newbie_ssr": true,
+	"next_great": false,
+	"outfit": {
+		"mc": "o_base"
+	},
+	"owned": {
+		"o_base": true,
+		"o_cafe": true,
+		"o_dragon": true,
+		"r_after": true,
+		"r_agent": true,
+		"r_base": true,
+		"r_maid": true,
+		"s_sakura": true
+	},
+	"partner": "rin",
+	"pass": {
+		"claimed": 3,
+		"owned": true,
+		"xp": 340
+	},
+	"pet": {
+		"day": "2026-03-02",
+		"n": 2
+	},
+	"pity": 21,
+	"player_lv": 12,
+	"profile": {
+		"avatar": "rin",
+		"created": 1768000000,
+		"frame": "",
+		"id": "5a1c0de5",
+		"nick": "Сакура Тян"
+	},
+	"profile_done": true,
+	"pulls": 87,
+	"rp": 1777,
+	"shards": {
+		"hana": 1,
+		"rin": 3
+	},
+	"side": "f",
+	"skin": "s_sakura",
+	"sound": true,
+	"sr_pity": 4,
+	"stars": {
+		"0": 1,
+		"1": 2,
+		"10": 2,
+		"11": 3,
+		"12": 1,
+		"13": 2,
+		"14": 3,
+		"15": 1,
+		"16": 2,
+		"17": 3,
+		"18": 1,
+		"19": 2,
+		"2": 3,
+		"20": 3,
+		"21": 1,
+		"22": 2,
+		"23": 3,
+		"24": 1,
+		"25": 2,
+		"26": 3,
+		"27": 1,
+		"28": 2,
+		"29": 3,
+		"3": 1,
+		"30": 1,
+		"31": 2,
+		"32": 3,
+		"33": 1,
+		"34": 2,
+		"35": 3,
+		"36": 1,
+		"37": 2,
+		"38": 3,
+		"39": 1,
+		"4": 2,
+		"40": 2,
+		"41": 3,
+		"42": 1,
+		"43": 2,
+		"44": 3,
+		"45": 1,
+		"46": 2,
+		"47": 3,
+		"5": 3,
+		"6": 1,
+		"7": 2,
+		"8": 3,
+		"9": 1
+	},
+	"stats": {
+		"duel": {
+			"games": 6,
+			"rp": 40,
+			"wins": 2
+		},
+		"path": {
+			"games": 40,
+			"rp": 420,
+			"wins": 31
+		}
+	},
+	"streak": 9,
+	"tasks": {
+		"claimed": [
+			true,
+			false,
+			false
+		],
+		"combo5": 1,
+		"day": "2026-03-02",
+		"levels": 2,
+		"pairs": 14
+	},
+	"tut_done": true,
+	"ult_cutin": "short",
+	"unlocked": 48,
+	"v6_fx": {
+		"flash": false,
+		"shake": false
+	},
+	"v6_map": {
+		"chests": {
+			"0": true,
+			"1": true,
+			"3": true
+		},
+		"seen": 48
+	},
+	"v7_room": {
+		"items": [
+			"lamp",
+			"rug"
+		],
+		"notes": [
+			"Привет! «Кавычки», ёлка, 漢字 и эмодзи ✨"
+		],
+		"pos": {
+			"lamp": [
+				120,
+				340
+			]
+		}
+	},
+	"ver": 7,
+	"voice": true,
+	"xp": 55,
+	"yaku_seen": {
+		"calm": true,
+		"clean": true
+	}
+}
