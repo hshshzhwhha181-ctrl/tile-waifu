@@ -1273,6 +1273,22 @@
     "total": 628
    }
   },
+  "twresult": {
+   "fast": {
+    "marker": "TWRESULT_SELFTEST 170/170",
+    "ok": 170,
+    "secs": 8.9,
+    "status": "pass",
+    "total": 170
+   },
+   "full": {
+    "marker": "TWRESULT_SELFTEST 170/170",
+    "ok": 170,
+    "secs": 9.5,
+    "status": "pass",
+    "total": 170
+   }
+  },
   "twwidgets": {
    "fast": {
     "marker": "TWWIDGETS_SELFTEST 1396/1396",
