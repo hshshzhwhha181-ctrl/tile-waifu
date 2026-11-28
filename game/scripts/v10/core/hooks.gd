@@ -261,21 +261,15 @@ static func _mode_gems_allow(want: int) -> int:
 func handle_mode_finished(main, res: Dictionary) -> void:
 	var mode: = String(res.get("mode", ""))
 	var rw: Dictionary = res.get("rewards", {}) if res.get("rewards") is Dictionary else {}
-	var reason: = "mj_" + (mode if mode != "" else "mode")
-	var cur: = {}
+	# P20: what to pay is TWRewards' plan (reward service); the daily cap on crystals stays here (it reads the meta state)
+	var gems_allowed: = 0
 	if not bool(res.get("rewards_paid", false)):
-		for k in ["coins", "petals", "tickets"]:
-			if int(rw.get(k, 0)) > 0:
-				cur[k] = int(rw[k])
-		var gems: = _mode_gems_allow(int(rw.get("gems", 0)))
-		if gems > 0:
-			cur["gems"] = gems
-		if not cur.is_empty():
-			V10Money.grant(cur, reason)
-		var aff: = int(rw.get("aff", 0))
-		var hero: = String(res.get("hero", ""))
-		if aff > 0 and hero != "":
-			V10Bond.gain(hero, aff, "mode_win")
+		gems_allowed = _mode_gems_allow(int(rw.get("gems", 0)))
+	var plan: = TWRewards.mode_finish_plan(res, gems_allowed)
+	if not (plan.grants as Dictionary).is_empty():
+		V10Money.grant(plan.grants, String(plan.reason))
+	if int(plan.aff) > 0 and String(plan.hero) != "":
+		V10Bond.gain(String(plan.hero), int(plan.aff), "mode_win")
 	if mode == "riichi":
 		var rs: Dictionary = G.S.get("v10_mj_riichi", {}) if G.S.get("v10_mj_riichi") is Dictionary else {}
 		rs["games"] = int(rs.get("games", 0)) + 1

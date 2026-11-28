@@ -908,18 +908,18 @@
   },
   "round": {
    "fast": {
-    "marker": "ROUND_SELFTEST 2377/2377",
-    "ok": 2377,
+    "marker": "ROUND_SELFTEST 2383/2383",
+    "ok": 2383,
     "secs": 6.0,
     "status": "pass",
-    "total": 2377
+    "total": 2383
    },
    "full": {
-    "marker": "ROUND_SELFTEST 2377/2377",
-    "ok": 2377,
+    "marker": "ROUND_SELFTEST 2383/2383",
+    "ok": 2383,
     "secs": 6.0,
     "status": "pass",
-    "total": 2377
+    "total": 2383
    }
   },
   "salon": {

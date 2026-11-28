@@ -34,6 +34,7 @@ static func run(env: Dictionary = {}) -> Array:
 	_legacy(env)
 	_bot()
 	_wallet()
+	_finish_plan()
 	_purity()
 	var total: = _pass + _fail
 	print("ROUND_SELFTEST %d/%d" % [_pass, total])
@@ -902,6 +903,22 @@ static func _wallet() -> void:
 	var ev3: = neg.pay(w2)
 	TWWallet.errors = errs_before
 	_check("wallet: a negative grant becomes an ERROR event, the balance is untouched", ev3.size() == 1 and ev3[0].type == "ERROR" and w2.bal("gems") == 110)
+
+
+# ═══════════════════════════════════════════ H2: the reward half of V10Hooks.handle_mode_finished ═════════════════════
+
+static func _finish_plan() -> void:
+	var p1: = TWRewards.mode_finish_plan({"mode": "riichi", "hero": "rin", "rewards": {"gems": 90, "coins": 40, "petals": 0, "tickets": 2, "aff": 12}}, 50)
+	_check("finish plan: coins / tickets as given, crystals as the daily cap allows (50 of 90), no zero lines", p1.grants == {"coins": 40, "tickets": 2, "gems": 50} and p1.reason == "mj_riichi" and p1.aff == 12 and p1.hero == "rin", str(p1))
+	_check("finish plan: key order coins, petals, tickets, gems (the old dictionary order)", (p1.grants.keys() as Array) == ["coins", "tickets", "gems"])
+	var p2: = TWRewards.mode_finish_plan({"mode": "koikoi", "hero": "yue", "rewards": {"gems": 30}, "rewards_paid": true}, 30)
+	_check("finish plan: rewards already paid -> nothing, no bond", p2.grants.is_empty() and p2.aff == 0)
+	var p3: = TWRewards.mode_finish_plan({"mode": "", "rewards": {"gems": 10}}, 0)
+	_check("finish plan: empty mode -> reason mj_mode, cap 0 -> no crystals", p3.grants.is_empty() and p3.reason == "mj_mode")
+	var p4: = TWRewards.mode_finish_plan({"mode": "sanma", "rewards": {"petals": 5}, "hero": ""}, 0)
+	_check("finish plan: petals only", p4.grants == {"petals": 5} and p4.aff == 0)
+	var p5: = TWRewards.mode_finish_plan({"mode": "x", "rewards": "bad"}, 7)
+	_check("finish plan: a malformed rewards field is treated as none", p5.grants == {"gems": 7})
 
 
 # ═══════════════════════════════════════════ I: purity ══════════════════════════════════════════════════════════════
