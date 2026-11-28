@@ -94,6 +94,8 @@ CATALOG: list[Suite] = [
     S("league", "LEAGUE", args=["--league_selftest=1"], group="core"),
     S("profile", "PROFILE", args=["--profile_selftest=1"], group="core"),
     S("recovery", "RECOVERY", args=["--recovery_selftest=1"], group="core"),
+    S("state", "STATE_SELFTEST", SV + "state/state_selftest.tscn", group="core",
+      note="P12: TWClock/TWSave/TWMigrate/TWState, golden saves v4..v8, 500-case save fuzz (+ parity with the legacy G.apply_state)"),
     S("ults", "ULTS", args=["--ults_selftest=1"], group="core"),
     S("letters", "LETTERS", args=["--letters_selftest=1"], group="core"),
     # ---- v10 registry modules (docs/INTEGRATION_0.10.md; ids == V10RegistryList ids) -----------------

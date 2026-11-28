@@ -1,0 +1,42 @@
+{
+	"v4.json": {
+		"from_ver": 4,
+		"gems": 4200,
+		"hash": "7a92311a3dda57c3903f2ff7a6a87185dac81befb099f6468b29dd76db937282",
+		"stars": 16,
+		"unlocked": 68,
+		"ver": 8
+	},
+	"v5.json": {
+		"from_ver": 5,
+		"gems": 4200,
+		"hash": "b481ffd2158d82dbcfc3d6780a6b372aa3a536e54ee39597758233469012c3cc",
+		"stars": 24,
+		"unlocked": 99,
+		"ver": 8
+	},
+	"v6.json": {
+		"from_ver": 6,
+		"gems": 4200,
+		"hash": "dfe77d9b7a93378446037865fea74e589fdb21eeedf950a54ffdc4fedcfa30cc",
+		"stars": 48,
+		"unlocked": 101,
+		"ver": 8
+	},
+	"v7.json": {
+		"from_ver": 7,
+		"gems": 23456,
+		"hash": "0d427b2b8e554439e46d18ec997a5e71edf6b1b7f872e1ad8bee2fc0601b14d9",
+		"stars": 48,
+		"unlocked": 101,
+		"ver": 8
+	},
+	"v8.json": {
+		"from_ver": 8,
+		"gems": 23456,
+		"hash": "ca3475cdd6959645ab92ca7007fa0939061b195ae8f1e2619498f9a318275308",
+		"stars": 48,
+		"unlocked": 101,
+		"ver": 8
+	}
+}

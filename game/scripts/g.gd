@@ -144,59 +144,7 @@ func loc_name(w: int) -> String:
 #   Each old star at 0..47 moves to the nearest unused non-Peak main-path level around round(old_i * 99 / 47) in Arc 1,
 #   preserving 100 % of earned stars (Salon bank == sum of legacy stars).
 static func migrate_48_to_1000(st_dict: Dictionary) -> void :
-	if not (st_dict.get("v10_levels") is Dictionary):
-		st_dict["v10_levels"] = {}
-	var lv10: Dictionary = st_dict["v10_levels"]
-	if bool(lv10.get("mig48", false)):
-		return
-	var old_stars: Dictionary = st_dict.get("stars", {}) if st_dict.get("stars") is Dictionary else {}
-	var old_unl: = maxi(1, int(st_dict.get("unlocked", 1)))
-	var has_hi: = old_unl > 48
-	for k in old_stars:
-		if int(k) >= 48:
-			has_hi = true
-			break
-	if has_hi:
-		lv10["mig48"] = true
-		return
-	var passed: = clampi(old_unl - 1, 0, 48)
-	var max_idx: = -1
-	for k in old_stars:
-		var idx: = int(k)
-		if idx >= 0 and idx < 48 and int(old_stars[k]) > 0:
-			passed = maxi(passed, idx + 1)
-			max_idx = maxi(max_idx, idx)
-	if old_unl <= 6 and max_idx < 6:
-		lv10["mig48"] = true
-		return
-	var new_stars: = {}
-	var used: = {}
-	var keys: = old_stars.keys()
-	keys.sort_custom(func(a, b): return int(a) < int(b))
-	for k in keys:
-		var sv: = clampi(int(old_stars[k]), 0, 3)
-		if sv <= 0:
-			continue
-		var oi: = clampi(int(k), 0, 47)
-		var target: = clampi(int(round(oi * 99.0 / 47.0)), 0, 99)
-		var pick: = -1
-		for d in 100:
-			for cand in ([target] if d == 0 else [target - d, target + d]):
-				if cand >= 0 and cand < 100 and not V10LevelGen.is_peak(cand) and not used.has(cand):
-					pick = cand
-					break
-			if pick >= 0:
-				break
-		if pick < 0:
-			pick = target
-		used[pick] = true
-		new_stars[str(pick)] = sv
-	st_dict["stars"] = new_stars
-	if passed <= 0:
-		st_dict["unlocked"] = 1
-	else:
-		st_dict["unlocked"] = clampi(int(round(passed * 100.0 / 48.0)) + 1, 1, V10PathState.released_total())
-	lv10["mig48"] = true
+	TWMigrate.migrate_48_to_1000(st_dict)   # P12: the body moved to game/core/state/tw_migrate.gd (same code, same tests)
 
 
 func level_feature(lv: Dictionary) -> String:
