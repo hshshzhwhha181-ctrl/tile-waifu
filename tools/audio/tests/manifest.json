@@ -1,0 +1,74 @@
+{
+ "01_sine997_mono_-20dBFS.wav": {
+  "sr": 48000,
+  "ch": 1,
+  "expected_lufs": -23.01,
+  "note": "anchor, mono"
+ },
+ "02_sine997_stereo_-20dBFS.wav": {
+  "sr": 48000,
+  "ch": 2,
+  "expected_lufs": -20.0,
+  "note": "anchor, dual channel (+3.01)"
+ },
+ "03_sine997_44k_-14LUFS.wav": {
+  "sr": 44100,
+  "ch": 1,
+  "expected_lufs": -14.0,
+  "note": "voice target level, 44.1 kHz"
+ },
+ "04_sine997_-16LUFS.wav": {
+  "sr": 48000,
+  "ch": 1,
+  "expected_lufs": -16.0,
+  "note": "music target level"
+ },
+ "05_sine100_mono_-18dBFS.wav": {
+  "sr": 44100,
+  "ch": 1,
+  "expected_lufs": -22.831,
+  "note": "low freq, RLB high pass bites"
+ },
+ "06_sine3k_mono_-20dBFS.wav": {
+  "sr": 48000,
+  "ch": 1,
+  "expected_lufs": -19.894,
+  "note": "pre-filter shelf boost"
+ },
+ "07_sine8k_mono_-24dBFS.wav": {
+  "sr": 44100,
+  "ch": 1,
+  "expected_lufs": -23.658,
+  "note": "top of the shelf"
+ },
+ "08_two_tones_per_channel.wav": {
+  "sr": 48000,
+  "ch": 2,
+  "expected_lufs": -20.724,
+  "note": "uncorrelated tones, channel sum"
+ },
+ "09_tone_then_silence.wav": {
+  "sr": 48000,
+  "ch": 1,
+  "expected_lufs": -23.349,
+  "note": "gating: silence ignored, partial blocks at the join counted per BS.1770"
+ },
+ "10_loud_then_quiet_-20LU.wav": {
+  "sr": 48000,
+  "ch": 1,
+  "expected_lufs": -23.345,
+  "note": "relative gate: quiet half ignored"
+ },
+ "11_white_noise_stereo.wav": {
+  "sr": 48000,
+  "ch": 2,
+  "expected_lufs": -19.885,
+  "note": "broadband, independent FFT reference"
+ },
+ "12_burst_300ms.wav": {
+  "sr": 48000,
+  "ch": 1,
+  "expected_lufs": -23.01,
+  "note": "sub-block signal"
+ }
+}

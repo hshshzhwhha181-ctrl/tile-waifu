@@ -178,6 +178,10 @@ EXTERNAL: list[Suite] = [
     # P19: the Path table is read through TWLevels.at(n) only; direct G.LEVELS[...] indexing is red
     Suite(id="no_direct_levels", kind="python", group="lint", marker="NO_DIRECT_LEVELS RESULT", timeout=60, fast=True,
           script="tools/lint_no_direct_levels.py", args=["--selftest", "--check"]),
+    # P45: loudness meter self-test on synthetic signals (python + numpy + ffmpeg; the corpus scan is a separate CLI run)
+    Suite(id="audio_gate", kind="python", group="lint", marker="AUDIO_GATE SELFTEST", timeout=120, fast=True,
+          script="tools/audio/lufs_gate.py", args=["--selftest", "--no-write"],
+          note="BS.1770 meter vs 12 reference signals (<=0.3 LU), true peak, leading silence, verdict rules"),
 ]
 for _s in EXTERNAL:
     BY_ID[_s.id] = _s
@@ -368,6 +372,13 @@ def run_suite(suite: Suite, godot: str | None, fast: bool, tscale: float, logdir
             if not node:
                 return Result(suite.id, "skip", reason="node not found")
             cmd = [node, str(E2E)]
+        elif suite.script:
+            sp = REPO / suite.script
+            if not sp.exists():
+                return Result(suite.id, "error", reason=f"missing {suite.script}")
+            if suite.id == "audio_gate" and not (shutil.which("ffmpeg") and shutil.which("ffprobe")):
+                return Result(suite.id, "skip", reason="ffmpeg/ffprobe not found")
+            cmd = [sys.executable, str(sp)] + list(suite.args)
         else:
             tool = REPO / suite.script if suite.script else UX_LINT
             if not tool.exists():
@@ -381,7 +392,7 @@ def run_suite(suite: Suite, godot: str | None, fast: bool, tscale: float, logdir
         res = parse_purity(suite, out, rc, timed_out)
     elif suite.kind == "python" and suite.id == "no_direct_levels":
         res = parse_nodl(suite, out, rc, timed_out)
-    elif suite.kind == "python":
+    elif suite.kind == "python" and not suite.script:
         res = parse_lint(suite, out, rc, timed_out)
     else:
         res = parse_output(suite, out, rc, timed_out)

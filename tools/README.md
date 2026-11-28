@@ -8,6 +8,7 @@
 | Godot selftests | 55 (8 core flags, 43 v10 registry modules, `registry`, `spec`, `summon`, `ult_rin`) | marker line of each suite (`ECON_SELFTEST 384/384`, `V10VOICE OK`, ...) |
 | `server/e2e_test.mjs` | `server_e2e` | `E2E_OK`, `N passed, 0 failed` (skipped with a reason if node or `node:sqlite` is missing) |
 | `ux_lint.py` | `ux_lint` | `UX_LINT RESULT: OK (0 violations)` (lives at `.agents/skills/tw-godot-qa/scripts/ux_lint.py`, verified present) |
+| `audio_gate` | 1 (`--selftest`) | `AUDIO_GATE SELFTEST 50/50`: loudness meter vs 12 synthetic signals with known loudness (<= 0.3 LU), true peak, leading silence, verdict rules |
 
 ## Use
 
@@ -140,3 +141,33 @@ Anything with a UI token, a Node base class, an autoload, or living in a present
 * Registry (P07): `registry_list.gd` is gone. Each of the 43 modules is `game/core/**/module.gd` (`static func spec() -> Dictionary`, same ids, explicit `order` = old line order) and `V10Registry` finds them by scanning `res://core`; callbacks that used to sit between the list lines are a module's `"wire"` Callable. A new module is ONE new `module.gd`; the `registry` suite (`REGISTRY_SELFTEST`) guards the 43 legacy ids and their order.
 * Selftests that source-scan a module directory now scan `scripts/v10/<m>/` **and** `core/<m>/` (so nothing silently stops being checked).
 * After pulling this change run `python3 tools/tw_test.py --import` once: `game/.godot/global_script_class_cache.cfg` must be regenerated for the new paths.
+`python tools/tw_test.py -s <id> --update-baseline`. `--check-drift` fails if a module appears in `V10RegistryList` without a catalog entry.
+
+## Audio loudness gate (P45, GDD s8.1 / s11.5 / N14)
+
+`tools/audio/lufs_gate.py` measures every ogg / mp3 / wav under `game/assets` and `audio/` and writes
+`tools/audio/audio_report.csv` (all files) and `tools/audio/audio_outside_contract.csv` (only the files that break the contract).
+
+```bash
+python tools/audio/lufs_gate.py -j 4          # ~20 s for 785 files on 4 cores; add --strict to exit 1 when anything is outside
+python tools/audio/lufs_gate.py game/assets/v10/voice/rin --csv /tmp/rin.csv
+python tools/audio/lufs_gate.py --selftest    # also what tw_test runs as suite `audio_gate`
+python tools/audio/normalize.py game/assets/voice --kind voice --report --trim-lead      # dry run of a fix
+python tools/audio/normalize.py DIR --kind music --out /tmp/fixed                        # write corrected copies
+```
+
+Dependencies: python3 + numpy and ffmpeg (decoding only; ffmpeg `ebur128` is used as an independent cross-check in the selftest, when present).
+No pyloudnorm / scipy needed: the meter is a from-scratch BS.1770-4 (K-weighting, 400 ms blocks, absolute -70 and relative -10 LU gates).
+Its values agree with pyloudnorm on the existing music loops (approved_metrics.json) within 0.1 LU and with ffmpeg ebur128 within 0.06 LU.
+
+| class (by path) | checks |
+| --- | --- |
+| music (`/music/`, `/daynight/`, `koikoi/audio`) | -16 +-1 LUFS, true peak <= -1 dBTP |
+| voice (`/voice/`, root `audio/`) | -14 +-1 LUFS, true peak <= -1 dBTP, leading silence <= 40 ms (first sample above -50 dBFS), spread inside one heroine +-1 LU vs her median, heroine medians within +-1.5 LU of the median of all heroines |
+| sfx / ui (`/sfx/`, `/fx/`) | sample peak <= -5 dBFS (target -6, 1 dB tolerance), true peak <= -1 dBTP |
+| ambient (`/amb/`) | true peak <= -1 dBTP |
+
+Conventions: voice mono files are measured as the plain file (like ffmpeg / pyloudnorm / `voice_build.py`); music is judged by `lufs_play`
+(mono duplicated to both speakers, +3.01 LU) because the asset slimming turned some stereo masters into mono (stings, `motif_rin`, `motif_nova`)
+without changing what is heard. Both numbers are in the CSV. mp3 is measured as ffmpeg decodes it. True peak is a 4x windowed-sinc
+oversampling (checked against an 8x FFT reconstruction within 0.1 dB).
