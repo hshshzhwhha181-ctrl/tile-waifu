@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Слепой тест JP-голосов</title>
+<style>
+:root{--bg:#faf7f2;--fg:#222;--mut:#777;--card:#fff;--ac:#b8452f;--ok:#2d7d46;--bd:#ddd}
+@media (prefers-color-scheme:dark){:root{--bg:#1b1a19;--fg:#eee;--mut:#999;--card:#262524;--ac:#e0745c;--ok:#5fc27d;--bd:#3a3836}}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,sans-serif}
+main{max-width:640px;margin:0 auto;padding:16px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:16px;margin:12px 0}
+button{font:inherit;padding:10px 16px;border-radius:8px;border:1px solid var(--bd);background:var(--card);color:var(--fg);cursor:pointer;min-height:44px}
+button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+button.pri{background:var(--ac);color:#fff;border-color:var(--ac)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.mut{color:var(--mut);font-size:14px}.jp{font-size:20px}
+progress{width:100%}input[type=text]{font:inherit;padding:8px;border-radius:8px;border:1px solid var(--bd);background:var(--card);color:var(--fg);width:100%;box-sizing:border-box}
+</style></head><body><main>
+<h1>Слепой тест JP-голосов</h1>
+<div id="start" class="card">
+<p>Слушайте образцы по одному. Для каждого: оценка 1-5 (естественность, 5 = как у студийной сэйю) и ответ, отличаете ли вы его от студийной записи. Названия скрыты, порядок случайный для каждого слушателя. Работает офлайн, ничего не отправляется: итог сохраняется файлом CSV.</p>
+<p><label>Ваше имя или код <input type="text" id="who" placeholder="например L1"></label></p>
+<p><label><input type="checkbox" id="native"> Я носитель японского языка</label></p>
+<p class="mut">Наушники, тихая комната, громкость не менять между образцами. Около 25 минут. Можно закрыть страницу: ответы сохраняются в браузере.</p>
+<button class="pri" id="go">Начать</button>
+</div>
+<div id="test" class="card" hidden>
+<progress id="prog" max="90" value="0"></progress>
+<div class="mut" id="count"></div>
+<p class="jp" id="jp"></p>
+<audio id="aud" controls preload="auto" style="width:100%"></audio>
+<p>Естественность (1 = синтетика, 5 = студия):</p>
+<div class="row" id="stars"></div>
+<p>Вы отличаете этот образец от студийной записи?</p>
+<div class="row"><button id="b_ind">Не отличаю</button><button id="b_dis">Отличаю</button></div>
+<div class="row"><button id="prev">Назад</button><button class="pri" id="next">Дальше</button></div>
+</div>
+<div id="done" class="card" hidden>
+<h2>Готово</h2>
+<p>Скачайте файл и передайте его организатору теста.</p>
+<button class="pri" id="dl">Скачать результаты (CSV)</button>
+<p class="mut" id="msg"></p>
+</div>
+<script>
+const SAMPLES=[{"hash": "d75c245f4b", "jp": "おはよう！今日も一緒に一局しようね！"}, {"hash": "3de5974c1f", "jp": "はじめまして、マージャンちゃんだよ！いい一局にしよ！"}, {"hash": "76ab680300", "jp": "あなたとだけ、ずっと打っていたいな。"}, {"hash": "48e776b517", "jp": "わっ、頭ポンポン？ふふ、くすぐったい！"}, {"hash": "770be03d42", "jp": "もう、つつきすぎ！牌じゃないんだから！"}, {"hash": "19f891f961", "jp": "これ、大好きなやつ！どうして分かったの？"}, {"hash": "d087b2ca29", "jp": "これからも、ずっとあなたの隣で打たせてね。"}, {"hash": "63cecc1116", "jp": "あれ、動けない…大丈夫、次は勝つから！"}, {"hash": "23778caa7a", "jp": "東の風！"}, {"hash": "b1131b5831", "jp": "ロン、いただき！"}, {"hash": "6e4b373bca", "jp": "朝の月も、悪くないわね。よく来たわ。"}, {"hash": "2c994b605a", "jp": "ユエよ。月の宮の主。お見知りおきを。"}, {"hash": "3f1696d14f", "jp": "あなたが来ると、月がよく見える気がするの。"}, {"hash": "acf4dd3c57", "jp": "頭に手を置くなんて…無礼ね。でも、許すわ。"}, {"hash": "2453abf635", "jp": "いい加減になさい。扇で叩くわよ？"}, {"hash": "d2faf4c6a4", "jp": "これは…わたくしの好みを、よく知っているのね。"}, {"hash": "732fee3d8d", "jp": "わたくしの月を、あなたに捧げるわ。永遠に。"}, {"hash": "13270ba81c", "jp": "月が雲に隠れただけよ。さあ、もう一度。"}, {"hash": "c92b543305", "jp": "満ちなさい！"}, {"hash": "9c15d83adc", "jp": "ロン、ですわ。"}, {"hash": "9a24401561", "jp": "おはよう！春の光が差してきたわ！"}, {"hash": "a1499bf081", "jp": "春を連れてきたわ。ズラータ、火の鳥の姫よ！"}, {"hash": "a43cc914de", "jp": "あなたのそばは、春の陽だまりのようね。"}, {"hash": "184e104a6b", "jp": "あら、私の頭に？…ふふ、あなたならいいわ。"}, {"hash": "2b7696c877", "jp": "ふふ、はは、あははっ！もう降参よ！"}, {"hash": "c740a09de1", "jp": "ブリヌイ！？…こほん。ありがたく、頂戴するわ。"}, {"hash": "9c6cbb8efd", "jp": "春が終わっても、あなたのそばに咲き続けるわ。"}, {"hash": "a881f59bc3", "jp": "灰は、始まりにすぎないわ。もう一度！"}, {"hash": "9f0806f2d6", "jp": "火の鳥、舞え！"}, {"hash": "537a48a7a4", "jp": "ロン、頂戴！"}, {"hash": "bad80b64a9", "jp": "おはよう！今日も一緒に一局しようね！"}, {"hash": "4401dc398a", "jp": "はじめまして、マージャンちゃんだよ！いい一局にしよ！"}, {"hash": "dea9e87ace", "jp": "あなたとだけ、ずっと打っていたいな。"}, {"hash": "79d300e30a", "jp": "わっ、頭ポンポン？ふふ、くすぐったい！"}, {"hash": "c3de76ff41", "jp": "もう、つつきすぎ！牌じゃないんだから！"}, {"hash": "1289e1ad10", "jp": "これ、大好きなやつ！どうして分かったの？"}, {"hash": "7391ace22e", "jp": "これからも、ずっとあなたの隣で打たせてね。"}, {"hash": "56c502e68c", "jp": "あれ、動けない…大丈夫、次は勝つから！"}, {"hash": "2796669715", "jp": "東の風！"}, {"hash": "db72d1329d", "jp": "ロン、いただき！"}, {"hash": "c3ecfe0e18", "jp": "朝の月も、悪くないわね。よく来たわ。"}, {"hash": "a6c17c74c7", "jp": "ユエよ。月の宮の主。お見知りおきを。"}, {"hash": "b3591d5088", "jp": "あなたが来ると、月がよく見える気がするの。"}, {"hash": "33a60a143b", "jp": "頭に手を置くなんて…無礼ね。でも、許すわ。"}, {"hash": "6ac9ed2555", "jp": "いい加減になさい。扇で叩くわよ？"}, {"hash": "1ae789f4f0", "jp": "これは…わたくしの好みを、よく知っているのね。"}, {"hash": "c1200c82bb", "jp": "わたくしの月を、あなたに捧げるわ。永遠に。"}, {"hash": "123d286bb7", "jp": "月が雲に隠れただけよ。さあ、もう一度。"}, {"hash": "3df4099595", "jp": "満ちなさい！"}, {"hash": "557a4be114", "jp": "ロン、ですわ。"}, {"hash": "af0b260db2", "jp": "おはよう！春の光が差してきたわ！"}, {"hash": "701ad7853d", "jp": "春を連れてきたわ。ズラータ、火の鳥の姫よ！"}, {"hash": "959ef670bc", "jp": "あなたのそばは、春の陽だまりのようね。"}, {"hash": "4d65969bb5", "jp": "あら、私の頭に？…ふふ、あなたならいいわ。"}, {"hash": "5a2dfc1df5", "jp": "ふふ、はは、あははっ！もう降参よ！"}, {"hash": "c46c2414ce", "jp": "ブリヌイ！？…こほん。ありがたく、頂戴するわ。"}, {"hash": "4c7236894d", "jp": "春が終わっても、あなたのそばに咲き続けるわ。"}, {"hash": "4dd08d1cd3", "jp": "灰は、始まりにすぎないわ。もう一度！"}, {"hash": "79e5bc7bd9", "jp": "火の鳥、舞え！"}, {"hash": "e9beae8f3b", "jp": "ロン、頂戴！"}, {"hash": "2fdcc1b441", "jp": "おはよう！今日も一緒に一局しようね！"}, {"hash": "7be0ee78cc", "jp": "はじめまして、マージャンちゃんだよ！いい一局にしよ！"}, {"hash": "408cf43780", "jp": "あなたとだけ、ずっと打っていたいな。"}, {"hash": "0564cee274", "jp": "わっ、頭ポンポン？ふふ、くすぐったい！"}, {"hash": "cdf4e77417", "jp": "もう、つつきすぎ！牌じゃないんだから！"}, {"hash": "d90c0243c2", "jp": "これ、大好きなやつ！どうして分かったの？"}, {"hash": "467c7fa83f", "jp": "これからも、ずっとあなたの隣で打たせてね。"}, {"hash": "7cfb0d2538", "jp": "あれ、動けない…大丈夫、次は勝つから！"}, {"hash": "8f2168b5fc", "jp": "東の風！"}, {"hash": "3f0b29b492", "jp": "ロン、いただき！"}, {"hash": "ad95199475", "jp": "朝の月も、悪くないわね。よく来たわ。"}, {"hash": "c1c63954ee", "jp": "ユエよ。月の宮の主。お見知りおきを。"}, {"hash": "ab3edb5dba", "jp": "あなたが来ると、月がよく見える気がするの。"}, {"hash": "08c32430d3", "jp": "頭に手を置くなんて…無礼ね。でも、許すわ。"}, {"hash": "6a1c1564b1", "jp": "いい加減になさい。扇で叩くわよ？"}, {"hash": "29b933f575", "jp": "これは…わたくしの好みを、よく知っているのね。"}, {"hash": "ea5208c544", "jp": "わたくしの月を、あなたに捧げるわ。永遠に。"}, {"hash": "cb302fd536", "jp": "月が雲に隠れただけよ。さあ、もう一度。"}, {"hash": "0c77ab7cba", "jp": "満ちなさい！"}, {"hash": "b34a881368", "jp": "ロン、ですわ。"}, {"hash": "3c56124da1", "jp": "おはよう！春の光が差してきたわ！"}, {"hash": "a75721c139", "jp": "春を連れてきたわ。ズラータ、火の鳥の姫よ！"}, {"hash": "0f4168221f", "jp": "あなたのそばは、春の陽だまりのようね。"}, {"hash": "b1a993d25c", "jp": "あら、私の頭に？…ふふ、あなたならいいわ。"}, {"hash": "83838524e6", "jp": "ふふ、はは、あははっ！もう降参よ！"}, {"hash": "6b37afbc90", "jp": "ブリヌイ！？…こほん。ありがたく、頂戴するわ。"}, {"hash": "432c371b85", "jp": "春が終わっても、あなたのそばに咲き続けるわ。"}, {"hash": "afcd4f2544", "jp": "灰は、始まりにすぎないわ。もう一度！"}, {"hash": "7f66f99613", "jp": "火の鳥、舞え！"}, {"hash": "d3259dd101", "jp": "ロン、頂戴！"}];
+const KEYSTORE='tw_p46_blind_v1';
+let st={who:'',native:false,order:[],i:0,ans:{}};
+try{const s=localStorage.getItem(KEYSTORE);if(s)st=JSON.parse(s)}catch(e){}
+const $=id=>document.getElementById(id);
+function save(){try{localStorage.setItem(KEYSTORE,JSON.stringify(st))}catch(e){}}
+function rng(seed){let h=2166136261;for(const c of seed){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return()=>{h^=h<<13;h^=h>>>17;h^=h<<5;return((h>>>0)%100000)/100000}}
+function shuffle(a,seed){const r=rng(seed+'|'+a.length),b=a.slice();for(let i=b.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b}
+function show(){
+ if(st.i>=st.order.length){$('test').hidden=true;$('done').hidden=false;return}
+ $('start').hidden=true;$('test').hidden=false;$('done').hidden=true;
+ const h=st.order[st.i],s=SAMPLES.find(x=>x.hash===h),a=st.ans[h]||{};
+ $('prog').value=st.i;$('count').textContent=(st.i+1)+' / '+st.order.length;
+ $('jp').textContent=s.jp;$('aud').src='samples/'+h+'.ogg';
+ $('stars').innerHTML='';
+ for(let k=1;k<=5;k++){const b=document.createElement('button');b.textContent=k;if(a.score===k)b.className='on';b.onclick=()=>{st.ans[h]=Object.assign(st.ans[h]||{},{score:k});save();show()};$('stars').appendChild(b)}
+ $('b_ind').className=a.ind===1?'on':'';$('b_dis').className=a.ind===0?'on':'';
+}
+function setInd(v){const h=st.order[st.i];st.ans[h]=Object.assign(st.ans[h]||{},{ind:v});save();show()}
+$('b_ind').onclick=()=>setInd(1);$('b_dis').onclick=()=>setInd(0);
+$('prev').onclick=()=>{if(st.i>0){st.i--;save();show()}};
+$('next').onclick=()=>{const a=st.ans[st.order[st.i]]||{};if(!a.score||a.ind===undefined){alert('Нужны оценка 1-5 и ответ «отличаю / не отличаю».');return}st.i++;save();show()};
+$('go').onclick=()=>{const w=$('who').value.trim();if(!w){alert('Введите имя или код');return}
+ st={who:w,native:$('native').checked,order:shuffle(SAMPLES.map(x=>x.hash),w),i:0,ans:{}};save();show()};
+$('dl').onclick=()=>{
+ const rows=['listener,native,hash,score,indistinguishable'];
+ for(const h of st.order){const a=st.ans[h]||{};rows.push([st.who.replace(/[,\n]/g,' '),st.native?1:0,h,a.score??'',a.ind??''].join(','))}
+ const b=new Blob([rows.join('\n')+'\n'],{type:'text/csv'}),u=URL.createObjectURL(b),l=document.createElement('a');
+ l.href=u;l.download='results_'+st.who.replace(/\W+/g,'_')+'.csv';l.click();$('msg').textContent='Сохранено: '+l.download};
+if(st.order.length){$('who').value=st.who;$('native').checked=st.native;show()}
+</script></main></body></html>
