@@ -409,7 +409,7 @@ def main(argv=None) -> int:
     ap.add_argument("--profile", choices=["chrome", "icon", "fx", "art"], help="force a profile for every image")
     ap.add_argument("--category", help="force the category label")
     ap.add_argument("--hero", help="restrict hero ramps to this heroine id (e.g. yue)")
-    ap.add_argument("--theme", help="restrict skin-theme ramps to this theme (e.g. MOON); without it themes are all allowed")
+    ap.add_argument("--theme", help="restrict skin-theme ramps to this theme (e.g. MOON). Without --hero/--theme all themes are allowed; with --hero and no --theme NO theme ramp is allowed (an L0 skin has theme null)")
     ap.add_argument("--repo-only", action="store_true", help="ignore status=proposed/legacy colours (strict: only shipped tokens)")
     ap.add_argument("--max-side", type=int, default=256)
     ap.add_argument("--seed", type=int, default=SEED, help="k-means seed (default 7); sweep it to check clustering stability (hypothesis H2)")

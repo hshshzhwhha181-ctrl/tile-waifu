@@ -9,7 +9,7 @@
 3. Нет школьной и детской кодировки (форма, класс, парта, ранец, слова student/teen/kid/minor/school, детские аксессуары). Нет текста, цифр, логотипов и водяных знаков внутри арта (весь текст рисует движок).
 4. Камера: без вида снизу под юбку, без «сканирования» частей тела; джигл и вторичное движение не являются смыслом кадра.
 5. Внутри этих линий максимум фан-сервиса не режется. QA **не ослабляет** контент, а ловит выход за линии: чёрный список слов (`SL-MAN-11`), OCR кадров (`SL-RL-02`), сигнал «телесный тон на месте ткани» (`SL-RL-04`), двойной аудит двумя разными людьми (`SL-MAN-12`), ручной аудит перед каждым дропом (§16).
-6. Монетизация (QA проверяет автоматически, §4–§5, §14): шлюз 18+, шансы и гарант видны, счётчики pity видны, нет фальшивых таймеров, добровольный лимит трат, правила RuStore. Экраны S32/S34/S35/S36/S41/S45 не меняются от скина (`AT-S22`).
+6. Монетизация (QA проверяет: `T-CMP-1` §5.3, пункты 6 и 15–17 чек-листа §16, роль gacha-whale/ru-store-risk в §14): шлюз 18+, шансы и гарант видны, счётчики pity видны, нет фальшивых таймеров, добровольный лимит трат, правила RuStore. Экраны S32/S34/S35/S36/S41/S45 не меняются от скина (`AT-S22`).
 
 ## 0. Кратко: что делает документ и что уже сделано в коде
 
@@ -25,7 +25,7 @@
 | `design/specs/skin_manifest.schema.json` + `tools/qa/build_skin_schema.py` | JSON-схема манифеста скина + таблицы правил (реестр 66 слотов, 31 цветовой слот и его источники, запертые слоты/токены, таблицы тиров) | реализован |
 | `tools/qa/skin_lint.py` | линтер манифеста (чистый stdlib): 30 кодов `SL-*`, из них 25 из `SKIN_HUD_SYSTEM §7.1`; режимы `--check-files` (sha256/байты/лишние файлы), `--release` | реализован, фаззинг 800 мутаций |
 | `tools/qa/fixtures/skins/{valid,invalid_hex,missing_slot}/…/manifest.json` + `make_skin_fixtures.py` | 3 образца манифестов (валидный SSR; hex в слотах; пропущены 3 обязательных слота) | реализованы |
-| `tools/qa/test_*.py`, `tools/qa/run_qa_tools.py` | `python3 -m unittest` + однострочный гейт `QA_TOOLS RESULT n/n OK` | 67 тестов, зелёные (palette 25, skin_lint 40, фаззинг 2) |
+| `tools/qa/test_*.py`, `tools/qa/run_qa_tools.py` | `python3 -m unittest` + однострочный гейт `QA_TOOLS RESULT n/n OK` | 68 тестов, зелёные (palette 26, skin_lint 40, фаззинг 2) |
 | `game/tests/skin_swap_soak/*` (+ `game/tests/fixtures/skins/*.json`) | Godot-тест `skin_swap_soak` (маркер `TWSKINSOAK_SELFTEST`), заглушка интерфейса `TWSkinHostStub` | реализован против **существующего** слоя `TWSkin`/`TWBus`/`TWPlate`; часть пунктов помечена PENDING до пакета P-skin (§5.2) |
 | `tools/tw_test.py` | +2 набора: `skin_soak` (Godot), `qa_tools` (python) | добавлено |
 | `.github/workflows/qa.yml` | +1 дешёвый шаг «QA tool-belt» (≈5 с, pip numpy+pillow) | добавлено, остальное — предложение `design/specs/ci_proposed/` (§16) |
@@ -34,13 +34,13 @@
 
 | Прогон | Результат |
 |---|---|
-| `python3 -m unittest discover -s tools/qa -p 'test_*.py'` | `Ran 67 tests … OK` (≈7 с; фаззинг ≈4 с) |
-| `python3 tools/qa/run_qa_tools.py` | `QA_TOOLS RESULT 72/72 OK` (67 тестов + 5 проверок синхронности и сэмплов) |
+| `python3 -m unittest discover -s tools/qa -p 'test_*.py'` | `Ran 68 tests … OK` (≈5 с; фаззинг ≈4 с) |
+| `python3 tools/qa/run_qa_tools.py` | `QA_TOOLS RESULT 73/73 OK` (68 тестов + 5 проверок синхронности и сэмплов) |
 | `palette_audit.py game/assets` (896 изображений, ≈1 мин, 1 ядро) | 666 PASS / 130 WARN / 100 FAIL; дрейфуют категории `icons`, `tile_faces`, `ui_chrome` (§3.4) |
 | `palette_audit.py design/golden_full/picks` (16 золотых кадров ветки `claude/p50b`) | 16 PASS / 0 WARN / 0 FAIL; медиана ΔE 5,08 (арт не обязан лежать в палитре; найдено 3 наблюдения, §3.4) |
 | `skin_lint.py tools/qa/fixtures/skins` | valid: OK; invalid_hex: 3×`SL-PAL-01` (+`SL-PAL-02`, `SL-MAN-01`); missing_slot: 3×`SL-SLOT-05` |
 | Godot `skin_swap_soak` | `TWSKINSOAK_SELFTEST 2387/2387 OK pending=7` (300 шагов, ≈6 с); с `-- --soak_swaps=3000`: `23447/23447 OK` |
-| `python3 tools/tw_test.py --fast -j 4 --no-mask-rc` | {{FAST_LINE}} |
+| `python3 tools/tw_test.py --fast -j 4 --no-mask-rc` | `64/67 pass`, 3 `known-fail` по базлайну (`letters`, `profile2`, `summon`), **`no regression vs baseline`**; новые `skin_soak` 2387/2387 и `qa_tools` зелёные; wall 208 с при `-j 3` (rc=134/−6 при завершении — известный SIGABRT Godot, игнорируется по правилу `--no-mask-rc`) |
 
 ### 0.3 Найденное по ходу (честно, это ценность QA-спеки)
 
@@ -157,7 +157,7 @@ python3 tools/qa/palette_audit.py game/assets --exclude '/incoming/' --json out/
 python3 tools/qa/palette_audit.py shot.png --profile chrome --hero yue --theme MOON --repo-only     # кадр скина (после PAL-0001)
 python3 tools/qa/palette_audit.py game/assets --write-baseline tools/qa/palette_baseline.json        # заморозить сегодняшнее
 python3 tools/qa/palette_audit.py game/assets --baseline tools/qa/palette_baseline.json              # ratchet на PR, меняющем арт
-python3 -m unittest discover -s tools/qa -p 'test_palette*.py'                                         # 25 тестов, <1 с
+python3 -m unittest discover -s tools/qa -p 'test_palette*.py'                                         # 26 тестов, <1 с
 ```
 Что покрывает относительно `PALETTE_LOCK §9.2` (шаги A1–A11): A1/A2/A3 (разрешённый набор, кластеризация, ΔE>порог) — да; A4 (хром C) и A5 (золотая полоса) — да; **A6 (контраст текста по `probe.json`), A7 (доля цвета героини в полном кадре), A8 (две героини рядом), A9 (дальтонизм), A10 (вспышки по серии кадров) — нет**: им нужен `TWSkinShot` (рендер кадров + `probe.json`), который появится с пакетом P-skin. Задел: `colorlib.contrast_ratio`, `delta_e2000`, `rgb_to_oklch`; тесты для A6/A9 пишутся вместе с `TWSkinShot` (§7).
 `palette_baseline.json` в этой ветке **не заморожен** (калибровка §3.3 первична); команда выше создаёт его одним вызовом.
@@ -658,11 +658,11 @@ Godot 4.5 Android экспортирует APK/AAB; краш-репортинг�
 |---|---|---|---|
 | lint core purity | `tools/lint_core_purity.py --selftest --check --by-file` | ≈0,5 с | было |
 | no direct levels | `tools/lint_no_direct_levels.py` | секунды | было |
-| **QA tool-belt** | `pip install numpy pillow` + `python tools/qa/run_qa_tools.py` (unittest: palette_audit 25, skin_lint 40+, фаззинг; ramps/schema в синхроне; сэмплы) | ≈10–15 с (из них pip ≈5 с) | **добавлено**, зелёное локально |
+| **QA tool-belt** | `pip install numpy pillow` + `python tools/qa/run_qa_tools.py` (unittest: palette_audit 26, skin_lint 40, фаззинг; ramps/schema в синхроне; сэмплы) | ≈10–15 с (из них pip ≈5 с) | **добавлено**, зелёное локально |
 | apt, Godot 4.5.1, кэш импорта | | 2–4 мин | было |
-| `tw_test.py --fast -j 4 --no-mask-rc` | fast (на PR) или full (push) | по baseline: fast ≈1 157 с суммарно/-j4 → ≈6–8 мин; full ≈2 130 с | было; **+ `skin_soak` (≈6 с), + `qa_tools` (≈5 с)** |
+| `tw_test.py --fast -j 4 --no-mask-rc` | fast (на PR) или full (push) | по `tools/baseline.json`: fast ≈1 157 с суммарного времени наборов (при `-j 4` ≈5–10 мин [ГИПОТЕЗА]); full ≈2 130 с | было; **+ `skin_soak` (≈6 с), + `qa_tools` (≈5 с)** |
 | upload logs | | | было |
-Стратегия отказа: красный только при **регрессии против `tools/baseline.json`**; известные падения (напр. `twassets`, `letters`, `summon`) остаются «ожидаемыми» до починки; новые наборы с вердиктом `new` не краснят. Новый наш набор обязан быть зелёным сразу (`skin_soak`: 2387/2387 локально).
+Стратегия отказа: красный только при **регрессии против `tools/baseline.json`**; известные падения (`letters`, `summon`, `profile2` — `known-fail` в базлайне) остаются «ожидаемыми» до починки; новые наборы с вердиктом `new` не краснят. Новый наш набор обязан быть зелёным сразу (`skin_soak`: 2387/2387 локально).
 
 ### 17.2 Предложение по уровням (файлы-заготовки в `design/specs/ci_proposed/`, в `.github/` НЕ включены, чтобы не ломать зелёный CI)
 

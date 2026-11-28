@@ -167,6 +167,15 @@ class AuditImages(unittest.TestCase):
         wrong = pa.audit_image(self.d / "yue.png", pa.load_palette(hero="zlata", repo_only=True), "yue.png", profile="chrome")
         self.assertNotEqual(wrong["verdict"], "PASS")
 
+    def test_hero_without_theme_excludes_theme_ramps(self):
+        pal = pa.load_palette(hero="yue")
+        self.assertFalse([n for n in pal.names if n.startswith("THEME_")])
+        self.assertTrue([n for n in pal.names if n.startswith("HERO_YUE_")])
+        self.assertFalse([n for n in pal.names if n.startswith("HERO_RIN_")])
+        pal2 = pa.load_palette(hero="yue", theme="NEON")
+        self.assertTrue([n for n in pal2.names if n.startswith("THEME_NEON2_")])        # NEON carries its second ramp
+        self.assertFalse([n for n in pal2.names if n.startswith("THEME_MOON_")])
+
     def test_gold_band_cap(self):
         solid(self.d / "gold.png", ["#E8C47E", "#1B171C"])
         r = self.audit("gold.png")
