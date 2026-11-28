@@ -40,6 +40,8 @@ static func _to_nonneg_int(v: Variant) -> int:
 #                     }
 # Returns: {mode: "full"|"assist"|"off", skip_lock_s: float, reason: String, counts_as_full: bool, clip_max_s: float}
 static func choose(seen: Dictionary, settings: Dictionary, last_full_age_s: float, context: Dictionary) -> Dictionary:
+	if is_nan(last_full_age_s):
+		last_full_age_s = 0.0
 	var ult_id: String = str(context.get("ult_id", ""))
 	var tier: String = str(context.get("tier", "BASE"))
 	var is_gallery: bool = bool(context.get("is_gallery", false))

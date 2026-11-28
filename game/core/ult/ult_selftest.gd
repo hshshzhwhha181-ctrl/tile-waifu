@@ -56,9 +56,9 @@ static func _test_catalogue_and_schema(chk: Callable, items: Dictionary) -> Dict
 	chk.call("AT-U01: catalogue has 58 entries", expected_ids.size() == 58 and reg_ids.size() == 58,
 		"json=%d reg=%d" % [expected_ids.size(), reg_ids.size()])
 	var cov: Dictionary = TWUltRegistry.coverage_report(expected_ids, items)
-	chk.call("AT-U01: bidirectional 100% parity (0 missing, 0 extra)",
-		(cov.missing_in_registry as Array).is_empty() and (cov.extra_in_registry as Array).is_empty(),
-		"missing=%s extra=%s" % [str(cov.missing_in_registry), str(cov.extra_in_registry)])
+	chk.call("AT-U01: bidirectional 100% parity (0 missing, 0 extra, 0 duplicates)",
+		(cov.missing_in_registry as Array).is_empty() and (cov.extra_in_registry as Array).is_empty() and (cov.duplicate_ids as Array).is_empty(),
+		"missing=%s extra=%s dups=%s" % [str(cov.missing_in_registry), str(cov.extra_in_registry), str(cov.duplicate_ids)])
 	chk.call("U17: all 10 heroines present with _base and _vow",
 		TWUltRegistry.heroes().size() == 10 and (cov.missing_base_vow as Array).is_empty(),
 		str(cov.missing_base_vow))
@@ -95,13 +95,26 @@ static func _test_negative_schema_guards(chk: Callable) -> void:
 			"beats_n": 2, "poses_n": 1, "plates_n": 0, "impact_events_max": 9,
 			"voice_cues": ["only_one"], "voice": ["TooLong".repeat(8)], "sfx_cues": [],
 			"vfx": ["GOLD_500", "#123456"], "twist": "T99",
-			"atk_pct_star0": 0.0, "atk_pct_per_star": 0.0, "skin_pack": "", "assets": [],
+			"atk_pct_star0": -1.0, "atk_pct_per_star": -0.5, "skin_pack": "", "assets": [],
+		}, {
+			"id": "bad_ult", "hero": "mc", "tier": "BASE",
 		}]
 	}
 	TWUltRegistry.install_catalogue(bad_doc)
 	var errs: Array = TWUltRegistry.schema_errors("bad_ult")
+	var bad_cov: Dictionary = TWUltRegistry.coverage_report()
 	TWUltRegistry.install_catalogue(orig)
 	chk.call("U01-U16 negative guard catches broken catalogue entry (%d errors)" % errs.size(), errs.size() >= 10, str(errs))
+	chk.call("SR-04 negative guard catches duplicate catalogue id and negative atk_pct",
+		(bad_cov.duplicate_ids as Array) == ["bad_ult"] and ("U01 invalid/negative atk_pct fields" in errs),
+		"dups=%s errs=%s" % [str(bad_cov.duplicate_ids), str(errs)])
+	# SR-03 immutability guard: mutating returned entry must not corrupt the global registry
+	var copy_u: Dictionary = TWUltRegistry.entry("mc_base")
+	copy_u["name_ru"] = "CORRUPTED"
+	(copy_u["vfx"] as Array).append("GOLD_500")
+	var fresh_u: Dictionary = TWUltRegistry.entry("mc_base")
+	chk.call("SR-03 entry() returns defensive deep copy (caller mutation does not corrupt registry)",
+		str(fresh_u.get("name_ru", "")) != "CORRUPTED" and TWUltRegistry.schema_errors("mc_base").is_empty())
 
 
 # ── U11: equipped() fallback, legacy() bidirectional map, injected legacy source ────────────────────────────
@@ -241,10 +254,14 @@ static func _test_policy_30_cases(chk: Callable) -> void:
 		elif str(c[0]).begins_with("31 "):
 			ok = ok and is_equal_approx(float(got.clip_max_s), TWUltPolicy.TABLE_SSRP_HIGHLIGHT_S)
 		chk.call("AT-U09 [%s]" % str(c[0]), ok, "got=%s want=(%s, %.1f)" % [str(got), str(c[5]), float(c[6])])
-	# Defensive check: corrupt seen[id] = null / string must not throw
+	# Defensive check: corrupt seen[id] = null must not throw; NAN last_full_age_s enforces cooldown consistently
 	var safe_got: Dictionary = TWUltPolicy.choose({"mc_base": null}, {"ult_cutin": "full"}, -1.0, {"ult_id": "mc_base", "tier": "BASE"})
 	chk.call("AT-U09: corrupt null seen value treated safely as unseen (first_view)",
 		str(safe_got.mode) == "full" and is_equal_approx(float(safe_got.skip_lock_s), 1.0), str(safe_got))
+	var nan_fpf: Dictionary = TWUltPolicy.choose({"mc_base": 2}, {"ult_cutin": "full", "ult_repeat": "first_per_fight"}, NAN, {"ult_id": "mc_base", "tier": "BASE", "hero_casts_in_fight": 0})
+	var nan_fav: Dictionary = TWUltPolicy.choose({"mc_ssrp_dragonnight": 2}, {"ult_cutin": "full", "ult_repeat": "favorite"}, NAN, {"ult_id": "mc_ssrp_dragonnight", "tier": "SSRP", "hero_casts_in_fight": 0})
+	chk.call("SR-05: NAN last_full_age_s safely returns assist across both first_per_fight and favorite",
+		str(nan_fpf.mode) == "assist" and str(nan_fav.mode) == "assist", "fpf=%s fav=%s" % [str(nan_fpf), str(nan_fav)])
 
 
 # ── AT-U12 / T17: modular ult_seen + ult_repeat migration (SAVE_VER stays 8, downgrade-safe) ────────────────
@@ -260,15 +277,16 @@ static func _test_save_ult_seen_and_downgrade(chk: Callable) -> void:
 	var n1: int = TWUltPolicy.record_seen(s, "mc_ssrp_dragonnight")
 	var n2: int = TWUltPolicy.record_seen(s, "mc_ssrp_dragonnight")
 	chk.call("AT-U12: record_seen increments ult_seen counter", n1 == 1 and n2 == 2 and TWUltPolicy.seen_count(s, "mc_ssrp_dragonnight") == 2)
-	# Repair corrupt values while keeping valid entries (including null mod_ver.battle)
+	# Repair corrupt values while keeping valid entries (including null mod_ver.battle and blank key)
 	s["ult_seen"]["bad_entry"] = "not_a_num"
 	s["ult_seen"]["neg_entry"] = -5
 	s["ult_seen"]["null_entry"] = null
+	s["ult_seen"][""] = 9
 	s["ult_repeat"] = "invalid_mode"
 	s["mod_ver"]["battle"] = null
 	TWUltRegistry.ensure_save(s)
 	chk.call("AT-U12: ensure_save repairs invalid ult_seen/ult_repeat/mod_ver while preserving valid counts",
-		not s.ult_seen.has("bad_entry") and not s.ult_seen.has("null_entry") and int(s.ult_seen.neg_entry) == 0 and int(s.ult_seen.mc_ssrp_dragonnight) == 2 and str(s.ult_repeat) == "first_per_fight" and int(s.mod_ver.battle) == 1)
+		not s.ult_seen.has("bad_entry") and not s.ult_seen.has("null_entry") and not s.ult_seen.has("") and int(s.ult_seen.neg_entry) == 0 and int(s.ult_seen.mc_ssrp_dragonnight) == 2 and str(s.ult_repeat) == "first_per_fight" and int(s.mod_ver.battle) == 1)
 	# T17 downgrade check: an older client checking SAVE_VER=8 accepts the save (not "future")
 	var mc: Dictionary = TWMigrate.check(s)
 	chk.call("T17 downgrade: save with ult_seen/mod_ver.battle passes TWMigrate.check (SAVE_VER=8)",

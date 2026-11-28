@@ -44,6 +44,7 @@ static var _loaded: = false
 static var _raw: Dictionary = {}
 static var _by_id: Dictionary = {}              # canonical ult_id -> Dictionary
 static var _order: PackedStringArray = PackedStringArray()
+static var _duplicate_ids: Array = []
 static var _cat_to_legacy: Dictionary = {}      # canonical ult_id -> legacy_outfit
 static var _legacy_to_cat: Dictionary = {}      # legacy_outfit -> first canonical ult_id
 static var _by_hero: Dictionary = {}            # hero -> Array[String]
@@ -65,6 +66,7 @@ static func reload_catalogue() -> void:
 	_raw = {}
 	_by_id = {}
 	_order = PackedStringArray()
+	_duplicate_ids = []
 	_cat_to_legacy = {}
 	_legacy_to_cat = {}
 	_by_hero = {}
@@ -78,13 +80,14 @@ static func reset_all() -> void:
 
 static func install_catalogue(doc: Dictionary) -> void:
 	_loaded = true
-	_raw = doc
+	_raw = doc.duplicate(true)
 	_by_id = {}
 	_order = PackedStringArray()
+	_duplicate_ids = []
 	_cat_to_legacy = {}
 	_legacy_to_cat = {}
 	_by_hero = {}
-	var ults = doc.get("ults", [])
+	var ults = _raw.get("ults", [])
 	if ults is Array:
 		for item in ults:
 			if not (item is Dictionary):
@@ -92,6 +95,9 @@ static func install_catalogue(doc: Dictionary) -> void:
 			var u: Dictionary = item
 			var uid: String = str(u.get("id", ""))
 			if uid == "":
+				continue
+			if _by_id.has(uid):
+				_duplicate_ids.append(uid)
 				continue
 			_by_id[uid] = u
 			_order.append(uid)
@@ -125,13 +131,13 @@ static func unregister_legacy_source(source_name: String) -> void:
 
 static func catalogue() -> Dictionary:
 	_ensure()
-	return _raw
+	return _raw.duplicate(true)
 
 
 static func tiers() -> Dictionary:
 	_ensure()
 	var t = _raw.get("tiers", {})
-	return t if t is Dictionary else {}
+	return (t as Dictionary).duplicate(true) if t is Dictionary else {}
 
 
 static func heroes() -> PackedStringArray:
@@ -189,9 +195,9 @@ static func has(id: String) -> bool:
 static func entry(id: String) -> Dictionary:
 	_ensure()
 	if _by_id.has(id):
-		return _by_id[id]
+		return (_by_id[id] as Dictionary).duplicate(true)
 	if _legacy_to_cat.has(id):
-		return _by_id[_legacy_to_cat[id]]
+		return (_by_id[_legacy_to_cat[id]] as Dictionary).duplicate(true)
 	return legacy_entry(id)
 
 
@@ -203,11 +209,11 @@ static func legacy_entry(id: String) -> Dictionary:
 	_ensure()
 	var lid: String = str(_cat_to_legacy.get(id, id))
 	if V9Ults.has(lid):
-		return V9Ults.get_ult(lid)
+		return V9Ults.get_ult(lid).duplicate(true)
 	for sn in _legacy_sources:
 		var ults: Dictionary = _legacy_sources[sn].ults
 		if ults.has(lid):
-			return ults[lid]
+			return (ults[lid] as Dictionary).duplicate(true)
 	return {}
 
 
@@ -405,8 +411,8 @@ static func schema_errors(id: String) -> Array:
 	# U16 / twist
 	if not (str(u.twist) in VALID_TWISTS):
 		errs.append("U16 invalid twist: " + str(u.twist))
-	if not _is_num(u.atk_pct_star0) or not _is_num(u.atk_pct_per_star):
-		errs.append("U01 non-numeric atk_pct fields")
+	if not _is_num(u.atk_pct_star0) or not _is_num(u.atk_pct_per_star) or float(u.atk_pct_star0) < 0.0 or float(u.atk_pct_per_star) < 0.0:
+		errs.append("U01 invalid/negative atk_pct fields")
 	if str(u.skin_pack).strip_edges() == "":
 		errs.append("U01 empty skin_pack")
 	if not (u.assets is Array) or (u.assets as Array).is_empty():
@@ -465,6 +471,7 @@ static func coverage_report(expected_ids: Array = [], items: Dictionary = {}) ->
 	return {
 		"ids": reg_ids.size(),
 		"covered": covered,
+		"duplicate_ids": _duplicate_ids.duplicate(),
 		"missing_in_registry": missing_in_reg,
 		"extra_in_registry": extra_in_reg,
 		"schema_errors": bad_schema,
@@ -484,6 +491,9 @@ static func ensure_save(S: Dictionary) -> Dictionary:
 		var seen: Dictionary = S["ult_seen"]
 		var drop: Array = []
 		for k in seen:
+			if not (k is String) or String(k).strip_edges() == "":
+				drop.append(k)
+				continue
 			var v = seen[k]
 			if v is int:
 				seen[k] = maxi(0, v)
