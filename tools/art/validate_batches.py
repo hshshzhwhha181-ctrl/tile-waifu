@@ -195,6 +195,7 @@ def validate(batches: dict, schema: dict, md_rows, plan_nom, plan_ceil, quiet=Fa
                         if not (WD.HEADS_MIN <= x <= WD.HEADS_MAX): errs.append(f"{tid}: {x} heads tall in {f} is outside the hard range {WD.HEADS_MIN}-{WD.HEADS_MAX}")
                         elif abs(x - want_h) > 0.011: errs.append(f"{tid}: {x} heads tall in {f} but the body table says {want_h} for {t['heroine']}")
                     if "mature adult face" not in v: errs.append(f"{tid}: {f} does not state a mature adult face")
+                    if WD.FIGURE[t["heroine"]] not in v: errs.append(f"{tid}: {f} lacks the approved figure descriptor of {t['heroine']} (body table, leg fullness and bust)")
             if tier_full and t["media"] == "image":
                 for i, v in enumerate(list(t.get("prompt_variants") or []) + list(t.get("hero_prompt_variants") or [])):
                     if not NOTEXT_RE.search(v): errs.append(f"{tid}: variant {i} lacks a 'no text' constraint")
@@ -318,6 +319,11 @@ def selftest(batches, schema, md_rows, pn, pc):
         "hero_prompt_variants", [v + " fully nude" for v in first(c, "H2_wardrobe.json", lambda t: t.get("hero_prompt_variants"))["hero_prompt_variants"]]), "banned word")
     mut("adult-face statement dropped", lambda c: first(c, "H3_combo_frames.json", lambda t: t.get("heroine")).__setitem__(
         "prompt", first(c, "H3_combo_frames.json", lambda t: t.get("heroine"))["prompt"].replace("mature adult face", "face")), "mature adult face")
+    mut("figure descriptor missing in a Tier FULL prompt", lambda c: first(c, "H3_combo_frames.json", lambda t: t.get("heroine") == "mc").__setitem__(
+        "prompt", first(c, "H3_combo_frames.json", lambda t: t.get("heroine") == "mc")["prompt"].replace(WD.FIGURE["mc"], "soft figure")), "figure descriptor")
+    mut("wardrobe variant loses its figure descriptor", lambda c: first(c, "H2_wardrobe.json", lambda t: t.get("prompt_variants")).__setitem__(
+        "prompt_variants", [v.replace("full soft thighs", "slim legs") for v in first(c, "H2_wardrobe.json", lambda t: t.get("prompt_variants"))["prompt_variants"]]), "figure descriptor")
+    mut("minor word next to a fuller-thigh body term", lambda c: append_prompt(c, "H2_wardrobe.json", lambda t: t.get("heroine") == "miel", " thick thighs on a schoolgirl"), "banned word")
     bad = 0
     for name, fn, needle in cases:
         c = copy.deepcopy(batches)
@@ -327,10 +333,10 @@ def selftest(batches, schema, md_rows, pn, pc):
         print(("ok   " if hit else "FAIL ") + f"selftest: {name} -> {'detected' if hit else 'NOT detected'}")
         bad += 0 if hit else 1
     c = copy.deepcopy(batches)
-    append_prompt(c, "H1_canon_set.json", lambda t: t.get("heroine"), " with garter straps and thigh-high stockings, a bunny headband and a bikini")
+    append_prompt(c, "H1_canon_set.json", lambda t: t.get("heroine"), " with garter straps and thigh-high stockings, a bunny headband, a bikini, thick shapely thighs, wide hips and a curvy figure")
     errs, _, _ = validate(c, schema, md_rows, pn, pc)
     ok = not any("banned" in e for e in errs)
-    print(("ok   " if ok else "FAIL ") + "selftest: Tier FULL allows garter / stockings / bunny / bikini as costume words -> " + ("accepted" if ok else "WRONGLY flagged"))
+    print(("ok   " if ok else "FAIL ") + "selftest: Tier FULL allows garter / stockings / bunny / bikini / thick thighs / wide hips / curvy as body and costume words -> " + ("accepted" if ok else "WRONGLY flagged"))
     bad += 0 if ok else 1
     print(f"ART_BATCHES_SELFTEST {len(cases) + 1 - bad}/{len(cases) + 1}")
     return 1 if bad else 0

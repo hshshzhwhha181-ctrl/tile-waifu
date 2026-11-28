@@ -49,3 +49,31 @@ Branch `claude/p50b`. Credits this round: **25.5** (12 + 3.5 + 10); session tota
 - Owner look at `round2/contact_sheet_round2.jpg` and `height_rerolls_sheet.jpg` (copies in the scratchpad `share/` folder).
 - Decide whether `kohaku_swim_H1` is the accepted ceiling.
 - Whether Shirin stays at 163 cm (canon text said tall; the owner's number was used).
+
+## Round 3 (owner feedback on rounds 1-2: fuller thighs, accent on legs and bust, more hot poses)
+
+Credits: **4** (4 pilot frames, 1k medium); session total 80.5 of 250. Nothing approved or registered. Pilots: `round3/round3_pilots.jpg` (copy in the scratchpad `share/round3_pilots.jpg`), frames `round3/*_1k.jpg`.
+
+### Done
+
+- **A. Figure descriptors** per heroine (`FIGURE` in `tools/art/full_tier_wardrobe.py`, table in `ART_TIER_FULL.md` section 3a, used in the prompt's Body clause): MC `full soft thighs, wide rounded hips ... full bust accented by the neckline`; Miel `thick shapely thighs and wide hips, soft curvy pear-shaped`; Kohaku and Rin full soft thighs; Zlata full thighs on long legs; Yue and Shirin very long statuesque legs with full thighs; Hana `strong thick thighs and soft definition`; Tsubame and Nova slim toned but shapely. Head counts and the adult-face floor (6.75) unchanged. `thick`, `curvy`, `full thighs`, `wide hips` are not hard-banned (the hard list is unchanged); the validator now requires each Full prompt to carry the heroine's exact descriptor.
+- **B. Leg and bust shot types.** Each of the 70 outfits now has poses A..E: D = leg focus, E = bust focus, camera codes L (low knee-level full body), T (thigh-focus crop), S (seated, legs prominent), B (stocking-band and garter close crop), F (lean-forward bust-forward), all at eye, hip or knee level, never below the hem. Plus the 2 hero splash poses. H1 has 5 frames per heroine (base, win, tease, leg, bust); H3 was re-posed (T1 bust-forward, T2 long leg forward at knee level, T3 arched presenting); every prompt says "the composition accents her legs, thighs and bust".
+- **New budgets** (recomputed, `ART_BATCHES.md` updated): **H2 350 -> 490 cr** (5 x 1 cr search + 1 x 2 cr final per outfit, 70 outfits, 140 tasks, pilot 15 cr); **H1 330 -> 530 cr** (50 frames x (6 + 2 x 2) + 30 post, 101 tasks); H0, H3, H4 unchanged (180, 150, 80). **Plan nominal 2712 -> 3052 cr, ceiling 3254 -> 3662 cr.** The owner confirms the new numbers (earlier approval covered 3254).
+- **Validator**: green (15 batches, 1023 tasks, 0 errors), selftest **19/19** (new: missing figure descriptor, wardrobe variant losing it, minor word next to a fuller-thigh term, and the positive control now covers `thick shapely thighs`, `wide hips`, `curvy`).
+
+### Pilots (4 cr, 0 refusals)
+
+| frame | prompt | result |
+|---|---|---|
+| mc_base_D_leg_low | low knee-level full body, long leg forward, lace stocking top | works: long legs, full soft thighs, stocking top and garter band in view, adult face |
+| miel_evening_D_thigh_crop | thigh-focus crop, perched on the counter, leg drawn up | works strongly: thick shapely thighs and wide hips, full bust, bow bands in view; the lifted leg shows the frilled petticoat of the skirt (not underwear, but close to the under-skirt line) |
+| hana_base_D_leg_low | low full body, strong thick thighs | works moderately: athletic thicker thighs and strong calves, over-the-knee striped socks; less fuller than Miel or MC |
+| yue_base_E_bust_forward | hands on knees, bust-forward, waist-up to hips | works: full bust framed by the plunging V, long statuesque legs with full thighs at the frame edge, adult face |
+
+### Weak spots
+
+1. Miel's lifted-leg crop is at the edge of "no under-skirt camera": for skirts with a lifted leg keep the T crop at hip level and use opaque tulle hems; do not drop the camera.
+2. Hana's thicker thighs read only moderately; a stronger wording ("thick powerful thighs") may be needed if the owner wants more, with the athletic cue kept.
+3. The model also enlarges the bust together with the thighs (Miel); the figure descriptors ask for "a full bust" only, so check the 7-head floor and the adult face on petite heroines in every frame.
+4. 1 candidate per pilot frame; no OCR or watermark scan; head count not measured on pixels.
+5. H1 grew to 5 frames per heroine and H2 to 5 poses per outfit: +340 cr over round 2; the budget numbers need the owner's yes.

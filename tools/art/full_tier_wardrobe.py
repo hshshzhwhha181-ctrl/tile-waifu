@@ -1,5 +1,5 @@
-"""Tier FULL wardrobe tables (P50b, round 2): body table + 10 heroines x 7 outfits, each outfit with 3 pose options (A/B/C)
-and 2 'hero' splash poses (H1/H2, used for SSR key art and showcase screens).
+"""Tier FULL wardrobe tables (P50b, rounds 2-3): body table + 10 heroines x 7 outfits, each outfit with 5 pose options (A/B/C hand-written,
+D leg-focus and E bust-focus from templates) and 2 'hero' splash poses (H1/H2, used for SSR key art and showcase screens).
 
 Spec: design/ART_TIER_FULL.md.  Used by tools/art/build_art_batches.py (H0 / H1 / H2 / H3 / H4) and quoted in the spec appendix.
 Vocabulary is fashion / pin-up only (no 'sexy', 'cleavage', 'nude', 'lingerie', no '*boob' words: 'underbust cut-out' and
@@ -19,25 +19,50 @@ SLOTS = ["base", "evening", "swim", "service", "robe", "battle", "seasonal"]
 # ---------------------------------------------------------------------------------------------------------------------
 HEADS_MIN, HEADS_MAX = 6.75, 8.0
 HEIGHTS = {
-    "yue":     dict(cm=177, heads=7.9,  tag="very tall and statuesque", legs="very long legs"),
-    "zlata":   dict(cm=176, heads=7.8,  tag="tall and statuesque", legs="long legs"),
-    "rin":     dict(cm=172, heads=7.5,  tag="tall and slender", legs="long legs"),
-    "mc":      dict(cm=170, heads=7.5,  tag="tall, soft and shapely", legs="long legs"),
-    "hana":    dict(cm=168, heads=7.25, tag="athletic average height", legs="toned long legs"),
-    "tsubame": dict(cm=165, heads=7.25, tag="lithe average height", legs="long legs"),
-    "shirin":  dict(cm=163, heads=7.25, tag="average height with fuller curves", legs="shapely legs"),
-    "kohaku":  dict(cm=160, heads=7.0,  tag="slightly petite but clearly a grown woman", legs="slender legs"),
-    "nova":    dict(cm=158, heads=7.0,  tag="petite but clearly a grown woman", legs="slender legs"),
-    "miel":    dict(cm=155, heads=6.75, tag="petite and curvy but clearly a mature grown woman", legs="soft shapely legs"),
+    "yue":     dict(cm=177, heads=7.9,  tag="very tall and statuesque", legs="very long statuesque legs with full thighs"),
+    "zlata":   dict(cm=176, heads=7.8,  tag="tall and statuesque", legs="long legs with full thighs"),
+    "rin":     dict(cm=172, heads=7.5,  tag="tall and slender", legs="long legs with full soft thighs"),
+    "mc":      dict(cm=170, heads=7.5,  tag="tall, soft and shapely", legs="long legs with full soft thighs"),
+    "hana":    dict(cm=168, heads=7.25, tag="athletic average height", legs="strong athletic legs with thick thighs"),
+    "tsubame": dict(cm=165, heads=7.25, tag="lithe average height", legs="slim toned shapely legs"),
+    "shirin":  dict(cm=163, heads=7.25, tag="average height with fuller curves", legs="long legs with full thighs"),
+    "kohaku":  dict(cm=160, heads=7.0,  tag="slightly petite but clearly a grown woman", legs="soft legs with full thighs"),
+    "nova":    dict(cm=158, heads=7.0,  tag="petite but clearly a grown woman", legs="slim toned shapely legs"),
+    "miel":    dict(cm=155, heads=6.75, tag="petite and curvy but clearly a mature grown woman", legs="thick shapely thighs and soft legs"),
+}
+
+# Figure descriptors (owner feedback round 3, 2026-11-28): fuller thighs on some heroines, accent on legs and bust, varied across the roster.
+# Exact approved body terms (Full files only; 'thick', 'full thighs', 'wide hips', 'curvy' are NOT hard-banned, minor / school words are).
+FIGURE = {
+    "mc":      "soft shapely figure, full soft thighs, wide rounded hips, a defined waist, a full bust accented by the neckline",
+    "miel":    "soft curvy pear-shaped figure with thick shapely thighs and wide hips, a slim waist, a full bust",
+    "kohaku":  "soft athletic-soft figure with full soft thighs and rounded hips, a slim waist, a full bust",
+    "zlata":   "statuesque figure, full thighs on long legs, wide regal hips, a slim waist, a full bust",
+    "rin":     "slender figure with long legs and full soft thighs, rounded hips, a slim waist, a shapely bust",
+    "yue":     "statuesque figure with very long legs and full thighs, rounded hips, a defined waist, a full bust",
+    "shirin":  "soft shapely figure with long legs, full thighs and wide hips, a defined waist, a full bust, a bare midriff",
+    "hana":    "athletic toned figure with strong thick thighs and soft definition, a flat stomach, a shapely bust",
+    "tsubame": "lithe slim toned figure with shapely legs, rounded hips, a slim waist, a shapely bust",
+    "nova":    "lean slim toned figure with shapely legs, gently rounded hips, a slim waist, a shapely bust",
 }
 
 # {hk: {slot: dict(name, outfit, setting, poses=[A,B,C], hero=[H1,H2])}}
 W: dict[str, dict[str, dict]] = {}
 
 
+FR = {
+    "L": "low full-body view from knee level looking straight ahead (never below the hem, never up a skirt) that elongates the legs",
+    "T": "thigh-focus three-quarter crop from the waist to the knees, the stocking bands and thighs filling the frame, camera at hip level",
+    "S": "full-body seated view at eye level with the legs prominent in the foreground",
+    "B": "close crop from the hip to the knees on the stocking band and garter, her smiling face partly in the frame, camera at eye level",
+    "F": "waist-up to hips view leaning toward the viewer, bust-forward, camera at eye level",
+}
+
+
 def _p(s: str):
-    pose, expr = [x.strip() for x in s.split("//")]
-    return (pose, expr)
+    """'pose // expression' or 'pose // expression // framing code' -> (pose, expression, framing text or None)."""
+    parts = [x.strip() for x in s.split("//")]
+    return (parts[0], parts[1], FR[parts[2]] if len(parts) > 2 else None)
 
 
 def add(hk, slot, name, outfit, setting, a, b, c, h1, h2):
@@ -625,16 +650,56 @@ add("zlata", "seasonal", "Winter-festival sarafan",
     "lying back on a fur-draped sleigh with one leg raised and an ember lantern held up // sultry warm smile")
 
 
+# ---------------------------------------------------------------------------------------------------------------------
+# Round 3 (owner feedback): LEG-focus (pose D) and BUST-focus (pose E) shot types for every outfit, so each outfit has
+# poses A..E (5 search candidates) plus the 2 hero splash poses.  Built from slot templates and per-heroine props.
+# Camera stays at eye, hip or knee level: never below the hem, never up a skirt.
+# ---------------------------------------------------------------------------------------------------------------------
+PROPS = {  # band = the stocking / thigh detail, seat = furniture, hug = what she hugs, wpn = battle prop, neck = neckline term, mood = smile adjective
+    "mc":      dict(band="lace stocking top and garter band", seat="the mahjong table", hug="a floral cushion", wpn="the war fan", neck="keyhole front", mood="playful"),
+    "rin":     dict(band="lace stocking top and garter strap", seat="the library table", hug="a big book", wpn="the tea whisk", neck="plunging neckline", mood="knowing"),
+    "hana":    dict(band="striped sock top", seat="the bench", hug="a gym towel", wpn="the baton", neck="deep neckline", mood="cheeky"),
+    "yue":     dict(band="lace stocking top and pearl garter strap", seat="the moon-cushion divan", hug="a moon-shaped pillow", wpn="the moon glaive", neck="plunging V front", mood="serene teasing"),
+    "nova":    dict(band="fishnet top and neon garter strap", seat="the console", hug="a cat-shaped pillow", wpn="the helmet", neck="sweetheart neckline", mood="smug"),
+    "tsubame": dict(band="fishnet top and crimson ribbon band", seat="the crate", hug="a bolster pillow", wpn="the kunai", neck="plunging neckline", mood="cool sly"),
+    "miel":    dict(band="ribbon-bow stocking band", seat="the marble counter", hug="a big cushion", wpn="the piping-bag lance", neck="plunging ruffled neckline", mood="sweet"),
+    "kohaku":  dict(band="ribbon-and-bell thigh band", seat="the shrine veranda", hug="her fluffy tail", wpn="the gohei", neck="plunging neckline", mood="toothy playful"),
+    "shirin":  dict(band="gold thigh chains", seat="the silk cushions", hug="a tasseled pillow", wpn="the curved blades", neck="plunging choli neckline", mood="mysterious"),
+    "zlata":   dict(band="lace stocking top and gold garter strap", seat="the gilded throne", hug="a feather pillow", wpn="the feathered spear", neck="sweetheart neckline", mood="regal"),
+}
+LEG_BUST = {  # slot -> (leg-focus template, bust-focus template); each is "pose // expression // framing code"
+    "base":     ("standing with one long leg stretched forward, a hand on her hip, the {band} in view // {mood} smirk // L",
+                 "leaning forward with both hands on her knees toward the viewer, the {neck} in front // {mood} smile // F"),
+    "evening":  ("perched on {seat} with one leg stretched out and the other drawn up, the {band} in view // {mood} smile // T",
+                 "leaning forward on her forearms over {seat}, hugging {hug} to her chest, looking up // {mood} smile // F"),
+    "swim":     ("lying on her side with one leg stretched out and the other drawn up, wet skin glowing, the thigh in view // {mood} smile // T",
+                 "kneeling and leaning forward with both hands on the ground, hair falling forward, a wink // {mood} wink // F"),
+    "service":  ("sitting on {seat} with her legs crossed and draped over the edge, the thigh strap in view // {mood} smile // S",
+                 "leaning forward with both hands on {seat}, the {neck} toward the viewer, ears tilted // {mood} wink // F"),
+    "robe":     ("sitting on the bed edge with one leg stretched out, the robe parted over the {band} // {mood} half-lidded smile // B",
+                 "kneeling on the bed hugging {hug} to her chest, leaning forward with an arched back // {mood} sleepy smile // F"),
+    "battle":   ("striding forward in a low knee-level view, the armoured stockings and thigh straps elongating her legs // {mood} grin // L",
+                 "leaning forward on {wpn} with both hands, bust-forward toward the viewer // {mood} smile // F"),
+    "seasonal": ("sitting with one leg lifted and crossed over the other, the {band} in view // {mood} smile // T",
+                 "leaning forward with both hands on her knees, a playful look up, the {neck} in front // {mood} laugh // F"),
+}
+for _hk, _d in W.items():
+    for _slot, _o in _d.items():
+        _t = LEG_BUST[_slot]
+        for _tpl in _t:
+            _o["poses"].append(_p(_tpl.format(**PROPS[_hk])))
+
+
 def outfit(hk: str, slot: str) -> dict:
     return W[hk][slot]
 
 
 def check() -> None:
-    assert set(W) == {"mc", "rin", "hana", "yue", "nova", "tsubame", "miel", "kohaku", "shirin", "zlata"} == set(HEIGHTS)
+    assert set(W) == {"mc", "rin", "hana", "yue", "nova", "tsubame", "miel", "kohaku", "shirin", "zlata"} == set(HEIGHTS) == set(FIGURE)
     for hk, d in W.items():
         assert list(d) == SLOTS, (hk, list(d))
         for s, o in d.items():
-            assert len(o["poses"]) == 3 and len(o["hero"]) == 2 and all(len(p) == 2 for p in o["poses"] + o["hero"]), (hk, s)
+            assert len(o["poses"]) == 5 and len(o["hero"]) == 2 and all(len(p) == 3 for p in o["poses"] + o["hero"]), (hk, s)
     for hk, b in HEIGHTS.items():
         assert HEADS_MIN <= b["heads"] <= HEADS_MAX, hk
 

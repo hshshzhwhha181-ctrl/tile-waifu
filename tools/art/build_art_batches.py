@@ -219,18 +219,6 @@ FULL_TAIL = (
     "mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, "
     "no logos, no watermark."
 )
-FULL_BODY = {
-    "mc": "soft shapely figure, defined waist, rounded hips, soft thighs, soft shoulders, a full natural bust in proportion",
-    "rin": "slender figure, long neck, long legs, slim waist, gently rounded hips, a natural bust in proportion",
-    "hana": "athletic toned figure, bare midriff with a flat stomach, long toned legs, a natural bust in proportion, no visible muscle definition",
-    "yue": "statuesque figure, long limbs, regal posture, defined waist, rounded hips, long thighs, a full natural bust in proportion",
-    "nova": "lean toned figure, slim waist, gently rounded hips, long legs, a natural bust in proportion",
-    "tsubame": "lithe slender figure, long legs, slim waist, rounded hips, a natural bust in proportion",
-    "miel": "soft pear-shaped figure with fuller hips and soft thighs, slim waist, a full natural bust in proportion",
-    "kohaku": "soft athletic-soft figure, slim waist, long legs, rounded hips, a full natural bust in proportion",
-    "shirin": "soft shapely figure, defined waist, fuller hips, a full natural bust in proportion, bare midriff",
-    "zlata": "statuesque figure, slim waist, broad regal shoulders, rounded hips, long legs, a full natural bust in proportion",
-}
 FULL_SKIN = {"nova": "fair pale cool-neutral porcelain-peach skin with a soft pink blush (not tanned, not dark)"}
 FULL_H0_SCENES = {
     "match": dict(
@@ -275,9 +263,11 @@ FULL_POSES = {
     },
 }
 FULL_H1_FRAMES = {
-    "base": ("standing with one hip tilted, one hand on her hip, the other hand touching her hair, eyes on the viewer", "confident teasing smile"),
-    "win": ("leaning toward the viewer in a joyful victory pose, one hand holding up a single blank ivory mahjong tile, a wink", "bright laugh with a wink"),
-    "tease": ("glancing back at the viewer over her shoulder, one fingertip at her lips, shoulders turned, hip tilted", "playful flirty smile"),
+    "base": ("standing with one hip tilted, one hand on her hip, the other hand touching her hair, eyes on the viewer", "confident teasing smile", None),
+    "win": ("leaning toward the viewer in a joyful victory pose, one hand holding up a single blank ivory mahjong tile, a wink", "bright laugh with a wink", None),
+    "tease": ("glancing back at the viewer over her shoulder, one fingertip at her lips, shoulders turned, hip tilted", "playful flirty smile", None),
+    "leg": ("perched on the edge of a low table with one long leg stretched out and the other drawn up, the stocking band or thigh strap in view, a hand on her knee", "teasing half-lidded smile", WD.FR["T"]),
+    "bust": ("leaning forward toward the viewer with both hands on her knees and an arched back, hair falling forward", "playful flirty smile", WD.FR["F"]),
 }
 
 
@@ -291,14 +281,14 @@ H0_MC_SLOT = {"match": "base", "summon": "base", "tea": "evening", "shop": "even
 
 def body_line(hk: str) -> str:
     b = WD.HEIGHTS[hk]
-    return f"{b['tag']}, about {b['cm']} cm tall ({b['heads']} heads tall), {FULL_BODY[hk]}"
+    return f"{b['tag']}, about {b['cm']} cm tall ({b['heads']} heads tall), {WD.FIGURE[hk]}"
 
 
 def figure_line(hk: str) -> str:
     """Per-heroine figure sentence of the tail.  Hard floor: a mature adult face and a grown woman's figure, never below WD.HEADS_MIN heads."""
     b = WD.HEIGHTS[hk]
     return (f"Adult woman with grown-woman proportions, {b['heads']} heads tall ({b['cm']} cm, {b['tag']}), {b['legs']}, a mature adult face "
-            f"and figure, a defined waist,")
+            f"and figure, a defined waist, the composition accents her legs, thighs and bust,")
 
 
 def full_prompt(h: dict, outfit: str, pose: str, expr: str, framing: str, setting: str, extra: str = "") -> str:
@@ -358,7 +348,7 @@ def build_H0(H, tail=None):
 # ----------------------------------------------------------------------------------------------------------------------
 def build_H1(H, tail=None):
     b = Batch("H1", base_meta(
-        "H1", "P51", "Canon set, tier Full: 10 heroines x 3 frames (three-quarter base, win, tease)", 3, "Heroines", 330,
+        "H1", "P51", "Canon set, tier Full: 10 heroines x 5 frames (three-quarter base, win, tease, leg-focus, bust-focus)", 3, "Heroines", 530,
         depends_on=["H0"], owner_gate="owner approves the Full tier from the H0 frames; finals pass the anatomy audit and the 45-pair face matrix",
         candidates_policy="search: 6 candidates per frame at 1k medium (1 cr); final: 2 candidates at 2k high (2 cr); post: 30 units of upscale / remove_background at ~1 cr",
         selection=full_selection(["face matrix: no two heroines share a face (pairwise >= 3 of 5 traits differ)",
@@ -369,8 +359,8 @@ def build_H1(H, tail=None):
     for hk in HERO_ORDER:
         h = H[hk]
         setting = f"softly blurred teahouse interior with paper lanterns, background {secondary_color_words(h)}"
-        for fk, (pose, expr) in FULL_H1_FRAMES.items():
-            p = full_prompt(h, WD.outfit(hk, "base")["outfit"], pose, expr, "three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered", setting)
+        for fk, (pose, expr, fr) in FULL_H1_FRAMES.items():
+            p = full_prompt(h, WD.outfit(hk, "base")["outfit"], pose, expr, fr or "three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered", setting)
             tid = f"{hk}_{fk}"
             common = dict(hero_task_fields(h), kind="canon_frame_full", tier="full", prompt=p, quality="medium")
             b.add(f"{tid}.search", stage="search", size=size_gpt("2:3", "1k"), candidates=6, unit_cost_cr=1.0, **common)
@@ -389,28 +379,28 @@ def build_H1(H, tail=None):
 # ----------------------------------------------------------------------------------------------------------------------
 def build_H2(H, tail=None):
     b = Batch("H2", base_meta(
-        "H2", "P55", "Wardrobe, tier Full: 10 heroines x 7 outfits (3 pose candidates + 1 final each)", 3, "Heroines", 350,
+        "H2", "P55", "Wardrobe, tier Full: 10 heroines x 7 outfits (5 pose candidates A-E + 1 final each)", 3, "Heroines", 490,
         depends_on=["H1"], owner_gate="face of every frame matches the H1 canon; owner approves each outfit from the 3-pose search sheet before its final is paid",
-        candidates_policy="search: 3 candidates per outfit at 1k medium (1 cr), candidate n uses prompt_variants[n] (three different poses); final: 1 candidate of the chosen pose at 2k high (2 cr)",
+        candidates_policy="search: 5 candidates per outfit at 1k medium (1 cr), candidate n uses prompt_variants[n] (five different poses A-E: A-C general, D leg-focus, E bust-focus); final: 1 candidate of the chosen pose at 2k high (2 cr)",
         selection=full_selection(["outfit matches the wardrobe table text (colour, cut, legwear band); the heroine identity items stay (hair, horns, ears, glasses, headphones, signature accessories)",
                                   "the three pose candidates are three different poses (not the same pose three times)"]),
         tool_note="gpt_image_2_6 + Elements, tail `v5f`. Outfit slots: base, evening, swim, service (bunny / maid / bartender), robe (sleepwear robe-dress), battle (battle / idol), seasonal.",
-        assumptions=["search 3 x 1 cr + final 1 x 2 cr = 5 cr per outfit, 70 outfits = 350 cr (the Standard-tier H2 was 200 cr)"]))
+        assumptions=["search 5 x 1 cr + final 1 x 2 cr = 7 cr per outfit, 70 outfits = 490 cr (round 2: 350 cr with 3 poses; the Standard-tier H2 was 200 cr)"]))
     b.meta["tier"] = "full"
     for hk in HERO_ORDER:
         h = H[hk]
         for slot in WD.SLOTS:
             o = WD.outfit(hk, slot)
             fr = "full-body view from head to heels, centered"
-            variants = [full_prompt(h, o["outfit"], pose, expr, fr, o["setting"], "") for pose, expr in o["poses"]]
+            variants = [full_prompt(h, o["outfit"], pose, expr, pfr or fr, o["setting"], "") for pose, expr, pfr in o["poses"]]
             tid = f"{hk}_{slot}"
             common = dict(hero_task_fields(h), kind="wardrobe_outfit", tier="full", outfit_name=o["name"], prompt=variants[0], quality="medium")
-            b.add(f"{tid}.search", stage="search", size=size_gpt("2:3", "1k"), candidates=3, unit_cost_cr=1.0, prompt_variants=variants, **common)
-            heroes = [full_prompt(h, o["outfit"], pose, expr, HERO_FRAMING, o["setting"], "SSR splash art, the richest costume of the heroine.") for pose, expr in o["hero"]]
+            b.add(f"{tid}.search", stage="search", size=size_gpt("2:3", "1k"), candidates=5, unit_cost_cr=1.0, prompt_variants=variants, **common)
+            heroes = [full_prompt(h, o["outfit"], pose, expr, HERO_FRAMING, o["setting"], "SSR splash art, the richest costume of the heroine.") for pose, expr, _f in o["hero"]]
             b.add(f"{tid}.final", stage="final", size=size_gpt("2:3", "2k"), candidates=1, unit_cost_cr=2.0, hero_prompt_variants=heroes,
                   **dict(common, quality="high", depends_on_task=f"H2.{tid}.search", seed_policy="replace seed with the winning search candidate seed; use the winning pose (hero_prompt_variants = 2 splash poses for SSR use, H4)"))
     b.meta["pilot"] = pilot_of(b, ["mc_swim.search", "nova_service.search", "kohaku_robe.search"], None,
-                               "3 outfits x 3 poses: the swim, bunny and robe outfits are the ones most likely to trip the generator moderation; look at them before releasing the rest")
+                               "3 outfits x 5 poses: the swim, bunny and robe outfits are the ones most likely to trip the generator moderation; look at them before releasing the rest")
     return b
 
 
@@ -419,11 +409,11 @@ def build_H2(H, tail=None):
 # ----------------------------------------------------------------------------------------------------------------------
 H3_HEROINES = ["mc", "rin", "hana", "yue", "nova"]
 H3_TIERS = {
-    "t1": ("T1 edge (x5): short quick reaction", "leaning in from the side with a wink, one hand on her hip and a tiny wave of the other",
-           "playful wink, small smile", "bust-up, cropped at the ribs, slightly off-center"),
-    "t2": ("T2 exit (x10): confident step", "stepping forward in three-quarter view, a hip tilted, one hand on her hip, the other pointing at the viewer",
-           "confident grin, eyes on the viewer", "three-quarter figure cut at mid-thigh, centered"),
-    "t3": ("T3 showcase (x20): big finish", "arms open wide in a proud presenting gesture with an arched back, hair and ribbons flowing in a breeze",
+    "t1": ("T1 edge (x5): short quick reaction", "leaning in from the side toward the viewer with a wink, bust-forward, one hand on her hip and a tiny wave of the other",
+           "playful wink, small smile", "waist-up to hips view cropped at the thighs, slightly off-center"),
+    "t2": ("T2 exit (x10): confident step", "stepping forward in three-quarter view with one long leg forward and a hip tilted, one hand on her hip, the other pointing at the viewer, the stocking band in view",
+           "confident grin, eyes on the viewer", "three-quarter figure cut at mid-thigh, low camera at knee level that elongates the legs, centered"),
+    "t3": ("T3 showcase (x20): big finish", "arms open wide in a proud presenting gesture with an arched back and a hip tilt, hair and ribbons flowing in a breeze",
            "radiant triumphant smile, eyes on the viewer", "three-quarter figure cut at mid-thigh with clear headroom, centered"),
 }
 
@@ -471,7 +461,7 @@ def build_H4(H, tail=None):
     for hk, slot in H4_PICK.items():
         h = H[hk]
         o = WD.outfit(hk, slot)
-        for n, (pose, ex) in enumerate(o["hero"], 1):
+        for n, (pose, ex, _f) in enumerate(o["hero"], 1):
             p = full_prompt(h, o["outfit"], pose, ex, HERO_FRAMING, "grand showcase backdrop: " + o["setting"],
                             "SSR key art, richest costume of the heroine, layered fabric, gold accents reserved for the outfit.")
             common = dict(hero_task_fields(h), kind="ssr_keyart_full", tier="full", prompt=p, quality="medium", outfit_source=f"{hk}.{slot}", hero_pose=n)
