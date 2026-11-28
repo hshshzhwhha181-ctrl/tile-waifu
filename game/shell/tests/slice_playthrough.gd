@@ -53,12 +53,12 @@ static func run(host: LegacyHost) -> void:
 	match mode:
 		"play":
 			await s._play()
-		"goldens", "tour":
+		"goldens", "tour", "reel", "boot":
 			await TWSliceGoldens.run(s)
 		"perf":
 			await TWSlicePerf.run(s)
 		_:
-			printerr("SLICE: unknown mode '%s' (play | goldens | perf)" % mode)
+			printerr("SLICE: unknown mode '%s' (play | goldens | tour | reel | boot | perf)" % mode)
 			host.get_tree().quit(2)
 
 

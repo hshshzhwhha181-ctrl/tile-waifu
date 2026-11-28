@@ -70,7 +70,7 @@ def main() -> int:
         if not os.environ.get("DISPLAY") and shutil.which("xvfb-run"):
             cmd += ["xvfb-run", "-a", "-s", "-screen 0 720x1280x24 -nolisten tcp"]
         cmd += [godot, "--rendering-driver", "opengl3", "--audio-driver", "Dummy", "--resolution", "720x1280", "--fixed-fps", "60",
-                "--path", str(GAME), "res://shell/main_v11.tscn", "--", "--slice=tour", f"--slice_out={frames}", f"--slice_every={a.every}"]
+                "--path", str(GAME), "res://shell/main_v11.tscn", "--", "--slice=tour", f"--slice_out={frames}", f"--slice_every={a.every}", "--v7_hour=12"]
         p = subprocess.run(cmd, env=env, capture_output=True, text=True, timeout=a.timeout, errors="replace")
         log = p.stdout + p.stderr
         (out / "tour.log").write_text("\n".join(ln for ln in log.splitlines() if "SLICE" in ln or "ERROR" in ln) + "\n", encoding="utf-8")

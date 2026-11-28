@@ -5,6 +5,10 @@ extends RefCounted
 #
 #   godot --path game --rendering-driver opengl3 --resolution 720x1280 --fixed-fps 60 res://shell/main_v11.tscn -- --slice=goldens --slice_out=<dir>
 #       -> <dir>/<screen>.png for home, match, result, collection, wish, shop   (+ "SLICE_SHOT <screen> WxH <bytes>" lines)
+#   ... -- --slice=reel --slice_out=<dir> [--slice_every=4] [--slice_seconds=90] [--slice_pace=14]   (P38)
+#       -> <dir>/f_00001.jpg ... a screen recording of ~N seconds of GAME time (fixed 60 fps): Home, then rounds played by the solver bot at a
+#          human pace (--slice_pace frames per tap), each ending on the real victory modal and its button, then Collection, Wish, Shop
+#   ... -- --slice=boot        -> "SLICE_BOOT engine_to_host_ms=.. home_ms=.. board_ms=.. static_mem_mb=.." (P38 cold-start numbers, see _boot)
 #   ... -- --slice=tour --slice_out=<dir> [--slice_every=6]
 #       -> <dir>/f_00001.png ... one PNG every N frames of a whole round: Home -> Match (real time, bot) -> Result -> Collection -> Wish -> Shop
 #
@@ -44,6 +48,10 @@ static func run(slice: TWSlice) -> void:
 	slice.start_dog()
 	if TWSlice.arg("slice") == "tour":
 		await g._tour()
+	elif TWSlice.arg("slice") == "reel":
+		await g._reel()
+	elif TWSlice.arg("slice") == "boot":
+		await g._boot()
 	else:
 		await g._shots()
 	V10Meta.clear_now()
@@ -160,6 +168,7 @@ func _shots() -> void:
 
 var _n: = 0
 var _every: = 6
+var _jpg: = false
 
 
 func _tick() -> void:
@@ -168,7 +177,10 @@ func _tick() -> void:
 	if _n % _every == 0:
 		var img: = s.h.get_viewport().get_texture().get_image()
 		img.convert(Image.FORMAT_RGB8)
-		img.save_png(out_dir.path_join("f_%05d.png" % (_n / _every)))
+		if _jpg:
+			img.save_jpg(out_dir.path_join("f_%05d.jpg" % (_n / _every)), 0.86)
+		else:
+			img.save_png(out_dir.path_join("f_%05d.png" % (_n / _every)))
 
 
 func _tour_frames(n: int) -> void:
@@ -212,3 +224,79 @@ func _tour() -> void:
 	s.check(_n > 100, "tour: %d frames recorded" % _n)
 	print("SLICE_TOUR frames=%d every=%d" % [_n / _every, _every])
 	print("SLICE_SELFTEST %d/%d" % [s.ok, s.total])
+
+
+# ---- the reel (P38): ~N seconds of game time for the owner's gate package ----------------------------------------------------------
+
+func _reel() -> void:
+	_jpg = true
+	_every = maxi(1, int(TWSlice.arg("slice_every", "4")))
+	var budget: = int(float(TWSlice.arg("slice_seconds", "90")) * 60.0)
+	var pace: = maxi(2, int(TWSlice.arg("slice_pace", "14")))
+	var tail: = 3 * 180          # Collection, Wish, Shop: 3 s each
+	await _tour_frames(30)
+	await s.h.open("home", {})
+	await _tour_frames(150)      # 2.5 s on Home
+	var round_i: = 0
+	var taps_total: = 0
+	var wins: = 0
+	while _n < budget - tail:
+		var facts: = {"wins_before": 5 + round_i, "partner": "rin", "chapter_has_3star": true}
+		var cfg: = _cfg()
+		cfg["seed"] = MATCH_SEED + round_i * 13
+		s.hide_legacy(true)
+		await s.h.tw_screens.go("match", {"cfg": cfg, "tile_size": "L", "result_facts": facts, "round_state": {"partner": "rin"}})
+		var m: = s.h.tw_screens.current as TWMatchScreen
+		if m == null:
+			s.check(false, "reel: the match screen mounts (round %d)" % round_i)
+			return
+		await _tour_frames(40)
+		var guard: = 0
+		while not m.ended and guard < 300 and _n < budget - tail + 900:
+			guard += 1
+			var id: = m.board.solver_move()
+			if id < 0:
+				break
+			m.tap_tile(id)
+			taps_total += 1
+			await _tour_frames(pace)
+		await _tour_frames(150)
+		if m.ended and m.result_modal != null:
+			wins += 1
+			await _tour_frames(60)
+			m.result_modal.cta.pressed.emit()
+		await _tour_frames(10)
+		await s.leave_match()
+		round_i += 1
+		if _n < budget - tail:
+			await s.h.open("home", {})
+			await _tour_frames(60)
+	for id in ["collection", "summon", "shop"]:
+		await s.h.open(id, {})
+		await _tour_frames(180)
+	s.check(wins == round_i and wins >= 1, "reel: %d rounds, %d victory modals" % [round_i, wins])
+	print("SLICE_REEL frames=%d every=%d game_seconds=%.1f rounds=%d taps=%d wins=%d" % [_n / _every, _every, _n / 60.0, round_i, taps_total, wins])
+	print("SLICE_SELFTEST %d/%d" % [s.ok, s.total])
+
+
+# ---- cold start (P38): engine milliseconds (Time.get_ticks_msec counts from the engine's start) at three moments ------------------------
+# host = this runner was called by the ready LegacyHost (engine + PCK + autoloads + the shell scene); home = the first DRAWN frame with the Home
+# screen up; board = the first DRAWN frame with a 60-tile v11 match board up. A fresh profile: no save, no caches. tools/slice_boot.py adds the
+# wall clock of the whole process (spawn -> that line) around it.
+
+func _boot() -> void:
+	var t_host: = Time.get_ticks_msec()
+	s.prepare_save(FROZEN_UNIX)
+	V10TutState.skip()
+	var t0: = Time.get_ticks_msec()
+	await s.h.open("home", {})
+	await RenderingServer.frame_post_draw
+	var t_home: = Time.get_ticks_msec()
+	s.hide_legacy(true)
+	await s.h.tw_screens.go("match", {"cfg": _cfg(), "tile_size": "L", "result_facts": {}, "round_state": {"partner": "rin"}})
+	await RenderingServer.frame_post_draw
+	var t_board: = Time.get_ticks_msec()
+	var mem: = float(OS.get_static_memory_peak_usage()) / 1048576.0
+	print("SLICE_BOOT engine_to_host_ms=%d home_ms=%d board_ms=%d static_mem_peak_mb=%.0f" % [t_host, t_home - t0, t_board - t0, mem])
+	V10Meta.clear_now()
+	s.h.get_tree().quit(0)

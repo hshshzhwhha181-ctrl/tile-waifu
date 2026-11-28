@@ -60,7 +60,7 @@ def render(godot: str, size: str, out: Path, timeout: int) -> tuple[int, str]:
         if not os.environ.get("DISPLAY") and shutil.which("xvfb-run"):
             cmd += ["xvfb-run", "-a", "-s", f"-screen 0 {w}x{h}x24 -nolisten tcp"]
         cmd += [godot, "--rendering-driver", "opengl3", "--audio-driver", "Dummy", "--resolution", size, "--fixed-fps", "60",
-                "--path", str(GAME), "res://shell/main_v11.tscn", "--", "--slice=goldens", f"--slice_out={out}"]
+                "--path", str(GAME), "res://shell/main_v11.tscn", "--", "--slice=goldens", f"--slice_out={out}", "--v7_hour=12"]   # DayNight tints Home by the SYSTEM hour: pin it (P38)
         try:
             p = subprocess.run(cmd, env=env, capture_output=True, text=True, timeout=timeout, errors="replace")
             return p.returncode, p.stdout + p.stderr
