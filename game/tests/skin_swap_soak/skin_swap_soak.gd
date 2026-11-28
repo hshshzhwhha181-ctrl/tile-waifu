@@ -1,7 +1,10 @@
 class_name TWSkinSwapSoak
 extends RefCounted
 
-# skin_swap_soak (design/specs/UNIFIED_QA_PLAN.md section 4, test T-SOAK-1):  godot --headless --path game res://tests/skin_swap_soak/skin_swap_soak.tscn
+# skin_swap_soak (design/specs/UNIFIED_QA_PLAN.md section 4, test T-SOAK-1; P96 T11/T13/T15d):
+#   Headless: godot --headless --path game res://tests/skin_swap_soak/skin_swap_soak.tscn
+#   Render:   xvfb-run godot --rendering-driver opengl3 --display-driver x11 --resolution 720x1280 \
+#             --path game res://tests/skin_swap_soak/skin_swap_soak.tscn -- --require_render=1
 # Prints "TWSKINSOAK_SELFTEST ok/total OK pending=N". Exit 0 when all pass. Pending items are NOT failures: they are the checks that need the
 # P-skin package (TWSkinHost / TWPalette / TWSkinPerf / pack mount) and are listed one per line "TWSKINSOAK PENDING ...".
 #
@@ -9,12 +12,14 @@ extends RefCounted
 #   * builds N_MANIFESTS synthetic skin manifests (all tiers x themes x 10 heroines, deterministic RNG seed 7) + loads 2 real fixtures
 #     (valid sample, invalid-hex sample) from res://tests/fixtures/skins/
 #   * swaps through them N_SWAPS times via TWSkinHostStub -> TWSkin.apply (the REAL shell token layer) -> group "tw_skinned" -> TWBus
-#   * after every swap checks: current id, revision +1, every override visible, NO leak of the previous skin, locked tokens untouched,
-#     overrides only from slots of that HUD level, exactly 1 _skin_changed per live widget, a skin.committed event
-#   * every 25th swap injects a BAD manifest (hex / locked slot / wrong HUD level / unknown slot): must be rejected ATOMICALLY
-#     (TWSkin.current, revision and overrides identical to before) and published as skin.failed with the right code
+#   * tracks live skin-slot Texture2D instances via TWSkinHostStub.Session WeakRefs: 0 leaked Texture2Ds after swaps, 0 after clear()
+#   * verifies host-owned rejected_count is preserved across TWSkin.apply calls (T11)
+#   * verifies OKLab mix differs from sRGB lerp by >= 0.02 OKLab dist (~dE >= 2) on a saturated pair (T15d)
+#   * runs AT-S22 / T-CMP-1 compliance snapshot check (draw-command list + tree properties + locked tokens == 0 diff across tiers;
+#     secondary pixel hash checked when rendering device is present)
+#   * runs pixel check of skinned TWPlate rim across two distinct skins (when --require_render=1, empty image = FAIL, never PENDING)
 #   * replay determinism (same seed => same FNV-1a hash of the whole swap history; other seed => other hash)
-#   * no growth: object count, node count and static memory after a warm-up
+#   * no growth: object count, node count, live Texture2D count and static memory after a warm-up
 #   * reset() returns to the base style
 # Gap found while writing it (documented, G-01): TWSkin.apply itself accepts ANY existing token incl. BTN_CASH_* / PAPER_*; the lock must live in TWSkinHost.
 
@@ -26,6 +31,7 @@ const BAD_EVERY: = 25
 const SEED: = 7
 const MAX_OBJECT_GROWTH: = 40            # [ГИПОТЕЗА] verify: run with N_SWAPS=3000 and watch the slope, tighten to 0..10
 const MAX_STATIC_GROWTH_BYTES: = 1500000  # [ГИПОТЕЗА]
+const MAX_LIVE_TEX_GROWTH: = 0           # P96 (T11/T15d): live skin-slot Texture2D count must equal active slots (0 leaks)
 const P95_SWAP_USEC: = 20000             # [ГИПОТЕЗА] logic-only budget on software GL; the real budget is "commit <= 400 ms" (SKIN_HUD_SYSTEM 4.10)
 
 var checks: = 0
@@ -35,10 +41,12 @@ var _host: Node
 var _data: Dictionary = {}
 var _manifests: Array = []
 var _bus: = TWBus.new()
+var _session: = TWSkinHostStub.Session.new()
 var _probes: Array = []
 var _plates: Array = []
 var _base: Dictionary = {}            # TOKEN -> base Color, read once from TWTokens
 var n_swaps: = N_SWAPS_DEFAULT        # nightly: --soak_swaps=3000 (user arg after "--")
+var require_render: = false           # P96: --require_render=1 turns headless empty-image pixel check into FAIL
 
 
 class Probe extends Node:
@@ -63,15 +71,21 @@ func todo(what: String) -> void:
 func run(host: Node) -> Array:
 	_host = host
 	for a in OS.get_cmdline_user_args():
-		if (a as String).begins_with("--soak_swaps="):
-			n_swaps = clampi(int((a as String).get_slice("=", 1)), 60, 100000)
+		var s: = str(a)
+		if s.begins_with("--soak_swaps="):
+			n_swaps = clampi(int(s.get_slice("=", 1)), 60, 100000)
+		elif s == "--require_render=1" or s == "--require_render":
+			require_render = true
 	TWSkin.reset()
+	_session.clear()
 	_load()
 	_fixtures()
 	_synthetic()
 	_stub_contract()
+	_oklab_contract()
 	_widgets()
 	await _soak()
+	await _compliance_snapshot_check()
 	_replay()
 	_reset()
 	_pending_list()
@@ -108,8 +122,10 @@ func _fixtures() -> void:
 	var rb: = TWSkinHostStub.resolve(b, _data)
 	ok(not rb["ok"] and (rb["errors"] as Array).has("SL-PAL-01"), "invalid-hex sample is rejected with SL-PAL-01: %s" % [rb["errors"]])
 	var before: = TWSkin.revision
-	var res: = TWSkinHostStub.swap(b, _data, _bus)
+	var rej0: = _session.rejected_count
+	var res: = TWSkinHostStub.swap(b, _data, _bus, _session)
 	ok(not res["ok"] and TWSkin.revision == before and TWSkin.current == "", "rejected sample leaves TWSkin untouched (atomic)")
+	ok(_session.rejected_count == rej0 + 1 and _session.live_texture_count() == 0, "rejected sample increments host rejected_count and allocates 0 textures")
 	_manifests.append(v)
 
 
@@ -182,6 +198,23 @@ func _stub_contract() -> void:
 		"slot table names constants missing in TWTokens (pending PAL-0001): %s" % [r2["pending_tokens"]])
 
 
+func _oklab_contract() -> void:
+	# T15d: OKLab mix in stub vs sRGB lerp must differ by >= dE 1 (>= 0.01 OKLab dist) on palette pairs
+	var c_a: Color = TWSkinHostStub.color_of("H500", _data["heroes"]["mc"], {}, _data["neutrals"])
+	var c_b: Color = TWSkinHostStub.color_of("T2", {}, _data["themes"]["TIDE"], _data["neutrals"])
+	var dist_hue: = TWSkinHostStub.oklab_distance(TWSkinHostStub.mix_oklab(c_a, c_b, 0.5), c_a.lerp(c_b, 0.5))
+	ok(dist_hue >= 0.01, "T15d OKLab mix differs from sRGB lerp on hue pair (oklab_dist=%.4f >= 0.01)" % dist_hue)
+	var c_dark: Color = TWSkin.c("NIGHT_900")
+	var c_light: Color = TWSkin.c("PAPER_100")
+	var dist_lum: = TWSkinHostStub.oklab_distance(TWSkinHostStub.mix_oklab(c_dark, c_light, 0.5), c_dark.lerp(c_light, 0.5))
+	ok(dist_lum >= 0.02, "T15d OKLab mix differs from sRGB lerp on luminance pair (oklab_dist=%.4f >= 0.02)" % dist_lum)
+	# Endpoints must match identically
+	var end0: = TWSkinHostStub.mix_oklab(c_a, c_b, 0.0)
+	var end1: = TWSkinHostStub.mix_oklab(c_a, c_b, 1.0)
+	ok(TWSkinHostStub.oklab_distance(end0, c_a) < 0.001 and TWSkinHostStub.oklab_distance(end1, c_b) < 0.001,
+		"T15d OKLab mix preserves endpoints t=0 and t=1")
+
+
 # four ways a manifest can try to cheat, each with the code that must reject it
 func _bad_variants(m: Dictionary) -> Array:
 	var out: Array = []
@@ -232,15 +265,19 @@ func _token_names() -> Array:
 	return names
 
 
+func _fnv1a_str(h: int, s: String) -> int:
+	for ch in s.to_utf8_buffer():
+		h = ((h ^ int(ch)) * 16777619) & 0xFFFFFFFF
+	return h
+
+
 func _history_hash(h: int, id: String, ov: Dictionary) -> int:
 	var s: = id
 	var keys: Array = ov.keys()
 	keys.sort()
 	for k in keys:
 		s += "|%s=%s" % [k, (ov[k] as Color).to_html(false)]
-	for ch in s.to_utf8_buffer():
-		h = ((h ^ int(ch)) * 16777619) & 0xFFFFFFFF
-	return h
+	return _fnv1a_str(h, s)
 
 
 func _run_sequence(seed_: int, n: int, with_checks: bool) -> Dictionary:
@@ -254,6 +291,8 @@ func _run_sequence(seed_: int, n: int, with_checks: bool) -> Dictionary:
 	var obj0: = 0
 	var node0: = 0
 	var mem0: = 0
+	var host_rej0: = _session.rejected_count
+	var max_tex_excess: = 0
 	for i in n:
 		if i == WARMUP and with_checks:
 			obj0 = int(Performance.get_monitor(Performance.OBJECT_COUNT))
@@ -267,11 +306,15 @@ func _run_sequence(seed_: int, n: int, with_checks: bool) -> Dictionary:
 			var snap_id: = TWSkin.current
 			var snap_rev: = TWSkin.revision
 			var snap_ov: = TWSkin.overrides()
-			var res: = TWSkinHostStub.swap(v["m"], _data, _bus)
+			var snap_tex_n: = _session.active_slot_count()
+			var rej_before: = _session.rejected_count
+			var res: = TWSkinHostStub.swap(v["m"], _data, _bus, _session if with_checks else null)
 			rejected += 1
 			if with_checks:
 				ok(not res["ok"] and res["code"] == v["code"], "swap %d: bad manifest '%s' rejected with %s (got %s)" % [i, v["name"], v["code"], res["code"]])
 				ok(TWSkin.current == snap_id and TWSkin.revision == snap_rev and TWSkin.overrides() == snap_ov, "swap %d: rejection is atomic (state identical)" % i)
+				ok(_session.rejected_count == rej_before + 1 and _session.active_slot_count() == snap_tex_n,
+					"swap %d: host rejected_count incremented and active textures untouched" % i)
 				var last: Dictionary = _bus.recent(1)[0]
 				ok(last.get("t", "") == "skin.failed" and last.get("code", "") == v["code"], "swap %d: skin.failed event with code" % i)
 			continue
@@ -280,12 +323,15 @@ func _run_sequence(seed_: int, n: int, with_checks: bool) -> Dictionary:
 		for p in _probes:
 			hits0.append(p.hits)
 		var t0: = Time.get_ticks_usec()
-		var r: = TWSkinHostStub.swap(m, _data, _bus)
+		var r: = TWSkinHostStub.swap(m, _data, _bus, _session if with_checks else null)
 		usec.append(Time.get_ticks_usec() - t0)
 		committed += 1
 		hist = _history_hash(hist, m["id"], r["overrides"])
 		if not with_checks:
 			continue
+		var tex_excess: = _session.live_texture_count() - _session.active_slot_count()
+		if tex_excess > max_tex_excess:
+			max_tex_excess = tex_excess
 		ok(r["ok"], "swap %d: %s committed" % [i, m["id"]])
 		ok(TWSkin.current == m["id"] and TWSkin.revision == rev0 + 1, "swap %d: current=id and revision+1" % i)
 		var ov: Dictionary = r["overrides"]
@@ -312,7 +358,12 @@ func _run_sequence(seed_: int, n: int, with_checks: bool) -> Dictionary:
 		ok(hit_ok, "swap %d: each live widget got exactly one _skin_changed" % i)
 		var ev: Dictionary = _bus.recent(1)[0]
 		ok(ev.get("t", "") == "skin.committed" and ev.get("skin", "") == m["id"], "swap %d: skin.committed published" % i)
-	return {"hash": hist, "usec": usec, "committed": committed, "rejected": rejected, "obj0": obj0, "node0": node0, "mem0": mem0}
+	return {
+		"hash": hist, "usec": usec, "committed": committed, "rejected": rejected,
+		"obj0": obj0, "node0": node0, "mem0": mem0,
+		"host_rej_delta": _session.rejected_count - host_rej0,
+		"max_tex_excess": max_tex_excess,
+	}
 
 
 func _within_level(ov: Dictionary, level: int) -> bool:
@@ -335,8 +386,14 @@ func _soak() -> void:
 	var obj1: = int(Performance.get_monitor(Performance.OBJECT_COUNT))
 	var node1: = int(Performance.get_monitor(Performance.OBJECT_NODE_COUNT))
 	var mem1: = int(Performance.get_monitor(Performance.MEMORY_STATIC))
+	var live_tex: = _session.live_texture_count()
+	var active_tex: = _session.active_slot_count()
 	ok(r["committed"] + r["rejected"] == n_swaps, "soak ran %d steps (%d committed, %d rejected)" % [n_swaps, r["committed"], r["rejected"]])
 	ok(r["rejected"] >= n_swaps / BAD_EVERY - 1, "the soak really injected bad manifests (%d)" % r["rejected"])
+	ok(int(r["host_rej_delta"]) == int(r["rejected"]), "T11 host rejected_count persisted across TWSkin.apply (%d == %d)" % [r["host_rej_delta"], r["rejected"]])
+	ok(active_tex > 0 and live_tex - active_tex <= MAX_LIVE_TEX_GROWTH and int(r["max_tex_excess"]) <= MAX_LIVE_TEX_GROWTH,
+		"P96 live Texture2D count matches active skin slots (live=%d active=%d max_excess=%d alloc=%d released=%d)" % [
+			live_tex, active_tex, r["max_tex_excess"], _session.total_allocated, _session.total_released])
 	ok(obj1 - int(r["obj0"]) <= MAX_OBJECT_GROWTH, "no object growth after warm-up: %d -> %d (<= +%d)" % [r["obj0"], obj1, MAX_OBJECT_GROWTH])
 	ok(node1 == int(r["node0"]), "node count constant after warm-up: %d -> %d" % [r["node0"], node1])
 	ok(mem1 - int(r["mem0"]) <= MAX_STATIC_GROWTH_BYTES, "static memory growth %d bytes (<= %d)" % [mem1 - int(r["mem0"]), MAX_STATIC_GROWTH_BYTES])
@@ -346,26 +403,24 @@ func _soak() -> void:
 	ok(p95 <= P95_SWAP_USEC, "swap logic p95 %d us <= %d us" % [p95, P95_SWAP_USEC])
 	ok(_bus.published - pub0 >= n_swaps, "TWBus published >= 1 event per step (%d)" % (_bus.published - pub0))
 	ok(_bus.dropped == 0, "TWBus dropped nothing")
-	# one real pixel check (skipped if the headless renderer gives no image)
+	# real pixel check (in render CI with --require_render=1, empty image = FAIL, never PENDING)
 	await _pixel_check()
-	print("TWSKINSOAK INFO soak p95=%d us, committed=%d, rejected=%d, objects %d->%d" % [p95, r["committed"], r["rejected"], r["obj0"], obj1])
+	print("TWSKINSOAK INFO soak p95=%d us, committed=%d, rejected=%d, live_tex=%d/%d, objects %d->%d" % [
+		p95, r["committed"], r["rejected"], live_tex, active_tex, r["obj0"], obj1])
 
 
-func _pixel_check() -> void:
-	var m: Dictionary = _manifests[0]                                  # real valid sample: rim = T3 of MOON
-	var r: = TWSkinHostStub.swap(m, _data, _bus)
-	var rim: Color = r["overrides"]["PLATE_RIM"]
-	var pl: Control = _plates[0]
+func _render_control_image(ctrl: Control, sz: Vector2i) -> Image:
 	var vp: = SubViewport.new()
-	vp.size = Vector2i(328, 80)
+	vp.size = sz
 	vp.transparent_bg = true
 	vp.render_target_update_mode = SubViewport.UPDATE_ONCE
 	_host.add_child(vp)
-	var par: = pl.get_parent()
-	par.remove_child(pl)
-	vp.add_child(pl)
-	pl.position = Vector2.ZERO
-	# bounded wait: a headless/dummy renderer may never emit frame_post_draw (then the pixel check goes to PENDING, the test must not hang)
+	var par: = ctrl.get_parent()
+	if par != null:
+		par.remove_child(ctrl)
+	vp.add_child(ctrl)
+	ctrl.position = Vector2.ZERO
+	# bounded wait: a headless/dummy renderer may never emit frame_post_draw (must not hang)
 	var drawn: Array = [false]
 	RenderingServer.frame_post_draw.connect(func() -> void: drawn[0] = true, CONNECT_ONE_SHOT)
 	var t0: = Time.get_ticks_msec()
@@ -374,14 +429,152 @@ func _pixel_check() -> void:
 	var img: Image = null
 	if drawn[0] and vp.get_texture() != null:
 		img = vp.get_texture().get_image()
-	vp.remove_child(pl)
-	par.add_child(pl)
+	vp.remove_child(ctrl)
+	if par != null:
+		par.add_child(ctrl)
 	vp.queue_free()
-	if img == null or img.is_empty():
-		todo("pixel check of the skinned TWPlate rim needs a rendering device (headless/dummy renderer returned no image)")
+	return img
+
+
+func _expected_mid_rim_color() -> Color:
+	# TWDraw.plate_surface draws rr_pts (rad=10 on h=80 -> vertical edge vertices at y=10, t=0.125 and y=70, t=0.875)
+	# with 3-stop gradient [0.0=PLATE_SPARK, 0.5=PLATE_RIM, 1.0=GOLD_700]. Midpoint (0, 40) interpolates those two corners:
+	var c_top_corner: = TWSkin.c("PLATE_SPARK").lerp(TWSkin.c("PLATE_RIM"), 0.25)
+	var c_bot_corner: = TWSkin.c("PLATE_RIM").lerp(TWSkin.c("GOLD_700"), 0.75)
+	return c_top_corner.lerp(c_bot_corner, 0.5)
+
+
+func _pixel_check() -> void:
+	var fails0: = fails
+	var m1: Dictionary = _manifests[0]                                  # real valid sample: rim = T3 of MOON
+	var r1: = TWSkinHostStub.swap(m1, _data, _bus, _session)
+	var rim1: Color = r1["overrides"]["PLATE_RIM"]
+	var exp_mid1: = _expected_mid_rim_color()
+	var pl: TWPlate = _plates[0] as TWPlate
+	var prev_focused: = pl.focused
+	pl.focused = true                                                   # rim_a = 1.0 for opaque rim verification
+	var img1: Image = await _render_control_image(pl, Vector2i(328, 80))
+	if img1 == null or img1.is_empty():
+		pl.focused = prev_focused
+		if require_render:
+			ok(false, "P96 pixel check (--require_render=1): rendering device returned empty image (headless/dummy?)")
+			print("TWSKINSOAK PIXEL_CHECK FAIL (empty image with --require_render=1)")
+		else:
+			todo("pixel check of the skinned TWPlate rim needs a rendering device (headless/dummy renderer returned no image)")
+			print("TWSKINSOAK PIXEL_CHECK PENDING")
 		return
-	var px: = img.get_pixel(160, 1)
-	ok(px.is_equal_approx(rim) or absf(px.r - rim.r) + absf(px.g - rim.g) + absf(px.b - rim.b) < 0.45, "skinned plate rim pixel %s near override %s" % [px.to_html(false), rim.to_html(false)])
+	var px1: = img1.get_pixel(0, 40)
+	ok(absf(px1.r - exp_mid1.r) + absf(px1.g - exp_mid1.g) + absf(px1.b - exp_mid1.b) < 0.12,
+		"skinned plate mid rim pixel %s matches interpolated PLATE_RIM %s" % [px1.to_html(false), exp_mid1.to_html(false)])
+	# Second distinct skin with a different PLATE_RIM: rendered pixels must actually change
+	var m2: Dictionary = {}
+	for cand in _manifests:
+		var rc: = TWSkinHostStub.resolve(cand, _data)
+		if rc["ok"] and (rc["overrides"] as Dictionary).has("PLATE_RIM"):
+			var c2: Color = rc["overrides"]["PLATE_RIM"]
+			if absf(c2.r - rim1.r) + absf(c2.g - rim1.g) + absf(c2.b - rim1.b) > 0.25:
+				m2 = cand
+				break
+	if not m2.is_empty():
+		TWSkinHostStub.swap(m2, _data, _bus, _session)
+		var exp_mid2: = _expected_mid_rim_color()
+		var img2: Image = await _render_control_image(pl, Vector2i(328, 80))
+		ok(img2 != null and not img2.is_empty(), "second skin renders non-empty image")
+		if img2 != null and not img2.is_empty():
+			var px2: = img2.get_pixel(0, 40)
+			ok(absf(px2.r - exp_mid2.r) + absf(px2.g - exp_mid2.g) + absf(px2.b - exp_mid2.b) < 0.12,
+				"second skin mid rim pixel %s matches interpolated PLATE_RIM %s" % [px2.to_html(false), exp_mid2.to_html(false)])
+			ok(not px1.is_equal_approx(px2), "swapping skins visibly changes rendered rim pixel (%s -> %s)" % [px1.to_html(false), px2.to_html(false)])
+	pl.focused = prev_focused
+	print("TWSKINSOAK PIXEL_CHECK %s" % ("PASS" if fails == fails0 else "FAIL"))
+
+
+func _compliance_snapshot(root: Control) -> String:
+	# AT-S22 / T-CMP-1 (P96 / T13): deterministic draw-command + tree-property + locked-token snapshot
+	var parts: Array = []
+	var locked: Array = (_data["locked_tokens"] as Array).duplicate()
+	locked.sort()
+	for tok in locked:
+		parts.append("tok:%s=%s" % [tok, TWSkin.c(str(tok)).to_html(true)])
+	var stack: Array = [root]
+	while not stack.is_empty():
+		var n: Node = stack.pop_back()
+		if n is Control:
+			var c: Control = n as Control
+			parts.append("node:%s|%s|%.1f,%.1f,%.1f,%.1f|mod=%s" % [
+				c.name, c.get_class(), c.position.x, c.position.y, c.size.x, c.size.y, c.modulate.to_html(true)])
+		if n is ColorRect:
+			var cr: ColorRect = n as ColorRect
+			parts.append("draw:rect|%s|color=%s" % [cr.name, cr.color.to_html(true)])
+		elif n is Label:
+			var lb: Label = n as Label
+			parts.append("draw:label|%s|text=%s|color=%s" % [lb.name, lb.text, lb.get_theme_color("font_color").to_html(true)])
+		var kids: Array = n.get_children()
+		for idx in range(kids.size() - 1, -1, -1):
+			stack.append(kids[idx])
+	return "|".join(parts)
+
+
+func _compliance_snapshot_check() -> void:
+	# Build a compliance surface (S34-like confirm sheet using only locked compliance tokens)
+	var sheet: = Control.new()
+	sheet.name = "ComplianceSheetS34"
+	sheet.size = Vector2(360, 120)
+	var bg: = ColorRect.new()
+	bg.name = "BgPaper"
+	bg.size = Vector2(360, 120)
+	bg.color = TWSkin.c("PAPER_100")
+	sheet.add_child(bg)
+	var btn: = ColorRect.new()
+	btn.name = "BtnCash"
+	btn.position = Vector2(20, 64)
+	btn.size = Vector2(320, 44)
+	btn.color = TWSkin.c("BTN_CASH_MID")
+	sheet.add_child(btn)
+	var lbl: = Label.new()
+	lbl.name = "Disclaimer"
+	lbl.position = Vector2(20, 12)
+	lbl.size = Vector2(320, 40)
+	lbl.text = "18+ / Confirm"
+	lbl.add_theme_color_override("font_color", TWSkin.c("INK_900"))
+	sheet.add_child(lbl)
+	_host.add_child(sheet)
+
+	# Pick one manifest per tier (base, s, ssr, ssrp)
+	var picks: Array = []
+	for tname in ["base", "s", "ssr", "ssrp"]:
+		for m in _manifests:
+			if str(m.get("tier", "")) == tname:
+				picks.append(m)
+				break
+
+	TWSkin.reset()
+	var base_snap: = _compliance_snapshot(sheet)
+	var base_img: Image = await _render_control_image(sheet, Vector2i(360, 120))
+	var base_px_hash: = base_img.get_data().hex_encode().md5_text() if (base_img != null and not base_img.is_empty()) else ""
+
+	var all_tree_eq: = true
+	var all_px_eq: = true
+	for m in picks:
+		TWSkinHostStub.swap(m, _data, _bus, _session)
+		# Refresh locked compliance colours from TWSkin (must be unchanged across every tier)
+		bg.color = TWSkin.c("PAPER_100")
+		btn.color = TWSkin.c("BTN_CASH_MID")
+		lbl.add_theme_color_override("font_color", TWSkin.c("INK_900"))
+		if _compliance_snapshot(sheet) != base_snap:
+			all_tree_eq = false
+		if base_px_hash != "":
+			var cur_img: Image = await _render_control_image(sheet, Vector2i(360, 120))
+			if cur_img == null or cur_img.is_empty() or cur_img.get_data().hex_encode().md5_text() != base_px_hash:
+				all_px_eq = false
+
+	ok(picks.size() == 4 and all_tree_eq, "AT-S22 compliance draw-command & tree snapshot identical across all 4 skin tiers")
+	if base_px_hash != "":
+		ok(all_px_eq, "AT-S22 secondary compliance pixel hash identical across all 4 skin tiers")
+	elif require_render:
+		ok(false, "AT-S22 secondary pixel check (--require_render=1): compliance SubViewport returned empty image")
+
+	sheet.queue_free()
 
 
 func _replay() -> void:
@@ -395,8 +588,10 @@ func _replay() -> void:
 func _reset() -> void:
 	var rev: = TWSkin.revision
 	TWSkin.reset()
+	_session.clear()
 	ok(TWSkin.current == "" and TWSkin.overrides().is_empty() and TWSkin.revision == rev + 1, "reset() returns to the base style and bumps the revision")
 	ok(TWSkin.c("PLATE_RIM") == TWTokens.PLATE_RIM, "base token value restored")
+	ok(_session.live_texture_count() == 0, "P96 live Texture2D count returns to 0 after session.clear()")
 
 
 func _real_host_present() -> bool:
@@ -410,7 +605,7 @@ func _pending_list() -> void:
 	# when the real host exists this test must be switched over: fail loudly instead of silently testing a stub
 	ok(not _real_host_present(), "TWSkinHost now exists: replace TWSkinHostStub by TWSkinHost in skin_swap_soak.gd and shrink the pending list")
 	todo("TWSkinHost state machine IDLE/PREPARING/STAGED/COMMITTING/ROLLBACK (SKIN_HUD_SYSTEM 2.6): 200 random swaps incl. tier changes, commit <= 400 ms")
-	todo("TWPalette.resolve/mix parity: stub mixes in sRGB, spec says OKLab; test 200 refs against the golden table")
+	todo("TWPalette.resolve/mix parity: stub now uses OKLab, still verify 200 refs against real TWPalette golden table when P60 lands")
 	todo("TWSkin.apply rejects locked tokens itself (gap G-01) or TWSkinHost.apply_locked_guard exists; AT-S23")
 	todo("texture memory returns to baseline after 50 hero x skin swaps (AT-S30): needs TWSkinHost + packs; RSS <= +20 MB")
 	todo("pack mount of .pck on a RELEASE Android build, 50 mounts (AT-S14): device only, see UNIFIED_QA_PLAN T-DEV-3")
@@ -424,4 +619,5 @@ func _cleanup() -> void:
 		p.queue_free()
 	_probes.clear()
 	_plates.clear()
+	_session.clear()
 	TWSkin.reset()

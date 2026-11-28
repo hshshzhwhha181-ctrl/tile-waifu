@@ -1,0 +1,133 @@
+name: qa-render
+
+# Additive rendering QA workflow (P96 / UNIFIED_QA_PLAN Appendix R T13, T19).
+# Runs rendering suites inside the pinned docker/qa-render container (xvfb + Mesa llvmpipe GL 3.3
+# + Godot 4.5.1 + deterministic fontconfig) instead of --headless Dummy renderer.
+# Does NOT replace or modify .github/workflows/qa.yml.
+
+on:
+  push:
+    branches: [claude/integration, main]
+  pull_request:
+    paths:
+      - "docker/qa-render/**"
+      - "docs/qa/THRESHOLDS.md"
+      - "game/tests/skin_swap_soak/**"
+      - "game/shell/design/**"
+      - "game/shell/skin/**"
+      - "game/assets/**"
+      - "tools/qa/**"
+      - ".github/workflows/qa-render.yml"
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+    inputs:
+      strict_pending:
+        description: "Force PENDING -> FAIL regardless of Date X in docs/qa/THRESHOLDS.md"
+        default: false
+        type: boolean
+      soak_swaps:
+        description: "Number of skin_swap_soak iterations"
+        default: "300"
+        type: string
+
+concurrency:
+  group: qa-render-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  render-qa:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build pinned qa-render image (xvfb + Mesa llvmpipe + Godot 4.5.1 + fonts)
+        uses: docker/build-push-action@v6
+        with:
+          context: docker/qa-render
+          file: docker/qa-render/Dockerfile
+          load: true
+          tags: tw-qa-render:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Verify pinned rendering image & capture env.json fingerprint
+        run: |
+          mkdir -p qa-render-out
+          docker run --rm tw-qa-render:ci > qa-render-out/verify_image.log
+          cat qa-render-out/verify_image.log
+          docker run --rm --entrypoint cat tw-qa-render:ci /etc/tw-qa-render/env.json > qa-render-out/env.json
+
+      - name: Cache Godot import (keyed to pinned image + project)
+        uses: actions/cache@v4
+        with:
+          path: game/.godot
+          key: godot-render-import-${{ hashFiles('docker/qa-render/Dockerfile', 'game/project.godot', 'game/**/*.import') }}
+          restore-keys: godot-render-import-
+
+      - name: Import Godot assets inside pinned container
+        run: |
+          docker run --rm -v "${{ github.workspace }}:/workspace" -w /workspace tw-qa-render:ci \
+            bash -lc 'python3 tools/tw_test.py --import'
+
+      - name: Run QA tool-belt & P96 pending/rc134 gate unit tests inside pinned container
+        run: |
+          docker run --rm -v "${{ github.workspace }}:/workspace" -w /workspace tw-qa-render:ci \
+            bash -lc 'python3 tools/qa/run_qa_tools.py && python3 -m unittest -v tools/qa/test_check_pending_gate.py'
+
+      - name: Run skin_swap_soak under xvfb + OpenGL3 (real pixels, live Texture2D, AT-S22)
+        env:
+          SOAK_SWAPS: ${{ github.event.inputs.soak_swaps || '300' }}
+        run: |
+          set +e
+          docker run --rm \
+            -e SOAK_SWAPS \
+            -v "${{ github.workspace }}:/workspace" -w /workspace \
+            tw-qa-render:ci \
+            tw-render-godot --resolution 720x1280 --path /workspace/game \
+              res://tests/skin_swap_soak/skin_swap_soak.tscn \
+              -- --require_render=1 --soak_swaps="${SOAK_SWAPS}" \
+            > qa-render-out/skin_swap_soak.log 2>&1
+          RC=$?
+          set -e
+          tail -n 30 qa-render-out/skin_swap_soak.log
+          # T19 strict rc 134 policy: rc 134/-6 accepted ONLY after green marker OK and 0 SCRIPT ERROR
+          python3 tools/qa/check_pending_gate.py \
+            --check-rc-log qa-render-out/skin_swap_soak.log \
+            --marker "TWSKINSOAK_SELFTEST" \
+            --rc "$RC"
+          grep -q "TWSKINSOAK PIXEL_CHECK PASS" qa-render-out/skin_swap_soak.log
+
+      - name: Run rendering suites (twboardview, responsive, phone) inside pinned container
+        run: |
+          docker run --rm -v "${{ github.workspace }}:/workspace" -w /workspace tw-qa-render:ci \
+            bash -lc 'python3 tools/tw_test.py -s twboardview,responsive,phone --fast -j 2 --no-mask-rc --json qa-render-out/render-suites.json --logs qa-render-out/logs'
+
+      - name: Enforce golden PENDING -> FAIL gate (Date X from docs/qa/THRESHOLDS.md)
+        env:
+          STRICT_PENDING: ${{ github.event.inputs.strict_pending || 'false' }}
+        run: |
+          STRICT_FLAG=""
+          if [ "$STRICT_PENDING" = "true" ]; then STRICT_FLAG="--strict"; fi
+          # Verify pixel/golden logs against Date X in docs/qa/THRESHOLDS.md
+          grep -E "PIXEL_CHECK|GOLDEN" qa-render-out/skin_swap_soak.log > qa-render-out/golden_scan.log || true
+          docker run --rm -v "${{ github.workspace }}:/workspace" -w /workspace tw-qa-render:ci \
+            python3 tools/qa/check_pending_gate.py \
+              --require-render-image \
+              --thresholds docs/qa/THRESHOLDS.md \
+              $STRICT_FLAG \
+              --logs qa-render-out/golden_scan.log \
+              --json qa-render-out/pending-gate.json
+
+      - name: Upload rendering QA artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qa-render-artifacts
+          path: |
+            qa-render-out/
+          retention-days: 14
