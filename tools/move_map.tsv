@@ -57,8 +57,8 @@ game/scripts/v10/adventure/adventure_battle.gd	game/core/modes/adventure/adventu
 game/scripts/v10/adventure/adventure_battle.gd.uid	game/core/modes/adventure/adventure_battle.gd.uid
 game/scripts/v10/adventure/adventure_data.gd	game/core/modes/adventure/adventure_data.gd
 game/scripts/v10/adventure/adventure_data.gd.uid	game/core/modes/adventure/adventure_data.gd.uid
-game/scripts/v10/adventure/adventure_reg.gd	game/core/modes/adventure/adventure_reg.gd
-game/scripts/v10/adventure/adventure_reg.gd.uid	game/core/modes/adventure/adventure_reg.gd.uid
+game/scripts/v10/adventure/adventure_reg.gd	game/core/modes/adventure/adventure_reg.gd	retired
+game/scripts/v10/adventure/adventure_reg.gd.uid	game/core/modes/adventure/adventure_reg.gd.uid	retired
 game/scripts/v10/auth/auth.gd	game/core/auth/auth.gd
 game/scripts/v10/auth/auth.gd.uid	game/core/auth/auth.gd.uid
 game/scripts/v10/auth/auth_nicks.gd	game/core/auth/auth_nicks.gd
@@ -89,10 +89,10 @@ game/scripts/v10/core/money.gd	game/core/base/money.gd
 game/scripts/v10/core/money.gd.uid	game/core/base/money.gd.uid
 game/scripts/v10/core/rank.gd	game/core/base/rank.gd
 game/scripts/v10/core/rank.gd.uid	game/core/base/rank.gd.uid
-game/scripts/v10/core/registry.gd	game/core/base/registry.gd
+game/scripts/v10/core/registry.gd	game/core/base/registry.gd	edited
 game/scripts/v10/core/registry.gd.uid	game/core/base/registry.gd.uid
-game/scripts/v10/core/registry_list.gd	game/core/base/registry_list.gd
-game/scripts/v10/core/registry_list.gd.uid	game/core/base/registry_list.gd.uid
+game/scripts/v10/core/registry_list.gd	game/core/base/registry_list.gd	retired
+game/scripts/v10/core/registry_list.gd.uid	game/core/base/registry_list.gd.uid	retired
 game/scripts/v10/core/sku.gd	game/core/base/sku.gd
 game/scripts/v10/core/sku.gd.uid	game/core/base/sku.gd.uid
 game/scripts/v10/duels/challenge/challenge_code.gd	game/core/modes/duels/challenge/challenge_code.gd
@@ -295,8 +295,8 @@ game/scripts/v10/online/online_bot.gd	game/core/online/online_bot.gd
 game/scripts/v10/online/online_bot.gd.uid	game/core/online/online_bot.gd.uid
 game/scripts/v10/online/online_cfg.gd	game/core/online/online_cfg.gd
 game/scripts/v10/online/online_cfg.gd.uid	game/core/online/online_cfg.gd.uid
-game/scripts/v10/online/online_reg.gd	game/core/online/online_reg.gd
-game/scripts/v10/online/online_reg.gd.uid	game/core/online/online_reg.gd.uid
+game/scripts/v10/online/online_reg.gd	game/core/online/online_reg.gd	retired
+game/scripts/v10/online/online_reg.gd.uid	game/core/online/online_reg.gd.uid	retired
 game/scripts/v10/palm/hand.gd	game/core/modes/palm/hand.gd
 game/scripts/v10/palm/hand.gd.uid	game/core/modes/palm/hand.gd.uid
 game/scripts/v10/palm/hand_gen.gd	game/core/modes/palm/hand_gen.gd

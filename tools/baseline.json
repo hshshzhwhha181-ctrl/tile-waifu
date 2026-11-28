@@ -737,6 +737,22 @@
     "total": 66
    }
   },
+  "registry": {
+   "fast": {
+    "marker": "REGISTRY_SELFTEST 264/264",
+    "ok": 264,
+    "secs": 5.7,
+    "status": "pass",
+    "total": 264
+   },
+   "full": {
+    "marker": "REGISTRY_SELFTEST 264/264",
+    "ok": 264,
+    "secs": 5.7,
+    "status": "pass",
+    "total": 264
+   }
+  },
   "responsive": {
    "fast": {
     "marker": "LAYOUT_SELFTEST 174/174",

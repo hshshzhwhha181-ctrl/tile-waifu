@@ -6,6 +6,7 @@ For every `old<TAB>new` row of tools/move_map.tsv it checks, against the pre-mov
 
   * the old path existed at the base commit and no longer exists in the working tree,
   * the new path exists in the working tree,
+  * (a 3rd column `retired` marks a file moved by WP3 and deleted later on purpose: it must be gone at both paths; `edited` = content changed on purpose later, only existence is checked)
   * the file content is IDENTICAL except for lines that mention a `res://` path (the path-based preload/extends/load
     literals that had to be re-pointed). `class_name` and every other line must be byte-for-byte unchanged.
 
@@ -52,11 +53,11 @@ def main() -> int:
     for ln in MAP.read_text(encoding="utf-8").splitlines():
         if ln.startswith("#") or not ln.strip():
             continue
-        o, n = ln.split("\t")[:2]
-        rows.append((o, n))
+        cols = ln.split("\t")
+        rows.append((cols[0], cols[1], cols[2] if len(cols) > 2 else ""))
     bad: list[str] = []
     changed_lines = 0
-    for o, n in rows:
+    for o, n, tag in rows:
         old = git("show", f"{base}:{o}")
         if old.returncode != 0:
             bad.append(f"{o}: not present at {base}")
@@ -64,8 +65,14 @@ def main() -> int:
         if (REPO / o).exists():
             bad.append(f"{o}: still exists after the move")
         newp = REPO / n
+        if tag == "retired":  # moved by WP3, then deliberately deleted by a later package (P07: registry list -> module.gd)
+            if newp.exists():
+                bad.append(f"{n}: marked retired but still exists")
+            continue
         if not newp.exists():
             bad.append(f"{n}: missing")
+            continue
+        if tag == "edited":  # moved by WP3, then rewritten on purpose by a later package (P07: scanning registry)
             continue
         ot = old.stdout.decode("utf-8", errors="surrogateescape").splitlines()
         nt = newp.read_bytes().decode("utf-8", errors="surrogateescape").splitlines()

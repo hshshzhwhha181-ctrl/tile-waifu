@@ -5,7 +5,7 @@
 
 | gate | suites | how it is judged |
 | --- | --- | --- |
-| Godot selftests | 54 (8 core flags, 43 v10 registry modules, `spec`, `summon`, `ult_rin`) | marker line of each suite (`ECON_SELFTEST 384/384`, `V10VOICE OK`, ...) |
+| Godot selftests | 55 (8 core flags, 43 v10 registry modules, `registry`, `spec`, `summon`, `ult_rin`) | marker line of each suite (`ECON_SELFTEST 384/384`, `V10VOICE OK`, ...) |
 | `server/e2e_test.mjs` | `server_e2e` | `E2E_OK`, `N passed, 0 failed` (skipped with a reason if node or `node:sqlite` is missing) |
 | `ux_lint.py` | `ux_lint` | `UX_LINT RESULT: OK (0 violations)` (lives at `.agents/skills/tw-godot-qa/scripts/ux_lint.py`, verified present) |
 
@@ -21,7 +21,7 @@ python tools/tw_test.py -j 2 --timeout-scale 2 # slower machine
 python tools/tw_test.py --update-baseline      # rewrite tools/baseline.json (full, or fast with --fast)
 python tools/tw_test.py --import               # headless asset import (automatic when game/.godot is missing)
 python tools/tw_test.py --shot home --out /tmp/home.png --res 450x1000 --at 2
-python tools/tw_test.py --check-drift          # every V10RegistryList selftest module is in the catalog?
+python tools/tw_test.py --check-drift          # every game/core/**/module.gd selftest module is in the catalog (and no duplicate ids)?
 ```
 
 Exit code: `0` no regression vs `tools/baseline.json`, `1` regression, `2` setup problem (no Godot, import failed).
@@ -87,8 +87,8 @@ Windows shows the equivalent `0xC0000005`. Facts established (timeboxed, ~35 min
 * valgrind (3.22) on that trivial script: 128 errors / 64 contexts, all inside the engine's shutdown call chain: 55 invalid reads
   (`pthread_mutex_lock` on a freed 1,752-byte block), 7 invalid writes and an invalid `free()`. The official 4.5.1 binary is stripped, so
   frames are unsymbolised; this looks like an engine-side use-after-free of an object holding a mutex (GDScript/script-class teardown), triggered
-  by something `G._ready` registers. Bisecting `G._ready`: the abort needs `V10Registry.load_all()` (-> `V10RegistryList.register_all()`)
-  and is layout dependent — cutting `register_all()` before `V10AdventureReg.register()` removes it, but even a bare
+  by something `G._ready` registers. Bisecting `G._ready`: the abort needs `V10Registry.load_all()` (before P07: `V10RegistryList.register_all()`, now the `module.gd` scan)
+  and is layout dependent — cutting the old `register_all()` before `V10AdventureReg.register()` removed it, but even a bare
   `V10Registry.module("adventure", {"step": 4})` brings it back, so the trigger is the amount/shape of registered data
   (many `Callable` lambdas stored in static dictionaries), not a specific module.
 * Not a test failure source, so the runner simply ignores the abort when the marker is green.
@@ -104,7 +104,7 @@ The workflow has not run on GitHub yet (only locally validated: same command, sa
 ## Adding a suite
 
 Add one `S(...)` line to `CATALOG` in `tw_test.py` (id, marker, scene/script, args, optional `fast_args`, `render`, `timeout`, `soft`), then
-`python tools/tw_test.py -s <id> --update-baseline`. `--check-drift` fails if a module appears in `V10RegistryList` without a catalog entry.
+`python tools/tw_test.py -s <id> --update-baseline`. `--check-drift` fails if a `module.gd` appears under `game/core` without a catalog entry (or two modules share an id). `--registry-dump [FILE]` prints/writes a canonical JSON dump of the whole registry (ids in order, specs, depth graph, screens, ensure keys, wiring flags): diff two dumps to prove a registry change is behaviour-neutral.
 
 ## Core carve-out (WP3): `game/core`, `move_map.tsv`, two checkers
 
@@ -133,6 +133,6 @@ Anything with a UI token, a Node base class, an autoload, or living in a present
   `tools/lint_baseline.json` (total N); any growth or any new violating file is red, fewer is fine, then lower N with `--update-baseline`
   (it refuses to raise N without `--allow-raise`). `--selftest` = 6 synthetic files with one violation each must give exactly 6 findings (+1 clean look-alike).
   Runs as suite `core_purity` (group `lint`, fast) in `tools/tw_test.py` and as the first step of `.github/workflows/qa.yml`.
-* Registry: `V10RegistryList` is now `game/core/base/registry_list.gd` (same 43 modules, same ids); the per-module `module.gd` split is left for a follow-up.
+* Registry (P07): `registry_list.gd` is gone. Each of the 43 modules is `game/core/**/module.gd` (`static func spec() -> Dictionary`, same ids, explicit `order` = old line order) and `V10Registry` finds them by scanning `res://core`; callbacks that used to sit between the list lines are a module's `"wire"` Callable. A new module is ONE new `module.gd`; the `registry` suite (`REGISTRY_SELFTEST`) guards the 43 legacy ids and their order.
 * Selftests that source-scan a module directory now scan `scripts/v10/<m>/` **and** `core/<m>/` (so nothing silently stops being checked).
 * After pulling this change run `python3 tools/tw_test.py --import` once: `game/.godot/global_script_class_cache.cfg` must be regenerated for the new paths.

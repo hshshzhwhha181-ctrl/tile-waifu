@@ -46,7 +46,7 @@ GAME = REPO / "game"
 BASELINE_PATH = REPO / "tools" / "baseline.json"
 UX_LINT = REPO / ".agents" / "skills" / "tw-godot-qa" / "scripts" / "ux_lint.py"
 E2E = REPO / "server" / "e2e_test.mjs"
-REGISTRY_LIST = GAME / "core" / "base" / "registry_list.gd"
+CORE_DIR = GAME / "core"   # V10Registry scans it for module.gd manifests
 
 # return codes that mean "engine aborted/crashed while tearing down"; accepted only with a green marker
 TEARDOWN_RCS = {134, -6, 139, -11, 0xC0000005, -1073741819, 3221225477}
@@ -154,6 +154,8 @@ CATALOG: list[Suite] = [
     S("adventure", "ADVENTURE_SELFTEST", SV + "adventure/adventure_selftest.tscn", ["--adventure_selftest=1"]),
     S("online", "ONLINE_SELFTEST", SV + "online/online_selftest.tscn"),
     S("events", "EVENTS_SELFTEST", SV + "events/events_selftest.tscn"),
+    S("registry", "REGISTRY_SELFTEST", SV + "core/registry_selftest.tscn",
+      note="V10Registry scan of game/core/**/module.gd: 43 legacy ids in order, no duplicates, no manifest errors"),
     # ---- extra: older suites that are not in the v10 registry ---------------------------------------
     S("spec", "SPECIAL SELFTEST", "res://scripts/v06/special/spec_selftest.tscn", group="extra"),
     S("summon", "SUMMON_SELFTEST", group="extra", render=True, res="720x1280",
@@ -507,23 +509,30 @@ def compare(r: Result, base: dict, fast: bool) -> None:
 # --------------------------------------------------------------------------------------------------
 # drift check: registry modules that the catalog does not know
 # --------------------------------------------------------------------------------------------------
+def registry_manifests() -> list[tuple[int, str, Path, bool]]:
+    """(order, id, module.gd, has_selftest) for every game/core/**/module.gd, in V10Registry order (order, id)."""
+    out = []
+    for f in sorted(CORE_DIR.rglob("module.gd")):
+        txt = f.read_text(encoding="utf-8")
+        mi = re.search(r'"id":\s*"(\w+)"', txt)
+        mo = re.search(r'"order":\s*(\d+)', txt)
+        if not mi:
+            continue
+        out.append((int(mo.group(1)) if mo else 1000, mi.group(1), f, '"selftest"' in txt))
+    return sorted(out, key=lambda t: (t[0], t[1]))
+
+
 def registry_ids() -> list[str]:
-    if not REGISTRY_LIST.exists():
-        return []
-    txt = REGISTRY_LIST.read_text(encoding="utf-8")
-    ids = []
-    parts = re.split(r'(?=R\.module\(")', txt)
-    for p in parts:
-        m = re.match(r'R\.module\("(\w+)"', p)
-        if m and '"selftest"' in p:
-            ids.append(m.group(1))
-    return ids
+    return [rid for _o, rid, _f, st in registry_manifests() if st]
 
 
 def check_drift() -> list[str]:
     cat = {s.id for s in CATALOG}
     alias = {"profile": "profile2"}  # registry id 'profile' runs profile2_selftest.tscn
-    return [rid for rid in registry_ids() if alias.get(rid, rid) not in cat]
+    miss = [rid for rid in registry_ids() if alias.get(rid, rid) not in cat]
+    ids = [rid for _o, rid, _f, _st in registry_manifests()]
+    dup = sorted({i for i in ids if ids.count(i) > 1})
+    return miss + [f"duplicate module id {d}" for d in dup]
 
 
 # --------------------------------------------------------------------------------------------------
@@ -539,6 +548,26 @@ def do_import(godot: str, timeout: int) -> int:
     if bad:
         print(out[-3000:])
     return 1 if bad else 0
+
+
+def do_registry_dump(godot: str, dest: str, timeout: int) -> int:
+    """Run the registry selftest scene in dump mode: ids in order + every spec (Callables as "<fn>"), depth graph,
+    screens, ensure_all keys, wiring flags. Diff two dumps to prove a registry refactor changed nothing."""
+    with tempfile.TemporaryDirectory(prefix="tw_regdump_") as td:
+        env = clean_env(Path(td))
+        rc, out, to, secs = run_cmd([godot, "--headless", "--audio-driver", "Dummy", "--path", str(GAME),
+                                     "res://scripts/v10/core/registry_selftest.tscn", "--", "--registry_dump=1"], env, timeout)
+    m = re.search(r"REGISTRY_DUMP_BEGIN\n(.*)\nREGISTRY_DUMP_END", out, re.S)
+    if to or not m:
+        print(out[-3000:])
+        print("[tw_test] registry dump FAILED")
+        return 1
+    if dest == "-":
+        print(m.group(1))
+    else:
+        Path(dest).write_text(m.group(1) + "\n", encoding="utf-8")
+        print(f"[tw_test] registry dump written to {dest} ({secs:.0f}s)")
+    return 0
 
 
 def do_shot(godot: str, screen: str, out_png: Path, res: str, at: float, act: str, timeout: int) -> int:
@@ -627,6 +656,8 @@ def main(argv=None) -> int:
     ap.add_argument("--at", type=float, default=2.0)
     ap.add_argument("--act", default="")
     ap.add_argument("--check-drift", action="store_true", help="verify the catalog covers every V10Registry selftest")
+    ap.add_argument("--registry-dump", nargs="?", const="-", metavar="FILE",
+                    help="print (or write to FILE) the canonical JSON dump of the whole V10Registry and exit")
     ap.add_argument("--godot-arg", action="append", default=[], help="extra engine arg (before --), repeatable")
     args = ap.parse_args(argv)
 
@@ -655,6 +686,11 @@ def main(argv=None) -> int:
             print("Godot binary not found", file=sys.stderr)
             return 2
         return do_import(godot, int(600 * args.timeout_scale))
+    if args.registry_dump:
+        if not godot:
+            print("Godot binary not found", file=sys.stderr)
+            return 2
+        return do_registry_dump(godot, args.registry_dump, int(300 * args.timeout_scale))
     if args.shot:
         if not godot or not args.out:
             print("--shot needs a Godot binary and --out", file=sys.stderr)
