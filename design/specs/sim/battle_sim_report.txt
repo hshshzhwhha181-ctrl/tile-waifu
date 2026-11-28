@@ -61,7 +61,7 @@
   1 SSR *1 on Hana                       album +0.5%  hana +11%                          team ATK + 3.4%  direct price ~  1490 RUB
   1 SSR *5 on Hana                       album +0.5%  hana +18%                          team ATK + 5.6%  direct price ~  1936 RUB
   SSR *5 on Hana + Nova + Mc             album +1.5%  hana +20%, nova +20%, mc +20%      team ATK +14.1%  direct price ~  5808 RUB
-  5 SSR/FLAG *5 on the whole squad       album +3.0%  hana +26%, nova +21%, mc +21%, rin +21%, kohaku +21% team ATK +22.3%  direct price ~  9680 RUB
+  1 SSR+ + 4 SSR *5 on the whole squad   album +3.0%  hana +26%, nova +21%, mc +21%, rin +21%, kohaku +21% team ATK +22.3%  direct price ~ 10680 RUB
 
 [T9] progression time: XP to level, days to cap by income profile (spec 2.2 / 2.10)
   Lv1 -> Lv20  cumulative XP     12086

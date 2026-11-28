@@ -89,10 +89,10 @@ PROFILES = {
     "P0+ F2P-long": dict(level=60, tal=0.40, skill=10, outfits=[],                                   bond=10),   # F2P at month 6+
     "P1 small":     dict(level=60, tal=0.40, skill=10, outfits=[("S", 2), ("SSR", 1)],               bond=10),
     "P2 mid":       dict(level=60, tal=0.40, skill=10, outfits=[("SSR", 2), ("SSR", 2), ("S", 3)],   bond=10),
-    "P3 whale":     dict(level=60, tal=0.43, skill=10, outfits=[("FLAG", 5), ("SSR", 5), ("SSR", 5), ("SSR", 5), ("S", 5)], bond=10),
+    "P3 whale":     dict(level=60, tal=0.43, skill=10, outfits=[("SSRP", 5), ("SSR", 5), ("SSR", 5), ("SSR", 5), ("S", 5)], bond=10),
 }
-OUTFIT_BASE = {"S": 0.04, "SSR": 0.08, "FLAG": 0.10}      # ATK % of the heroine who wears it (HP gets 60 % of it)
-OUTFIT_STEP = {"S": 0.010, "SSR": 0.020, "FLAG": 0.025}    # per star above 0 (stars 0..5)
+OUTFIT_BASE = {"S": 0.04, "SSR": 0.08, "SSRP": 0.10}      # ATK % of the heroine who wears it (HP gets 60 % of it)
+OUTFIT_STEP = {"S": 0.010, "SSR": 0.020, "SSRP": 0.025}    # per star above 0 (stars 0..5)
 BOND_PER_LV = 0.005
 COLLECTION_PER_OUTFIT = 0.0025  # account-wide "Альбом" bonus per owned S/SSR outfit, cap 0.06
 COLLECTION_CAP = 0.06
@@ -486,7 +486,7 @@ def main():
         ("1 SSR *1 on Hana",                          [("hana", "SSR", 1)],                             2,  1490),
         ("1 SSR *5 on Hana",                          [("hana", "SSR", 5)],                             2,  1490 + 446),
         ("SSR *5 on Hana + Nova + Mc",                [("hana", "SSR", 5), ("nova", "SSR", 5), ("mc", "SSR", 5)], 6, 3 * (1490 + 446)),
-        ("5 SSR/FLAG *5 on the whole squad",          [("hana", "FLAG", 5), ("nova", "SSR", 5), ("mc", "SSR", 5), ("rin", "SSR", 5), ("kohaku", "SSR", 5)], 12, 5 * (1490 + 446)),
+        ("1 SSR+ + 4 SSR *5 on the whole squad",          [("hana", "SSRP", 5), ("nova", "SSR", 5), ("mc", "SSR", 5), ("rin", "SSR", 5), ("kohaku", "SSR", 5)], 12, (2490 + 446) + 4 * (1490 + 446)),
     )
     sq_ref = build_squad(SQUAD_STD, PROFILES["P0+ F2P-long"])
     tot_atk = sum(h["atk"] for h in sq_ref)
