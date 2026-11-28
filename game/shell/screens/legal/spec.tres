@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ScreenSpec" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://shell/nav/screen_spec.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "legal"
+script_path = "res://shell/screens/legal/legal_screen.gd"
+chrome = PackedStringArray("header", "back")
+back_target = "home"
+keep_history = true
