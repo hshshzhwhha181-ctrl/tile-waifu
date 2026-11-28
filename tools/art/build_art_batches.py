@@ -212,7 +212,7 @@ TAILS = {}
 FULL_TAIL_ID = "v5f"
 FULL_TAIL = (
     "Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult "
-    "fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct "
+    "fashion pin-up styling. {figure} a direct "
     "teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated "
     "colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric "
     "texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult "
@@ -220,16 +220,16 @@ FULL_TAIL = (
     "no logos, no watermark."
 )
 FULL_BODY = {
-    "mc": "medium height, soft shapely figure, defined waist, rounded hips, soft thighs, soft shoulders, a full natural bust in proportion",
-    "rin": "tall slender figure, long neck and very long legs, slim waist, gently rounded hips, a natural bust in proportion",
+    "mc": "soft shapely figure, defined waist, rounded hips, soft thighs, soft shoulders, a full natural bust in proportion",
+    "rin": "slender figure, long neck, long legs, slim waist, gently rounded hips, a natural bust in proportion",
     "hana": "athletic toned figure, bare midriff with a flat stomach, long toned legs, a natural bust in proportion, no visible muscle definition",
-    "yue": "tall statuesque figure, long limbs, regal posture, defined waist, rounded hips, long thighs, a full natural bust in proportion",
+    "yue": "statuesque figure, long limbs, regal posture, defined waist, rounded hips, long thighs, a full natural bust in proportion",
     "nova": "lean toned figure, slim waist, gently rounded hips, long legs, a natural bust in proportion",
     "tsubame": "lithe slender figure, long legs, slim waist, rounded hips, a natural bust in proportion",
-    "miel": "medium-small height, soft pear-shaped figure with fuller hips and soft thighs, slim waist, a full natural bust in proportion",
-    "kohaku": "medium height, soft athletic-soft figure, slim waist, long legs, rounded hips, a full natural bust in proportion",
-    "shirin": "tall soft shapely figure, defined waist, fuller hips, a full natural bust in proportion, bare midriff",
-    "zlata": "tall statuesque figure, slim waist, broad regal shoulders, rounded hips, long legs, a full natural bust in proportion",
+    "miel": "soft pear-shaped figure with fuller hips and soft thighs, slim waist, a full natural bust in proportion",
+    "kohaku": "soft athletic-soft figure, slim waist, long legs, rounded hips, a full natural bust in proportion",
+    "shirin": "soft shapely figure, defined waist, fuller hips, a full natural bust in proportion, bare midriff",
+    "zlata": "statuesque figure, slim waist, broad regal shoulders, rounded hips, long legs, a full natural bust in proportion",
 }
 FULL_SKIN = {"nova": "fair pale cool-neutral porcelain-peach skin with a soft pink blush (not tanned, not dark)"}
 FULL_H0_SCENES = {
@@ -282,17 +282,33 @@ FULL_H1_FRAMES = {
 
 
 
-TAILS[FULL_TAIL_ID] = FULL_TAIL
+TAILS[FULL_TAIL_ID] = FULL_TAIL  # contains the {figure} placeholder, filled per heroine by figure_line()
 HERO_ORDER = ["mc", "rin", "hana", "yue", "nova", "tsubame", "miel", "kohaku", "shirin", "zlata"]
 H0_HEROINES = ["mc", "yue", "nova"]
 # MC wears her night qipao on the board / altar and the floral tea cheongsam elsewhere (owner mock-ups 12-15)
 H0_MC_SLOT = {"match": "base", "summon": "base", "tea": "evening", "shop": "evening", "win": "evening"}
 
 
+def body_line(hk: str) -> str:
+    b = WD.HEIGHTS[hk]
+    return f"{b['tag']}, about {b['cm']} cm tall ({b['heads']} heads tall), {FULL_BODY[hk]}"
+
+
+def figure_line(hk: str) -> str:
+    """Per-heroine figure sentence of the tail.  Hard floor: a mature adult face and a grown woman's figure, never below WD.HEADS_MIN heads."""
+    b = WD.HEIGHTS[hk]
+    return (f"Adult woman with grown-woman proportions, {b['heads']} heads tall ({b['cm']} cm, {b['tag']}), {b['legs']}, a mature adult face "
+            f"and figure, a defined waist,")
+
+
 def full_prompt(h: dict, outfit: str, pose: str, expr: str, framing: str, setting: str, extra: str = "") -> str:
     hk = h["key"]
-    return (f"{identity_block(h, FULL_BODY[hk], FULL_SKIN.get(hk))} Outfit: {outfit}. Pose: {pose}. Expression: {expr}. Framing: {framing}. "
-            f"Setting: {setting}. {extra} {FULL_TAIL}").replace("  ", " ").strip()
+    tail = FULL_TAIL.replace("{figure}", figure_line(hk))
+    return (f"{identity_block(h, body_line(hk), FULL_SKIN.get(hk))} Outfit: {outfit}. Pose: {pose}. Expression: {expr}. Framing: {framing}. "
+            f"Setting: {setting}. {extra} {tail}").replace("  ", " ").strip()
+
+
+HERO_FRAMING = "dynamic splash-art composition, three-quarter figure from head to knees, strong diagonal, camera at eye level to slightly low"
 
 
 def full_selection(extra_criteria=()):
@@ -390,8 +406,9 @@ def build_H2(H, tail=None):
             tid = f"{hk}_{slot}"
             common = dict(hero_task_fields(h), kind="wardrobe_outfit", tier="full", outfit_name=o["name"], prompt=variants[0], quality="medium")
             b.add(f"{tid}.search", stage="search", size=size_gpt("2:3", "1k"), candidates=3, unit_cost_cr=1.0, prompt_variants=variants, **common)
-            b.add(f"{tid}.final", stage="final", size=size_gpt("2:3", "2k"), candidates=1, unit_cost_cr=2.0,
-                  **dict(common, quality="high", depends_on_task=f"H2.{tid}.search", seed_policy="replace seed with the winning search candidate seed; use the winning pose"))
+            heroes = [full_prompt(h, o["outfit"], pose, expr, HERO_FRAMING, o["setting"], "SSR splash art, the richest costume of the heroine.") for pose, expr in o["hero"]]
+            b.add(f"{tid}.final", stage="final", size=size_gpt("2:3", "2k"), candidates=1, unit_cost_cr=2.0, hero_prompt_variants=heroes,
+                  **dict(common, quality="high", depends_on_task=f"H2.{tid}.search", seed_policy="replace seed with the winning search candidate seed; use the winning pose (hero_prompt_variants = 2 splash poses for SSR use, H4)"))
     b.meta["pilot"] = pilot_of(b, ["mc_swim.search", "nova_service.search", "kohaku_robe.search"], None,
                                "3 outfits x 3 poses: the swim, bunny and robe outfits are the ones most likely to trip the generator moderation; look at them before releasing the rest")
     return b
@@ -446,7 +463,7 @@ def build_H4(H, tail=None):
         "H4", "ART plan (H4)", "SSR key art 'First guest' (rin_ssr, hana_ssr, yue_ssr), tier Full", 5, "Heroines", 80, in_plan=False, status="blocked_owner_decision",
         blocked_by=["Q-15 (SSR line-up of 'First guest')", "H0 gate (P50)"], depends_on=["H0", "H1"],
         owner_gate="Q-15 decides which three SSR outfits; the prompts below use wardrobe outfits (rin bunny tea-server, hana sunflower bikini, yue dragon-scale armour) as placeholders",
-        candidates_policy="search: 14 candidates per heroine at 1k medium; final: 6 candidates per heroine at 2k high; post 2 cr",
+        candidates_policy="per SSR heroine: 2 hero splash poses; search 7 candidates per pose at 1k medium (14 per heroine); final 3 candidates per pose at 2k high (6 per heroine); post 2 cr",
         selection=full_selection(["raw model output is forbidden on showcase screens: AD pass is mandatory before approve"]),
         assumptions=["plan figure is 60-100 cr outside the 4-week window; 80 is the middle", "the three outfits are placeholders until Q-15"],
         tool_note="Not part of the plan nominal; needs a separate approval after P50 and Q-15."))
@@ -454,17 +471,17 @@ def build_H4(H, tail=None):
     for hk, slot in H4_PICK.items():
         h = H[hk]
         o = WD.outfit(hk, slot)
-        pose, ex = o["poses"][0]
-        p = full_prompt(h, o["outfit"], pose, ex, "three-quarter figure, knees-up, key-art composition with a strong diagonal", "grand showcase backdrop: " + o["setting"],
-                        "SSR key art, richest costume of the heroine, layered fabric, gold accents reserved for the outfit.")
-        common = dict(hero_task_fields(h), kind="ssr_keyart_full", tier="full", prompt=p, quality="medium", outfit_source=f"{hk}.{slot}")
-        b.add(f"{hk}_ssr.search", stage="search", size=size_gpt("2:3", "1k"), candidates=14, unit_cost_cr=1.0, **common)
-        b.add(f"{hk}_ssr.final", stage="final", size=size_gpt("2:3", "2k"), candidates=6, unit_cost_cr=2.0,
-              **dict(common, quality="high", depends_on_task=f"H4.{hk}_ssr.search", seed_policy="replace seed with the winning search candidate seed"))
+        for n, (pose, ex) in enumerate(o["hero"], 1):
+            p = full_prompt(h, o["outfit"], pose, ex, HERO_FRAMING, "grand showcase backdrop: " + o["setting"],
+                            "SSR key art, richest costume of the heroine, layered fabric, gold accents reserved for the outfit.")
+            common = dict(hero_task_fields(h), kind="ssr_keyart_full", tier="full", prompt=p, quality="medium", outfit_source=f"{hk}.{slot}", hero_pose=n)
+            b.add(f"{hk}_ssr_h{n}.search", stage="search", size=size_gpt("2:3", "1k"), candidates=7, unit_cost_cr=1.0, **common)
+            b.add(f"{hk}_ssr_h{n}.final", stage="final", size=size_gpt("2:3", "2k"), candidates=3, unit_cost_cr=2.0,
+                  **dict(common, quality="high", depends_on_task=f"H4.{hk}_ssr_h{n}.search", seed_policy="replace seed with the winning search candidate seed"))
     b.add("post_pool", stage="post", kind="post_pool", media="post", tool="upscale_image", model="higgsfield_post",
           prompt="Post-processing pool for approved finals only. No prompt.", candidates=2, unit_cost_cr=1.0, unit_cost_basis="assumed",
           size={"aspect": "n/a", "resolution": "n/a", "width": 0, "height": 0})
-    b.meta["pilot"] = pilot_of(b, ["yue_ssr.search"], 3)
+    b.meta["pilot"] = pilot_of(b, ["yue_ssr_h1.search"], 3)
     return b
 
 

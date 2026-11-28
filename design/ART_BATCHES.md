@@ -32,7 +32,7 @@
 | **M1** | P48 | 3 | 12 приоритетных треков × 3 варианта + стемы 8 треков + резерв 25% | 298.5 | yes | 343.3 | 36 | 21 | 3.3 | `M1_music_priority.json` |
 | **S1** | P49 | 3 | 40 звуков × 3 варианта + 2 амбиента по 30 с | 105 | yes | 120.8 | 126 | 42 | 1.5 | `S1_sfx.json` |
 | **X1** | P57 | 4 | Видео-пилоты: ульта (Kling ×6, Seedance ×2) + memorial (Kling ×6) | 190 | yes | 218.5 | 14 | 5 | 10 | `X1_video_pilots.json` |
-| **H4** | вне окна | 5 | SSR key-art «Первый гость»: rin_ssr, hana_ssr, yue_ssr (ждёт Q-15) | 80 | no | 92 | 60 | 7 | 3 | `H4_ssr_keyart.json` |
+| **H4** | вне окна | 5 | SSR key-art «Первый гость»: rin_ssr, hana_ssr, yue_ssr (ждёт Q-15) | 80 | no | 92 | 60 | 13 | 3 | `H4_ssr_keyart.json` |
 | **V3** | вне окна | 5 | Launch-60: остальные 36 строк для МТ, Юэ, Златы | 64.8 | no | 74.5 | 324 | 108 | 0.2 | `V3_launch60_flagships.json` |
 
 - plan_nominal_cr: 2712

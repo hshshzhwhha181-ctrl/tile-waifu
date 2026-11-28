@@ -5,3 +5,7 @@ date,batch_id,task_id,quote_ref,quoted_cr,actual_cr,balance_after,note
 2026-11-28,H2,probes mc_swim+nova_service+kohaku_robe+rin_service+hana_swim,,5,5,,P50b moderation probes (1k medium 2:3)
 2026-11-28,H0,mc_summon with reference image (ref 24),,1,1,,P50b image_references test
 2026-11-28,P50b,session total,,51,51,18358.15,attributable by image count (51 x 1 cr); the account balance fell 91.2 cr over the session (18449.35 -> 18358.15) and the account is shared; transactions tool still fails its output schema
+2026-11-28,H2,round 2 boldness probes x12 (new wardrobe poses incl. hero splash),,12,12,,P50b round 2; 2:3 1k medium; 0 refusals
+2026-11-28,H0,height lineup of 10 heroines 21:9 2k medium x2,quote:FlEBftpbtSo1hrZP-CBHnQ,3.5,3.5,,P50b round 2; multi-element prompt (10 element ids) accepted
+2026-11-28,H0,height re-rolls nova x5 + yue x5 (new body table prompts),,10,10,,P50b round 2; 9:16 1k medium x1 each
+2026-11-28,P50b,round 2 total,,25.5,25.5,,P50b round 2; session total 76.5 cr (51 + 25.5)

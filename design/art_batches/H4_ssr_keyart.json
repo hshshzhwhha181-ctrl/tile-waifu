@@ -25,7 +25,7 @@
    "the three outfits are placeholders until Q-15"
   ]
  },
- "candidates_policy": "search: 14 candidates per heroine at 1k medium; final: 6 candidates per heroine at 2k high; post 2 cr",
+ "candidates_policy": "per SSR heroine: 2 hero splash poses; search 7 candidates per pose at 1k medium (14 per heroine); final 3 candidates per pose at 2k high (6 per heroine); post 2 cr",
  "selection": {
   "keep_per_task": 1,
   "gate": "Full-tier look gate (design/ART_TIER_FULL.md section 7) + anatomy audit",
@@ -41,7 +41,7 @@
  },
  "pilot": {
   "task_ids": [
-   "H4.yue_ssr.search"
+   "H4.yue_ssr_h1.search"
   ],
   "candidates_per_task": 3,
   "max_cr": 3.0,
@@ -59,8 +59,8 @@
  "batch_id": "H4",
  "tasks": [
   {
-   "id": "H4.rin_ssr.search",
-   "seed": 924413,
+   "id": "H4.rin_ssr_h1.search",
+   "seed": 708161,
    "status": "pending",
    "quote_ref": null,
    "stage": "search",
@@ -70,7 +70,7 @@
     "width": 680,
     "height": 1024
    },
-   "candidates": 14,
+   "candidates": 7,
    "unit_cost_cr": 1.0,
    "heroine": "rin",
    "element_ids": [
@@ -81,21 +81,22 @@
    "tool": "generate_image",
    "kind": "ssr_keyart_full",
    "tier": "full",
-   "prompt": "<<<4d50001c-c2be-4758-a1e5-6d2c7d5f70be>>> is Rin, an adult woman of 27, tea master of the Ice Pavilion. Hair: dark sage-green long glossy hair with a side parting and one thick loose braid falling over her left shoulder. Eyes: sage-green almond eyes with calm half-lowered lids. Skin: light warm beige skin. Face: long narrow adult oval face, high cheekbones, almond eyes, thin straight brows, small refined mouth, elegant long neck. Signature items that must be present: thin round gold wire glasses (worn in every image, Rin only); jade teardrop earrings; jade bangle; celadon tea bowl or tea set nearby. Body: tall slender figure, long neck and very long legs, slim waist, gently rounded hips, a natural bust in proportion. Outfit: black bunny-style tailcoat leotard with gold-trimmed lapels, a deep plunging neckline, a green bow tie, black bunny-ear headband with a white tail, white gloves, sheer black pantyhose, black heels, a silver teapot. Pose: bending slightly forward presenting a silver teapot on one hand, tilting her head. Expression: gracious teasing smile. Framing: three-quarter figure, knees-up, key-art composition with a strong diagonal. Setting: grand showcase backdrop: grand tea hall with red velvet drapes, marble floor and an armillary sphere. SSR key art, richest costume of the heroine, layered fabric, gold accents reserved for the outfit. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "prompt": "<<<4d50001c-c2be-4758-a1e5-6d2c7d5f70be>>> is Rin, an adult woman of 27, tea master of the Ice Pavilion. Hair: dark sage-green long glossy hair with a side parting and one thick loose braid falling over her left shoulder. Eyes: sage-green almond eyes with calm half-lowered lids. Skin: light warm beige skin. Face: long narrow adult oval face, high cheekbones, almond eyes, thin straight brows, small refined mouth, elegant long neck. Signature items that must be present: thin round gold wire glasses (worn in every image, Rin only); jade teardrop earrings; jade bangle; celadon tea bowl or tea set nearby. Body: tall and slender, about 172 cm tall (7.5 heads tall), slender figure, long neck, long legs, slim waist, gently rounded hips, a natural bust in proportion. Outfit: high-cut black bunny-style tailcoat leotard with gold-trimmed lapels, a deep plunging neckline, a side-cut waist, thigh straps with gold clasps, a green bow tie, black bunny-ear headband with a white tail, white gloves, sheer black pantyhose, black heels, a silver teapot. Pose: straddling a tea-hall chair backwards with her chin on her gloved hands. Expression: sly teasing smile. Framing: dynamic splash-art composition, three-quarter figure from head to knees, strong diagonal, camera at eye level to slightly low. Setting: grand showcase backdrop: grand tea hall with red velvet drapes, marble floor and an armillary sphere. SSR key art, richest costume of the heroine, layered fabric, gold accents reserved for the outfit. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman with grown-woman proportions, 7.5 heads tall (172 cm, tall and slender), long legs, a mature adult face and figure, a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
    "quality": "medium",
    "outfit_source": "rin.service",
-   "quota_cr": 14.0,
-   "max_credits": 14.0,
+   "hero_pose": 1,
+   "quota_cr": 7.0,
+   "max_credits": 7.0,
    "lora": null,
    "unit_cost_basis": "quoted",
    "output": {
-    "dir": "assets/incoming/H4/rin_ssr.search",
+    "dir": "assets/incoming/H4/rin_ssr_h1.search",
     "name": "cand_{n:02d}"
    }
   },
   {
-   "id": "H4.rin_ssr.final",
-   "seed": 525452,
+   "id": "H4.rin_ssr_h1.final",
+   "seed": 159272,
    "status": "pending",
    "quote_ref": null,
    "stage": "final",
@@ -105,7 +106,7 @@
     "width": 1368,
     "height": 2048
    },
-   "candidates": 6,
+   "candidates": 3,
    "unit_cost_cr": 2.0,
    "heroine": "rin",
    "element_ids": [
@@ -116,23 +117,24 @@
    "tool": "generate_image",
    "kind": "ssr_keyart_full",
    "tier": "full",
-   "prompt": "<<<4d50001c-c2be-4758-a1e5-6d2c7d5f70be>>> is Rin, an adult woman of 27, tea master of the Ice Pavilion. Hair: dark sage-green long glossy hair with a side parting and one thick loose braid falling over her left shoulder. Eyes: sage-green almond eyes with calm half-lowered lids. Skin: light warm beige skin. Face: long narrow adult oval face, high cheekbones, almond eyes, thin straight brows, small refined mouth, elegant long neck. Signature items that must be present: thin round gold wire glasses (worn in every image, Rin only); jade teardrop earrings; jade bangle; celadon tea bowl or tea set nearby. Body: tall slender figure, long neck and very long legs, slim waist, gently rounded hips, a natural bust in proportion. Outfit: black bunny-style tailcoat leotard with gold-trimmed lapels, a deep plunging neckline, a green bow tie, black bunny-ear headband with a white tail, white gloves, sheer black pantyhose, black heels, a silver teapot. Pose: bending slightly forward presenting a silver teapot on one hand, tilting her head. Expression: gracious teasing smile. Framing: three-quarter figure, knees-up, key-art composition with a strong diagonal. Setting: grand showcase backdrop: grand tea hall with red velvet drapes, marble floor and an armillary sphere. SSR key art, richest costume of the heroine, layered fabric, gold accents reserved for the outfit. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "prompt": "<<<4d50001c-c2be-4758-a1e5-6d2c7d5f70be>>> is Rin, an adult woman of 27, tea master of the Ice Pavilion. Hair: dark sage-green long glossy hair with a side parting and one thick loose braid falling over her left shoulder. Eyes: sage-green almond eyes with calm half-lowered lids. Skin: light warm beige skin. Face: long narrow adult oval face, high cheekbones, almond eyes, thin straight brows, small refined mouth, elegant long neck. Signature items that must be present: thin round gold wire glasses (worn in every image, Rin only); jade teardrop earrings; jade bangle; celadon tea bowl or tea set nearby. Body: tall and slender, about 172 cm tall (7.5 heads tall), slender figure, long neck, long legs, slim waist, gently rounded hips, a natural bust in proportion. Outfit: high-cut black bunny-style tailcoat leotard with gold-trimmed lapels, a deep plunging neckline, a side-cut waist, thigh straps with gold clasps, a green bow tie, black bunny-ear headband with a white tail, white gloves, sheer black pantyhose, black heels, a silver teapot. Pose: straddling a tea-hall chair backwards with her chin on her gloved hands. Expression: sly teasing smile. Framing: dynamic splash-art composition, three-quarter figure from head to knees, strong diagonal, camera at eye level to slightly low. Setting: grand showcase backdrop: grand tea hall with red velvet drapes, marble floor and an armillary sphere. SSR key art, richest costume of the heroine, layered fabric, gold accents reserved for the outfit. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman with grown-woman proportions, 7.5 heads tall (172 cm, tall and slender), long legs, a mature adult face and figure, a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
    "quality": "high",
    "outfit_source": "rin.service",
-   "depends_on_task": "H4.rin_ssr.search",
+   "hero_pose": 1,
+   "depends_on_task": "H4.rin_ssr_h1.search",
    "seed_policy": "replace seed with the winning search candidate seed",
-   "quota_cr": 12.0,
-   "max_credits": 12.0,
+   "quota_cr": 6.0,
+   "max_credits": 6.0,
    "lora": null,
    "unit_cost_basis": "quoted",
    "output": {
-    "dir": "assets/incoming/H4/rin_ssr.final",
+    "dir": "assets/incoming/H4/rin_ssr_h1.final",
     "name": "cand_{n:02d}"
    }
   },
   {
-   "id": "H4.hana_ssr.search",
-   "seed": 649173,
+   "id": "H4.rin_ssr_h2.search",
+   "seed": 437954,
    "status": "pending",
    "quote_ref": null,
    "stage": "search",
@@ -142,7 +144,81 @@
     "width": 680,
     "height": 1024
    },
-   "candidates": 14,
+   "candidates": 7,
+   "unit_cost_cr": 1.0,
+   "heroine": "rin",
+   "element_ids": [
+    "4d50001c-c2be-4758-a1e5-6d2c7d5f70be"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "ssr_keyart_full",
+   "tier": "full",
+   "prompt": "<<<4d50001c-c2be-4758-a1e5-6d2c7d5f70be>>> is Rin, an adult woman of 27, tea master of the Ice Pavilion. Hair: dark sage-green long glossy hair with a side parting and one thick loose braid falling over her left shoulder. Eyes: sage-green almond eyes with calm half-lowered lids. Skin: light warm beige skin. Face: long narrow adult oval face, high cheekbones, almond eyes, thin straight brows, small refined mouth, elegant long neck. Signature items that must be present: thin round gold wire glasses (worn in every image, Rin only); jade teardrop earrings; jade bangle; celadon tea bowl or tea set nearby. Body: tall and slender, about 172 cm tall (7.5 heads tall), slender figure, long neck, long legs, slim waist, gently rounded hips, a natural bust in proportion. Outfit: high-cut black bunny-style tailcoat leotard with gold-trimmed lapels, a deep plunging neckline, a side-cut waist, thigh straps with gold clasps, a green bow tie, black bunny-ear headband with a white tail, white gloves, sheer black pantyhose, black heels, a silver teapot. Pose: seen from behind in three-quarter view leaning on a marble table with the tailcoat flaring, looking back over her shoulder. Expression: seductive smirk. Framing: dynamic splash-art composition, three-quarter figure from head to knees, strong diagonal, camera at eye level to slightly low. Setting: grand showcase backdrop: grand tea hall with red velvet drapes, marble floor and an armillary sphere. SSR key art, richest costume of the heroine, layered fabric, gold accents reserved for the outfit. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman with grown-woman proportions, 7.5 heads tall (172 cm, tall and slender), long legs, a mature adult face and figure, a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "medium",
+   "outfit_source": "rin.service",
+   "hero_pose": 2,
+   "quota_cr": 7.0,
+   "max_credits": 7.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H4/rin_ssr_h2.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H4.rin_ssr_h2.final",
+   "seed": 479829,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "2k",
+    "width": 1368,
+    "height": 2048
+   },
+   "candidates": 3,
+   "unit_cost_cr": 2.0,
+   "heroine": "rin",
+   "element_ids": [
+    "4d50001c-c2be-4758-a1e5-6d2c7d5f70be"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "ssr_keyart_full",
+   "tier": "full",
+   "prompt": "<<<4d50001c-c2be-4758-a1e5-6d2c7d5f70be>>> is Rin, an adult woman of 27, tea master of the Ice Pavilion. Hair: dark sage-green long glossy hair with a side parting and one thick loose braid falling over her left shoulder. Eyes: sage-green almond eyes with calm half-lowered lids. Skin: light warm beige skin. Face: long narrow adult oval face, high cheekbones, almond eyes, thin straight brows, small refined mouth, elegant long neck. Signature items that must be present: thin round gold wire glasses (worn in every image, Rin only); jade teardrop earrings; jade bangle; celadon tea bowl or tea set nearby. Body: tall and slender, about 172 cm tall (7.5 heads tall), slender figure, long neck, long legs, slim waist, gently rounded hips, a natural bust in proportion. Outfit: high-cut black bunny-style tailcoat leotard with gold-trimmed lapels, a deep plunging neckline, a side-cut waist, thigh straps with gold clasps, a green bow tie, black bunny-ear headband with a white tail, white gloves, sheer black pantyhose, black heels, a silver teapot. Pose: seen from behind in three-quarter view leaning on a marble table with the tailcoat flaring, looking back over her shoulder. Expression: seductive smirk. Framing: dynamic splash-art composition, three-quarter figure from head to knees, strong diagonal, camera at eye level to slightly low. Setting: grand showcase backdrop: grand tea hall with red velvet drapes, marble floor and an armillary sphere. SSR key art, richest costume of the heroine, layered fabric, gold accents reserved for the outfit. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman with grown-woman proportions, 7.5 heads tall (172 cm, tall and slender), long legs, a mature adult face and figure, a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "high",
+   "outfit_source": "rin.service",
+   "hero_pose": 2,
+   "depends_on_task": "H4.rin_ssr_h2.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 6.0,
+   "max_credits": 6.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H4/rin_ssr_h2.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H4.hana_ssr_h1.search",
+   "seed": 724559,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "1k",
+    "width": 680,
+    "height": 1024
+   },
+   "candidates": 7,
    "unit_cost_cr": 1.0,
    "heroine": "hana",
    "element_ids": [
@@ -153,21 +229,22 @@
    "tool": "generate_image",
    "kind": "ssr_keyart_full",
    "tier": "full",
-   "prompt": "<<<ded72d02-6c3a-45e4-874a-0afdc3936c07>>> is Hana, an adult woman of 24, relay team captain and gym coach. Hair: short tousled curly orange bob, chin-length with messy wavy ends. Eyes: warm amber eyes. Skin: warm light-tan skin with light freckles (one consistent skin tone in every image). Face: round-square adult face with a soft jaw, wide upturned eyes, thick expressive brows, wide toothy grin. Signature items that must be present: yellow sunflower hair clip above the right ear; light freckles across nose and cheeks; track jacket tied around the waist (most outfits); sport wristband. Body: athletic toned figure, bare midriff with a flat stomach, long toned legs, a natural bust in proportion, no visible muscle definition. Outfit: yellow tie-side bikini with an off-shoulder sheer white shirt tied at the waist, a wide straw sun hat with a yellow ribbon, a sport wristband. Pose: kneeling on the towel with both fists under her chin, a wink. Expression: beaming wink. Framing: three-quarter figure, knees-up, key-art composition with a strong diagonal. Setting: grand showcase backdrop: sunset beach with a striped towel and a driftwood log. SSR key art, richest costume of the heroine, layered fabric, gold accents reserved for the outfit. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "prompt": "<<<ded72d02-6c3a-45e4-874a-0afdc3936c07>>> is Hana, an adult woman of 24, relay team captain and gym coach. Hair: short tousled curly orange bob, chin-length with messy wavy ends. Eyes: warm amber eyes. Skin: warm light-tan skin with light freckles (one consistent skin tone in every image). Face: round-square adult face with a soft jaw, wide upturned eyes, thick expressive brows, wide toothy grin. Signature items that must be present: yellow sunflower hair clip above the right ear; light freckles across nose and cheeks; track jacket tied around the waist (most outfits); sport wristband. Body: athletic average height, about 168 cm tall (7.25 heads tall), athletic toned figure, bare midriff with a flat stomach, long toned legs, a natural bust in proportion, no visible muscle definition. Outfit: yellow string bikini with thin tie sides, an off-shoulder wet-look sheer white shirt tied at the waist, a wide straw sun hat with a yellow ribbon, a sport wristband. Pose: seen from behind in three-quarter view walking into the surf, looking back with a hand on her hip. Expression: teasing grin. Framing: dynamic splash-art composition, three-quarter figure from head to knees, strong diagonal, camera at eye level to slightly low. Setting: grand showcase backdrop: sunset beach with a striped towel and a driftwood log. SSR key art, richest costume of the heroine, layered fabric, gold accents reserved for the outfit. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman with grown-woman proportions, 7.25 heads tall (168 cm, athletic average height), toned long legs, a mature adult face and figure, a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
    "quality": "medium",
    "outfit_source": "hana.swim",
-   "quota_cr": 14.0,
-   "max_credits": 14.0,
+   "hero_pose": 1,
+   "quota_cr": 7.0,
+   "max_credits": 7.0,
    "lora": null,
    "unit_cost_basis": "quoted",
    "output": {
-    "dir": "assets/incoming/H4/hana_ssr.search",
+    "dir": "assets/incoming/H4/hana_ssr_h1.search",
     "name": "cand_{n:02d}"
    }
   },
   {
-   "id": "H4.hana_ssr.final",
-   "seed": 921639,
+   "id": "H4.hana_ssr_h1.final",
+   "seed": 721592,
    "status": "pending",
    "quote_ref": null,
    "stage": "final",
@@ -177,7 +254,7 @@
     "width": 1368,
     "height": 2048
    },
-   "candidates": 6,
+   "candidates": 3,
    "unit_cost_cr": 2.0,
    "heroine": "hana",
    "element_ids": [
@@ -188,23 +265,24 @@
    "tool": "generate_image",
    "kind": "ssr_keyart_full",
    "tier": "full",
-   "prompt": "<<<ded72d02-6c3a-45e4-874a-0afdc3936c07>>> is Hana, an adult woman of 24, relay team captain and gym coach. Hair: short tousled curly orange bob, chin-length with messy wavy ends. Eyes: warm amber eyes. Skin: warm light-tan skin with light freckles (one consistent skin tone in every image). Face: round-square adult face with a soft jaw, wide upturned eyes, thick expressive brows, wide toothy grin. Signature items that must be present: yellow sunflower hair clip above the right ear; light freckles across nose and cheeks; track jacket tied around the waist (most outfits); sport wristband. Body: athletic toned figure, bare midriff with a flat stomach, long toned legs, a natural bust in proportion, no visible muscle definition. Outfit: yellow tie-side bikini with an off-shoulder sheer white shirt tied at the waist, a wide straw sun hat with a yellow ribbon, a sport wristband. Pose: kneeling on the towel with both fists under her chin, a wink. Expression: beaming wink. Framing: three-quarter figure, knees-up, key-art composition with a strong diagonal. Setting: grand showcase backdrop: sunset beach with a striped towel and a driftwood log. SSR key art, richest costume of the heroine, layered fabric, gold accents reserved for the outfit. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "prompt": "<<<ded72d02-6c3a-45e4-874a-0afdc3936c07>>> is Hana, an adult woman of 24, relay team captain and gym coach. Hair: short tousled curly orange bob, chin-length with messy wavy ends. Eyes: warm amber eyes. Skin: warm light-tan skin with light freckles (one consistent skin tone in every image). Face: round-square adult face with a soft jaw, wide upturned eyes, thick expressive brows, wide toothy grin. Signature items that must be present: yellow sunflower hair clip above the right ear; light freckles across nose and cheeks; track jacket tied around the waist (most outfits); sport wristband. Body: athletic average height, about 168 cm tall (7.25 heads tall), athletic toned figure, bare midriff with a flat stomach, long toned legs, a natural bust in proportion, no visible muscle definition. Outfit: yellow string bikini with thin tie sides, an off-shoulder wet-look sheer white shirt tied at the waist, a wide straw sun hat with a yellow ribbon, a sport wristband. Pose: seen from behind in three-quarter view walking into the surf, looking back with a hand on her hip. Expression: teasing grin. Framing: dynamic splash-art composition, three-quarter figure from head to knees, strong diagonal, camera at eye level to slightly low. Setting: grand showcase backdrop: sunset beach with a striped towel and a driftwood log. SSR key art, richest costume of the heroine, layered fabric, gold accents reserved for the outfit. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman with grown-woman proportions, 7.25 heads tall (168 cm, athletic average height), toned long legs, a mature adult face and figure, a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
    "quality": "high",
    "outfit_source": "hana.swim",
-   "depends_on_task": "H4.hana_ssr.search",
+   "hero_pose": 1,
+   "depends_on_task": "H4.hana_ssr_h1.search",
    "seed_policy": "replace seed with the winning search candidate seed",
-   "quota_cr": 12.0,
-   "max_credits": 12.0,
+   "quota_cr": 6.0,
+   "max_credits": 6.0,
    "lora": null,
    "unit_cost_basis": "quoted",
    "output": {
-    "dir": "assets/incoming/H4/hana_ssr.final",
+    "dir": "assets/incoming/H4/hana_ssr_h1.final",
     "name": "cand_{n:02d}"
    }
   },
   {
-   "id": "H4.yue_ssr.search",
-   "seed": 411615,
+   "id": "H4.hana_ssr_h2.search",
+   "seed": 842444,
    "status": "pending",
    "quote_ref": null,
    "stage": "search",
@@ -214,7 +292,81 @@
     "width": 680,
     "height": 1024
    },
-   "candidates": 14,
+   "candidates": 7,
+   "unit_cost_cr": 1.0,
+   "heroine": "hana",
+   "element_ids": [
+    "ded72d02-6c3a-45e4-874a-0afdc3936c07"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "ssr_keyart_full",
+   "tier": "full",
+   "prompt": "<<<ded72d02-6c3a-45e4-874a-0afdc3936c07>>> is Hana, an adult woman of 24, relay team captain and gym coach. Hair: short tousled curly orange bob, chin-length with messy wavy ends. Eyes: warm amber eyes. Skin: warm light-tan skin with light freckles (one consistent skin tone in every image). Face: round-square adult face with a soft jaw, wide upturned eyes, thick expressive brows, wide toothy grin. Signature items that must be present: yellow sunflower hair clip above the right ear; light freckles across nose and cheeks; track jacket tied around the waist (most outfits); sport wristband. Body: athletic average height, about 168 cm tall (7.25 heads tall), athletic toned figure, bare midriff with a flat stomach, long toned legs, a natural bust in proportion, no visible muscle definition. Outfit: yellow string bikini with thin tie sides, an off-shoulder wet-look sheer white shirt tied at the waist, a wide straw sun hat with a yellow ribbon, a sport wristband. Pose: kneeling in the shallows with an arched back and her hands in her wet hair, the shirt clinging. Expression: radiant grin. Framing: dynamic splash-art composition, three-quarter figure from head to knees, strong diagonal, camera at eye level to slightly low. Setting: grand showcase backdrop: sunset beach with a striped towel and a driftwood log. SSR key art, richest costume of the heroine, layered fabric, gold accents reserved for the outfit. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman with grown-woman proportions, 7.25 heads tall (168 cm, athletic average height), toned long legs, a mature adult face and figure, a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "medium",
+   "outfit_source": "hana.swim",
+   "hero_pose": 2,
+   "quota_cr": 7.0,
+   "max_credits": 7.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H4/hana_ssr_h2.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H4.hana_ssr_h2.final",
+   "seed": 409765,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "2k",
+    "width": 1368,
+    "height": 2048
+   },
+   "candidates": 3,
+   "unit_cost_cr": 2.0,
+   "heroine": "hana",
+   "element_ids": [
+    "ded72d02-6c3a-45e4-874a-0afdc3936c07"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "ssr_keyart_full",
+   "tier": "full",
+   "prompt": "<<<ded72d02-6c3a-45e4-874a-0afdc3936c07>>> is Hana, an adult woman of 24, relay team captain and gym coach. Hair: short tousled curly orange bob, chin-length with messy wavy ends. Eyes: warm amber eyes. Skin: warm light-tan skin with light freckles (one consistent skin tone in every image). Face: round-square adult face with a soft jaw, wide upturned eyes, thick expressive brows, wide toothy grin. Signature items that must be present: yellow sunflower hair clip above the right ear; light freckles across nose and cheeks; track jacket tied around the waist (most outfits); sport wristband. Body: athletic average height, about 168 cm tall (7.25 heads tall), athletic toned figure, bare midriff with a flat stomach, long toned legs, a natural bust in proportion, no visible muscle definition. Outfit: yellow string bikini with thin tie sides, an off-shoulder wet-look sheer white shirt tied at the waist, a wide straw sun hat with a yellow ribbon, a sport wristband. Pose: kneeling in the shallows with an arched back and her hands in her wet hair, the shirt clinging. Expression: radiant grin. Framing: dynamic splash-art composition, three-quarter figure from head to knees, strong diagonal, camera at eye level to slightly low. Setting: grand showcase backdrop: sunset beach with a striped towel and a driftwood log. SSR key art, richest costume of the heroine, layered fabric, gold accents reserved for the outfit. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman with grown-woman proportions, 7.25 heads tall (168 cm, athletic average height), toned long legs, a mature adult face and figure, a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "high",
+   "outfit_source": "hana.swim",
+   "hero_pose": 2,
+   "depends_on_task": "H4.hana_ssr_h2.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 6.0,
+   "max_credits": 6.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H4/hana_ssr_h2.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H4.yue_ssr_h1.search",
+   "seed": 210611,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "1k",
+    "width": 680,
+    "height": 1024
+   },
+   "candidates": 7,
    "unit_cost_cr": 1.0,
    "heroine": "yue",
    "element_ids": [
@@ -225,21 +377,22 @@
    "tool": "generate_image",
    "kind": "ssr_keyart_full",
    "tier": "full",
-   "prompt": "<<<8edeacc2-f24b-4a41-a166-66896711f259>>> is Yue, an adult woman of 27, ruler of the Moon Palace. Hair: very long straight-to-wavy pale lavender hair down to the waist with a half-up crown section. Eyes: violet almond eyes with long lashes. Skin: pale porcelain skin. Face: long elegant adult face with slim high nose, narrow almond eyes, serene composed smile. Signature items that must be present: pair of curved pearly-gold dragon horns rising from the crown; gold crescent-moon forehead ornament; gold crescent drop earrings with lavender tassels; moon-phase folding fan (Yue only). Body: tall statuesque figure, long limbs, regal posture, defined waist, rounded hips, long thighs, a full natural bust in proportion. Outfit: purple dragon-scale armour dress with gold filigree plates, a plunging keyhole front with a gem pendant, a short layered armoured skirt, scale thigh-high stockings with crescent gold garter bands, scale gloves, a moon glaive. Pose: standing in a wide stance holding the moon glaive across her body. Expression: confident smirk. Framing: three-quarter figure, knees-up, key-art composition with a strong diagonal. Setting: grand showcase backdrop: misty mountain temple stairs at dusk with moon banners. SSR key art, richest costume of the heroine, layered fabric, gold accents reserved for the outfit. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "prompt": "<<<8edeacc2-f24b-4a41-a166-66896711f259>>> is Yue, an adult woman of 27, ruler of the Moon Palace. Hair: very long straight-to-wavy pale lavender hair down to the waist with a half-up crown section. Eyes: violet almond eyes with long lashes. Skin: pale porcelain skin. Face: long elegant adult face with slim high nose, narrow almond eyes, serene composed smile. Signature items that must be present: pair of curved pearly-gold dragon horns rising from the crown; gold crescent-moon forehead ornament; gold crescent drop earrings with lavender tassels; moon-phase folding fan (Yue only). Body: very tall and statuesque, about 177 cm tall (7.9 heads tall), statuesque figure, long limbs, regal posture, defined waist, rounded hips, long thighs, a full natural bust in proportion. Outfit: purple dragon-scale armour leotard-dress with gold filigree plates, a plunging keyhole front with a gem pendant, side-cut hips, a short layered armoured skirt, scale thigh-high stockings with crescent gold garter bands, scale gloves, a moon glaive. Pose: seen from behind in three-quarter view on the temple stairs, the scale armour hugging her hips, looking back. Expression: imperious smirk. Framing: dynamic splash-art composition, three-quarter figure from head to knees, strong diagonal, camera at eye level to slightly low. Setting: grand showcase backdrop: misty mountain temple stairs at dusk with moon banners. SSR key art, richest costume of the heroine, layered fabric, gold accents reserved for the outfit. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman with grown-woman proportions, 7.9 heads tall (177 cm, very tall and statuesque), very long legs, a mature adult face and figure, a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
    "quality": "medium",
    "outfit_source": "yue.battle",
-   "quota_cr": 14.0,
-   "max_credits": 14.0,
+   "hero_pose": 1,
+   "quota_cr": 7.0,
+   "max_credits": 7.0,
    "lora": null,
    "unit_cost_basis": "quoted",
    "output": {
-    "dir": "assets/incoming/H4/yue_ssr.search",
+    "dir": "assets/incoming/H4/yue_ssr_h1.search",
     "name": "cand_{n:02d}"
    }
   },
   {
-   "id": "H4.yue_ssr.final",
-   "seed": 173302,
+   "id": "H4.yue_ssr_h1.final",
+   "seed": 301779,
    "status": "pending",
    "quote_ref": null,
    "stage": "final",
@@ -249,7 +402,7 @@
     "width": 1368,
     "height": 2048
    },
-   "candidates": 6,
+   "candidates": 3,
    "unit_cost_cr": 2.0,
    "heroine": "yue",
    "element_ids": [
@@ -260,17 +413,92 @@
    "tool": "generate_image",
    "kind": "ssr_keyart_full",
    "tier": "full",
-   "prompt": "<<<8edeacc2-f24b-4a41-a166-66896711f259>>> is Yue, an adult woman of 27, ruler of the Moon Palace. Hair: very long straight-to-wavy pale lavender hair down to the waist with a half-up crown section. Eyes: violet almond eyes with long lashes. Skin: pale porcelain skin. Face: long elegant adult face with slim high nose, narrow almond eyes, serene composed smile. Signature items that must be present: pair of curved pearly-gold dragon horns rising from the crown; gold crescent-moon forehead ornament; gold crescent drop earrings with lavender tassels; moon-phase folding fan (Yue only). Body: tall statuesque figure, long limbs, regal posture, defined waist, rounded hips, long thighs, a full natural bust in proportion. Outfit: purple dragon-scale armour dress with gold filigree plates, a plunging keyhole front with a gem pendant, a short layered armoured skirt, scale thigh-high stockings with crescent gold garter bands, scale gloves, a moon glaive. Pose: standing in a wide stance holding the moon glaive across her body. Expression: confident smirk. Framing: three-quarter figure, knees-up, key-art composition with a strong diagonal. Setting: grand showcase backdrop: misty mountain temple stairs at dusk with moon banners. SSR key art, richest costume of the heroine, layered fabric, gold accents reserved for the outfit. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman, 7.25 heads tall, long legs, shapely athletic-soft figure with a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "prompt": "<<<8edeacc2-f24b-4a41-a166-66896711f259>>> is Yue, an adult woman of 27, ruler of the Moon Palace. Hair: very long straight-to-wavy pale lavender hair down to the waist with a half-up crown section. Eyes: violet almond eyes with long lashes. Skin: pale porcelain skin. Face: long elegant adult face with slim high nose, narrow almond eyes, serene composed smile. Signature items that must be present: pair of curved pearly-gold dragon horns rising from the crown; gold crescent-moon forehead ornament; gold crescent drop earrings with lavender tassels; moon-phase folding fan (Yue only). Body: very tall and statuesque, about 177 cm tall (7.9 heads tall), statuesque figure, long limbs, regal posture, defined waist, rounded hips, long thighs, a full natural bust in proportion. Outfit: purple dragon-scale armour leotard-dress with gold filigree plates, a plunging keyhole front with a gem pendant, side-cut hips, a short layered armoured skirt, scale thigh-high stockings with crescent gold garter bands, scale gloves, a moon glaive. Pose: seen from behind in three-quarter view on the temple stairs, the scale armour hugging her hips, looking back. Expression: imperious smirk. Framing: dynamic splash-art composition, three-quarter figure from head to knees, strong diagonal, camera at eye level to slightly low. Setting: grand showcase backdrop: misty mountain temple stairs at dusk with moon banners. SSR key art, richest costume of the heroine, layered fabric, gold accents reserved for the outfit. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman with grown-woman proportions, 7.9 heads tall (177 cm, very tall and statuesque), very long legs, a mature adult face and figure, a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
    "quality": "high",
    "outfit_source": "yue.battle",
-   "depends_on_task": "H4.yue_ssr.search",
+   "hero_pose": 1,
+   "depends_on_task": "H4.yue_ssr_h1.search",
    "seed_policy": "replace seed with the winning search candidate seed",
-   "quota_cr": 12.0,
-   "max_credits": 12.0,
+   "quota_cr": 6.0,
+   "max_credits": 6.0,
    "lora": null,
    "unit_cost_basis": "quoted",
    "output": {
-    "dir": "assets/incoming/H4/yue_ssr.final",
+    "dir": "assets/incoming/H4/yue_ssr_h1.final",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H4.yue_ssr_h2.search",
+   "seed": 328752,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "search",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "1k",
+    "width": 680,
+    "height": 1024
+   },
+   "candidates": 7,
+   "unit_cost_cr": 1.0,
+   "heroine": "yue",
+   "element_ids": [
+    "8edeacc2-f24b-4a41-a166-66896711f259"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "ssr_keyart_full",
+   "tier": "full",
+   "prompt": "<<<8edeacc2-f24b-4a41-a166-66896711f259>>> is Yue, an adult woman of 27, ruler of the Moon Palace. Hair: very long straight-to-wavy pale lavender hair down to the waist with a half-up crown section. Eyes: violet almond eyes with long lashes. Skin: pale porcelain skin. Face: long elegant adult face with slim high nose, narrow almond eyes, serene composed smile. Signature items that must be present: pair of curved pearly-gold dragon horns rising from the crown; gold crescent-moon forehead ornament; gold crescent drop earrings with lavender tassels; moon-phase folding fan (Yue only). Body: very tall and statuesque, about 177 cm tall (7.9 heads tall), statuesque figure, long limbs, regal posture, defined waist, rounded hips, long thighs, a full natural bust in proportion. Outfit: purple dragon-scale armour leotard-dress with gold filigree plates, a plunging keyhole front with a gem pendant, side-cut hips, a short layered armoured skirt, scale thigh-high stockings with crescent gold garter bands, scale gloves, a moon glaive. Pose: standing on a stair with an arched back and the glaive overhead in both hands, hair streaming. Expression: majestic fierce gaze. Framing: dynamic splash-art composition, three-quarter figure from head to knees, strong diagonal, camera at eye level to slightly low. Setting: grand showcase backdrop: misty mountain temple stairs at dusk with moon banners. SSR key art, richest costume of the heroine, layered fabric, gold accents reserved for the outfit. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman with grown-woman proportions, 7.9 heads tall (177 cm, very tall and statuesque), very long legs, a mature adult face and figure, a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "medium",
+   "outfit_source": "yue.battle",
+   "hero_pose": 2,
+   "quota_cr": 7.0,
+   "max_credits": 7.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H4/yue_ssr_h2.search",
+    "name": "cand_{n:02d}"
+   }
+  },
+  {
+   "id": "H4.yue_ssr_h2.final",
+   "seed": 209550,
+   "status": "pending",
+   "quote_ref": null,
+   "stage": "final",
+   "size": {
+    "aspect": "2:3",
+    "resolution": "2k",
+    "width": 1368,
+    "height": 2048
+   },
+   "candidates": 3,
+   "unit_cost_cr": 2.0,
+   "heroine": "yue",
+   "element_ids": [
+    "8edeacc2-f24b-4a41-a166-66896711f259"
+   ],
+   "model": "gpt_image_2_6",
+   "media": "image",
+   "tool": "generate_image",
+   "kind": "ssr_keyart_full",
+   "tier": "full",
+   "prompt": "<<<8edeacc2-f24b-4a41-a166-66896711f259>>> is Yue, an adult woman of 27, ruler of the Moon Palace. Hair: very long straight-to-wavy pale lavender hair down to the waist with a half-up crown section. Eyes: violet almond eyes with long lashes. Skin: pale porcelain skin. Face: long elegant adult face with slim high nose, narrow almond eyes, serene composed smile. Signature items that must be present: pair of curved pearly-gold dragon horns rising from the crown; gold crescent-moon forehead ornament; gold crescent drop earrings with lavender tassels; moon-phase folding fan (Yue only). Body: very tall and statuesque, about 177 cm tall (7.9 heads tall), statuesque figure, long limbs, regal posture, defined waist, rounded hips, long thighs, a full natural bust in proportion. Outfit: purple dragon-scale armour leotard-dress with gold filigree plates, a plunging keyhole front with a gem pendant, side-cut hips, a short layered armoured skirt, scale thigh-high stockings with crescent gold garter bands, scale gloves, a moon glaive. Pose: standing on a stair with an arched back and the glaive overhead in both hands, hair streaming. Expression: majestic fierce gaze. Framing: dynamic splash-art composition, three-quarter figure from head to knees, strong diagonal, camera at eye level to slightly low. Setting: grand showcase backdrop: misty mountain temple stairs at dusk with moon banners. SSR key art, richest costume of the heroine, layered fabric, gold accents reserved for the outfit. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman with grown-woman proportions, 7.9 heads tall (177 cm, very tall and statuesque), very long legs, a mature adult face and figure, a defined waist, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
+   "quality": "high",
+   "outfit_source": "yue.battle",
+   "hero_pose": 2,
+   "depends_on_task": "H4.yue_ssr_h2.search",
+   "seed_policy": "replace seed with the winning search candidate seed",
+   "quota_cr": 6.0,
+   "max_credits": 6.0,
+   "lora": null,
+   "unit_cost_basis": "quoted",
+   "output": {
+    "dir": "assets/incoming/H4/yue_ssr_h2.final",
     "name": "cand_{n:02d}"
    }
   },
@@ -306,7 +534,7 @@
   }
  ],
  "totals": {
-  "tasks": 7,
+  "tasks": 13,
   "task_quota_sum_cr": 80.0,
   "candidates": 60
  },

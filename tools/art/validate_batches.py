@@ -27,6 +27,9 @@ import re
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import full_tier_wardrobe as WD  # noqa: E402  (body table: heads per heroine)
+
 ROOT = Path(__file__).resolve().parents[2]
 DEF_DIR = ROOT / "design" / "art_batches"
 DEF_MD = ROOT / "design" / "ART_BATCHES.md"
@@ -50,6 +53,7 @@ HARD_BANNED_FULL = ["school", "schoolgirl", "seifuku", "student", "teacher", "cl
                     "sideboob", "underboob", "cameltoe", "lingerie", "panties", "upskirt", "cleavage", "sexy", "thicc", "busty"]
 PROMPT_FIELDS = ("prompt", "text_ref")
 NOTEXT_RE = re.compile(r"\bno (text|letters|lettering)\b|absolutely no text", re.I)
+HEADS_RE = re.compile(r"(\d+(?:\.\d+)?) heads tall", re.I)
 UUID_RE = re.compile(r"<<<([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})>>>")
 
 
@@ -171,7 +175,8 @@ def validate(batches: dict, schema: dict, md_rows, plan_nom, plan_ceil, quiet=Fa
             if t["media"] in ("audio", "video") and "duration_s" not in t: errs.append(f"{tid}: {t['media']} task without duration_s")
             # banned words
             tier_full = d.get("tier") == "full" or t.get("tier") == "full"
-            texts = [(f, t.get(f) or "") for f in PROMPT_FIELDS] + [(f"prompt_variants[{i}]", v) for i, v in enumerate(t.get("prompt_variants") or [])]
+            texts = ([(f, t.get(f) or "") for f in PROMPT_FIELDS] + [(f"prompt_variants[{i}]", v) for i, v in enumerate(t.get("prompt_variants") or [])]
+                     + [(f"hero_prompt_variants[{i}]", v) for i, v in enumerate(t.get("hero_prompt_variants") or [])])
             for f, s in texts:
                 if tier_full:
                     for m in RE_HARD.finditer(s): errs.append(f"{tid}: banned word '{m.group(0)}' in {f} (hard line, all tiers)")
@@ -179,10 +184,21 @@ def validate(batches: dict, schema: dict, md_rows, plan_nom, plan_ceil, quiet=Fa
                 for m in RE_PKG.finditer(s): errs.append(f"{tid}: banned word '{m.group(0)}' in {f}")
                 if t["media"] in ("image", "video"):
                     for m in RE_SPEC.finditer(s): errs.append(f"{tid}: banned SPEC term '{m.group(0)}' in {f}")
+            if tier_full and t["media"] == "image" and t.get("heroine"):
+                # per-heroine body rules (owner decision 2026-11-28): heads tall in [HEADS_MIN, HEADS_MAX] and equal to the body table; adult face stated
+                want_h = WD.HEIGHTS[t["heroine"]]["heads"]
+                for f, v in texts:
+                    if not v: continue
+                    hs = [float(x) for x in HEADS_RE.findall(v)]
+                    if not hs: errs.append(f"{tid}: no 'N heads tall' in {f}"); continue
+                    for x in hs:
+                        if not (WD.HEADS_MIN <= x <= WD.HEADS_MAX): errs.append(f"{tid}: {x} heads tall in {f} is outside the hard range {WD.HEADS_MIN}-{WD.HEADS_MAX}")
+                        elif abs(x - want_h) > 0.011: errs.append(f"{tid}: {x} heads tall in {f} but the body table says {want_h} for {t['heroine']}")
+                    if "mature adult face" not in v: errs.append(f"{tid}: {f} does not state a mature adult face")
             if tier_full and t["media"] == "image":
-                for i, v in enumerate(t.get("prompt_variants") or []):
-                    if not NOTEXT_RE.search(v): errs.append(f"{tid}: prompt_variants[{i}] lacks a 'no text' constraint")
-                    if any(u not in v for u in UUID_RE.findall(t["prompt"])): errs.append(f"{tid}: prompt_variants[{i}] lacks the element id")
+                for i, v in enumerate(list(t.get("prompt_variants") or []) + list(t.get("hero_prompt_variants") or [])):
+                    if not NOTEXT_RE.search(v): errs.append(f"{tid}: variant {i} lacks a 'no text' constraint")
+                    if any(u not in v for u in UUID_RE.findall(t["prompt"])): errs.append(f"{tid}: variant {i} lacks the element id")
             # element ids
             found = UUID_RE.findall(t["prompt"])
             for u in found:
@@ -294,6 +310,14 @@ def selftest(batches, schema, md_rows, pn, pc):
     mut("nude word in a Tier FULL wardrobe variant", lambda c: first(c, "H2_wardrobe.json", lambda t: t.get("prompt_variants")).__setitem__(
         "prompt_variants", [v + " fully nude" for v in first(c, "H2_wardrobe.json", lambda t: t.get("prompt_variants"))["prompt_variants"]]), "banned word")
     mut("minor word in a Tier FULL prompt", lambda c: append_prompt(c, "H0_golden_composites.json", lambda t: t.get("heroine"), " a teen girl"), "banned word")
+    mut("heads below the hard floor in a Tier FULL prompt", lambda c: first(c, "H1_canon_set.json", lambda t: t.get("heroine") == "miel").__setitem__(
+        "prompt", first(c, "H1_canon_set.json", lambda t: t.get("heroine") == "miel")["prompt"].replace("6.75 heads tall", "6.0 heads tall")), "hard range")
+    mut("heads differ from the body table", lambda c: first(c, "H0_golden_composites.json", lambda t: t.get("heroine") == "yue").__setitem__(
+        "prompt", first(c, "H0_golden_composites.json", lambda t: t.get("heroine") == "yue")["prompt"].replace("7.9 heads tall", "7.25 heads tall")), "body table")
+    mut("banned word in a hero splash variant", lambda c: first(c, "H2_wardrobe.json", lambda t: t.get("hero_prompt_variants")).__setitem__(
+        "hero_prompt_variants", [v + " fully nude" for v in first(c, "H2_wardrobe.json", lambda t: t.get("hero_prompt_variants"))["hero_prompt_variants"]]), "banned word")
+    mut("adult-face statement dropped", lambda c: first(c, "H3_combo_frames.json", lambda t: t.get("heroine")).__setitem__(
+        "prompt", first(c, "H3_combo_frames.json", lambda t: t.get("heroine"))["prompt"].replace("mature adult face", "face")), "mature adult face")
     bad = 0
     for name, fn, needle in cases:
         c = copy.deepcopy(batches)
