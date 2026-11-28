@@ -322,6 +322,21 @@ func _test_a08_bus_leaks_and_batch_order() -> void:
 	check("A-08c: publish_all([A, B]) delivers full batch before handler-published follow-ups (FIFO)",
 		top_order == ["A", "B", "A_FOLLOW"],
 		"order=%s" % str(top_order))
+	# 4. Single Node owner with multiple subscriptions drops ALL of them on tree_exiting
+	var b3: = TWBus.new()
+	var multi: = Node.new()
+	host.add_child(multi)
+	var mh: Array = [0]
+	b3.subscribe("E1", func(_ev): mh[0] += 1, multi)
+	b3.subscribe("E2", func(_ev): mh[0] += 10, multi)
+	b3.subscribe("*", func(_ev): mh[0] += 100, multi)
+	var n_conns: int = multi.tree_exiting.get_connections().size()
+	host.remove_child(multi)
+	multi.free()
+	b3.publish_all([{"t": "E1"}, {"t": "E2"}])
+	check("A-08d: single Node owner with 3 subscriptions uses 1 tree_exiting hook and drops all 3 on exit",
+		n_conns == 1 and b3.subscriber_count() == 0 and mh[0] == 0,
+		"conns=%d subs=%d hits=%d" % [n_conns, b3.subscriber_count(), mh[0]])
 
 
 # ── A-09: TWAssets.install_manifest keeps custom resolvers ──────────────────────────────────────────────────
