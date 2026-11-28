@@ -13,7 +13,7 @@ const DRAGON_ART: = SSR_ART
 
 const REWARDS: Array[Dictionary] = [
 	{"day": 1, "title": "10 Билетов\nжеланий", "icon": "ticket", "tickets": 10},
-	{"day": 2, "title": "200 Чашек чая\n+ 300 кристаллов", "icon": "tea", "tea": 200, "gems": 300},
+	{"day": 2, "title": "2 000 монет\n+ 300 кристаллов", "icon": "coin_gem", "coins": 2000, "gems": 300},
 	{"day": 3, "title": "Подарок «Шёлковый\nвеер» (+120 ♥)", "icon": "fan", "gift": "gift_silk_fan"},
 	{"day": 4, "title": "500 кристаллов", "icon": "crystal", "gems": 500},
 	{"day": 5, "title": "5 Билетов\nжеланий", "icon": "ticket", "tickets": 5},
@@ -90,9 +90,9 @@ static func claim_today() -> Dictionary:
 	if int(r.get("gems", 0)) > 0:
 		V10Money.grant({"gems": int(r.gems)}, "welcome7")
 		lines.append("+%d кристаллов" % int(r.gems))
-	if int(r.get("tea", 0)) > 0:
-		V10Stamina.grant(int(r.tea))
-		lines.append("+%d Чашек чая" % int(r.tea))
+	if int(r.get("coins", 0)) > 0:
+		V10Money.grant({"coins": int(r.coins)}, "welcome7")
+		lines.append("+%d монет" % int(r.coins))
 	if str(r.get("gift", "")) != "":
 		V10AffCurve.grant_gift(str(r.gift), 1)
 		lines.append("Подарок «%s»" % str(V10AffCurve.gift_def(str(r.gift)).get("name", r.gift)))
@@ -452,7 +452,7 @@ func _make_reward_icon(kind: String, grand: bool) -> Control:
 		badge.add_child(UI.center_label(UI.label("SSR", 18, Color("#FFF7E4"), Color(0.22, 0.02, 0.08), 4, "body", 900), Rect2(0, -1, 84, 30)))
 		box.add_child(badge)
 		return box
-	if kind == "tea":
+	if kind == "coin_gem":
 		box.size = Vector2(124, 88)
 		var tg: = Sprite2D.new()
 		tg.texture = G.fx("glow")

@@ -103,9 +103,6 @@ func build(m, args: Dictionary) -> void:
 	tint.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(tint)
 	V8Header.make(self, main, "Столы", Callable(), _hub_help)
-	var st_pill: = V10Stamina.make_pill(main)
-	st_pill.position = Vector2(W - 92.0 - 166.0, 24.0)
-	add_child(st_pill)
 	_scroll = ScrollContainer.new()
 	_scroll.name = "TablesScroll"
 	_scroll.position = Vector2(0.0, 104.0)

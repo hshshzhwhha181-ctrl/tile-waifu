@@ -34,6 +34,14 @@ class StubMain extends Control:
 		pass
 
 
+# P08: records every main.go() so a bot can start many Path levels in a row
+class GoMain extends StubMain:
+	var calls: = []
+	var sheets: = 0
+	func go(scr: String, args: Dictionary = {}) -> void:
+		calls.append([scr, args])
+
+
 func check(cond: bool, what: String) -> void:
 	total += 1
 	if not by.has(_sec):
@@ -62,6 +70,7 @@ func run() -> Array:
 	_peaks()
 	_legend()
 	_boosters()
+	_no_energy()
 	_wind()
 	_jam()
 	await _ui()
@@ -264,6 +273,30 @@ func _legend() -> void:
 	check(w.laurel and "laurel_arc1" in State.st().cos, "a real Legendary win gives the laurel")
 	check(int(State.S().get("tickets", 0)) == t0 + 1, "arc end ticket only once")
 	check(int(w.gems) == 150, "Legendary first win 150")
+
+
+# ------------------------------------------------------------------ no energy (P08)
+
+# 30 Path levels in a row (boss levels and onboarding included) start at once: no «tea» gate, no dialog
+func _no_energy() -> void:
+	_sec = "no_energy"
+	var d: = fresh()
+	var m: = GoMain.new(Vector2(720, 1280))
+	add_child(m)
+	var started: = 0
+	var seen: = {}
+	for k in 30:
+		d["unlocked"] = k + 1
+		var cur: = State.current()
+		V10Nav.play_path(m)
+		if m.calls.size() == started + 1 and String(m.calls[started][0]) == "play" and int(m.calls[started][1].level) == cur:
+			started += 1
+		seen[cur] = true
+	check(started == 30, "30 consecutive Path levels start without any energy gate (%d)" % started)
+	check(m.overlay.get_child_count() == 0 and m.toasts.is_empty(), "no dialog, sheet or toast opened by starting levels")
+	check(seen.size() >= 20, "the bot covered %d distinct levels" % seen.size())
+	m.queue_free()
+	State.root_override = null
 
 
 # ------------------------------------------------------------------ boosters

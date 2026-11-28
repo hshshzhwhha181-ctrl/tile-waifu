@@ -160,7 +160,6 @@ static func attach(S: Dictionary) -> void:
 	S["econ"] = e.st
 	g.set("econ", e)
 	# the day's grants (month card) and store receipts; NOT e.tick(): it pays «Воск» for ended banners (spec: no wax)
-	e.energy.tick()
 	e.shop.reconcile()
 	_mirror.clear()
 	_attaching = false
@@ -172,7 +171,6 @@ static func on_resumed() -> void:
 	if e == null:
 		return
 	e.clock.resume()
-	e.energy.tick()
 	e.shop.reconcile()
 	_write_mirrors()
 

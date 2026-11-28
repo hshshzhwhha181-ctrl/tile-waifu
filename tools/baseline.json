@@ -3,18 +3,34 @@
  "suites": {
   "adventure": {
    "fast": {
-    "marker": "ADVENTURE_SELFTEST 147/147",
-    "ok": 147,
-    "secs": 6.1,
+    "marker": "ADVENTURE_SELFTEST 142/142",
+    "ok": 142,
+    "secs": 6.4,
     "status": "pass",
-    "total": 147
+    "total": 142
    },
    "full": {
-    "marker": "ADVENTURE_SELFTEST 147/147",
-    "ok": 147,
-    "secs": 6.0,
+    "marker": "ADVENTURE_SELFTEST 142/142",
+    "ok": 142,
+    "secs": 6.1,
     "status": "pass",
-    "total": 147
+    "total": 142
+   }
+  },
+  "affection": {
+   "fast": {
+    "marker": "AFFECTION_SELFTEST 30/30",
+    "ok": 30,
+    "secs": 5.6,
+    "status": "pass",
+    "total": 30
+   },
+   "full": {
+    "marker": "AFFECTION_SELFTEST 30/30",
+    "ok": 30,
+    "secs": 5.4,
+    "status": "pass",
+    "total": 30
    }
   },
   "audio": {
@@ -179,18 +195,18 @@
   },
   "economy": {
    "fast": {
-    "marker": "ECON_SELFTEST 384/384 (3.1 s)",
-    "ok": 384,
-    "secs": 8.4,
+    "marker": "ECON_SELFTEST 358/358 (3.1 s)",
+    "ok": 358,
+    "secs": 8.9,
     "status": "pass",
-    "total": 384
+    "total": 358
    },
    "full": {
-    "marker": "ECON_SELFTEST 384/384 (29.0 s)",
-    "ok": 384,
+    "marker": "ECON_SELFTEST 358/358 (28.8 s)",
+    "ok": 358,
     "secs": 34.5,
     "status": "pass",
-    "total": 384
+    "total": 358
    }
   },
   "event": {
@@ -663,18 +679,18 @@
   },
   "path": {
    "fast": {
-    "marker": "PATH SELFTEST 141/141 (levels 30/30, peaks 12/12, legend 10/10, boosters 24/24, wind 7/7, jam 4/4, ui 26/26, ux 28/28) 1",
-    "ok": 141,
-    "secs": 7.6,
+    "marker": "PATH SELFTEST 144/144 (levels 30/30, peaks 12/12, legend 10/10, boosters 24/24, no_energy 3/3, wind 7/7, jam 4/4, ui 26/",
+    "ok": 144,
+    "secs": 7.9,
     "status": "pass",
-    "total": 141
+    "total": 144
    },
    "full": {
-    "marker": "PATH SELFTEST 141/141 (levels 30/30, peaks 12/12, legend 10/10, boosters 24/24, wind 7/7, jam 4/4, ui 26/26, ux 28/28) 1",
-    "ok": 141,
-    "secs": 7.6,
+    "marker": "PATH SELFTEST 144/144 (levels 30/30, peaks 12/12, legend 10/10, boosters 24/24, no_energy 3/3, wind 7/7, jam 4/4, ui 26/",
+    "ok": 144,
+    "secs": 8.0,
     "status": "pass",
-    "total": 141
+    "total": 144
    }
   },
   "phone": {
@@ -757,14 +773,14 @@
    "fast": {
     "marker": "REGISTRY_SELFTEST 264/264",
     "ok": 264,
-    "secs": 5.7,
+    "secs": 5.8,
     "status": "pass",
     "total": 264
    },
    "full": {
     "marker": "REGISTRY_SELFTEST 264/264",
     "ok": 264,
-    "secs": 5.7,
+    "secs": 5.4,
     "status": "pass",
     "total": 264
    }
@@ -879,22 +895,6 @@
     "secs": 23.7,
     "status": "pass",
     "total": 288
-   }
-  },
-  "stamina": {
-   "fast": {
-    "marker": "STAMINA_SELFTEST 98/98",
-    "ok": 98,
-    "secs": 5.4,
-    "status": "pass",
-    "total": 98
-   },
-   "full": {
-    "marker": "STAMINA_SELFTEST 98/98",
-    "ok": 98,
-    "secs": 5.5,
-    "status": "pass",
-    "total": 98
    }
   },
   "summon": {
@@ -1017,18 +1017,18 @@
   },
   "tutorial": {
    "fast": {
-    "marker": "V10TUT 2757/2757 (code 61/61, lint 2412/2412, gates 39/39, geom 100/100, help 85/85, logic 60/60)",
-    "ok": 2757,
-    "secs": 8.9,
+    "marker": "V10TUT 2762/2762 (code 66/66, lint 2412/2412, gates 39/39, geom 100/100, help 85/85, logic 60/60)",
+    "ok": 2762,
+    "secs": 9.1,
     "status": "pass",
-    "total": 2757
+    "total": 2762
    },
    "full": {
-    "marker": "V10TUT 2757/2757 (code 61/61, lint 2412/2412, gates 39/39, geom 100/100, help 85/85, logic 60/60)",
-    "ok": 2757,
-    "secs": 8.8,
+    "marker": "V10TUT 2762/2762 (code 66/66, lint 2412/2412, gates 39/39, geom 100/100, help 85/85, logic 60/60)",
+    "ok": 2762,
+    "secs": 9.0,
     "status": "pass",
-    "total": 2757
+    "total": 2762
    }
   },
   "tw_levels": {

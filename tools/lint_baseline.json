@@ -37,7 +37,7 @@
    "NODE_API": 1,
    "AUTOLOAD_G": 1
   },
-  "game/core/economy/stamina/module.gd": {
+  "game/core/economy/affection/module.gd": {
    "SHELL_DEP": 1
   },
   "game/core/gacha/gacha_selftest.gd": {

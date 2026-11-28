@@ -950,11 +950,6 @@ func _build_v10(mail_new: bool) -> void :
 			V9Feel.press(mute_btn, "tap")
 			main.toast("Звук включён" if on else "Звук выключен", "sound" if on else "sound_off"))
 	home2.add_child(mute_btn)
-	# Tea Stamina indicator ("Чашки чая") neatly left of Mute in the Tea House top bar
-	var st_pill: = V10Stamina.make_pill(main)
-	st_pill.position = Vector2(mx - 166.0, ph_r.position.y + 16.0)
-	st_pill.set_meta("ux_role", "tertiary")
-	home2.add_child(st_pill)
 	_build_framing_ui(L, ph_r)
 	if not V10Look.previewing():
 		_build_quick_ui(L)

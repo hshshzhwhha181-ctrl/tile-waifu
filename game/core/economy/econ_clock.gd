@@ -10,13 +10,13 @@ extends RefCounted
 #     A wall clock that runs AHEAD of the monotonic one is accepted and re-anchors the session (st.fwd): Android's
 #     monotonic clock stops while the device sleeps, so a phone left asleep overnight with the game in background
 #     looks exactly like that — and a forward move is accepted on the next app start anyway, so ignoring it bought
-#     no protection, only lost tea regen and late daily resets for honest players.
+#     no protection, only late daily resets for honest players.
 #   • resume(): call on NOTIFICATION_APPLICATION_RESUMED; drops the session anchor and the server time (the
 #     monotonic clock missed the sleep) until the next sync_server().
 #   • Across sessions only the wall clock exists. now() is clamped to the high-water mark st.hw (latest time ever
 #     seen): rolling the clock back freezes time until real time passes the mark (st.rollbacks counts it). So a
 #     forward-jump-then-back trick pays back every second it borrowed; the most one can gain is what a regen cap
-#     already bounds (one full energy bar).
+#     already bounds.
 #   • day_key()/day_index() use Moscow time for everyone (calendar resets are the same for all players).
 #
 # Saved state (dict, JSON-safe): {"hw": int, "rollbacks": int, "jumps": int, "fwd": int, "in_rb": bool}

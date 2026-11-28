@@ -17,9 +17,6 @@ const COMBO_STEP: = 0.25
 const COMBO_CAP: = 6
 const ULT_STUN_TURNS: = 2
 const ULT_HEAL: = 15
-const STAMINA_COST: = 15
-const STAMINA_DEFEAT_REFUND: = 10
-const STAMINA_SCRIPT_PATH: = "res://scripts/v10/economy/stamina.gd"
 const ULT_VIDEO_DIR: = "res://assets/v10/ult_video"
 const CG_16_DIR: = "res://assets/v10/cg_16"
 
@@ -224,7 +221,6 @@ const SQUAD_SYNERGIES: Array[Dictionary] = [
 ]
 
 static var _tex_cache: = {}
-static var _stamina_mock = null
 
 
 static func count() -> int:
@@ -692,7 +688,7 @@ static func hub_card_info(S = null) -> Dictionary:
 	}
 
 
-# ── Ultimate Video & CG Resolvers + Soft V10Stamina Hook ──────────────────────
+# ── Ultimate Video & CG Resolvers ──────────────────────
 
 static func ult_video_path(hero_id: String, equipped_id: String = "") -> String:
 	var cands: Array[String] = []
@@ -730,46 +726,3 @@ static func ult_cg_texture(hero_id: String, equipped_id: String = "") -> Texture
 			if im != null and not im.is_empty():
 				return ImageTexture.create_from_image(im)
 	return null
-
-
-static func stamina_api():
-	if _stamina_mock != null:
-		return _stamina_mock
-	if ResourceLoader.exists(STAMINA_SCRIPT_PATH):
-		return load(STAMINA_SCRIPT_PATH)
-	return null
-
-
-static func can_afford_stamina(cost: int = STAMINA_COST) -> bool:
-	var api = stamina_api()
-	if api == null or not api.has_method("can_spend"):
-		return true
-	return bool(api.call("can_spend", cost))
-
-
-static func try_spend_stamina(main_node = null, cost: int = STAMINA_COST) -> bool:
-	var api = stamina_api()
-	if api == null:
-		return true
-	if api.has_method("can_spend") and not bool(api.call("can_spend", cost)):
-		if main_node != null and api.has_method("open_sheet"):
-			api.call("open_sheet", main_node)
-		return false
-	if api.has_method("spend"):
-		return bool(api.call("spend", cost, "adventure"))
-	return true
-
-
-static func refund_defeat_stamina(amount: int = STAMINA_DEFEAT_REFUND) -> int:
-	var api = stamina_api()
-	if api != null and api.has_method("refund"):
-		api.call("refund", amount)
-		return amount
-	return 0
-
-
-static func stamina_badge_text() -> String:
-	var api = stamina_api()
-	if api != null and api.has_method("current") and api.has_method("cap"):
-		return "Чай %d/%d · -%d" % [int(api.call("current")), int(api.call("cap")), STAMINA_COST]
-	return "Чай -%d" % STAMINA_COST

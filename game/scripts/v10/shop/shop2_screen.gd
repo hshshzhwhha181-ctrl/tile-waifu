@@ -4,15 +4,14 @@ extends Control
 # Preserves V10PassScreen / V10Purchases routing and tabs 1–2 («Наряды», «Пополнить»),
 # while upgrading Tab 0 («Витрина») with BD2/NIKKE-style Hero Offer Banners
 # («Подарок хозяйки», «Лунный абонемент», «Сезонный пропуск · Сакура») and the
-# interactive «Чай и Подарки симпатии» shelf + header Tea HUD pill.
+# interactive «Подарки симпатии» shelf.
 
 const HOSTESS_KEY: = "hostess_pack_done"
-const HOSTESS_TEA: = 200
+const HOSTESS_COINS: = 5000
 const HOSTESS_WISHES: = 10
 const HOSTESS_OUTFIT: = "o_dragon"
 
 var main
-var _tea_pill: Control = null
 var _hooked_view: Control = null
 var _active_hostess_sku: = ""
 
@@ -51,7 +50,6 @@ func _attach_vitrina_hooks() -> void:
 		v.seg.changed.connect(_on_seg_changed)
 	if not get_viewport().size_changed.is_connected(_on_vp_resized):
 		get_viewport().size_changed.connect(_on_vp_resized)
-	_inject_header_tea_pill(v)
 	if int(v.get("tab")) == 0:
 		_upgrade_vitrina(v)
 
@@ -60,7 +58,6 @@ func _on_seg_changed(_idx: int) -> void:
 	var v: = _view()
 	if v == null:
 		return
-	_inject_header_tea_pill.call_deferred(v)
 	if int(v.get("tab")) == 0:
 		_upgrade_vitrina.call_deferred(v)
 
@@ -69,7 +66,6 @@ func _on_vp_resized() -> void:
 	var v: = _view()
 	if v == null or not is_instance_valid(v):
 		return
-	_inject_header_tea_pill.call_deferred(v)
 	if int(v.get("tab")) == 0:
 		_upgrade_vitrina.call_deferred(v)
 
@@ -89,7 +85,6 @@ func refresh() -> void:
 	if v and v.has_method("refresh"):
 		v.call("refresh")
 	if v != null:
-		_inject_header_tea_pill(v)
 		if int(v.get("tab")) == 0:
 			_upgrade_vitrina(v)
 	if main and main.has_method("refresh_currency"):
@@ -104,26 +99,8 @@ func currency_target(cur: String) -> Vector2:
 
 
 func dev_act(act: String) -> void:
-	if act == "stamina" and main != null:
-		V10Stamina.open_sheet(main)
-	elif act == "tab2":
+	if act == "tab2":
 		_set_tab(2)
-
-
-func _inject_header_tea_pill(v: Control) -> void:
-	var strip: Control = v.get_node_or_null("Strip")
-	if strip == null:
-		return
-	var old: = strip.get_node_or_null("TeaPill")
-	if old != null:
-		old.queue_free()
-	var pill: = V10Stamina.make_pill(main)
-	var col_x: = float(v.get("col_x"))
-	var col_w: = float(v.get("col_w"))
-	var top_y: = float(v.get("top_y"))
-	pill.position = Vector2(col_x + col_w - 148.0 * 2.0 - 16.0 - pill.size.x, top_y + 28.0)
-	strip.add_child(pill)
-	_tea_pill = pill
 
 
 func _hostess_sku(model: V10ShopModel) -> String:
@@ -148,8 +125,7 @@ func _on_shop_delivered(r: Dictionary) -> void:
 		if not bool(G.S.v10_shop.get(HOSTESS_KEY, false)):
 			G.S.v10_shop[HOSTESS_KEY] = true
 			G.give_new(HOSTESS_OUTFIT)
-			V10Money.grant({"tickets": HOSTESS_WISHES}, "hostess_pack")
-			V10Stamina.grant(HOSTESS_TEA)
+			V10Money.grant({"tickets": HOSTESS_WISHES, "coins": HOSTESS_COINS}, "hostess_pack")
 			G.save()
 	if is_inside_tree():
 		refresh.call_deferred()
@@ -200,8 +176,8 @@ func _upgrade_vitrina(v: Control) -> void:
 	anim_nodes.append(pass_banner)
 	y += pass_banner.size.y + 18.0
 
-	# 4. «Чай и Подарки симпатии» interactive shelf (Tea refills + 3 Affection Gifts)
-	var shelf: = _build_tea_and_gifts_shelf(v, model, col_x, y, col_w)
+	# 4. «Подарки симпатии» interactive shelf (3 Affection Gifts)
+	var shelf: = _build_gifts_shelf(v, model, col_x, y, col_w)
 	content.add_child(shelf)
 	anim_nodes.append(shelf)
 	y += shelf.size.y + 18.0
@@ -299,7 +275,7 @@ func _build_hostess_banner(v: Control, model: V10ShopModel, x: float, y: float, 
 	var rows: = [
 		["item_frame", "SSR-наряд «Императрица дракона»"],
 		["item_wish", "10 билетов желаний сразу"],
-		["item_tea", "200 чашек чая в запас"],
+		["item_coin", "5 000 монет в запас"],
 	]
 	var ry: = 130.0
 	for r in rows:
@@ -508,7 +484,7 @@ func _build_pass_banner(v: Control, model: V10ShopModel, x: float, y: float, w: 
 
 # ── «Чай и Подарки симпатии» Shelf ──────────────────────────────────────────────────────────────────────────────
 
-func _build_tea_and_gifts_shelf(v: Control, _model: V10ShopModel, x: float, y: float, w: float) -> Control:
+func _build_gifts_shelf(v: Control, _model: V10ShopModel, x: float, y: float, w: float) -> Control:
 	var partner: = String(G.S.get("partner", "mc"))
 	if not G.HEROES.has(partner):
 		partner = "mc"
@@ -519,11 +495,11 @@ func _build_tea_and_gifts_shelf(v: Control, _model: V10ShopModel, x: float, y: f
 	var pneed: = int(pinfo.get("need", 120))
 
 	var box: = Control.new()
-	box.name = "TeaAndGiftsShelf"
+	box.name = "GiftsShelf"
 	box.mouse_filter = Control.MOUSE_FILTER_PASS
 	box.position = Vector2(x, y)
 
-	var hdr: = V10ShopKit.lbl("Чай и Подарки симпатии", "ui_strong", 22, V10DS.GOLD_300, true)
+	var hdr: = V10ShopKit.lbl("Подарки симпатии", "ui_strong", 22, V10DS.GOLD_300, true)
 	hdr.position = Vector2(0, 4)
 	hdr.size = Vector2(340, 32)
 	box.add_child(hdr)
@@ -538,71 +514,16 @@ func _build_tea_and_gifts_shelf(v: Control, _model: V10ShopModel, x: float, y: f
 	var ch: = 186.0
 	var gy: = 44.0
 
-	# Card 0: Tea Refill / Daily Kettle
-	var tea_card: = _build_tea_shelf_card(v, Vector2(cw, ch))
-	tea_card.position = Vector2(0, gy)
-	box.add_child(tea_card)
-
 	# Cards 1..3: Affection Gifts
 	for i in V10AffCurve.GIFTS.size():
 		var gdef: Dictionary = V10AffCurve.GIFTS[i]
-		var slot: = i + 1
+		var slot: = i
 		var gc: = _build_gift_shelf_card(v, gdef, partner, hname, Vector2(cw, ch))
 		gc.position = Vector2((slot % 2) * (cw + 16.0), gy + (slot / 2) * (ch + 14.0))
 		box.add_child(gc)
 
 	box.size = Vector2(w, gy + ch * 2.0 + 14.0)
 	return box
-
-
-func _build_tea_shelf_card(v: Control, sz: Vector2) -> Control:
-	var c: = V10ShopW.Lac.new()
-	c.name = "ShelfTeaCard"
-	c.bevel = 10.0
-	c.selected = V10Stamina.kettle_ready()
-	c.size = sz
-
-	var t: = V10ShopKit.tex("item_tea")
-	if t:
-		c.add_child(V10ShopKit.art(t, Rect2(14, 14, 68, 68)))
-
-	var pill: = _GlowBadge.new().setup(
-		"БЕСПЛАТНО +60" if V10Stamina.kettle_ready() else "+%d ЧАШЕК" % V10Stamina.REFILL_AMOUNT,
-		V10DS.JADE_300, V10DS.NIGHT_700, false)
-	pill.position = Vector2(92, 12)
-	c.add_child(pill)
-
-	var tl: = V10ShopKit.lbl("Свежая заварка", "ui_strong", 20, V10DS.PAPER_100)
-	tl.position = Vector2(92, 44)
-	tl.size = Vector2(sz.x - 102, 28)
-	c.add_child(tl)
-
-	var sub_txt: = "Чайник дня готов!" if V10Stamina.kettle_ready() else "Запас: %d/%d · +1 за 6 мин" % [V10Stamina.current(), V10Stamina.cap()]
-	var sl: = V10ShopKit.lbl(sub_txt, "ui", 18, V10DS.PAPER_300)
-	sl.position = Vector2(14, 86)
-	sl.size = Vector2(sz.x - 28, 26)
-	c.add_child(sl)
-
-	if V10Stamina.kettle_ready():
-		var kb: = V10Button.make("play", "Налить +60", Vector2(sz.x - 28, 56))
-		kb.sheen = false
-		kb.position = Vector2(14, sz.y - 68)
-		kb.pressed.connect(func():
-			if V10Stamina.claim_kettle():
-				V10ShopKit.press(kb, true)
-				V10ShopKit.toast(v, "Чайник дня: +60 чашек чая!")
-				refresh())
-		c.add_child(kb)
-	else:
-		var pr: = V10Stamina.refill_price()
-		var chip: = V10ShopW.Chip.new().setup(V10ShopKit.tex("item_crystal"), "%d · Пополнить" % pr, Vector2(sz.x - 28, 56))
-		chip.position = Vector2(14, sz.y - 68)
-		chip.pressed.connect(func():
-			if main != null:
-				V10Stamina.open_sheet(main))
-		c.add_child(chip)
-
-	return c
 
 
 func _build_gift_shelf_card(v: Control, gdef: Dictionary, partner: String, hname: String, sz: Vector2) -> Control:

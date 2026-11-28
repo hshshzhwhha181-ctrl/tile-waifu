@@ -97,7 +97,7 @@ CATALOG: list[Suite] = [
       args=["--layout_selftest=1", "--save=user://layout_shots_save.json", "--save_wipe=1"]),
     S("economy", "ECON_SELFTEST", SV + "economy/econ_selftest.tscn", ["--econ_selftest=1"],
       fast_args=["--econ_selftest=1", "--econ_mc=0.1"]),
-    S("stamina", "STAMINA_SELFTEST", SV + "economy/stamina_selftest.tscn", ["--stamina_selftest=1"]),
+    S("affection", "AFFECTION_SELFTEST", SV + "economy/affection_selftest.tscn", ["--affection_selftest=1"]),
     S("meta", "META_SELFTEST", SV + "meta/meta_runner.tscn",
       ["--meta_selftest=1", "--save=user://meta_runner.json", "--save_wipe=1"]),
     S("hud2", "HUD2 SELFTEST", SV + "hud2/hud2_demo.tscn", ["--hud2_selftest=1"]),

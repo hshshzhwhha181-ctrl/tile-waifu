@@ -575,7 +575,7 @@ func say(text: String, emo: = "", voice: = "", talk: = true) -> void:
 	var h2: Control = home.get_node_or_null("V10HudHome") as Control
 	if h2 != null and home.size.y > 700.0:
 		# 0.11.0 Tea House: float cleanly above the bottom action dock so the bubble NEVER covers
-		# the heroine's face or the top-right Framing / Tea Stamina / Mute pills.
+		# the heroine's face or the top-right Framing / Mute pills.
 		var w: = BUBBLE_W + (AV - 6.0 if with_av else 0.0)
 		var play_top: float = home.size.y - 310.0
 		var hm = home.get("main")

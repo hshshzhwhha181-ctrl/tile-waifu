@@ -216,7 +216,7 @@ func _content_title(g: Dictionary) -> String:
 
 func _content_parts(g: Dictionary) -> Array:
 	var parts: = []
-	for k in ["moon", "crystal", "wish", "coin", "petal", "tea"]:
+	for k in ["moon", "crystal", "wish", "coin", "petal"]:
 		if int(g.get(k, 0)) > 0:
 			parts.append(V10ShopTxt.amount(k, int(g[k])))
 	if g.has("items"):
@@ -500,7 +500,7 @@ func pass_claim_all() -> Array:
 
 static func grant_text(g: Dictionary) -> String:
 	var parts: = []
-	for k in ["crystal", "moon", "wish", "coin", "petal", "tea"]:
+	for k in ["crystal", "moon", "wish", "coin", "petal"]:
 		if int(g.get(k, 0)) > 0:
 			parts.append(V10ShopTxt.amount(k, int(g[k])))
 	if g.has("items"):

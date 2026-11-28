@@ -89,8 +89,6 @@ static func amount(cur: String, n: int) -> String:
 			return "%s %s" % [num(n), plural(n, "лепесток", "лепестка", "лепестков")]
 		"wax":
 			return "%s воска" % num(n)
-		"tea":
-			return "%s заварки" % num(n)
 	return "%s %s" % [num(n), cur]
 
 
