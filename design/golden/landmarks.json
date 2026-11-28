@@ -1,0 +1,5 @@
+{"_note": "hand-placed pixel y on the 752x1344 frames (grid-overlay crops, +-8 px); head = hair crown (ears excluded) to chin; sole = bottom of boot sole. head size cross-checked against cascade face boxes in face_boxes.json (box height ~0.94 x head).",
+ "nova_tea":    {"crown": 64,  "chin": 237, "sole": 1316},
+ "nova_summon": {"crown": 134, "chin": 285, "sole": 1284},
+ "nova_shop":   {"crown": 69,  "chin": 258, "sole": 1316},
+ "nova_win":    {"crown": 90,  "chin": 267, "sole": 1300}}

@@ -1,0 +1,17 @@
+{
+ "mc_match": "c1",
+ "mc_tea": "c0",
+ "mc_summon": "c0",
+ "mc_shop": "c2",
+ "mc_win": "c2",
+ "yue_match": "c2",
+ "yue_tea": "c0",
+ "yue_summon": "c0",
+ "yue_shop": "c1",
+ "yue_win": "c0",
+ "nova_match": "c1",
+ "nova_tea": "c0",
+ "nova_summon": "c0",
+ "nova_shop": "c1",
+ "nova_win": "c0"
+}
