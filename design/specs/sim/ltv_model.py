@@ -25,6 +25,10 @@ SPEND_SCALE = {"низкий": 0.75, "средний": 1.0, "высокий": 1.
 # распределение времени первого платежа по месяцам жизни когорты (сумма=1): 1-й месяц основной всплеск
 FIRST_PAY_MONTH = [0.55, 0.15, 0.08, 0.06, 0.05, 0.04, 0.03, 0.02, 0.01, 0.005, 0.003, 0.002]
 
+# Чувствительность «окна прямой продажи закрыты» (MONETIZATION_PLAN Прил. R W2): доля выручки M1, которую игроки не могут потратить
+# в днях 1-28 (SSR+ с дня 57, S/SSR баннера с дня 29) и которая переходит на M2 и M3 (50/50). [ГИПОТЕЗА]; 0 = исходная модель.
+WINDOW_DEFER = 0.35
+
 def retention_at(ret, day):
     pts = [(0, 1.0), (1, ret["D1"]), (7, ret["D7"]), (30, ret["D30"]), (90, ret["D90"]), (180, ret["D180"]), (365, ret["D365"])]
     for (d0, r0), (d1, r1) in zip(pts, pts[1:]):
@@ -48,6 +52,12 @@ def revenue_by_month(scn):
                 rev[m] += r; per_seg[seg][m] += r
     return rev, per_seg
 
+def defer_window(rev, d=WINDOW_DEFER):
+    out = list(rev)
+    moved = out[0] * d
+    out[0] -= moved; out[1] += moved / 2; out[2] += moved / 2
+    return out
+
 def main():
     print("| Сценарий | Платящие/365д | DAU D30 | Выручка M1 | M3 | M6 | M12 | LTV D30/уст. | D90 | D180 | D365 | чистый LTV365 | макс. CPI (окуп. 12 мес) |")
     print("|---|---|---|---|---|---|---|---|---|---|---|---|---|")
@@ -60,6 +70,11 @@ def main():
         net365 = ltv(12) * NET
         print(f"| {scn} | {INSTALLS*PAYER_CONV[scn]:.0f} | {dau30:.0f} | {rev[0]:,.0f} | {rev[2]:,.0f} | {rev[5]:,.0f} | {rev[11]:,.0f} | {ltv(1):.1f} | {ltv(3):.1f} | {ltv(6):.1f} | {ltv(12):.1f} | {net365:.1f} | {net365:.0f} ₽ |".replace(",", " "))
         detail[scn] = (rev, per)
+    print()
+    print(f"Чувствительность «окна закрыты» (сдвиг {WINDOW_DEFER:.0%} выручки M1 на M2/M3, [ГИПОТЕЗА]): годовая выручка не меняется, меняется календарь")
+    for scn in ("низкий", "средний", "высокий"):
+        r0 = detail[scn][0]; r1 = defer_window(r0)
+        print(f"  {scn}: M1 {r0[0]:,.0f} -> {r1[0]:,.0f}; M2 {r0[1]:,.0f} -> {r1[1]:,.0f}; M3 {r0[2]:,.0f} -> {r1[2]:,.0f}; LTV D30/уст. {r0[0]/INSTALLS:.1f} -> {r1[0]/INSTALLS:.1f}".replace(",", " "))
     print()
     for scn in ("низкий", "средний", "высокий"):
         rev, per = detail[scn]
