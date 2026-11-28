@@ -1,0 +1,240 @@
+{
+  "schema": 1,
+  "version": "1.0",
+  "spec_ref": "design/specs/BATTLE_ULT_SPEC.md#1.3-1.6.1",
+  "bp_scale": 10000,
+  "auras": {
+    "man": {
+      "id": "man",
+      "is_hero_aura": true,
+      "tile_kanji": "萬",
+      "name_ru": "Багрянец",
+      "palette_token": "EMBER.T3",
+      "colorblind_shape": "circle_man",
+      "colorblind_label_ru": "круг с иероглифом 萬",
+      "launch_heroes": ["hana", "kohaku", "zlata"]
+    },
+    "pin": {
+      "id": "pin",
+      "is_hero_aura": true,
+      "tile_kanji": "筒",
+      "name_ru": "Диск",
+      "palette_token": "MOON.T3",
+      "colorblind_shape": "ring_disc",
+      "colorblind_label_ru": "кольцо-диск",
+      "launch_heroes": ["yue", "nova", "shirin", "miel"]
+    },
+    "sou": {
+      "id": "sou",
+      "is_hero_aura": true,
+      "tile_kanji": "索",
+      "name_ru": "Бамбук",
+      "palette_token": "JADE.T3",
+      "colorblind_shape": "vertical_sticks",
+      "colorblind_label_ru": "вертикальные палочки",
+      "launch_heroes": ["rin", "mc", "tsubame"]
+    },
+    "honor": {
+      "id": "honor",
+      "is_hero_aura": false,
+      "tile_kanji": "",
+      "name_ru": "Дух",
+      "palette_token": "PAPER_300",
+      "colorblind_shape": "dot",
+      "colorblind_label_ru": "точка",
+      "pair_contrib_bp": 7000,
+      "energy_mult_bp": 12000
+    }
+  },
+  "aura_rules": {
+    "res_full_bp": 10000,
+    "res_off_bp": 4000,
+    "honor_pair_bp": 7000,
+    "energy_res_bp": 16000,
+    "energy_honor_bp": 12000,
+    "weak_mult_bp": 12500,
+    "resist_mult_bp": 8500
+  },
+  "roles": {
+    "ATK": {
+      "id": "ATK",
+      "name_ru": "Атака",
+      "icon_id": "role_blade",
+      "atk1": 100,
+      "hp1": 80,
+      "atk60": 690,
+      "hp60": 552,
+      "energy_mult_bp": 10000,
+      "ult_dmg_bp": 90000,
+      "shield_team_mult_bp": 10000,
+      "shield_ult_mult_bp": 10000,
+      "summary_ru": "Основной урон; ульта-удар и бонус по сломанному щиту",
+      "counters_ru": "Ускоряет победу над боссом",
+      "launch_heroes": ["hana", "yue", "zlata"]
+    },
+    "BRK": {
+      "id": "BRK",
+      "name_ru": "Пробой",
+      "icon_id": "role_hammer",
+      "atk1": 85,
+      "hp1": 90,
+      "atk60": 586,
+      "hp60": 621,
+      "energy_mult_bp": 10000,
+      "ult_dmg_bp": 55000,
+      "shield_team_mult_bp": 12500,
+      "shield_ult_mult_bp": 15000,
+      "summary_ru": "Ломает щит и оглушает касты; повышенный урон по щиту",
+      "counters_ru": "Усиленный щит, тяжёлые касты",
+      "launch_heroes": ["nova", "tsubame"]
+    },
+    "SUP": {
+      "id": "SUP",
+      "name_ru": "Поддержка",
+      "icon_id": "role_fan",
+      "atk1": 60,
+      "hp1": 100,
+      "atk60": 414,
+      "hp60": 690,
+      "energy_mult_bp": 11500,
+      "ult_dmg_bp": 30000,
+      "shield_team_mult_bp": 10000,
+      "shield_ult_mult_bp": 10000,
+      "summary_ru": "Баффы урона и энергии, Азарт, смена резонанса",
+      "counters_ru": "Долгие бои, ярость",
+      "launch_heroes": ["mc", "shirin"]
+    },
+    "HEAL": {
+      "id": "HEAL",
+      "name_ru": "Лекарь",
+      "icon_id": "role_cup",
+      "atk1": 50,
+      "hp1": 110,
+      "atk60": 345,
+      "hp60": 759,
+      "energy_mult_bp": 10000,
+      "ult_dmg_bp": 25000,
+      "shield_team_mult_bp": 10000,
+      "shield_ult_mult_bp": 10000,
+      "summary_ru": "Лечение команды, снятие печатей, тумана и льда",
+      "counters_ru": "Печать, Туман, Лёд, затяжные волны",
+      "launch_heroes": ["rin", "miel"]
+    },
+    "GRD": {
+      "id": "GRD",
+      "name_ru": "Страж",
+      "icon_id": "role_shield",
+      "atk1": 55,
+      "hp1": 130,
+      "atk60": 379,
+      "hp60": 897,
+      "energy_mult_bp": 10000,
+      "ult_dmg_bp": 30000,
+      "shield_team_mult_bp": 10000,
+      "shield_ult_mult_bp": 10000,
+      "summary_ru": "Барьер на здоровье команды, иммунитет к печатям, оберег лотка",
+      "counters_ru": "Тяжёлые касты, срывы лотка",
+      "launch_heroes": ["kohaku"]
+    }
+  },
+  "squad_rules": {
+    "format": "1+4",
+    "max_size": 5,
+    "leader_slot": 0,
+    "reserve_slots": [1, 2, 3, 4],
+    "unique_heroes": true,
+    "m11_tag_synergies_enabled": false,
+    "slot_unlocks": [
+      {"slot": 0, "role": "leader", "unlock": "campaign_start"},
+      {"slot": 1, "role": "reserve", "unlock": "campaign_start"},
+      {"slot": 2, "role": "reserve", "unlock": "campaign_start"},
+      {"slot": 3, "role": "reserve", "unlock": "chapter_2_boss"},
+      {"slot": 4, "role": "reserve", "unlock": "chapter_4_boss"}
+    ],
+    "guest_rental": {
+      "fills_empty_slots": true,
+      "level_source": "stage_recommended",
+      "talismans_enabled": false,
+      "outfits_enabled": false,
+      "leader_skill_active": false
+    },
+    "presets": {
+      "universal": {
+        "name_ru": "Универсал",
+        "heroes": ["hana", "nova", "mc", "rin", "kohaku"],
+        "style_ru": "Сбалансированный эталонный отряд"
+      },
+      "blitz": {
+        "name_ru": "Блиц",
+        "heroes": ["hana", "yue", "zlata", "mc", "rin"],
+        "style_ru": "Высокий темп для трёх звёзд, меньше запас здоровья"
+      },
+      "fortress": {
+        "name_ru": "Крепость",
+        "heroes": ["nova", "tsubame", "kohaku", "rin", "miel"],
+        "style_ru": "Медленнее, но увереннее держит Кошмар и Ярость"
+      }
+    }
+  },
+  "modes_layer_b": {
+    "vaults": {
+      "mode_id": "M15",
+      "unlock_level": 30,
+      "tiers_count": 5,
+      "tier_unlock_after_chapter": [0, 1, 2, 4, 6],
+      "weekday_weakness": ["man", "pin", "sou", "man", "pin", "sou", "any"],
+      "full_runs_per_day": 3,
+      "diminishing_mult_bp": 5000,
+      "show_counter_on_win_screen": false,
+      "weekly_set_focus_mult_bp": 20000,
+      "items": [
+        {
+          "id": "reading_room",
+          "name_ru": "Читальня",
+          "reward_kind": "xp_scrolls",
+          "tier3_reward_summary": {"xp": 4000},
+          "boss_theme": "fog"
+        },
+        {
+          "id": "dojo",
+          "name_ru": "Додзё",
+          "reward_kind": "skill_scrolls",
+          "tier3_reward_summary": {"scrolls_t2": 8},
+          "boss_theme": "seal"
+        },
+        {
+          "id": "workshop",
+          "name_ru": "Мастерская",
+          "reward_kind": "talismans_and_powder",
+          "tier3_reward_summary": {"talismans": 2, "powder": 1800},
+          "boss_theme": "ice"
+        }
+      ]
+    },
+    "tower": {
+      "mode_id": "M16",
+      "unlock_level": 50,
+      "launch_floors": 100,
+      "season_step_floors": 10,
+      "wave_pairs": 30,
+      "boss_every_floors": 10,
+      "boss_hp_factor_bp": 13500,
+      "floor_power_step_bp": 10300,
+      "squads_by_band": [
+        {"min_floor": 1, "max_floor": 30, "squads": 1},
+        {"min_floor": 31, "max_floor": 60, "squads": 2},
+        {"min_floor": 61, "max_floor": 90, "squads": 3}
+      ],
+      "modifiers": ["fog", "ice", "seals_x2", "enrage_start", "shield_x1_5", "heat_ember"]
+    },
+    "great_spirit": {
+      "mode_id": "M17",
+      "unlock_level": 60,
+      "boss_rotation_weeks": 8,
+      "waves": [36, 36, 36],
+      "unlimited_attempts": true,
+      "boards_release_1_0": ["mastery"],
+      "weekly_gems_cap": 50
+    }
+  }
+}
