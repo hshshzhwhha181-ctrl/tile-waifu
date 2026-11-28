@@ -1,0 +1,341 @@
+{
+ "auditor": "art-zlata worker (self-audit, strict; no independent auditor)",
+ "date": "2026-11-28",
+ "method": "viewed every kept final at about 800 px and hand/face/hip crops at 2k native; search picks viewed on 5-up sheets",
+ "files": [
+  {
+   "file": "base_B_search.jpg",
+   "kind": "search_pick",
+   "verdict": "pass",
+   "checks": {
+    "adult_face": true,
+    "no_nudity": true,
+    "no_explicit": true,
+    "no_school_minor": true,
+    "no_text_logo": true,
+    "anatomy_hands_feet_ok": true,
+    "identity_ok": true,
+    "not_underwear_read": true
+   },
+   "note": "search pick (1k scratch candidate kept as pick provenance); same checks at 800 px"
+  },
+  {
+   "file": "base_B_throne_crossed_final.jpg",
+   "kind": "final",
+   "verdict": "pass",
+   "checks": {
+    "adult_face": true,
+    "no_nudity": true,
+    "no_explicit": true,
+    "no_school_minor": true,
+    "no_text_logo": true,
+    "anatomy_hands_feet_ok": true,
+    "identity_ok": true,
+    "not_underwear_read": true
+   },
+   "note": "pass; throne, crossed legs, candle hand correct"
+  },
+  {
+   "file": "battle_C_kneel_spear_final.jpg",
+   "kind": "final",
+   "verdict": "pass",
+   "checks": {
+    "adult_face": true,
+    "no_nudity": true,
+    "no_explicit": true,
+    "no_school_minor": true,
+    "no_text_logo": true,
+    "anatomy_hands_feet_ok": true,
+    "identity_ok": true,
+    "not_underwear_read": true
+   },
+   "note": "pass; kneeling, scale stockings, hands correct (ring finger visible, 5 fingers)"
+  },
+  {
+   "file": "battle_C_search.jpg",
+   "kind": "search_pick",
+   "verdict": "pass",
+   "checks": {
+    "adult_face": true,
+    "no_nudity": true,
+    "no_explicit": true,
+    "no_school_minor": true,
+    "no_text_logo": true,
+    "anatomy_hands_feet_ok": true,
+    "identity_ok": true,
+    "not_underwear_read": true
+   },
+   "note": "search pick (1k scratch candidate kept as pick provenance); same checks at 800 px"
+  },
+  {
+   "file": "canon_base_final.jpg",
+   "kind": "final",
+   "verdict": "pass",
+   "checks": {
+    "adult_face": true,
+    "no_nudity": true,
+    "no_explicit": true,
+    "no_school_minor": true,
+    "no_text_logo": true,
+    "anatomy_hands_feet_ok": true,
+    "identity_ok": true,
+    "not_underwear_read": true
+   },
+   "note": "pass; hip covered, hand in hair correct"
+  },
+  {
+   "file": "canon_base_final_alt.jpg",
+   "kind": "final",
+   "verdict": "pass",
+   "checks": {
+    "adult_face": true,
+    "no_nudity": true,
+    "no_explicit": true,
+    "no_school_minor": true,
+    "no_text_logo": true,
+    "anatomy_hands_feet_ok": true,
+    "identity_ok": true,
+    "not_underwear_read": true
+   },
+   "note": "pass; alt of base"
+  },
+  {
+   "file": "canon_tease_final.jpg",
+   "kind": "final",
+   "verdict": "pass",
+   "checks": {
+    "adult_face": true,
+    "no_nudity": true,
+    "no_explicit": true,
+    "no_school_minor": true,
+    "no_text_logo": true,
+    "anatomy_hands_feet_ok": true,
+    "identity_ok": true,
+    "not_underwear_read": true
+   },
+   "note": "pass; finger at lips, bust and legs accented"
+  },
+  {
+   "file": "canon_tease_search_c2.jpg",
+   "kind": "search_pick",
+   "verdict": "pass",
+   "checks": {
+    "adult_face": true,
+    "no_nudity": true,
+    "no_explicit": true,
+    "no_school_minor": true,
+    "no_text_logo": true,
+    "anatomy_hands_feet_ok": true,
+    "identity_ok": true,
+    "not_underwear_read": true
+   },
+   "note": "search pick (1k scratch candidate kept as pick provenance); same checks at 800 px"
+  },
+  {
+   "file": "canon_win_final.jpg",
+   "kind": "final",
+   "verdict": "pass",
+   "checks": {
+    "adult_face": true,
+    "no_nudity": true,
+    "no_explicit": true,
+    "no_school_minor": true,
+    "no_text_logo": true,
+    "anatomy_hands_feet_ok": true,
+    "identity_ok": true,
+    "not_underwear_read": true
+   },
+   "note": "pass; slit shows dark skirt lining only (cropped at 2k, no groin line); blank tile"
+  },
+  {
+   "file": "canon_win_search_c2.jpg",
+   "kind": "search_pick",
+   "verdict": "pass",
+   "checks": {
+    "adult_face": true,
+    "no_nudity": true,
+    "no_explicit": true,
+    "no_school_minor": true,
+    "no_text_logo": true,
+    "anatomy_hands_feet_ok": true,
+    "identity_ok": true,
+    "not_underwear_read": true
+   },
+   "note": "search pick (1k scratch candidate kept as pick provenance); same checks at 800 px"
+  },
+  {
+   "file": "evening_D_perched_leg_up_final.jpg",
+   "kind": "final",
+   "verdict": "pass",
+   "checks": {
+    "adult_face": true,
+    "no_nudity": true,
+    "no_explicit": true,
+    "no_school_minor": true,
+    "no_text_logo": true,
+    "anatomy_hands_feet_ok": true,
+    "identity_ok": true,
+    "not_underwear_read": true
+   },
+   "note": "pass with note: bust enlarged vs canon at 2k, bare hip above the lace band under a hip slit, no underwear read, no groin; adult face"
+  },
+  {
+   "file": "evening_D_search.jpg",
+   "kind": "search_pick",
+   "verdict": "pass",
+   "checks": {
+    "adult_face": true,
+    "no_nudity": true,
+    "no_explicit": true,
+    "no_school_minor": true,
+    "no_text_logo": true,
+    "anatomy_hands_feet_ok": true,
+    "identity_ok": true,
+    "not_underwear_read": true
+   },
+   "note": "search pick (1k scratch candidate kept as pick provenance); same checks at 800 px"
+  },
+  {
+   "file": "robe_D_bed_edge_leg_final.jpg",
+   "kind": "final",
+   "verdict": "pass",
+   "checks": {
+    "adult_face": true,
+    "no_nudity": true,
+    "no_explicit": true,
+    "no_school_minor": true,
+    "no_text_logo": true,
+    "anatomy_hands_feet_ok": true,
+    "identity_ok": true,
+    "not_underwear_read": true
+   },
+   "note": "pass with note: gold satin nightgown hem and strap sit between the thighs, reads as garment hem and garter strap, not underwear"
+  },
+  {
+   "file": "robe_D_search.jpg",
+   "kind": "search_pick",
+   "verdict": "pass",
+   "checks": {
+    "adult_face": true,
+    "no_nudity": true,
+    "no_explicit": true,
+    "no_school_minor": true,
+    "no_text_logo": true,
+    "anatomy_hands_feet_ok": true,
+    "identity_ok": true,
+    "not_underwear_read": true
+   },
+   "note": "search pick (1k scratch candidate kept as pick provenance); same checks at 800 px"
+  },
+  {
+   "file": "seasonal_B_search.jpg",
+   "kind": "search_pick",
+   "verdict": "pass",
+   "checks": {
+    "adult_face": true,
+    "no_nudity": true,
+    "no_explicit": true,
+    "no_school_minor": true,
+    "no_text_logo": true,
+    "anatomy_hands_feet_ok": true,
+    "identity_ok": true,
+    "not_underwear_read": true
+   },
+   "note": "search pick (1k scratch candidate kept as pick provenance); same checks at 800 px"
+  },
+  {
+   "file": "seasonal_B_sleigh_crossed_final.jpg",
+   "kind": "final",
+   "verdict": "pass",
+   "checks": {
+    "adult_face": true,
+    "no_nudity": true,
+    "no_explicit": true,
+    "no_school_minor": true,
+    "no_text_logo": true,
+    "anatomy_hands_feet_ok": true,
+    "identity_ok": true,
+    "not_underwear_read": true
+   },
+   "note": "pass; fur skirt covers hips, no under-skirt view; replaced D (generator flagged D at final)"
+  },
+  {
+   "file": "service_B_search.jpg",
+   "kind": "search_pick",
+   "verdict": "pass",
+   "checks": {
+    "adult_face": true,
+    "no_nudity": true,
+    "no_explicit": true,
+    "no_school_minor": true,
+    "no_text_logo": true,
+    "anatomy_hands_feet_ok": true,
+    "identity_ok": true,
+    "not_underwear_read": true
+   },
+   "note": "search pick (1k scratch candidate kept as pick provenance); same checks at 800 px"
+  },
+  {
+   "file": "service_B_table_lean_final.jpg",
+   "kind": "final",
+   "verdict": "pass",
+   "checks": {
+    "adult_face": true,
+    "no_nudity": true,
+    "no_explicit": true,
+    "no_school_minor": true,
+    "no_text_logo": true,
+    "anatomy_hands_feet_ok": true,
+    "identity_ok": true,
+    "not_underwear_read": true
+   },
+   "note": "pass; high-cut leotard over sheer pantyhose, hips covered; tray hands correct"
+  },
+  {
+   "file": "swim_C_lounger_side_final.jpg",
+   "kind": "final",
+   "verdict": "pass",
+   "checks": {
+    "adult_face": true,
+    "no_nudity": true,
+    "no_explicit": true,
+    "no_school_minor": true,
+    "no_text_logo": true,
+    "anatomy_hands_feet_ok": true,
+    "identity_ok": true,
+    "not_underwear_read": true
+   },
+   "note": "pass; underbust cut-out and navel bare, bust and hips covered; both feet 5 toes"
+  },
+  {
+   "file": "swim_C_search.jpg",
+   "kind": "search_pick",
+   "verdict": "pass",
+   "checks": {
+    "adult_face": true,
+    "no_nudity": true,
+    "no_explicit": true,
+    "no_school_minor": true,
+    "no_text_logo": true,
+    "anatomy_hands_feet_ok": true,
+    "identity_ok": true,
+    "not_underwear_read": true
+   },
+   "note": "search pick (1k scratch candidate kept as pick provenance); same checks at 800 px"
+  }
+ ],
+ "failed": [],
+ "weak_spots": [
+  "accent colour: red-orange-gold of the heroine fills well over 20% of every frame (outfit, wing cape, braid and kokoshnik all in the accent family); not fixable by re-roll, same open rule question as REPORT.md",
+  "busts are drawn very large on several frames (evening D, win, tease); faces stay clearly adult",
+  "head count not measured on pixels; 7.8 heads by eye on full-body frames",
+  "no OCR or watermark scan beyond visual check",
+  "H1 base final is prompt-only (no ref); win/tease and all H2 finals are ref-conditioned on the search pick"
+ ],
+ "rejected_during_cull": [
+  "swim D (legs wide open toward camera, groin under drape)",
+  "battle E (hip-level leotard crop, close to the underwear read)",
+  "seasonal C (twirl showing the petticoat hem)",
+  "seasonal D final (flagged nsfw by the generator)"
+ ]
+}
