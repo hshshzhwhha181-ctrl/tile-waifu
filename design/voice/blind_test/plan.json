@@ -1,0 +1,878 @@
+{
+ "schema": 1,
+ "threshold": 0.7,
+ "min_listeners": 3,
+ "models": [
+  {
+   "id": "seed_audio",
+   "label": "Seed Audio 1.0",
+   "credits": 0.2,
+   "params": {
+    "model": "seed_audio",
+    "format": "wav",
+    "sample_rate": 48000
+   }
+  },
+  {
+   "id": "elevenlabs_v4",
+   "label": "Eleven v4",
+   "credits": 0.23,
+   "params": {
+    "model": "elevenlabs_v4"
+   }
+  },
+  {
+   "id": "text2speech_v2",
+   "label": "Text to Speech V2 (minimax)",
+   "credits": 0.15,
+   "params": {
+    "model": "text2speech_v2",
+    "variant": "minimax"
+   }
+  }
+ ],
+ "voices": [
+  {
+   "id": "luna",
+   "name": "Luna",
+   "heroine": "mc",
+   "voice_id": "375a3398-e3b4-4f91-845d-42181e352899"
+  },
+  {
+   "id": "naomi",
+   "name": "Naomi",
+   "heroine": "yue",
+   "voice_id": "caeba733-3c17-43db-863e-69c7025512cd"
+  },
+  {
+   "id": "helena",
+   "name": "Helena",
+   "heroine": "zlata",
+   "voice_id": "3c2b83c0-2e0a-5ae8-998a-a5fe71b7eccd"
+  }
+ ],
+ "categories": [
+  "login_morning",
+  "intro_summon",
+  "idle_warm",
+  "touch_head",
+  "touch_spam",
+  "gift_liked",
+  "level_max_vow",
+  "fail",
+  "ult_cast",
+  "ron"
+ ],
+ "samples": [
+  {
+   "n": 0,
+   "hash": "d75c245f4b",
+   "model": "seed_audio",
+   "voice": "luna",
+   "line_id": "mc_login_morning_1",
+   "jp": "おはよう！今日も一緒に一局しようね！",
+   "class": "lobby"
+  },
+  {
+   "n": 1,
+   "hash": "3de5974c1f",
+   "model": "seed_audio",
+   "voice": "luna",
+   "line_id": "mc_intro_summon_1",
+   "jp": "はじめまして、マージャンちゃんだよ！いい一局にしよ！",
+   "class": "intro"
+  },
+  {
+   "n": 2,
+   "hash": "76ab680300",
+   "model": "seed_audio",
+   "voice": "luna",
+   "line_id": "mc_idle_warm_1",
+   "jp": "あなたとだけ、ずっと打っていたいな。",
+   "class": "lobby"
+  },
+  {
+   "n": 3,
+   "hash": "48e776b517",
+   "model": "seed_audio",
+   "voice": "luna",
+   "line_id": "mc_touch_head_1",
+   "jp": "わっ、頭ポンポン？ふふ、くすぐったい！",
+   "class": "lobby"
+  },
+  {
+   "n": 4,
+   "hash": "770be03d42",
+   "model": "seed_audio",
+   "voice": "luna",
+   "line_id": "mc_touch_spam_1",
+   "jp": "もう、つつきすぎ！牌じゃないんだから！",
+   "class": "lobby"
+  },
+  {
+   "n": 5,
+   "hash": "19f891f961",
+   "model": "seed_audio",
+   "voice": "luna",
+   "line_id": "mc_gift_liked_1",
+   "jp": "これ、大好きなやつ！どうして分かったの？",
+   "class": "lobby"
+  },
+  {
+   "n": 6,
+   "hash": "d087b2ca29",
+   "model": "seed_audio",
+   "voice": "luna",
+   "line_id": "mc_level_max_vow_1",
+   "jp": "これからも、ずっとあなたの隣で打たせてね。",
+   "class": "lobby"
+  },
+  {
+   "n": 7,
+   "hash": "63cecc1116",
+   "model": "seed_audio",
+   "voice": "luna",
+   "line_id": "mc_fail_1",
+   "jp": "あれ、動けない…大丈夫、次は勝つから！",
+   "class": "lobby"
+  },
+  {
+   "n": 8,
+   "hash": "23778caa7a",
+   "model": "seed_audio",
+   "voice": "luna",
+   "line_id": "mc_ult_cast_1",
+   "jp": "東の風！",
+   "class": "call"
+  },
+  {
+   "n": 9,
+   "hash": "b1131b5831",
+   "model": "seed_audio",
+   "voice": "luna",
+   "line_id": "mc_ron_1",
+   "jp": "ロン、いただき！",
+   "class": "call"
+  },
+  {
+   "n": 10,
+   "hash": "6e4b373bca",
+   "model": "seed_audio",
+   "voice": "naomi",
+   "line_id": "yue_login_morning_1",
+   "jp": "朝の月も、悪くないわね。よく来たわ。",
+   "class": "lobby"
+  },
+  {
+   "n": 11,
+   "hash": "2c994b605a",
+   "model": "seed_audio",
+   "voice": "naomi",
+   "line_id": "yue_intro_summon_1",
+   "jp": "ユエよ。月の宮の主。お見知りおきを。",
+   "class": "intro"
+  },
+  {
+   "n": 12,
+   "hash": "3f1696d14f",
+   "model": "seed_audio",
+   "voice": "naomi",
+   "line_id": "yue_idle_warm_1",
+   "jp": "あなたが来ると、月がよく見える気がするの。",
+   "class": "lobby"
+  },
+  {
+   "n": 13,
+   "hash": "acf4dd3c57",
+   "model": "seed_audio",
+   "voice": "naomi",
+   "line_id": "yue_touch_head_1",
+   "jp": "頭に手を置くなんて…無礼ね。でも、許すわ。",
+   "class": "lobby"
+  },
+  {
+   "n": 14,
+   "hash": "2453abf635",
+   "model": "seed_audio",
+   "voice": "naomi",
+   "line_id": "yue_touch_spam_1",
+   "jp": "いい加減になさい。扇で叩くわよ？",
+   "class": "lobby"
+  },
+  {
+   "n": 15,
+   "hash": "d2faf4c6a4",
+   "model": "seed_audio",
+   "voice": "naomi",
+   "line_id": "yue_gift_liked_1",
+   "jp": "これは…わたくしの好みを、よく知っているのね。",
+   "class": "lobby"
+  },
+  {
+   "n": 16,
+   "hash": "732fee3d8d",
+   "model": "seed_audio",
+   "voice": "naomi",
+   "line_id": "yue_level_max_vow_1",
+   "jp": "わたくしの月を、あなたに捧げるわ。永遠に。",
+   "class": "lobby"
+  },
+  {
+   "n": 17,
+   "hash": "13270ba81c",
+   "model": "seed_audio",
+   "voice": "naomi",
+   "line_id": "yue_fail_1",
+   "jp": "月が雲に隠れただけよ。さあ、もう一度。",
+   "class": "lobby"
+  },
+  {
+   "n": 18,
+   "hash": "c92b543305",
+   "model": "seed_audio",
+   "voice": "naomi",
+   "line_id": "yue_ult_cast_1",
+   "jp": "満ちなさい！",
+   "class": "call"
+  },
+  {
+   "n": 19,
+   "hash": "9c15d83adc",
+   "model": "seed_audio",
+   "voice": "naomi",
+   "line_id": "yue_ron_1",
+   "jp": "ロン、ですわ。",
+   "class": "call"
+  },
+  {
+   "n": 20,
+   "hash": "9a24401561",
+   "model": "seed_audio",
+   "voice": "helena",
+   "line_id": "zlata_login_morning_1",
+   "jp": "おはよう！春の光が差してきたわ！",
+   "class": "lobby"
+  },
+  {
+   "n": 21,
+   "hash": "a1499bf081",
+   "model": "seed_audio",
+   "voice": "helena",
+   "line_id": "zlata_intro_summon_1",
+   "jp": "春を連れてきたわ。ズラータ、火の鳥の姫よ！",
+   "class": "intro"
+  },
+  {
+   "n": 22,
+   "hash": "a43cc914de",
+   "model": "seed_audio",
+   "voice": "helena",
+   "line_id": "zlata_idle_warm_1",
+   "jp": "あなたのそばは、春の陽だまりのようね。",
+   "class": "lobby"
+  },
+  {
+   "n": 23,
+   "hash": "184e104a6b",
+   "model": "seed_audio",
+   "voice": "helena",
+   "line_id": "zlata_touch_head_1",
+   "jp": "あら、私の頭に？…ふふ、あなたならいいわ。",
+   "class": "lobby"
+  },
+  {
+   "n": 24,
+   "hash": "2b7696c877",
+   "model": "seed_audio",
+   "voice": "helena",
+   "line_id": "zlata_touch_spam_1",
+   "jp": "ふふ、はは、あははっ！もう降参よ！",
+   "class": "lobby"
+  },
+  {
+   "n": 25,
+   "hash": "c740a09de1",
+   "model": "seed_audio",
+   "voice": "helena",
+   "line_id": "zlata_gift_liked_1",
+   "jp": "ブリヌイ！？…こほん。ありがたく、頂戴するわ。",
+   "class": "lobby"
+  },
+  {
+   "n": 26,
+   "hash": "9c6cbb8efd",
+   "model": "seed_audio",
+   "voice": "helena",
+   "line_id": "zlata_level_max_vow_1",
+   "jp": "春が終わっても、あなたのそばに咲き続けるわ。",
+   "class": "lobby"
+  },
+  {
+   "n": 27,
+   "hash": "a881f59bc3",
+   "model": "seed_audio",
+   "voice": "helena",
+   "line_id": "zlata_fail_1",
+   "jp": "灰は、始まりにすぎないわ。もう一度！",
+   "class": "lobby"
+  },
+  {
+   "n": 28,
+   "hash": "9f0806f2d6",
+   "model": "seed_audio",
+   "voice": "helena",
+   "line_id": "zlata_ult_cast_1",
+   "jp": "火の鳥、舞え！",
+   "class": "call"
+  },
+  {
+   "n": 29,
+   "hash": "537a48a7a4",
+   "model": "seed_audio",
+   "voice": "helena",
+   "line_id": "zlata_ron_1",
+   "jp": "ロン、頂戴！",
+   "class": "call"
+  },
+  {
+   "n": 30,
+   "hash": "bad80b64a9",
+   "model": "elevenlabs_v4",
+   "voice": "luna",
+   "line_id": "mc_login_morning_1",
+   "jp": "おはよう！今日も一緒に一局しようね！",
+   "class": "lobby"
+  },
+  {
+   "n": 31,
+   "hash": "4401dc398a",
+   "model": "elevenlabs_v4",
+   "voice": "luna",
+   "line_id": "mc_intro_summon_1",
+   "jp": "はじめまして、マージャンちゃんだよ！いい一局にしよ！",
+   "class": "intro"
+  },
+  {
+   "n": 32,
+   "hash": "dea9e87ace",
+   "model": "elevenlabs_v4",
+   "voice": "luna",
+   "line_id": "mc_idle_warm_1",
+   "jp": "あなたとだけ、ずっと打っていたいな。",
+   "class": "lobby"
+  },
+  {
+   "n": 33,
+   "hash": "79d300e30a",
+   "model": "elevenlabs_v4",
+   "voice": "luna",
+   "line_id": "mc_touch_head_1",
+   "jp": "わっ、頭ポンポン？ふふ、くすぐったい！",
+   "class": "lobby"
+  },
+  {
+   "n": 34,
+   "hash": "c3de76ff41",
+   "model": "elevenlabs_v4",
+   "voice": "luna",
+   "line_id": "mc_touch_spam_1",
+   "jp": "もう、つつきすぎ！牌じゃないんだから！",
+   "class": "lobby"
+  },
+  {
+   "n": 35,
+   "hash": "1289e1ad10",
+   "model": "elevenlabs_v4",
+   "voice": "luna",
+   "line_id": "mc_gift_liked_1",
+   "jp": "これ、大好きなやつ！どうして分かったの？",
+   "class": "lobby"
+  },
+  {
+   "n": 36,
+   "hash": "7391ace22e",
+   "model": "elevenlabs_v4",
+   "voice": "luna",
+   "line_id": "mc_level_max_vow_1",
+   "jp": "これからも、ずっとあなたの隣で打たせてね。",
+   "class": "lobby"
+  },
+  {
+   "n": 37,
+   "hash": "56c502e68c",
+   "model": "elevenlabs_v4",
+   "voice": "luna",
+   "line_id": "mc_fail_1",
+   "jp": "あれ、動けない…大丈夫、次は勝つから！",
+   "class": "lobby"
+  },
+  {
+   "n": 38,
+   "hash": "2796669715",
+   "model": "elevenlabs_v4",
+   "voice": "luna",
+   "line_id": "mc_ult_cast_1",
+   "jp": "東の風！",
+   "class": "call"
+  },
+  {
+   "n": 39,
+   "hash": "db72d1329d",
+   "model": "elevenlabs_v4",
+   "voice": "luna",
+   "line_id": "mc_ron_1",
+   "jp": "ロン、いただき！",
+   "class": "call"
+  },
+  {
+   "n": 40,
+   "hash": "c3ecfe0e18",
+   "model": "elevenlabs_v4",
+   "voice": "naomi",
+   "line_id": "yue_login_morning_1",
+   "jp": "朝の月も、悪くないわね。よく来たわ。",
+   "class": "lobby"
+  },
+  {
+   "n": 41,
+   "hash": "a6c17c74c7",
+   "model": "elevenlabs_v4",
+   "voice": "naomi",
+   "line_id": "yue_intro_summon_1",
+   "jp": "ユエよ。月の宮の主。お見知りおきを。",
+   "class": "intro"
+  },
+  {
+   "n": 42,
+   "hash": "b3591d5088",
+   "model": "elevenlabs_v4",
+   "voice": "naomi",
+   "line_id": "yue_idle_warm_1",
+   "jp": "あなたが来ると、月がよく見える気がするの。",
+   "class": "lobby"
+  },
+  {
+   "n": 43,
+   "hash": "33a60a143b",
+   "model": "elevenlabs_v4",
+   "voice": "naomi",
+   "line_id": "yue_touch_head_1",
+   "jp": "頭に手を置くなんて…無礼ね。でも、許すわ。",
+   "class": "lobby"
+  },
+  {
+   "n": 44,
+   "hash": "6ac9ed2555",
+   "model": "elevenlabs_v4",
+   "voice": "naomi",
+   "line_id": "yue_touch_spam_1",
+   "jp": "いい加減になさい。扇で叩くわよ？",
+   "class": "lobby"
+  },
+  {
+   "n": 45,
+   "hash": "1ae789f4f0",
+   "model": "elevenlabs_v4",
+   "voice": "naomi",
+   "line_id": "yue_gift_liked_1",
+   "jp": "これは…わたくしの好みを、よく知っているのね。",
+   "class": "lobby"
+  },
+  {
+   "n": 46,
+   "hash": "c1200c82bb",
+   "model": "elevenlabs_v4",
+   "voice": "naomi",
+   "line_id": "yue_level_max_vow_1",
+   "jp": "わたくしの月を、あなたに捧げるわ。永遠に。",
+   "class": "lobby"
+  },
+  {
+   "n": 47,
+   "hash": "123d286bb7",
+   "model": "elevenlabs_v4",
+   "voice": "naomi",
+   "line_id": "yue_fail_1",
+   "jp": "月が雲に隠れただけよ。さあ、もう一度。",
+   "class": "lobby"
+  },
+  {
+   "n": 48,
+   "hash": "3df4099595",
+   "model": "elevenlabs_v4",
+   "voice": "naomi",
+   "line_id": "yue_ult_cast_1",
+   "jp": "満ちなさい！",
+   "class": "call"
+  },
+  {
+   "n": 49,
+   "hash": "557a4be114",
+   "model": "elevenlabs_v4",
+   "voice": "naomi",
+   "line_id": "yue_ron_1",
+   "jp": "ロン、ですわ。",
+   "class": "call"
+  },
+  {
+   "n": 50,
+   "hash": "af0b260db2",
+   "model": "elevenlabs_v4",
+   "voice": "helena",
+   "line_id": "zlata_login_morning_1",
+   "jp": "おはよう！春の光が差してきたわ！",
+   "class": "lobby"
+  },
+  {
+   "n": 51,
+   "hash": "701ad7853d",
+   "model": "elevenlabs_v4",
+   "voice": "helena",
+   "line_id": "zlata_intro_summon_1",
+   "jp": "春を連れてきたわ。ズラータ、火の鳥の姫よ！",
+   "class": "intro"
+  },
+  {
+   "n": 52,
+   "hash": "959ef670bc",
+   "model": "elevenlabs_v4",
+   "voice": "helena",
+   "line_id": "zlata_idle_warm_1",
+   "jp": "あなたのそばは、春の陽だまりのようね。",
+   "class": "lobby"
+  },
+  {
+   "n": 53,
+   "hash": "4d65969bb5",
+   "model": "elevenlabs_v4",
+   "voice": "helena",
+   "line_id": "zlata_touch_head_1",
+   "jp": "あら、私の頭に？…ふふ、あなたならいいわ。",
+   "class": "lobby"
+  },
+  {
+   "n": 54,
+   "hash": "5a2dfc1df5",
+   "model": "elevenlabs_v4",
+   "voice": "helena",
+   "line_id": "zlata_touch_spam_1",
+   "jp": "ふふ、はは、あははっ！もう降参よ！",
+   "class": "lobby"
+  },
+  {
+   "n": 55,
+   "hash": "c46c2414ce",
+   "model": "elevenlabs_v4",
+   "voice": "helena",
+   "line_id": "zlata_gift_liked_1",
+   "jp": "ブリヌイ！？…こほん。ありがたく、頂戴するわ。",
+   "class": "lobby"
+  },
+  {
+   "n": 56,
+   "hash": "4c7236894d",
+   "model": "elevenlabs_v4",
+   "voice": "helena",
+   "line_id": "zlata_level_max_vow_1",
+   "jp": "春が終わっても、あなたのそばに咲き続けるわ。",
+   "class": "lobby"
+  },
+  {
+   "n": 57,
+   "hash": "4dd08d1cd3",
+   "model": "elevenlabs_v4",
+   "voice": "helena",
+   "line_id": "zlata_fail_1",
+   "jp": "灰は、始まりにすぎないわ。もう一度！",
+   "class": "lobby"
+  },
+  {
+   "n": 58,
+   "hash": "79e5bc7bd9",
+   "model": "elevenlabs_v4",
+   "voice": "helena",
+   "line_id": "zlata_ult_cast_1",
+   "jp": "火の鳥、舞え！",
+   "class": "call"
+  },
+  {
+   "n": 59,
+   "hash": "e9beae8f3b",
+   "model": "elevenlabs_v4",
+   "voice": "helena",
+   "line_id": "zlata_ron_1",
+   "jp": "ロン、頂戴！",
+   "class": "call"
+  },
+  {
+   "n": 60,
+   "hash": "2fdcc1b441",
+   "model": "text2speech_v2",
+   "voice": "luna",
+   "line_id": "mc_login_morning_1",
+   "jp": "おはよう！今日も一緒に一局しようね！",
+   "class": "lobby"
+  },
+  {
+   "n": 61,
+   "hash": "7be0ee78cc",
+   "model": "text2speech_v2",
+   "voice": "luna",
+   "line_id": "mc_intro_summon_1",
+   "jp": "はじめまして、マージャンちゃんだよ！いい一局にしよ！",
+   "class": "intro"
+  },
+  {
+   "n": 62,
+   "hash": "408cf43780",
+   "model": "text2speech_v2",
+   "voice": "luna",
+   "line_id": "mc_idle_warm_1",
+   "jp": "あなたとだけ、ずっと打っていたいな。",
+   "class": "lobby"
+  },
+  {
+   "n": 63,
+   "hash": "0564cee274",
+   "model": "text2speech_v2",
+   "voice": "luna",
+   "line_id": "mc_touch_head_1",
+   "jp": "わっ、頭ポンポン？ふふ、くすぐったい！",
+   "class": "lobby"
+  },
+  {
+   "n": 64,
+   "hash": "cdf4e77417",
+   "model": "text2speech_v2",
+   "voice": "luna",
+   "line_id": "mc_touch_spam_1",
+   "jp": "もう、つつきすぎ！牌じゃないんだから！",
+   "class": "lobby"
+  },
+  {
+   "n": 65,
+   "hash": "d90c0243c2",
+   "model": "text2speech_v2",
+   "voice": "luna",
+   "line_id": "mc_gift_liked_1",
+   "jp": "これ、大好きなやつ！どうして分かったの？",
+   "class": "lobby"
+  },
+  {
+   "n": 66,
+   "hash": "467c7fa83f",
+   "model": "text2speech_v2",
+   "voice": "luna",
+   "line_id": "mc_level_max_vow_1",
+   "jp": "これからも、ずっとあなたの隣で打たせてね。",
+   "class": "lobby"
+  },
+  {
+   "n": 67,
+   "hash": "7cfb0d2538",
+   "model": "text2speech_v2",
+   "voice": "luna",
+   "line_id": "mc_fail_1",
+   "jp": "あれ、動けない…大丈夫、次は勝つから！",
+   "class": "lobby"
+  },
+  {
+   "n": 68,
+   "hash": "8f2168b5fc",
+   "model": "text2speech_v2",
+   "voice": "luna",
+   "line_id": "mc_ult_cast_1",
+   "jp": "東の風！",
+   "class": "call"
+  },
+  {
+   "n": 69,
+   "hash": "3f0b29b492",
+   "model": "text2speech_v2",
+   "voice": "luna",
+   "line_id": "mc_ron_1",
+   "jp": "ロン、いただき！",
+   "class": "call"
+  },
+  {
+   "n": 70,
+   "hash": "ad95199475",
+   "model": "text2speech_v2",
+   "voice": "naomi",
+   "line_id": "yue_login_morning_1",
+   "jp": "朝の月も、悪くないわね。よく来たわ。",
+   "class": "lobby"
+  },
+  {
+   "n": 71,
+   "hash": "c1c63954ee",
+   "model": "text2speech_v2",
+   "voice": "naomi",
+   "line_id": "yue_intro_summon_1",
+   "jp": "ユエよ。月の宮の主。お見知りおきを。",
+   "class": "intro"
+  },
+  {
+   "n": 72,
+   "hash": "ab3edb5dba",
+   "model": "text2speech_v2",
+   "voice": "naomi",
+   "line_id": "yue_idle_warm_1",
+   "jp": "あなたが来ると、月がよく見える気がするの。",
+   "class": "lobby"
+  },
+  {
+   "n": 73,
+   "hash": "08c32430d3",
+   "model": "text2speech_v2",
+   "voice": "naomi",
+   "line_id": "yue_touch_head_1",
+   "jp": "頭に手を置くなんて…無礼ね。でも、許すわ。",
+   "class": "lobby"
+  },
+  {
+   "n": 74,
+   "hash": "6a1c1564b1",
+   "model": "text2speech_v2",
+   "voice": "naomi",
+   "line_id": "yue_touch_spam_1",
+   "jp": "いい加減になさい。扇で叩くわよ？",
+   "class": "lobby"
+  },
+  {
+   "n": 75,
+   "hash": "29b933f575",
+   "model": "text2speech_v2",
+   "voice": "naomi",
+   "line_id": "yue_gift_liked_1",
+   "jp": "これは…わたくしの好みを、よく知っているのね。",
+   "class": "lobby"
+  },
+  {
+   "n": 76,
+   "hash": "ea5208c544",
+   "model": "text2speech_v2",
+   "voice": "naomi",
+   "line_id": "yue_level_max_vow_1",
+   "jp": "わたくしの月を、あなたに捧げるわ。永遠に。",
+   "class": "lobby"
+  },
+  {
+   "n": 77,
+   "hash": "cb302fd536",
+   "model": "text2speech_v2",
+   "voice": "naomi",
+   "line_id": "yue_fail_1",
+   "jp": "月が雲に隠れただけよ。さあ、もう一度。",
+   "class": "lobby"
+  },
+  {
+   "n": 78,
+   "hash": "0c77ab7cba",
+   "model": "text2speech_v2",
+   "voice": "naomi",
+   "line_id": "yue_ult_cast_1",
+   "jp": "満ちなさい！",
+   "class": "call"
+  },
+  {
+   "n": 79,
+   "hash": "b34a881368",
+   "model": "text2speech_v2",
+   "voice": "naomi",
+   "line_id": "yue_ron_1",
+   "jp": "ロン、ですわ。",
+   "class": "call"
+  },
+  {
+   "n": 80,
+   "hash": "3c56124da1",
+   "model": "text2speech_v2",
+   "voice": "helena",
+   "line_id": "zlata_login_morning_1",
+   "jp": "おはよう！春の光が差してきたわ！",
+   "class": "lobby"
+  },
+  {
+   "n": 81,
+   "hash": "a75721c139",
+   "model": "text2speech_v2",
+   "voice": "helena",
+   "line_id": "zlata_intro_summon_1",
+   "jp": "春を連れてきたわ。ズラータ、火の鳥の姫よ！",
+   "class": "intro"
+  },
+  {
+   "n": 82,
+   "hash": "0f4168221f",
+   "model": "text2speech_v2",
+   "voice": "helena",
+   "line_id": "zlata_idle_warm_1",
+   "jp": "あなたのそばは、春の陽だまりのようね。",
+   "class": "lobby"
+  },
+  {
+   "n": 83,
+   "hash": "b1a993d25c",
+   "model": "text2speech_v2",
+   "voice": "helena",
+   "line_id": "zlata_touch_head_1",
+   "jp": "あら、私の頭に？…ふふ、あなたならいいわ。",
+   "class": "lobby"
+  },
+  {
+   "n": 84,
+   "hash": "83838524e6",
+   "model": "text2speech_v2",
+   "voice": "helena",
+   "line_id": "zlata_touch_spam_1",
+   "jp": "ふふ、はは、あははっ！もう降参よ！",
+   "class": "lobby"
+  },
+  {
+   "n": 85,
+   "hash": "6b37afbc90",
+   "model": "text2speech_v2",
+   "voice": "helena",
+   "line_id": "zlata_gift_liked_1",
+   "jp": "ブリヌイ！？…こほん。ありがたく、頂戴するわ。",
+   "class": "lobby"
+  },
+  {
+   "n": 86,
+   "hash": "432c371b85",
+   "model": "text2speech_v2",
+   "voice": "helena",
+   "line_id": "zlata_level_max_vow_1",
+   "jp": "春が終わっても、あなたのそばに咲き続けるわ。",
+   "class": "lobby"
+  },
+  {
+   "n": 87,
+   "hash": "afcd4f2544",
+   "model": "text2speech_v2",
+   "voice": "helena",
+   "line_id": "zlata_fail_1",
+   "jp": "灰は、始まりにすぎないわ。もう一度！",
+   "class": "lobby"
+  },
+  {
+   "n": 88,
+   "hash": "7f66f99613",
+   "model": "text2speech_v2",
+   "voice": "helena",
+   "line_id": "zlata_ult_cast_1",
+   "jp": "火の鳥、舞え！",
+   "class": "call"
+  },
+  {
+   "n": 89,
+   "hash": "d3259dd101",
+   "model": "text2speech_v2",
+   "voice": "helena",
+   "line_id": "zlata_ron_1",
+   "jp": "ロン、頂戴！",
+   "class": "call"
+  }
+ ]
+}
