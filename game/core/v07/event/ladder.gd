@@ -131,7 +131,7 @@ static var _par_cache: = {}
 static func table_pairs(k: int, start_day: int) -> int:
 	var key: = "%d:%d" % [start_day, k]
 	if not _par_cache.has(key):
-		_par_cache[key] = TrayBoard.gen_layout(table_cfg(k, start_day)).size() / 2
+		_par_cache[key] = TWFree.gen_layout(table_cfg(k, start_day)).size() / 2
 	return int(_par_cache[key])
 
 static func table_par(k: int, start_day: int) -> int:

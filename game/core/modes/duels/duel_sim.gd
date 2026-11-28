@@ -3,8 +3,8 @@ extends RefCounted
 
 # V10DuelSim — a headless model of the duel race (spec R6 «калибровка офлайн») and the calibration itself.
 #
-# The table is the tower track's model V10TowerSim (TrayBoard.gen_layout as is, the «free» rule of
-# TrayBoard._free_if, the _assign algorithm from a seeded stream) on the duel cfg of V10DuelCfg. The heroine is
+# The table is the tower track's model V10TowerSim (TWFree.gen_layout as is, the «free» rule of
+# tray_board._free_if, the _assign algorithm from a seeded stream) on the duel cfg of V10DuelCfg. The heroine is
 # V6Duel / V10DuelRun as an event model: her clock runs down from `pace` (±15 %), at `telegraph` she marks a free
 # pair (aiming at a face you hold in the tray only with soft_steal), at 0 she takes it if both tiles are still there,
 # otherwise it is a steal (her clock restarts at 0,75 pace). Every `need` pairs she plays her trick, at most trick_n

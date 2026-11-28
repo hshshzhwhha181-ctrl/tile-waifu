@@ -1,7 +1,7 @@
 class_name V10LevelSim
 extends RefCounted
 
-# 0.10 levels: a compact, headless rules engine for the tray board (TrayBoard + V6SpecialBoard rules), used by the
+# 0.10 levels: a compact, headless rules engine for the tray board (tray_board + V6SpecialBoard rules), used by the
 # generator (removal orders), the verifier (certificate replay, independent DFS solver) and the difficulty bots.
 #
 # Rules mirrored from tray_board.gd / special_board.gd:
@@ -79,7 +79,7 @@ var failed: = false
 var has_locks: = false
 
 
-# Build the topology from positions (Array of Vector3i in TrayBoard.setup order).
+# Build the topology from positions (Array of Vector3i in tray_board.setup order).
 func build(positions: Array) -> void :
 	n = positions.size()
 	tag = ""

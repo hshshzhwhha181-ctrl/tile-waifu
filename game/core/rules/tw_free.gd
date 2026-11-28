@@ -2,22 +2,22 @@ class_name TWFree
 extends RefCounted
 
 # TWFree (P16 / WP5): the geometry of the tile table and the ONE rule of a "free" tile, as pure static code with no
-# Node, no Tile and no render stack. TrayBoard, V10LevelSim and the mode boards (triples, garden, classic, ...) each
+# Node, no Tile and no render stack. tray_board, V10LevelSim and the mode boards (triples, garden, classic, ...) each
 # carry their own copy of this rule; TWBoard and every later mode board take it from here.
 #
 # Grid: tiles sit on integer cells (x, y, z); a tile is 2 cells wide and 2 cells high, layer z sits half a tile off the
 # layer below, so x and y of layer z have the parity of z.
 #
-# THE rule (identical to TrayBoard.is_free / V10LevelSim.is_free):
+# THE rule (identical to tray_board.is_free / V10LevelSim.is_free):
 #   a tile is COVERED by a present tile o with o.z > t.z, |o.x - t.x| < 2 and |o.y - t.y| < 2;
 #   a tile is FREE when nothing present covers it AND NOT (a present tile on the left side AND a present tile on the
 #   right side). Left/right = same z, dx = -2 / +2, |dy| < 2.
 #   "present" = on the table: not taken and not sitting in the tray.
 #
 #   TWFree.gen_layout(cfg)        the cell list of a board config (cols, rows, layers, fill, shape, upper, seed)
-#   TWFree.positions(cfg)         gen_layout + the odd tile removed + sorted: the tile ids of TrayBoard.setup / V10LevelGen
+#   TWFree.positions(cfg)         gen_layout + the odd tile removed + sorted: the tile ids of tray_board.setup / V10LevelGen
 #   TWFree.topology(pos)          {cov_by, covers, lft, rgt, lft_of, rgt_of}: adjacency lists by tile id
-#   TWFree.world(pos)             Vector2 of a cell on the table in TrayBoard pixels (blast radius, hint distance, views)
+#   TWFree.world(pos)             Vector2 of a cell on the table in tray_board pixels (blast radius, hint distance, views)
 #
 # gen_layout draws from the ENGINE generator seeded with cfg.seed, on purpose: the certificates of the 1000 Path levels
 # (levels_bake.json) and the baked triples / bridge tables were made from exactly this stream, and WP5 forbids altering
@@ -26,7 +26,7 @@ extends RefCounted
 const MAX_COLS: = 6
 const MAX_ROWS: = 9
 
-# TrayBoard / Tile pixel constants (Tile.TW = 84, Tile.S = TW / 185, Tile.TH = 192 * S); only distances are used
+# tray_board / Tile pixel constants (Tile.TW = 84, Tile.S = TW / 185, Tile.TH = 192 * S); only distances are used
 const TW: = 84.0
 const TH: = 192.0 * (84.0 / 185.0)
 const UX: = TW * 0.5 + 1.0
@@ -118,7 +118,7 @@ static func gen_layout(cfg: Dictionary) -> Array:
 	return pos
 
 
-# the take-order key of TrayBoard.setup: layer first, then row, then column
+# the take-order key of tray_board.setup: layer first, then row, then column
 static func sort_positions(pos: Array) -> void:
 	pos.sort_custom( func(a, b): return a.z * 100000 + a.y * 100 + a.x < b.z * 100000 + b.y * 100 + b.x)
 
@@ -209,6 +209,6 @@ static func is_free(i: int, topo: Dictionary, present: Callable) -> bool:
 	return true
 
 
-# the table position of a cell in TrayBoard pixels, relative to cell (0, 0, 0)
+# the table position of a cell in tray_board pixels, relative to cell (0, 0, 0)
 static func world(p: Vector3i) -> Vector2:
 	return Vector2(p.x * UX, p.y * UY) + DZ * p.z

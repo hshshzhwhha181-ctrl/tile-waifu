@@ -72,7 +72,7 @@ static func make_cfg(gi: int, heroes: Array) -> Dictionary:
 		code = "S%d" % gi
 	# a table of at least a few pairs, whatever the shape does to a small grid
 	var tries: = 0
-	while TrayBoard.gen_layout(cfg).size() < 8 and tries < 20:
+	while TWFree.gen_layout(cfg).size() < 8 and tries < 20:
 		cfg.seed = int(cfg.get("seed", 1)) + 1
 		cfg.cols = int(cfg.cols) + (1 if tries % 2 == 0 else 0)
 		cfg.rows = int(cfg.rows) + (1 if tries % 2 == 1 else 0)
