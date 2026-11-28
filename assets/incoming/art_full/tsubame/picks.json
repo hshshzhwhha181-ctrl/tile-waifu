@@ -250,17 +250,5 @@
   "stage": "search",
   "quality_notes": "Pose B: sitting on stone step legs crossed with a candy apple. D (leg lifted, hem rides up) and E (back hip exposed) rejected.",
   "higgsfield_job_id": "6dd39189-ddd0-479d-b663-e407ab8cf11d"
- },
- {
-  "file": "assets/incoming/art_full/tsubame/seasonal_B_final.jpg",
-  "batch": "H2",
-  "task_id": "H2.tsubame_seasonal.final",
-  "outfit_slot": "seasonal",
-  "pose": "B",
-  "prompt": "<<<259cfc8a-2078-4aae-b99a-8670ac4ec5e1>>> is Tsubame, an adult woman of 24, kunoichi courier between worlds. Hair: jet-black very long high ponytail tied with a crimson cord and tassels, long side-swept bangs framing the face. Eyes: crimson red narrow upturned eyes. Skin: light-medium neutral skin. Face: angular adult oval face with sharp cheekbones, narrow crimson eyes, long straight lashes, thin brows, small closed smile. Signature items that must be present: silver swallow-shaped kunai hairpin; long crimson scarf; messenger pouch with a swallow emblem; small brass bell on the obi cord. Body: lithe average height, about 165 cm tall (7.25 heads tall), lithe slim toned figure with shapely legs, rounded hips, a slim waist, a shapely bust. Outfit: short crimson yukata with swallow print, an off-shoulder neckline, a black obi with a bell, a slit to the hip, black thigh-high socks with red ribbon bands, wooden geta. Pose: sitting on a stone step with legs crossed, a candy apple in hand. Expression: teasing smile. Framing: full-body view from head to heels, centered. Setting: summer festival with goldfish stalls and fireworks. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman with grown-woman proportions, 7.25 heads tall (165 cm, lithe average height), slim toned shapely legs, a mature adult face and figure, a defined waist, the composition accents her legs, thighs and bust, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
-  "seed": 665874,
-  "stage": "final",
-  "quality_notes": "2k high. Crimson swallow-print yukata, obi with bell, thigh-high socks with ribbon bands, geta. A small flying-swallow shape floats near the hair (recurring model motif).",
-  "higgsfield_job_id": "4bd9019d-6415-4989-b384-bcb603c10d51"
  }
 ]

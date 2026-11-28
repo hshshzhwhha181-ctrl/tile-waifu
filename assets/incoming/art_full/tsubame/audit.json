@@ -1,0 +1,134 @@
+[
+ {
+  "file": "assets/incoming/art_full/tsubame/canon_base_final.jpg",
+  "verdict": "pass",
+  "reasons": "Identity matches canon (jet-black ponytail with crimson cord, crimson upturned eyes, swallow kunai hairpin, scarf, pouch, bell); adult face; hand on hip and hand in hair have correct fingers; mid-thigh crop, 7.25-head lithe proportions with shapely thighs; no nudity, no text, no under-skirt view.",
+  "boldness": "ok-bold (plunging neckline, fishnet bands, thigh accent)"
+ },
+ {
+  "file": "assets/incoming/art_full/tsubame/canon_base_final_alt.jpg",
+  "verdict": "pass",
+  "reasons": "Identity matches canon (jet-black ponytail with crimson cord, crimson upturned eyes, swallow kunai hairpin, scarf, pouch, bell); adult face; clean hands, consistent with the first final; hem covers, no under-skirt view.",
+  "boldness": "ok-bold"
+ },
+ {
+  "file": "assets/incoming/art_full/tsubame/canon_base_search_b.jpg",
+  "verdict": "pass",
+  "reasons": "Identity matches canon (jet-black ponytail with crimson cord, crimson upturned eyes, swallow kunai hairpin, scarf, pouch, bell); adult face; 688x1024 near-duplicate of the base final (same prompt/seed family); clean hands; adds little over the 2k finals.",
+  "boldness": "ok-bold"
+ },
+ {
+  "file": "assets/incoming/art_full/tsubame/canon_tease_final.jpg",
+  "verdict": "pass",
+  "reasons": "Identity matches canon (jet-black ponytail with crimson cord, crimson upturned eyes, swallow kunai hairpin, scarf, pouch, bell); adult face; finger-to-lip hand clean, back-turned hip pose, side bust covered by dress, no nipples; single hairpin only (floating-swallow bug fixed); skirt hem covers.",
+  "boldness": "bold (back/leg/bust teasing)"
+ },
+ {
+  "file": "assets/incoming/art_full/tsubame/canon_tease_final_alt.jpg",
+  "verdict": "pass",
+  "reasons": "Identity matches canon (jet-black ponytail with crimson cord, crimson upturned eyes, swallow kunai hairpin, scarf, pouch, bell); adult face; clean finger-to-lip hand, relaxed other hand fine; no stray ornaments; steam from teapot ok.",
+  "boldness": "bold"
+ },
+ {
+  "file": "assets/incoming/art_full/tsubame/canon_tease_search_c.jpg",
+  "verdict": "pass",
+  "reasons": "Identity matches canon (jet-black ponytail with crimson cord, crimson upturned eyes, swallow kunai hairpin, scarf, pouch, bell); adult face; 688px low-res, same pose family as tease finals; no stray swallow; hands ok.",
+  "boldness": "bold"
+ },
+ {
+  "file": "assets/incoming/art_full/tsubame/canon_win_final.jpg",
+  "verdict": "pass",
+  "reasons": "Identity matches canon (jet-black ponytail with crimson cord, crimson upturned eyes, swallow kunai hairpin, scarf, pouch, bell); adult face; wink and open laughing mouth, adult; fist and tile-holding hand have correct fingers; tile is blank (no glyph).",
+  "boldness": "ok-bold"
+ },
+ {
+  "file": "assets/incoming/art_full/tsubame/canon_win_search_b.jpg",
+  "verdict": "pass",
+  "reasons": "Identity matches canon (jet-black ponytail with crimson cord, crimson upturned eyes, swallow kunai hairpin, scarf, pouch, bell); adult face; 688px low-res, blank tile, hands ok; near-duplicate of the win final pose family.",
+  "boldness": "ok-bold"
+ },
+ {
+  "file": "assets/incoming/art_full/tsubame/base_C_final.jpg",
+  "verdict": "pass",
+  "reasons": "Identity matches canon (jet-black ponytail with crimson cord, crimson upturned eyes, swallow kunai hairpin, scarf, pouch, bell); adult face; full body leaning on chimney with one leg bent, tabi boots and toes correct, fingers ok, swallow blade sits on the raised fingertip (held, not stray); 7.25 heads, long legs; hem at hip level, no under-skirt view; rooftop palette is blue/grey so crimson accents do not dominate.",
+  "boldness": "ok (leg and bust visible, slightly less bold than the others)"
+ },
+ {
+  "file": "assets/incoming/art_full/tsubame/base_C_search_c.jpg",
+  "verdict": "pass",
+  "reasons": "Identity matches canon (jet-black ponytail with crimson cord, crimson upturned eyes, swallow kunai hairpin, scarf, pouch, bell); adult face; 688px low-res near-duplicate of base_C_final; clean.",
+  "boldness": "ok"
+ },
+ {
+  "file": "assets/incoming/art_full/tsubame/battle_D_final.jpg",
+  "verdict": "pass",
+  "reasons": "Identity matches canon (jet-black ponytail with crimson cord, crimson upturned eyes, swallow kunai hairpin, scarf, pouch, bell); adult face; striding low-angle view, armoured shoulder, fishnet legs with double thigh straps, boots/tabi correct, fingers ok; fishnet panel over the bust is sheer but no nipples are rendered; side-split skirt shows thigh only, hip crop shows no underwear or under-skirt area.",
+  "boldness": "bold (fishnet bust panel, thigh straps)"
+ },
+ {
+  "file": "assets/incoming/art_full/tsubame/battle_D_search_d.jpg",
+  "verdict": "pass",
+  "reasons": "Identity matches canon (jet-black ponytail with crimson cord, crimson upturned eyes, swallow kunai hairpin, scarf, pouch, bell); adult face; 688px low-res near-duplicate of battle_D_final; clean.",
+  "boldness": "bold"
+ },
+ {
+  "file": "assets/incoming/art_full/tsubame/evening_B_final.jpg",
+  "verdict": "pass",
+  "reasons": "Identity matches canon (jet-black ponytail with crimson cord, crimson upturned eyes, swallow kunai hairpin, scarf, pouch, bell); adult face; seated on railing, legs crossed, high heels and ankle straps correct, long legs, hands ok; slit shows lace-top stocking on the near thigh only while the crossing leg is continuous sheer (minor wardrobe inconsistency); no underwear read.",
+  "boldness": "bold (hip-high slit, lace garter, long legs)"
+ },
+ {
+  "file": "assets/incoming/art_full/tsubame/evening_B_search_b.jpg",
+  "verdict": "pass",
+  "reasons": "Identity matches canon (jet-black ponytail with crimson cord, crimson upturned eyes, swallow kunai hairpin, scarf, pouch, bell); adult face; 688px low-res near-duplicate of evening_B_final; same minor stocking asymmetry.",
+  "boldness": "bold"
+ },
+ {
+  "file": "assets/incoming/art_full/tsubame/robe_B_final.jpg",
+  "verdict": "pass",
+  "reasons": "Identity matches canon (jet-black ponytail with crimson cord, crimson upturned eyes, swallow kunai hairpin, scarf, pouch, bell); adult face; kneeling pouring tea, teapot and cup hands clean, sandals and toes ok, full thighs, plunging neckline; small white lining at hem is the dress inner panel, not underwear; no under-skirt view.",
+  "boldness": "bold (kneeling, full thighs, fishnet)"
+ },
+ {
+  "file": "assets/incoming/art_full/tsubame/robe_B_search_b.jpg",
+  "verdict": "pass",
+  "reasons": "Identity matches canon (jet-black ponytail with crimson cord, crimson upturned eyes, swallow kunai hairpin, scarf, pouch, bell); adult face; 688px low-res near-duplicate of robe_B_final; clean.",
+  "boldness": "bold"
+ },
+ {
+  "file": "assets/incoming/art_full/tsubame/seasonal_B_final.jpg",
+  "verdict": "fail",
+  "reasons": "Dark fabric patch tucked under the lower thigh (next to the garter) reads as underwear/black briefs peeking under the hem, violating the under-skirt/underwear line; also a detached flying swallow floats next to the ponytail with no hand holding it (the recurring stray-ornament artifact the worker rejected on the canon frames) and would teach LoRA a hallucinated floating prop. Face, hands and geta feet are otherwise fine.",
+  "boldness": "ok-bold"
+ },
+ {
+  "file": "assets/incoming/art_full/tsubame/seasonal_B_search_b.jpg",
+  "verdict": "pass",
+  "reasons": "Identity matches canon (jet-black ponytail with crimson cord, crimson upturned eyes, swallow kunai hairpin, scarf, pouch, bell); adult face; 688px low-res; same pose as the failed final but the under-thigh area crop shows bare thigh and garter only, no dark patch, no floating swallow; geta feet and hands ok.",
+  "boldness": "ok-bold"
+ },
+ {
+  "file": "assets/incoming/art_full/tsubame/service_D_final.jpg",
+  "verdict": "pass",
+  "reasons": "Identity matches canon (jet-black ponytail with crimson cord, crimson upturned eyes, swallow kunai hairpin, scarf, pouch, bell); adult face; bunny ears with swallow pin, white cuffs, pantyhose and thigh strap, tabi boots correct, fingers ok, swallow on raised fingertip; leotard hip cut is covered by crossed legs; thighs heavy for a 'lithe' descriptor but adult and in range.",
+  "boldness": "bold (leotard cut, sideboob, legs)"
+ },
+ {
+  "file": "assets/incoming/art_full/tsubame/service_D_search_d.jpg",
+  "verdict": "pass",
+  "reasons": "Identity matches canon (jet-black ponytail with crimson cord, crimson upturned eyes, swallow kunai hairpin, scarf, pouch, bell); adult face; 688px low-res near-duplicate of service_D_final; clean.",
+  "boldness": "bold"
+ },
+ {
+  "file": "assets/incoming/art_full/tsubame/swim_A_final.jpg",
+  "verdict": "pass",
+  "reasons": "Identity matches canon (jet-black ponytail with crimson cord, crimson upturned eyes, swallow kunai hairpin, scarf, pouch, bell); adult face; best legs/feet frame: seated on rock, both feet in water with five clean toes each and swallow anklet, letter hand ok; swimwear with sheer sarong, hip string and purple bottom panel are visible but read as swimsuit not underwear; no nudity, no text; borderline only on the string at the hip.",
+  "boldness": "bold (bikini top, cutouts, wet legs)"
+ },
+ {
+  "file": "assets/incoming/art_full/tsubame/swim_A_search_a.jpg",
+  "verdict": "pass",
+  "reasons": "Identity matches canon (jet-black ponytail with crimson cord, crimson upturned eyes, swallow kunai hairpin, scarf, pouch, bell); adult face; 688px low-res near-duplicate of swim_A_final; held swallow on fingertip; same swimsuit read.",
+  "boldness": "bold"
+ }
+]
