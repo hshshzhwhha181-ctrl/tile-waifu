@@ -240,10 +240,10 @@ EXTERNAL: list[Suite] = [
     Suite(id="slice_goldens", kind="python", group="lint", marker="SLICE_GOLDENS", timeout=900, fast=False,
           script="tools/slice_goldens.py", args=[],
           note="P37: home/match/result/collection/wish/shop at 720x1280, 720x1600, 1536x2048 vs game/tests/goldens (<= 1.5 % of pixels differ); `python tools/slice_goldens.py --update` re-records"),
-    # P37: 60-tile frame cost (headless + software GL) and the exported pack size (the PCK step is `python tools/perf_budget.py`, off here)
+    # P37: 60-tile frame cost (headless + software GL) and the exported pack size
     Suite(id="perf_budget", kind="python", group="lint", marker="PERF_BUDGET", timeout=600, fast=False,
-          script="tools/perf_budget.py", args=["--no-pck"],
-          note="P37: p95 frame cost of a live 60-tile round <= 16.6 ms (headless and xvfb; device not verified); the 135 MB pack check runs with `python tools/perf_budget.py` (no --no-pck)"),
+          script="tools/perf_budget.py", args=[],
+          note="P37: p95 frame cost of a live 60-tile round <= 16.6 ms (headless and xvfb; device not verified) + the Android-store pack <= 135 MB (export-pack)"),
     # QA plan: tools/qa tool-belt (palette_audit on synthetic images, skin_lint + schema + 3 sample manifests, fuzz, ramps/schema in sync); numpy+Pillow optional (palette tests skip without them)
     Suite(id="qa_tools", kind="python", group="lint", marker="QA_TOOLS RESULT", timeout=120, fast=True,
           script="tools/qa/run_qa_tools.py",

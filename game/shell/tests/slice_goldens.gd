@@ -144,7 +144,10 @@ func _shots() -> void:
 		if m.result_modal != null:
 			m.result_modal.advance(1.6)
 		await shot("result")
+		m.result_modal.cta.pressed.emit()   # the way on, like a finger: the modal leaves the stack before Collection opens
+		await s.frames(2)
 		await s.leave_match()
+		s.check(s.h.modals.depth() == 0, "result: the modal layer is empty after the button")
 	# 4-6. Collection, Wish, Shop
 	await _legacy("collection", "collection")
 	await _legacy("summon", "wish")
@@ -161,6 +164,7 @@ var _every: = 6
 
 func _tick() -> void:
 	_n += 1
+	s.last_beat_ms = Time.get_ticks_msec()   # a drawn frame is an event for the watchdog
 	if _n % _every == 0:
 		var img: = s.h.get_viewport().get_texture().get_image()
 		img.convert(Image.FORMAT_RGB8)
