@@ -33,6 +33,15 @@
     "total": 30
    }
   },
+  "asset_id_only": {
+   "full": {
+    "marker": "ASSET_ID_ONLY SELFTEST 13/13 PASS",
+    "ok": 13,
+    "secs": 0.8,
+    "status": "pass",
+    "total": 13
+   }
+  },
   "audio": {
    "fast": {
     "marker": "V10AUDIO OK 339/339",
@@ -1109,6 +1118,15 @@
     "secs": 7.2,
     "status": "pass",
     "total": 64
+   }
+  },
+  "twassets": {
+   "full": {
+    "marker": "TWASSETS_SELFTEST 69/69",
+    "ok": 69,
+    "secs": 16.8,
+    "status": "pass",
+    "total": 69
    }
   },
   "twboard": {

@@ -102,6 +102,8 @@ CATALOG: list[Suite] = [
       note="P23: ScreenSpec, TWScreen, TWScreens (go/back/history/tabs on 12 fake screens, 3 s watchdog), TWContext, TWBus"),
     S("twmodal", "TWMODAL_SELFTEST", "res://shell/nav/modal_selftest.tscn", group="core",
       note="P24: TWModal, ModalStack (scrim owned by the modal, on_close exactly once, clear_all), Android back table (4 rows), 500-sequence property test"),
+    S("twassets", "TWASSETS_SELFTEST", "res://shell/assets/assets_selftest.tscn", group="core", timeout=600,
+      note="P29: TWAssets registry (direct + composite ids: every manifest asset and every resolver id loads, 0 missing), release gate (not approved -> null + code), dev flagged placeholder"),
     S("ults", "ULTS", args=["--ults_selftest=1"], group="core"),
     S("letters", "LETTERS", args=["--letters_selftest=1"], group="core"),
     # ---- v10 registry modules (docs/INTEGRATION_0.10.md; ids == V10RegistryList ids) -----------------
@@ -200,6 +202,10 @@ EXTERNAL: list[Suite] = [
     Suite(id="modal_only_via_stack", kind="python", group="lint", marker="MODAL_ONLY_VIA_STACK SELFTEST", timeout=60, fast=True,
           script="tools/lint_modal_only_via_stack.py", args=["--selftest", "--check"],
           note="MODAL_ONLY_VIA_STACK: 14 synthetic cases + shell has 0 violations + legacy overlay-scan sites (report mode, 39) within tools/lint_modal_baseline.json"),
+    # P29: assets are reached by id through TWAssets; a res://assets literal in game/shell is red, legacy literals are a ratchet
+    Suite(id="asset_id_only", kind="python", group="lint", marker="ASSET_ID_ONLY SELFTEST", timeout=60, fast=True,
+          script="tools/lint_asset_id_only.py", args=["--selftest", "--check"],
+          note="ASSET_ID_ONLY: 13 synthetic cases + game/shell has 0 res://assets literals + legacy literals (report mode, 493) within tools/lint_asset_id_baseline.json"),
     # P45: loudness meter self-test on synthetic signals (python + numpy + ffmpeg; the corpus scan is a separate CLI run)
     Suite(id="audio_gate", kind="python", group="lint", marker="AUDIO_GATE SELFTEST", timeout=120, fast=True,
           script="tools/audio/lufs_gate.py", args=["--selftest", "--no-write"],
