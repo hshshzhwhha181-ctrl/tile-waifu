@@ -130,6 +130,22 @@ CATALOG: list[Suite] = [
       note="G1 Brief A: regression + property/fuzz suite for clock/save/migrate/board/nav/modal/bus/assets fixes"),
     S("twult", "TWULT_SELFTEST", "res://tests/ult/ult_selftest.tscn", group="core",
       note="P87: TWUltRegistry (58-id catalogue + legacy sources), TWUltPolicy, ult_seen modular save"),
+    S("battle_progress", "BATTLE_PROGRESS_SELFTEST", "res://tests/battle/progress_selftest.tscn", group="core",
+      note="P78: TWBattleProgress AT-B03, AT-B11 (100k pity), W15 catch-up, D30 cohort"),
+    S("battle_core", "BATTLE_CORE_SELFTEST", "res://tests/battle/battle_core_selftest.tscn", group="core",
+      note="P74: TWBattle/TWBattleMath/TWBattleEvents AT-B01..B06, AT-B15, AT-U10, XP table, ULT_AIM journal"),
+    S("battle", "BATTLE_SELFTEST", "res://tests/battle/battle_selftest.tscn", ["--battle_selftest=1"], fast_args=["--battle_selftest=1", "--runs=300"], group="core",
+      note="P75: TWBattleBot/TWBattleSelftest AT-B07 role spread, AT-B08 twist spread, AT-B09 sim parity, AT-B16 autobattle"),
+    S("battle_stages", "BATTLE_STAGES_SELFTEST", "res://tests/battle/stages_selftest.tscn", group="core",
+      note="P77: AT-B10 60 stages x 3 seeds = 180 certified boards + suit_weights + blind solver"),
+    S("twage", "TWAGE_SELFTEST", "res://tests/age/age_selftest.tscn", group="core", timeout=180,
+      note="P22: TWAge/TWConsent/TWSpendLimit/PullHistory"),
+    S("twlegal", "TWLEGAL_SELFTEST", "res://tests/legal/legal_selftest.tscn", group="core", timeout=180,
+      note="P108: 13 legal template docs, C16 clause, offer-versioned consent journal, TWLegalScreen"),
+    S("analytics", "ANALYTICS_SELFTEST", "res://tests/analytics/analytics_selftest.tscn", group="core",
+      note="P106: TWAnalyticsSchema + TWAnalyticsBuffer"),
+    S("modal_soak", "MODAL_SOAK_SELFTEST", "res://shell/tests/modal_soak.tscn", group="core", timeout=300, fast_args=["--soak_ops=1200"],
+      note="P26: 61 screens x 10 modal archetypes soak + 0.12.1 regression + leak check"),
     S("ults", "ULTS", args=["--ults_selftest=1"], group="core"),
     S("letters", "LETTERS", args=["--letters_selftest=1"], group="core"),
     # ---- v10 registry modules (docs/INTEGRATION_0.10.md; ids == V10RegistryList ids) -----------------
@@ -217,6 +233,16 @@ EXTERNAL: list[Suite] = [
     # game/core purity ratchet: selftest (6 synthetic files -> 6 findings) + violations vs tools/lint_baseline.json
     Suite(id="core_purity", kind="python", group="lint", marker="CORE_PURITY RESULT", timeout=60, fast=True,
           script="tools/lint_core_purity.py", args=["--selftest", "--check"]),
+    Suite(id="battle_sim_v2", kind="python", group="lint", marker="[GATES]", timeout=120, fast=True, script="design/specs/sim/battle_sim.py", args=["--quick", "--check-gates"],
+          note="P73: balance.json Variant A parity, W15 catch-up, T1-T8 twist spread, rules publication gate"),
+    Suite(id="gen_stages", kind="python", group="lint", marker="GEN_STAGES VERIFY", timeout=60, fast=True, script="tools/gen_stages.py", args=["--selftest", "--verify"],
+          note="P77: verify 60 stages x 3 seeds certified boards"),
+    Suite(id="design_lint", kind="python", group="lint", marker="DESIGN_LINT RESULT", timeout=60, fast=True, script="tools/design_lint.py", args=["--selftest", "--check"],
+          note="P93 W17: skins.json/shop.json <-> spec tables"),
+    Suite(id="dashboards", kind="python", group="lint", marker="DASHBOARDS_SELFTEST", timeout=60, fast=True, script="tools/dashboards/test_dashboards.py", args=["--selftest"],
+          note="P106: DB-01..DB-10"),
+    Suite(id="export_filter", kind="python", group="lint", marker="EXPORT_FILTER SELFTEST", timeout=60, fast=True, script="tools/assets/export_filter.py", args=["--selftest"],
+          note="P92: export filter selftest (--check-presets after export_presets.cfg is updated)"),
     # P19: the Path table is read through TWLevels.at(n) only; direct G.LEVELS[...] indexing is red
     Suite(id="no_direct_levels", kind="python", group="lint", marker="NO_DIRECT_LEVELS RESULT", timeout=60, fast=True,
           script="tools/lint_no_direct_levels.py", args=["--selftest", "--check"]),
@@ -298,9 +324,11 @@ def parse_output(suite: Suite, text: str, rc: int | None, timed_out: bool) -> Re
     text = ANSI_RE.sub("", text)
     lines = [ln.rstrip("\r") for ln in text.split("\n")]
     marker_line = ""
+    marker_idx = -1
     low = suite.marker.lower()
-    for ln in lines:
+    for idx, ln in enumerate(lines):
         if low in ln.lower():
+            marker_idx = idx
             marker_line = ln.strip()
     r.marker_line = marker_line
     # failure ids: FAIL lines and SCRIPT ERROR lines. The marker summary line itself ("X 12/13") is not a
@@ -310,7 +338,7 @@ def parse_output(suite: Suite, text: str, rc: int | None, timed_out: bool) -> Re
         s = ln.strip()
         if FAIL_RE.search(s) and not s.startswith("at:"):
             fails.append(norm_fail(s))
-    serr = [norm_fail(ln) for ln in lines if ln.lstrip().startswith("SCRIPT ERROR:")]
+    serr = [norm_fail(ln) for ln in lines if "SCRIPT ERROR:" in ln]   # P96/T19: anywhere, incl. teardown
     r.script_errors = len(serr)
     if suite.soft:
         soft_re = re.compile(suite.soft)
@@ -330,7 +358,8 @@ def parse_output(suite: Suite, text: str, rc: int | None, timed_out: bool) -> Re
         r.status, r.reason = "error", f"no marker line '{suite.marker}'"
         return r
     bad_ratio = r.ok is not None and (r.total - r.ok > n_soft or r.total == 0)
-    rc_ok = rc == 0 or (rc in TEARDOWN_RCS and not serr)
+    marker_green = (marker_idx >= 0) and not bad_ratio and not r.failures and not FAIL_RE.search(marker_line)   # P96/T19
+    rc_ok = rc == 0 or (rc in TEARDOWN_RCS and marker_green and not serr)
     if rc_ok and NO_MASK_RC and rc not in (0, *KNOWN_ABORT_RCS):
         rc_ok = False
     if bad_ratio or r.failures or not rc_ok:
