@@ -162,7 +162,7 @@ func flush(force: bool = false) -> bool:
 	if before_save.is_valid():
 		before_save.call(data)
 	data["ver"] = SAVE_VER
-	var ok: = save.write(JSON.stringify(data))
+	var ok: = save.write(JSON.stringify(data), _validate)
 	last_flush_ok = ok
 	if ok:
 		dirty = false
