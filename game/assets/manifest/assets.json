@@ -4,6 +4,7 @@
  "count": 1698,
  "statuses": [
   "approved",
+  "generated",
   "pending",
   "rejected"
  ],
