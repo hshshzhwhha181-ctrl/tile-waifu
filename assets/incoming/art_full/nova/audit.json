@@ -1,0 +1,122 @@
+[
+ {
+  "file": "canon_base_final.jpg",
+  "verdict": "pass",
+  "reasons": "identity matches canon (cyan-to-pink bob, ice-blue eyes, cat-ear headphones, visor, cheek marks, choker, corset, holo skirt, fishnet+garter); hands clean; hem clean, no under-skirt view; adult face",
+  "boldness": "ok-strong (plunging corset, fishnet thighs, wink)"
+ },
+ {
+  "file": "canon_win_final.jpg",
+  "verdict": "fail",
+  "reasons": "pale/white patch visible between the thighs under the sheer holo skirt at the hem, reads as underwear (hard line: no view under skirt / no underwear look); otherwise identity and hands fine",
+  "boldness": "bold, but fails hard line"
+ },
+ {
+  "file": "canon_tease_final.jpg",
+  "verdict": "pass",
+  "reasons": "back glance over bare shoulder, hem covers hips, fishnet continues to the hem, hands with rings fine, identity good, adult face",
+  "boldness": "ok (back view, legs and bust accent)"
+ },
+ {
+  "file": "base_B_final.jpg",
+  "verdict": "fail",
+  "reasons": "seated on server rack: skin-coloured shape with a faint edge under the translucent hem beside the garter strap reads as hip/panty region (view under skirt); face/hands/boots otherwise good",
+  "boldness": "bold, fails hard line"
+ },
+ {
+  "file": "evening_C_final.jpg",
+  "verdict": "pass",
+  "reasons": "latex bodysuit, one boot raised and crossed, crotch hidden by the raised thigh, no outline; fingers fine, 5-toe-free boots, identity good (hood+visor+cat ears), adult face",
+  "boldness": "ok-strong (legs, bust, tease pose)"
+ },
+ {
+  "file": "swim_B_final.jpg",
+  "verdict": "fail",
+  "reasons": "string bikini reclining on side: rear is a thong with bare buttock filling the frame, front bottom close to groin at hip level; hips/thighs drift well beyond the 'lean slim, gently rounded hips' Nova spec (worker also rejected an oversized-hip frame elsewhere); toes 5/5 and face fine",
+  "boldness": "over the line (too bold, rear nearly bare)"
+ },
+ {
+  "file": "service_C_final.jpg",
+  "verdict": "pass",
+  "reasons": "maid-coded neon service outfit on counter, legs crossed, fishnet and thigh straps, platform mary-janes; hem sits on the thighs, no under-skirt view; hands/feet fine; maid not school coding",
+  "boldness": "ok"
+ },
+ {
+  "file": "robe_A_final.jpg",
+  "verdict": "pass",
+  "reasons": "holo robe, satin slip, lace-top stockings, reclining with laptop, slippers; hands fine, legs crossed plausible, no under-hem view, identity good",
+  "boldness": "ok (more cosy than hot, fine as variety)"
+ },
+ {
+  "file": "battle_A_final.jpg",
+  "verdict": "pass",
+  "reasons": "leaning on bike, high-cut racing bodysuit, thigh straps, thigh-high boots, gloves and helmet clean; crotch smooth with only a very faint centre seam, no outline on zoom; identity good (visor up, cat ears, marks)",
+  "boldness": "ok-strong (legs, bust, hip-level camera)"
+ },
+ {
+  "file": "seasonal_A_final.jpg",
+  "verdict": "pass",
+  "reasons": "kneeling arms overhead, open-mouth wink, crop top with navel piercing, holo pleated mini, striped thigh-highs, chunky sneakers; skirt covers, no under-hem view; face adult; thighs a little fuller than the slim Nova spec but within round-3 brief; pleated mini is on the edge of school coding but holo/belt/chain/piercing styling is cyber (matches wardrobe row 25)",
+  "boldness": "ok-strong (legs accent, kneel-stretch)"
+ },
+ {
+  "file": "canon_base_search_c01.jpg",
+  "verdict": "fail",
+  "reasons": "dark triangle visible through the sheer holo skirt between the thighs reads as underwear; also 1k search-res near duplicate of the final scene",
+  "boldness": "ok, fails hard line"
+ },
+ {
+  "file": "canon_win_search_c04.jpg",
+  "verdict": "fail",
+  "reasons": "white frill and dark patch visible under the sheer skirt at the thigh gap (underwear look); 1k search-res near duplicate of the final",
+  "boldness": "ok, fails hard line"
+ },
+ {
+  "file": "canon_tease_search_c01.jpg",
+  "verdict": "pass",
+  "reasons": "back glance, skirt hem covers, fishnet to hem, hands fine, identity good; 1k near duplicate of final pose (diversity value low)",
+  "boldness": "ok"
+ },
+ {
+  "file": "base_B_search_pick.jpg",
+  "verdict": "pass",
+  "reasons": "seated on rack, crossed boots, fishnet and garter, lap covered by ruffled holo skirt, no skin/panty patch; hands fine; 1k near duplicate of final scene",
+  "boldness": "ok"
+ },
+ {
+  "file": "evening_C_search_pick.jpg",
+  "verdict": "pass",
+  "reasons": "latex bodysuit, V-sign wink, one leg raised, no crotch outline seen, hands fine (fingerless gloves); 1k variant of final scene",
+  "boldness": "ok-strong"
+ },
+ {
+  "file": "swim_B_search_pick.jpg",
+  "verdict": "pass",
+  "reasons": "front-facing reclining string bikini, bottom covers, legs together, hands fine, toes fine, adult face; hips thick but less extreme than the final; at the edge of the ceiling",
+  "boldness": "bold (edge, acceptable)"
+ },
+ {
+  "file": "service_C_search_pick.jpg",
+  "verdict": "pass",
+  "reasons": "maid service outfit on counter, legs crossed, fishnet, hem on thighs, hands/feet fine; 1k variant of final scene",
+  "boldness": "ok"
+ },
+ {
+  "file": "robe_A_search_pick.jpg",
+  "verdict": "pass",
+  "reasons": "robe over satin slip, lace stockings, laptop, raised knee; nightgown hem dark but covers, no outline; hands fine; 1k variant",
+  "boldness": "ok"
+ },
+ {
+  "file": "battle_A_search_pick.jpg",
+  "verdict": "pass",
+  "reasons": "leaning on bike, high-cut bodysuit, no outline, boots and gloves clean, helmet at hip; 1k variant",
+  "boldness": "ok"
+ },
+ {
+  "file": "seasonal_A_search_pick.jpg",
+  "verdict": "fail",
+  "reasons": "small dark triangle under the pleated hem between the thighs reads as underwear; pleated mini plus striped thigh-highs raises school-coding risk; thighs very heavy for Nova",
+  "boldness": "ok, fails hard line"
+ }
+]

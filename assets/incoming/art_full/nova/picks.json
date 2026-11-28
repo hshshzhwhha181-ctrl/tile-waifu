@@ -13,45 +13,6 @@
   "quality_notes": "wink, hand-in-hair, hem clean, adult face; f2 rejected (panty-like patch under hem) | 2k high, png->jpg q92"
  },
  {
-  "file": "canon_base_search_c01.jpg",
-  "batch": "H1",
-  "task_id": "H1.nova_base.search",
-  "outfit_slot": "canon",
-  "pose": "base",
-  "prompt": "<<<0c657961-8e36-4535-a0c3-0059ce5df987>>> is Nova, an adult woman of 23, white-hat hacker and street racer. Hair: chin-length asymmetric bob fading from cyan-blue at the roots to hot pink at the ends, side-swept bangs. Eyes: ice-blue eyes with a faint pink gradient under the lids and winged liner. Skin: fair pale cool-neutral porcelain-peach skin with a soft pink blush (not tanned, not dark). Face: small sharp adult oval face with a pointed chin, cat-like upturned eyes, thin arched brows, smug smile. Signature items that must be present: neon cat-ear headphones glowing cyan and pink (Nova only); small cyan face-marks on the cheek; black choker with a metal ring; transparent visor pushed up on the forehead in some outfits. Body: petite but clearly a grown woman, about 158 cm tall (7.0 heads tall), lean slim toned figure with shapely legs, gently rounded hips, a slim waist, a shapely bust. Outfit: strapless black corset bodice with neon cyan piping and a plunging sweetheart neckline, detached puffed black sleeves with neon trim, layered holographic tiered mini skirt with a big pink cat-badge bow at the hip, black fishnet thigh-highs with a neon cyan garter strap, black thigh-high lace-up platform boots with cyan laces. Pose: standing with one hip tilted, one hand on her hip, the other hand touching her hair, eyes on the viewer. Expression: confident teasing smile. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward hot pink. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman with grown-woman proportions, 7.0 heads tall (158 cm, petite but clearly a grown woman), slim toned shapely legs, a mature adult face and figure, a defined waist, the composition accents her legs, thighs and bust, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
-  "seed": null,
-  "nominal_seed": 187887,
-  "stage": "search",
-  "job_id": "65892c17-dfe2-45c5-9bd8-99970252dd4a",
-  "quality_notes": "best of 6 | 1k medium, jpeg q88"
- },
- {
-  "file": "canon_win_final.jpg",
-  "batch": "H1",
-  "task_id": "H1.nova_win.final",
-  "outfit_slot": "canon",
-  "pose": "win",
-  "prompt": "<<<0c657961-8e36-4535-a0c3-0059ce5df987>>> is Nova, an adult woman of 23, white-hat hacker and street racer. Hair: chin-length asymmetric bob fading from cyan-blue at the roots to hot pink at the ends, side-swept bangs. Eyes: ice-blue eyes with a faint pink gradient under the lids and winged liner. Skin: fair pale cool-neutral porcelain-peach skin with a soft pink blush (not tanned, not dark). Face: small sharp adult oval face with a pointed chin, cat-like upturned eyes, thin arched brows, smug smile. Signature items that must be present: neon cat-ear headphones glowing cyan and pink (Nova only); small cyan face-marks on the cheek; black choker with a metal ring; transparent visor pushed up on the forehead in some outfits. Body: petite but clearly a grown woman, about 158 cm tall (7.0 heads tall), lean slim toned figure with shapely legs, gently rounded hips, a slim waist, a shapely bust. Outfit: strapless black corset bodice with neon cyan piping and a plunging sweetheart neckline, detached puffed black sleeves with neon trim, layered holographic tiered mini skirt with a big pink cat-badge bow at the hip, black fishnet thigh-highs with a neon cyan garter strap, black thigh-high lace-up platform boots with cyan laces. Pose: leaning toward the viewer in a joyful victory pose, one hand holding up a single blank ivory mahjong tile, a wink. Expression: bright laugh with a wink. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward hot pink. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman with grown-woman proportions, 7.0 heads tall (158 cm, petite but clearly a grown woman), slim toned shapely legs, a mature adult face and figure, a defined waist, the composition accents her legs, thighs and bust, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
-  "seed": null,
-  "nominal_seed": 133581,
-  "stage": "final",
-  "job_id": "346e4cec-eb30-4817-9655-7aa869b22a46",
-  "quality_notes": "laughing wink, blank tile, hem clean; f2 rejected (panty-like patch under hem) | 2k high, png->jpg q92"
- },
- {
-  "file": "canon_win_search_c04.jpg",
-  "batch": "H1",
-  "task_id": "H1.nova_win.search",
-  "outfit_slot": "canon",
-  "pose": "win",
-  "prompt": "<<<0c657961-8e36-4535-a0c3-0059ce5df987>>> is Nova, an adult woman of 23, white-hat hacker and street racer. Hair: chin-length asymmetric bob fading from cyan-blue at the roots to hot pink at the ends, side-swept bangs. Eyes: ice-blue eyes with a faint pink gradient under the lids and winged liner. Skin: fair pale cool-neutral porcelain-peach skin with a soft pink blush (not tanned, not dark). Face: small sharp adult oval face with a pointed chin, cat-like upturned eyes, thin arched brows, smug smile. Signature items that must be present: neon cat-ear headphones glowing cyan and pink (Nova only); small cyan face-marks on the cheek; black choker with a metal ring; transparent visor pushed up on the forehead in some outfits. Body: petite but clearly a grown woman, about 158 cm tall (7.0 heads tall), lean slim toned figure with shapely legs, gently rounded hips, a slim waist, a shapely bust. Outfit: strapless black corset bodice with neon cyan piping and a plunging sweetheart neckline, detached puffed black sleeves with neon trim, layered holographic tiered mini skirt with a big pink cat-badge bow at the hip, black fishnet thigh-highs with a neon cyan garter strap, black thigh-high lace-up platform boots with cyan laces. Pose: leaning toward the viewer in a joyful victory pose, one hand holding up a single blank ivory mahjong tile, a wink. Expression: bright laugh with a wink. Framing: three-quarter figure cut at mid-thigh so the thigh band or hem is visible, centered. Setting: softly blurred teahouse interior with paper lanterns, background softly tinted toward hot pink. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman with grown-woman proportions, 7.0 heads tall (158 cm, petite but clearly a grown woman), slim toned shapely legs, a mature adult face and figure, a defined waist, the composition accents her legs, thighs and bust, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
-  "seed": null,
-  "nominal_seed": 133581,
-  "stage": "search",
-  "job_id": "5577b18c-af00-446a-b629-b8b3eec3f62f",
-  "quality_notes": "best of 6; c01/c02/c06 rejected for dark/white patch under hem | 1k medium, jpeg q88"
- },
- {
   "file": "canon_tease_final.jpg",
   "batch": "H1",
   "task_id": "H1.nova_tease.final",
@@ -76,19 +37,6 @@
   "stage": "search",
   "job_id": "16be12e2-f9bf-4acb-81d5-ba17c422e47e",
   "quality_notes": "reroll prompt; the first 6 candidates (original batch prompt) ALL rejected: skirt flares over bare buttocks | 1k medium, jpeg q88"
- },
- {
-  "file": "base_B_final.jpg",
-  "batch": "H2",
-  "task_id": "H2.nova_base.final",
-  "outfit_slot": "base",
-  "pose": "B",
-  "prompt": "<<<0c657961-8e36-4535-a0c3-0059ce5df987>>> is Nova, an adult woman of 23, white-hat hacker and street racer. Hair: chin-length asymmetric bob fading from cyan-blue at the roots to hot pink at the ends, side-swept bangs. Eyes: ice-blue eyes with a faint pink gradient under the lids and winged liner. Skin: fair pale cool-neutral porcelain-peach skin with a soft pink blush (not tanned, not dark). Face: small sharp adult oval face with a pointed chin, cat-like upturned eyes, thin arched brows, smug smile. Signature items that must be present: neon cat-ear headphones glowing cyan and pink (Nova only); small cyan face-marks on the cheek; black choker with a metal ring; transparent visor pushed up on the forehead in some outfits. Body: petite but clearly a grown woman, about 158 cm tall (7.0 heads tall), lean slim toned figure with shapely legs, gently rounded hips, a slim waist, a shapely bust. Outfit: strapless black corset bodice with neon cyan piping and a plunging sweetheart neckline, detached puffed black sleeves with neon trim, layered holographic tiered mini skirt with a big pink cat-badge bow at the hip, black fishnet thigh-highs with a neon cyan garter strap, black thigh-high lace-up platform boots with cyan laces. Pose: perched on a server rack with her boots crossed, tapping her headphones. Expression: confident smirk. Framing: full-body view from head to heels, centered. Setting: night server room with glowing racks and a holographic panel. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman with grown-woman proportions, 7.0 heads tall (158 cm, petite but clearly a grown woman), slim toned shapely legs, a mature adult face and figure, a defined waist, the composition accents her legs, thighs and bust, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
-  "seed": null,
-  "nominal_seed": 821358,
-  "stage": "final",
-  "job_id": "5c213ff6-516c-436d-a3ac-91ea54211b32",
-  "quality_notes": "perched on server rack, crossed boots, fishnet and garter, plunging corset; f1 near-identical, dropped | 2k high, png->jpg q92"
  },
  {
   "file": "base_B_search_pick.jpg",
@@ -128,19 +76,6 @@
   "stage": "search",
   "job_id": "5a09da67-b567-4b0e-8d0f-0e77c2ef1c2e",
   "quality_notes": "best of A-E; B standing is the safe fallback | 1k medium, jpeg q88"
- },
- {
-  "file": "swim_B_final.jpg",
-  "batch": "H2",
-  "task_id": "H2.nova_swim.final",
-  "outfit_slot": "swim",
-  "pose": "B",
-  "prompt": "<<<0c657961-8e36-4535-a0c3-0059ce5df987>>> is Nova, an adult woman of 23, white-hat hacker and street racer. Hair: chin-length asymmetric bob fading from cyan-blue at the roots to hot pink at the ends, side-swept bangs. Eyes: ice-blue eyes with a faint pink gradient under the lids and winged liner. Skin: fair pale cool-neutral porcelain-peach skin with a soft pink blush (not tanned, not dark). Face: small sharp adult oval face with a pointed chin, cat-like upturned eyes, thin arched brows, smug smile. Signature items that must be present: neon cat-ear headphones glowing cyan and pink (Nova only); small cyan face-marks on the cheek; black choker with a metal ring; transparent visor pushed up on the forehead in some outfits. Body: petite but clearly a grown woman, about 158 cm tall (7.0 heads tall), lean slim toned figure with shapely legs, gently rounded hips, a slim waist, a shapely bust. Outfit: black-and-neon-cyan string bikini with a pink cat-badge clasp, thin tie sides, an open wet-look holographic mesh hoodie, black thigh-high sandals with cyan straps, cat-ear headphones kept. Pose: lying on her side on a glowing lounger propped on one elbow. Expression: teasing smile. Framing: full-body view from head to heels, centered. Setting: rooftop pool at night with neon city lights and glowing lounge beds. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman with grown-woman proportions, 7.0 heads tall (158 cm, petite but clearly a grown woman), slim toned shapely legs, a mature adult face and figure, a defined waist, the composition accents her legs, thighs and bust, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
-  "seed": null,
-  "nominal_seed": 178164,
-  "stage": "final",
-  "job_id": "33f649c2-10e0-491b-8bd1-f9ae5604febd",
-  "quality_notes": "reclining on side, string bikini covers, legs together, wet-look hoodie; at the edge of the ceiling; f2 legs more open, dropped | 2k high, png->jpg q92"
  },
  {
   "file": "swim_B_search_pick.jpg",
@@ -245,18 +180,5 @@
   "stage": "final",
   "job_id": "9799d387-aa43-41d9-8e12-0a4a6af683e9",
   "quality_notes": "kneeling arms overhead, open-mouth wink, striped/plain thigh-highs, skirt covers; f1 dropped (pale patch under hem) | 2k high, png->jpg q92"
- },
- {
-  "file": "seasonal_A_search_pick.jpg",
-  "batch": "H2",
-  "task_id": "H2.nova_seasonal.search",
-  "outfit_slot": "seasonal",
-  "pose": "A",
-  "prompt": "<<<0c657961-8e36-4535-a0c3-0059ce5df987>>> is Nova, an adult woman of 23, white-hat hacker and street racer. Hair: chin-length asymmetric bob fading from cyan-blue at the roots to hot pink at the ends, side-swept bangs. Eyes: ice-blue eyes with a faint pink gradient under the lids and winged liner. Skin: fair pale cool-neutral porcelain-peach skin with a soft pink blush (not tanned, not dark). Face: small sharp adult oval face with a pointed chin, cat-like upturned eyes, thin arched brows, smug smile. Signature items that must be present: neon cat-ear headphones glowing cyan and pink (Nova only); small cyan face-marks on the cheek; black choker with a metal ring; transparent visor pushed up on the forehead in some outfits. Body: petite but clearly a grown woman, about 158 cm tall (7.0 heads tall), lean slim toned figure with shapely legs, gently rounded hips, a slim waist, a shapely bust. Outfit: black crop top with a deep neckline, neon cyan piping and a navel stud, an iridescent holographic mini skirt, black-and-cyan striped thigh-high socks, chunky white-and-pink platform sneakers, an off-shoulder cropped jacket. Pose: kneeling with both arms stretched high above her head, a wink. Expression: open-mouth grin with a wink. Framing: full-body view from head to heels, centered. Setting: rooftop at dusk with a water tower, city haze and pink clouds. Glossy-warm painterly anime gacha key art with premium mobile-gacha production quality, original character design, adult fashion pin-up styling. Adult woman with grown-woman proportions, 7.0 heads tall (158 cm, petite but clearly a grown woman), slim toned shapely legs, a mature adult face and figure, a defined waist, the composition accents her legs, thighs and bust, a direct teasing gaze, lacquer-like specular highlights on hair, satin and sheer legwear, a warm colored rim light, rich saturated colors with a slightly softened supporting background, thin warm-colored lineart with soft cel-painted shading, fabric texture and at least three accessories. Garments and legwear cover the chest, hips and groin and stay exactly in place, adult mature face, adult setting, mahjong tiles blank or absent, one single character in frame, no text, no letters or numerals, no logos, no watermark.",
-  "seed": null,
-  "nominal_seed": 504828,
-  "stage": "search",
-  "job_id": "eaf916ce-6c4a-42b4-8e46-323bef3a85cf",
-  "quality_notes": "best of A-E; D rejected (lifted leg near under-skirt) | 1k medium, jpeg q88"
  }
 ]
