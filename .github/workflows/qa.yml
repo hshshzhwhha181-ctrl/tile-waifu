@@ -80,7 +80,9 @@ jobs:
           FLAG=""
           if [ "$MODE" = "fast" ]; then FLAG="--fast"; fi
           # xvfb-run is applied by the runner itself for the rendering suites; -j 4 is the measured sweet spot
-          python tools/tw_test.py $FLAG -j 4 --json qa-results.json --logs qa-logs
+          # --no-mask-rc (P02): only exit codes 0 and 134 (the known teardown SIGABRT, docs/qa/SIGABRT_SPIKE.md) are accepted; a SIGSEGV or any
+          # other rc turns the suite red even when its marker line is green.
+          python tools/tw_test.py $FLAG -j 4 --no-mask-rc --json qa-results.json --logs qa-logs
 
       - name: Upload logs
         if: always()

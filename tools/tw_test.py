@@ -50,7 +50,11 @@ CORE_DIR = GAME / "core"   # V10Registry scans it for module.gd manifests
 
 # return codes that mean "engine aborted/crashed while tearing down"; accepted only with a green marker
 TEARDOWN_RCS = {134, -6, 139, -11, 0xC0000005, -1073741819, 3221225477}
+# --no-mask-rc: only the one KNOWN teardown abort (SIGABRT, docs/qa/SIGABRT_SPIKE.md) is tolerated; a SIGSEGV (139 / -11) or a
+# Windows access violation is no longer swallowed, so a NEW crash class shows up as a red suite instead of hiding behind the green marker.
+KNOWN_ABORT_RCS = {134, -6}
 WIN = os.name == "nt"
+NO_MASK_RC = False   # set by --no-mask-rc (see KNOWN_ABORT_RCS)
 
 
 # --------------------------------------------------------------------------------------------------
@@ -257,6 +261,8 @@ def parse_output(suite: Suite, text: str, rc: int | None, timed_out: bool) -> Re
         return r
     bad_ratio = r.ok is not None and (r.total - r.ok > n_soft or r.total == 0)
     rc_ok = rc == 0 or (rc in TEARDOWN_RCS and not serr)
+    if rc_ok and NO_MASK_RC and rc not in (0, *KNOWN_ABORT_RCS):
+        rc_ok = False
     if bad_ratio or r.failures or not rc_ok:
         r.status = "fail"
         if not rc_ok:
@@ -685,8 +691,12 @@ def main(argv=None) -> int:
     ap.add_argument("--check-drift", action="store_true", help="verify the catalog covers every V10Registry selftest")
     ap.add_argument("--registry-dump", nargs="?", const="-", metavar="FILE",
                     help="print (or write to FILE) the canonical JSON dump of the whole V10Registry and exit")
+    ap.add_argument("--no-mask-rc", action="store_true",
+                    help="fail a suite on any exit code except 0 and the known teardown SIGABRT (134 / -6); default masks 139/-11/0xC0000005 too")
     ap.add_argument("--godot-arg", action="append", default=[], help="extra engine arg (before --), repeatable")
     args = ap.parse_args(argv)
+    global NO_MASK_RC
+    NO_MASK_RC = args.no_mask_rc
 
     if args.list:
         print(f"{'ID':<12} {'GROUP':<7} {'FAST':<5} {'RENDER':<6} {'TIMEOUT':>7}  MARKER")

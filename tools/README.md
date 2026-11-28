@@ -95,6 +95,10 @@ Windows shows the equivalent `0xC0000005`. Facts established (timeboxed, ~35 min
 * Ideas not tried (need a symbolised engine): build Godot 4.5.1 with `debug_symbols=yes` and rerun valgrind; try 4.5.2/4.6; stop keeping
   lambdas/Callables in `static var` dictionaries of `V10Registry` (clear `_mods` on `NOTIFICATION_PREDELETE`/before `quit()`).
 
+Update (P02 spike): root cause narrowed to `V10Registry.load_all()` retaining lambda-bearing spec Dictionaries in static storage; full matrix and
+bisect in [docs/qa/SIGABRT_SPIKE.md](../docs/qa/SIGABRT_SPIKE.md). `python tools/tw_test.py --no-mask-rc` accepts only rc 0 / 134 / -6 (a SIGSEGV
+139 / -11 or `0xC0000005` fails the suite); CI runs with it.
+
 ## CI
 
 `.github/workflows/qa.yml` (ubuntu-24.04, Godot 4.5.1 downloaded from the official release, node 24, python 3.12, xvfb + GL libs, cached `game/.godot`):
