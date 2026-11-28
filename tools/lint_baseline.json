@@ -1,0 +1,302 @@
+{
+ "version": 1,
+ "N": 574,
+ "by_rule": {
+  "NODE_BASE": 0,
+  "NODE_API": 57,
+  "AUDIO_FX": 0,
+  "AUTOLOAD_G": 465,
+  "ROOT_PATH": 1,
+  "SHELL_DEP": 51
+ },
+ "core_files": 209,
+ "files": {
+  "game/core/auth/auth.gd": {
+   "AUTOLOAD_G": 19,
+   "NODE_API": 1
+  },
+  "game/core/auth/auth_nicks.gd": {
+   "AUTOLOAD_G": 1
+  },
+  "game/core/auth/provider.gd": {
+   "NODE_API": 2
+  },
+  "game/core/base/money.gd": {
+   "NODE_API": 1
+  },
+  "game/core/base/rank.gd": {
+   "NODE_API": 1
+  },
+  "game/core/base/registry_list.gd": {
+   "AUTOLOAD_G": 16,
+   "NODE_API": 1,
+   "SHELL_DEP": 7
+  },
+  "game/core/chat/chat_selftest.gd": {
+   "NODE_API": 1
+  },
+  "game/core/chat/chat_validate.gd": {
+   "NODE_API": 1
+  },
+  "game/core/economy/affection_curve.gd": {
+   "NODE_API": 1,
+   "AUTOLOAD_G": 1
+  },
+  "game/core/gacha/gacha_selftest.gd": {
+   "AUTOLOAD_G": 2
+  },
+  "game/core/levels/level_gen.gd": {
+   "SHELL_DEP": 1
+  },
+  "game/core/look/kit_data.gd": {
+   "NODE_API": 2
+  },
+  "game/core/look/look_cos.gd": {
+   "SHELL_DEP": 3
+  },
+  "game/core/meta/afisha.gd": {
+   "AUTOLOAD_G": 1
+  },
+  "game/core/meta/bond.gd": {
+   "AUTOLOAD_G": 1
+  },
+  "game/core/meta/meta.gd": {
+   "NODE_API": 1,
+   "AUTOLOAD_G": 1
+  },
+  "game/core/meta/notify_text.gd": {
+   "NODE_API": 1,
+   "AUTOLOAD_G": 2
+  },
+  "game/core/modes/adventure/adventure_data.gd": {
+   "NODE_API": 4,
+   "SHELL_DEP": 1
+  },
+  "game/core/modes/bridge/bridge_save.gd": {
+   "AUTOLOAD_G": 1
+  },
+  "game/core/modes/classic/classic_data.gd": {
+   "NODE_API": 1
+  },
+  "game/core/modes/classic/layouts.gd": {
+   "NODE_API": 1
+  },
+  "game/core/modes/classic/ults_classic.gd": {
+   "SHELL_DEP": 1
+  },
+  "game/core/modes/connect/connect_save.gd": {
+   "NODE_API": 1
+  },
+  "game/core/modes/cube/cube_atlas.gd": {
+   "AUTOLOAD_G": 2
+  },
+  "game/core/modes/cube/cube_save.gd": {
+   "AUTOLOAD_G": 1,
+   "SHELL_DEP": 1
+  },
+  "game/core/modes/duels/challenge/challenge_deal.gd": {
+   "SHELL_DEP": 1
+  },
+  "game/core/modes/duels/duel_rank.gd": {
+   "AUTOLOAD_G": 3
+  },
+  "game/core/modes/duels/duel_util.gd": {
+   "NODE_API": 1,
+   "AUTOLOAD_G": 11
+  },
+  "game/core/modes/garden/garden_gen.gd": {
+   "SHELL_DEP": 1
+  },
+  "game/core/modes/garden/garden_info.gd": {
+   "AUTOLOAD_G": 1
+  },
+  "game/core/modes/garden/garden_save.gd": {
+   "AUTOLOAD_G": 1
+  },
+  "game/core/modes/koikoi/koikoi_save.gd": {
+   "NODE_API": 1
+  },
+  "game/core/modes/palm/hand_gen.gd": {
+   "SHELL_DEP": 1
+  },
+  "game/core/modes/palm/hand_state.gd": {
+   "AUTOLOAD_G": 2
+  },
+  "game/core/modes/palm/hand_util.gd": {
+   "NODE_API": 1,
+   "AUTOLOAD_G": 10
+  },
+  "game/core/modes/riichi/riichi_data.gd": {
+   "NODE_API": 2
+  },
+  "game/core/modes/sanma/sanma_data.gd": {
+   "NODE_API": 1,
+   "ROOT_PATH": 1
+  },
+  "game/core/modes/sanma/sanma_text.gd": {
+   "SHELL_DEP": 1
+  },
+  "game/core/modes/tower/journey.gd": {
+   "AUTOLOAD_G": 5
+  },
+  "game/core/modes/tower/pagoda.gd": {
+   "AUTOLOAD_G": 4
+  },
+  "game/core/modes/tower/sim.gd": {
+   "SHELL_DEP": 1
+  },
+  "game/core/modes/tower/tower_board.gd": {
+   "AUTOLOAD_G": 4,
+   "SHELL_DEP": 1
+  },
+  "game/core/modes/tower/tower_util.gd": {
+   "AUTOLOAD_G": 5
+  },
+  "game/core/modes/triples/triples_gen.gd": {
+   "SHELL_DEP": 1
+  },
+  "game/core/modes/triples/triples_save.gd": {
+   "AUTOLOAD_G": 1
+  },
+  "game/core/online/online_bot.gd": {
+   "SHELL_DEP": 1
+  },
+  "game/core/online/online_cfg.gd": {
+   "NODE_API": 6
+  },
+  "game/core/path/path_state.gd": {
+   "AUTOLOAD_G": 3
+  },
+  "game/core/profile/card_payload.gd": {
+   "NODE_API": 1,
+   "AUTOLOAD_G": 4
+  },
+  "game/core/profile/cosmetics.gd": {
+   "NODE_API": 7,
+   "AUTOLOAD_G": 15,
+   "SHELL_DEP": 1
+  },
+  "game/core/rituals/rit_bridge.gd": {
+   "NODE_API": 1,
+   "AUTOLOAD_G": 17
+  },
+  "game/core/rituals/rit_save.gd": {
+   "AUTOLOAD_G": 4
+  },
+  "game/core/rituals/rituals.gd": {
+   "NODE_API": 1
+  },
+  "game/core/salon/salon.gd": {
+   "NODE_API": 2
+  },
+  "game/core/salon/vip_date.gd": {
+   "AUTOLOAD_G": 2
+  },
+  "game/core/shop/shop_model.gd": {
+   "SHELL_DEP": 1
+  },
+  "game/core/tutorial/tut_lines.gd": {
+   "AUTOLOAD_G": 2,
+   "SHELL_DEP": 1
+  },
+  "game/core/tutorial/tut_reveal.gd": {
+   "AUTOLOAD_G": 2
+  },
+  "game/core/tutorial/tut_state.gd": {
+   "AUTOLOAD_G": 4
+  },
+  "game/core/v06/heroines/heroines_data.gd": {
+   "AUTOLOAD_G": 11
+  },
+  "game/core/v06/map/layouts.gd": {
+   "AUTOLOAD_G": 1
+  },
+  "game/core/v06/map/worlds.gd": {
+   "AUTOLOAD_G": 11
+  },
+  "game/core/v06/modes/modes_data.gd": {
+   "AUTOLOAD_G": 9,
+   "SHELL_DEP": 1
+  },
+  "game/core/v06/story/txt.gd": {
+   "SHELL_DEP": 1
+  },
+  "game/core/v07/album/album_data.gd": {
+   "AUTOLOAD_G": 1
+  },
+  "game/core/v07/event/event_data.gd": {
+   "AUTOLOAD_G": 9
+  },
+  "game/core/v07/event/ladder.gd": {
+   "AUTOLOAD_G": 3,
+   "SHELL_DEP": 1
+  },
+  "game/core/v07/room/room_data.gd": {
+   "AUTOLOAD_G": 10
+  },
+  "game/core/v08/core/recovery.gd": {
+   "AUTOLOAD_G": 12
+  },
+  "game/core/v08/core/recovery_selftest.gd": {
+   "AUTOLOAD_G": 112
+  },
+  "game/core/v08/league/league.gd": {
+   "AUTOLOAD_G": 19,
+   "SHELL_DEP": 3
+  },
+  "game/core/v08/league/league_selftest.gd": {
+   "AUTOLOAD_G": 37,
+   "SHELL_DEP": 1
+  },
+  "game/core/v08/play/play_rules.gd": {
+   "AUTOLOAD_G": 6
+  },
+  "game/core/v08/profile/nicks.gd": {
+   "AUTOLOAD_G": 1
+  },
+  "game/core/v09/core/ults.gd": {
+   "AUTOLOAD_G": 5
+  },
+  "game/core/v09/home/touch.gd": {
+   "AUTOLOAD_G": 4,
+   "SHELL_DEP": 2
+  },
+  "game/core/v09/letters/letter_text.gd": {
+   "AUTOLOAD_G": 1
+  },
+  "game/core/v09/letters/letters_selftest.gd": {
+   "NODE_API": 1,
+   "AUTOLOAD_G": 31,
+   "SHELL_DEP": 5
+  },
+  "game/core/v09/summon/summon_rules.gd": {
+   "AUTOLOAD_G": 3
+  },
+  "game/core/v09/summon/summon_selftest.gd": {
+   "NODE_API": 1,
+   "AUTOLOAD_G": 24,
+   "SHELL_DEP": 1
+  },
+  "game/core/wave1/w1_audio.gd": {
+   "SHELL_DEP": 2
+  },
+  "game/core/wave1/w1_core.gd": {
+   "NODE_API": 2
+  },
+  "game/core/wave1/w1_look.gd": {
+   "SHELL_DEP": 6
+  },
+  "game/core/wave1/w1_play.gd": {
+   "AUTOLOAD_G": 7,
+   "SHELL_DEP": 2
+  },
+  "game/core/wave1/w1_social.gd": {
+   "NODE_API": 2
+  },
+  "game/core/wave1/wave1.gd": {
+   "NODE_API": 7,
+   "SHELL_DEP": 1
+  }
+ },
+ "note": "CORE_PURITY ratchet: counts may only go down. Regenerate with `python3 tools/lint_core_purity.py --update-baseline` after burning violations down."
+}

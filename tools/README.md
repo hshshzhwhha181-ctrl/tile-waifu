@@ -126,9 +126,13 @@ Anything with a UI token, a Node base class, an autoload, or living in a present
 * `tools/move_map.tsv` — every move (`old<TAB>new`, repo-relative; `.gd`, `.gd.uid` and data files).
 * `python3 tools/check_move_map.py` — proves each move is mechanical: old path gone, new path present, content identical to the pre-move commit
   except for lines that mention a `res://` path. Exit 0 = clean.
-* `python3 tools/lint_core_purity.py [--files] [--json F] [--max N]` — CORE_PURITY lint, **report-only** (exit 0): Node-family `extends`, Node/Control/
-  Tween/get_tree tokens, `await get_tree()`, `Sfx`/`V9Feel`, `G.` (autoload god-object), `/root/` and core -> shell class dependencies. The counts are the
-  burn-down list for WP4+ (`G.` is the big one: it goes away with `TWState`).
+* `python3 tools/lint_core_purity.py [--files|--by-file] [--json F] [--check] [--selftest] [--update-baseline]` — CORE_PURITY lint (pure Python, ~0.5 s).
+  Six categories: NODE_BASE (`extends` a Node-family class), NODE_API (Node/Control/Tween/create_timer/get_tree/DisplayServer, incl. `await get_tree()`),
+  AUDIO_FX (`Sfx`/`V9Feel`), AUTOLOAD_G (`G.`, the god-object that WP4/`TWState` removes), ROOT_PATH (`/root/`), SHELL_DEP (core names a `game/scripts` class).
+  Comments and string literals are ignored. Default = report (exit 0). `--check` is the **ratchet**: counts per file/rule are frozen in
+  `tools/lint_baseline.json` (total N); any growth or any new violating file is red, fewer is fine, then lower N with `--update-baseline`
+  (it refuses to raise N without `--allow-raise`). `--selftest` = 6 synthetic files with one violation each must give exactly 6 findings (+1 clean look-alike).
+  Runs as suite `core_purity` (group `lint`, fast) in `tools/tw_test.py` and as the first step of `.github/workflows/qa.yml`.
 * Registry: `V10RegistryList` is now `game/core/base/registry_list.gd` (same 43 modules, same ids); the per-module `module.gd` split is left for a follow-up.
 * Selftests that source-scan a module directory now scan `scripts/v10/<m>/` **and** `core/<m>/` (so nothing silently stops being checked).
 * After pulling this change run `python3 tools/tw_test.py --import` once: `game/.godot/global_script_class_cache.cfg` must be regenerated for the new paths.

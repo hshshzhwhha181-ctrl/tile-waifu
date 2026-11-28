@@ -145,6 +145,22 @@
     "total": 35
    }
   },
+  "core_purity": {
+   "fast": {
+    "marker": "CORE_PURITY RESULT: PASS (574 violations, baseline 574, +0 new)",
+    "ok": 6,
+    "secs": 0.4,
+    "status": "pass",
+    "total": 6
+   },
+   "full": {
+    "marker": "CORE_PURITY RESULT: PASS (574 violations, baseline 574, +0 new)",
+    "ok": 6,
+    "secs": 0.5,
+    "status": "pass",
+    "total": 6
+   }
+  },
   "duels": {
    "fast": {
     "marker": "DUEL_SELFTEST 175/175",
@@ -1060,6 +1076,6 @@
    }
   }
  },
- "updated": "2026-11-27",
+ "updated": "2026-11-28",
  "version": 1
 }

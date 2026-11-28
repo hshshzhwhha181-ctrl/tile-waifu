@@ -168,6 +168,9 @@ BY_ID = {s.id: s for s in CATALOG}
 EXTERNAL: list[Suite] = [
     Suite(id="server_e2e", kind="node", group="server", marker="E2E_OK", timeout=180, fast=True),
     Suite(id="ux_lint", kind="python", group="lint", marker="UX_LINT RESULT", timeout=120, fast=True),
+    # game/core purity ratchet: selftest (6 synthetic files -> 6 findings) + violations vs tools/lint_baseline.json
+    Suite(id="core_purity", kind="python", group="lint", marker="CORE_PURITY RESULT", timeout=60, fast=True,
+          script="tools/lint_core_purity.py", args=["--selftest", "--check"]),
 ]
 for _s in EXTERNAL:
     BY_ID[_s.id] = _s
@@ -359,13 +362,16 @@ def run_suite(suite: Suite, godot: str | None, fast: bool, tscale: float, logdir
                 return Result(suite.id, "skip", reason="node not found")
             cmd = [node, str(E2E)]
         else:
-            if not UX_LINT.exists():
-                return Result(suite.id, "error", reason=f"missing {UX_LINT.relative_to(REPO)}")
-            cmd = [sys.executable, str(UX_LINT)]
+            tool = REPO / suite.script if suite.script else UX_LINT
+            if not tool.exists():
+                return Result(suite.id, "error", reason=f"missing {tool.relative_to(REPO)}")
+            cmd = [sys.executable, str(tool)] + list(suite.args)
         # node's e2e spawns a server with its own temp db; keep cwd at the repo root for the lint paths
         rc, out, timed_out, secs = run_cmd(cmd, env, timeout, cwd=REPO)
     if suite.kind == "node":
         res = parse_node(suite, out, rc, timed_out)
+    elif suite.kind == "python" and suite.id == "core_purity":
+        res = parse_purity(suite, out, rc, timed_out)
     elif suite.kind == "python":
         res = parse_lint(suite, out, rc, timed_out)
     else:
@@ -409,6 +415,26 @@ def parse_lint(suite: Suite, out: str, rc, timed_out) -> Result:
         r.status, r.reason = "error", "no 'UX_LINT RESULT' line"
     else:
         r.status = "pass" if (rc == 0 and n == 0) else "fail"
+    return r
+
+
+def parse_purity(suite: Suite, out: str, rc, timed_out) -> Result:
+    """tools/lint_core_purity.py --selftest --check: green = selftest 6/6 AND no new violations vs lint_baseline.json."""
+    r = Result(suite.id, rc=rc)
+    if timed_out:
+        r.status, r.reason = "timeout", "no exit within the limit"
+        return r
+    m = re.search(r"CORE_PURITY RESULT: (PASS|FAIL) \((\d+) violations, baseline (\d+), \+(\d+) new\)", out)
+    st = re.search(r"CORE_PURITY SELFTEST: (\d+)/(\d+) (PASS|FAIL)", out)
+    r.marker_line = m.group(0) if m else ""
+    if st:
+        r.ok, r.total = int(st.group(1)), int(st.group(2))
+    r.failures = sorted({norm_fail(ln) for ln in out.split("\n") if ln.startswith(("NEW VIOLATION", "SELFTEST FAIL"))})
+    if not m or not st:
+        r.status, r.reason = "error", "missing 'CORE_PURITY RESULT' / 'CORE_PURITY SELFTEST' line"
+    else:
+        r.status = "pass" if (rc == 0 and m.group(1) == "PASS" and st.group(3) == "PASS") else "fail"
+        r.reason = f"{m.group(2)} violations, baseline {m.group(3)}" if r.status != "pass" else ""
     return r
 
 
