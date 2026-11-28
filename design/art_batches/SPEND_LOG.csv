@@ -10,3 +10,5 @@ date,batch_id,task_id,quote_ref,quoted_cr,actual_cr,balance_after,note
 2026-11-28,H0,height re-rolls nova x5 + yue x5 (new body table prompts),,10,10,,P50b round 2; 9:16 1k medium x1 each
 2026-11-28,P50b,round 2 total,,25.5,25.5,,P50b round 2; session total 76.5 cr (51 + 25.5)
 2026-11-28,H2,round 3 pilots x4 (fuller thighs, leg and bust focus: mc_base D, miel_evening D, hana_base D, yue_base E),,4,4,,P50b round 3; 2:3 1k medium; 0 refusals; session total 80.5 cr
+2026-11-28,A6-tsubame,search 17 slots x4-6 candidates (96 images; gpt_image_2_6 2:3 1k medium via quote refs),,96,96,,art6-tsubame; 12 submissions hit 503 busy and 6 of them were not resubmitted (base0/base1/battle1/seasonal0 got 5, robe0 got 4); 0 moderation refusals; no rerolls needed
+2026-11-28,A6-tsubame,finals x17 bytedance_image_upscale 2k of the picked 1k frames,,34,34,,art6-tsubame; own total 130 cr of cap 380
