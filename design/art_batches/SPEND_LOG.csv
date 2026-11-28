@@ -10,3 +10,9 @@ date,batch_id,task_id,quote_ref,quoted_cr,actual_cr,balance_after,note
 2026-11-28,H0,height re-rolls nova x5 + yue x5 (new body table prompts),,10,10,,P50b round 2; 9:16 1k medium x1 each
 2026-11-28,P50b,round 2 total,,25.5,25.5,,P50b round 2; session total 76.5 cr (51 + 25.5)
 2026-11-28,H2,round 3 pilots x4 (fuller thighs, leg and bust focus: mc_base D, miel_evening D, hana_base D, yue_base E),,4,4,,P50b round 3; 2:3 1k medium; 0 refusals; session total 80.5 cr
+2026-11-28,H1,yue canon: first search (3 frames, batch_size 4 ignored: 3 images delivered; charge assumed 4 cr each),,12,12,,art-yue worker; upper bound (3 if batch_size was not billed); first frames rejected for bare hip above the slit
+2026-11-28,H1,yue canon: re-search 3 frames x3 (hip-covered prompt) 1k medium,,9,9,,art-yue worker
+2026-11-28,H1,yue canon finals 3 frames x2 (2k high; one plain, one ref-conditioned),,12,12,,art-yue worker
+2026-11-28,H2,yue wardrobe search 7 outfits x5 poses 1k medium,,35,35,,art-yue worker; 0 refusals
+2026-11-28,H2,yue wardrobe finals 7 outfits x1 (2k high, ref-conditioned),,14,14,,art-yue worker
+2026-11-28,art-yue,session total,,82,82,,art-yue worker; image count x unit cost, upper bound; account balance is shared with other workers
