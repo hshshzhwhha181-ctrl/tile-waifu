@@ -2,7 +2,7 @@
 
 Everything here is `RefCounted`/`Resource`/static code with no scene-tree or presentation dependency (rules, data tables, economy, gacha, meta, save helpers,
 mode engines, bots, text data). The shell (`game/scripts`) may depend on core, never the reverse. Moved mechanically from `game/scripts` in WP3; see
-`tools/move_map.tsv` (every move), `tools/check_move_map.py` (proof it was mechanical) and `tools/lint_core_purity.py` (report-only purity lint; the remaining
+`tools/move_map.tsv` (every move), `tools/check_move_map.py` (proof it was mechanical) and `tools/lint_core_purity.py` (purity lint, report + ratchet vs tools/lint_baseline.json; the remaining
 `G.` / Node-API / shell-class references are the to-do list for the state/facade work package).
 
 Layout: `base/` (registry, money, rank, sku), `modes/<mode>/` (riichi, sanma, koikoi, triples, classic, connect, cube, garden, bridge, palm, tower, duels, adventure),

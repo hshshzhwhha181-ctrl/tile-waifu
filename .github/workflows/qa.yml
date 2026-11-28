@@ -37,6 +37,13 @@ jobs:
         with:
           node-version: "24"
 
+      # pure Python, ~0.5 s, no Godot: runs first so a purity regression fails the job in seconds.
+      # Ratchet vs tools/lint_baseline.json: new violations in game/core are red, burn-down is fine
+      # (then `python3 tools/lint_core_purity.py --update-baseline` to lower N).
+      - name: CORE_PURITY lint (game/core, ratchet)
+        run: |
+          python tools/lint_core_purity.py --selftest --check --by-file
+
       - name: System packages (xvfb + GL for the rendering suites)
         run: |
           sudo apt-get update
