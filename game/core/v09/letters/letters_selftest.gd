@@ -39,12 +39,14 @@ static func run(main) -> void:
 	var demo_was: bool = G.demo
 	G.S = G.S.duplicate(true)
 	G.demo = true
+	V10Meta.set_now(V10Meta.now_unix())   # freeze: no day rollover in the middle of the run
 	_texts()
 	_touch_lines()
 	_generator()
 	_midnight()
 	_zones()
 	_taps()
+	V10Meta.clear_now()
 	G.S = saved
 	G.demo = demo_was
 	printerr("LETTERS SELFTEST %d/%d" % [ok, ok + bad])
@@ -102,8 +104,10 @@ static func _touch_lines() -> void:
 				_clean(str(e.text), where)
 
 
+# the game day (V10Meta.key_of: local time minus DAY_START_H), NOT the raw calendar date: between midnight and
+# DAY_START_H the two differ and the test used to fail at those hours (G.today() is yesterday's raw date then)
 static func _date(days_ago: int) -> String:
-	return Time.get_date_string_from_unix_time(V10Meta.now_unix() - days_ago * 86400)
+	return V10Meta.key_of(V10Meta.now_unix() - days_ago * 86400)
 
 
 # home on day D, the match ends after midnight: the win is recorded before the first tick of D+1 (whose rollover
