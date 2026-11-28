@@ -96,6 +96,8 @@ CATALOG: list[Suite] = [
     S("recovery", "RECOVERY", args=["--recovery_selftest=1"], group="core"),
     S("state", "STATE_SELFTEST", SV + "state/state_selftest.tscn", group="core",
       note="P12: TWClock/TWSave/TWMigrate/TWState, golden saves v4..v8, 500-case save fuzz (+ parity with the legacy G.apply_state)"),
+    S("twboard", "TWBOARD_SELFTEST", SV + "rules/tw_board_selftest.tscn", group="core",
+      note="P16: TWRng, TWFree, TWBoardEvents, TWBoard (unified solitaire rules): scenarios, 1000 seeds, 200 Path levels (lockstep with V10LevelSim, certificate, solver bot), replay, shuffle, fuzz"),
     S("ults", "ULTS", args=["--ults_selftest=1"], group="core"),
     S("letters", "LETTERS", args=["--letters_selftest=1"], group="core"),
     # ---- v10 registry modules (docs/INTEGRATION_0.10.md; ids == V10RegistryList ids) -----------------
