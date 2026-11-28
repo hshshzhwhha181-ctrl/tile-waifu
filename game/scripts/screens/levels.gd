@@ -763,7 +763,7 @@ func open_card(i: int) -> void :
 			UI.pop_in(s, 0.1 + q * 0.08, 0.3)
 	y += 84.0
 
-	var n_pos: = TrayBoard.gen_layout(lv.duplicate(true)).size()
+	var n_pos: = TWFree.gen_layout(lv.duplicate(true)).size()
 	var nt: = n_pos - n_pos % 2
 	# 0.8: every info tag is the same graphite chip; a small coloured dot says what kind of tag it is
 	var tags: Array = [["%d фишек" % nt, Color("f2e6d0")], [V6Layouts.shape_name(lv.shape), Color("c8b6ff")]]

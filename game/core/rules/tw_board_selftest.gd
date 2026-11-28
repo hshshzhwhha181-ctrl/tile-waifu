@@ -15,6 +15,8 @@ extends RefCounted
 #   G  shuffle      the dealt-again table is still clearable
 #   H  fuzz         random operation streams keep the counters, the tray and the free set consistent
 #   I  lint         the new files contain no await / Tween / timer / scene-tree access
+#   J  view         (P18) what the tray_board view relies on: deal() == from_cfg without specials, load_view round trip,
+#                   reassign of a subset, best/solver/hint over a given free list, next_combo
 #
 # Prints "TWBOARD_SELFTEST ok/total" (FAIL lines first). Args of run(env): levels_n (200), seeds_n (1000), fuzz_n (48).
 
@@ -38,6 +40,7 @@ static func run(env: Dictionary = {}) -> Array:
 	_shuffle()
 	_fuzz(int(env.get("fuzz_n", 48)))
 	_lint()
+	_view()
 	var total: = _pass + _fail
 	print("TWBOARD_SELFTEST %d/%d  (%.1f s)" % [_pass, total, (Time.get_ticks_msec() - t0) / 1000.0])
 	return [_pass, total]
@@ -288,9 +291,9 @@ static func _free() -> void:
 				break
 		if ok:
 			same_topo += 1
-	_c("free: layouts == TrayBoard.gen_layout path (%d levels)" % checked, same_pos == checked, "%d/%d" % [same_pos, checked])
+	_c("free: layouts == TWFree.gen_layout path (%d levels)" % checked, same_pos == checked, "%d/%d" % [same_pos, checked])
 	_c("free: layouts are even" , odd_ok == checked)
-	_c("free: layouts sorted like TrayBoard.setup", sorted_ok == checked)
+	_c("free: layouts sorted like tray_board.setup", sorted_ok == checked)
 	_c("free: topology == V10LevelSim (%d levels)" % checked, same_topo == checked, "%d/%d" % [same_topo, checked])
 	# every shape of the game builds a layout
 	var shapes: = 0
@@ -1174,3 +1177,40 @@ static func _lint() -> void:
 					bad.append("%s: %s" % [p.get_file(), nd])
 	_c("lint: no await / Tween / timer / scene tree / G / audio in the rules core (%d lines)" % lines, bad.is_empty(), ",".join(bad))
 	_c("lint: sources readable", lines > 600)
+
+
+# ------------------------------------------------------------------ J: the API of the tray_board view (P18)
+
+static func _view() -> void:
+	var cfg: = {"cols": 5, "rows": 6, "layers": 3, "fill": 0.7, "seed": 11, "faces": 8, "gold": 2, "ice": 2, "hidden": true, "deal_seed": 77}
+	var a: = TWBoard.from_cfg(cfg)
+	var pos: Array = TWFree.positions(cfg)
+	var b: = TWBoard.from_positions(pos, 4)
+	b.reset()
+	b.deal(cfg, false)
+	_c("view: deal() on a bare table == from_cfg", a.face0 == b.face0 and a.step0 == b.step0 and a.ice0 == b.ice0 and a.secret0 == b.secret0)
+	var c: = TWBoard.from_cfg(cfg)
+	for _i in 6:
+		var m: = c.solver_move()
+		if m < 0 or c.failed or c.cleared:
+			break
+		c.tap(m)
+	var h0: = c.state_hash()
+	var d: = c.fork_fresh()
+	d.load_view({"present": c.present.duplicate(), "alive": c.alive.duplicate(), "face": c.face.duplicate(), "step": c.step.duplicate(),
+		"gold": c.gold.duplicate(), "ice": c.ice.duplicate(), "sec": c.sec.duplicate(), "shard": c.shard_f.duplicate(),
+		"opened": c.opened.duplicate(), "tray": c.tray.duplicate(), "history": c.history.duplicate()})
+	_c("view: load_view of a played state gives the same counters", d.covcnt == c.covcnt and d.lcnt == c.lcnt and d.rcnt == c.rcnt and d.on_board == c.on_board and d.alive_n == c.alive_n)
+	_c("view: load_view keeps the free set", d.free_tiles() == c.free_tiles())
+	_c("view: best_move_from(free_tiles()) == best_move()", d.best_move_from(d.free_tiles()) == c.best_move())
+	_c("view: solver_move_from without the certificate picks a free tile", c.solver_move_from(c.free_tiles(), false) in c.free_tiles() or c.free_tiles().is_empty())
+	_c("view: hint_from == hint", d.hint_from(d.free_tiles()) == c.hint())
+	var ids: Array = []
+	for t in c.n:
+		if c.present[t] == 1 and c.shard_f[t] == 0 and ids.size() < 4:
+			ids.append(t)
+	var before: = c.on_board
+	c.reassign(ids)
+	_c("view: reassign(subset) keeps the table, only those tiles may change", c.on_board == before and not c.reveal_events().has(null))
+	_c("view: next_combo continues inside the window", TWBoard.next_combo(3, 10.0, 12.0, 5.0) == 4)
+	_c("view: next_combo restarts after the window", TWBoard.next_combo(3, 10.0, 15.0, 5.0) == 1)

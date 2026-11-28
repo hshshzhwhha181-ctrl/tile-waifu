@@ -1,16 +1,16 @@
 class_name TWParitySelftest
 extends RefCounted
 
-# P17 (WP5): TWBoard parity with the legacy TrayBoard, by recorded games (the legacy _assign is unseeded, so a seed cannot prove
+# P17 (WP5): TWBoard parity with the legacy tray_board, by recorded games (the legacy _assign is unseeded, so a seed cannot prove
 # anything: the corpus stores the legacy DEAL (layout + faces + ice/gold/secret/shard) and the legacy JOURNAL (every operation
-# with the state the legacy board showed after it)). Pure core: no TrayBoard, no scene tree. The corpus lives in
+# with the state the legacy board showed after it)). Pure core: no tray_board, no scene tree. The corpus lives in
 # tests/fixtures/replays/corpus_NN.json and is written by the recorder (scripts/v10/rules/parity_record_runner.gd) from the
-# real TrayBoard; the lockstep fuzz against a live TrayBoard is scripts/v10/rules/parity_legacy.gd (the shell side).
+# real tray_board; the lockstep fuzz against a live tray_board is scripts/v10/rules/parity_legacy.gd (the shell side).
 #
 #   A  corpus     500 games: one check per game = 0 divergences in legality and outcome across its whole journal
 #   B  layouts    the stored layout of every game == TWFree.positions(cfg) (the gen_layout path) and its initial free set
 #   C  levels     V10LevelGen certificate of every Path level replays on TWBoard (1000/1000)
-#   D  fuzz       (shell side) 5000 random operations in lockstep with a live TrayBoard: the free set, tray, counters equal
+#   D  fuzz       (shell side) 5000 random operations in lockstep with a live tray_board: the free set, tray, counters equal
 #
 # What is compared after every journal entry (legacy value recorded vs TWBoard value): result kind of a tap (deny / ice crack /
 # to tray / match / tray full / ignored), board count, tray size and the tray tile ids in order, combo, cracks, max tray, the
@@ -377,7 +377,7 @@ static func _shuffle_step(b: TWBoard, rec: Dictionary, r: Dictionary) -> int:
 	return 0
 
 
-# the ult "vanish k pairs" (TrayBoard.auto_pairs): the pair list must contain the legacy pick and the pick must be in the first
+# the ult "vanish k pairs" (tray_board.auto_pairs): the pair list must contain the legacy pick and the pick must be in the first
 # class of ties (same lowest step); the legacy pick is then removed on TWBoard
 static func _vanish_step(b: TWBoard, k: int, picks: Array, r: Dictionary) -> int:
 	var done: = 0

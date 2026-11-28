@@ -12,8 +12,8 @@ extends RefCounted
 #   SLOTS = 4, HELPS_RANKED = {hint 1, undo 0, shuffle 0}
 #
 # Determinism needs the play.gd hook H2 (README): seed(int(cfg.seed)) right before board.setup(cfg), because
-# TrayBoard._assign still deals faces from the global RNG (until the M1 «засев» lands, then cfg.seed feeds V10Seed).
-# The layout itself (TrayBoard.gen_layout) is already seeded by cfg.seed.
+# tray_board._assign still deals faces from the global RNG (until the M1 «засев» lands, then cfg.seed feeds V10Seed).
+# The layout itself (TWFree.gen_layout) is already seeded by cfg.seed.
 
 const U: = preload("res://core/modes/duels/duel_util.gd")
 const F: = preload("res://core/modes/duels/duel_forms.gd")

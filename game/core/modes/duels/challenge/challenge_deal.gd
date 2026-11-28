@@ -10,7 +10,7 @@ extends RefCounted
 #   · Путь on the 0.9 table list (gen 0, before the integrator switches G.LEVELS to V10LevelGen): TWLevels.at(i);
 #   · Партия дня: the day formula of play.gd (level = day of month % levels, seed = YYYYMMDD);
 #   · Странствие: V10Journey.board_cfg_for(week, board) with the theme of the week and no blessings or curses.
-# The face deal of the non-payload tables is drawn by TrayBoard._assign from the GLOBAL generator, so play.gd seeds
+# The face deal of the non-payload tables is drawn by tray_board._assign from the GLOBAL generator, so play.gd seeds
 # it with cfg.seed right before board.setup(cfg) for every seeded mode (seeded() below; the same line the tower
 # lane needs for Странствие). Same cfg + same seed ⇒ same board: deal_hash() hashes the cfg, board_fingerprint()
 # the dealt board, and the selftest proves both.
@@ -157,7 +157,7 @@ static func pairs_of(cfg: Dictionary) -> int:
 	var v10 = cfg.get("v10", {})
 	if v10 is Dictionary and int((v10 as Dictionary).get("n", 0)) > 0:
 		return int(v10.n) / 2
-	return TrayBoard.gen_layout(cfg).size() / 2
+	return TWFree.gen_layout(cfg).size() / 2
 
 
 static func _fill_look(cfg: Dictionary) -> void:

@@ -42,7 +42,7 @@ const THEMES: = [
 
 # the boss's «подлость» (spec R3: from V6Duel skills); the boss board plays it twice, each after a cut-in.
 # op: veil (faces of N free tiles hidden for S s), frost (N free tiles under ice), gust (faces of N free tiles
-# swapped among themselves, solvability kept by TrayBoard.reassign_faces), smoke (a fog bank until P pairs)
+# swapped among themselves, solvability kept by tray_board.reassign_faces), smoke (a fog bank until P pairs)
 const BOSS: = {
 	"mc": {"name": "Восточный ветер", "line": "Ветер перемешал шесть свободных фишек", "op": {"op": "gust", "n": 6}},
 	"rin": {"name": "Чайная церемония", "line": "Три свободные фишки покрылись инеем", "op": {"op": "frost", "n": 3}},

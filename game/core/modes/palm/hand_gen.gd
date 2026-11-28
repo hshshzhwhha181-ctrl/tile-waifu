@@ -2,7 +2,7 @@ class_name V10HandGen
 extends RefCounted
 
 # «Чтение руки» (spec 0.10 R4) — the hand of the day and its table. Built on V8Mj (counts / shanten / waits /
-# decompose); the deal uses the very layout and free rule of TrayBoard.
+# decompose); the deal uses the very layout and free rule of tray_board.
 #
 # KINDS  riichi kinds 0..33: 0–8 ман, 9–17 пин, 18–26 со, 27–33 Восток Юг Запад Север Белый Зелёный Красный (V8Mj).
 #        The hand is shown SORTED (ман, пин, со, honours), so the place of a closed card carries information.
@@ -15,7 +15,7 @@ extends RefCounted
 #   board    one pair of every other hand kind (hand + board ≤ 4 copies) + decoy pairs of kinds NOT in her hand that
 #            cover almost all absent kinds; some decoys come twice (all 4 copies visible ⇒ dimmed in the shutter).
 #            Waits are never on the board. The pairs are listed in deal step order (`pairs`), the layout is
-#            TrayBoard.gen_layout(`layout`) and the step order comes from `deal_seed` (see deal()).
+#            TWFree.gen_layout(`layout`) and the step order comes from `deal_seed` (see deal()).
 #   accept   only if at the FULLY revealed state (every board pair taken: every non-sleeve kind flipped, every decoy
 #            known «Не у неё») EVERY filling of the closed positions that is consistent with the sorted order, the
 #            kinds known absent and the copy limits, and that leaves her tenpai, has EXACTLY the true wait set
@@ -30,7 +30,7 @@ extends RefCounted
 #   V10HandGen.write_table(n = 365) -> Dictionary   --hand_gen=365: writes DATA_PATH, returns stats
 #   V10HandGen.board_cfg(entry) -> Dictionary       cfg for V10HandBoard.setup(cfg)
 #   V10HandGen.deal(cfg) -> Dictionary              pure model of that deal {pos, cov, sides, order, face, step}
-#   V10HandGen.step_order_ok(model) -> bool         solvable by the step order (the free rule of TrayBoard)
+#   V10HandGen.step_order_ok(model) -> bool         solvable by the step order (the free rule of tray_board)
 #   V10HandGen.real_waits(counts, board = []) -> Array
 #   V10HandGen.check_unique(hand, sleeve, absent_known, board, waits) -> {ok, tenpai, bad}
 #   V10HandGen.classify(hand, waits) -> {form, partial, title}   V10HandGen.explain(hand, waits) -> String
@@ -69,7 +69,7 @@ const FORM_TITLE: = {"ryanmen": "Ожидание с двух сторон", "ka
 	"tanki": "Ожидание пары", "nobetan": "Ряд из четырёх", "sanmen": "Ожидание с трёх сторон", "chiitoi": "Семь пар",
 	"shanpon": "Две пары", "mixed": "Сложная форма"}
 
-# Layout presets [cols, rows, layers, fill, shape] — all inside TrayBoard.MAX_COLS/MAX_ROWS, no ice/gold/shards.
+# Layout presets [cols, rows, layers, fill, shape] — all inside tray_board.MAX_COLS/MAX_ROWS, no ice/gold/shards.
 const LAYOUTS: = [
 	[5, 5, 3, 0.85, "rect"], [6, 5, 3, 0.8, "rect"], [5, 6, 3, 0.8, "rect"], [6, 6, 2, 0.85, "rect"],
 	[6, 6, 3, 0.7, "diamond"], [6, 6, 3, 0.75, "ring"], [5, 6, 3, 0.8, "butterfly"], [6, 5, 3, 0.85, "heart"],
@@ -533,11 +533,11 @@ static func reach(hand: Array, sleeve: Array) -> Array:
 	return ks
 
 
-# ================================================================== layouts and the deal (pure model of TrayBoard)
+# ================================================================== layouts and the deal (pure model of tray_board)
 
-# positions exactly as TrayBoard.setup builds them: gen_layout, odd count → drop the first top-most, sort (z, y, x)
+# positions exactly as tray_board.setup builds them: gen_layout, odd count → drop the first top-most, sort (z, y, x)
 static func positions(cfg: Dictionary) -> Array:
-	var pos: Array = TrayBoard.gen_layout(cfg)
+	var pos: Array = TWFree.gen_layout(cfg)
 	if pos.size() % 2 == 1:
 		var top: = 0
 		for i in pos.size():
@@ -576,7 +576,7 @@ static func _geometry(pos: Array) -> Dictionary:
 	return {"cov": cov, "sides": sides}
 
 
-# TrayBoard._free_if with present = «not gone»
+# tray_board._free_if with present = «not gone»
 static func free_i(geo: Dictionary, i: int, gone: Dictionary) -> bool:
 	for o in geo.cov[i]:
 		if not gone.has(o):
@@ -595,7 +595,7 @@ static func free_i(geo: Dictionary, i: int, gone: Dictionary) -> bool:
 	return true
 
 
-# The deal of V10HandBoard._assign as a pure model: the same random walk over free tiles as TrayBoard._assign, but
+# The deal of V10HandBoard._assign as a pure model: the same random walk over free tiles as tray_board._assign, but
 # from RandomNumberGenerator(deal_seed); tiles order[2k], order[2k+1] get face pairs[k] and step k.
 static func deal(cfg: Dictionary) -> Dictionary:
 	var pos: = positions(cfg)

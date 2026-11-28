@@ -13,7 +13,7 @@ var _t: = 0.0
 var _back: Texture2D = preload("res://assets/v06/flip/tile_back.png")
 
 func setup(cfg: Dictionary, acc: Color) -> void :
-	pos = TrayBoard.gen_layout(cfg)
+	pos = TWFree.gen_layout(cfg)
 	accent = acc
 	_box = StyleBoxFlat.new()
 	_side = StyleBoxFlat.new()

@@ -10,7 +10,7 @@ New pure core, `tray_board.gd` is NOT touched yet (P17 turns it into a thin view
 | `tw_board.gd` | `TWBoard` | the engine: integer tile ids, seeded deal (`from_cfg`) or payload (`from_level`), `tap(id) -> [Event]`, `undo`, `return_tray`, `shuffle`, `hint/best_move/solver_move`, `vanish_pairs/hack_deepest/moonlight/open_tile`, `state_hash`, `certificate/verify_certificate`, `snapshot/restore/fork_fresh`, `export_replay/play_replay`. Injected clock (`clock` Callable or `time`), no Node/Tween/await/G. |
 | `tw_board_selftest.gd` | `TWBoardSelftest` | `TWBOARD_SELFTEST n/n`; runner `scripts/v10/rules/tw_board_selftest.tscn` (`-- --levels_n=200 --seeds_n=1000 --fuzz_n=48`). |
 
-Rules merged from TrayBoard (tap, tray, pair, combo window, ice, secret/reveal, gold, shard, undo, return_tray, hint, shuffle,
+Rules merged from tray_board (tap, tray, pair, combo window, ice, secret/reveal, gold, shard, undo, return_tray, hint, shuffle,
 ults), V6SpecialBoard (key/lock/chain/joker/bomb/gift/unstick) and V10LevelSim (representation, certificate replay).
 
 Deliberate differences from the legacy board (all in `shuffle`/events, none in tap legality):
@@ -19,18 +19,18 @@ Deliberate differences from the legacy board (all in `shuffle`/events, none in t
 * `shuffle` pairs gold tiles with each other first (legacy `gs.pop_back() or gs.pop_back()` dropped one element when the first was gold).
 * the bomb blast removes the same nearby pairs but is ordered with an id tie-break (legacy sort was unstable).
 
-Parity facts proven by the selftest: layouts equal `V10LevelGen.positions` (TrayBoard.gen_layout path) for 200 levels, topology equals
+Parity facts proven by the selftest: layouts equal `V10LevelGen.positions` (TWFree.gen_layout path) for 200 levels, topology equals
 `V10LevelSim`, lockstep random play equals `V10LevelSim` (moves, results, tray, pairs, unstuck) on 200 levels (also run: 1000/1000),
 generator certificates replay on TWBoard, the solver bot clears the levels with bombs blasting.
 
 ## P17: parity proof (`parity_selftest.gd`, fixtures `game/tests/fixtures/replays/`)
 
 The legacy `_assign` is unseeded, so parity is proven by RECORDED games, not by a seed. `scripts/v10/rules/parity_record.tscn` plays 500 games on the
-real `TrayBoard` (tap / undo / return_tray / shuffle_board / auto_pairs / hack_deepest / moonlight / best_move, under a fast virtual clock) and stores
+real `tray_board` (tap / undo / return_tray / shuffle_board / auto_pairs / hack_deepest / moonlight / best_move, under a fast virtual clock) and stores
 the deal (layout, faces, steps, gold, ice, secret, shard) plus the journal with the state the legacy showed after every operation. `TWParitySelftest`
 (pure core) rebuilds each deal as a TWBoard payload and replays the journal: result kind of every tap (deny / ice crack / to tray / match / tray full /
 ignored), board count, tray ids in order, combo (virtual clock on the 0.25 s grid, the 5 s window boundary included), cracks, max tray, the free set,
-undo / rescue effects, the pairs picked by the ults must all be identical. `scripts/v10/rules/parity_legacy.gd` (shell side: it needs TrayBoard) adds the
+undo / rescue effects, the pairs picked by the ults must all be identical. `scripts/v10/rules/parity_legacy.gd` (shell side: it needs tray_board) adds the
 live fuzz in lockstep. Re-record: `godot --headless --path game res://scripts/v10/rules/parity_record.tscn` (seeds are fixed).
 
 Compared by class, not identity: `best_move` (the hint; legacy iterates a Dictionary in insertion order, TWBoard sorts the face keys), `shuffle` (unseeded

@@ -2,7 +2,7 @@ class_name V10AdventureBattle
 extends RefCounted
 
 # V10AdventureBattle — pure combat state of one monster fight (no nodes, no timers; fully unit-testable).
-# The screen feeds it events from the TrayBoard: on_pair() for every matched pair, on_move() for every tile
+# The screen feeds it events from the tray_board: on_pair() for every matched pair, on_move() for every tile
 # put into the tray, on_overflow() when the tray overflows, use_ult() when the heroine ultimate is fired.
 #
 # 0.12: the squad (lead + 2 supports) adds passive bonuses and a synergy (mods), and every boss carries a

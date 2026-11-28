@@ -231,7 +231,7 @@ static func on_cfg(cfg: Dictionary, rules: Dictionary) -> Dictionary:
 	if rules.no_ice:
 		c.ice = 0
 	else:
-		# TrayBoard._assign deals round(cfg.ice × 1.5) ice tiles: guards N adds exactly N
+		# tray_board._assign deals round(cfg.ice × 1.5) ice tiles: guards N adds exactly N
 		c.ice = float(c.get("ice", 0)) + float(rules.guards) / 1.5
 	if rules.no_hidden:
 		c.hidden = false
@@ -241,7 +241,7 @@ static func on_cfg(cfg: Dictionary, rules: Dictionary) -> Dictionary:
 	return c
 
 # on_start: data ops for the adapter, in the order they must run. `tiles` is an array of
-# {i, step, free, covered, secret} describing the dealt table (V10TowerRules builds it from the TrayBoard;
+# {i, step, free, covered, secret} describing the dealt table (V10TowerRules builds it from the tray_board;
 # the selftest builds it from V10TowerSim). Fog picks tiles deterministically from cfg.seed.
 static func on_start(rules: Dictionary, cfg: Dictionary, tiles: Array) -> Array:
 	var ops: = []

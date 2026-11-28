@@ -1,15 +1,15 @@
 {
  "version": 1,
- "N": 573,
+ "N": 565,
  "by_rule": {
   "NODE_BASE": 0,
   "NODE_API": 57,
   "AUDIO_FX": 0,
   "AUTOLOAD_G": 465,
   "ROOT_PATH": 1,
-  "SHELL_DEP": 50
+  "SHELL_DEP": 42
  },
- "core_files": 249,
+ "core_files": 260,
  "files": {
   "game/core/auth/auth.gd": {
    "AUTOLOAD_G": 19,
@@ -42,9 +42,6 @@
   },
   "game/core/gacha/module.gd": {
    "AUTOLOAD_G": 12,
-   "SHELL_DEP": 1
-  },
-  "game/core/levels/level_gen.gd": {
    "SHELL_DEP": 1
   },
   "game/core/levels/module.gd": {
@@ -99,18 +96,12 @@
    "AUTOLOAD_G": 1,
    "SHELL_DEP": 1
   },
-  "game/core/modes/duels/challenge/challenge_deal.gd": {
-   "SHELL_DEP": 1
-  },
   "game/core/modes/duels/duel_rank.gd": {
    "AUTOLOAD_G": 3
   },
   "game/core/modes/duels/duel_util.gd": {
    "NODE_API": 1,
    "AUTOLOAD_G": 11
-  },
-  "game/core/modes/garden/garden_gen.gd": {
-   "SHELL_DEP": 1
   },
   "game/core/modes/garden/garden_info.gd": {
    "AUTOLOAD_G": 1
@@ -120,9 +111,6 @@
   },
   "game/core/modes/koikoi/koikoi_save.gd": {
    "NODE_API": 1
-  },
-  "game/core/modes/palm/hand_gen.gd": {
-   "SHELL_DEP": 1
   },
   "game/core/modes/palm/hand_state.gd": {
    "AUTOLOAD_G": 2
@@ -147,18 +135,12 @@
   "game/core/modes/tower/pagoda.gd": {
    "AUTOLOAD_G": 4
   },
-  "game/core/modes/tower/sim.gd": {
-   "SHELL_DEP": 1
-  },
   "game/core/modes/tower/tower_board.gd": {
    "AUTOLOAD_G": 4,
    "SHELL_DEP": 1
   },
   "game/core/modes/tower/tower_util.gd": {
    "AUTOLOAD_G": 5
-  },
-  "game/core/modes/triples/triples_gen.gd": {
-   "SHELL_DEP": 1
   },
   "game/core/modes/triples/triples_save.gd": {
    "AUTOLOAD_G": 1
@@ -232,8 +214,7 @@
    "AUTOLOAD_G": 11
   },
   "game/core/v06/modes/modes_data.gd": {
-   "AUTOLOAD_G": 9,
-   "SHELL_DEP": 1
+   "AUTOLOAD_G": 9
   },
   "game/core/v06/story/txt.gd": {
    "SHELL_DEP": 1
@@ -245,8 +226,7 @@
    "AUTOLOAD_G": 9
   },
   "game/core/v07/event/ladder.gd": {
-   "AUTOLOAD_G": 3,
-   "SHELL_DEP": 1
+   "AUTOLOAD_G": 3
   },
   "game/core/v07/room/room_data.gd": {
    "AUTOLOAD_G": 10

@@ -5,7 +5,7 @@ extends RefCounted
 #   1 лёгкий · 2 обычный · 3 обычный · 4 сложный · 5 передышка · 6 обычный · 7 сложный · 8 пик · 9 передышка · 10 босс
 # Главы 1–2 без пиков (пик → сложный), боссы глав 1–4 — «сложный», 5–12 — «пик».
 #
-# Стол = TrayBoard.gen_layout(cfg) (те же формы и засев, что в Пути), обрезанный до кратного трём сверху.
+# Стол = TWFree.gen_layout(cfg) (те же формы и засев, что в Пути), обрезанный до кратного трём сверху.
 # Рычаги сложности (одно число x ∈ [0; 1.4] на уровень):
 #   kinds  — число разных лиц (меньше видов → больше случайных совпадений → легче);
 #   hold   — сколько троек сертификат держит открытыми одновременно (1…3, лоток по сертификату ≤ 2·hold ≤ 6);
@@ -124,7 +124,7 @@ static func params(i: int, x: float, salt: int) -> Dictionary:
 	}
 
 
-# раскладка: ищем cfg TrayBoard.gen_layout, чьё число фишек ближе всего к цели, затем обрезаем до кратного 3
+# раскладка: ищем cfg TWFree.gen_layout, чьё число фишек ближе всего к цели, затем обрезаем до кратного 3
 static var _layout_cache: = {}
 
 static func layout(p: Dictionary) -> Array:
@@ -148,7 +148,7 @@ static func layout(p: Dictionary) -> Array:
 					for rows in [5, 6, 7, 8, 9]:
 						var cfg: = {"seed": int(p.seed), "cols": cols, "rows": rows, "layers": layers,
 							"fill": fill, "shape": shapes[si], "upper": p.upper}
-						var ps: Array = TrayBoard.gen_layout(cfg)
+						var ps: Array = TWFree.gen_layout(cfg)
 						var n: = ps.size() - ps.size() % 3
 						var d: = absi(n - int(p.target)) * 4 + (0 if layers == int(p.layers_max) else 3) \
 							+ absi(cols * 3 - rows * 2) + (0 if si == 0 else 100) + (0 if fill < 0.8 else 6)

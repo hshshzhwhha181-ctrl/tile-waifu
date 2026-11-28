@@ -2,7 +2,7 @@ class_name V10MjGardenGen
 extends RefCounted
 
 # Сад 2.0 — генератор волн (docs/MODES.md §4.9). Волна — небольшая раскладка 24–40 фишек на тех же формах, что Путь
-# (TrayBoard.gen_layout + формы V6Layouts), «доливается» на стол, когда там остаётся 6 фишек.
+# (TWFree.gen_layout + формы V6Layouts), «доливается» на стол, когда там остаётся 6 фишек.
 #
 # Как волна ложится рядом со старыми фишками (их ≤ 6 на столе и ≤ 5 в лотке):
 #   • новая фишка не ставится ни над, ни под, ни вплотную сбоку (на том же ярусе) к старой — и к «дому» фишки в лотке,
@@ -225,7 +225,7 @@ static func make_wave(r: V10MjGardenRules) -> Dictionary:
 		}
 		if a < 2 and w <= 1:
 			cfg.shape = "rect" if a == 0 else cfg.shape
-		var raw: Array = TrayBoard.gen_layout(cfg)
+		var raw: Array = TWFree.gen_layout(cfg)
 		var free_x: = V10MjGardenRules.FIELD_X - 2 * (cols - 1)
 		var free_y: = V10MjGardenRules.FIELD_Y - 2 * (rows - 1)
 		var off: = Vector2i(rng.randi_range(0, free_x), rng.randi_range(0, free_y))
@@ -244,7 +244,7 @@ static func make_wave(r: V10MjGardenRules) -> Dictionary:
 		var cfg2: = {"seed": rng.randi(), "cols": 6, "rows": 7, "layers": 3 + extra % 2, "fill": 1.0,
 			"shape": "rect", "upper": ""}
 		var off2: = Vector2i(extra % (V10MjGardenRules.FIELD_X - 10 + 1), 0)
-		var pos2: = place(TrayBoard.gen_layout(cfg2), off2, present, rng)
+		var pos2: = place(TWFree.gen_layout(cfg2), off2, present, rng)
 		if pos2.size() > best.size():
 			best = pos2
 			best_cfg = cfg2

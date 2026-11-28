@@ -1,13 +1,13 @@
 class_name V10TowerSim
 extends RefCounted
 
-# Headless table model for the tower track: the same layout as the game (TrayBoard.gen_layout, reused as is),
-# the same «free» rule as TrayBoard._free_if, and a deal with the same algorithm as TrayBoard._assign
+# Headless table model for the tower track: the same layout as the game (TWFree.gen_layout, reused as is),
+# the same «free» rule as tray_board._free_if, and a deal with the same algorithm as tray_board._assign
 # but from a seeded stream (V10TowerUtil.rng), so a seed always gives the same table.
 #
 #   var b := V10TowerSim.deal(cfg)          -> SimBoard (tiles, faces, steps, ice, secret)
 #   V10TowerSim.step_order_ok(b)            -> true when the table clears in step order (the existing
-#                                              TrayBoard.solver_move path): proves the table is solvable
+#                                              tray_board.solver_move path): proves the table is solvable
 #   V10TowerSim.play(b, rules, skill, rng, opts) -> {cleared, lives, overflows, timeouts, taps, secs, pairs, max_combo}
 #
 # The bot plays like a player who sees the table: no hints, no boosters, no ult (spec Ф4: V10Bot uses no helps).
@@ -28,7 +28,7 @@ const TIME_REFILL: = 0.5  # hourglass: after a time-out the clock refills to hal
 const COMBO_WINDOW: = 5.0
 
 class SimBoard extends RefCounted:
-	var pos: Array = []           # Vector3i per tile, sorted like TrayBoard.setup
+	var pos: Array = []           # Vector3i per tile, sorted like tray_board.setup
 	var n: = 0
 	var cov: Array = []           # PackedInt32Array: tiles covering i
 	var left: Array = []          # PackedInt32Array
@@ -85,11 +85,11 @@ class SimBoard extends RefCounted:
 static func _covers(o: Vector3i, t: Vector3i) -> bool:
 	return o.z > t.z and absi(o.x - t.x) < 2 and absi(o.y - t.y) < 2
 
-# the layout of TrayBoard.setup: gen_layout, drop the first highest tile when odd, sort, covers and sides
+# the layout of tray_board.setup: gen_layout, drop the first highest tile when odd, sort, covers and sides
 static func layout(cfg: Dictionary) -> SimBoard:
 	var b: = SimBoard.new()
 	b.cfg = cfg
-	var pos: Array = TrayBoard.gen_layout(cfg)
+	var pos: Array = TWFree.gen_layout(cfg)
 	if pos.size() % 2 == 1:
 		var top: = 0
 		for i in pos.size():
@@ -137,7 +137,7 @@ static func layout(cfg: Dictionary) -> SimBoard:
 		b.present[i] = 1
 	return b
 
-# TrayBoard._assign with a seeded stream: random free-order elimination, consecutive picks are pairs
+# tray_board._assign with a seeded stream: random free-order elimination, consecutive picks are pairs
 static func deal(cfg: Dictionary) -> SimBoard:
 	var b: = layout(cfg)
 	var r: = U.rng(int(cfg.get("seed", 1)), "deal")
@@ -192,8 +192,8 @@ static func deal(cfg: Dictionary) -> SimBoard:
 				b.secret[i] = 1
 	return b
 
-# Load faces / steps / ice / secret from a live TrayBoard (selftest: the real deal checked by the same model)
-static func from_tray(tb: TrayBoard, cfg: Dictionary) -> SimBoard:
+# Load faces / steps / ice / secret from a live tray_board (selftest: the real deal checked by the same model)
+static func from_tray(tb, cfg: Dictionary) -> SimBoard:
 	var b: = layout(cfg)
 	var idx: = {}
 	for i in b.n:
@@ -241,7 +241,7 @@ static func step_order_ok(b: SimBoard) -> bool:
 	b.present = saved
 	return ok
 
-# lowest-step pair with both tiles on the table (TrayBoard._pairs_on_board / auto_pairs)
+# lowest-step pair with both tiles on the table (tray_board._pairs_on_board / auto_pairs)
 static func _auto_pair(b: SimBoard) -> bool:
 	var by: = {}
 	for i in b.n:
@@ -303,7 +303,7 @@ static func play(b: SimBoard, rules: Dictionary, skill: String, r: RandomNumberG
 		if guard > 4000:
 			break
 		var fr: = b.free_list()
-		# reveal: a secret tile shows its face once free (TrayBoard.reveal_free)
+		# reveal: a secret tile shows its face once free (tray_board.reveal_free)
 		for i in fr:
 			b.secret[i] = 0
 		var pick: = _choose(b, fr, tray, slots, fog, sk, r)

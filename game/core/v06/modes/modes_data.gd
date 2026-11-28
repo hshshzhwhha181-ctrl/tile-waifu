@@ -114,7 +114,7 @@ static func fit_seed(c: Dictionary, target: int, tol: int) -> Dictionary:
 	for k in 40:
 		var sd: = int(c.seed) + k * 104729
 		c.seed = sd
-		var n: = TrayBoard.gen_layout(c).size()
+		var n: = TWFree.gen_layout(c).size()
 		var d: = absi(n - target)
 		if d < best_d:
 			best_d = d

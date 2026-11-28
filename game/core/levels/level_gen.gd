@@ -3,11 +3,11 @@ extends RefCounted
 
 # 0.10 «Путь на 1000 партий»: a deterministic generator for 10 worlds x 100 levels.
 #
-#  level(i)  -> the level dict (TrayBoard cfg + map metadata), no board payload — cheap, for the map screen.
+#  level(i)  -> the level dict (tray_board cfg + map metadata), no board payload — cheap, for the map screen.
 #  build(i)  -> level(i) + "v10" board payload (faces/steps/ice/secret/gold/shard/specials per tile, aligned with
-#               TrayBoard.setup tile order) + "cert" (a take order that clears the board under the real rules).
+#               tray_board.setup tile order) + "cert" (a take order that clears the board under the real rules).
 #
-# Same index + same salt => byte-identical level on every device (own RNG, own hash; TrayBoard.gen_layout is
+# Same index + same salt => byte-identical level on every device (own RNG, own hash; TWFree.gen_layout is
 # seeded from cfg.seed). The salt table (data/v10/levels/levels_bake.json) is written by the bake run of the
 # selftest: the bot picks, per level, the seed that lands in the tier's pass-rate band (CEO_PLAN §3).
 #
@@ -203,7 +203,7 @@ static func mechs_known(i: int) -> Array:
 	return out
 
 
-# The level dict: everything the map screen and TrayBoard.setup need, no per-tile payload.
+# The level dict: everything the map screen and tray_board.setup need, no per-tile payload.
 static func level(i: int, salt: int = -1, assist: bool = false) -> Dictionary:
 	return _level(i, salt, assist)[0]
 
@@ -428,9 +428,9 @@ static func _hash(x: int) -> int:
 	return h
 
 
-# Positions exactly as TrayBoard.setup builds its `tiles` (gen_layout, drop the first top-most tile when odd, sort).
+# Positions exactly as tray_board.setup builds its `tiles` (gen_layout, drop the first top-most tile when odd, sort).
 static func positions(cfg: Dictionary) -> Array:
-	var pos: Array = TrayBoard.gen_layout(cfg)
+	var pos: Array = TWFree.gen_layout(cfg)
 	if pos.size() % 2 == 1:
 		var top: = 0
 		for k in pos.size():
@@ -584,7 +584,7 @@ static func build(i: int, salt: int = -1, sim = null, assist: bool = false) -> D
 			done += 1
 	var npairs: = n / 2
 
-	# 4) shard / gold / ice / hidden — the same rules as TrayBoard._assign, on certificate pairs
+	# 4) shard / gold / ice / hidden — the same rules as tray_board._assign, on certificate pairs
 	var closing: = []   # pairs in completion order: [opener, closer]
 	for k in n:
 		var t: = order[k]

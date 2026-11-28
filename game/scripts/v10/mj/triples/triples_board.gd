@@ -2,7 +2,7 @@ class_name V10MjTriplesBoard
 extends Node2D
 
 # V10MjTriplesBoard — стол Троек (docs/MODES.md §4.2). Фишки — обычные Tile (материал, кромка, свет V6TileLook),
-# раскладка — TrayBoard.gen_layout через V10MjTriplesGen; правила — V10MjTriplesRules (одна правда с ботом и
+# раскладка — TWFree.gen_layout через V10MjTriplesGen; правила — V10MjTriplesRules (одна правда с ботом и
 # самотестом). TrayBoard не меняется и не наследуется.
 #
 # Ощущение (всё по таймингам спеки):

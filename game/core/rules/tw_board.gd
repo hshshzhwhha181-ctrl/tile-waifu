@@ -2,16 +2,16 @@ class_name TWBoard
 extends RefCounted
 
 # TWBoard (P16 / WP5): the ONE rules engine of the tray solitaire (tile table + 4-slot tray), as pure RefCounted code.
-# It merges the rules of TrayBoard (tap / tray / pair / ice / secret / gold / shard / undo / hint / shuffle / return_tray),
+# It merges the rules of tray_board (tap / tray / pair / ice / secret / gold / shard / undo / hint / shuffle / return_tray),
 # V6SpecialBoard (key, lock, chain, joker, bomb, gift, unstick) and V10LevelSim (the compact integer representation, the
 # certificate replay) into one engine that has
-#   * integer tile ids (index into `pos`, the order of TrayBoard.setup / V10LevelGen payloads),
+#   * integer tile ids (index into `pos`, the order of tray_board.setup / V10LevelGen payloads),
 #   * a seeded deal (TWRng): faces, gold, ice, secret, shard and the specials are a function of the seed,
 #   * an injected clock (`clock` Callable, else `time`) for the combo window,
 #   * no Node, no Tile, no Tween, no await, no G: every operation returns the EVENTS it caused (TWBoardEvents) and the
 #     view animates them,
 #   * state_hash / certificate / fork, so a game can be compared, replayed and proven.
-# tray_board.gd is NOT changed by this package: it is replaced by a thin view adapter in a later package (P17 parity).
+# tray_board.gd (P18) is the thin view over this engine: it syncs its tiles in, calls an operation here and animates the events.
 #
 #   TWBoard.from_cfg(cfg)      a fresh seeded deal of a board config (cols, rows, layers, faces, gold, ice, hidden, shard,
 #                              seed, specials plan in cfg.plan or cfg.v10_plan)
@@ -146,17 +146,28 @@ static func from_positions(positions: Array, slots_: int = 4) -> TWBoard:
 # the seeded deal of a board config; same cfg => same board on every run
 static func from_cfg(cfg: Dictionary) -> TWBoard:
 	var b: = from_positions(TWFree.positions(cfg), int(cfg.get("slots", 4)))
-	b.code = str(cfg.get("code", ""))
-	b.deal_seed = int(cfg.get("deal_seed", cfg.get("seed", 1)))
-	b.shard_hero = str(cfg.get("shard", ""))
-	b.rng = TWRng.make(b.deal_seed, 2)
-	var deal: = TWRng.make(b.deal_seed, 1)
-	b._deal(cfg, deal)
-	var plan: Dictionary = cfg.get("plan", cfg.get("v10_plan", {}))
-	if not plan.is_empty():
-		b._specials(plan, deal)
-	b.reset()
+	b.deal(cfg)
 	return b
+
+
+# deal this table's faces / steps / ice / gold / secret / shard (and the specials of cfg.plan) from cfg.deal_seed (else cfg.seed);
+# same cfg => same deal. The table keeps its topology; the state goes back to the start of the game.
+func deal(cfg: Dictionary, with_plan: bool = true) -> void:
+	code = str(cfg.get("code", ""))
+	deal_seed = int(cfg.get("deal_seed", cfg.get("seed", 1)))
+	shard_hero = str(cfg.get("shard", ""))
+	rng = TWRng.make(deal_seed, 2)
+	var r: = TWRng.make(deal_seed, 1)
+	_deal(cfg, r)
+	var plan: Dictionary = cfg.get("plan", cfg.get("v10_plan", {})) if with_plan else {}
+	if not plan.is_empty():
+		_specials(plan, r)
+	reset()
+
+
+# the combo counter after a pair at time `tnow`: continues inside the window, else starts again at 1
+static func next_combo(combo_: int, last: float, tnow: float, window: float) -> int:
+	return combo_ + 1 if tnow - last < window else 1
 
 
 # a Path level with its payload (lv.v10 from V10LevelGen.build); the layout must match the payload
@@ -191,7 +202,7 @@ static func from_level(lv: Dictionary) -> TWBoard:
 	return b
 
 
-# ---- the deal: TrayBoard._assign with TWRng ----
+# ---- the deal: tray_board._assign with TWRng ----
 
 # A random removal order: a free tile each step (a legal order to clear the table from the given counts).
 func _removal_order(ids: Array, covc: PackedInt32Array, lc: PackedInt32Array, rc: PackedInt32Array, r: TWRng, respect_opened: bool) -> Array:
@@ -443,6 +454,47 @@ func reset() -> void:
 	rng = TWRng.make(deal_seed, 2)
 
 
+# Take the table a VIEW holds (per tile id: on the table / not matched / face / step / gold / ice / hidden / shard / forced free,
+# plus the tray and the undo history as tile ids) as this board's state; the counters are rebuilt. A view whose tiles are changed
+# from outside (skills, ults) calls this before every rule operation, so the rules never run on a stale copy.
+func load_view(v: Dictionary) -> void:
+	present = v.present
+	alive = v.alive
+	face = v.face
+	step = v.step
+	gold = v.gold
+	ice = v.ice
+	sec = v.sec
+	shard_f = v.shard
+	opened = v.opened
+	tray = v.tray
+	history = v.history
+	covcnt.resize(n)
+	covcnt.fill(0)
+	lcnt.resize(n)
+	lcnt.fill(0)
+	rcnt.resize(n)
+	rcnt.fill(0)
+	on_board = 0
+	alive_n = 0
+	sec_left = 0
+	for j in n:
+		if alive[j] == 1:
+			alive_n += 1
+		if sec[j] == 1:
+			sec_left += 1
+		if present[j] == 1:
+			on_board += 1
+			for c in covers[j]:
+				covcnt[c] += 1
+			for t in lft_of[j]:
+				lcnt[t] += 1
+			for t in rgt_of[j]:
+				rcnt[t] += 1
+	failed = false
+	cleared = false
+
+
 func now() -> float:
 	return float(clock.call()) if clock.is_valid() else time
 
@@ -611,7 +663,11 @@ func tray_twin(i: int) -> int:
 
 
 func best_move() -> int:
-	var fr: = free_tiles()
+	return best_move_from(free_tiles())
+
+
+# best_move over a given free list (a view that filters the free tiles by its own locks passes its list)
+func best_move_from(fr: PackedInt32Array) -> int:
 	if fr.is_empty():
 		return -1
 	if not tray.is_empty():
@@ -647,11 +703,15 @@ func best_move() -> int:
 
 # [tile] or [tile, its free twin on the table]: the glints of the hint; [] when there is no move
 func hint() -> Array:
-	var t: = best_move()
+	return hint_from(free_tiles())
+
+
+func hint_from(fr: PackedInt32Array) -> Array:
+	var t: = best_move_from(fr)
 	if t < 0:
 		return []
 	var out: = [t]
-	for o in free_tiles():
+	for o in fr:
 		if o != t and face[o] == face[t]:
 			out.append(o)
 			break
@@ -661,14 +721,17 @@ func hint() -> Array:
 # the auto-player (V10LevelBoard.solver_move): the twin of a tray tile (same step), the next tile of the certificate while it
 # is still valid, any tile with the tray's face, else the lowest step
 func solver_move() -> int:
-	var fr: = free_tiles()
+	return solver_move_from(free_tiles())
+
+
+func solver_move_from(fr: PackedInt32Array, use_cert: bool = true) -> int:
 	if fr.is_empty():
 		return -1
 	for x in tray:
 		for t in fr:
 			if face[t] == face[x] and step[t] == step[x]:
 				return t
-	if not shuffled:
+	if use_cert and not shuffled:
 		for idx in cert:
 			if present[idx] == 1:
 				if fr.has(idx):
@@ -763,7 +826,7 @@ func tap(i: int) -> Array:
 
 func _match(a: int, b: int, ev: Array) -> void:
 	var tnow: = now()
-	combo = combo + 1 if tnow - last_match < combo_window else 1
+	combo = next_combo(combo, last_match, tnow, combo_window)
 	last_match = tnow
 	last_face = face[a]
 	last_gift = kind[a] == K_GIFT or kind[b] == K_GIFT
@@ -886,7 +949,13 @@ func _unstick(ev: Array) -> void:
 		ev.append(E.make(E.UNSTICK))
 
 
-# secret tiles that became free show their faces
+# secret tiles that became free show their faces: the REVEAL events
+func reveal_events() -> Array:
+	var ev: Array = []
+	_reveal(ev)
+	return ev
+
+
 func _reveal(ev: Array) -> void:
 	if sec_left <= 0:
 		return
@@ -958,16 +1027,21 @@ func return_tray(k: int = 3) -> Array:
 	return ev
 
 
-# TrayBoard.reassign_faces + V6SpecialBoard.shuffle_board: the faces of the table (not shards, not jokers) are dealt again
+# tray_board.reassign_faces + V6SpecialBoard.shuffle_board: the faces of the table (not shards, not jokers) are dealt again
 # from a removal order of the CURRENT table, so the new deal is solvable; tray tiles keep a twin on the table
 func shuffle(r: TWRng = null) -> Array:
-	var ev: Array = []
-	if r == null:
-		r = rng
 	var ts: Array = []
 	for t in n:
 		if present[t] == 1 and shard_f[t] == 0 and face[t] != JOKER:
 			ts.append(t)
+	return reassign(ts, r)
+
+
+# deal the faces of the given tiles (ids on the table) again, solvable from the current table
+func reassign(ts: Array, r: TWRng = null) -> Array:
+	var ev: Array = []
+	if r == null:
+		r = rng
 	if ts.is_empty():
 		return ev
 	var mine: = {}
@@ -1027,7 +1101,7 @@ func shuffle(r: TWRng = null) -> Array:
 	return ev
 
 
-# =================================================================== ults and skills (TrayBoard.auto_pairs / hack_deepest / moonlight)
+# =================================================================== ults and skills (tray_board.auto_pairs / hack_deepest / moonlight)
 
 # the pairs lying on the table: by step when both tiles agree, else by face; earliest step first
 func pairs_on_board() -> Array:
