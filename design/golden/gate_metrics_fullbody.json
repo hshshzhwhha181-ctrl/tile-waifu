@@ -1,0 +1,34 @@
+{
+ "mc_fba": {
+  "accent_pct": 6.1,
+  "accent_loose_pct": 7.6,
+  "gold_pct": 0.2,
+  "heads": 6.83,
+  "accent_ok": true,
+  "heads_ok": true
+ },
+ "mc_fbb": {
+  "accent_pct": 7.3,
+  "accent_loose_pct": 8.5,
+  "gold_pct": 0.01,
+  "heads": 6.98,
+  "accent_ok": true,
+  "heads_ok": true
+ },
+ "yue_fba": {
+  "accent_pct": 12.0,
+  "accent_loose_pct": 15.9,
+  "gold_pct": 0.0,
+  "heads": 7.65,
+  "accent_ok": true,
+  "heads_ok": true
+ },
+ "yue_fbb": {
+  "accent_pct": 6.5,
+  "accent_loose_pct": 9.4,
+  "gold_pct": 0.0,
+  "heads": 7.27,
+  "accent_ok": true,
+  "heads_ok": true
+ }
+}
