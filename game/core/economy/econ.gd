@@ -1,7 +1,7 @@
 class_name V10Econ
 extends RefCounted
 
-# V10Econ — the economy core in one object: clock, wallet, energy, gacha, pass, spending protection, shop.
+# V10Econ — the economy core in one object: clock, wallet, gacha, pass, spending protection, shop.
 # Pure logic, no nodes, no UI, no disk: the owner (G) keeps econ.st inside its save and calls save_dict()/load.
 #
 #   var e := V10Econ.new(state_dict_or_empty, provider_or_null, extra_pool_items)
@@ -9,7 +9,7 @@ extends RefCounted
 #   e.spark(banner_id, pick)      200 candles → featured SSR
 #   e.choose_first(id)            first SSR of choice (free, once)
 #   e.tick()                      close ended banners (candles → wax); call on start/resume and on the shop screen
-#   e.grant(g, src) / e.revoke(g, src)   apply a reward/refund dict {currency: n, "tea": n, "items": [ids]}
+#   e.grant(g, src) / e.revoke(g, src)   apply a reward/refund dict {currency: n, "items": [ids]}
 #   e.audit() -> Array            plausibility problems (wallet invariant, candles vs pulls, ranges, receipts, seal)
 #   e.save_dict(key) / V10Econ.verify(d, key)      HMAC-SHA256 seal over the canonical JSON of the state
 #   V10Econ.from_legacy(G.S, now)  econ state from a 0.8/0.9 save (save v7), see README «Миграция»
@@ -28,7 +28,6 @@ const LOCAL_KEY: = "tw-econ-v1:5e1f0c2a9b"    # deterrent only; the server issue
 var st: Dictionary
 var clock: V10Clock
 var wallet: V10Wallet
-var energy: V10Energy
 var gacha: V10Gacha
 var pass_: V10Pass
 var spend: V10Spend
@@ -42,7 +41,7 @@ var pass_xp_per_pull: = 0
 func _init(state: Dictionary = {}, provider: V10PaymentProvider = null, items: Array = [], t0: int = 0) -> void:
 	st = state
 	st["ver"] = int(st.get("ver", VER))
-	for k in ["clock", "wallet", "energy", "gacha", "pass", "spend", "shop", "inv", "const", "flags"]:
+	for k in ["clock", "wallet", "gacha", "pass", "spend", "shop", "inv", "const", "flags"]:
 		if not (st.get(k) is Dictionary):
 			st[k] = {}
 	owns = _owns_local
@@ -50,7 +49,6 @@ func _init(state: Dictionary = {}, provider: V10PaymentProvider = null, items: A
 	if t0 > 0:
 		clock.set_manual(t0, 0)
 	wallet = V10Wallet.new(st.wallet, clock)
-	energy = V10Energy.new(st.energy, clock)
 	gacha = V10Gacha.new(st.gacha, clock, items)
 	gacha.owns = _owns_proxy
 	pass_ = V10Pass.new(st.pass, clock)
@@ -90,7 +88,7 @@ func grant(g: Dictionary, src: String = "") -> void:
 				st.inv[iid] = true
 				item_granted.emit(iid, src)
 		elif k == "tea":
-			energy.add(int(g[k]))
+			pass       # legacy reward key: there is no energy (GDD 1.1), a stray "tea" in an old grant is ignored
 		else:
 			wallet.add(String(k), int(g[k]), src)
 	changed.emit()
@@ -216,7 +214,6 @@ func tick() -> Dictionary:
 		if w > 0:
 			wallet.add("wax", w, "candles:" + bid)
 			wax += w
-	energy.tick()
 	return {"wax": wax}
 
 
@@ -224,7 +221,6 @@ func tick() -> Dictionary:
 func audit() -> Array:
 	var bad: = []
 	bad.append_array(wallet.audit())
-	bad.append_array(energy.audit())
 	bad.append_array(gacha.audit())
 	bad.append_array(shop.audit())
 	if bool(st.flags.get("tampered", false)):
@@ -288,7 +284,6 @@ static func from_legacy(S: Dictionary, now: int) -> Dictionary:
 	var gems: = maxi(0, int(S.get("gems", 0)))
 	var coins: = maxi(0, int(S.get("coins", 0)))
 	e.wallet = {"bal": {"crystal": gems, "coin": coins}, "earned": {"crystal": gems, "coin": coins}}
-	e.energy = {"v": V10Catalog.TEA_CAP, "t": now}
 	# the legacy single pity counter carried the event banners → the shared limited counter keeps it (and its rules)
 	var pity: = clampi(int(S.get("pity", 0)), 0, V10Catalog.SSR_HARD - 1)
 	var spity: = clampi(int(S.get("sr_pity", 0)), 0, V10Catalog.S_HARD - 1)

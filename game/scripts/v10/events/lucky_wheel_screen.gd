@@ -14,7 +14,7 @@ const WHEEL_PX: = 560.0
 const SECTORS: Array[Dictionary] = [
 	{"label": "300 крист.", "short": "300\nкрист.", "gems": 300, "w": 3},
 	{"label": "2 Билета", "short": "2\nБилета", "tickets": 2, "w": 5},
-	{"label": "+80 Чая", "short": "+80\nЧая", "tea": 80, "w": 30},
+	{"label": "800 монет", "short": "800\nмонет", "coins": 800, "w": 30},
 	{"label": "Шёлковый веер ♥", "short": "Веер\n♥", "gift": "gift_silk_fan", "w": 6},
 	{"label": "150 крист.", "short": "150\nкрист.", "gems": 150, "w": 15},
 	{"label": "1 500 монет", "short": "1 500\nмонет", "coins": 1500, "w": 36},
@@ -94,8 +94,6 @@ static func apply_reward(idx: int) -> String:
 		V10Money.grant({"tickets": int(d.tickets)}, "wheel")
 	if int(d.get("coins", 0)) > 0:
 		V10Money.grant({"coins": int(d.coins)}, "wheel")
-	if int(d.get("tea", 0)) > 0:
-		V10Stamina.grant(int(d.tea))
 	if str(d.get("gift", "")) != "":
 		V10AffCurve.grant_gift(str(d.gift), 1)
 	return str(d.label)

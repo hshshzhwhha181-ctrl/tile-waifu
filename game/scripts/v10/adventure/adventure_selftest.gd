@@ -8,33 +8,6 @@ var _pass: = 0
 var _fail: = 0
 
 
-class _MockStamina:
-	var tea: = 30
-	var cap_v: = 120
-	var sheet_opened: = 0
-
-	func current() -> int:
-		return tea
-
-	func cap() -> int:
-		return cap_v
-
-	func can_spend(cost: int) -> bool:
-		return tea >= cost
-
-	func spend(cost: int, _reason: String = "") -> bool:
-		if tea < cost:
-			return false
-		tea -= cost
-		return true
-
-	func refund(amount: int) -> void:
-		tea = mini(cap_v, tea + amount)
-
-	func open_sheet(_m) -> void:
-		sheet_opened += 1
-
-
 func _check(cond: bool, msg: String) -> void:
 	if cond:
 		_pass += 1
@@ -106,7 +79,7 @@ func _run() -> void:
 		bt3.on_overflow()
 	_check(bt3.over and not bt3.won and bt3.hero_hp == 0, "repeated overflow defeats heroine")
 
-	# 3. Save persistence, progression & soft V10Stamina hook + .ogv resolver
+	# 3. Save persistence, progression  + .ogv resolver
 	var fake_s: = {}
 	var st: = V10AdventureData.ensure(fake_s)
 	_check(int(st.stage) == 0 and int(st.best_stage) == 0, "default save initialized")
@@ -114,15 +87,6 @@ func _run() -> void:
 	_check(bool(rw.first_clear) and int(rw.gems) > 0 and int(st.stage) == 1 and int(st.best_stage) == 1, "first clear unlocks stage 1")
 	var info: = V10AdventureData.hub_card_info(fake_s)
 	_check(String(info.screen) == "adventure" and int(info.stage) == 1, "hub_card_info reflects progression")
-
-	_check(V10AdventureData.STAMINA_COST == 15 and V10AdventureData.STAMINA_DEFEAT_REFUND == 10, "stamina cost=15 and refund=10 configured")
-	var mock_st: = _MockStamina.new()
-	V10AdventureData._stamina_mock = mock_st
-	_check(V10AdventureData.try_spend_stamina(null) and mock_st.tea == 15, "try_spend_stamina spends 15 tea")
-	_check(V10AdventureData.try_spend_stamina(null) and mock_st.tea == 0, "second adventure spend reaches 0 tea")
-	_check(not V10AdventureData.try_spend_stamina(self) and mock_st.sheet_opened == 1, "insufficient tea blocks entry and opens stamina sheet")
-	_check(V10AdventureData.refund_defeat_stamina() == 10 and mock_st.tea == 10, "defeat refunds 10 tea")
-	V10AdventureData._stamina_mock = null
 
 	_check(V10AdventureData.ult_video_path("mc").ends_with("mc.ogv"), "mc ult video resolves to mc.ogv")
 	_check(V10AdventureData.ult_video_path("mc", "o_dragon").ends_with("o_dragon.ogv"), "o_dragon outfit resolves to o_dragon.ogv")
@@ -179,7 +143,7 @@ func _run() -> void:
 	var scr: = V10AdventureScreen.new()
 	scr.size = Vector2(720, 1600)
 	add_child(scr)
-	scr.build(null, {"stage": 2, "hero": "mc", "skip_stamina": true})
+	scr.build(null, {"stage": 2, "hero": "mc"})
 	_check(scr.mon_clip != null and scr.mon_clip.size == Vector2(210, 210), "top boss portrait showcased at 210x210")
 	_check(scr.dock_rect.position.y > 1350.0 and scr.ult_btn != null and scr.ult_btn.size.x >= 300.0, "heroine Ult dock placed at bottom for 1-thumb reach")
 	scr.dev_act("combat_showcase")
@@ -363,7 +327,7 @@ func _run_squad() -> void:
 	var scr2: = V10AdventureScreen.new()
 	scr2.size = Vector2(720, 1600)
 	add_child(scr2)
-	scr2.build(null, {"stage": 0, "hero": "mc", "skip_stamina": true})
+	scr2.build(null, {"stage": 0, "hero": "mc"})
 	_check(scr2.squad.size() >= 3 and String(scr2.squad[0]) == "mc", "owned goddesses fill the squad with mc as lead")
 	scr2.open_squad_modal()
 	_check(scr2.squad_modal != null and scr2._squad_card != null, "Отряд opens the squad selection window")

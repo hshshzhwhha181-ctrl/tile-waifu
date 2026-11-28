@@ -318,7 +318,6 @@ func refund(pid: String) -> bool:
 			if pass_ != null and String(pass_.st.oid) == String(r.oid):
 				for g in pass_.revoke():
 					V10Catalog._add_into(back, g)
-	back.erase("tea")      # tea is not clawed back
 	if not back.is_empty():
 		revoke_fn.call(back, "refund:" + String(r.sku))
 	r.st = "refunded"

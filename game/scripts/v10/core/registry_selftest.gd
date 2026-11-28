@@ -11,7 +11,7 @@ extends Node
 
 # the 43 modules of 0.12 in their historical initialisation order (registry_list.gd, before P07): they must all stay
 # discovered, in this relative order; new modules may be added anywhere (one module.gd file, no edit here)
-const LEGACY_IDS: = ["responsive", "economy", "meta", "hud2", "fonts", "profile", "look", "shop", "auth", "clarity", "tutorial", "juice", "levels", "path", "salon", "rituals", "chat", "phone", "gacha", "rig", "voice", "audio", "hudfx", "tower", "mj_stage", "mj_look", "mj_triples", "mj_riichi", "mj_sanma", "mj_koikoi", "mj_classic", "mj_connect", "mj_cube", "mj_garden", "mj_bridge", "palm", "duels", "challenge", "wave1", "adventure", "online", "events", "stamina"]
+const LEGACY_IDS: = ["responsive", "economy", "meta", "hud2", "fonts", "profile", "look", "shop", "auth", "clarity", "tutorial", "juice", "levels", "path", "salon", "rituals", "chat", "phone", "gacha", "rig", "voice", "audio", "hudfx", "tower", "mj_stage", "mj_look", "mj_triples", "mj_riichi", "mj_sanma", "mj_koikoi", "mj_classic", "mj_connect", "mj_cube", "mj_garden", "mj_bridge", "palm", "duels", "challenge", "wave1", "adventure", "online", "events", "affection"]
 
 var ok: int = 0
 var total: int = 0
@@ -137,7 +137,7 @@ func _run() -> void:
 			check(String(st.get("marker", "")) != "", "%s: selftest marker set" % id)
 	check(not order_missing, "every module declares an order")
 	check(ordered, "module order is strictly increasing in registration order")
-	check(V10Registry.get_module("responsive").get("order", 9999) < V10Registry.get_module("stamina").get("order", -1), "responsive before stamina")
+	check(V10Registry.get_module("responsive").get("order", 9999) < V10Registry.get_module("affection").get("order", -1), "responsive before affection")
 	check(V10Registry.manifest_errors().is_empty(), "no manifest errors: %s" % str(V10Registry.manifest_errors()))
 	print("REGISTRY_SELFTEST %d/%d" % [ok, total])
 	get_tree().quit(0 if ok == total else 1)

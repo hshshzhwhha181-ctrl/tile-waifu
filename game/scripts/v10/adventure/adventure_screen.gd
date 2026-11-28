@@ -52,7 +52,6 @@ var debuff_lbl: Label
 var stage_lbl: Label
 var prev_stage_btn: Panel
 var next_stage_btn: Panel
-var stamina_lbl: Label
 
 var hero_dock: Control
 var hero_medallion: Control
@@ -96,8 +95,6 @@ func build(m, args: Dictionary = {}) -> void:
 			hero_id = h0
 	if not Hero.RIGS.has(hero_id):
 		hero_id = "mc"
-	if not bool(args.get("skip_stamina", false)):
-		V10AdventureData.try_spend_stamina(main)
 	squad = V10AdventureData.effective_squad(hero_id)
 	battle = V10AdventureBattle.new(stage_idx, hero_id, squad, V10AdventureData.aff_bonuses(hero_id))
 	Sfx.music("play")
@@ -164,11 +161,6 @@ func _build_header() -> void:
 	Common.fit_line(hdr_title, W - 252.0, 14)
 	hdr_title.size.y = 26
 	shake_root.add_child(hdr_title)
-
-	stamina_lbl = UI.label(V10AdventureData.stamina_badge_text(), 14, Color("#D8F5C8"), Color(0.06, 0.02, 0.10), 3, "body", 800)
-	stamina_lbl.position = Vector2(74, top_y + 29)
-	stamina_lbl.size = Vector2(W - 252, 20)
-	shake_root.add_child(stamina_lbl)
 
 	var flee_p: = _pill_panel(Rect2(W - 178, top_y + 2, 102, 48), Color(0.16, 0.08, 0.22, 0.92), Color(0.86, 0.72, 0.46, 0.85), 24)
 	flee_p.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -524,7 +516,7 @@ func _switch_stage(target_idx: int) -> void:
 		V10AdventureVfx.spawn_float_text(fx_layer, Vector2(W * 0.5, arena_rect.end.y - 16.0), "Победи текущего босса!", Color("#FFD670"), 22, 0.80)
 		return
 	if main != null and main.has_method("go"):
-		main.go("adventure", {"stage": target_idx, "hero": hero_id, "skip_stamina": true})
+		main.go("adventure", {"stage": target_idx, "hero": hero_id})
 
 
 func _on_match(mid: Vector2, combo: int, gold: bool, _shard: String) -> void:
@@ -839,8 +831,6 @@ func _refresh_hud(instant_bars: bool = false) -> void:
 	if next_stage_btn != null:
 		var unl: = V10AdventureData.is_stage_unlocked(stage_idx + 1)
 		next_stage_btn.modulate.a = 1.0 if unl else 0.42
-	if stamina_lbl != null:
-		stamina_lbl.text = V10AdventureData.stamina_badge_text()
 
 
 func _finish(victory: bool) -> void:
@@ -851,7 +841,6 @@ func _finish(victory: bool) -> void:
 	if board != null and is_instance_valid(board):
 		board.input_on = false
 	var rw: Dictionary = {}
-	var refunded: = 0
 	var raid: Dictionary = {}
 	if victory:
 		Sfx.play("win", 1.0, -3.0)
@@ -868,7 +857,6 @@ func _finish(victory: bool) -> void:
 	else:
 		Sfx.say(hero_id, "lose")
 		raid = V10AdventureData.record_defeat(battle.dmg_total, null, battle.breaks, stage_idx)
-		refunded = V10AdventureData.refund_defeat_stamina()
 		G.save()
 	V10AdventureData.submit_raid_score(stage_idx, battle.dmg_total)
 	var raid_line: = "\nУрон за бой: %d · Рекорд: %d%s" % [battle.dmg_total, int(raid.get("best", battle.dmg_total)), (" · НОВЫЙ РЕКОРД!" if bool(raid.get("new_best", false)) else "")]
@@ -884,9 +872,8 @@ func _finish(victory: bool) -> void:
 	t_lbl.size = Vector2(card.size.x - 32, 46)
 	t_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	card.add_child(t_lbl)
-	var refund_note: = ("\nВозвращено чая: +%d" % refunded) if refunded > 0 else ""
 	var gift_note: = ("\nТрофей: Подарок «%s»" % String(rw.get("gift_name", ""))) if String(rw.get("gift_name", "")) != "" else ""
-	var sub_txt: String = ("%s повержен!\nНаграда: +%d кристаллов · +%d монет · +%d симпатии%s%s" % [String(battle.m.name), int(rw.gems), int(rw.coins), int(rw.aff), gift_note, raid_line]) if victory else ("%s оказался сильнее.%s\nСнимай золотые пары и жми Суперудар внизу для оглушения!%s" % [String(battle.m.name), refund_note, raid_line])
+	var sub_txt: String = ("%s повержен!\nНаграда: +%d кристаллов · +%d монет · +%d симпатии%s%s" % [String(battle.m.name), int(rw.gems), int(rw.coins), int(rw.aff), gift_note, raid_line]) if victory else ("%s оказался сильнее.\nСнимай золотые пары и жми Суперудар внизу для оглушения!%s" % [String(battle.m.name), raid_line])
 	var sub: = UI.label(sub_txt, 20, Color("#F2E6D8"), Color(0.06, 0.03, 0.10), 3, "body", 800)
 	sub.position = Vector2(24, 92)
 	sub.size = Vector2(card.size.x - 48, 172)
@@ -1262,7 +1249,7 @@ func squad_commit() -> void:
 	if same:
 		return
 	if lead != hero_id and main != null and main.has_method("go"):
-		main.go("adventure", {"stage": stage_idx, "hero": lead, "skip_stamina": true})
+		main.go("adventure", {"stage": stage_idx, "hero": lead})
 		return
 	squad = chosen
 	battle.set_squad(squad, V10AdventureData.aff_bonuses(hero_id))

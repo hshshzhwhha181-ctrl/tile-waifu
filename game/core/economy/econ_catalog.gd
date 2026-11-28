@@ -14,26 +14,16 @@ extends RefCounted
 #   wish     «Желание»         one pull ticket (any banner except the beginner one).
 #   wax      «Воск»            unspent candles of an ended banner; spent in the outfit shop.
 #   petal    «Лепестки»        duplicates; fixed-price path to Constellation stars (CEO_PLAN №12).
-# Energy «Чай» is not a wallet currency (it regenerates) — see V10Energy.
+# There is no energy in 1.1 (GDD_V11 decision 2).
 
 const CURRENCIES: = ["crystal", "moon", "coin", "wish", "wax", "petal"]
 const CUR_NAME: = {"crystal": "Кристаллы", "moon": "Лунный камень", "coin": "Монеты", "wish": "Желание",
-	"wax": "Воск", "petal": "Лепестки", "tea": "Чай"}
+	"wax": "Воск", "petal": "Лепестки"}
 const PREMIUM: = ["crystal", "moon"]          # spend order: free crystals first, then paid moonstone
 
 # ---------------------------------------------------------------- clock / calendar
 const TZ_OFFSET: = 3 * 3600                   # all daily resets on Moscow time, the same for every player
 const DAY: = 86400
-
-# ---------------------------------------------------------------- energy «Чай» (CEO_PLAN №8, §2)
-const TEA_CAP: = 160
-const TEA_REGEN_SEC: = 360                    # 1 tea / 6 min → empty to full in 16 h
-const TEA_HARD_MAX: = 2000                    # grants/refills may overfill the cap, never past this
-const THERMOS_CAP: = 1200                     # «Термос»: regen overflow while full is stored here 1:1
-const TEA_REFILL: = 60                        # one refill gives 60 tea …
-const TEA_REFILL_COST: = 60                   # … for a fixed 60 crystals (never escalates)
-const TEA_REFILLS_DAY: = 2
-const TEA_AD_REFILLS_DAY: = 1
 
 # ---------------------------------------------------------------- gacha (ROSTER_20 §1.4, g.gd roll())
 const RARS: = ["A", "S", "SSR"]
@@ -127,7 +117,7 @@ const SKUS: = [
 	{"id": "first_79", "kind": "starter", "name": "Первая чашка", "rub": 79, "grant": {"moon": 150, "coin": 2000},
 		"once": true, "requires_server": true},
 	{"id": "guest_149", "kind": "starter", "name": "Набор первого гостя", "rub": 149,
-		"grant": {"moon": 300, "tea": 120}, "once": true, "requires_server": true},
+		"grant": {"moon": 300, "coin": 3000}, "once": true, "requires_server": true},
 	{"id": "newbie_499", "kind": "starter", "name": "Набор новичка", "rub": 499,
 		"grant": {"moon": 650, "wish": 3}, "once": true, "requires_server": true},
 	{"id": "traveler_199", "kind": "starter", "name": "Набор путника", "rub": 199,
@@ -154,7 +144,7 @@ static func pass_free(tier: int) -> Dictionary:     # tier 1..30
 	if tier % 10 == 0:
 		return {"crystal": 100, "coin": 3000}
 	if tier % 5 == 0:
-		return {"tea": 60}
+		return {"coin": 1500}
 	return {"coin": 800} if tier % 2 == 1 else {"crystal": 20}
 
 

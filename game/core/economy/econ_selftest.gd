@@ -6,7 +6,7 @@ extends RefCounted
 # prints «ECON_SELFTEST ok/total» (exit code 0 only when every check passed) and every failed check.
 # --econ_mc=N scales the Monte-Carlo sample (default 1 = 400 000 standard pulls, 300 000 limited, 20 000 beginner runs).
 #
-# Sections: catalog & store rules · clock anti-cheat · wallet · energy · gacha rules · Monte-Carlo vs advertised odds ·
+# Sections: catalog & store rules · clock anti-cheat · wallet · gacha rules · Monte-Carlo vs advertised odds ·
 # odds disclosure · shop purchase flow (stub provider) · refunds · restore · spending protection · pass · summon flow ·
 # save/seal/migration.
 
@@ -40,7 +40,6 @@ static func run(scale: float = 1.0) -> int:
 	_catalog()
 	_clock()
 	_wallet()
-	_energy()
 	_gacha_rules()
 	_monte_carlo()
 	_odds()
@@ -176,67 +175,6 @@ static func _wallet() -> void:
 	w.st.bal.crystal = 99999
 	_check(not w.audit().is_empty(), "edited balance breaks the invariant")
 	_check(w.st.log.size() > 0 and w.st.log.size() <= V10Wallet.LOG_MAX, "operation log kept and capped")
-
-
-# ================================================================= energy
-static func _energy() -> void:
-	var e: = _econ()
-	var en: = e.energy
-	_check(en.value() == 160, "tea starts full (160)")
-	_check(en.next_in() == 0 and en.full_in() == 0, "no timer while full")
-	_check(en.spend(40) and en.value() == 120, "spend 40 tea")
-	_check(not en.spend(500), "cannot spend more than there is")
-	_adv(e, 359)
-	_check(en.value() == 120 and en.next_in() == 1, "no tea before 6 min")
-	_adv(e, 1)
-	_check(en.value() == 121, "+1 tea after 6 min")
-	_check(en.full_in() == 39 * 360, "full in 39 × 6 min")
-	_adv(e, 39 * 360 + 360 * 5)
-	_check(en.value() == 160 and en.thermos() == 5, "overflow while full goes into the thermos (%d/%d)" % [en.value(), en.thermos()])
-	_adv(e, 360 * 5000)
-	_check(en.thermos() == 1200, "thermos capped at 1200")
-	_check(en.take_thermos(100) == 100 and en.value() == 260, "take tea from the thermos over the cap")
-	_check(en.thermos() == 1100, "thermos reduced")
-	_adv(e, 3600)
-	_check(en.value() == 260 and en.thermos() == 1110, "over the cap: regen goes to the thermos")
-	# refills: fixed price, 2 a day, +1 ad
-	e.wallet.add("crystal", 1000, "t")
-	var r1: = en.refill(e.wallet)
-	var r2: = en.refill(e.wallet)
-	var r3: = en.refill(e.wallet)
-	_check(r1.ok and r2.ok and not r3.ok and r3.reason == "daily_limit", "2 refills a day")
-	_check(e.wallet.balance("crystal") == 880, "each refill costs exactly 60 crystals (no escalation)")
-	_check(en.ad_refill().ok and not en.ad_refill().ok, "1 ad refill a day")
-	var e2: = _econ()
-	_check(not e2.energy.refill(e2.wallet).ok, "refill needs crystals")
-	_adv(e, 86400)
-	_check(en.refills_left() == 2 and en.ad_refills_left() == 1, "refills reset next day")
-	en.refill(e.wallet)
-	en.refill(e.wallet)
-	# clock rolled back to yesterday in a new session: refill counters do NOT reset
-	e.clock.new_session(e.clock._m_wall - 86400)
-	_check(en.refills_left() == 0, "rollback cannot reset the daily refill limit")
-	# in-session forward jump (or device sleep): treated like an app restart — tea bounded by the bar + thermos,
-	# and moving the clock back afterwards freezes regen until real time catches up
-	var e3: = _econ()
-	e3.energy.spend(160)
-	e3.clock.set_manual(T0 + 86400 * 3, 1000)
-	_check(e3.energy.value() == 160 and e3.energy.thermos() <= V10Catalog.THERMOS_CAP, "in-session forward jump fills at most bar + thermos")
-	e3.energy.spend(160)
-	e3.clock.new_session(T0 + 2000)
-	e3.clock.set_manual(T0 + 2000 + 86400, 86400000)
-	_check(e3.energy.value() == 0, "clock moved back after the jump: no regen until real time catches up")
-	# across sessions the gain is bounded by the cap (no thermos fill beyond real time once rolled back)
-	var e4: = _econ()
-	e4.energy.spend(160)
-	e4.clock.new_session(T0 + 86400 * 30)
-	var v: = e4.energy.value()
-	_check(v == 160, "cross-session jump fills at most the bar (%d)" % v)
-	e4.clock.new_session(T0 + 100)
-	var th: = e4.energy.thermos()
-	e4.clock.set_manual(T0 + 100 + 86400, 86400000)
-	_check(e4.energy.thermos() == th, "after rolling back, borrowed time is paid back before regen resumes")
-	_check(e.energy.audit().is_empty(), "energy audit clean")
 
 
 # ================================================================= gacha rules
@@ -891,7 +829,6 @@ static func _save() -> void:
 	e.gacha.rng.seed = 3
 	e.summon("lim_zlata", 10)
 	e.shop.buy("moon_180")
-	e.energy.spend(33)
 	var d: = e.save_dict()
 	var txt: = JSON.stringify(d)
 	var back = JSON.parse_string(txt)
@@ -899,7 +836,7 @@ static func _save() -> void:
 	var e2: = V10Econ.load_dict(back, p, [], "tw-econ-v1:5e1f0c2a9b", e.clock._m_wall)
 	_check(e2.wallet.balance("crystal") == e.wallet.balance("crystal") and e2.wallet.balance("moon") == 120, "balances restored")
 	_check(typeof(e2.st.wallet.bal.crystal) == TYPE_INT, "numbers normalised to int on load")
-	_check(e2.energy.value() == 127 and e2.gacha.candles("lim_zlata") == 10, "energy and candles restored")
+	_check(e2.gacha.candles("lim_zlata") == 10, "candles restored")
 	_check(e2.shop.st.receipts.size() == 1 and e2.gacha.counter("limited").p == e.gacha.counter("limited").p, "receipts and pity restored")
 	_check(e2.audit().is_empty(), "restored state audits clean: %s" % str(e2.audit()))
 	# tamper
@@ -926,7 +863,6 @@ static func _save() -> void:
 	_check(em.shop.month_days_left() == 10, "month card days carried (%d)" % em.shop.month_days_left())
 	_check(em.shop.is_first(V10Catalog.sku("moon_180")), "fake 0.8 purchases do not burn the first-purchase bonus")
 	_check(em.shop.available("guest_149").reason in ["expired", "server"], "beginner sets follow the original install date")
-	_check(em.energy.value() == 160, "tea starts full")
 	_check(em.audit().is_empty(), "migrated state audits clean: %s" % str(em.audit()))
 	var empty: = V10Econ.from_legacy({"gems": 0, "unlocked": 1}, T0)
 	_check(V10Econ.new(empty, null, [], T0).audit().is_empty(), "migrating a minimal save works")
@@ -945,13 +881,8 @@ static func _review() -> void:
 			got = got or r.rar == "SSR"
 		all_ok = all_ok and got and em.gacha.newbie_left() == 0
 	_check(all_ok, "migrated beginner banner (10 used, no SSR) keeps the SSR-within-50 promise")
-	# refill refused (and nothing charged) when the tea would not fit under the hard max
 	var e: = _econ()
 	e.wallet.add("crystal", 500, "t")
-	e.energy.add(V10Catalog.TEA_HARD_MAX)
-	var rf: = e.energy.refill(e.wallet)
-	_check(not rf.ok and rf.reason == "full" and e.wallet.balance("crystal") == 500, "refill at the tea hard max costs nothing")
-	_check(not e.energy.ad_refill().ok and e.energy.ad_refills_left() == 1, "ad refill at the hard max is not used up")
 	# zero / negative pull counts
 	_check(not e.summon("std", 0).ok and not e.summon("std", -3).ok and e.wallet.balance("crystal") == 500, "0 or negative pulls refused")
 	_check(not e.summon_free("newbie", 10).ok and e.gacha.newbie_left() == V10Catalog.NEWBIE_PULLS, "gifted pulls never use the beginner banner")

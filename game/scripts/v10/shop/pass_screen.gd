@@ -199,9 +199,6 @@ func _tile(g: Dictionary, r: Rect2, reached: bool, got: bool, open: bool, nm: St
 		amount = int(g.wish)
 	elif int(g.get("crystal", 0)) > 0:
 		amount = int(g.crystal)
-	elif int(g.get("tea", 0)) > 0:
-		icon = "item_tea"
-		amount = int(g.tea)
 	elif int(g.get("coin", 0)) > 0:
 		icon = "item_coin"
 		amount = int(g.coin)
