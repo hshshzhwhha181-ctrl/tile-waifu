@@ -33,6 +33,22 @@
     "total": 339
    }
   },
+  "audio_gate": {
+   "fast": {
+    "marker": "AUDIO_GATE SELFTEST 50/50",
+    "ok": 50,
+    "secs": 2.2,
+    "status": "pass",
+    "total": 50
+   },
+   "full": {
+    "marker": "AUDIO_GATE SELFTEST 50/50",
+    "ok": 50,
+    "secs": 2.2,
+    "status": "pass",
+    "total": 50
+   }
+  },
   "auth": {
    "fast": {
     "marker": "AUTH_SELFTEST 102/102",
@@ -1060,6 +1076,6 @@
    }
   }
  },
- "updated": "2026-11-27",
+ "updated": "2026-11-28",
  "version": 1
 }

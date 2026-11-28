@@ -168,6 +168,10 @@ BY_ID = {s.id: s for s in CATALOG}
 EXTERNAL: list[Suite] = [
     Suite(id="server_e2e", kind="node", group="server", marker="E2E_OK", timeout=180, fast=True),
     Suite(id="ux_lint", kind="python", group="lint", marker="UX_LINT RESULT", timeout=120, fast=True),
+    # P45: loudness meter self-test on synthetic signals (python + numpy + ffmpeg; the corpus scan is a separate CLI run)
+    Suite(id="audio_gate", kind="python", group="lint", marker="AUDIO_GATE SELFTEST", timeout=120, fast=True,
+          script="tools/audio/lufs_gate.py", args=["--selftest", "--no-write"],
+          note="BS.1770 meter vs 12 reference signals (<=0.3 LU), true peak, leading silence, verdict rules"),
 ]
 for _s in EXTERNAL:
     BY_ID[_s.id] = _s
@@ -358,6 +362,13 @@ def run_suite(suite: Suite, godot: str | None, fast: bool, tscale: float, logdir
             if not node:
                 return Result(suite.id, "skip", reason="node not found")
             cmd = [node, str(E2E)]
+        elif suite.script:
+            sp = REPO / suite.script
+            if not sp.exists():
+                return Result(suite.id, "error", reason=f"missing {suite.script}")
+            if suite.id == "audio_gate" and not (shutil.which("ffmpeg") and shutil.which("ffprobe")):
+                return Result(suite.id, "skip", reason="ffmpeg/ffprobe not found")
+            cmd = [sys.executable, str(sp)] + list(suite.args)
         else:
             if not UX_LINT.exists():
                 return Result(suite.id, "error", reason=f"missing {UX_LINT.relative_to(REPO)}")
@@ -366,7 +377,7 @@ def run_suite(suite: Suite, godot: str | None, fast: bool, tscale: float, logdir
         rc, out, timed_out, secs = run_cmd(cmd, env, timeout, cwd=REPO)
     if suite.kind == "node":
         res = parse_node(suite, out, rc, timed_out)
-    elif suite.kind == "python":
+    elif suite.kind == "python" and not suite.script:
         res = parse_lint(suite, out, rc, timed_out)
     else:
         res = parse_output(suite, out, rc, timed_out)

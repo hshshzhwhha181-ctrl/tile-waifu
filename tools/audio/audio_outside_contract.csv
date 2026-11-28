@@ -1,0 +1,485 @@
+file,kind,group,status,lufs_file,lufs_play,true_peak_dbtp,sample_peak_dbfs,lead_ms,dur_s,sr,ch,dev_hero_lu,fails
+game/assets/sfx/clack0.wav,sfx,sfx,FAIL,-18.41,-15.40,-3.08,-3.08,0.0,0.12,44100,1,,peak -3.1 > -5 dBFS
+game/assets/sfx/clack1.wav,sfx,sfx,FAIL,-19.05,-16.04,-2.89,-3.01,0.0,0.12,44100,1,,peak -3.0 > -5 dBFS
+game/assets/sfx/clack2.wav,sfx,sfx,FAIL,-19.37,-16.36,-3.11,-3.15,0.0,0.12,44100,1,,peak -3.2 > -5 dBFS
+game/assets/sfx/combo.wav,sfx,sfx,FAIL,-16.62,-13.61,-1.93,-2.05,0.0,2.46,44100,1,,peak -2.1 > -5 dBFS
+game/assets/sfx/deny.wav,sfx,sfx,FAIL,-18.12,-15.11,-4.43,-4.44,0.0,0.25,44100,1,,peak -4.4 > -5 dBFS
+game/assets/sfx/fever.wav,sfx,sfx,FAIL,-16.43,-13.42,-1.29,-1.29,163.2,4.45,44100,1,,peak -1.3 > -5 dBFS
+game/assets/sfx/match0.wav,sfx,sfx,FAIL,-17.61,-14.60,-1.96,-1.98,0.0,2.27,44100,1,,peak -2.0 > -5 dBFS
+game/assets/sfx/match1.wav,sfx,sfx,FAIL,-18.19,-15.18,-1.96,-2.00,0.0,2.27,44100,1,,peak -2.0 > -5 dBFS
+game/assets/sfx/match2.wav,sfx,sfx,FAIL,-17.15,-14.14,-1.90,-1.93,0.0,2.27,44100,1,,peak -1.9 > -5 dBFS
+game/assets/sfx/match3.wav,sfx,sfx,FAIL,-17.59,-14.58,-1.82,-1.84,0.0,2.27,44100,1,,peak -1.8 > -5 dBFS
+game/assets/sfx/match4.wav,sfx,sfx,FAIL,-16.37,-13.36,-1.72,-1.80,0.0,2.27,44100,1,,peak -1.8 > -5 dBFS
+game/assets/sfx/match5.wav,sfx,sfx,FAIL,-16.14,-13.13,-2.03,-2.04,0.0,2.27,44100,1,,peak -2.0 > -5 dBFS
+game/assets/sfx/match6.wav,sfx,sfx,FAIL,-17.16,-14.15,-1.57,-1.69,0.0,2.27,44100,1,,peak -1.7 > -5 dBFS
+game/assets/sfx/match7.wav,sfx,sfx,FAIL,-16.87,-13.86,-2.18,-2.31,0.0,2.27,44100,1,,peak -2.3 > -5 dBFS
+game/assets/sfx/pop.wav,sfx,sfx,FAIL,-20.05,-17.04,-4.42,-4.43,0.0,0.20,44100,1,,peak -4.4 > -5 dBFS
+game/assets/sfx/reveal_sr.wav,sfx,sfx,FAIL,-15.53,-12.52,-2.58,-2.58,0.0,2.87,44100,1,,peak -2.6 > -5 dBFS
+game/assets/sfx/reveal_ssr.wav,sfx,sfx,FAIL,-15.06,-12.05,-1.13,-1.21,0.1,5.72,44100,1,,peak -1.2 > -5 dBFS
+game/assets/sfx/select.wav,sfx,sfx,FAIL,-23.62,-20.61,-2.09,-2.09,0.0,0.50,44100,1,,peak -2.1 > -5 dBFS
+game/assets/sfx/star0.wav,sfx,sfx,FAIL,-14.52,-11.51,-1.44,-1.44,0.0,2.60,44100,1,,peak -1.4 > -5 dBFS
+game/assets/sfx/star1.wav,sfx,sfx,FAIL,-15.99,-12.98,-1.36,-1.47,0.0,2.60,44100,1,,peak -1.5 > -5 dBFS
+game/assets/sfx/star2.wav,sfx,sfx,FAIL,-14.36,-11.35,-1.02,-1.72,0.0,2.60,44100,1,,peak -1.7 > -5 dBFS
+game/assets/sfx/summon_boom.wav,sfx,sfx,FAIL,-20.81,-17.80,-0.34,-0.44,0.0,4.05,44100,1,,peak -0.4 > -5 dBFS; tp -0.3 > -1 dBTP
+game/assets/sfx/summon_charge.wav,sfx,sfx,FAIL,-18.60,-15.59,-1.81,-2.00,293.1,3.50,44100,1,,peak -2.0 > -5 dBFS
+game/assets/sfx/win.wav,sfx,sfx,FAIL,-15.22,-12.21,-1.64,-1.66,0.1,4.80,44100,1,,peak -1.7 > -5 dBFS
+game/assets/v06/fx/chime0.wav,sfx,sfx,FAIL,-17.06,-14.05,-4.32,-4.40,0.0,1.91,44100,1,,peak -4.4 > -5 dBFS
+game/assets/v06/fx/chime1.wav,sfx,sfx,FAIL,-20.21,-17.20,-4.47,-4.49,0.0,1.92,44100,1,,peak -4.5 > -5 dBFS
+game/assets/v06/fx/chime2.wav,sfx,sfx,FAIL,-17.83,-14.82,-4.26,-4.41,0.0,1.90,44100,1,,peak -4.4 > -5 dBFS
+game/assets/v06/fx/chime3.wav,sfx,sfx,FAIL,-14.48,-11.46,-4.34,-4.34,0.0,1.95,44100,1,,peak -4.3 > -5 dBFS
+game/assets/v06/fx/chime4.wav,sfx,sfx,FAIL,-17.79,-14.78,-4.25,-4.29,0.0,1.98,44100,1,,peak -4.3 > -5 dBFS
+game/assets/v06/fx/chime5.wav,sfx,sfx,FAIL,-17.18,-14.17,-4.33,-4.45,0.0,1.92,44100,1,,peak -4.5 > -5 dBFS
+game/assets/v06/fx/chime6.wav,sfx,sfx,FAIL,-16.94,-13.93,-3.87,-4.58,0.0,1.95,44100,1,,peak -4.6 > -5 dBFS
+game/assets/v06/fx/chime7.wav,sfx,sfx,FAIL,-17.80,-14.79,-4.18,-4.86,0.0,1.83,44100,1,,peak -4.9 > -5 dBFS
+game/assets/v06/fx/clear_impact.wav,sfx,sfx,FAIL,-21.41,-18.40,-0.26,-0.43,0.0,3.19,44100,1,,peak -0.4 > -5 dBFS; tp -0.3 > -1 dBTP
+game/assets/v06/fx/coin.wav,sfx,sfx,FAIL,-14.58,-11.57,-4.70,-4.83,0.0,0.44,44100,1,,peak -4.8 > -5 dBFS
+game/assets/v06/fx/combo_big.wav,sfx,sfx,FAIL,-15.38,-12.37,-0.79,-1.00,0.0,1.61,44100,1,,peak -1.0 > -5 dBFS; tp -0.8 > -1 dBTP
+game/assets/v06/fx/combo_hit.wav,sfx,sfx,FAIL,-21.71,-18.70,-1.07,-1.14,0.0,0.94,44100,1,,peak -1.1 > -5 dBFS
+game/assets/v06/fx/fail.wav,sfx,sfx,FAIL,-18.18,-15.17,-2.50,-2.50,0.1,2.39,44100,1,,peak -2.5 > -5 dBFS
+game/assets/v06/fx/flip.wav,sfx,sfx,FAIL,-20.89,-17.88,-4.46,-4.46,0.0,0.59,44100,1,,peak -4.5 > -5 dBFS
+game/assets/v06/fx/heartbeat.wav,sfx,sfx,FAIL,-18.66,-15.65,-3.10,-3.10,0.4,0.41,44100,1,,peak -3.1 > -5 dBFS
+game/assets/v06/fx/ice_shatter.wav,sfx,sfx,FAIL,-17.60,-14.59,-3.31,-4.17,0.0,1.06,44100,1,,peak -4.2 > -5 dBFS
+game/assets/v06/fx/land.wav,sfx,sfx,FAIL,-16.85,-13.84,-4.42,-4.44,0.0,0.14,44100,1,,peak -4.4 > -5 dBFS
+game/assets/v06/fx/level_start.wav,sfx,sfx,FAIL,-17.35,-14.34,-0.81,-0.81,0.0,3.71,44100,1,,peak -0.8 > -5 dBFS; tp -0.8 > -1 dBTP
+game/assets/v06/fx/rare.wav,sfx,sfx,FAIL,-18.24,-15.23,-1.38,-1.42,0.0,3.88,44100,1,,peak -1.4 > -5 dBFS
+game/assets/v06/fx/reward_pop.wav,sfx,sfx,FAIL,-16.47,-13.46,-3.10,-3.34,0.0,1.39,44100,1,,peak -3.3 > -5 dBFS
+game/assets/v06/fx/riser.wav,sfx,sfx,FAIL,-18.46,-15.45,-4.50,-4.64,138.1,1.60,44100,1,,peak -4.6 > -5 dBFS
+game/assets/v06/fx/thump.wav,sfx,sfx,FAIL,-15.34,-12.33,-1.93,-1.94,0.1,0.45,44100,1,,peak -1.9 > -5 dBFS
+game/assets/v06/fx/victory_tail.wav,sfx,sfx,FAIL,-15.69,-12.68,-2.64,-3.07,0.1,3.01,44100,1,,peak -3.1 > -5 dBFS
+game/assets/v07/daynight/menu_morning.ogg,music,music,FAIL,-17.53,-17.53,-3.79,-3.79,0.0,41.74,44100,2,,lufs -17.5 vs -16+-1
+game/assets/v10/audio/music/motif_nova.ogg,music,music,FAIL,-16.51,-13.50,0.38,0.10,0.0,12.19,44100,1,,lufs -13.5 vs -16+-1; tp 0.4 > -1 dBTP
+game/assets/v10/audio/music/motif_rin.ogg,music,music,FAIL,-17.83,-14.82,1.44,1.43,0.0,13.33,44100,1,,lufs -14.8 vs -16+-1; tp 1.4 > -1 dBTP
+game/assets/v10/audio/music/path.ogg,music,music,FAIL,-16.01,-16.01,-0.08,-0.10,0.0,38.08,44100,2,,tp -0.1 > -1 dBTP
+game/assets/v10/audio/music/phone.ogg,music,music,FAIL,-16.02,-16.02,-0.63,-0.67,0.0,24.61,44100,2,,tp -0.6 > -1 dBTP
+game/assets/v10/audio/sfx/booster.ogg,sfx,sfx,FAIL,-13.08,-10.07,0.08,0.08,0.0,1.65,44100,1,,peak 0.1 > -5 dBFS; tp 0.1 > -1 dBTP
+game/assets/v10/audio/sfx/btn_hover.ogg,sfx,sfx,FAIL,-14.35,-11.34,1.64,1.58,1.5,0.20,44100,1,,peak 1.6 > -5 dBFS; tp 1.6 > -1 dBTP
+game/assets/v10/audio/sfx/btn_press.ogg,sfx,sfx,FAIL,-28.08,-25.07,2.54,1.69,0.1,0.40,44100,1,,peak 1.7 > -5 dBFS; tp 2.5 > -1 dBTP
+game/assets/v10/audio/sfx/btn_press_b.ogg,sfx,sfx,FAIL,-22.52,-19.51,1.90,1.87,0.6,0.26,44100,1,,peak 1.9 > -5 dBFS; tp 1.9 > -1 dBTP
+game/assets/v10/audio/sfx/card_flip.ogg,sfx,sfx,FAIL,-15.72,-12.71,1.93,1.93,0.1,0.45,44100,1,,peak 1.9 > -5 dBFS; tp 1.9 > -1 dBTP
+game/assets/v10/audio/sfx/chest_open.ogg,sfx,sfx,FAIL,-22.42,-19.41,3.00,2.54,0.3,2.98,44100,1,,peak 2.5 > -5 dBFS; tp 3.0 > -1 dBTP
+game/assets/v10/audio/sfx/coin_fly.ogg,sfx,sfx,FAIL,-15.55,-12.54,1.32,0.54,0.1,1.77,44100,1,,peak 0.5 > -5 dBFS; tp 1.3 > -1 dBTP
+game/assets/v10/audio/sfx/combo_finale.ogg,sfx,sfx,FAIL,-13.68,-10.67,-1.11,-1.11,1.5,1.98,44100,1,,peak -1.1 > -5 dBFS
+game/assets/v10/audio/sfx/combo_step.ogg,sfx,sfx,FAIL,-15.88,-12.87,2.21,1.77,0.3,0.60,44100,1,,peak 1.8 > -5 dBFS; tp 2.2 > -1 dBTP
+game/assets/v10/audio/sfx/cutin_whoosh.ogg,sfx,sfx,FAIL,-13.94,-10.92,-1.34,-1.38,0.1,2.00,44100,1,,peak -1.4 > -5 dBFS
+game/assets/v10/audio/sfx/fever_end.ogg,sfx,sfx,FAIL,-16.17,-13.16,1.78,1.78,0.7,2.00,44100,1,,peak 1.8 > -5 dBFS; tp 1.8 > -1 dBTP
+game/assets/v10/audio/sfx/fever_ignite.ogg,sfx,sfx,FAIL,-15.59,-12.58,2.39,2.39,0.3,2.99,44100,1,,peak 2.4 > -5 dBFS; tp 2.4 > -1 dBTP
+game/assets/v10/audio/sfx/gem_fly.ogg,sfx,sfx,FAIL,-29.38,-26.37,2.66,2.54,0.9,0.90,44100,1,,peak 2.5 > -5 dBFS; tp 2.7 > -1 dBTP
+game/assets/v10/audio/sfx/heart.ogg,sfx,sfx,FAIL,-19.75,-16.74,2.07,2.07,1.5,0.72,44100,1,,peak 2.1 > -5 dBFS; tp 2.1 > -1 dBTP
+game/assets/v10/audio/sfx/lantern_rise.ogg,sfx,sfx,FAIL,-20.42,-17.41,2.25,2.18,0.5,3.98,44100,1,,peak 2.2 > -5 dBFS; tp 2.2 > -1 dBTP
+game/assets/v10/audio/sfx/match_1.ogg,sfx,sfx,FAIL,-26.71,-23.70,0.82,0.70,0.7,0.90,44100,1,,peak 0.7 > -5 dBFS; tp 0.8 > -1 dBTP
+game/assets/v10/audio/sfx/match_1b.ogg,sfx,sfx,FAIL,-26.69,-23.68,1.30,1.18,0.0,0.80,44100,1,,peak 1.2 > -5 dBFS; tp 1.3 > -1 dBTP
+game/assets/v10/audio/sfx/match_2.ogg,sfx,sfx,FAIL,-15.33,-12.32,2.73,2.73,0.0,1.99,44100,1,,peak 2.7 > -5 dBFS; tp 2.7 > -1 dBTP
+game/assets/v10/audio/sfx/match_3.ogg,sfx,sfx,FAIL,-13.89,-10.88,0.14,0.13,0.1,1.99,44100,1,,peak 0.1 > -5 dBFS; tp 0.1 > -1 dBTP
+game/assets/v10/audio/sfx/page_turn.ogg,sfx,sfx,FAIL,-14.27,-11.26,-0.24,-0.24,0.0,0.34,44100,1,,peak -0.2 > -5 dBFS; tp -0.2 > -1 dBTP
+game/assets/v10/audio/sfx/rank_up.ogg,sfx,sfx,FAIL,-17.91,-14.90,2.33,2.23,0.3,3.54,44100,1,,peak 2.2 > -5 dBFS; tp 2.3 > -1 dBTP
+game/assets/v10/audio/sfx/reward_pop.ogg,sfx,sfx,FAIL,-16.75,-13.74,1.82,1.76,0.0,0.50,44100,1,,peak 1.8 > -5 dBFS; tp 1.8 > -1 dBTP
+game/assets/v10/audio/sfx/shuffle.ogg,sfx,sfx,FAIL,-24.37,-21.36,1.11,1.05,0.2,2.00,44100,1,,peak 1.1 > -5 dBFS; tp 1.1 > -1 dBTP
+game/assets/v10/audio/sfx/sr_reveal.ogg,sfx,sfx,FAIL,-13.80,-10.79,-2.43,-2.71,0.6,2.98,44100,1,,peak -2.7 > -5 dBFS
+game/assets/v10/audio/sfx/ssr_reveal.ogg,sfx,sfx,FAIL,-15.55,-12.54,2.85,2.66,0.1,3.98,44100,1,,peak 2.7 > -5 dBFS; tp 2.9 > -1 dBTP
+game/assets/v10/audio/sfx/star.ogg,sfx,sfx,FAIL,-21.88,-18.87,1.42,1.23,0.2,1.61,44100,1,,peak 1.2 > -5 dBFS; tp 1.4 > -1 dBTP
+game/assets/v10/audio/sfx/tab_switch.ogg,sfx,sfx,FAIL,-20.35,-17.34,1.79,1.79,0.0,0.30,44100,1,,peak 1.8 > -5 dBFS; tp 1.8 > -1 dBTP
+game/assets/v10/audio/sfx/tile_click.ogg,sfx,sfx,FAIL,-22.24,-19.23,2.86,2.13,0.1,0.18,44100,1,,peak 2.1 > -5 dBFS; tp 2.9 > -1 dBTP
+game/assets/v10/audio/sfx/tile_click_b.ogg,sfx,sfx,FAIL,-24.54,-21.53,2.52,2.09,1.2,0.25,44100,1,,peak 2.1 > -5 dBFS; tp 2.5 > -1 dBTP
+game/assets/v10/audio/sfx/tile_click_c.ogg,sfx,sfx,FAIL,-19.60,-16.59,2.15,1.95,0.1,0.14,44100,1,,peak 1.9 > -5 dBFS; tp 2.1 > -1 dBTP
+game/assets/v10/audio/sfx/tile_deny.ogg,sfx,sfx,FAIL,-20.26,-17.25,1.72,1.72,0.5,0.32,44100,1,,peak 1.7 > -5 dBFS; tp 1.7 > -1 dBTP
+game/assets/v10/audio/sfx/tile_select.ogg,sfx,sfx,FAIL,-18.58,-15.57,1.69,1.69,0.1,0.35,44100,1,,peak 1.7 > -5 dBFS; tp 1.7 > -1 dBTP
+game/assets/v10/audio/sfx/ult_cast.ogg,sfx,sfx,FAIL,-13.97,-10.96,2.02,2.01,2.3,2.98,44100,1,,peak 2.0 > -5 dBFS; tp 2.0 > -1 dBTP
+game/assets/v10/audio/sfx/ult_ready.ogg,sfx,sfx,FAIL,-14.12,-11.11,0.80,0.80,0.1,0.81,44100,1,,peak 0.8 > -5 dBFS; tp 0.8 > -1 dBTP
+game/assets/v10/audio/sfx/undo.ogg,sfx,sfx,FAIL,-28.63,-25.62,1.85,1.85,0.7,0.60,44100,1,,peak 1.9 > -5 dBFS; tp 1.9 > -1 dBTP
+game/assets/v10/audio/voice/hana_rankup1.ogg,voice,hana,FAIL,-16.50,-13.49,-1.15,-1.15,0.4,3.54,44100,1,-1.52,lufs -16.5 vs -14+-1; spread -1.5 LU vs hana median -15.0 (+-1)
+game/assets/v10/audio/voice/hana_riichi1.ogg,voice,hana,FAIL,-16.44,-13.43,-0.85,-0.87,1.8,3.11,44100,1,-1.45,lufs -16.4 vs -14+-1; tp -0.9 > -1 dBTP; spread -1.5 LU vs hana median -15.0 (+-1)
+game/assets/v10/audio/voice/mc_rankup1.ogg,voice,mc,FAIL,-16.71,-13.70,-3.75,-3.87,3.6,3.52,44100,1,-2.31,lufs -16.7 vs -14+-1; spread -2.3 LU vs mc median -14.4 (+-1)
+game/assets/v10/audio/voice/mc_riichi1.ogg,voice,mc,FAIL,-16.65,-13.64,-2.76,-2.76,1.1,3.59,44100,1,-2.25,lufs -16.7 vs -14+-1; spread -2.3 LU vs mc median -14.4 (+-1)
+game/assets/v10/audio/voice/nova_rankup1.ogg,voice,nova,FAIL,-15.65,-12.64,0.74,0.72,1.9,2.40,44100,1,-1.31,lufs -15.6 vs -14+-1; tp 0.7 > -1 dBTP; spread -1.3 LU vs nova median -14.3 (+-1)
+game/assets/v10/audio/voice/nova_riichi1.ogg,voice,nova,FAIL,-15.89,-12.88,-0.46,-0.51,1.0,2.50,44100,1,-1.55,lufs -15.9 vs -14+-1; tp -0.5 > -1 dBTP; spread -1.6 LU vs nova median -14.3 (+-1)
+game/assets/v10/audio/voice/rin_rankup1.ogg,voice,rin,FAIL,-15.20,-12.19,0.44,0.44,0.6,4.41,44100,1,-0.82,lufs -15.2 vs -14+-1; tp 0.4 > -1 dBTP
+game/assets/v10/audio/voice/rin_riichi1.ogg,voice,rin,FAIL,-15.03,-12.01,0.34,0.32,0.6,3.94,44100,1,-0.65,lufs -15.0 vs -14+-1; tp 0.3 > -1 dBTP
+game/assets/v10/audio/voice/yue_rankup1.ogg,voice,yue,FAIL,-15.39,-12.38,-1.71,-1.71,1.4,4.02,44100,1,-1.31,lufs -15.4 vs -14+-1; spread -1.3 LU vs yue median -14.1 (+-1)
+game/assets/v10/audio/voice/yue_riichi1.ogg,voice,yue,FAIL,-15.41,-12.40,-1.69,-1.71,2.4,4.14,44100,1,-1.33,lufs -15.4 vs -14+-1; spread -1.3 LU vs yue median -14.1 (+-1)
+game/assets/v10/mj/koikoi/audio/koikoi_loop.ogg,music,music,FAIL,-17.58,-17.58,-1.57,-1.57,0.0,87.54,44100,2,,lufs -17.6 vs -16+-1
+game/assets/v10/mj/koikoi/voice/hana_koikoi.ogg,voice,hana,FAIL,-16.01,-13.00,-2.07,-2.08,74.4,1.07,44100,1,-1.03,lufs -16.0 vs -14+-1; lead 74ms > 40; spread -1.0 LU vs hana median -15.0 (+-1)
+game/assets/v10/mj/koikoi/voice/hana_month.ogg,voice,hana,FAIL,-15.86,-12.85,-5.43,-5.56,46.4,1.41,44100,1,-0.88,lufs -15.9 vs -14+-1; lead 46ms > 40
+game/assets/v10/mj/koikoi/voice/hana_take.ogg,voice,hana,FAIL,-15.96,-12.95,-3.75,-3.76,46.0,1.07,44100,1,-0.98,lufs -16.0 vs -14+-1; lead 46ms > 40
+game/assets/v10/mj/koikoi/voice/mc_koikoi.ogg,voice,mc,FAIL,-16.38,-13.37,-1.91,-1.92,88.0,1.15,44100,1,-1.98,lufs -16.4 vs -14+-1; lead 88ms > 40; spread -2.0 LU vs mc median -14.4 (+-1)
+game/assets/v10/mj/koikoi/voice/mc_month.ogg,voice,mc,FAIL,-16.30,-13.29,-3.71,-3.71,25.1,1.57,44100,1,-1.90,lufs -16.3 vs -14+-1; spread -1.9 LU vs mc median -14.4 (+-1)
+game/assets/v10/mj/koikoi/voice/mc_take.ogg,voice,mc,FAIL,-15.96,-12.95,-2.69,-2.70,45.0,1.23,44100,1,-1.56,lufs -16.0 vs -14+-1; lead 45ms > 40; spread -1.6 LU vs mc median -14.4 (+-1)
+game/assets/v10/mj/koikoi/voice/nova_koikoi.ogg,voice,nova,FAIL,-16.02,-13.01,-1.11,-1.13,85.8,1.07,44100,1,-1.69,lufs -16.0 vs -14+-1; lead 86ms > 40; spread -1.7 LU vs nova median -14.3 (+-1)
+game/assets/v10/mj/koikoi/voice/nova_month.ogg,voice,nova,FAIL,-15.87,-12.86,-5.72,-5.77,62.3,1.65,44100,1,-1.53,lufs -15.9 vs -14+-1; lead 62ms > 40; spread -1.5 LU vs nova median -14.3 (+-1)
+game/assets/v10/mj/koikoi/voice/nova_take.ogg,voice,nova,FAIL,-15.91,-12.89,-3.04,-3.04,67.1,1.07,44100,1,-1.57,lufs -15.9 vs -14+-1; lead 67ms > 40; spread -1.6 LU vs nova median -14.3 (+-1)
+game/assets/v10/mj/koikoi/voice/rin_koikoi.ogg,voice,rin,FAIL,-17.09,-14.08,-1.93,-1.93,56.5,0.91,44100,1,-2.71,lufs -17.1 vs -14+-1; lead 57ms > 40; spread -2.7 LU vs rin median -14.4 (+-1)
+game/assets/v10/mj/koikoi/voice/rin_month.ogg,voice,rin,FAIL,-15.93,-12.92,-5.12,-5.13,46.8,1.49,44100,1,-1.55,lufs -15.9 vs -14+-1; lead 47ms > 40; spread -1.5 LU vs rin median -14.4 (+-1)
+game/assets/v10/mj/koikoi/voice/rin_take.ogg,voice,rin,FAIL,-15.98,-12.97,-4.04,-4.04,45.5,1.07,44100,1,-1.60,lufs -16.0 vs -14+-1; lead 45ms > 40; spread -1.6 LU vs rin median -14.4 (+-1)
+game/assets/v10/mj/koikoi/voice/yue_koikoi.ogg,voice,yue,FAIL,-17.12,-14.11,-1.35,-1.38,80.7,1.57,44100,1,-3.03,lufs -17.1 vs -14+-1; lead 81ms > 40; spread -3.0 LU vs yue median -14.1 (+-1)
+game/assets/v10/mj/koikoi/voice/yue_month.ogg,voice,yue,FAIL,-15.86,-12.85,-1.31,-1.41,59.8,1.65,44100,1,-1.78,lufs -15.9 vs -14+-1; lead 60ms > 40; spread -1.8 LU vs yue median -14.1 (+-1)
+game/assets/v10/mj/koikoi/voice/yue_take.ogg,voice,yue,FAIL,-15.97,-12.96,-2.88,-2.91,51.5,1.07,44100,1,-1.89,lufs -16.0 vs -14+-1; lead 52ms > 40; spread -1.9 LU vs yue median -14.1 (+-1)
+game/assets/v10/mj/look/music/connect.ogg,music,music,FAIL,-17.13,-17.13,0.07,0.07,0.0,41.10,44100,2,,lufs -17.1 vs -16+-1; tp 0.1 > -1 dBTP
+game/assets/v10/mj/look/music/riichi.ogg,music,music,FAIL,-18.89,-18.89,-2.91,-2.91,0.0,41.61,44100,2,,lufs -18.9 vs -16+-1
+game/assets/v10/mj/look/music/riichi_r1.ogg,music,music,FAIL,-22.00,-22.00,-1.67,-1.67,0.0,41.61,44100,2,,lufs -22.0 vs -16+-1
+game/assets/v10/mj/look/music/riichi_r2.ogg,music,music,FAIL,-25.95,-25.95,-8.96,-9.12,21.6,41.61,44100,2,,lufs -26.0 vs -16+-1
+game/assets/v10/mj/sanma/voice/host_x2.ogg,voice,host,FAIL,-13.77,-10.76,-0.82,-0.83,9.9,3.44,44100,1,,tp -0.8 > -1 dBTP
+game/assets/v10/mj/sanma/voice/kita_5.ogg,voice,kita,FAIL,-13.82,-10.81,-0.99,-1.00,2.3,3.12,44100,1,0.01,tp -1.0 > -1 dBTP
+game/assets/v10/mj/stage/sfx/heartbeat.ogg,sfx,sfx,FAIL,-20.12,-17.11,-3.65,-3.65,1.0,1.60,44100,1,,peak -3.6 > -5 dBFS
+game/assets/v10/mj/stage/sfx/sting_hana.ogg,sfx,sfx,FAIL,-15.59,-12.58,0.05,0.04,1.0,0.90,44100,1,,peak 0.0 > -5 dBFS; tp 0.0 > -1 dBTP
+game/assets/v10/mj/stage/sfx/sting_mc.ogg,sfx,sfx,FAIL,-16.31,-13.30,0.36,0.36,0.1,0.90,44100,1,,peak 0.4 > -5 dBFS; tp 0.4 > -1 dBTP
+game/assets/v10/mj/stage/sfx/sting_nova.ogg,sfx,sfx,FAIL,-17.70,-14.69,2.46,1.43,0.0,0.92,44100,1,,peak 1.4 > -5 dBFS; tp 2.5 > -1 dBTP
+game/assets/v10/mj/stage/sfx/sting_rin.ogg,sfx,sfx,FAIL,-16.29,-13.28,0.52,0.49,0.0,0.90,44100,1,,peak 0.5 > -5 dBFS; tp 0.5 > -1 dBTP
+game/assets/v10/mj/stage/sfx/sting_yue.ogg,sfx,sfx,FAIL,-15.90,-12.89,-0.26,-0.26,1.3,0.90,44100,1,,peak -0.3 > -5 dBFS; tp -0.3 > -1 dBTP
+game/assets/v10/mj/stage/voice/hana_danger_1.ogg,voice,hana,FAIL,-15.85,-12.84,-0.23,-0.33,3.0,2.02,44100,1,-0.87,lufs -15.9 vs -14+-1; tp -0.2 > -1 dBTP
+game/assets/v10/mj/stage/voice/hana_danger_3.ogg,voice,hana,FAIL,-15.67,-12.66,-0.93,-1.00,2.6,1.50,44100,1,-0.69,lufs -15.7 vs -14+-1; tp -0.9 > -1 dBTP
+game/assets/v10/mj/stage/voice/hana_dealin_1.ogg,voice,hana,FAIL,-14.44,-11.43,-0.45,-0.56,4.4,2.45,44100,1,0.54,tp -0.5 > -1 dBTP
+game/assets/v10/mj/stage/voice/hana_idle_2.ogg,voice,hana,FAIL,-14.32,-11.31,-0.89,-0.89,24.1,2.51,44100,1,0.66,tp -0.9 > -1 dBTP
+game/assets/v10/mj/stage/voice/hana_kan_1.ogg,voice,hana,FAIL,-14.75,-11.74,-0.92,-0.92,26.5,1.52,44100,1,0.24,tp -0.9 > -1 dBTP
+game/assets/v10/mj/stage/voice/hana_lose_1.ogg,voice,hana,FAIL,-14.34,-11.33,-0.97,-0.99,22.8,2.70,44100,1,0.64,tp -1.0 > -1 dBTP
+game/assets/v10/mj/stage/voice/hana_lose_2.ogg,voice,hana,FAIL,-15.04,-12.03,-0.18,-0.22,16.3,1.80,44100,1,-0.06,lufs -15.0 vs -14+-1; tp -0.2 > -1 dBTP
+game/assets/v10/mj/stage/voice/hana_lose_3.ogg,voice,hana,FAIL,-15.50,-12.49,-1.56,-1.58,20.7,1.08,44100,1,-0.51,lufs -15.5 vs -14+-1
+game/assets/v10/mj/stage/voice/hana_mech_intro_1.ogg,voice,hana,FAIL,-14.96,-11.95,-0.62,-0.63,21.4,2.08,44100,1,0.03,tp -0.6 > -1 dBTP
+game/assets/v10/mj/stage/voice/hana_mech_intro_2.ogg,voice,hana,FAIL,-14.60,-11.59,-0.23,-0.23,18.8,2.78,44100,1,0.38,tp -0.2 > -1 dBTP
+game/assets/v10/mj/stage/voice/hana_mech_intro_3.ogg,voice,hana,FAIL,-14.52,-11.51,-0.73,-0.75,16.4,1.39,44100,1,0.47,tp -0.7 > -1 dBTP
+game/assets/v10/mj/stage/voice/hana_pair_combo_2.ogg,voice,hana,FAIL,-15.14,-12.13,-0.57,-0.59,8.3,2.26,44100,1,-0.16,lufs -15.1 vs -14+-1; tp -0.6 > -1 dBTP
+game/assets/v10/mj/stage/voice/hana_pair_combo_3.ogg,voice,hana,FAIL,-15.54,-12.53,-0.26,-0.28,13.6,1.75,44100,1,-0.56,lufs -15.5 vs -14+-1; tp -0.3 > -1 dBTP
+game/assets/v10/mj/stage/voice/hana_riichi_1.ogg,voice,hana,FAIL,-14.30,-11.29,-0.39,-0.45,29.6,2.19,44100,1,0.69,tp -0.4 > -1 dBTP
+game/assets/v10/mj/stage/voice/hana_ron_1.ogg,voice,hana,FAIL,-15.36,-12.35,0.43,0.38,18.0,1.88,44100,1,-0.38,lufs -15.4 vs -14+-1; tp 0.4 > -1 dBTP
+game/assets/v10/mj/stage/voice/hana_signature_1.ogg,voice,hana,FAIL,-14.45,-11.44,-0.61,-0.61,27.7,2.47,44100,1,0.53,tp -0.6 > -1 dBTP
+game/assets/v10/mj/stage/voice/hana_signature_2.ogg,voice,hana,FAIL,-15.02,-12.01,-0.50,-0.50,20.9,1.25,44100,1,-0.04,lufs -15.0 vs -14+-1; tp -0.5 > -1 dBTP
+game/assets/v10/mj/stage/voice/hana_signature_3.ogg,voice,hana,FAIL,-14.80,-11.79,-0.91,-0.94,12.6,1.04,44100,1,0.18,tp -0.9 > -1 dBTP
+game/assets/v10/mj/stage/voice/hana_tenpai_1.ogg,voice,hana,FAIL,-15.11,-12.10,-0.19,-0.19,18.2,2.75,44100,1,-0.13,lufs -15.1 vs -14+-1; tp -0.2 > -1 dBTP
+game/assets/v10/mj/stage/voice/hana_tsumo_1.ogg,voice,hana,FAIL,-14.98,-11.97,-0.89,-0.92,20.9,3.17,44100,1,0.00,tp -0.9 > -1 dBTP
+game/assets/v10/mj/stage/voice/hana_wave_1.ogg,voice,hana,FAIL,-16.27,-13.26,-0.89,-0.89,1.1,2.20,44100,1,-1.28,lufs -16.3 vs -14+-1; tp -0.9 > -1 dBTP; spread -1.3 LU vs hana median -15.0 (+-1)
+game/assets/v10/mj/stage/voice/hana_wave_2.ogg,voice,hana,FAIL,-15.28,-12.27,0.18,0.11,16.6,1.31,44100,1,-0.30,lufs -15.3 vs -14+-1; tp 0.2 > -1 dBTP
+game/assets/v10/mj/stage/voice/hana_wave_3.ogg,voice,hana,FAIL,-14.78,-11.77,-0.94,-0.94,23.4,1.59,44100,1,0.20,tp -0.9 > -1 dBTP
+game/assets/v10/mj/stage/voice/hana_win_1.ogg,voice,hana,FAIL,-15.07,-12.06,-0.47,-0.54,5.4,2.04,44100,1,-0.08,lufs -15.1 vs -14+-1; tp -0.5 > -1 dBTP
+game/assets/v10/mj/stage/voice/hana_win_2.ogg,voice,hana,FAIL,-14.24,-11.23,-0.54,-0.65,18.4,2.40,44100,1,0.74,tp -0.5 > -1 dBTP
+game/assets/v10/mj/stage/voice/hana_win_3.ogg,voice,hana,FAIL,-14.48,-11.46,-0.09,-0.09,16.0,1.80,44100,1,0.51,tp -0.1 > -1 dBTP
+game/assets/v10/mj/stage/voice/mc_danger_1.ogg,voice,mc,FAIL,-14.40,-11.39,-0.59,-0.60,13.0,3.15,44100,1,0.00,tp -0.6 > -1 dBTP
+game/assets/v10/mj/stage/voice/mc_danger_2.ogg,voice,mc,FAIL,-14.75,-11.74,0.32,0.32,8.8,0.90,44100,1,-0.35,tp 0.3 > -1 dBTP
+game/assets/v10/mj/stage/voice/mc_danger_3.ogg,voice,mc,FAIL,-14.28,-11.27,-0.98,-0.99,21.5,2.44,44100,1,0.12,tp -1.0 > -1 dBTP
+game/assets/v10/mj/stage/voice/mc_mech_intro_2.ogg,voice,mc,FAIL,-14.62,-11.61,0.47,0.46,11.4,1.55,44100,1,-0.22,tp 0.5 > -1 dBTP
+game/assets/v10/mj/stage/voice/mc_pair_combo_2.ogg,voice,mc,FAIL,-14.32,-11.31,-0.86,-0.95,11.6,1.81,44100,1,0.08,tp -0.9 > -1 dBTP
+game/assets/v10/mj/stage/voice/mc_pair_combo_3.ogg,voice,mc,FAIL,-14.53,-11.52,0.34,0.21,5.2,1.49,44100,1,-0.13,tp 0.3 > -1 dBTP
+game/assets/v10/mj/stage/voice/mc_pon_1.ogg,voice,mc,FAIL,-14.18,-11.17,-0.87,-0.91,20.4,1.63,44100,1,0.22,tp -0.9 > -1 dBTP
+game/assets/v10/mj/stage/voice/mc_riichi_1.ogg,voice,mc,FAIL,-14.15,-11.14,-0.99,-0.99,14.5,2.49,44100,1,0.25,tp -1.0 > -1 dBTP
+game/assets/v10/mj/stage/voice/mc_ron_1.ogg,voice,mc,FAIL,-14.34,-11.33,-0.97,-1.01,18.2,2.34,44100,1,0.06,tp -1.0 > -1 dBTP
+game/assets/v10/mj/stage/voice/mc_signature_1.ogg,voice,mc,FAIL,-14.19,-11.18,0.08,0.08,1.7,2.62,44100,1,0.21,tp 0.1 > -1 dBTP
+game/assets/v10/mj/stage/voice/mc_signature_2.ogg,voice,mc,FAIL,-14.27,-11.26,-0.99,-1.02,18.5,1.52,44100,1,0.13,tp -1.0 > -1 dBTP
+game/assets/v10/mj/stage/voice/mc_signature_3.ogg,voice,mc,FAIL,-14.91,-11.90,-0.77,-0.79,4.1,1.58,44100,1,-0.51,tp -0.8 > -1 dBTP
+game/assets/v10/mj/stage/voice/mc_tenpai_1.ogg,voice,mc,FAIL,-14.78,-11.77,-0.43,-0.53,18.8,1.84,44100,1,-0.38,tp -0.4 > -1 dBTP
+game/assets/v10/mj/stage/voice/mc_wave_1.ogg,voice,mc,FAIL,-14.41,-11.40,-0.55,-0.56,1.3,2.21,44100,1,-0.01,tp -0.5 > -1 dBTP
+game/assets/v10/mj/stage/voice/mc_wave_3.ogg,voice,mc,FAIL,-14.13,-11.12,-0.98,-1.00,19.0,2.46,44100,1,0.27,tp -1.0 > -1 dBTP
+game/assets/v10/mj/stage/voice/mc_win_1.ogg,voice,mc,FAIL,-13.76,-10.75,-0.99,-1.01,15.9,3.42,44100,1,0.64,tp -1.0 > -1 dBTP
+game/assets/v10/mj/stage/voice/mc_win_2.ogg,voice,mc,FAIL,-14.61,-11.60,-0.86,-0.91,12.8,3.66,44100,1,-0.21,tp -0.9 > -1 dBTP
+game/assets/v10/mj/stage/voice/mc_win_3.ogg,voice,mc,FAIL,-14.31,-11.30,0.45,0.07,14.9,3.63,44100,1,0.09,tp 0.4 > -1 dBTP
+game/assets/v10/mj/stage/voice/nova_danger_2.ogg,voice,nova,FAIL,-15.06,-12.05,-0.32,-0.33,14.1,2.46,44100,1,-0.73,lufs -15.1 vs -14+-1; tp -0.3 > -1 dBTP
+game/assets/v10/mj/stage/voice/nova_danger_3.ogg,voice,nova,FAIL,-14.32,-11.31,-0.97,-1.00,22.6,1.72,44100,1,0.01,tp -1.0 > -1 dBTP
+game/assets/v10/mj/stage/voice/nova_dealin_1.ogg,voice,nova,FAIL,-15.52,-12.51,-0.71,-0.78,23.0,1.40,44100,1,-1.19,lufs -15.5 vs -14+-1; tp -0.7 > -1 dBTP; spread -1.2 LU vs nova median -14.3 (+-1)
+game/assets/v10/mj/stage/voice/nova_idle_1.ogg,voice,nova,FAIL,-14.67,-11.66,-0.44,-0.44,28.2,3.12,44100,1,-0.34,tp -0.4 > -1 dBTP
+game/assets/v10/mj/stage/voice/nova_idle_2.ogg,voice,nova,FAIL,-14.49,-11.48,-0.56,-1.16,23.8,1.85,44100,1,-0.15,tp -0.6 > -1 dBTP
+game/assets/v10/mj/stage/voice/nova_idle_3.ogg,voice,nova,FAIL,-14.46,-11.45,-0.96,-0.97,17.9,2.39,44100,1,-0.13,tp -1.0 > -1 dBTP
+game/assets/v10/mj/stage/voice/nova_kan_1.ogg,voice,nova,FAIL,-14.23,-11.22,-0.83,-0.85,24.5,1.92,44100,1,0.11,tp -0.8 > -1 dBTP
+game/assets/v10/mj/stage/voice/nova_lose_3.ogg,voice,nova,FAIL,-14.25,-11.24,-0.94,-0.99,20.3,2.25,44100,1,0.09,tp -0.9 > -1 dBTP
+game/assets/v10/mj/stage/voice/nova_mech_intro_2.ogg,voice,nova,FAIL,-14.27,-11.26,1.13,1.10,18.8,2.46,44100,1,0.07,tp 1.1 > -1 dBTP
+game/assets/v10/mj/stage/voice/nova_mech_intro_3.ogg,voice,nova,FAIL,-14.08,-11.07,-0.33,-0.55,23.0,1.61,44100,1,0.26,tp -0.3 > -1 dBTP
+game/assets/v10/mj/stage/voice/nova_pair_combo_1.ogg,voice,nova,FAIL,-14.59,-11.58,-0.99,-1.00,16.0,1.78,44100,1,-0.26,tp -1.0 > -1 dBTP
+game/assets/v10/mj/stage/voice/nova_pon_1.ogg,voice,nova,FAIL,-14.28,-11.27,-0.97,-0.97,18.6,2.15,44100,1,0.06,tp -1.0 > -1 dBTP
+game/assets/v10/mj/stage/voice/nova_riichi_1.ogg,voice,nova,FAIL,-14.47,-11.46,-0.64,-0.67,18.9,2.78,44100,1,-0.13,tp -0.6 > -1 dBTP
+game/assets/v10/mj/stage/voice/nova_signature_1.ogg,voice,nova,FAIL,-14.93,-11.92,-0.14,-0.16,23.1,2.47,44100,1,-0.60,tp -0.1 > -1 dBTP
+game/assets/v10/mj/stage/voice/nova_signature_3.ogg,voice,nova,FAIL,-14.37,-11.36,-0.11,-0.11,17.5,1.96,44100,1,-0.04,tp -0.1 > -1 dBTP
+game/assets/v10/mj/stage/voice/nova_tenpai_1.ogg,voice,nova,FAIL,-14.75,-11.74,-0.13,-0.14,17.5,1.78,44100,1,-0.42,tp -0.1 > -1 dBTP
+game/assets/v10/mj/stage/voice/nova_tsumo_1.ogg,voice,nova,FAIL,-14.40,-11.39,-0.94,-0.94,1.3,2.17,44100,1,-0.06,tp -0.9 > -1 dBTP
+game/assets/v10/mj/stage/voice/nova_wave_2.ogg,voice,nova,FAIL,-14.28,-11.27,-0.14,-0.22,8.6,1.82,44100,1,0.05,tp -0.1 > -1 dBTP
+game/assets/v10/mj/stage/voice/nova_win_1.ogg,voice,nova,FAIL,-14.33,-11.32,-0.87,-0.87,2.9,1.77,44100,1,0.01,tp -0.9 > -1 dBTP
+game/assets/v10/mj/stage/voice/rin_chi_1.ogg,voice,rin,FAIL,-14.12,-11.11,-0.94,-0.94,7.1,1.35,44100,1,0.26,tp -0.9 > -1 dBTP
+game/assets/v10/mj/stage/voice/rin_idle_3.ogg,voice,rin,FAIL,-15.03,-12.02,-0.95,-0.96,4.9,1.15,44100,1,-0.65,lufs -15.0 vs -14+-1; tp -0.9 > -1 dBTP
+game/assets/v10/mj/stage/voice/rin_lose_1.ogg,voice,rin,FAIL,-14.35,-11.34,-0.95,-0.95,1.7,2.61,44100,1,0.03,tp -0.9 > -1 dBTP
+game/assets/v10/mj/stage/voice/rin_lose_3.ogg,voice,rin,FAIL,-14.50,-11.49,-0.98,-1.02,19.5,2.11,44100,1,-0.12,tp -1.0 > -1 dBTP
+game/assets/v10/mj/stage/voice/rin_mech_intro_1.ogg,voice,rin,FAIL,-14.65,-11.64,-0.99,-1.03,12.2,2.46,44100,1,-0.27,tp -1.0 > -1 dBTP
+game/assets/v10/mj/stage/voice/rin_pair_combo_1.ogg,voice,rin,FAIL,-14.92,-11.91,-0.86,-0.90,11.6,2.36,44100,1,-0.55,tp -0.9 > -1 dBTP
+game/assets/v10/mj/stage/voice/rin_pair_combo_2.ogg,voice,rin,FAIL,-13.99,-10.98,-0.87,-0.87,17.4,1.04,44100,1,0.39,tp -0.9 > -1 dBTP
+game/assets/v10/mj/stage/voice/rin_ron_1.ogg,voice,rin,FAIL,-14.10,-11.09,-0.78,-0.78,7.4,1.90,44100,1,0.28,tp -0.8 > -1 dBTP
+game/assets/v10/mj/stage/voice/rin_signature_3.ogg,voice,rin,FAIL,-15.32,-12.31,-1.16,-1.17,25.1,0.71,44100,1,-0.94,lufs -15.3 vs -14+-1
+game/assets/v10/mj/stage/voice/rin_tenpai_1.ogg,voice,rin,FAIL,-14.38,-11.37,-0.94,-0.94,6.4,1.95,44100,1,0.00,tp -0.9 > -1 dBTP
+game/assets/v10/mj/stage/voice/rin_wave_1.ogg,voice,rin,FAIL,-13.94,-10.93,-0.68,-0.70,9.4,2.41,44100,1,0.44,tp -0.7 > -1 dBTP
+game/assets/v10/mj/stage/voice/rin_wave_2.ogg,voice,rin,FAIL,-14.21,-11.20,-0.87,-0.88,11.1,1.88,44100,1,0.17,tp -0.9 > -1 dBTP
+game/assets/v10/mj/stage/voice/rin_win_3.ogg,voice,rin,FAIL,-14.50,-11.49,-0.86,-0.86,12.4,1.45,44100,1,-0.12,tp -0.9 > -1 dBTP
+game/assets/v10/mj/stage/voice/yue_danger_1.ogg,voice,yue,FAIL,-14.26,-11.25,-0.66,-0.98,11.7,1.08,44100,1,-0.18,tp -0.7 > -1 dBTP
+game/assets/v10/mj/stage/voice/yue_dealin_1.ogg,voice,yue,FAIL,-14.16,-11.15,-0.47,-0.53,18.3,2.18,44100,1,-0.08,tp -0.5 > -1 dBTP
+game/assets/v10/mj/stage/voice/yue_kan_1.ogg,voice,yue,FAIL,-14.11,-11.10,-0.67,-0.80,13.8,2.68,44100,1,-0.03,tp -0.7 > -1 dBTP
+game/assets/v10/mj/stage/voice/yue_lose_2.ogg,voice,yue,FAIL,-13.93,-10.92,-0.87,-0.87,20.1,1.44,44100,1,0.15,tp -0.9 > -1 dBTP
+game/assets/v10/mj/stage/voice/yue_lose_3.ogg,voice,yue,FAIL,-14.49,-11.48,-0.97,-0.97,22.3,2.21,44100,1,-0.41,tp -1.0 > -1 dBTP
+game/assets/v10/mj/stage/voice/yue_wave_2.ogg,voice,yue,FAIL,-14.81,-11.80,-0.90,-0.90,22.0,1.93,44100,1,-0.73,tp -0.9 > -1 dBTP
+game/assets/v10/mj/stage/voice/yue_wave_3.ogg,voice,yue,FAIL,-13.48,-10.47,-0.62,-0.63,17.7,3.35,44100,1,0.61,tp -0.6 > -1 dBTP
+game/assets/v10/rituals/sfx/bell.ogg,sfx,sfx,FAIL,-21.68,-18.67,-3.80,-3.90,0.0,1.99,44100,1,,peak -3.9 > -5 dBFS
+game/assets/v10/rituals/sfx/blow.ogg,sfx,sfx,FAIL,-22.77,-19.76,-4.14,-4.15,0.0,1.98,44100,1,,peak -4.2 > -5 dBFS
+game/assets/v10/rituals/sfx/leaf_land.ogg,sfx,sfx,FAIL,-46.87,-43.86,-3.94,-3.94,0.0,1.98,44100,1,,peak -3.9 > -5 dBFS
+game/assets/v10/rituals/sfx/paper_fan.ogg,sfx,sfx,FAIL,-30.29,-27.28,-4.26,-4.26,0.1,1.99,44100,1,,peak -4.3 > -5 dBFS
+game/assets/v10/rituals/sfx/pen_scratch.ogg,sfx,sfx,FAIL,-33.13,-30.12,-4.92,-4.92,0.0,1.98,44100,1,,peak -4.9 > -5 dBFS
+game/assets/v10/rituals/sfx/steam.ogg,sfx,sfx,FAIL,-16.26,-13.25,-3.98,-4.04,0.0,2.00,44100,1,,peak -4.0 > -5 dBFS
+game/assets/v10/rituals/sfx/tea_pour.ogg,sfx,sfx,FAIL,-29.37,-26.36,-4.04,-4.04,0.0,1.98,44100,1,,peak -4.0 > -5 dBFS
+game/assets/v10/salon/sfx/salon_shutter.wav,sfx,sfx,FAIL,-34.39,-31.38,-2.00,-2.00,0.0,1.98,44100,1,,peak -2.0 > -5 dBFS
+game/assets/v10/salon/sfx/salon_thud.wav,sfx,sfx,FAIL,-24.47,-21.46,-2.00,-2.00,0.0,1.99,44100,1,,peak -2.0 > -5 dBFS
+game/assets/v10/salon/sfx/salon_zone_sting.wav,sfx,sfx,FAIL,-17.89,-14.88,-3.64,-3.71,0.0,3.97,44100,1,,peak -3.7 > -5 dBFS
+game/assets/v10/voice/hana/birthday.ogg,voice,hana,FAIL,-14.14,-11.13,-0.30,-0.30,36.5,5.94,44100,1,0.84,tp -0.3 > -1 dBTP
+game/assets/v10/voice/hana/close1.ogg,voice,hana,FAIL,-15.96,-12.95,-1.10,-1.17,38.4,5.69,44100,1,-0.98,lufs -16.0 vs -14+-1
+game/assets/v10/voice/hana/close2.ogg,voice,hana,FAIL,-16.03,-13.02,-1.10,-1.12,30.5,3.93,44100,1,-1.05,lufs -16.0 vs -14+-1; spread -1.0 LU vs hana median -15.0 (+-1)
+game/assets/v10/voice/hana/close3.ogg,voice,hana,FAIL,-16.06,-13.05,-0.91,-0.92,25.8,6.86,44100,1,-1.08,lufs -16.1 vs -14+-1; tp -0.9 > -1 dBTP; spread -1.1 LU vs hana median -15.0 (+-1)
+game/assets/v10/voice/hana/combo10.ogg,voice,hana,FAIL,-14.15,-11.14,-0.93,-0.94,25.6,1.65,44100,1,0.83,tp -0.9 > -1 dBTP
+game/assets/v10/voice/hana/combo20.ogg,voice,hana,FAIL,-14.19,-11.18,-0.58,-0.60,38.5,2.24,44100,1,0.79,tp -0.6 > -1 dBTP
+game/assets/v10/voice/hana/combo5.ogg,voice,hana,FAIL,-14.18,-11.17,-0.77,-0.84,36.6,2.51,44100,1,0.80,tp -0.8 > -1 dBTP
+game/assets/v10/voice/hana/comeback.ogg,voice,hana,FAIL,-14.29,-11.28,-0.47,-0.50,38.1,6.53,44100,1,0.70,tp -0.5 > -1 dBTP
+game/assets/v10/voice/hana/danger.ogg,voice,hana,FAIL,-14.12,-11.11,0.02,-0.20,39.4,5.57,44100,1,0.86,tp 0.0 > -1 dBTP
+game/assets/v10/voice/hana/greet.ogg,voice,hana,FAIL,-14.20,-11.19,-0.36,-0.42,33.7,3.23,44100,1,0.79,tp -0.4 > -1 dBTP
+game/assets/v10/voice/hana/idle.ogg,voice,hana,FAIL,-14.16,-11.15,0.02,-0.01,36.0,5.23,44100,1,0.82,tp 0.0 > -1 dBTP
+game/assets/v10/voice/hana/lose.ogg,voice,hana,FAIL,-14.08,-11.07,0.04,0.01,37.3,4.59,44100,1,0.91,tp 0.0 > -1 dBTP
+game/assets/v10/voice/hana/summon.ogg,voice,hana,FAIL,-14.08,-11.07,-0.49,-0.64,29.4,5.80,44100,1,0.90,tp -0.5 > -1 dBTP
+game/assets/v10/voice/hana/tag.ogg,voice,hana,FAIL,-14.29,-11.28,-0.48,-0.60,22.3,0.74,44100,1,0.69,tp -0.5 > -1 dBTP
+game/assets/v10/voice/hana/tap_acc.ogg,voice,hana,FAIL,-14.07,-11.06,-0.60,-0.66,39.4,5.51,44100,1,0.92,tp -0.6 > -1 dBTP
+game/assets/v10/voice/hana/tap_hair.ogg,voice,hana,FAIL,-14.19,-11.18,-0.68,-0.68,39.4,3.73,44100,1,0.79,tp -0.7 > -1 dBTP
+game/assets/v10/voice/hana/tap_prop.ogg,voice,hana,FAIL,-14.09,-11.08,0.13,-0.04,36.0,5.77,44100,1,0.89,tp 0.1 > -1 dBTP
+game/assets/v10/voice/hana/tap_spam.ogg,voice,hana,FAIL,-14.31,-11.30,-0.35,-0.35,35.6,5.61,44100,1,0.68,tp -0.3 > -1 dBTP
+game/assets/v10/voice/hana/tut1.ogg,voice,hana,FAIL,-14.11,-11.10,-0.23,-0.24,38.7,4.85,44100,1,0.88,tp -0.2 > -1 dBTP
+game/assets/v10/voice/hana/tut2.ogg,voice,hana,FAIL,-14.05,-11.04,-0.69,-0.73,36.9,5.06,44100,1,0.94,tp -0.7 > -1 dBTP
+game/assets/v10/voice/hana/tut3.ogg,voice,hana,FAIL,-13.96,-10.95,-0.85,-0.85,38.3,3.96,44100,1,1.02,tp -0.8 > -1 dBTP; spread +1.0 LU vs hana median -15.0 (+-1)
+game/assets/v10/voice/mc/birthday.ogg,voice,mc,FAIL,-13.91,-10.90,-0.36,-0.37,38.8,6.13,44100,1,0.49,tp -0.4 > -1 dBTP
+game/assets/v10/voice/mc/close1.ogg,voice,mc,FAIL,-15.71,-12.70,-3.24,-3.25,37.9,4.09,44100,1,-1.31,lufs -15.7 vs -14+-1; spread -1.3 LU vs mc median -14.4 (+-1)
+game/assets/v10/voice/mc/close2.ogg,voice,mc,FAIL,-15.89,-12.88,-2.69,-2.69,38.6,5.43,44100,1,-1.49,lufs -15.9 vs -14+-1; spread -1.5 LU vs mc median -14.4 (+-1)
+game/assets/v10/voice/mc/close3.ogg,voice,mc,FAIL,-15.72,-12.71,-2.67,-2.67,2.0,5.07,44100,1,-1.32,lufs -15.7 vs -14+-1; spread -1.3 LU vs mc median -14.4 (+-1)
+game/assets/v10/voice/mc/combo10.ogg,voice,mc,FAIL,-13.83,-10.82,0.08,0.08,35.9,2.31,44100,1,0.57,tp 0.1 > -1 dBTP
+game/assets/v10/voice/mc/combo20.ogg,voice,mc,FAIL,-14.29,-11.28,-0.85,-0.89,19.5,3.04,44100,1,0.11,tp -0.9 > -1 dBTP
+game/assets/v10/voice/mc/combo5.ogg,voice,mc,FAIL,-13.92,-10.91,0.20,0.20,14.0,2.35,44100,1,0.48,tp 0.2 > -1 dBTP
+game/assets/v10/voice/mc/danger.ogg,voice,mc,FAIL,-13.94,-10.92,-0.54,-0.55,37.8,5.61,44100,1,0.47,tp -0.5 > -1 dBTP
+game/assets/v10/voice/mc/greet.ogg,voice,mc,FAIL,-13.81,-10.80,-0.61,-0.84,35.6,4.68,44100,1,0.59,tp -0.6 > -1 dBTP
+game/assets/v10/voice/mc/idle.ogg,voice,mc,FAIL,-13.83,-10.82,-0.72,-0.72,35.7,4.34,44100,1,0.57,tp -0.7 > -1 dBTP
+game/assets/v10/voice/mc/priem.ogg,voice,mc,FAIL,-14.02,-11.01,-0.50,-0.61,31.6,3.83,44100,1,0.38,tp -0.5 > -1 dBTP
+game/assets/v10/voice/mc/tag.ogg,voice,mc,FAIL,-13.88,-10.86,-0.76,-0.80,4.5,1.44,44100,1,0.53,tp -0.8 > -1 dBTP
+game/assets/v10/voice/mc/tap_head.ogg,voice,mc,FAIL,-13.98,-10.97,-0.73,-0.73,38.4,5.30,44100,1,0.42,tp -0.7 > -1 dBTP
+game/assets/v10/voice/mc/tut1.ogg,voice,mc,FAIL,-13.87,-10.86,-0.82,-0.85,23.7,6.32,44100,1,0.53,tp -0.8 > -1 dBTP
+game/assets/v10/voice/mc/tut2.ogg,voice,mc,FAIL,-13.90,-10.89,-0.44,-0.48,36.9,6.61,44100,1,0.50,tp -0.4 > -1 dBTP
+game/assets/v10/voice/nova/birthday.ogg,voice,nova,FAIL,-14.30,-11.29,-0.88,-0.89,38.1,5.74,44100,1,0.03,tp -0.9 > -1 dBTP
+game/assets/v10/voice/nova/close1.ogg,voice,nova,FAIL,-16.11,-13.10,-1.00,-1.04,15.0,4.88,44100,1,-1.78,lufs -16.1 vs -14+-1; spread -1.8 LU vs nova median -14.3 (+-1)
+game/assets/v10/voice/nova/close2.ogg,voice,nova,FAIL,-15.90,-12.89,-0.78,-0.81,33.6,3.77,44100,1,-1.56,lufs -15.9 vs -14+-1; tp -0.8 > -1 dBTP; spread -1.6 LU vs nova median -14.3 (+-1)
+game/assets/v10/voice/nova/close3.ogg,voice,nova,FAIL,-15.98,-12.97,-1.26,-1.28,27.5,7.68,44100,1,-1.64,lufs -16.0 vs -14+-1; spread -1.6 LU vs nova median -14.3 (+-1)
+game/assets/v10/voice/nova/combo10.ogg,voice,nova,FAIL,-13.88,-10.87,-0.90,-0.90,37.0,2.28,44100,1,0.46,tp -0.9 > -1 dBTP
+game/assets/v10/voice/nova/combo5.ogg,voice,nova,FAIL,-13.99,-10.98,-0.84,-0.87,26.1,1.40,44100,1,0.34,tp -0.8 > -1 dBTP
+game/assets/v10/voice/nova/comeback.ogg,voice,nova,FAIL,-14.03,-11.02,-0.97,-1.00,36.8,4.78,44100,1,0.31,tp -1.0 > -1 dBTP
+game/assets/v10/voice/nova/danger.ogg,voice,nova,FAIL,-14.25,-11.24,-0.79,-0.79,31.6,4.81,44100,1,0.09,tp -0.8 > -1 dBTP
+game/assets/v10/voice/nova/greet.ogg,voice,nova,FAIL,-14.02,-11.01,-0.97,-1.03,23.1,4.68,44100,1,0.32,tp -1.0 > -1 dBTP
+game/assets/v10/voice/nova/idle.ogg,voice,nova,FAIL,-14.12,-11.11,1.79,1.79,33.8,4.05,44100,1,0.22,tp 1.8 > -1 dBTP
+game/assets/v10/voice/nova/lose.ogg,voice,nova,FAIL,-14.20,-11.19,-0.54,-0.54,17.2,5.41,44100,1,0.14,tp -0.5 > -1 dBTP
+game/assets/v10/voice/nova/priem.ogg,voice,nova,FAIL,-14.07,-11.06,-0.75,-0.76,36.1,3.14,44100,1,0.27,tp -0.8 > -1 dBTP
+game/assets/v10/voice/nova/summon.ogg,voice,nova,FAIL,-14.11,-11.10,-1.00,-1.00,27.1,5.75,44100,1,0.23,tp -1.0 > -1 dBTP
+game/assets/v10/voice/nova/tag.ogg,voice,nova,FAIL,-13.75,-10.73,1.53,0.74,33.8,0.98,44100,1,0.59,tp 1.5 > -1 dBTP
+game/assets/v10/voice/nova/tap_hair.ogg,voice,nova,FAIL,-14.11,-11.10,-0.35,-0.54,38.4,5.92,44100,1,0.23,tp -0.4 > -1 dBTP
+game/assets/v10/voice/nova/tap_prop.ogg,voice,nova,FAIL,-14.15,-11.14,-0.79,-0.80,35.0,5.85,44100,1,0.19,tp -0.8 > -1 dBTP
+game/assets/v10/voice/nova/tap_spam.ogg,voice,nova,FAIL,-14.11,-11.10,-0.98,-0.98,25.9,5.17,44100,1,0.23,tp -1.0 > -1 dBTP
+game/assets/v10/voice/nova/tut1.ogg,voice,nova,FAIL,-14.12,-11.11,-0.71,-0.71,31.7,5.28,44100,1,0.22,tp -0.7 > -1 dBTP
+game/assets/v10/voice/nova/tut2.ogg,voice,nova,FAIL,-14.19,-11.18,-0.41,-0.41,38.3,5.15,44100,1,0.14,tp -0.4 > -1 dBTP
+game/assets/v10/voice/nova/tut3.ogg,voice,nova,FAIL,-14.11,-11.10,-0.94,-1.01,32.3,5.45,44100,1,0.23,tp -0.9 > -1 dBTP
+game/assets/v10/voice/nova/win.ogg,voice,nova,FAIL,-14.15,-11.13,-0.46,-0.46,35.6,5.30,44100,1,0.19,tp -0.5 > -1 dBTP
+game/assets/v10/voice/rin/close1.ogg,voice,rin,FAIL,-15.81,-12.80,-1.51,-1.55,38.7,4.83,44100,1,-1.43,lufs -15.8 vs -14+-1; spread -1.4 LU vs rin median -14.4 (+-1)
+game/assets/v10/voice/rin/close2.ogg,voice,rin,FAIL,-15.91,-12.90,-1.78,-1.79,29.6,4.25,44100,1,-1.53,lufs -15.9 vs -14+-1; spread -1.5 LU vs rin median -14.4 (+-1)
+game/assets/v10/voice/rin/close3.ogg,voice,rin,FAIL,-15.94,-12.93,-3.23,-3.24,39.0,6.24,44100,1,-1.56,lufs -15.9 vs -14+-1; spread -1.6 LU vs rin median -14.4 (+-1)
+game/assets/v10/voice/rin/combo5.ogg,voice,rin,FAIL,-14.27,-11.26,-0.96,-0.96,37.5,1.44,44100,1,0.11,tp -1.0 > -1 dBTP
+game/assets/v10/voice/rin/lose.ogg,voice,rin,FAIL,-13.86,-10.85,-0.10,-0.52,36.3,5.36,44100,1,0.52,tp -0.1 > -1 dBTP
+game/assets/v10/voice/rin/priem.ogg,voice,rin,FAIL,-13.75,-10.74,1.43,1.19,36.1,2.27,44100,1,0.63,tp 1.4 > -1 dBTP
+game/assets/v10/voice/rin/tap_prop.ogg,voice,rin,FAIL,-14.08,-11.07,-0.96,-1.02,38.3,5.66,44100,1,0.30,tp -1.0 > -1 dBTP
+game/assets/v10/voice/rin/tut1.ogg,voice,rin,FAIL,-14.00,-10.99,-0.83,-0.88,23.3,5.10,44100,1,0.38,tp -0.8 > -1 dBTP
+game/assets/v10/voice/rin/tut3.ogg,voice,rin,FAIL,-13.86,-10.85,-0.88,-0.88,38.2,4.01,44100,1,0.52,tp -0.9 > -1 dBTP
+game/assets/v10/voice/yue/close1.ogg,voice,yue,FAIL,-16.14,-13.13,-1.36,-1.49,2.4,4.43,44100,1,-2.05,lufs -16.1 vs -14+-1; spread -2.1 LU vs yue median -14.1 (+-1)
+game/assets/v10/voice/yue/close2.ogg,voice,yue,FAIL,-16.13,-13.12,-1.41,-1.41,11.3,6.61,44100,1,-2.05,lufs -16.1 vs -14+-1; spread -2.1 LU vs yue median -14.1 (+-1)
+game/assets/v10/voice/yue/close3.ogg,voice,yue,FAIL,-15.90,-12.89,-1.53,-1.53,4.8,5.81,44100,1,-1.82,lufs -15.9 vs -14+-1; spread -1.8 LU vs yue median -14.1 (+-1)
+game/assets/v10/voice/yue/combo10.ogg,voice,yue,FAIL,-14.20,-11.19,-0.98,-0.99,35.7,1.88,44100,1,-0.11,tp -1.0 > -1 dBTP
+game/assets/v10/voice/yue/combo5.ogg,voice,yue,FAIL,-14.08,-11.07,0.36,-0.71,38.8,3.11,44100,1,0.00,tp 0.4 > -1 dBTP
+game/assets/v10/voice/yue/greet.ogg,voice,yue,FAIL,-14.04,-11.03,-0.71,-0.72,2.9,6.13,44100,1,0.04,tp -0.7 > -1 dBTP
+game/assets/v10/voice/yue/idle.ogg,voice,yue,FAIL,-13.98,-10.97,0.55,-0.15,11.1,5.79,44100,1,0.10,tp 0.6 > -1 dBTP
+game/assets/v10/voice/yue/tap_hair.ogg,voice,yue,FAIL,-13.89,-10.88,0.34,0.34,4.0,4.78,44100,1,0.19,tp 0.3 > -1 dBTP
+game/assets/v10/voice/yue/tap_spam.ogg,voice,yue,FAIL,-13.96,-10.95,-0.07,-0.07,36.7,6.78,44100,1,0.12,tp -0.1 > -1 dBTP
+game/assets/v10/voice/yue/tut1.ogg,voice,yue,FAIL,-14.09,-11.08,-0.64,-1.10,30.0,6.80,44100,1,-0.01,tp -0.6 > -1 dBTP
+game/assets/v10/wave1/audio/voice/kohaku_aff1.ogg,voice,kohaku,FAIL,-15.24,-12.23,-4.80,-5.11,27.5,3.76,44100,1,0.59,lufs -15.2 vs -14+-1
+game/assets/v10/wave1/audio/voice/kohaku_combo1.ogg,voice,kohaku,FAIL,-15.89,-12.88,-7.36,-7.37,39.1,3.36,44100,1,-0.05,lufs -15.9 vs -14+-1
+game/assets/v10/wave1/audio/voice/kohaku_greet1.ogg,voice,kohaku,FAIL,-15.80,-12.79,-5.84,-5.85,29.6,5.92,44100,1,0.03,lufs -15.8 vs -14+-1
+game/assets/v10/wave1/audio/voice/kohaku_outfit1.ogg,voice,kohaku,FAIL,-16.28,-13.27,-5.52,-5.54,0.0,5.68,44100,1,-0.44,lufs -16.3 vs -14+-1
+game/assets/v10/wave1/audio/voice/kohaku_ssr1.ogg,voice,kohaku,FAIL,-15.87,-12.86,-5.92,-5.92,0.0,5.60,44100,1,-0.03,lufs -15.9 vs -14+-1
+game/assets/v10/wave1/audio/voice/kohaku_win1.ogg,voice,kohaku,FAIL,-15.05,-12.04,-4.67,-4.67,25.0,4.88,44100,1,0.78,lufs -15.1 vs -14+-1
+game/assets/v10/wave1/audio/voice/miel_aff1.ogg,voice,miel,FAIL,-15.44,-12.43,-2.52,-2.56,0.0,4.48,44100,1,0.15,lufs -15.4 vs -14+-1
+game/assets/v10/wave1/audio/voice/miel_combo1.ogg,voice,miel,FAIL,-16.47,-13.46,-4.48,-4.72,101.3,4.71,44100,1,-0.88,lufs -16.5 vs -14+-1; lead 101ms > 40
+game/assets/v10/wave1/audio/voice/miel_greet1.ogg,voice,miel,FAIL,-15.75,-12.74,-4.55,-4.55,0.0,5.04,44100,1,-0.15,lufs -15.7 vs -14+-1
+game/assets/v10/wave1/audio/voice/miel_outfit1.ogg,voice,miel,FAIL,-15.35,-12.34,-4.03,-4.05,0.2,4.24,44100,1,0.25,lufs -15.3 vs -14+-1
+game/assets/v10/wave1/audio/voice/miel_ssr1.ogg,voice,miel,FAIL,-14.44,-11.43,-3.53,-3.53,24.0,4.64,44100,1,1.16,spread +1.2 LU vs miel median -15.6 (+-1)
+game/assets/v10/wave1/audio/voice/miel_win1.ogg,voice,miel,FAIL,-16.18,-13.16,-3.65,-3.67,0.0,5.68,44100,1,-0.58,lufs -16.2 vs -14+-1
+game/assets/v10/wave1/audio/voice/shirin_aff1.ogg,voice,shirin,FAIL,-16.77,-13.76,-0.86,-0.92,0.0,5.92,44100,1,-0.17,lufs -16.8 vs -14+-1; tp -0.9 > -1 dBTP
+game/assets/v10/wave1/audio/voice/shirin_combo1.ogg,voice,shirin,FAIL,-14.99,-11.98,-0.81,-0.82,0.0,4.96,44100,1,1.61,tp -0.8 > -1 dBTP; spread +1.6 LU vs shirin median -16.6 (+-1)
+game/assets/v10/wave1/audio/voice/shirin_greet1.ogg,voice,shirin,FAIL,-16.43,-13.42,-0.74,-0.74,0.0,6.48,44100,1,0.17,lufs -16.4 vs -14+-1; tp -0.7 > -1 dBTP
+game/assets/v10/wave1/audio/voice/shirin_outfit1.ogg,voice,shirin,FAIL,-18.43,-15.42,-0.27,-0.52,0.0,6.80,44100,1,-1.83,lufs -18.4 vs -14+-1; tp -0.3 > -1 dBTP; spread -1.8 LU vs shirin median -16.6 (+-1)
+game/assets/v10/wave1/audio/voice/shirin_ssr1.ogg,voice,shirin,FAIL,-17.55,-14.54,-1.67,-1.71,0.0,6.48,44100,1,-0.95,lufs -17.5 vs -14+-1
+game/assets/v10/wave1/audio/voice/shirin_win1.ogg,voice,shirin,FAIL,-15.83,-12.82,-0.84,-0.98,0.0,6.08,44100,1,0.77,lufs -15.8 vs -14+-1; tp -0.8 > -1 dBTP
+game/assets/v10/wave1/audio/voice/tsubame_aff1.ogg,voice,tsubame,FAIL,-16.32,-13.31,-3.15,-3.17,42.6,6.88,44100,1,-0.27,lufs -16.3 vs -14+-1; lead 43ms > 40
+game/assets/v10/wave1/audio/voice/tsubame_combo1.ogg,voice,tsubame,FAIL,-15.45,-12.44,-3.37,-3.38,0.0,6.48,44100,1,0.59,lufs -15.5 vs -14+-1
+game/assets/v10/wave1/audio/voice/tsubame_greet1.ogg,voice,tsubame,FAIL,-16.15,-13.14,-2.80,-2.80,0.0,9.36,44100,1,-0.10,lufs -16.2 vs -14+-1
+game/assets/v10/wave1/audio/voice/tsubame_outfit1.ogg,voice,tsubame,FAIL,-15.38,-12.37,-3.61,-3.61,31.2,7.60,44100,1,0.67,lufs -15.4 vs -14+-1
+game/assets/v10/wave1/audio/voice/tsubame_ssr1.ogg,voice,tsubame,FAIL,-15.94,-12.93,-3.10,-3.10,0.0,8.48,44100,1,0.10,lufs -15.9 vs -14+-1
+game/assets/v10/wave1/audio/voice/tsubame_win1.ogg,voice,tsubame,FAIL,-16.62,-13.61,-4.22,-4.22,0.0,5.44,44100,1,-0.57,lufs -16.6 vs -14+-1
+game/assets/v10/wave1/audio/voice/zlata_aff1.ogg,voice,zlata,FAIL,-16.73,-13.72,-1.38,-1.39,0.1,4.40,44100,1,-0.68,lufs -16.7 vs -14+-1
+game/assets/v10/wave1/audio/voice/zlata_combo1.ogg,voice,zlata,FAIL,-15.38,-12.37,-0.37,-0.38,0.0,3.68,44100,1,0.67,lufs -15.4 vs -14+-1; tp -0.4 > -1 dBTP
+game/assets/v10/wave1/audio/voice/zlata_greet1.ogg,voice,zlata,FAIL,-17.16,-14.15,-0.90,-0.90,43.7,7.04,44100,1,-1.10,lufs -17.2 vs -14+-1; lead 44ms > 40; tp -0.9 > -1 dBTP; spread -1.1 LU vs zlata median -16.1 (+-1)
+game/assets/v10/wave1/audio/voice/zlata_outfit1.ogg,voice,zlata,FAIL,-15.80,-12.79,-0.73,-0.73,0.0,5.44,44100,1,0.25,lufs -15.8 vs -14+-1; tp -0.7 > -1 dBTP
+game/assets/v10/wave1/audio/voice/zlata_ssr1.ogg,voice,zlata,FAIL,-15.80,-12.78,-0.57,-0.66,22.3,4.96,44100,1,0.26,lufs -15.8 vs -14+-1; tp -0.6 > -1 dBTP
+game/assets/v10/wave1/audio/voice/zlata_win1.ogg,voice,zlata,FAIL,-16.31,-13.30,-0.82,-0.82,0.0,4.96,44100,1,-0.25,lufs -16.3 vs -14+-1; tp -0.8 > -1 dBTP
+game/assets/voice/hana_aff1.mp3,voice,hana,FAIL,-14.51,-11.50,1.35,1.30,53.9,4.42,32000,1,0.48,lead 54ms > 40; tp 1.4 > -1 dBTP
+game/assets/voice/hana_combo1.mp3,voice,hana,FAIL,-16.37,-13.36,-1.99,-2.17,71.1,2.18,32000,1,-1.38,lufs -16.4 vs -14+-1; lead 71ms > 40; spread -1.4 LU vs hana median -15.0 (+-1)
+game/assets/voice/hana_combo2.mp3,voice,hana,FAIL,-16.40,-13.39,-2.32,-2.35,73.1,2.55,32000,1,-1.41,lufs -16.4 vs -14+-1; lead 73ms > 40; spread -1.4 LU vs hana median -15.0 (+-1)
+game/assets/voice/hana_fever1.mp3,voice,hana,FAIL,-15.35,-12.34,0.10,-0.03,29.4,3.40,32000,1,-0.36,lufs -15.3 vs -14+-1; tp 0.1 > -1 dBTP
+game/assets/voice/hana_gacha1.mp3,voice,hana,FAIL,-16.37,-13.36,-0.86,-0.91,39.2,2.17,32000,1,-1.38,lufs -16.4 vs -14+-1; tp -0.9 > -1 dBTP; spread -1.4 LU vs hana median -15.0 (+-1)
+game/assets/voice/hana_greet1.mp3,voice,hana,FAIL,-14.28,-11.27,0.98,0.98,61.6,3.69,32000,1,0.70,lead 62ms > 40; tp 1.0 > -1 dBTP
+game/assets/voice/hana_greet2.mp3,voice,hana,FAIL,-17.33,-14.32,1.12,0.96,68.8,2.95,32000,1,-2.34,lufs -17.3 vs -14+-1; lead 69ms > 40; tp 1.1 > -1 dBTP; spread -2.3 LU vs hana median -15.0 (+-1)
+game/assets/voice/hana_hint1.mp3,voice,hana,FAIL,-16.37,-13.36,-1.22,-1.38,60.0,1.88,32000,1,-1.39,lufs -16.4 vs -14+-1; lead 60ms > 40; spread -1.4 LU vs hana median -15.0 (+-1)
+game/assets/voice/hana_lose1.mp3,voice,hana,FAIL,-14.23,-11.22,1.56,1.33,71.0,4.04,32000,1,0.76,lead 71ms > 40; tp 1.6 > -1 dBTP
+game/assets/voice/hana_match1.mp3,voice,hana,FAIL,-16.36,-13.35,-1.62,-1.62,70.3,1.05,32000,1,-1.38,lufs -16.4 vs -14+-1; lead 70ms > 40; spread -1.4 LU vs hana median -15.0 (+-1)
+game/assets/voice/hana_match2.mp3,voice,hana,FAIL,-16.34,-13.33,-3.45,-3.45,72.0,0.67,32000,1,-1.36,lufs -16.3 vs -14+-1; lead 72ms > 40; spread -1.4 LU vs hana median -15.0 (+-1)
+game/assets/voice/hana_match3.mp3,voice,hana,FAIL,-16.34,-13.33,-2.93,-2.97,63.6,1.67,32000,1,-1.35,lufs -16.3 vs -14+-1; lead 64ms > 40; spread -1.4 LU vs hana median -15.0 (+-1)
+game/assets/voice/hana_outfit1.mp3,voice,hana,FAIL,-15.49,-12.48,-0.17,-0.23,34.9,4.43,32000,1,-0.50,lufs -15.5 vs -14+-1; tp -0.2 > -1 dBTP
+game/assets/voice/hana_ssr1.mp3,voice,hana,FAIL,-16.39,-13.38,-3.40,-3.46,74.0,2.99,32000,1,-1.40,lufs -16.4 vs -14+-1; lead 74ms > 40; spread -1.4 LU vs hana median -15.0 (+-1)
+game/assets/voice/hana_win1.mp3,voice,hana,FAIL,-16.38,-13.37,-1.28,-1.28,40.4,3.00,32000,1,-1.39,lufs -16.4 vs -14+-1; lead 40ms > 40; spread -1.4 LU vs hana median -15.0 (+-1)
+game/assets/voice/hana_win2.mp3,voice,hana,FAIL,-16.38,-13.37,-2.49,-2.51,49.6,2.33,32000,1,-1.39,lufs -16.4 vs -14+-1; lead 50ms > 40; spread -1.4 LU vs hana median -15.0 (+-1)
+game/assets/voice/mc_aff1.mp3,voice,mc,FAIL,-15.12,-12.11,-1.21,-1.27,65.5,3.49,32000,1,-0.72,lufs -15.1 vs -14+-1; lead 66ms > 40
+game/assets/voice/mc_combo1.mp3,voice,mc,FAIL,-16.40,-13.39,-4.34,-4.41,75.6,2.53,32000,1,-2.00,lufs -16.4 vs -14+-1; lead 76ms > 40; spread -2.0 LU vs mc median -14.4 (+-1)
+game/assets/voice/mc_combo2.mp3,voice,mc,FAIL,-16.39,-13.38,-4.61,-4.70,64.9,2.35,32000,1,-1.99,lufs -16.4 vs -14+-1; lead 65ms > 40; spread -2.0 LU vs mc median -14.4 (+-1)
+game/assets/voice/mc_fever1.mp3,voice,mc,FAIL,-16.37,-13.36,-3.23,-3.23,65.3,2.71,32000,1,-1.97,lufs -16.4 vs -14+-1; lead 65ms > 40; spread -2.0 LU vs mc median -14.4 (+-1)
+game/assets/voice/mc_gacha1.mp3,voice,mc,FAIL,-16.39,-13.38,-1.83,-1.97,77.4,2.78,32000,1,-1.99,lufs -16.4 vs -14+-1; lead 77ms > 40; spread -2.0 LU vs mc median -14.4 (+-1)
+game/assets/voice/mc_greet1.mp3,voice,mc,FAIL,-15.55,-12.54,-1.15,-1.22,72.6,6.19,32000,1,-1.15,lufs -15.6 vs -14+-1; lead 73ms > 40; spread -1.2 LU vs mc median -14.4 (+-1)
+game/assets/voice/mc_greet2.mp3,voice,mc,FAIL,-16.38,-13.37,-4.39,-4.39,74.3,2.75,32000,1,-1.98,lufs -16.4 vs -14+-1; lead 74ms > 40; spread -2.0 LU vs mc median -14.4 (+-1)
+game/assets/voice/mc_hint1.mp3,voice,mc,FAIL,-16.36,-13.35,-2.19,-2.24,73.0,2.20,32000,1,-1.96,lufs -16.4 vs -14+-1; lead 73ms > 40; spread -2.0 LU vs mc median -14.4 (+-1)
+game/assets/voice/mc_lose1.mp3,voice,mc,FAIL,-13.04,-10.03,1.14,1.11,16.1,4.68,32000,1,1.36,tp 1.1 > -1 dBTP; spread +1.4 LU vs mc median -14.4 (+-1)
+game/assets/voice/mc_match1.mp3,voice,mc,FAIL,-16.42,-13.41,-6.13,-6.38,73.6,1.24,32000,1,-2.02,lufs -16.4 vs -14+-1; lead 74ms > 40; spread -2.0 LU vs mc median -14.4 (+-1)
+game/assets/voice/mc_match2.mp3,voice,mc,FAIL,-16.40,-13.39,-6.91,-6.97,74.1,1.38,32000,1,-2.00,lufs -16.4 vs -14+-1; lead 74ms > 40; spread -2.0 LU vs mc median -14.4 (+-1)
+game/assets/voice/mc_match3.mp3,voice,mc,FAIL,-16.38,-13.37,-3.79,-3.88,64.7,1.42,32000,1,-1.98,lufs -16.4 vs -14+-1; lead 65ms > 40; spread -2.0 LU vs mc median -14.4 (+-1)
+game/assets/voice/mc_outfit1.mp3,voice,mc,FAIL,-16.39,-13.38,-0.23,-0.24,76.1,2.80,32000,1,-1.99,lufs -16.4 vs -14+-1; lead 76ms > 40; tp -0.2 > -1 dBTP; spread -2.0 LU vs mc median -14.4 (+-1)
+game/assets/voice/mc_ssr1.mp3,voice,mc,FAIL,-16.57,-13.56,-3.97,-4.00,76.1,2.84,32000,1,-2.17,lufs -16.6 vs -14+-1; lead 76ms > 40; spread -2.2 LU vs mc median -14.4 (+-1)
+game/assets/voice/mc_win1.mp3,voice,mc,FAIL,-15.26,-12.25,-3.16,-3.17,72.9,3.57,32000,1,-0.86,lufs -15.3 vs -14+-1; lead 73ms > 40
+game/assets/voice/mc_win2.mp3,voice,mc,FAIL,-16.37,-13.36,-1.53,-1.70,72.5,2.97,32000,1,-1.96,lufs -16.4 vs -14+-1; lead 72ms > 40; spread -2.0 LU vs mc median -14.4 (+-1)
+game/assets/voice/nova_aff1.mp3,voice,nova,FAIL,-15.74,-12.73,1.31,1.22,71.9,4.10,32000,1,-1.40,lufs -15.7 vs -14+-1; lead 72ms > 40; tp 1.3 > -1 dBTP; spread -1.4 LU vs nova median -14.3 (+-1)
+game/assets/voice/nova_combo1.mp3,voice,nova,FAIL,-16.39,-13.38,-2.16,-2.17,69.1,2.42,32000,1,-2.05,lufs -16.4 vs -14+-1; lead 69ms > 40; spread -2.1 LU vs nova median -14.3 (+-1)
+game/assets/voice/nova_combo2.mp3,voice,nova,FAIL,-14.20,-11.19,1.17,1.08,47.8,3.09,32000,1,0.14,lead 48ms > 40; tp 1.2 > -1 dBTP
+game/assets/voice/nova_fever1.mp3,voice,nova,FAIL,-16.35,-13.34,-1.08,-1.11,50.0,2.65,32000,1,-2.02,lufs -16.4 vs -14+-1; lead 50ms > 40; spread -2.0 LU vs nova median -14.3 (+-1)
+game/assets/voice/nova_gacha1.mp3,voice,nova,FAIL,-19.19,-16.18,1.06,1.05,68.7,2.62,32000,1,-4.86,lufs -19.2 vs -14+-1; lead 69ms > 40; tp 1.1 > -1 dBTP; spread -4.9 LU vs nova median -14.3 (+-1)
+game/assets/voice/nova_greet1.mp3,voice,nova,FAIL,-14.59,-11.58,1.16,1.14,63.9,4.41,32000,1,-0.25,lead 64ms > 40; tp 1.2 > -1 dBTP
+game/assets/voice/nova_greet2.mp3,voice,nova,FAIL,-14.24,-11.23,1.21,1.13,62.5,3.93,32000,1,0.09,lead 62ms > 40; tp 1.2 > -1 dBTP
+game/assets/voice/nova_hint1.mp3,voice,nova,FAIL,-17.93,-14.92,1.10,1.02,63.5,2.70,32000,1,-3.59,lufs -17.9 vs -14+-1; lead 63ms > 40; tp 1.1 > -1 dBTP; spread -3.6 LU vs nova median -14.3 (+-1)
+game/assets/voice/nova_lose1.mp3,voice,nova,FAIL,-16.23,-13.22,1.16,1.15,72.8,3.43,32000,1,-1.89,lufs -16.2 vs -14+-1; lead 73ms > 40; tp 1.2 > -1 dBTP; spread -1.9 LU vs nova median -14.3 (+-1)
+game/assets/voice/nova_match1.mp3,voice,nova,FAIL,-16.48,-13.46,-0.51,-0.51,34.6,0.47,32000,1,-2.14,lufs -16.5 vs -14+-1; tp -0.5 > -1 dBTP; spread -2.1 LU vs nova median -14.3 (+-1)
+game/assets/voice/nova_match2.mp3,voice,nova,FAIL,-16.39,-13.38,-2.24,-2.31,69.2,0.65,32000,1,-2.05,lufs -16.4 vs -14+-1; lead 69ms > 40; spread -2.1 LU vs nova median -14.3 (+-1)
+game/assets/voice/nova_match3.mp3,voice,nova,FAIL,-16.32,-13.31,-2.87,-2.87,65.5,0.56,32000,1,-1.98,lufs -16.3 vs -14+-1; lead 66ms > 40; spread -2.0 LU vs nova median -14.3 (+-1)
+game/assets/voice/nova_outfit1.mp3,voice,nova,FAIL,-16.14,-13.13,1.06,1.04,66.4,3.86,32000,1,-1.80,lufs -16.1 vs -14+-1; lead 66ms > 40; tp 1.1 > -1 dBTP; spread -1.8 LU vs nova median -14.3 (+-1)
+game/assets/voice/nova_ssr1.mp3,voice,nova,FAIL,-14.34,-11.33,1.10,1.09,26.2,3.21,32000,1,0.00,tp 1.1 > -1 dBTP
+game/assets/voice/nova_win1.mp3,voice,nova,FAIL,-14.25,-11.24,0.40,0.37,64.1,3.07,32000,1,0.09,lead 64ms > 40; tp 0.4 > -1 dBTP
+game/assets/voice/nova_win2.mp3,voice,nova,FAIL,-15.60,-12.59,1.14,1.07,39.9,3.83,32000,1,-1.26,lufs -15.6 vs -14+-1; tp 1.1 > -1 dBTP; spread -1.3 LU vs nova median -14.3 (+-1)
+game/assets/voice/rin_aff1.mp3,voice,rin,FAIL,-15.28,-12.27,0.93,0.86,70.6,3.40,32000,1,-0.91,lufs -15.3 vs -14+-1; lead 71ms > 40; tp 0.9 > -1 dBTP
+game/assets/voice/rin_combo1.mp3,voice,rin,FAIL,-16.41,-13.40,-4.14,-4.18,69.8,2.50,32000,1,-2.03,lufs -16.4 vs -14+-1; lead 70ms > 40; spread -2.0 LU vs rin median -14.4 (+-1)
+game/assets/voice/rin_combo2.mp3,voice,rin,FAIL,-16.36,-13.35,-0.32,-0.32,40.6,2.55,32000,1,-1.98,lufs -16.4 vs -14+-1; lead 41ms > 40; tp -0.3 > -1 dBTP; spread -2.0 LU vs rin median -14.4 (+-1)
+game/assets/voice/rin_fever1.mp3,voice,rin,FAIL,-12.85,-9.84,1.13,1.13,74.3,3.96,32000,1,1.52,lufs -12.9 vs -14+-1; lead 74ms > 40; tp 1.1 > -1 dBTP; spread +1.5 LU vs rin median -14.4 (+-1)
+game/assets/voice/rin_gacha1.mp3,voice,rin,FAIL,-15.45,-12.44,-0.34,-0.36,43.4,3.38,32000,1,-1.08,lufs -15.5 vs -14+-1; lead 43ms > 40; tp -0.3 > -1 dBTP; spread -1.1 LU vs rin median -14.4 (+-1)
+game/assets/voice/rin_greet1.mp3,voice,rin,FAIL,-13.10,-10.09,1.12,1.11,69.2,4.67,32000,1,1.28,lead 69ms > 40; tp 1.1 > -1 dBTP; spread +1.3 LU vs rin median -14.4 (+-1)
+game/assets/voice/rin_greet2.mp3,voice,rin,FAIL,-15.87,-12.86,1.16,1.16,71.7,3.53,32000,1,-1.49,lufs -15.9 vs -14+-1; lead 72ms > 40; tp 1.2 > -1 dBTP; spread -1.5 LU vs rin median -14.4 (+-1)
+game/assets/voice/rin_hint1.mp3,voice,rin,FAIL,-16.39,-13.38,0.22,0.22,71.9,2.62,32000,1,-2.01,lufs -16.4 vs -14+-1; lead 72ms > 40; tp 0.2 > -1 dBTP; spread -2.0 LU vs rin median -14.4 (+-1)
+game/assets/voice/rin_lose1.mp3,voice,rin,FAIL,-15.23,-12.22,0.07,-0.00,72.1,3.77,32000,1,-0.85,lufs -15.2 vs -14+-1; lead 72ms > 40; tp 0.1 > -1 dBTP
+game/assets/voice/rin_match1.mp3,voice,rin,FAIL,-16.42,-13.41,-6.75,-6.75,73.9,0.70,32000,1,-2.04,lufs -16.4 vs -14+-1; lead 74ms > 40; spread -2.0 LU vs rin median -14.4 (+-1)
+game/assets/voice/rin_match2.mp3,voice,rin,FAIL,-16.40,-13.39,-5.80,-5.86,73.7,1.42,32000,1,-2.02,lufs -16.4 vs -14+-1; lead 74ms > 40; spread -2.0 LU vs rin median -14.4 (+-1)
+game/assets/voice/rin_match3.mp3,voice,rin,FAIL,-16.38,-13.37,-2.87,-2.93,69.0,1.51,32000,1,-2.00,lufs -16.4 vs -14+-1; lead 69ms > 40; spread -2.0 LU vs rin median -14.4 (+-1)
+game/assets/voice/rin_outfit1.mp3,voice,rin,FAIL,-15.09,-12.08,1.03,1.00,72.8,5.07,32000,1,-0.71,lufs -15.1 vs -14+-1; lead 73ms > 40; tp 1.0 > -1 dBTP
+game/assets/voice/rin_ssr1.mp3,voice,rin,FAIL,-14.87,-11.86,1.27,0.67,68.1,4.99,32000,1,-0.49,lead 68ms > 40; tp 1.3 > -1 dBTP
+game/assets/voice/rin_win1.mp3,voice,rin,FAIL,-13.40,-10.39,0.55,0.55,25.5,4.11,32000,1,0.98,tp 0.5 > -1 dBTP
+game/assets/voice/rin_win2.mp3,voice,rin,FAIL,-14.84,-11.83,-1.61,-1.66,57.0,3.29,32000,1,-0.46,lead 57ms > 40
+game/assets/voice/yue_aff1.mp3,voice,yue,FAIL,-13.58,-10.57,-1.03,-1.04,61.0,4.02,32000,1,0.50,lead 61ms > 40
+game/assets/voice/yue_combo1.mp3,voice,yue,FAIL,-14.39,-11.38,0.77,0.68,61.9,4.77,32000,1,-0.31,lead 62ms > 40; tp 0.8 > -1 dBTP
+game/assets/voice/yue_combo2.mp3,voice,yue,FAIL,-16.38,-13.37,-3.67,-3.67,75.3,2.61,32000,1,-2.30,lufs -16.4 vs -14+-1; lead 75ms > 40; spread -2.3 LU vs yue median -14.1 (+-1)
+game/assets/voice/yue_fever1.mp3,voice,yue,FAIL,-16.06,-13.05,-3.40,-3.58,75.9,3.57,32000,1,-1.98,lufs -16.1 vs -14+-1; lead 76ms > 40; spread -2.0 LU vs yue median -14.1 (+-1)
+game/assets/voice/yue_gacha1.mp3,voice,yue,FAIL,-15.07,-12.06,-4.25,-4.27,56.6,3.34,32000,1,-0.99,lufs -15.1 vs -14+-1; lead 57ms > 40
+game/assets/voice/yue_greet1.mp3,voice,yue,FAIL,-15.11,-12.10,-2.56,-2.61,64.2,4.58,32000,1,-1.03,lufs -15.1 vs -14+-1; lead 64ms > 40; spread -1.0 LU vs yue median -14.1 (+-1)
+game/assets/voice/yue_greet2.mp3,voice,yue,FAIL,-15.75,-12.74,-3.88,-3.88,66.6,3.22,32000,1,-1.67,lufs -15.8 vs -14+-1; lead 67ms > 40; spread -1.7 LU vs yue median -14.1 (+-1)
+game/assets/voice/yue_hint1.mp3,voice,yue,FAIL,-16.39,-13.38,-6.67,-6.68,68.7,1.13,32000,1,-2.31,lufs -16.4 vs -14+-1; lead 69ms > 40; spread -2.3 LU vs yue median -14.1 (+-1)
+game/assets/voice/yue_lose1.mp3,voice,yue,FAIL,-13.55,-10.54,-0.77,-0.79,57.0,3.83,32000,1,0.53,lead 57ms > 40; tp -0.8 > -1 dBTP
+game/assets/voice/yue_match1.mp3,voice,yue,FAIL,-16.42,-13.41,-2.84,-2.91,74.2,1.05,32000,1,-2.34,lufs -16.4 vs -14+-1; lead 74ms > 40; spread -2.3 LU vs yue median -14.1 (+-1)
+game/assets/voice/yue_match2.mp3,voice,yue,FAIL,-16.35,-13.34,-3.50,-3.55,73.1,1.29,32000,1,-2.27,lufs -16.4 vs -14+-1; lead 73ms > 40; spread -2.3 LU vs yue median -14.1 (+-1)
+game/assets/voice/yue_match3.mp3,voice,yue,FAIL,-16.41,-13.40,-4.21,-4.21,67.0,2.36,32000,1,-2.32,lufs -16.4 vs -14+-1; lead 67ms > 40; spread -2.3 LU vs yue median -14.1 (+-1)
+game/assets/voice/yue_outfit1.mp3,voice,yue,FAIL,-15.15,-12.14,-4.60,-4.62,73.2,3.94,32000,1,-1.07,lufs -15.2 vs -14+-1; lead 73ms > 40; spread -1.1 LU vs yue median -14.1 (+-1)
+game/assets/voice/yue_ssr1.mp3,voice,yue,FAIL,-11.18,-8.17,1.20,1.13,66.9,5.68,32000,1,2.90,lufs -11.2 vs -14+-1; lead 67ms > 40; tp 1.2 > -1 dBTP; spread +2.9 LU vs yue median -14.1 (+-1)
+game/assets/voice/yue_win1.mp3,voice,yue,FAIL,-14.46,-11.45,-2.92,-2.92,64.1,4.34,32000,1,-0.38,lead 64ms > 40
+game/assets/voice/yue_win2.mp3,voice,yue,FAIL,-15.89,-12.88,-2.55,-2.56,76.5,3.47,32000,1,-1.81,lufs -15.9 vs -14+-1; lead 76ms > 40; spread -1.8 LU vs yue median -14.1 (+-1)
+audio/hana_aff1.mp3,voice,hana,FAIL,-14.51,-11.50,1.35,1.30,53.9,4.42,32000,1,0.48,lead 54ms > 40; tp 1.4 > -1 dBTP
+audio/hana_combo1.mp3,voice,hana,FAIL,-16.37,-13.36,-1.99,-2.17,71.1,2.18,32000,1,-1.38,lufs -16.4 vs -14+-1; lead 71ms > 40; spread -1.4 LU vs hana median -15.0 (+-1)
+audio/hana_combo2.mp3,voice,hana,FAIL,-16.40,-13.39,-2.32,-2.35,73.1,2.55,32000,1,-1.41,lufs -16.4 vs -14+-1; lead 73ms > 40; spread -1.4 LU vs hana median -15.0 (+-1)
+audio/hana_fever1.mp3,voice,hana,FAIL,-15.35,-12.34,0.10,-0.03,29.4,3.40,32000,1,-0.36,lufs -15.3 vs -14+-1; tp 0.1 > -1 dBTP
+audio/hana_gacha1.mp3,voice,hana,FAIL,-16.37,-13.36,-0.86,-0.91,39.2,2.17,32000,1,-1.38,lufs -16.4 vs -14+-1; tp -0.9 > -1 dBTP; spread -1.4 LU vs hana median -15.0 (+-1)
+audio/hana_greet1.mp3,voice,hana,FAIL,-14.28,-11.27,0.98,0.98,61.6,3.69,32000,1,0.70,lead 62ms > 40; tp 1.0 > -1 dBTP
+audio/hana_greet2.mp3,voice,hana,FAIL,-17.33,-14.32,1.12,0.96,68.8,2.95,32000,1,-2.34,lufs -17.3 vs -14+-1; lead 69ms > 40; tp 1.1 > -1 dBTP; spread -2.3 LU vs hana median -15.0 (+-1)
+audio/hana_hint1.mp3,voice,hana,FAIL,-16.37,-13.36,-1.22,-1.38,60.0,1.88,32000,1,-1.39,lufs -16.4 vs -14+-1; lead 60ms > 40; spread -1.4 LU vs hana median -15.0 (+-1)
+audio/hana_lose1.mp3,voice,hana,FAIL,-14.23,-11.22,1.56,1.33,71.0,4.04,32000,1,0.76,lead 71ms > 40; tp 1.6 > -1 dBTP
+audio/hana_match1.mp3,voice,hana,FAIL,-16.36,-13.35,-1.62,-1.62,70.3,1.05,32000,1,-1.38,lufs -16.4 vs -14+-1; lead 70ms > 40; spread -1.4 LU vs hana median -15.0 (+-1)
+audio/hana_match2.mp3,voice,hana,FAIL,-16.34,-13.33,-3.45,-3.45,72.0,0.67,32000,1,-1.36,lufs -16.3 vs -14+-1; lead 72ms > 40; spread -1.4 LU vs hana median -15.0 (+-1)
+audio/hana_match3.mp3,voice,hana,FAIL,-16.34,-13.33,-2.93,-2.97,63.6,1.67,32000,1,-1.35,lufs -16.3 vs -14+-1; lead 64ms > 40; spread -1.4 LU vs hana median -15.0 (+-1)
+audio/hana_outfit1.mp3,voice,hana,FAIL,-15.49,-12.48,-0.17,-0.23,34.9,4.43,32000,1,-0.50,lufs -15.5 vs -14+-1; tp -0.2 > -1 dBTP
+audio/hana_ssr1.mp3,voice,hana,FAIL,-16.39,-13.38,-3.40,-3.46,74.0,2.99,32000,1,-1.40,lufs -16.4 vs -14+-1; lead 74ms > 40; spread -1.4 LU vs hana median -15.0 (+-1)
+audio/hana_win1.mp3,voice,hana,FAIL,-16.38,-13.37,-1.28,-1.28,40.4,3.00,32000,1,-1.39,lufs -16.4 vs -14+-1; lead 40ms > 40; spread -1.4 LU vs hana median -15.0 (+-1)
+audio/hana_win2.mp3,voice,hana,FAIL,-16.38,-13.37,-2.49,-2.51,49.6,2.33,32000,1,-1.39,lufs -16.4 vs -14+-1; lead 50ms > 40; spread -1.4 LU vs hana median -15.0 (+-1)
+audio/mc_aff1.mp3,voice,mc,FAIL,-15.12,-12.11,-1.21,-1.27,65.5,3.49,32000,1,-0.72,lufs -15.1 vs -14+-1; lead 66ms > 40
+audio/mc_combo1.mp3,voice,mc,FAIL,-16.40,-13.39,-4.34,-4.41,75.6,2.53,32000,1,-2.00,lufs -16.4 vs -14+-1; lead 76ms > 40; spread -2.0 LU vs mc median -14.4 (+-1)
+audio/mc_combo2.mp3,voice,mc,FAIL,-16.39,-13.38,-4.61,-4.70,64.9,2.35,32000,1,-1.99,lufs -16.4 vs -14+-1; lead 65ms > 40; spread -2.0 LU vs mc median -14.4 (+-1)
+audio/mc_fever1.mp3,voice,mc,FAIL,-16.37,-13.36,-3.23,-3.23,65.3,2.71,32000,1,-1.97,lufs -16.4 vs -14+-1; lead 65ms > 40; spread -2.0 LU vs mc median -14.4 (+-1)
+audio/mc_gacha1.mp3,voice,mc,FAIL,-16.39,-13.38,-1.83,-1.97,77.4,2.78,32000,1,-1.99,lufs -16.4 vs -14+-1; lead 77ms > 40; spread -2.0 LU vs mc median -14.4 (+-1)
+audio/mc_greet1.mp3,voice,mc,FAIL,-15.55,-12.54,-1.15,-1.22,72.6,6.19,32000,1,-1.15,lufs -15.6 vs -14+-1; lead 73ms > 40; spread -1.2 LU vs mc median -14.4 (+-1)
+audio/mc_greet2.mp3,voice,mc,FAIL,-16.38,-13.37,-4.39,-4.39,74.3,2.75,32000,1,-1.98,lufs -16.4 vs -14+-1; lead 74ms > 40; spread -2.0 LU vs mc median -14.4 (+-1)
+audio/mc_hint1.mp3,voice,mc,FAIL,-16.36,-13.35,-2.19,-2.24,73.0,2.20,32000,1,-1.96,lufs -16.4 vs -14+-1; lead 73ms > 40; spread -2.0 LU vs mc median -14.4 (+-1)
+audio/mc_lose1.mp3,voice,mc,FAIL,-13.04,-10.03,1.14,1.11,16.1,4.68,32000,1,1.36,tp 1.1 > -1 dBTP; spread +1.4 LU vs mc median -14.4 (+-1)
+audio/mc_match1.mp3,voice,mc,FAIL,-16.42,-13.41,-6.13,-6.38,73.6,1.24,32000,1,-2.02,lufs -16.4 vs -14+-1; lead 74ms > 40; spread -2.0 LU vs mc median -14.4 (+-1)
+audio/mc_match2.mp3,voice,mc,FAIL,-16.40,-13.39,-6.91,-6.97,74.1,1.38,32000,1,-2.00,lufs -16.4 vs -14+-1; lead 74ms > 40; spread -2.0 LU vs mc median -14.4 (+-1)
+audio/mc_match3.mp3,voice,mc,FAIL,-16.38,-13.37,-3.79,-3.88,64.7,1.42,32000,1,-1.98,lufs -16.4 vs -14+-1; lead 65ms > 40; spread -2.0 LU vs mc median -14.4 (+-1)
+audio/mc_outfit1.mp3,voice,mc,FAIL,-16.39,-13.38,-0.23,-0.24,76.1,2.80,32000,1,-1.99,lufs -16.4 vs -14+-1; lead 76ms > 40; tp -0.2 > -1 dBTP; spread -2.0 LU vs mc median -14.4 (+-1)
+audio/mc_ssr1.mp3,voice,mc,FAIL,-16.57,-13.56,-3.97,-4.00,76.1,2.84,32000,1,-2.17,lufs -16.6 vs -14+-1; lead 76ms > 40; spread -2.2 LU vs mc median -14.4 (+-1)
+audio/mc_win1.mp3,voice,mc,FAIL,-15.26,-12.25,-3.16,-3.17,72.9,3.57,32000,1,-0.86,lufs -15.3 vs -14+-1; lead 73ms > 40
+audio/mc_win2.mp3,voice,mc,FAIL,-16.37,-13.36,-1.53,-1.70,72.5,2.97,32000,1,-1.96,lufs -16.4 vs -14+-1; lead 72ms > 40; spread -2.0 LU vs mc median -14.4 (+-1)
+audio/nova_aff1.mp3,voice,nova,FAIL,-15.74,-12.73,1.31,1.22,71.9,4.10,32000,1,-1.40,lufs -15.7 vs -14+-1; lead 72ms > 40; tp 1.3 > -1 dBTP; spread -1.4 LU vs nova median -14.3 (+-1)
+audio/nova_combo1.mp3,voice,nova,FAIL,-16.39,-13.38,-2.16,-2.17,69.1,2.42,32000,1,-2.05,lufs -16.4 vs -14+-1; lead 69ms > 40; spread -2.1 LU vs nova median -14.3 (+-1)
+audio/nova_combo2.mp3,voice,nova,FAIL,-14.20,-11.19,1.17,1.08,47.8,3.09,32000,1,0.14,lead 48ms > 40; tp 1.2 > -1 dBTP
+audio/nova_fever1.mp3,voice,nova,FAIL,-16.35,-13.34,-1.08,-1.11,50.0,2.65,32000,1,-2.02,lufs -16.4 vs -14+-1; lead 50ms > 40; spread -2.0 LU vs nova median -14.3 (+-1)
+audio/nova_gacha1.mp3,voice,nova,FAIL,-19.19,-16.18,1.06,1.05,68.7,2.62,32000,1,-4.86,lufs -19.2 vs -14+-1; lead 69ms > 40; tp 1.1 > -1 dBTP; spread -4.9 LU vs nova median -14.3 (+-1)
+audio/nova_greet1.mp3,voice,nova,FAIL,-14.59,-11.58,1.16,1.14,63.9,4.41,32000,1,-0.25,lead 64ms > 40; tp 1.2 > -1 dBTP
+audio/nova_greet2.mp3,voice,nova,FAIL,-14.24,-11.23,1.21,1.13,62.5,3.93,32000,1,0.09,lead 62ms > 40; tp 1.2 > -1 dBTP
+audio/nova_hint1.mp3,voice,nova,FAIL,-17.93,-14.92,1.10,1.02,63.5,2.70,32000,1,-3.59,lufs -17.9 vs -14+-1; lead 63ms > 40; tp 1.1 > -1 dBTP; spread -3.6 LU vs nova median -14.3 (+-1)
+audio/nova_lose1.mp3,voice,nova,FAIL,-16.23,-13.22,1.16,1.15,72.8,3.43,32000,1,-1.89,lufs -16.2 vs -14+-1; lead 73ms > 40; tp 1.2 > -1 dBTP; spread -1.9 LU vs nova median -14.3 (+-1)
+audio/nova_match1.mp3,voice,nova,FAIL,-16.48,-13.46,-0.51,-0.51,34.6,0.47,32000,1,-2.14,lufs -16.5 vs -14+-1; tp -0.5 > -1 dBTP; spread -2.1 LU vs nova median -14.3 (+-1)
+audio/nova_match2.mp3,voice,nova,FAIL,-16.39,-13.38,-2.24,-2.31,69.2,0.65,32000,1,-2.05,lufs -16.4 vs -14+-1; lead 69ms > 40; spread -2.1 LU vs nova median -14.3 (+-1)
+audio/nova_match3.mp3,voice,nova,FAIL,-16.32,-13.31,-2.87,-2.87,65.5,0.56,32000,1,-1.98,lufs -16.3 vs -14+-1; lead 66ms > 40; spread -2.0 LU vs nova median -14.3 (+-1)
+audio/nova_outfit1.mp3,voice,nova,FAIL,-16.14,-13.13,1.06,1.04,66.4,3.86,32000,1,-1.80,lufs -16.1 vs -14+-1; lead 66ms > 40; tp 1.1 > -1 dBTP; spread -1.8 LU vs nova median -14.3 (+-1)
+audio/nova_ssr1.mp3,voice,nova,FAIL,-14.34,-11.33,1.10,1.09,26.2,3.21,32000,1,0.00,tp 1.1 > -1 dBTP
+audio/nova_win1.mp3,voice,nova,FAIL,-14.25,-11.24,0.40,0.37,64.1,3.07,32000,1,0.09,lead 64ms > 40; tp 0.4 > -1 dBTP
+audio/nova_win2.mp3,voice,nova,FAIL,-15.60,-12.59,1.14,1.07,39.9,3.83,32000,1,-1.26,lufs -15.6 vs -14+-1; tp 1.1 > -1 dBTP; spread -1.3 LU vs nova median -14.3 (+-1)
+audio/rin_aff1.mp3,voice,rin,FAIL,-15.28,-12.27,0.93,0.86,70.6,3.40,32000,1,-0.91,lufs -15.3 vs -14+-1; lead 71ms > 40; tp 0.9 > -1 dBTP
+audio/rin_combo1.mp3,voice,rin,FAIL,-16.41,-13.40,-4.14,-4.18,69.8,2.50,32000,1,-2.03,lufs -16.4 vs -14+-1; lead 70ms > 40; spread -2.0 LU vs rin median -14.4 (+-1)
+audio/rin_combo2.mp3,voice,rin,FAIL,-16.36,-13.35,-0.32,-0.32,40.6,2.55,32000,1,-1.98,lufs -16.4 vs -14+-1; lead 41ms > 40; tp -0.3 > -1 dBTP; spread -2.0 LU vs rin median -14.4 (+-1)
+audio/rin_fever1.mp3,voice,rin,FAIL,-12.85,-9.84,1.13,1.13,74.3,3.96,32000,1,1.52,lufs -12.9 vs -14+-1; lead 74ms > 40; tp 1.1 > -1 dBTP; spread +1.5 LU vs rin median -14.4 (+-1)
+audio/rin_gacha1.mp3,voice,rin,FAIL,-15.45,-12.44,-0.34,-0.36,43.4,3.38,32000,1,-1.08,lufs -15.5 vs -14+-1; lead 43ms > 40; tp -0.3 > -1 dBTP; spread -1.1 LU vs rin median -14.4 (+-1)
+audio/rin_greet1.mp3,voice,rin,FAIL,-13.10,-10.09,1.12,1.11,69.2,4.67,32000,1,1.28,lead 69ms > 40; tp 1.1 > -1 dBTP; spread +1.3 LU vs rin median -14.4 (+-1)
+audio/rin_greet2.mp3,voice,rin,FAIL,-15.87,-12.86,1.16,1.16,71.7,3.53,32000,1,-1.49,lufs -15.9 vs -14+-1; lead 72ms > 40; tp 1.2 > -1 dBTP; spread -1.5 LU vs rin median -14.4 (+-1)
+audio/rin_hint1.mp3,voice,rin,FAIL,-16.39,-13.38,0.22,0.22,71.9,2.62,32000,1,-2.01,lufs -16.4 vs -14+-1; lead 72ms > 40; tp 0.2 > -1 dBTP; spread -2.0 LU vs rin median -14.4 (+-1)
+audio/rin_lose1.mp3,voice,rin,FAIL,-15.23,-12.22,0.07,-0.00,72.1,3.77,32000,1,-0.85,lufs -15.2 vs -14+-1; lead 72ms > 40; tp 0.1 > -1 dBTP
+audio/rin_match1.mp3,voice,rin,FAIL,-16.42,-13.41,-6.75,-6.75,73.9,0.70,32000,1,-2.04,lufs -16.4 vs -14+-1; lead 74ms > 40; spread -2.0 LU vs rin median -14.4 (+-1)
+audio/rin_match2.mp3,voice,rin,FAIL,-16.40,-13.39,-5.80,-5.86,73.7,1.42,32000,1,-2.02,lufs -16.4 vs -14+-1; lead 74ms > 40; spread -2.0 LU vs rin median -14.4 (+-1)
+audio/rin_match3.mp3,voice,rin,FAIL,-16.38,-13.37,-2.87,-2.93,69.0,1.51,32000,1,-2.00,lufs -16.4 vs -14+-1; lead 69ms > 40; spread -2.0 LU vs rin median -14.4 (+-1)
+audio/rin_outfit1.mp3,voice,rin,FAIL,-15.09,-12.08,1.03,1.00,72.8,5.07,32000,1,-0.71,lufs -15.1 vs -14+-1; lead 73ms > 40; tp 1.0 > -1 dBTP
+audio/rin_ssr1.mp3,voice,rin,FAIL,-14.87,-11.86,1.27,0.67,68.1,4.99,32000,1,-0.49,lead 68ms > 40; tp 1.3 > -1 dBTP
+audio/rin_win1.mp3,voice,rin,FAIL,-13.40,-10.39,0.55,0.55,25.5,4.11,32000,1,0.98,tp 0.5 > -1 dBTP
+audio/rin_win2.mp3,voice,rin,FAIL,-14.84,-11.83,-1.61,-1.66,57.0,3.29,32000,1,-0.46,lead 57ms > 40
+audio/yue_aff1.mp3,voice,yue,FAIL,-13.58,-10.57,-1.03,-1.04,61.0,4.02,32000,1,0.50,lead 61ms > 40
+audio/yue_combo1.mp3,voice,yue,FAIL,-14.39,-11.38,0.77,0.68,61.9,4.77,32000,1,-0.31,lead 62ms > 40; tp 0.8 > -1 dBTP
+audio/yue_combo2.mp3,voice,yue,FAIL,-16.38,-13.37,-3.67,-3.67,75.3,2.61,32000,1,-2.30,lufs -16.4 vs -14+-1; lead 75ms > 40; spread -2.3 LU vs yue median -14.1 (+-1)
+audio/yue_fever1.mp3,voice,yue,FAIL,-16.06,-13.05,-3.40,-3.58,75.9,3.57,32000,1,-1.98,lufs -16.1 vs -14+-1; lead 76ms > 40; spread -2.0 LU vs yue median -14.1 (+-1)
+audio/yue_gacha1.mp3,voice,yue,FAIL,-15.07,-12.06,-4.25,-4.27,56.6,3.34,32000,1,-0.99,lufs -15.1 vs -14+-1; lead 57ms > 40
+audio/yue_greet1.mp3,voice,yue,FAIL,-15.11,-12.10,-2.56,-2.61,64.2,4.58,32000,1,-1.03,lufs -15.1 vs -14+-1; lead 64ms > 40; spread -1.0 LU vs yue median -14.1 (+-1)
+audio/yue_greet2.mp3,voice,yue,FAIL,-15.75,-12.74,-3.88,-3.88,66.6,3.22,32000,1,-1.67,lufs -15.8 vs -14+-1; lead 67ms > 40; spread -1.7 LU vs yue median -14.1 (+-1)
+audio/yue_hint1.mp3,voice,yue,FAIL,-16.39,-13.38,-6.67,-6.68,68.7,1.13,32000,1,-2.31,lufs -16.4 vs -14+-1; lead 69ms > 40; spread -2.3 LU vs yue median -14.1 (+-1)
+audio/yue_lose1.mp3,voice,yue,FAIL,-13.55,-10.54,-0.77,-0.79,57.0,3.83,32000,1,0.53,lead 57ms > 40; tp -0.8 > -1 dBTP
+audio/yue_match1.mp3,voice,yue,FAIL,-16.42,-13.41,-2.84,-2.91,74.2,1.05,32000,1,-2.34,lufs -16.4 vs -14+-1; lead 74ms > 40; spread -2.3 LU vs yue median -14.1 (+-1)
+audio/yue_match2.mp3,voice,yue,FAIL,-16.35,-13.34,-3.50,-3.55,73.1,1.29,32000,1,-2.27,lufs -16.4 vs -14+-1; lead 73ms > 40; spread -2.3 LU vs yue median -14.1 (+-1)
+audio/yue_match3.mp3,voice,yue,FAIL,-16.41,-13.40,-4.21,-4.21,67.0,2.36,32000,1,-2.32,lufs -16.4 vs -14+-1; lead 67ms > 40; spread -2.3 LU vs yue median -14.1 (+-1)
+audio/yue_outfit1.mp3,voice,yue,FAIL,-15.15,-12.14,-4.60,-4.62,73.2,3.94,32000,1,-1.07,lufs -15.2 vs -14+-1; lead 73ms > 40; spread -1.1 LU vs yue median -14.1 (+-1)
+audio/yue_ssr1.mp3,voice,yue,FAIL,-11.18,-8.17,1.20,1.13,66.9,5.68,32000,1,2.90,lufs -11.2 vs -14+-1; lead 67ms > 40; tp 1.2 > -1 dBTP; spread +2.9 LU vs yue median -14.1 (+-1)
+audio/yue_win1.mp3,voice,yue,FAIL,-14.46,-11.45,-2.92,-2.92,64.1,4.34,32000,1,-0.38,lead 64ms > 40
+audio/yue_win2.mp3,voice,yue,FAIL,-15.89,-12.88,-2.55,-2.56,76.5,3.47,32000,1,-1.81,lufs -15.9 vs -14+-1; lead 76ms > 40; spread -1.8 LU vs yue median -14.1 (+-1)
