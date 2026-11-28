@@ -123,6 +123,10 @@ CATALOG: list[Suite] = [
     S("skin_soak", "TWSKINSOAK_SELFTEST", "res://tests/skin_swap_soak/skin_swap_soak.tscn", group="core", timeout=300,
       note="QA plan T-SOAK-1: 61 synthetic+real skin manifests, 300 swaps through TWSkinHostStub -> TWSkin.apply -> tw_skinned group -> TWBus: no leak of the previous skin, "
            "locked tokens untouched, atomic rejection of bad manifests (hex / locked / unknown / wrong level), replay hash, no object/memory growth; pending items printed as PENDING"),
+    S("core_audit", "CORE_AUDIT_SELFTEST", "res://tests/core_audit/core_audit_selftest.tscn", group="core", timeout=300,
+      note="G1 Brief A: regression + property/fuzz suite for clock/save/migrate/board/nav/modal/bus/assets fixes"),
+    S("twult", "TWULT_SELFTEST", "res://tests/ult/ult_selftest.tscn", group="core",
+      note="P87: TWUltRegistry (58-id catalogue + legacy sources), TWUltPolicy, ult_seen modular save"),
     S("ults", "ULTS", args=["--ults_selftest=1"], group="core"),
     S("letters", "LETTERS", args=["--letters_selftest=1"], group="core"),
     # ---- v10 registry modules (docs/INTEGRATION_0.10.md; ids == V10RegistryList ids) -----------------
