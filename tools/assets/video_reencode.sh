@@ -4,18 +4,20 @@
 # Only clips whose average bitrate is above THRESH_K (default 1500) are touched; the small ~0.5 MB ult clips stay.
 # Idempotent: re-encoded clips carry TWSLIM=1 and are skipped. A re-encode that is not at least 10% smaller than
 # the original, or whose SSIM against the original is below MIN_SSIM (default 0.90), is discarded; the script then
-# tries the next rung of the bitrate ladder (default 1000 -> 1500 -> 2000 -> 2500 kbps).
+# tries the next rung of the bitrate ladder (default 1000 -> 1500 -> 2000 -> 2500 -> 3000 kbps). P03 visual QA showed that the clip-average
+# SSIM hides blocking in the worst frames (zlata/shirin/tsubame @1000k: clip 0.90 but worst frame 0.84-0.88, macroblocks visible),
+# so a rung must ALSO keep the worst single frame at SSIM >= MIN_FRAME_SSIM (default 0.92, --min-frame-ssim).
 #
-# usage: video_reencode.sh [--dry-run|--apply] [--bitrate-k 1000] [--ladder 1000,1500,2000,2500] [--thresh-k 1100] [--root game/assets] [--report out.tsv]
+# usage: video_reencode.sh [--dry-run|--apply] [--bitrate-k 1000] [--ladder 1000,1500,2000,2500,3000] [--min-frame-ssim 0.92] [--thresh-k 1100] [--root game/assets] [--report out.tsv]
 set -euo pipefail
-MODE=dry; BR=1000; LADDER=""; THRESH=1500; MIN_SSIM=0.90; REPORT=""
+MODE=dry; BR=1000; LADDER=""; THRESH=1500; MIN_SSIM=0.90; MIN_FRAME_SSIM=0.92; REPORT=""
 HERE=$(cd "$(dirname "$0")" && pwd); ROOT="$HERE/../../game/assets"
 while [[ $# -gt 0 ]]; do case $1 in
   --dry-run) MODE=dry;; --apply) MODE=apply;;
-  --bitrate-k) BR=$2; shift;; --ladder) LADDER=${2//,/ }; shift;; --thresh-k) THRESH=$2; shift;;
+  --bitrate-k) BR=$2; shift;; --ladder) LADDER=${2//,/ }; shift;; --thresh-k) THRESH=$2; shift;; --min-frame-ssim) MIN_FRAME_SSIM=$2; shift;;
   --root) ROOT=$2; shift;; --report) REPORT=$2; shift;;
   *) echo "unknown arg $1" >&2; exit 2;; esac; shift; done
-[[ -z "$LADDER" ]] && LADDER="$BR 1500 2000 2500"
+[[ -z "$LADDER" ]] && LADDER="$BR 1500 2000 2500 3000"
 enc=$(ffmpeg -hide_banner -encoders 2>/dev/null || true); [[ "$enc" == *libtheora* ]] || { echo "ffmpeg with libtheora required" >&2; exit 1; }
 
 tb=0; ta=0
@@ -38,10 +40,12 @@ while IFS= read -r -d '' f; do
       tmp=$(mktemp --suffix=.ogv)
       ffmpeg -nostdin -v error -y -i "$f" -map 0:v:0 -c:v libtheora -b:v ${rung}k -g 24 -pix_fmt yuv420p -an -metadata TWSLIM=1 "$tmp"
       a2=$(stat -c %s "$tmp")
-      ssim=$(ffmpeg -nostdin -v info -i "$tmp" -i "$f" -lavfi "[0:v][1:v]ssim" -f null - 2>&1 | grep -o 'All:[0-9.]*' | tail -1 | cut -d: -f2)
+      st=$(mktemp)
+      ssim=$(ffmpeg -nostdin -v info -i "$tmp" -i "$f" -lavfi "[0:v][1:v]ssim=stats_file=$st" -f null - 2>&1 | grep -o 'All:[0-9.]*' | tail -1 | cut -d: -f2)
+      fmin=$(grep -o 'All:[0-9.]*' "$st" | cut -d: -f2 | sort -n | head -1); rm -f "$st"
       if awk -v a="$a2" -v s="$size" 'BEGIN{exit !(a>s*0.9)}'; then res="KEPT-ORIGINAL:not-smaller"; rm -f "$tmp"; break
-      elif awk -v q="${ssim:-0}" -v m="$MIN_SSIM" 'BEGIN{exit !(q<m)}'; then res="KEPT-ORIGINAL:ssim-${ssim}@${rung}k"; rm -f "$tmp"
-      else chmod --reference="$f" "$tmp"; mv "$tmp" "$f"; after=$a2; res="encoded@${rung}k"; break; fi
+      elif awk -v q="${ssim:-0}" -v m="$MIN_SSIM" -v fq="${fmin:-0}" -v fm="$MIN_FRAME_SSIM" 'BEGIN{exit !(q<m || fq<fm)}'; then res="KEPT-ORIGINAL:ssim-${ssim}/worst-frame-${fmin}@${rung}k"; rm -f "$tmp"
+      else chmod --reference="$f" "$tmp"; mv "$tmp" "$f"; after=$a2; res="encoded@${rung}k worst-frame-ssim=${fmin}"; break; fi
     done
   fi
   tb=$((tb+size)); ta=$((ta+after))
