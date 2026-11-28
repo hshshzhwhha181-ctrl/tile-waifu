@@ -231,7 +231,7 @@ func _t_save_ults_words() -> void:
 		for f0 in DirAccess.get_files_at(d0):
 			scan_files.append(d0 + f0)
 	for fp in scan_files:
-		var f: = fp.get_file()
+		var f: String = String(fp).get_file()
 		if not f.ends_with(".gd") or f == "connect_selftest.gd":
 			continue
 		var txt: = FileAccess.get_file_as_string(fp)

@@ -285,7 +285,7 @@ func _contract_grep() -> void:
 		for f0 in DirAccess.get_files_at(d0):
 			salon_files.append(d0 + f0)
 	for fp in salon_files:
-		var f: = fp.get_file()
+		var f: String = String(fp).get_file()
 		if not f.ends_with(".gd") or f == "salon_selftest.gd":
 			continue
 		var src: = FileAccess.get_file_as_string(fp)
