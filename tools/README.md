@@ -9,6 +9,7 @@
 | `server/e2e_test.mjs` | `server_e2e` | `E2E_OK`, `N passed, 0 failed` (skipped with a reason if node or `node:sqlite` is missing) |
 | `lint_screen_has_spec.py` | `screen_has_spec` (P23) | `SCREEN_HAS_SPEC SELFTEST 7/7` + repo has 0 violations (a screen folder without `spec.tres`, bad/duplicate ScreenSpec, a `TWScreen` outside `shell/screens/`) |
 | `lint_modal_only_via_stack.py` | `modal_only_via_stack` (P24) | `MODAL_ONLY_VIA_STACK SELFTEST 14/14` + shell has 0 violations + the legacy overlay-scan sites (report mode, 39) do not grow vs `tools/lint_modal_baseline.json` |
+| `lint_asset_id_only.py` | `asset_id_only` (P29) | `ASSET_ID_ONLY SELFTEST 13/13` + `game/shell` has 0 `res://assets` literals (exempt: `shell/assets/`, selftests) + the legacy literals (report mode, 493) do not grow vs `tools/lint_asset_id_baseline.json` |
 | `ux_lint.py` | `ux_lint` | `UX_LINT RESULT: OK (0 violations)` (lives at `.agents/skills/tw-godot-qa/scripts/ux_lint.py`, verified present) |
 | `audio_gate` | 1 (`--selftest`) | `AUDIO_GATE SELFTEST 50/50`: loudness meter vs 12 synthetic signals with known loudness (<= 0.3 LU), true peak, leading silence, verdict rules |
 
