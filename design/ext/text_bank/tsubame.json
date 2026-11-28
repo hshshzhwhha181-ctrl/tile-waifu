@@ -1,0 +1,266 @@
+{
+  "heroine_id": "tsubame",
+  "name_ru": "Цубамэ",
+  "age": "24",
+  "role": "Куноити-курьер гильдии «Ночные ласточки»",
+  "ssr_outfit_ref": "tb_crimson / tsubame_ssr_ninjarose",
+  "beta24_note": "24 строки Beta-24 по DEC-P44-1 + 8 строк SSR-костюма = 32",
+  "lines": [
+    {
+      "id": "tsubame_login_morning_1",
+      "slot": "login_morning",
+      "tier": "beta24",
+      "text": "Утренняя почта доставлена. Ждала тебя на крыше с рассвета.",
+      "emotion": "neutral",
+      "max_words": 12
+    },
+    {
+      "id": "tsubame_login_evening_1",
+      "slot": "login_evening",
+      "tier": "beta24",
+      "text": "Ночь — моё время. Составишь компанию тихой ласточке?",
+      "emotion": "warm",
+      "max_words": 12
+    },
+    {
+      "id": "tsubame_intro_summon_1",
+      "slot": "intro_summon",
+      "tier": "beta24",
+      "text": "Я Цубамэ, курьер между мирами. Письмо адресовано лично тебе.",
+      "emotion": "confident",
+      "max_words": 12
+    },
+    {
+      "id": "tsubame_outfit_equip_1",
+      "slot": "outfit_equip",
+      "tier": "beta24",
+      "text": "Лёгкий крой, движений не стесняет. …Тебе правда нравится?",
+      "emotion": "shy",
+      "max_words": 12
+    },
+    {
+      "id": "tsubame_idle_1",
+      "slot": "idle_1",
+      "tier": "beta24",
+      "text": "Кручу кунай-ласточку и сверяю маршруты. Скоро начнём партию?",
+      "emotion": "neutral",
+      "max_words": 12
+    },
+    {
+      "id": "tsubame_idle_2",
+      "slot": "idle_2",
+      "tier": "beta24",
+      "text": "Я нашла письмо без подписи… Нет, это точно не моё!",
+      "emotion": "shy_averted",
+      "max_words": 12
+    },
+    {
+      "id": "tsubame_idle_warm_1",
+      "slot": "idle_warm",
+      "tier": "beta24",
+      "text": "Сквозь любые миры мой маршрут всё равно ведёт к тебе.",
+      "emotion": "warm",
+      "max_words": 12
+    },
+    {
+      "id": "tsubame_touch_head_1",
+      "slot": "touch_head",
+      "tier": "beta24",
+      "text": "Не подкрадывайся сзади — это моя работа! …Но рука тёплая.",
+      "emotion": "surprised",
+      "max_words": 12
+    },
+    {
+      "id": "tsubame_touch_hand_1",
+      "slot": "touch_hand",
+      "tier": "beta24",
+      "text": "Вот запечатанный конверт. Забирай… вместе с моей ладонью, если хочешь.",
+      "emotion": "shy",
+      "max_words": 12
+    },
+    {
+      "id": "tsubame_touch_hair_1",
+      "slot": "touch_hair",
+      "tier": "beta24",
+      "text": "Алый шнур на хвосте держит удачу — завяжи его покрепче.",
+      "emotion": "warm",
+      "max_words": 12
+    },
+    {
+      "id": "tsubame_touch_outfit_1",
+      "slot": "touch_outfit",
+      "tier": "beta24",
+      "text": "Не тяни мой алый шарф, я же за него прячусь!",
+      "emotion": "shy",
+      "max_words": 12
+    },
+    {
+      "id": "tsubame_touch_spam_1",
+      "slot": "touch_spam",
+      "tier": "beta24",
+      "text": "Исчезну в дымке! Хватит проверять рефлексы куноити!",
+      "emotion": "pout",
+      "max_words": 12
+    },
+    {
+      "id": "tsubame_touch_bold_1",
+      "slot": "touch_bold",
+      "tier": "beta24",
+      "text": "Когда благодаришь так тихо, даже шарф не скрывает румянец.",
+      "emotion": "shy",
+      "max_words": 12
+    },
+    {
+      "id": "tsubame_gift_normal_1",
+      "slot": "gift_normal",
+      "tier": "beta24",
+      "text": "Посылка для меня? Спасибо… приму без расписки.",
+      "emotion": "happy",
+      "max_words": 12
+    },
+    {
+      "id": "tsubame_gift_liked_1",
+      "slot": "gift_liked",
+      "tier": "beta24",
+      "text": "Откуда ты узнал? Прячу лицо в шарф — мне очень приятно.",
+      "emotion": "shy",
+      "max_words": 12
+    },
+    {
+      "id": "tsubame_level_max_vow_1",
+      "slot": "level_max_vow",
+      "tier": "beta24",
+      "text": "Последнее письмо я подпишу своим именем — и отдам тебе.",
+      "emotion": "warm",
+      "max_words": 12
+    },
+    {
+      "id": "tsubame_combo_t2_1",
+      "slot": "combo_t2",
+      "tier": "beta24",
+      "text": "Точный выпад.",
+      "emotion": "confident",
+      "max_words": 12
+    },
+    {
+      "id": "tsubame_combo_t3_1",
+      "slot": "combo_t3",
+      "tier": "beta24",
+      "text": "Тени быстрее ветра!",
+      "emotion": "confident",
+      "max_words": 12
+    },
+    {
+      "id": "tsubame_clear_normal_1",
+      "slot": "clear",
+      "tier": "beta24",
+      "text": "Доставлено. Победа закрыта чисто и без лишнего шума.",
+      "emotion": "happy",
+      "max_words": 12
+    },
+    {
+      "id": "tsubame_fail_1",
+      "slot": "fail",
+      "tier": "beta24",
+      "text": "Перетяну хвост… Ещё заход. В следующий раз не промахнусь.",
+      "emotion": "neutral",
+      "max_words": 12
+    },
+    {
+      "id": "tsubame_ult_cast_1",
+      "slot": "ult_cast",
+      "tier": "beta24",
+      "text": "Теневой шаг!",
+      "emotion": "confident",
+      "max_words": 12
+    },
+    {
+      "id": "tsubame_riichi_1",
+      "slot": "riichi",
+      "tier": "beta24",
+      "text": "Риичи. Тень легла.",
+      "emotion": "confident",
+      "max_words": 12
+    },
+    {
+      "id": "tsubame_ron_1",
+      "slot": "ron",
+      "tier": "beta24",
+      "text": "Рон. Доставлено точно.",
+      "emotion": "confident",
+      "max_words": 12
+    },
+    {
+      "id": "tsubame_tsumo_1",
+      "slot": "tsumo",
+      "tier": "beta24",
+      "text": "Цумо. Бесшумно.",
+      "emotion": "happy",
+      "max_words": 12
+    },
+    {
+      "id": "tsubame_ssr_outfit_new",
+      "slot": "outfit_new",
+      "tier": "ssr_outfit",
+      "text": "Алая луна клана… Это кимоно я надеваю только для тебя.",
+      "emotion": "confident",
+      "max_words": 12
+    },
+    {
+      "id": "tsubame_ssr_idle_2",
+      "slot": "idle_2",
+      "tier": "ssr_outfit",
+      "text": "Крыши молчат, ветер треплет рукава… Посиди со мной немного.",
+      "emotion": "warm",
+      "max_words": 12
+    },
+    {
+      "id": "tsubame_ssr_touch_2",
+      "slot": "touch_2",
+      "tier": "ssr_outfit",
+      "text": "Не дёргай за ленту корсажа, иначе спрячусь в облаке дыма.",
+      "emotion": "shy",
+      "max_words": 12
+    },
+    {
+      "id": "tsubame_ssr_level_vow",
+      "slot": "level_vow",
+      "tier": "ssr_outfit",
+      "text": "Клянусь печатью ласточек: моя тень всегда защитит тебя.",
+      "emotion": "warm",
+      "max_words": 12
+    },
+    {
+      "id": "tsubame_ssr_ult_cast_a",
+      "slot": "ult_cast_a",
+      "tier": "ssr_outfit",
+      "text": "Танец ласточек!",
+      "emotion": "confident",
+      "max_words": 12
+    },
+    {
+      "id": "tsubame_ssr_ult_cast_b",
+      "slot": "ult_cast_b",
+      "tier": "ssr_outfit",
+      "text": "Алая роза ночи!",
+      "emotion": "excited",
+      "max_words": 12
+    },
+    {
+      "id": "tsubame_ssr_equip",
+      "slot": "equip",
+      "tier": "ssr_outfit",
+      "text": "Боевое кимоно готово. Сегодня ни одна пара не уйдёт.",
+      "emotion": "confident",
+      "max_words": 12
+    },
+    {
+      "id": "tsubame_ssr_win",
+      "slot": "win",
+      "tier": "ssr_outfit",
+      "text": "Стая ласточек принесла победу. Салют тебе, мой адресат.",
+      "emotion": "happy",
+      "max_words": 12
+    }
+  ]
+}

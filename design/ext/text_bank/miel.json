@@ -1,0 +1,266 @@
+{
+  "heroine_id": "miel",
+  "name_ru": "Миэль",
+  "age": "25",
+  "role": "Кондитер-патиссье, хозяйка кондитерской «Мёд и пар»",
+  "ssr_outfit_ref": "me_gala / miel_ssr_seaside",
+  "beta24_note": "24 строки Beta-24 по DEC-P44-1 + 8 строк SSR-костюма = 32",
+  "lines": [
+    {
+      "id": "miel_login_morning_1",
+      "slot": "login_morning",
+      "tier": "beta24",
+      "text": "Доброе утро! Слышишь аромат? Свежие круассаны ждут именно тебя!",
+      "emotion": "happy",
+      "max_words": 12
+    },
+    {
+      "id": "miel_login_evening_1",
+      "slot": "login_evening",
+      "tier": "beta24",
+      "text": "Вечерний десерт готов! Присаживайся, я сберегла самый сладкий кусочек.",
+      "emotion": "warm",
+      "max_words": 12
+    },
+    {
+      "id": "miel_intro_summon_1",
+      "slot": "intro_summon",
+      "tier": "beta24",
+      "text": "Я Миэль из «Мёда и пара»! Попробуй мой фирменный крем~",
+      "emotion": "happy",
+      "max_words": 12
+    },
+    {
+      "id": "miel_outfit_equip_1",
+      "slot": "outfit_equip",
+      "tier": "beta24",
+      "text": "Атласная лента на месте! Ну как, выгляжу аппетитно?",
+      "emotion": "tease",
+      "max_words": 12
+    },
+    {
+      "id": "miel_idle_1",
+      "slot": "idle_1",
+      "tier": "beta24",
+      "text": "Взбиваю сливки под музыку и придумываю вкус нашей партии~",
+      "emotion": "happy",
+      "max_words": 12
+    },
+    {
+      "id": "miel_idle_2",
+      "slot": "idle_2",
+      "tier": "beta24",
+      "text": "Треснувший макарон — катастрофа! Хорошо, что ты рядом и успокоишь.",
+      "emotion": "pout",
+      "max_words": 12
+    },
+    {
+      "id": "miel_idle_warm_1",
+      "slot": "idle_warm",
+      "tier": "beta24",
+      "text": "Тайный ингредиент всех моих пирожных — улыбка для тебя.",
+      "emotion": "warm",
+      "max_words": 12
+    },
+    {
+      "id": "miel_touch_head_1",
+      "slot": "touch_head",
+      "tier": "beta24",
+      "text": "Ой, облачко сахарной пудры! Хи-хи, теперь и ты сладкий~",
+      "emotion": "happy",
+      "max_words": 12
+    },
+    {
+      "id": "miel_touch_hand_1",
+      "slot": "touch_hand",
+      "tier": "beta24",
+      "text": "Скажи «а-а»! Ложечка крема прямо из рук кондитера~",
+      "emotion": "tease",
+      "max_words": 12
+    },
+    {
+      "id": "miel_touch_hair_1",
+      "slot": "touch_hair",
+      "tier": "beta24",
+      "text": "Осторожнее с заколкой-макароном, она несъедобная — честно-честно!",
+      "emotion": "happy",
+      "max_words": 12
+    },
+    {
+      "id": "miel_touch_outfit_1",
+      "slot": "touch_outfit",
+      "tier": "beta24",
+      "text": "Не дёргай за бант фартука, иначе обсыплю мукой с головы!",
+      "emotion": "tease",
+      "max_words": 12
+    },
+    {
+      "id": "miel_touch_spam_1",
+      "slot": "touch_spam",
+      "tier": "beta24",
+      "text": "Ну хватит щекотать! Я же крем перевзобью из-за тебя!",
+      "emotion": "surprised",
+      "max_words": 12
+    },
+    {
+      "id": "miel_touch_bold_1",
+      "slot": "touch_bold",
+      "tier": "beta24",
+      "text": "На щеке капелька крема… Поможешь убрать, раз уж так близко?",
+      "emotion": "shy",
+      "max_words": 12
+    },
+    {
+      "id": "miel_gift_normal_1",
+      "slot": "gift_normal",
+      "tier": "beta24",
+      "text": "Ой, спасибо! Обещаю испечь в ответ что-нибудь воздушное!",
+      "emotion": "happy",
+      "max_words": 12
+    },
+    {
+      "id": "miel_gift_liked_1",
+      "slot": "gift_liked",
+      "tier": "beta24",
+      "text": "Мечта кондитера! За такой подарок — бесконечный запас пирожных!",
+      "emotion": "excited",
+      "max_words": 12
+    },
+    {
+      "id": "miel_level_max_vow_1",
+      "slot": "level_max_vow",
+      "tier": "beta24",
+      "text": "Я назвала свой лучший рецепт твоим именем — на всю жизнь.",
+      "emotion": "warm",
+      "max_words": 12
+    },
+    {
+      "id": "miel_combo_t2_1",
+      "slot": "combo_t2",
+      "tier": "beta24",
+      "text": "Как по маслу!",
+      "emotion": "happy",
+      "max_words": 12
+    },
+    {
+      "id": "miel_combo_t3_1",
+      "slot": "combo_t3",
+      "tier": "beta24",
+      "text": "Сладкий восторг!",
+      "emotion": "excited",
+      "max_words": 12
+    },
+    {
+      "id": "miel_clear_normal_1",
+      "slot": "clear",
+      "tier": "beta24",
+      "text": "Попробуй! Эта победа получилась нежнее любого безе!",
+      "emotion": "happy",
+      "max_words": 12
+    },
+    {
+      "id": "miel_fail_1",
+      "slot": "fail",
+      "tier": "beta24",
+      "text": "Перестаралась с сахаром… Ничего, следующий замес выйдет идеальным!",
+      "emotion": "pout",
+      "max_words": 12
+    },
+    {
+      "id": "miel_ult_cast_1",
+      "slot": "ult_cast",
+      "tier": "beta24",
+      "text": "Печенье-джокер, вперёд!",
+      "emotion": "excited",
+      "max_words": 12
+    },
+    {
+      "id": "miel_riichi_1",
+      "slot": "riichi",
+      "tier": "beta24",
+      "text": "Риичи! Попробуй поймать!",
+      "emotion": "happy",
+      "max_words": 12
+    },
+    {
+      "id": "miel_ron_1",
+      "slot": "ron",
+      "tier": "beta24",
+      "text": "Рон! Сладкий трофей!",
+      "emotion": "excited",
+      "max_words": 12
+    },
+    {
+      "id": "miel_tsumo_1",
+      "slot": "tsumo",
+      "tier": "beta24",
+      "text": "Цумо! Идеальный вкус!",
+      "emotion": "happy",
+      "max_words": 12
+    },
+    {
+      "id": "miel_ssr_outfit_new",
+      "slot": "outfit_new",
+      "tier": "ssr_outfit",
+      "text": "Малиновый крем и органза-безе! Приглашаю на мой Сахарный бал~",
+      "emotion": "excited",
+      "max_words": 12
+    },
+    {
+      "id": "miel_ssr_idle_2",
+      "slot": "idle_2",
+      "tier": "ssr_outfit",
+      "text": "Кружусь в платье, как сливки в чаше… Потанцуешь со мной?",
+      "emotion": "tease",
+      "max_words": 12
+    },
+    {
+      "id": "miel_ssr_touch_2",
+      "slot": "touch_2",
+      "tier": "ssr_outfit",
+      "text": "Длинные перчатки берегут тепло рук. Держи меня крепче, сладкий~",
+      "emotion": "shy",
+      "max_words": 12
+    },
+    {
+      "id": "miel_ssr_level_vow",
+      "slot": "level_vow",
+      "tier": "ssr_outfit",
+      "text": "Наш медовый вечер пусть никогда не заканчивается, обещаешь?",
+      "emotion": "warm",
+      "max_words": 12
+    },
+    {
+      "id": "miel_ssr_ult_cast_a",
+      "slot": "ult_cast_a",
+      "tier": "ssr_outfit",
+      "text": "Многоярусный торт!",
+      "emotion": "excited",
+      "max_words": 12
+    },
+    {
+      "id": "miel_ssr_ult_cast_b",
+      "slot": "ult_cast_b",
+      "tier": "ssr_outfit",
+      "text": "Морская карамель!",
+      "emotion": "happy",
+      "max_words": 12
+    },
+    {
+      "id": "miel_ssr_equip",
+      "slot": "equip",
+      "tier": "ssr_outfit",
+      "text": "Праздничный наряд готов — сегодня угощаю победами всех вокруг!",
+      "emotion": "happy",
+      "max_words": 12
+    },
+    {
+      "id": "miel_ssr_win",
+      "slot": "win",
+      "tier": "ssr_outfit",
+      "text": "Поднос сияющих пирожных — и главный приз достаётся тебе!",
+      "emotion": "excited",
+      "max_words": 12
+    }
+  ]
+}

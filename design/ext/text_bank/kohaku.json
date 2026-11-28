@@ -1,0 +1,266 @@
+{
+  "heroine_id": "kohaku",
+  "name_ru": "Кохаку",
+  "age": "на вид 25 (лисе 900 лет)",
+  "role": "Белая лиса-жрица храма Тысячи врат",
+  "ssr_outfit_ref": "ko_kyubi / kohaku_ssrp_moonfest",
+  "beta24_note": "24 строки Beta-24 по DEC-P44-1 + 8 строк SSR-костюма = 32",
+  "lines": [
+    {
+      "id": "kohaku_login_morning_1",
+      "slot": "login_morning",
+      "tier": "beta24",
+      "text": "Удача проснулась раньше тебя! Заходи, одарю лисьим благословением.",
+      "emotion": "tease",
+      "max_words": 12
+    },
+    {
+      "id": "kohaku_login_evening_1",
+      "slot": "login_evening",
+      "tier": "beta24",
+      "text": "Фонари врат зажглись. Пришёл поиграть с хитрой жрицей?",
+      "emotion": "tease",
+      "max_words": 12
+    },
+    {
+      "id": "kohaku_intro_summon_1",
+      "slot": "intro_summon",
+      "tier": "beta24",
+      "text": "Я Кохаку, хранительница Тысячи врат. Удача любит меня — привыкай!",
+      "emotion": "confident",
+      "max_words": 12
+    },
+    {
+      "id": "kohaku_outfit_equip_1",
+      "slot": "outfit_equip",
+      "tier": "beta24",
+      "text": "Хе-хе, любоваться жрицей можно… но только за хорошую партию!",
+      "emotion": "tease",
+      "max_words": 12
+    },
+    {
+      "id": "kohaku_idle_1",
+      "slot": "idle_1",
+      "tier": "beta24",
+      "text": "Колокольчик звенит, огонёк пляшет — а ты всё раздумываешь?",
+      "emotion": "tease",
+      "max_words": 12
+    },
+    {
+      "id": "kohaku_idle_2",
+      "slot": "idle_2",
+      "tier": "beta24",
+      "text": "Девять веков храню удачу холма, но с тобой скучать некогда.",
+      "emotion": "warm",
+      "max_words": 12
+    },
+    {
+      "id": "kohaku_idle_warm_1",
+      "slot": "idle_warm",
+      "tier": "beta24",
+      "text": "Не смотри на хвост! Он виляет сам, когда ты приходишь.",
+      "emotion": "shy",
+      "max_words": 12
+    },
+    {
+      "id": "kohaku_touch_head_1",
+      "slot": "touch_head",
+      "tier": "beta24",
+      "text": "Не гладь уши! …Эй, я сказала не… м-м, ладно, чуть-чуть.",
+      "emotion": "shy",
+      "max_words": 12
+    },
+    {
+      "id": "kohaku_touch_hand_1",
+      "slot": "touch_hand",
+      "tier": "beta24",
+      "text": "Лисий огонёк прыгнул тебе на палец — теперь ты мой!",
+      "emotion": "tease",
+      "max_words": 12
+    },
+    {
+      "id": "kohaku_touch_hair_1",
+      "slot": "touch_hair",
+      "tier": "beta24",
+      "text": "Белые пряди с алыми кончиками не путай — жрице положено почтение!",
+      "emotion": "pout",
+      "max_words": 12
+    },
+    {
+      "id": "kohaku_touch_outfit_1",
+      "slot": "touch_outfit",
+      "tier": "beta24",
+      "text": "Надену лисью маску и буду подглядывать, как ты краснеешь~",
+      "emotion": "tease",
+      "max_words": 12
+    },
+    {
+      "id": "kohaku_touch_spam_1",
+      "slot": "touch_spam",
+      "tier": "beta24",
+      "text": "Ох, нахал! Защекочу хвостом, если не уберёшь пальцы!",
+      "emotion": "surprised",
+      "max_words": 12
+    },
+    {
+      "id": "kohaku_touch_bold_1",
+      "slot": "touch_bold",
+      "tier": "beta24",
+      "text": "Только тебе позволено видеть, как надменная лиса тает в руках.",
+      "emotion": "shy",
+      "max_words": 12
+    },
+    {
+      "id": "kohaku_gift_normal_1",
+      "slot": "gift_normal",
+      "tier": "beta24",
+      "text": "Подношение храму? Хи-хи, принимаю! Удача тебе улыбнётся.",
+      "emotion": "happy",
+      "max_words": 12
+    },
+    {
+      "id": "kohaku_gift_liked_1",
+      "slot": "gift_liked",
+      "tier": "beta24",
+      "text": "Ух ты, угадал! Хвост так и пляшет — спасибо тебе!",
+      "emotion": "excited",
+      "max_words": 12
+    },
+    {
+      "id": "kohaku_level_max_vow_1",
+      "slot": "level_max_vow",
+      "tier": "beta24",
+      "text": "Под слепым дождём свяжу наши нити — на все века.",
+      "emotion": "warm",
+      "max_words": 12
+    },
+    {
+      "id": "kohaku_combo_t2_1",
+      "slot": "combo_t2",
+      "tier": "beta24",
+      "text": "Лисий огонёк!",
+      "emotion": "happy",
+      "max_words": 12
+    },
+    {
+      "id": "kohaku_combo_t3_1",
+      "slot": "combo_t3",
+      "tier": "beta24",
+      "text": "Удача на максимуме!",
+      "emotion": "excited",
+      "max_words": 12
+    },
+    {
+      "id": "kohaku_clear_normal_1",
+      "slot": "clear",
+      "tier": "beta24",
+      "text": "Удача любит меня — а значит, и тебя, хитрец!",
+      "emotion": "happy",
+      "max_words": 12
+    },
+    {
+      "id": "kohaku_fail_1",
+      "slot": "fail",
+      "tier": "beta24",
+      "text": "Уши прижались… Хм, переиграем! Лиса не уходит без победы!",
+      "emotion": "pout",
+      "max_words": 12
+    },
+    {
+      "id": "kohaku_ult_cast_1",
+      "slot": "ult_cast",
+      "tier": "beta24",
+      "text": "Лисий оберег!",
+      "emotion": "confident",
+      "max_words": 12
+    },
+    {
+      "id": "kohaku_riichi_1",
+      "slot": "riichi",
+      "tier": "beta24",
+      "text": "Риичи! Удача со мной!",
+      "emotion": "tease",
+      "max_words": 12
+    },
+    {
+      "id": "kohaku_ron_1",
+      "slot": "ron",
+      "tier": "beta24",
+      "text": "Рон! Попался лисе!",
+      "emotion": "happy",
+      "max_words": 12
+    },
+    {
+      "id": "kohaku_tsumo_1",
+      "slot": "tsumo",
+      "tier": "beta24",
+      "text": "Цумо! Благословение врат!",
+      "emotion": "excited",
+      "max_words": 12
+    },
+    {
+      "id": "kohaku_ssr_outfit_new",
+      "slot": "outfit_new",
+      "tier": "ssr_outfit",
+      "text": "Девять хвостов пробудились. Не бойся — я открылась только тебе.",
+      "emotion": "regal",
+      "max_words": 12
+    },
+    {
+      "id": "kohaku_ssr_idle_2",
+      "slot": "idle_2",
+      "tier": "ssr_outfit",
+      "text": "В лунном свете фестиваля все огни пляшут вокруг нас двоих.",
+      "emotion": "warm",
+      "max_words": 12
+    },
+    {
+      "id": "kohaku_ssr_touch_2",
+      "slot": "touch_2",
+      "tier": "ssr_outfit",
+      "text": "Погладишь все девять хвостов? Тогда останусь с тобой до рассвета~",
+      "emotion": "tease",
+      "max_words": 12
+    },
+    {
+      "id": "kohaku_ssr_level_vow",
+      "slot": "level_vow",
+      "tier": "ssr_outfit",
+      "text": "Истинный облик Девятихвостой принадлежит одному сердцу — твоему.",
+      "emotion": "warm",
+      "max_words": 12
+    },
+    {
+      "id": "kohaku_ssr_ult_cast_a",
+      "slot": "ult_cast_a",
+      "tier": "ssr_outfit",
+      "text": "Девять огней, сойдитесь!",
+      "emotion": "confident",
+      "max_words": 12
+    },
+    {
+      "id": "kohaku_ssr_ult_cast_b",
+      "slot": "ult_cast_b",
+      "tier": "ssr_outfit",
+      "text": "Солнечный дождь!",
+      "emotion": "excited",
+      "max_words": 12
+    },
+    {
+      "id": "kohaku_ssr_equip",
+      "slot": "equip",
+      "tier": "ssr_outfit",
+      "text": "Чёрное с золотом к лицу хранительнице. Зажжём ночной фестиваль!",
+      "emotion": "confident",
+      "max_words": 12
+    },
+    {
+      "id": "kohaku_ssr_win",
+      "slot": "win",
+      "tier": "ssr_outfit",
+      "text": "Девять огней венчают победу! Погладь меня в награду, смельчак~",
+      "emotion": "happy",
+      "max_words": 12
+    }
+  ]
+}

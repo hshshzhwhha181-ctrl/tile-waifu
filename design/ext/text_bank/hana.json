@@ -1,0 +1,266 @@
+{
+  "heroine_id": "hana",
+  "name_ru": "Хана",
+  "age": "24",
+  "role": "Капитан фонарной эстафеты и тренер спорткомплекса",
+  "ssr_outfit_ref": "h_gala / hana_ssr_beach",
+  "beta24_note": "24 строки Beta-24 по DEC-P44-1 + 8 строк SSR-костюма = 32",
+  "lines": [
+    {
+      "id": "hana_login_morning_1",
+      "slot": "login_morning",
+      "tier": "beta24",
+      "text": "На старт! Утро бодрое, разомнёмся быстрой партией прямо сейчас!",
+      "emotion": "excited",
+      "max_words": 12
+    },
+    {
+      "id": "hana_login_evening_1",
+      "slot": "login_evening",
+      "tier": "beta24",
+      "text": "Вечерняя тренировка! Кто проиграет — угощает ужином, договорились?",
+      "emotion": "happy",
+      "max_words": 12
+    },
+    {
+      "id": "hana_intro_summon_1",
+      "slot": "intro_summon",
+      "tier": "beta24",
+      "text": "Я Хана, капитан эстафеты! Готов угнаться за моим темпом?",
+      "emotion": "confident",
+      "max_words": 12
+    },
+    {
+      "id": "hana_outfit_equip_1",
+      "slot": "outfit_equip",
+      "tier": "beta24",
+      "text": "Ого, сидит отлично! Эй, хватит улыбаться — пошли играть!",
+      "emotion": "shy",
+      "max_words": 12
+    },
+    {
+      "id": "hana_idle_1",
+      "slot": "idle_1",
+      "tier": "beta24",
+      "text": "Подсолнух крутится, адреналин растёт — когда уже начнём реванш?",
+      "emotion": "excited",
+      "max_words": 12
+    },
+    {
+      "id": "hana_idle_2",
+      "slot": "idle_2",
+      "tier": "beta24",
+      "text": "Выпрями спину и глотни воды! Тренер за тобой присматривает.",
+      "emotion": "happy",
+      "max_words": 12
+    },
+    {
+      "id": "hana_idle_warm_1",
+      "slot": "idle_warm",
+      "tier": "beta24",
+      "text": "Зову тебя на реванш снова, потому что не хочу расставаться.",
+      "emotion": "shy",
+      "max_words": 12
+    },
+    {
+      "id": "hana_touch_head_1",
+      "slot": "touch_head",
+      "tier": "beta24",
+      "text": "Ха-ха, эй! Сбил моё каре — теперь точно отыграюсь!",
+      "emotion": "happy",
+      "max_words": 12
+    },
+    {
+      "id": "hana_touch_hand_1",
+      "slot": "touch_hand",
+      "tier": "beta24",
+      "text": "Дай пять! …Ой, а ты ладонь не отпускаешь? Ну и ладно!",
+      "emotion": "shy",
+      "max_words": 12
+    },
+    {
+      "id": "hana_touch_hair_1",
+      "slot": "touch_hair",
+      "tier": "beta24",
+      "text": "Не трогай заколку-подсолнух, она мой счастливый талисман!",
+      "emotion": "pout",
+      "max_words": 12
+    },
+    {
+      "id": "hana_touch_outfit_1",
+      "slot": "touch_outfit",
+      "tier": "beta24",
+      "text": "Эй, не развязывай куртку на поясе, я только её закрепила!",
+      "emotion": "surprised",
+      "max_words": 12
+    },
+    {
+      "id": "hana_touch_spam_1",
+      "slot": "touch_spam",
+      "tier": "beta24",
+      "text": "Фол! Судья, штрафную за бесконечные касания капитана!",
+      "emotion": "pout",
+      "max_words": 12
+    },
+    {
+      "id": "hana_touch_bold_1",
+      "slot": "touch_bold",
+      "tier": "beta24",
+      "text": "С тобой пульс выше, чем на финише стометровки… слышишь?",
+      "emotion": "shy",
+      "max_words": 12
+    },
+    {
+      "id": "hana_gift_normal_1",
+      "slot": "gift_normal",
+      "tier": "beta24",
+      "text": "Супер, спасибо! Заряд энергии на три партии вперёд!",
+      "emotion": "happy",
+      "max_words": 12
+    },
+    {
+      "id": "hana_gift_liked_1",
+      "slot": "gift_liked",
+      "tier": "beta24",
+      "text": "Да ладно, мой любимый! Ты лучший напарник в команде!",
+      "emotion": "excited",
+      "max_words": 12
+    },
+    {
+      "id": "hana_level_max_vow_1",
+      "slot": "level_max_vow",
+      "tier": "beta24",
+      "text": "Передаю тебе свой огонь — бежим по жизни в одной связке!",
+      "emotion": "warm",
+      "max_words": 12
+    },
+    {
+      "id": "hana_combo_t2_1",
+      "slot": "combo_t2",
+      "tier": "beta24",
+      "text": "Ускоряемся!",
+      "emotion": "excited",
+      "max_words": 12
+    },
+    {
+      "id": "hana_combo_t3_1",
+      "slot": "combo_t3",
+      "tier": "beta24",
+      "text": "Новый рекорд!",
+      "emotion": "excited",
+      "max_words": 12
+    },
+    {
+      "id": "hana_clear_normal_1",
+      "slot": "clear",
+      "tier": "beta24",
+      "text": "Финишная лента наша! Дай пять, чемпион!",
+      "emotion": "happy",
+      "max_words": 12
+    },
+    {
+      "id": "hana_fail_1",
+      "slot": "fail",
+      "tier": "beta24",
+      "text": "Реванш! Сейчас же! Я не отступлю, пока не победим!",
+      "emotion": "pout",
+      "max_words": 12
+    },
+    {
+      "id": "hana_ult_cast_1",
+      "slot": "ult_cast",
+      "tier": "beta24",
+      "text": "На старт — рывок!",
+      "emotion": "excited",
+      "max_words": 12
+    },
+    {
+      "id": "hana_riichi_1",
+      "slot": "riichi",
+      "tier": "beta24",
+      "text": "Риичи! Финишная прямая!",
+      "emotion": "excited",
+      "max_words": 12
+    },
+    {
+      "id": "hana_ron_1",
+      "slot": "ron",
+      "tier": "beta24",
+      "text": "Рон! Прямо в цель!",
+      "emotion": "excited",
+      "max_words": 12
+    },
+    {
+      "id": "hana_tsumo_1",
+      "slot": "tsumo",
+      "tier": "beta24",
+      "text": "Цумо! Чистый рекорд!",
+      "emotion": "happy",
+      "max_words": 12
+    },
+    {
+      "id": "hana_ssr_outfit_new",
+      "slot": "outfit_new",
+      "tier": "ssr_outfit",
+      "text": "Не смейся, я на каблуках впервые! …Ну скажи, красиво?",
+      "emotion": "shy",
+      "max_words": 12
+    },
+    {
+      "id": "hana_ssr_idle_2",
+      "slot": "idle_2",
+      "tier": "ssr_outfit",
+      "text": "В вечернем платье не побегаешь, зато можно потанцевать с тобой.",
+      "emotion": "shy_averted",
+      "max_words": 12
+    },
+    {
+      "id": "hana_ssr_touch_2",
+      "slot": "touch_2",
+      "tier": "ssr_outfit",
+      "text": "Поддержи за локоть, а то оступлюсь… И спасибо, что рядом.",
+      "emotion": "shy",
+      "max_words": 12
+    },
+    {
+      "id": "hana_ssr_level_vow",
+      "slot": "level_vow",
+      "tier": "ssr_outfit",
+      "text": "Ради тебя я даже в платье выйду на главную сцену.",
+      "emotion": "warm",
+      "max_words": 12
+    },
+    {
+      "id": "hana_ssr_ult_cast_a",
+      "slot": "ult_cast_a",
+      "tier": "ssr_outfit",
+      "text": "Золотой финиш!",
+      "emotion": "excited",
+      "max_words": 12
+    },
+    {
+      "id": "hana_ssr_ult_cast_b",
+      "slot": "ult_cast_b",
+      "tier": "ssr_outfit",
+      "text": "Передаю огонь!",
+      "emotion": "confident",
+      "max_words": 12
+    },
+    {
+      "id": "hana_ssr_equip",
+      "slot": "equip",
+      "tier": "ssr_outfit",
+      "text": "Подсолнечный гала — звучит громко, но с тобой не страшно!",
+      "emotion": "happy",
+      "max_words": 12
+    },
+    {
+      "id": "hana_ssr_win",
+      "slot": "win",
+      "tier": "ssr_outfit",
+      "text": "Выиграли даже на каблуках! Теперь танец за победителем!",
+      "emotion": "excited",
+      "max_words": 12
+    }
+  ]
+}
