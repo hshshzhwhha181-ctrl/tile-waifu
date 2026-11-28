@@ -228,6 +228,14 @@ func _guard() -> int:
 	return n
 
 
+# type-normalises snapshot keys of a state that may not have a wallet yet (a loaded save, a fresh default): present and integer. The values
+# are NOT input: attach / for_state rewrite them from the wallet
+static func ensure_keys(S: Dictionary, keys: Array) -> void:
+	for k in keys:
+		if k in MIRRORS:
+			S[k] = int(S.get(k, 0))
+
+
 func sync() -> int:
 	var n: = _guard()
 	write_mirrors()

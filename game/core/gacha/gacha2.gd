@@ -69,6 +69,7 @@ func item(id: String) -> Dictionary:
 
 func ensure() -> void:
 	var st: = V10Banners.state(S)
+	TWWallet.ensure_keys(S, ["tickets", "petals"])   # the wallet snapshot keys the 0.9 readers expect (integers)
 	for k in ["candles", "pity_std", "s_pity_std", "pity", "sr_pity", "pulls"]:
 		S[k] = int(S.get(k, 0))
 	S["guar"] = bool(S.get("guar", false))
