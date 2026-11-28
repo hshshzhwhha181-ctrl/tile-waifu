@@ -645,6 +645,22 @@
     "total": 2736
    }
   },
+  "modal_only_via_stack": {
+   "fast": {
+    "marker": "MODAL_ONLY_VIA_STACK SELFTEST 14/14 PASS",
+    "ok": 14,
+    "secs": 0.9,
+    "status": "pass",
+    "total": 14
+   },
+   "full": {
+    "marker": "MODAL_ONLY_VIA_STACK SELFTEST 14/14 PASS",
+    "ok": 14,
+    "secs": 0.9,
+    "status": "pass",
+    "total": 14
+   }
+  },
   "no_direct_levels": {
    "fast": {
     "marker": "NO_DIRECT_LEVELS RESULT: PASS (0 violations)",
@@ -1109,6 +1125,22 @@
     "secs": 14.7,
     "status": "pass",
     "total": 1997
+   }
+  },
+  "twmodal": {
+   "fast": {
+    "marker": "TWMODAL_SELFTEST 83/83",
+    "ok": 83,
+    "secs": 9.7,
+    "status": "pass",
+    "total": 83
+   },
+   "full": {
+    "marker": "TWMODAL_SELFTEST 83/83",
+    "ok": 83,
+    "secs": 8.6,
+    "status": "pass",
+    "total": 83
    }
   },
   "twnav": {

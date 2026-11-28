@@ -10,6 +10,10 @@ New files only; **nothing routes the live game through them yet** (main.gd / the
 | `../tw_context.gd` | `TWContext` | typed `state / clock / bus / screens` + a closed service table (`wallet audio assets modals ...`) |
 | `../tw_bus.gd` | `TWBus` | shell side of the event contract: subscribe by event kind, ordered synchronous `publish_all(core_events)`, no re-entrancy |
 | `nav_fake_screen.gd` | `TWNavFakeScreen` | test double (hang / late intro, block / consume back); the only TWScreen allowed outside `shell/screens/` |
+| `tw_modal.gd` | `TWModal` (Control) | base of every modal (P24): the **scrim is its child 0**, `on_close(result, reason)` runs exactly once, `close()`, `on_back()`, `dismissable` |
+| `modal_stack.gd` | `ModalStack` (Control) | the one modal layer (P24): `open / close / close_top / clear_all / handle_back / request_exit / bind_screens`, tree_exiting auto-pop |
+| `tw_exit_confirm.gd` | `TWExitConfirm` | "leave the game?" modal, last row of the Android back table |
+| `modal_selftest*.gd/.tscn` | `TWModalSelftest` | `TWMODAL_SELFTEST ok/total` (suite `twmodal`): units, 0.12.1 regression, back table, 500-sequence property test |
 | `nav_selftest*.gd/.tscn` | `TWNavSelftest` | `TWNAV_SELFTEST ok/total` (suite `twnav`) |
 
 ## A screen = a folder
@@ -37,3 +41,18 @@ negative samples of the runtime scan test).
 * Autoloads are still 11 (limit at this stage: 11 + 1). `TWScreens` is a `class_name`, so it cannot also be an autoload *named* `TWScreens` (Godot: "hides an autoload singleton"). Wire it as one instance owned by the v11 root (`TWContext.screens`), or autoload it as `Screens`.
 * `TWBus` and `TWContext` are plain RefCounted objects held by the root; nothing needs an autoload.
 * Core never imports any of this (CORE_PURITY); the shell hands `ctx.bus.publish_all(events)` the lists core commands return.
+
+## Modals (P24 / WP8b)
+
+```gdscript
+var stack := ModalStack.new()      # last child of the v11 root: above screens, chrome and toasts
+root.add_child(stack)
+stack.bind_screens(screens)        # screens.modals = stack; screens.exit_requested -> stack.request_exit()
+stack.open(MyModal.new())          # MyModal extends TWModal; on_close = func(result, reason): ...
+```
+
+* One layer, one owner. Nothing but the stack adds children to it; a modal's scrim is the modal's own child, so a scrim cannot outlive its modal (the 0.12.1 "nothing is clickable" class).
+* `TWScreens.go()` calls `stack.clear_all("go:<id>")` before every mount: every open modal gets `on_close(null, "go:<id>")` once, strays added behind the stack's back are swept, afterwards the layer is empty.
+* `on_close` runs exactly once whatever happens: `close()`, back, scrim tap, `clear_all`, the node being `free()`d from outside (tree_exiting pops it, reason `freed`), the stack leaving the tree, a refused open (`refused`: depth over `MAX_DEPTH` 8, during `clear_all`, a modal already open elsewhere).
+* Android back, one table (`TWScreens.back()`): top modal closes (it always swallows the press; a forced modal stays) -> screen `on_back()`/`can_back()` -> history -> `back_target` -> `exit_requested` -> `TWExitConfirm` ("Выйти из игры?"; back on it = stay; "Выйти" = `quit_fn` once).
+* `tools/lint_modal_only_via_stack.py` (suite `modal_only_via_stack`): enforcing in `game/shell` (no `overlay` access, no `add_child` on the layer outside the stack), report mode over the legacy code: 39 `overlay.get_children / get_child_count / find_children` detectors (+3 indexed, +11 direct adds) frozen as a ratchet in `tools/lint_modal_baseline.json`. Legacy screens that still add to `main.overlay` are LegacyHost's job (P25).

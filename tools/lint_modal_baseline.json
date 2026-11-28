@@ -1,0 +1,45 @@
+{
+ "_note": "MODAL_ONLY_VIA_STACK legacy ratchet: sites per file (report mode); regenerate with --update-baseline",
+ "totals": {
+  "scan": 39,
+  "index": 3,
+  "add": 11
+ },
+ "scan": {
+  "scripts/main.gd": 7,
+  "scripts/screens/levels.gd": 1,
+  "scripts/screens/play.gd": 1,
+  "scripts/v07/album/photo.gd": 1,
+  "scripts/v07/eggs/eggs.gd": 1,
+  "scripts/v07/room/room.gd": 1,
+  "scripts/v08/devtools/playtest.gd": 2,
+  "scripts/v10/auth/auth_dev.gd": 1,
+  "scripts/v10/core/sheet.gd": 1,
+  "scripts/v10/duels/challenge/challenge_selftest.gd": 1,
+  "scripts/v10/duels/challenge/challenge_util.gd": 1,
+  "scripts/v10/duels/duel_screen.gd": 1,
+  "scripts/v10/duels/duel_selftest.gd": 5,
+  "scripts/v10/gacha/ui/demo_host.gd": 2,
+  "scripts/v10/path/path_map.gd": 1,
+  "scripts/v10/path/path_runner.gd": 2,
+  "scripts/v10/path/path_selftest.gd": 3,
+  "scripts/v10/responsive/layout_shots.gd": 3,
+  "scripts/v10/tower/tower_play.gd": 1,
+  "scripts/v10/tower/ui/demo_play.gd": 3
+ },
+ "index": {
+  "scripts/main.gd": 3
+ },
+ "add": {
+  "scripts/main.gd": 2,
+  "scripts/screens/collection.gd": 1,
+  "scripts/screens/common.gd": 1,
+  "scripts/v07/album/album_view.gd": 1,
+  "scripts/v10/core/sheet.gd": 1,
+  "scripts/v10/duels/duel_selftest.gd": 1,
+  "scripts/v10/gacha/ui/demo_host.gd": 1,
+  "scripts/v10/path/path_card.gd": 1,
+  "scripts/v10/path/path_dialogs.gd": 1,
+  "scripts/v10/tutorial/tut_logic_test.gd": 1
+ }
+}
