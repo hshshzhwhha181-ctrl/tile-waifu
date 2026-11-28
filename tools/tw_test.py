@@ -102,6 +102,8 @@ CATALOG: list[Suite] = [
       note="P23: ScreenSpec, TWScreen, TWScreens (go/back/history/tabs on 12 fake screens, 3 s watchdog), TWContext, TWBus"),
     S("twmodal", "TWMODAL_SELFTEST", "res://shell/nav/modal_selftest.tscn", group="core",
       note="P24: TWModal, ModalStack (scrim owned by the modal, on_close exactly once, clear_all), Android back table (4 rows), 500-sequence property test"),
+    S("legacy_host", "LEGACY_HOST_SELFTEST", "res://shell/main_v11.tscn", ["--legacy_selftest=1"], group="core", timeout=400,
+      note="P25: v11 root = LegacyHost (extends the frozen v10 main): v11 plumbing wired, main API intact, catalogue == SCREENS (46 ids), every legacy screen opened + closed through the host with 0 script errors / modal leaks"),
     S("twassets", "TWASSETS_SELFTEST", "res://shell/assets/assets_selftest.tscn", group="core", timeout=600,
       note="P29: TWAssets registry (direct + composite ids: every manifest asset and every resolver id loads, 0 missing), release gate (not approved -> null + code), dev flagged placeholder"),
     S("twwidgets", "TWWIDGETS_SELFTEST", "res://shell/design/widgets_selftest.tscn", group="core", timeout=600,

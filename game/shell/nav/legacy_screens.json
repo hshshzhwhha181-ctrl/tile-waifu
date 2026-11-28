@@ -1,0 +1,293 @@
+{
+ "_doc": "P25 LegacyHost catalogue: every id of main.gd SCREENS (16) + V10Registry.screens() (30 more; summon/shop are in both). group=main|v10, tab=bottom-nav tab, match=a table screen (PLAY_BACK / overlay z 400), chrome=false hides top/nav bars, args=default go() args used by LegacyHost.open, migrated_to=v11 screen id once ported (then the row and its legacy folder are deleted in the same merge). Regenerate rows with: godot --path game res://shell/main_v11.tscn -- --legacy_dump=1. LegacyHost.catalogue_drift() keeps this file equal to the live SCREENS table.",
+ "screens": {
+  "adventure": {
+   "script": "res://scripts/v10/adventure/adventure_screen.gd",
+   "group": "v10",
+   "chrome": false,
+   "migrated_to": null
+  },
+  "arena": {
+   "script": "res://scripts/v06/modes/mode_play.gd",
+   "group": "main",
+   "match": true,
+   "args": {
+    "mode": "climb",
+    "partner": "mc"
+   },
+   "migrated_to": null
+  },
+  "challenge": {
+   "script": "res://scripts/v10/duels/challenge/challenge_screen.gd",
+   "group": "v10",
+   "chrome": false,
+   "migrated_to": null
+  },
+  "challenge_play": {
+   "script": "res://scripts/v10/duels/challenge/challenge_play.gd",
+   "group": "v10",
+   "match": true,
+   "chrome": false,
+   "migrated_to": null
+  },
+  "collection": {
+   "script": "res://scripts/screens/collection.gd",
+   "group": "main",
+   "tab": "collection",
+   "migrated_to": null
+  },
+  "duel2": {
+   "script": "res://scripts/v10/duels/duel_play.gd",
+   "group": "v10",
+   "match": true,
+   "chrome": false,
+   "migrated_to": null
+  },
+  "duels": {
+   "script": "res://scripts/v10/duels/duel_screen.gd",
+   "group": "v10",
+   "chrome": false,
+   "migrated_to": null
+  },
+  "hand": {
+   "script": "res://scripts/v10/palm/hand_screen.gd",
+   "group": "v10",
+   "chrome": false,
+   "migrated_to": null
+  },
+  "home": {
+   "script": "res://scripts/screens/home.gd",
+   "group": "main",
+   "tab": "home",
+   "migrated_to": null
+  },
+  "journey": {
+   "script": "res://scripts/v10/tower/journey_screen.gd",
+   "group": "v10",
+   "chrome": false,
+   "migrated_to": null
+  },
+  "letters": {
+   "script": "res://scripts/v09/letters/letters_screen.gd",
+   "group": "main",
+   "migrated_to": null
+  },
+  "levels": {
+   "script": "res://scripts/screens/levels.gd",
+   "group": "main",
+   "args": {
+    "select": 4
+   },
+   "migrated_to": null
+  },
+  "mj_bridge": {
+   "script": "res://scripts/v10/mj/bridge/bridge_screen.gd",
+   "group": "v10",
+   "chrome": false,
+   "migrated_to": null
+  },
+  "mj_bridge_daily": {
+   "script": "res://scripts/v10/mj/bridge/bridge_daily_screen.gd",
+   "group": "v10",
+   "chrome": false,
+   "migrated_to": null
+  },
+  "mj_bridge_hand": {
+   "script": "res://scripts/v10/mj/bridge/bridge_hand_screen.gd",
+   "group": "v10",
+   "chrome": false,
+   "migrated_to": null
+  },
+  "mj_classic": {
+   "script": "res://scripts/v10/mj/classic/classic_screen.gd",
+   "group": "v10",
+   "chrome": false,
+   "migrated_to": null
+  },
+  "mj_classic_lobby": {
+   "script": "res://scripts/v10/mj/classic/classic_lobby.gd",
+   "group": "v10",
+   "chrome": false,
+   "migrated_to": null
+  },
+  "mj_connect": {
+   "script": "res://scripts/v10/mj/connect/connect_screen.gd",
+   "group": "v10",
+   "chrome": false,
+   "migrated_to": null
+  },
+  "mj_cube": {
+   "script": "res://scripts/v10/mj/cube/cube_screen.gd",
+   "group": "v10",
+   "chrome": false,
+   "migrated_to": null
+  },
+  "mj_garden": {
+   "script": "res://scripts/v10/mj/garden/garden_screen.gd",
+   "group": "v10",
+   "chrome": false,
+   "migrated_to": null
+  },
+  "mj_koikoi": {
+   "script": "res://scripts/v10/mj/koikoi/koikoi_screen.gd",
+   "group": "v10",
+   "chrome": false,
+   "migrated_to": null
+  },
+  "mj_memory": {
+   "script": "res://scripts/v10/mj/classic/memory.gd",
+   "group": "v10",
+   "chrome": false,
+   "migrated_to": null
+  },
+  "mj_riichi": {
+   "script": "res://scripts/v10/mj/riichi/riichi_screen.gd",
+   "group": "v10",
+   "chrome": false,
+   "migrated_to": null
+  },
+  "mj_sanma": {
+   "script": "res://scripts/v10/mj/sanma/sanma_screen.gd",
+   "group": "v10",
+   "chrome": false,
+   "migrated_to": null
+  },
+  "mj_triples": {
+   "script": "res://scripts/v10/mj/triples/triples_screen.gd",
+   "group": "v10",
+   "chrome": false,
+   "migrated_to": null
+  },
+  "modes": {
+   "script": "res://scripts/screens/modes.gd",
+   "group": "main",
+   "migrated_to": null
+  },
+  "odds": {
+   "script": "res://scripts/v10/gacha/ui/odds_screen.gd",
+   "group": "v10",
+   "migrated_to": null
+  },
+  "pagoda": {
+   "script": "res://scripts/v10/tower/pagoda_screen.gd",
+   "group": "v10",
+   "chrome": false,
+   "migrated_to": null
+  },
+  "play": {
+   "script": "res://scripts/screens/play.gd",
+   "group": "main",
+   "match": true,
+   "args": {
+    "level": 6,
+    "partner": "mc"
+   },
+   "migrated_to": null
+  },
+  "profile": {
+   "script": "res://scripts/v08/profile/profile_screen.gd",
+   "group": "main",
+   "args": {
+    "from": "home"
+   },
+   "migrated_to": null
+  },
+  "room": {
+   "script": "res://scripts/v07/room/room.gd",
+   "group": "main",
+   "args": {
+    "hero": "mc"
+   },
+   "migrated_to": null
+  },
+  "shop": {
+   "script": "res://scripts/v10/shop/shop2_screen.gd",
+   "group": "main",
+   "tab": "shop",
+   "migrated_to": null
+  },
+  "summon": {
+   "script": "res://scripts/v10/gacha/ui/wish_screen.gd",
+   "group": "main",
+   "tab": "summon",
+   "migrated_to": null
+  },
+  "tables": {
+   "script": "res://scripts/v10/core/tables_hub.gd",
+   "group": "main",
+   "tab": "tables",
+   "migrated_to": null
+  },
+  "tower_play": {
+   "script": "res://scripts/v10/tower/tower_play.gd",
+   "group": "v10",
+   "match": true,
+   "chrome": false,
+   "migrated_to": null
+  },
+  "v10account": {
+   "script": "res://scripts/v10/online/account_screen.gd",
+   "group": "v10",
+   "migrated_to": null
+  },
+  "v10boudoir": {
+   "script": "res://scripts/v10/salon/vip_boudoir_screen.gd",
+   "group": "main",
+   "migrated_to": null
+  },
+  "v10path": {
+   "script": "res://scripts/v10/path/path_map.gd",
+   "group": "v10",
+   "migrated_to": null
+  },
+  "v10pvp": {
+   "script": "res://scripts/v10/online/pvp_online_screen.gd",
+   "group": "v10",
+   "migrated_to": null
+  },
+  "v10salon": {
+   "script": "res://scripts/v10/salon/salon_screen.gd",
+   "group": "v10",
+   "migrated_to": null
+  },
+  "v10scene": {
+   "script": "res://scripts/v10/salon/zone_scene.gd",
+   "group": "v10",
+   "migrated_to": null
+  },
+  "v10welcome7": {
+   "script": "res://scripts/v10/events/welcome7_screen.gd",
+   "group": "v10",
+   "migrated_to": null
+  },
+  "v10wheel": {
+   "script": "res://scripts/v10/events/lucky_wheel_screen.gd",
+   "group": "v10",
+   "migrated_to": null
+  },
+  "v7event": {
+   "script": "res://scripts/v07/event/event_screen.gd",
+   "group": "main",
+   "migrated_to": null
+  },
+  "v7play": {
+   "script": "res://scripts/v07/event/event_play.gd",
+   "group": "main",
+   "match": true,
+   "args": {
+    "mode": "v7tourney",
+    "table": 0,
+    "partner": "mc"
+   },
+   "migrated_to": null
+  },
+  "v7tourney": {
+   "script": "res://scripts/v07/event/tourney_screen.gd",
+   "group": "main",
+   "args": {
+    "tab": "quarter"
+   },
+   "migrated_to": null
+  }
+ }
+}

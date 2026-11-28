@@ -56,3 +56,22 @@ stack.open(MyModal.new())          # MyModal extends TWModal; on_close = func(re
 * `on_close` runs exactly once whatever happens: `close()`, back, scrim tap, `clear_all`, the node being `free()`d from outside (tree_exiting pops it, reason `freed`), the stack leaving the tree, a refused open (`refused`: depth over `MAX_DEPTH` 8, during `clear_all`, a modal already open elsewhere).
 * Android back, one table (`TWScreens.back()`): top modal closes (it always swallows the press; a forced modal stays) -> screen `on_back()`/`can_back()` -> history -> `back_target` -> `exit_requested` -> `TWExitConfirm` ("Выйти из игры?"; back on it = stay; "Выйти" = `quit_fn` once).
 * `tools/lint_modal_only_via_stack.py` (suite `modal_only_via_stack`): enforcing in `game/shell` (no `overlay` access, no `add_child` on the layer outside the stack), report mode over the legacy code: 39 `overlay.get_children / get_child_count / find_children` detectors (+3 indexed, +11 direct adds) frozen as a ratchet in `tools/lint_modal_baseline.json`. Legacy screens that still add to `main.overlay` are LegacyHost's job (P25).
+
+## LegacyHost / main_v11.tscn (P25 / WP8c)
+
+`--shell=v11` (user arg; or ProjectSettings `tw/shell` = "v11", which nothing sets) makes `main.tscn` hand over to `res://shell/main_v11.tscn`
+(`main.gd::_shell_redirect`, deferred `change_scene_to_file`). Without the flag nothing changes: v10 boots exactly as before. You can also run
+`godot --path game res://shell/main_v11.tscn` directly (dev args `--screen= --shots= --at=` work in both).
+
+* `legacy_host.gd` (`LegacyHost`, root of main_v11.tscn) **extends the frozen v10 `scripts/main.gd`**. That is the shim: the whole duck-typed `main` API
+  (go / back / android_back / toast / overlay / screen / screen_id / refresh_currency / refresh_nav / show_chrome / fly_gems / ...) is the v10 code itself, so
+  the 88 `has_method`, 103 `main.screen` and 19 `get_tree().current_scene` sites cannot drift. main.gd is touched only by `_shell_redirect` (+ the host overrides it to `false`).
+* v11 plumbing next to the legacy chrome: `ctx` (TWContext, `ctx.service("legacy_host")` is the host), `tw_screens` (TWScreens in the tree, empty until the first
+  screen migrates), `modals` (ModalStack, last child, **hidden while empty** so the legacy `android_back` child scan skips it). `android_back()` closes a v11 modal first.
+* `legacy_screens.json` is the catalogue of every legacy screen id (46 today: 16 of `main.SCREENS` + 30 more from `V10Registry.screens()`; `summon` and `shop` are in both).
+  `LegacyHost.catalogue_drift()` keeps it equal to the live table. When a screen is ported its row and legacy folder go in the same merge. Regenerate rows with
+  `godot --path game res://shell/main_v11.tscn -- --legacy_dump=1`.
+* `open(id, args)` / `close()` = awaitable `go()` (returns when mounted / unmounted).
+* Suite `legacy_host` (`--legacy_selftest=1`): wiring, API surface, catalogue, every id opened and closed with 0 SCRIPT ERROR / non-teardown ERROR and a clean modal layer.
+  Engine ERRORs "Lambda capture ... was freed" / "Playback can only happen ..." (legacy screens freed under a running tween, same on v10) are counted, not failed.
+* `tools/legacy_host_shots.py`: pixel comparison default launch vs `--shell=v11`.
