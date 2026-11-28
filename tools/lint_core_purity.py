@@ -49,7 +49,10 @@ CORE = REPO / "game" / "core"
 SHELL = REPO / "game" / "scripts"
 BASELINE = REPO / "tools" / "lint_baseline.json"
 
-RULE_IDS = ["NODE_BASE", "NODE_API", "AUDIO_FX", "AUTOLOAD_G", "ROOT_PATH", "SHELL_DEP"]
+RULE_IDS = ["NODE_BASE", "NODE_API", "AUDIO_FX", "AUTOLOAD_G", "ROOT_PATH", "SHELL_DEP", "BATTLE_INT_ONLY"]
+
+# T10 (BATTLE_ULT_SPEC Appendix R, P74): game/core/modes/battle/**/*.gd must be strictly integer-deterministic.
+BATTLE_INT_ONLY_RX = re.compile(r"\b(pow|exp|log|sin|cos|randf|randfn)\b")
 
 NODE_BASES = {
     "Node", "Node2D", "Node3D", "Control", "CanvasLayer", "CanvasItem", "SceneTree", "MainLoop", "Window",
@@ -102,11 +105,17 @@ def split_line(line: str) -> tuple[str, str]:
     return "".join(keep), "".join(blank)
 
 
-def analyze(text: str, shell_classes: set[str] | frozenset[str] = frozenset()) -> dict:
+def is_battle_core_path(rel_path: str) -> bool:
+    norm = rel_path.replace("\\", "/")
+    return norm.startswith("game/core/modes/battle/") or "/modes/battle/" in norm
+
+
+def analyze(text: str, shell_classes: set[str] | frozenset[str] = frozenset(), rel_path: str = "") -> dict:
     """Pure function: GDScript source -> {"rules": {rule: count}, "lines": {rule: [lineno,...]}, "deps": [...]}."""
     rules: dict[str, int] = collections.Counter()
     lines: dict[str, list[int]] = collections.defaultdict(list)
     ident_pool: set[str] = set()
+    battle_int_check = is_battle_core_path(rel_path)
     in_triple = False
     for no, raw in enumerate(text.split("\n"), 1):
         # triple-quoted strings (docstrings / multi-line texts) are string content: skip their lines
@@ -128,6 +137,9 @@ def analyze(text: str, shell_classes: set[str] | frozenset[str] = frozenset()) -
             if rx.search(blank):
                 rules[rid] += 1
                 lines[rid].append(no)
+        if battle_int_check and BATTLE_INT_ONLY_RX.search(blank):
+            rules["BATTLE_INT_ONLY"] += 1
+            lines["BATTLE_INT_ONLY"].append(no)
         if ROOT_RX.search(keep):
             rules["ROOT_PATH"] += 1
             lines["ROOT_PATH"].append(no)
@@ -155,7 +167,7 @@ def scan(core: Path = CORE, shell: Path = SHELL) -> dict:
     deps: dict[str, list[str]] = {}
     for p in files:
         rel = p.relative_to(REPO).as_posix() if REPO in p.parents else p.as_posix()
-        a = analyze(p.read_text(encoding="utf-8", errors="replace"), shell_cls)
+        a = analyze(p.read_text(encoding="utf-8", errors="replace"), shell_cls, rel_path=rel)
         if a["rules"]:
             findings[rel] = a["rules"]
             lines[rel] = a["lines"]
@@ -213,49 +225,81 @@ SYNTH = {
     "root_path.gd": ("extends RefCounted\nfunc f(t):\n\treturn t.get_node(\"/root/Main\")\n", "ROOT_PATH"),
     "shell_dep.gd": ("extends RefCounted\nfunc f():\n\treturn ShellScreen.new()\n", "SHELL_DEP"),
 }
+SYNTH_BATTLE = {
+    "battle_pow.gd": ("extends RefCounted\nfunc f(x):\n\treturn pow(x, 1.5)\n", "BATTLE_INT_ONLY"),
+    "battle_exp.gd": ("extends RefCounted\nfunc f(x):\n\treturn exp(x)\n", "BATTLE_INT_ONLY"),
+    "battle_log.gd": ("extends RefCounted\nfunc f(x):\n\treturn log(x)\n", "BATTLE_INT_ONLY"),
+    "battle_sin.gd": ("extends RefCounted\nfunc f(x):\n\treturn sin(x)\n", "BATTLE_INT_ONLY"),
+    "battle_cos.gd": ("extends RefCounted\nfunc f(x):\n\treturn cos(x)\n", "BATTLE_INT_ONLY"),
+    "battle_randf.gd": ("extends RefCounted\nfunc f():\n\treturn randf()\n", "BATTLE_INT_ONLY"),
+    "battle_randfn.gd": ("extends RefCounted\nfunc f():\n\treturn randfn(0.0, 1.0)\n", "BATTLE_INT_ONLY"),
+}
 # clean look-alikes that MUST NOT fire (comments, strings, member access, identifiers containing the tokens)
 SYNTH_CLEAN = (
     "extends RefCounted\n"
     "class_name SynthClean\n"
-    "# Node Control Tween G.coins /root/Main Sfx.play get_tree() ShellScreen\n"
-    "var a := \"G. is a string, Node too, Sfx.x\"  # trailing Node comment\n"
+    "# Node Control Tween G.coins /root/Main Sfx.play get_tree() ShellScreen pow exp log sin cos randf randfn\n"
+    "var a := \"G. is a string, Node too, Sfx.x, pow(1,2) randf()\"  # trailing Node comment\n"
     "var b := 1  # G.x\n"
     "var color := \"#ff00ff\"\n"
-    "func f(player, NodeCount, Ring):\n"
+    "func f(player, NodeCount, Ring, power_val, catalog, cosine):\n"
     "\tvar g = player.G.x\n"
     "\tvar my_G = 1\n"
-    "\treturn NodeCount + Ring\n"
-    "\"\"\"\ndocstring with Node and G.coins and get_tree()\n\"\"\"\n"
+    "\treturn NodeCount + Ring + power_val + catalog + cosine\n"
+    "\"\"\"\ndocstring with Node and G.coins and get_tree() and pow() and randf()\n\"\"\"\n"
 )
 
 
 def selftest() -> int:
     import tempfile
     shell_cls = {"ShellScreen"}
+    total_cases = len(SYNTH) + len(SYNTH_BATTLE)
     with tempfile.TemporaryDirectory(prefix="core_purity_selftest_") as td:
         d = Path(td)
         for name, (src, _) in SYNTH.items():
             (d / name).write_text(src, encoding="utf-8")
         (d / "clean.gd").write_text(SYNTH_CLEAN, encoding="utf-8")
+        # Non-battle core file using pow() must NOT trip BATTLE_INT_ONLY
+        (d / "non_battle_pow.gd").write_text("extends RefCounted\nfunc f(x):\n\treturn pow(x, 2)\n", encoding="utf-8")
+        bdir = d / "game" / "core" / "modes" / "battle"
+        bdir.mkdir(parents=True, exist_ok=True)
+        for name, (src, _) in SYNTH_BATTLE.items():
+            (bdir / name).write_text(src, encoding="utf-8")
+        (bdir / "battle_clean.gd").write_text(SYNTH_CLEAN, encoding="utf-8")
+
         total, ok, bad = 0, 0, []
         for p in sorted(d.glob("*.gd")):
-            a = analyze(p.read_text(encoding="utf-8"), shell_cls)
+            a = analyze(p.read_text(encoding="utf-8"), shell_cls, rel_path=p.name)
             n = sum(a["rules"].values())
             total += n
-            if p.name == "clean.gd":
+            if p.name in ("clean.gd", "non_battle_pow.gd"):
                 if n:
-                    bad.append(f"clean.gd false positives: {a['rules']}")
+                    bad.append(f"{p.name} false positives: {a['rules']}")
                 continue
             want = SYNTH[p.name][1]
             if a["rules"] == {want: 1}:
                 ok += 1
             else:
                 bad.append(f"{p.name}: want {{{want}: 1}} got {a['rules']}")
+        for p in sorted(bdir.glob("*.gd")):
+            rel = p.relative_to(d).as_posix()
+            a = analyze(p.read_text(encoding="utf-8"), shell_cls, rel_path=rel)
+            n = sum(a["rules"].values())
+            total += n
+            if p.name == "battle_clean.gd":
+                if n:
+                    bad.append(f"{rel} false positives: {a['rules']}")
+                continue
+            want = SYNTH_BATTLE[p.name][1]
+            if a["rules"] == {want: 1}:
+                ok += 1
+            else:
+                bad.append(f"{rel}: want {{{want}: 1}} got {a['rules']}")
     for b in bad:
         print("SELFTEST FAIL:", b)
-    good = ok == len(SYNTH) and total == len(SYNTH) and not bad
-    print(f"CORE_PURITY SELFTEST: {ok}/{len(SYNTH)} {'PASS' if good else 'FAIL'} ({total} findings in "
-          f"{len(SYNTH)} synthetic files + 1 clean look-alike file)")
+    good = ok == total_cases and total == total_cases and not bad
+    print(f"CORE_PURITY SELFTEST: {ok}/{total_cases} {'PASS' if good else 'FAIL'} ({total} findings in "
+          f"{total_cases} synthetic files + 3 clean look-alike files)")
     return 0 if good else 1
 
 

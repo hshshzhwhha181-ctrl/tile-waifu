@@ -1,0 +1,374 @@
+{
+  "schema": 1,
+  "version": "1.0",
+  "spec_ref": "design/specs/BATTLE_ULT_SPEC.md#1.6-1.6.1,8.0",
+  "bp_scale": 10000,
+  "energy_scale": 1000,
+  "heroes": {
+    "mc": {
+      "id": "mc",
+      "name_ru": "Маджонг-тян",
+      "role": "SUP",
+      "aura": "sou",
+      "base_ult_id": "mc_base",
+      "vow_ult_id": "mc_vow",
+      "ult_name_ru": "Восточный ветер",
+      "ult_name_jp": "東風 (Tōfū)",
+      "chapter_guest": [1, 6],
+      "passive": {
+        "id": "mc_passive",
+        "name_ru": "Заряд хозяйки",
+        "effect_type": "ally_energy_per_pair",
+        "params": {"ally_energy_milli": 300},
+        "scale_per_lv_bp": 400
+      },
+      "leader": {
+        "id": "mc_leader",
+        "name_ru": "Пять ветров",
+        "effect_type": "honor_resonant_all",
+        "params": {"honor_resonant_all": true},
+        "scale_per_lv_bp": 800,
+        "unlock_level": 30
+      },
+      "ult": {
+        "dmg_bp": 30000,
+        "needs_aim": true,
+        "aim_kind": "pair",
+        "rider": {
+          "team_buff_bp": 12500,
+          "team_buff_pairs": 8,
+          "ally_energy_milli": 20000,
+          "honor_resonant_pairs": 8,
+          "remove_ult_pairs": 1
+        }
+      }
+    },
+    "rin": {
+      "id": "rin",
+      "name_ru": "Рин",
+      "role": "HEAL",
+      "aura": "sou",
+      "base_ult_id": "rin_base",
+      "vow_ult_id": "rin_vow",
+      "ult_name_ru": "Чайная пауза",
+      "ult_name_jp": "茶の間 (Cha no Ma)",
+      "chapter_guest": [3],
+      "passive": {
+        "id": "rin_passive",
+        "name_ru": "Чайное тепло",
+        "effect_type": "gold_pair_heal",
+        "params": {"gold_pair_heal_bp": 100},
+        "scale_per_lv_bp": 400
+      },
+      "leader": {
+        "id": "rin_leader",
+        "name_ru": "Тихий час",
+        "effect_type": "post_boss_cast_cleanse_seal",
+        "params": {"cleanse_seals": 1},
+        "scale_per_lv_bp": 800,
+        "unlock_level": 30
+      },
+      "ult": {
+        "dmg_bp": 25000,
+        "needs_aim": false,
+        "aim_kind": "",
+        "rider": {
+          "heal_bp": 2500,
+          "cleanse_all_board": true,
+          "return_tray_or_pair": true,
+          "passive_cup_gain": 1
+        }
+      }
+    },
+    "hana": {
+      "id": "hana",
+      "name_ru": "Хана",
+      "role": "ATK",
+      "aura": "man",
+      "base_ult_id": "hana_base",
+      "vow_ult_id": "hana_vow",
+      "ult_name_ru": "Рывок",
+      "ult_name_jp": "疾走 (Shissō)",
+      "chapter_guest": [4],
+      "passive": {
+        "id": "hana_passive",
+        "name_ru": "Ритм забега",
+        "effect_type": "combo_step_bonus",
+        "params": {"combo_step_bonus_bp": 500},
+        "scale_per_lv_bp": 400
+      },
+      "leader": {
+        "id": "hana_leader",
+        "name_ru": "Спринт",
+        "effect_type": "fever_threshold_override",
+        "params": {"fever_combo_threshold": 8},
+        "scale_per_lv_bp": 800,
+        "unlock_level": 30
+      },
+      "ult": {
+        "dmg_bp": 90000,
+        "needs_aim": false,
+        "aim_kind": "",
+        "rider": {
+          "broken_bonus_bp": 12500,
+          "remove_ult_pairs": 2,
+          "combo_bonus": 3
+        }
+      }
+    },
+    "yue": {
+      "id": "yue",
+      "name_ru": "Юэ",
+      "role": "ATK",
+      "aura": "pin",
+      "base_ult_id": "yue_base",
+      "vow_ult_id": "yue_vow",
+      "ult_name_ru": "Лунный свет",
+      "ult_name_jp": "月光 (Gekkō)",
+      "chapter_guest": [2],
+      "passive": {
+        "id": "yue_passive",
+        "name_ru": "Лунный прицел",
+        "effect_type": "gold_crit_bonus",
+        "params": {"gold_crit_bonus_bp": 1500},
+        "scale_per_lv_bp": 400
+      },
+      "leader": {
+        "id": "yue_leader",
+        "name_ru": "Лунные грани",
+        "effect_type": "periodic_gold_pair",
+        "params": {"gold_pair_every_n": 8},
+        "scale_per_lv_bp": 800,
+        "unlock_level": 30
+      },
+      "ult": {
+        "dmg_bp": 90000,
+        "needs_aim": false,
+        "aim_kind": "",
+        "rider": {
+          "reveal_row": true,
+          "next_gold_pairs": 3,
+          "gold_crit_bp": 22000
+        }
+      }
+    },
+    "nova": {
+      "id": "nova",
+      "name_ru": "Нова",
+      "role": "BRK",
+      "aura": "pin",
+      "base_ult_id": "nova_base",
+      "vow_ult_id": "nova_vow",
+      "ult_name_ru": "Взлом",
+      "ult_name_jp": "侵入 (Shin'nyū)",
+      "chapter_guest": [],
+      "passive": {
+        "id": "nova_passive",
+        "name_ru": "Пробой защиты",
+        "effect_type": "pair_shield_bonus",
+        "params": {"pair_shield_bonus_bp": 1500},
+        "scale_per_lv_bp": 400
+      },
+      "leader": {
+        "id": "nova_leader",
+        "name_ru": "Взлом входа",
+        "effect_type": "boss_start_shield_reduce",
+        "params": {"boss_start_shield_reduce_bp": 1000},
+        "scale_per_lv_bp": 800,
+        "unlock_level": 30
+      },
+      "ult": {
+        "dmg_bp": 55000,
+        "needs_aim": true,
+        "aim_kind": "layer",
+        "rider": {
+          "shield_shred_bp": 10000,
+          "remove_deepest_pair": true
+        }
+      }
+    },
+    "tsubame": {
+      "id": "tsubame",
+      "name_ru": "Цубамэ",
+      "role": "BRK",
+      "aura": "sou",
+      "base_ult_id": "tsubame_base",
+      "vow_ult_id": "tsubame_vow",
+      "ult_name_ru": "Теневой шаг",
+      "ult_name_jp": "影渡り (Kagewatari)",
+      "chapter_guest": [],
+      "passive": {
+        "id": "tsubame_passive",
+        "name_ru": "Теневой надрез",
+        "effect_type": "periodic_shield_double",
+        "params": {"every_n_pairs": 6, "shield_mult_bp": 20000},
+        "scale_per_lv_bp": 400
+      },
+      "leader": {
+        "id": "tsubame_leader",
+        "name_ru": "Первый шаг",
+        "effect_type": "skip_first_boss_cast",
+        "params": {"skip_first_boss_casts": 1},
+        "scale_per_lv_bp": 800,
+        "unlock_level": 30
+      },
+      "ult": {
+        "dmg_bp": 55000,
+        "needs_aim": false,
+        "aim_kind": "",
+        "rider": {
+          "stun_casts": 2,
+          "shield_shred_bp": 5000,
+          "remove_sandwiched_pair": true
+        }
+      }
+    },
+    "miel": {
+      "id": "miel",
+      "name_ru": "Миэль",
+      "role": "HEAL",
+      "aura": "pin",
+      "base_ult_id": "miel_base",
+      "vow_ult_id": "miel_vow",
+      "ult_name_ru": "Печенье-джокер",
+      "ult_name_jp": "ジョーカークッキー",
+      "chapter_guest": [],
+      "passive": {
+        "id": "miel_passive",
+        "name_ru": "Сахарная искра",
+        "effect_type": "lowest_ally_energy_per_pair",
+        "params": {"lowest_ally_energy_milli": 500},
+        "scale_per_lv_bp": 400
+      },
+      "leader": {
+        "id": "miel_leader",
+        "name_ru": "Печенье в запас",
+        "effect_type": "start_tray_joker",
+        "params": {"start_tray_jokers": 1},
+        "scale_per_lv_bp": 800,
+        "unlock_level": 30
+      },
+      "ult": {
+        "dmg_bp": 25000,
+        "needs_aim": false,
+        "aim_kind": "",
+        "rider": {
+          "heal_bp": 2000,
+          "lowest_ally_energy_milli": 25000,
+          "add_tray_joker": 1
+        }
+      }
+    },
+    "kohaku": {
+      "id": "kohaku",
+      "name_ru": "Кохаку",
+      "role": "GRD",
+      "aura": "man",
+      "base_ult_id": "kohaku_base",
+      "vow_ult_id": "kohaku_vow",
+      "ult_name_ru": "Лисий оберег",
+      "ult_name_jp": "狐の御守 (Kitsune no Omamori)",
+      "chapter_guest": [6],
+      "passive": {
+        "id": "kohaku_passive",
+        "name_ru": "Лисий огонь",
+        "effect_type": "team_ult_dmg_bonus",
+        "params": {"team_ult_dmg_bonus_bp": 400},
+        "scale_per_lv_bp": 400
+      },
+      "leader": {
+        "id": "kohaku_leader",
+        "name_ru": "Оберег на лотке",
+        "effect_type": "start_tray_ward",
+        "params": {"start_tray_wards": 1},
+        "scale_per_lv_bp": 800,
+        "unlock_level": 30
+      },
+      "ult": {
+        "dmg_bp": 30000,
+        "needs_aim": false,
+        "aim_kind": "",
+        "rider": {
+          "barrier_bp": 2000,
+          "barrier_casts": 2,
+          "seal_immunity_casts": 2,
+          "add_tray_ward": 1
+        }
+      }
+    },
+    "shirin": {
+      "id": "shirin",
+      "name_ru": "Ширин",
+      "role": "SUP",
+      "aura": "pin",
+      "base_ult_id": "shirin_base",
+      "vow_ult_id": "shirin_vow",
+      "ult_name_ru": "Танец монет",
+      "ult_name_jp": "銭の舞 (Zeni no Mai)",
+      "chapter_guest": [],
+      "passive": {
+        "id": "shirin_passive",
+        "name_ru": "Танец монет",
+        "effect_type": "gold_pair_shield_bonus",
+        "params": {"gold_pair_shield_bonus_bp": 1000},
+        "scale_per_lv_bp": 400
+      },
+      "leader": {
+        "id": "shirin_leader",
+        "name_ru": "Долгий азарт",
+        "effect_type": "fever_duration_bonus",
+        "params": {"fever_extra_pairs": 2},
+        "scale_per_lv_bp": 800,
+        "unlock_level": 30
+      },
+      "ult": {
+        "dmg_bp": 30000,
+        "needs_aim": false,
+        "aim_kind": "",
+        "rider": {
+          "ignite_fever_pairs": 6,
+          "extend_fever_pairs": 3,
+          "ally_energy_milli": 15000,
+          "remove_ult_pairs": 1
+        }
+      }
+    },
+    "zlata": {
+      "id": "zlata",
+      "name_ru": "Злата",
+      "role": "ATK",
+      "aura": "man",
+      "base_ult_id": "zlata_base",
+      "vow_ult_id": "zlata_vow",
+      "ult_name_ru": "Огненный шлейф",
+      "ult_name_jp": "火の尾羽 (Hi no Obane)",
+      "chapter_guest": [5],
+      "passive": {
+        "id": "zlata_passive",
+        "name_ru": "Жар-птица",
+        "effect_type": "pair_dmg_bonus",
+        "params": {"pair_dmg_bonus_bp": 300},
+        "scale_per_lv_bp": 400
+      },
+      "leader": {
+        "id": "zlata_leader",
+        "name_ru": "Весенний жар",
+        "effect_type": "periodic_melt_ice",
+        "params": {"every_n_pairs": 6, "melt_count": 1},
+        "scale_per_lv_bp": 800,
+        "unlock_level": 30
+      },
+      "ult": {
+        "dmg_bp": 90000,
+        "needs_aim": false,
+        "aim_kind": "",
+        "rider": {
+          "burn_atk_bp": 12000,
+          "burn_pairs": 6,
+          "melt_line": true,
+          "remove_ult_pairs": 1
+        }
+      }
+    }
+  }
+}

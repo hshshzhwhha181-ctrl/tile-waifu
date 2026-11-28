@@ -1,0 +1,700 @@
+{
+  "schema": 1,
+  "version": "2.0-variant-a",
+  "spec_ref": "design/specs/BATTLE_ULT_SPEC.md",
+  "bp_scale": 10000,
+  "energy_scale": 1000,
+  "shield_scale": 1000,
+  "flags": {
+    "variant": "A",
+    "outfit_stats_enabled": false,
+    "bond_stats_enabled": false,
+    "paid_accelerators_enabled": false,
+    "publish_sim_numbers_in_rules": false,
+    "selftest_gates_calibrated": false,
+    "power_leaderboard_rewards_enabled": false
+  },
+  "auras": [
+    "man",
+    "pin",
+    "sou"
+  ],
+  "combat": {
+    "pair_norm_bp": 3500,
+    "combo_step_bp": 2500,
+    "combo_cap": 6,
+    "combo_window_ms": 5000,
+    "fever_combo": 10,
+    "fever_pairs": 6,
+    "fever_dmg_bp": 13000,
+    "fever_energy_bp": 15000,
+    "fever_shield_bp": 16000,
+    "support_buff_bp": 12500,
+    "support_buff_pairs": 8,
+    "res_full_bp": 10000,
+    "res_off_bp": 4000,
+    "honor_pair_bp": 7000,
+    "weak_mult_bp": 12500,
+    "resist_mult_bp": 8500,
+    "gold_crit_bp": 15000,
+    "yue_gold_crit_bp": 22000,
+    "ult_pair_dmg_bp": 5000,
+    "board_clear_boss_hp_bp": 1200,
+    "board_clear_energy_milli": 30000,
+    "energy_pair_milli": 2400,
+    "energy_res_bp": 16000,
+    "energy_honor_bp": 12000,
+    "energy_combo_milli": 200,
+    "energy_start_milli": 40000,
+    "ult_cost_milli": 100000,
+    "sup_ult_ally_energy_milli": 20000,
+    "shirin_ult_ally_energy_milli": 15000,
+    "ult_aim_timeout_ms": 2000
+  },
+  "patterns": {
+    "one_suit": {
+      "min_streak": 3,
+      "dmg_bonus_bp": 2000,
+      "energy_bonus_milli": 0,
+      "priority": 1
+    },
+    "kan": {
+      "same_face": true,
+      "dmg_bonus_bp": 2500,
+      "energy_bonus_milli": 0,
+      "priority": 2
+    },
+    "ladder": {
+      "min_streak": 3,
+      "dmg_bonus_bp": 3500,
+      "energy_bonus_milli": 0,
+      "priority": 3
+    },
+    "pure": {
+      "min_streak": 6,
+      "dmg_bonus_bp": 8000,
+      "energy_bonus_milli": 20000,
+      "priority": 4
+    }
+  },
+  "shield_and_boss": {
+    "shield_units_default": 16,
+    "shield_pair_milli": 1000,
+    "shield_ult_milli": 4000,
+    "shield_brk_team_bp": 12500,
+    "shield_brk_ult_bp": 15000,
+    "break_hits": 3,
+    "break_mult_bp": 20000,
+    "break_stun": 1,
+    "boss_atk_bp": 4000,
+    "boss_cadence_default": 6,
+    "boss_cadence_enrage_step": 2,
+    "boss_cadence_min": 3,
+    "boss_heavy_every": 3,
+    "boss_heavy_bp": 18000,
+    "enrage_per_wave_bp": 8000,
+    "overflow_dmg_bp": 1500,
+    "waves_default": [
+      36,
+      24
+    ],
+    "stage_factors_bp": {
+      "normal": 10000,
+      "elite": 11200,
+      "boss": 13500
+    },
+    "difficulties": {
+      "normal": {
+        "hp_bp": 10000,
+        "atk_bp": 10000
+      },
+      "hard": {
+        "hp_bp": 12500,
+        "atk_bp": 11000
+      },
+      "nightmare": {
+        "hp_bp": 15000,
+        "atk_bp": 12500
+      }
+    },
+    "assist_hp_reduction_bp": 1500,
+    "k_normal_bp": 1120000,
+    "star3_max_pairs": 32,
+    "star2_min_hp_bp": 5000
+  },
+  "roles": {
+    "ATK": {
+      "atk1": 100,
+      "hp1": 80,
+      "energy_mult_bp": 10000,
+      "ult_dmg_bp": 90000
+    },
+    "BRK": {
+      "atk1": 85,
+      "hp1": 90,
+      "energy_mult_bp": 10000,
+      "ult_dmg_bp": 55000
+    },
+    "SUP": {
+      "atk1": 60,
+      "hp1": 100,
+      "energy_mult_bp": 11500,
+      "ult_dmg_bp": 30000
+    },
+    "HEAL": {
+      "atk1": 50,
+      "hp1": 110,
+      "energy_mult_bp": 10000,
+      "ult_dmg_bp": 25000
+    },
+    "GRD": {
+      "atk1": 55,
+      "hp1": 130,
+      "energy_mult_bp": 10000,
+      "ult_dmg_bp": 30000
+    }
+  },
+  "role_effects": {
+    "heal_passive_bp": 30,
+    "heal_ult_bp": 2500,
+    "miel_heal_ult_bp": 2000,
+    "guard_ult_bp": 2000,
+    "vow_heal_ult_bp": 1500,
+    "atk_broken_bonus_bp": 12500
+  },
+  "heroes": {
+    "hana": {
+      "role": "ATK",
+      "aura": "man"
+    },
+    "kohaku": {
+      "role": "GRD",
+      "aura": "man"
+    },
+    "zlata": {
+      "role": "ATK",
+      "aura": "man"
+    },
+    "yue": {
+      "role": "ATK",
+      "aura": "pin"
+    },
+    "nova": {
+      "role": "BRK",
+      "aura": "pin"
+    },
+    "shirin": {
+      "role": "SUP",
+      "aura": "pin"
+    },
+    "miel": {
+      "role": "HEAL",
+      "aura": "pin"
+    },
+    "tsubame": {
+      "role": "BRK",
+      "aura": "sou"
+    },
+    "mc": {
+      "role": "SUP",
+      "aura": "sou"
+    },
+    "rin": {
+      "role": "HEAL",
+      "aura": "sou"
+    }
+  },
+  "progression": {
+    "level_step_bp": 1000,
+    "level_cap_launch": 60,
+    "level_cap_max": 90,
+    "level_cap_schedule": {
+      "launch": 60,
+      "m4": 70,
+      "m8": 80,
+      "m12": 90
+    },
+    "chapter_cap_base": 10,
+    "chapter_cap_step": 7,
+    "skill_ult_step_bp": 600,
+    "skill_rider_step_bp": 400,
+    "skill_leader_step_bp": 800,
+    "talisman_hp_ratio_bp": 9000,
+    "talisman_max_bp": 4300,
+    "talisman_f2p_max_bp": 4000,
+    "bond_per_lv_bp": 50,
+    "bond_max_lv": 10,
+    "outfit_base_bp": {
+      "BASE": 0,
+      "VOW": 0,
+      "S": 400,
+      "SSR": 800,
+      "SSRP": 1000
+    },
+    "outfit_star_step_bp": {
+      "BASE": 0,
+      "VOW": 0,
+      "S": 100,
+      "SSR": 200,
+      "SSRP": 250
+    },
+    "outfit_hp_ratio_bp": 6000,
+    "outfit_max_stars": 5,
+    "collection_per_outfit_bp": 25,
+    "collection_cap_bp": 600,
+    "monetizable_cap_bp": 0,
+    "monetizable_cap_bp_variant_b": 2800,
+    "monetizable_cap_bp_compliance_b": 1000,
+    "xp_step": [
+      18,
+      51,
+      94,
+      144,
+      201,
+      265,
+      333,
+      407,
+      486,
+      569,
+      657,
+      748,
+      844,
+      943,
+      1046,
+      1152,
+      1262,
+      1375,
+      1491,
+      1610,
+      1732,
+      1857,
+      1985,
+      2116,
+      2250,
+      2386,
+      2525,
+      2667,
+      2811,
+      2958,
+      3107,
+      3258,
+      3412,
+      3569,
+      3727,
+      3888,
+      4051,
+      4216,
+      4384,
+      4554,
+      4726,
+      4899,
+      5075,
+      5254,
+      5434,
+      5616,
+      5800,
+      5986,
+      6174,
+      6364,
+      6556,
+      6750,
+      6945,
+      7143,
+      7342,
+      7543,
+      7746,
+      7951,
+      8157,
+      8366,
+      8576,
+      8787,
+      9001,
+      9216,
+      9433,
+      9651,
+      9872,
+      10093,
+      10317,
+      10542,
+      10769,
+      10997,
+      11227,
+      11458,
+      11691,
+      11926,
+      12162,
+      12400,
+      12639,
+      12880,
+      13122,
+      13366,
+      13611,
+      13858,
+      14106,
+      14356,
+      14607,
+      14859,
+      15113
+    ],
+    "xp_cum": [
+      0,
+      18,
+      69,
+      163,
+      307,
+      508,
+      773,
+      1106,
+      1513,
+      1999,
+      2568,
+      3225,
+      3973,
+      4817,
+      5760,
+      6806,
+      7958,
+      9220,
+      10595,
+      12086,
+      13696,
+      15428,
+      17285,
+      19270,
+      21386,
+      23636,
+      26022,
+      28547,
+      31214,
+      34025,
+      36983,
+      40090,
+      43348,
+      46760,
+      50329,
+      54056,
+      57944,
+      61995,
+      66211,
+      70595,
+      75149,
+      79875,
+      84774,
+      89849,
+      95103,
+      100537,
+      106153,
+      111953,
+      117939,
+      124113,
+      130477,
+      137033,
+      143783,
+      150728,
+      157871,
+      165213,
+      172756,
+      180502,
+      188453,
+      196610,
+      204976,
+      213552,
+      222339,
+      231340,
+      240556,
+      249989,
+      259640,
+      269512,
+      279605,
+      289922,
+      300464,
+      311233,
+      322230,
+      333457,
+      344915,
+      356606,
+      368532,
+      380694,
+      393094,
+      405733,
+      418613,
+      431735,
+      445101,
+      458712,
+      472570,
+      486676,
+      501032,
+      515639,
+      530498,
+      545611
+    ]
+  },
+  "catchup": {
+    "enabled": true,
+    "lag_levels_threshold": 10,
+    "xp_mult_bp": 20000,
+    "powder_mult_bp": 20000,
+    "sync_new_hero_to_squad_avg": true,
+    "pre_cap_raise_gift_days_before": 7,
+    "pre_cap_raise_gift_xp": 60000,
+    "cap_raise_milestones_days": [
+      112,
+      224,
+      336
+    ],
+    "beta_p1_f2p_mid_ch4_d30_target_bp": 6000
+  },
+  "twists": {
+    "T1": {
+      "code": "echo",
+      "minor": {
+        "extra_ult_pairs": 1,
+        "bonus_atk_bp": 1000
+      },
+      "major": {
+        "extra_ult_pairs": 2,
+        "bonus_atk_bp": 1500
+      }
+    },
+    "T2": {
+      "code": "burn",
+      "minor": {
+        "atk_bp": 1500,
+        "pairs": 3
+      },
+      "major": {
+        "atk_bp": 2200,
+        "pairs": 4
+      }
+    },
+    "T3": {
+      "code": "ward",
+      "minor": {
+        "barrier_bp": 800,
+        "bonus_atk_bp": 4500
+      },
+      "major": {
+        "barrier_bp": 1200,
+        "bonus_atk_bp": 8000
+      }
+    },
+    "T4": {
+      "code": "charge",
+      "minor": {
+        "ally_energy_milli": 8000,
+        "bonus_atk_bp": 5500
+      },
+      "major": {
+        "ally_energy_milli": 12000,
+        "bonus_atk_bp": 9500
+      }
+    },
+    "T5": {
+      "code": "mend",
+      "minor": {
+        "heal_bp": 600,
+        "bonus_atk_bp": 4500
+      },
+      "major": {
+        "heal_bp": 1000,
+        "bonus_atk_bp": 8000
+      }
+    },
+    "T6": {
+      "code": "breach",
+      "minor": {
+        "shield_pct_bp": 1500,
+        "bonus_atk_bp": 1500
+      },
+      "major": {
+        "shield_pct_bp": 2500,
+        "bonus_atk_bp": 3500
+      }
+    },
+    "T7": {
+      "code": "fever",
+      "minor": {
+        "fever_pairs": 1,
+        "bonus_atk_bp": 0
+      },
+      "major": {
+        "fever_pairs": 2,
+        "bonus_atk_bp": 0
+      }
+    },
+    "T8": {
+      "code": "mark",
+      "minor": {
+        "dmg_mult_bp": 11000,
+        "pairs": 3
+      },
+      "major": {
+        "dmg_mult_bp": 11400,
+        "pairs": 4
+      }
+    }
+  },
+  "sim": {
+    "pair_rate_milli": {
+      "casual": 9000,
+      "mid": 11000,
+      "expert": 13500
+    },
+    "combo_p_bp": {
+      "casual": 5200,
+      "mid": 6800,
+      "expert": 8200
+    },
+    "overflow_p_bp": {
+      "casual": 200,
+      "mid": 100,
+      "expert": 40
+    },
+    "autobattle": {
+      "pair_rate_milli": 7000,
+      "combo_p_bp": 4500,
+      "overflow_p_bp": 120
+    },
+    "suit_prob_bp": 8100,
+    "ladder_sim_p_bp": 600,
+    "kan_sim_p_bp": 400,
+    "squad_std": [
+      "hana",
+      "nova",
+      "mc",
+      "rin",
+      "kohaku"
+    ],
+    "daily_xp_income": {
+      "light": 9000,
+      "mid": 15000,
+      "active": 22000
+    },
+    "daily_powder_income": {
+      "light": 3600,
+      "mid": 5800,
+      "active": 8100
+    },
+    "profiles": {
+      "P0- F2P-mid": {
+        "level": 52,
+        "tal_bp": 1800,
+        "skill": 6,
+        "outfits": [],
+        "bond": 8,
+        "collection": 0
+      },
+      "P0 F2P-max": {
+        "level": 60,
+        "tal_bp": 3000,
+        "skill": 8,
+        "outfits": [],
+        "bond": 10,
+        "collection": 3
+      },
+      "P0+ F2P-long": {
+        "level": 60,
+        "tal_bp": 4000,
+        "skill": 10,
+        "outfits": [],
+        "bond": 10,
+        "collection": 3
+      },
+      "P1 small": {
+        "level": 60,
+        "tal_bp": 4000,
+        "skill": 10,
+        "outfits": [
+          [
+            "S",
+            2
+          ],
+          [
+            "SSR",
+            1
+          ]
+        ],
+        "bond": 10,
+        "collection": 3
+      },
+      "P2 mid": {
+        "level": 60,
+        "tal_bp": 4000,
+        "skill": 10,
+        "outfits": [
+          [
+            "SSR",
+            2
+          ],
+          [
+            "SSR",
+            2
+          ],
+          [
+            "S",
+            3
+          ]
+        ],
+        "bond": 10,
+        "collection": 6
+      },
+      "P3 whale": {
+        "level": 60,
+        "tal_bp": 4000,
+        "tal_bp_variant_b": 4300,
+        "skill": 10,
+        "outfits": [
+          [
+            "SSRP",
+            5
+          ],
+          [
+            "SSR",
+            5
+          ],
+          [
+            "SSR",
+            5
+          ],
+          [
+            "SSR",
+            5
+          ],
+          [
+            "S",
+            5
+          ]
+        ],
+        "bond": 10,
+        "collection": 12
+      }
+    },
+    "f2p_mid_attendance_days_per_week": [
+      3.5,
+      6.0,
+      4.8
+    ]
+  },
+  "gates": {
+    "calibrated": false,
+    "publish_in_rules": false,
+    "win_p0_mid_normal_bp": [
+      9000,
+      9700
+    ],
+    "win_p0_mid_hard_bp": [
+      4500,
+      6800
+    ],
+    "ttk_p0_mid_normal_pairs": [
+      26,
+      32
+    ],
+    "ult_share_bp": [
+      4200,
+      5500
+    ],
+    "role_spread_max_bp": 300,
+    "twist_spread_max_bp": 300
+  }
+}

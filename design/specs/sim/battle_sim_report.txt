@@ -1,75 +1,88 @@
-[CAL] P0 squad: team HP 4693, pair power (combo 1) 714.2. Boss HP 81417 gives 28 pairs (mid skill).  K_normal = HP / TPP = 114.0
+[META] balance=data/battle/balance.json variant=A outfit_stats=False bond_stats=False paid_accel=False publish_in_rules=False gates_calibrated=False
+[CAL] P0 squad: team HP 4467, pair power (combo 1) 678.4. Boss HP 75995 gives 28 pairs (mid skill).  K_normal = HP / TPP = 112.0
 
 [T1] profile x skill on the calibrated NORMAL stage (waves 36+24 pairs): win / 3-star / pairs / sec / ults / HP left
-  P0- F2P-mid cas win  17% 3*   0% 40.1p 267s u4.3 hp 30% | mid win  55% 3*   1% 38.1p 208s u6.0 hp 30% | exp win  84% 3*  14% 33.2p 148s u6.1 hp 32%
-  P0 F2P-max  cas win  80% 3*  12% 32.7p 218s u4.8 hp 30% | mid win  94% 3*  47% 28.6p 156s u5.0 hp 43% | exp win 100% 3*  66% 23.8p 106s u5.0 hp 55%
-  P0+ F2P-longcas win  93% 3*  52% 26.2p 174s u4.8 hp 48% | mid win  99% 3*  74% 23.6p 129s u4.9 hp 53% | exp win 100% 3*  91% 20.0p  89s u5.0 hp 60%
-  P1 small    cas win  96% 3*  56% 24.3p 162s u4.8 hp 49% | mid win  99% 3*  78% 21.5p 117s u5.0 hp 54% | exp win 100% 3*  93% 18.6p  83s u5.0 hp 61%
-  P2 mid      cas win  98% 3*  61% 22.4p 150s u4.9 hp 50% | mid win 100% 3*  80% 20.3p 111s u5.0 hp 55% | exp win 100% 3*  94% 18.1p  80s u5.0 hp 61%
-  P3 whale    cas win  99% 3*  69% 19.7p 131s u5.0 hp 57% | mid win 100% 3*  84% 18.7p 102s u5.0 hp 61% | exp win 100% 3*  94% 17.2p  76s u4.8 hp 66%
+  P0- F2P-mid cas win   3% 3*   0% 37.4p 250s u3.7 hp 25% | mid win  27% 3*   1% 35.8p 195s u4.9 hp 16% | exp win  77% 3*  13% 32.3p 144s u5.3 hp 25%
+  P0 F2P-max  cas win  83% 3*  19% 31.4p 209s u4.8 hp 32% | mid win  94% 3*  47% 27.7p 151s u5.0 hp 44% | exp win 100% 3*  53% 23.0p 102s u5.0 hp 54%
+  P0+ F2P-longcas win  94% 3*  54% 25.5p 170s u4.8 hp 48% | mid win  99% 3*  75% 22.9p 125s u5.0 hp 53% | exp win 100% 3*  92% 19.4p  86s u5.0 hp 60%
+  P1 small    cas win  94% 3*  54% 25.5p 170s u4.8 hp 48% | mid win  99% 3*  75% 22.9p 125s u5.0 hp 53% | exp win 100% 3*  92% 19.4p  86s u5.0 hp 60%
+  P2 mid      cas win  94% 3*  54% 25.5p 170s u4.8 hp 48% | mid win  99% 3*  75% 22.9p 125s u5.0 hp 53% | exp win 100% 3*  92% 19.4p  86s u5.0 hp 60%
+  P3 whale    cas win  94% 3*  54% 25.5p 170s u4.8 hp 48% | mid win  99% 3*  75% 22.9p 125s u5.0 hp 53% | exp win 100% 3*  92% 19.4p  86s u5.0 hp 60%
+
+[T1b] Variant A power parity: F2P tiers (mid / month-2 / month-6+) vs whale outfits (SSRP*5 + 3xSSR*5 + S*5, album 12)
+  P0- F2P-mid   ATK 2515 vs 2515 (+0.00%) | HP 3612 vs 3612 (+0.00%) | mid win  29.0% vs  29.0% (+0.00 pp)
+  P0 F2P-max    ATK 3136 vs 3136 (+0.00%) | HP 4467 vs 4467 (+0.00%) | mid win  95.2% vs  95.2% (+0.00 pp)
+  P0+ F2P-long  ATK 3378 vs 3378 (+0.00%) | HP 4783 vs 4783 (+0.00%) | mid win  98.4% vs  98.4% (+0.00 pp)
 
 [T2] campaign curve (60 launch stages): level cap per chapter, recommended pair power RP, boss HP = RP * K_normal * stage factor
-  stage  1 ch 1 L14 (cap L17)  RP  184.5  boss HP   21028 (x1.00)  ref team HP  1236  boss cast   494
-  stage  5 ch 1 L17 (cap L17)  RP  210.1  boss HP   26828 (x1.12)  ref team HP  1406  boss cast   563
-  stage 10 ch 1 L17 (cap L17)  RP  212.1  boss HP   32645 (x1.35)  ref team HP  1419  boss cast   567
-  stage 11 ch 2 L21 (cap L24)  RP  251.1  boss HP   28621 (x1.00)  ref team HP  1676  boss cast   670
-  stage 20 ch 2 L24 (cap L24)  RP  280.8  boss HP   43209 (x1.35)  ref team HP  1871  boss cast   748
-  stage 30 ch 3 L31 (cap L31)  RP  354.4  boss HP   54545 (x1.35)  ref team HP  2354  boss cast   942
-  stage 40 ch 4 L38 (cap L38)  RP  433.2  boss HP   66663 (x1.35)  ref team HP  2869  boss cast  1148
-  stage 50 ch 5 L45 (cap L45)  RP  517.0  boss HP   79572 (x1.35)  ref team HP  3415  boss cast  1366
-  stage 60 ch 6 L52 (cap L52)  RP  606.1  boss HP   93283 (x1.35)  ref team HP  3993  boss cast  1597
+  stage  1 ch 1 L14 (cap L17)  RP  180.0  boss HP   20159 (x1.00)  ref team HP  1214  boss cast   485
+  stage  5 ch 1 L17 (cap L17)  RP  206.0  boss HP   25844 (x1.12)  ref team HP  1383  boss cast   553
+  stage 10 ch 1 L17 (cap L17)  RP  207.3  boss HP   31343 (x1.35)  ref team HP  1396  boss cast   558
+  stage 11 ch 2 L21 (cap L24)  RP  244.4  boss HP   27377 (x1.00)  ref team HP  1640  boss cast   656
+  stage 20 ch 2 L24 (cap L24)  RP  273.6  boss HP   41378 (x1.35)  ref team HP  1831  boss cast   732
+  stage 30 ch 3 L31 (cap L31)  RP  344.4  boss HP   52088 (x1.35)  ref team HP  2295  boss cast   918
+  stage 40 ch 4 L38 (cap L38)  RP  418.2  boss HP   63238 (x1.35)  ref team HP  2782  boss cast  1112
+  stage 50 ch 5 L45 (cap L45)  RP  497.9  boss HP   75297 (x1.35)  ref team HP  3296  boss cast  1318
+  stage 60 ch 6 L52 (cap L52)  RP  581.1  boss HP   87878 (x1.35)  ref team HP  3837  boss cast  1534
 
 [T3] win / 3-star vs power ratio (own pair power / recommended), mid skill, normal stage
-  ratio 0.60  win   3.2%  3*   0.8%  TTK 34.7 pairs (189 s)  ults 0.3  HP left  73%
-  ratio 0.70  win  55.7%  3*   1.2%  TTK 38.4 pairs (209 s)  ults 6.4  HP left  38%
-  ratio 0.80  win  65.8%  3*   1.4%  TTK 37.6 pairs (205 s)  ults 5.8  HP left  38%
-  ratio 0.90  win  84.2%  3*   3.9%  TTK 34.2 pairs (187 s)  ults 5.2  HP left  31%
-  ratio 1.00  win  94.1%  3*  44.9%  TTK 28.7 pairs (156 s)  ults 5.0  HP left  43%
-  ratio 1.10  win  98.7%  3*  70.0%  TTK 24.7 pairs (134 s)  ults 5.0  HP left  51%
-  ratio 1.20  win  99.1%  3*  79.5%  TTK 21.2 pairs (115 s)  ults 5.0  HP left  55%
-  ratio 1.30  win  99.9%  3*  82.8%  TTK 19.0 pairs (104 s)  ults 5.0  HP left  57%
-  ratio 1.40  win  99.9%  3*  83.7%  TTK 18.4 pairs (101 s)  ults 4.9  HP left  60%
+  ratio 0.60  win   2.3%  3*   0.1%  TTK 38.2 pairs (209 s)  ults 0.3  HP left  66%
+  ratio 0.70  win  19.7%  3*   0.7%  TTK 37.4 pairs (204 s)  ults 5.2  HP left  31%
+  ratio 0.80  win  39.1%  3*   1.1%  TTK 36.1 pairs (197 s)  ults 4.7  HP left  24%
+  ratio 0.90  win  81.9%  3*   3.5%  TTK 33.1 pairs (180 s)  ults 5.0  HP left  30%
+  ratio 1.00  win  94.6%  3*  49.3%  TTK 27.6 pairs (150 s)  ults 4.9  HP left  45%
+  ratio 1.10  win  98.9%  3*  71.5%  TTK 23.9 pairs (130 s)  ults 5.0  HP left  51%
+  ratio 1.20  win  98.8%  3*  77.9%  TTK 20.7 pairs (113 s)  ults 4.9  HP left  54%
+  ratio 1.30  win  99.9%  3*  83.5%  TTK 18.8 pairs (102 s)  ults 5.0  HP left  57%
+  ratio 1.40  win  99.7%  3*  83.1%  TTK 18.4 pairs (101 s)  ults 4.9  HP left  59%
 
-[T4] raid score = damage dealt in a fixed 60-pair run (boss HP infinite), mid skill; relative to F2P-max
-  P0- F2P-mid   score     82969  (x0.60 of P0, x0.53 of P0+)
-  P0 F2P-max    score    138699  (x1.00 of P0, x0.89 of P0+)
-  P0+ F2P-long  score    156343  (x1.13 of P0, x1.00 of P0+)
-  P1 small      score    164858  (x1.19 of P0, x1.05 of P0+)
-  P2 mid        score    171970  (x1.24 of P0, x1.10 of P0+)
-  P3 whale      score    194566  (x1.40 of P0, x1.24 of P0+)
+[T4] raid score = damage dealt in a fixed 60-pair run (boss HP infinite), mid skill; relative to F2P-max / F2P-long
+  P0- F2P-mid   score     71037  (x0.67 of P0, x0.58 of P0+)
+  P0 F2P-max    score    105305  (x1.00 of P0, x0.86 of P0+)
+  P0+ F2P-long  score    121860  (x1.16 of P0, x1.00 of P0+)
+  P1 small      score    121860  (x1.16 of P0, x1.00 of P0+)
+  P2 mid        score    121860  (x1.16 of P0, x1.00 of P0+)
+  P3 whale      score    121860  (x1.16 of P0, x1.00 of P0+)
 
-[T5] skill vs wallet: win rate by difficulty (boss HP/ATK multipliers {'normal': (1.0, 1.0), 'hard': (1.25, 1.1), 'nightmare': (1.5, 1.25)})
-  normal    P0- cas  16% | P0- mid  54% | P0- exp  85% | P0 cas  80% | P0 mid  94% | P0 exp  99% | P3 cas 100% | P3 mid 100% | P3 exp 100%
-  hard      P0- cas   0% | P0- mid   3% | P0- exp  18% | P0 cas  24% | P0 mid  66% | P0 exp  90% | P3 cas  87% | P3 mid  98% | P3 exp 100%
-  nightmare P0- cas   0% | P0- mid   0% | P0- exp  11% | P0 cas  16% | P0 mid  52% | P0 exp  86% | P3 cas  47% | P3 mid  84% | P3 exp  97%
+[T5] skill vs wallet: win rate by difficulty (boss HP/ATK multipliers from balance.json)
+  normal    P0- cas   4% | P0- mid  26% | P0- exp  79% | P0 cas  81% | P0 mid  96% | P0 exp  99% | P3 cas  94% | P3 mid  99% | P3 exp 100%
+  hard      P0- cas   1% | P0- mid   3% | P0- exp  20% | P0 cas   6% | P0 mid  41% | P0 exp  85% | P3 cas  51% | P3 mid  81% | P3 exp  97%
+  nightmare P0- cas   0% | P0- mid   1% | P0- exp  16% | P0 cas   3% | P0 mid  22% | P0 exp  74% | P3 cas   3% | P3 mid  22% | P3 exp  73%
 
-[T6] aura: stage suit tilt 50/25/25 (man heavy), boss weak = man x1.25, resists = pin x0.85; same roles/stats, auras re-assigned
-  all 5 = man (stack the weak suit)    TTK 23.2 pairs  win 99%  3* 53%
-  3 man + 1 pin + 1 sou                TTK 24.5 pairs  win 99%  3* 62%
-  balanced 2/2/1                       TTK 28.0 pairs  win 98%  3* 47%
-  all 5 = pin (the resisted suit)      TTK 28.6 pairs  win 97%  3* 45%
-  neutral stage                        TTK 28.4 pairs  (reference: neutral stage, no tilt)
+[T6] aura: stage suit tilt 50/25/25 (man heavy), boss weak = man x1.25, resists = pin x0.85
+  all 5 = man (stack the weak suit)    TTK 22.7 pairs  win 99%  3* 33%
+  3 man + 1 pin + 1 sou                TTK 23.9 pairs  win 99%  3* 45%
+  balanced 2/2/1                       TTK 27.4 pairs  win 98%  3* 44%
+  all 5 = pin (the resisted suit)      TTK 28.0 pairs  win 97%  3* 49%
+  neutral stage                        TTK 27.6 pairs  (reference: neutral stage, no tilt)
 
 [T7] ult cadence and share of ult damage (P0, mid skill, 5 heroines)
-   36 pairs: 6.1 ults per fight -> one ult every 5.9 pairs (32 s); ult share of damage 47%
-   60 pairs: 11.8 ults per fight -> one ult every 5.1 pairs (28 s); ult share of damage 50%
-  108 pairs: 22.6 ults per fight -> one ult every 4.8 pairs (26 s); ult share of damage 49%
+   36 pairs: 5.4 ults per fight -> one ult every 6.6 pairs (36 s); ult share of damage 46%
+   60 pairs: 10.8 ults per fight -> one ult every 5.6 pairs (30 s); ult share of damage 47%
+  108 pairs: 21.3 ults per fight -> one ult every 5.1 pairs (28 s); ult share of damage 47%
 
-[T8] spend ladder: per-heroine ATK bonus and effect on the team (squad = std, bonus on the heroines listed), capped by MONETIZABLE_CAP = 28 percent
+[T8] spend ladder: per-heroine ATK bonus and team effect (variant=A, MONETIZABLE_CAP=0 bp = 0%)
   nothing                                album +0.0%  -                                  team ATK + 0.0%  direct price ~     0 RUB
-  1 S *2 on Hana                         album +0.5%  hana +6%                           team ATK + 2.2%  direct price ~   648 RUB
-  1 SSR *1 on Hana                       album +0.5%  hana +11%                          team ATK + 3.4%  direct price ~  1490 RUB
-  1 SSR *5 on Hana                       album +0.5%  hana +18%                          team ATK + 5.6%  direct price ~  1936 RUB
-  SSR *5 on Hana + Nova + Mc             album +1.5%  hana +20%, nova +20%, mc +20%      team ATK +14.1%  direct price ~  5808 RUB
-  1 SSR+ + 4 SSR *5 on the whole squad   album +3.0%  hana +26%, nova +21%, mc +21%, rin +21%, kohaku +21% team ATK +22.3%  direct price ~ 10680 RUB
+  1 S *2 on Hana                         album +0.0%  -                                  team ATK + 0.0%  direct price ~   648 RUB
+  1 SSR *1 on Hana                       album +0.0%  -                                  team ATK + 0.0%  direct price ~  1490 RUB
+  1 SSR *5 on Hana                       album +0.0%  -                                  team ATK + 0.0%  direct price ~  1936 RUB
+  SSR *5 on Hana + Nova + Mc             album +0.0%  -                                  team ATK + 0.0%  direct price ~  5808 RUB
+  1 SSR+ + 4 SSR *5 on the whole squad   album +0.0%  -                                  team ATK + 0.0%  direct price ~ 10680 RUB
 
-[T9] progression time: XP to level, days to cap by income profile (spec 2.2 / 2.10)
+[T9] progression time (integer xp_cum table from balance.json) + W15 catch-up (no paid accelerators in Variant A)
   Lv1 -> Lv20  cumulative XP     12086
   Lv1 -> Lv40  cumulative XP     70595
   Lv1 -> Lv60  cumulative XP    196610
   Lv1 -> Lv70  cumulative XP    289922
   Lv1 -> Lv80  cumulative XP    405733
   Lv1 -> Lv90  cumulative XP    545611
-  active (6 vault runs + drops)    one heroine Lv60:   8.9 days;  squad of 5:  44.7 days
-  light (3 runs)                   one heroine Lv60:  21.8 days;  squad of 5: 109.2 days
-  whale (active + 3 packs/week)    one heroine Lv60:   5.0 days;  squad of 5:  25.1 days
+  active (6 vault runs + drops)    1xLv60:  8.9d | 5xLv60 no-cu:  45.0d | 5xLv60 W15 catch-up:  32.0d | 5xLv70 (+60k gift):  43.0d
+  mid F2P (4-5 runs + drops)       1xLv60: 13.1d | 5xLv60 no-cu:  66.0d | 5xLv60 W15 catch-up:  47.0d | 5xLv70 (+60k gift):  63.0d
+  light (3 runs)                   1xLv60: 21.8d | 5xLv60 no-cu: 110.0d | 5xLv60 W15 catch-up:  78.0d | 5xLv70 (+60k gift): 106.0d
+
+[T10] Appendix R W15 catch-up Beta P1 gate (F2P-mid -> Ch4 by D30 >= 60%) & twist spread (AT-B08 <= 3%)
+  W15 cohort (n=1000): enter Ch4 by D30 WITH catch-up = 100.0% (median 13d) | clear Ch4 by D30 WITH catch-up =  99.2% (median 21d) | WITHOUT catch-up: enter 100.0%, clear  80.1% (median 27d)
+  twists (minor) TTK min=27.08 max=27.62 spread=1.96% (gate <=3.00%) | T1:27.22 T2:27.42 T3:27.42 T4:27.62 T5:27.42 T6:27.08 T7:27.45 T8:27.42
+  twists (major) TTK min=26.84 max=27.29 spread=1.64% (gate <=3.00%) | T1:26.99 T2:27.26 T3:27.15 T4:27.29 T5:27.15 T6:26.84 T7:27.15 T8:27.17
+
+[GATES] (HYPOTHESIS, calibrated=False, publish_in_rules=False) 8/8 PASS: win_p0_mid_normal=OK, ttk_p0_mid_normal=OK, ult_share_36=OK, variant_a_parity=OK, w15_ch4_d30_ge_60=OK, twist_spread_minor_le_3=OK, twist_spread_major_le_3=OK, rules_publication_blocked=OK
