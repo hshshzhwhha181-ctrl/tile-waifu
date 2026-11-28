@@ -102,5 +102,29 @@ FAST_RC=1
 
 ```python
     S("core_audit", "CORE_AUDIT_SELFTEST", "res://tests/core_audit/core_audit_selftest.tscn", group="core", timeout=300,
-      note="Brief A: 10 regression checks (determinism, calendar dates, UTF-8/bak save, board re-deal/UNCHAIN, go_tab leak/history, modal open order, bus leaks/FIFO, custom resolvers) + 150 TWBoard & 150 TWSave/TWMigrate property/fuzz cases"),
+      note="Brief A: 10+ regression checks (determinism, calendar dates + ratchet guard, UTF-8/bak save, board re-deal/UNCHAIN, go_tab leak/history, modal open order, bus leaks/FIFO, custom resolvers) + 150 TWBoard & 150 TWSave/TWMigrate property/fuzz cases"),
 ```
+
+## 6. Дополнение после self-review (`SR-01`, `SR-02`)
+
+- **SR-01 (`game/core/meta/save_v8.gd`):** в `_latest_key()` верхняя граница кандидата (`max_idx = day_index(today) + 1`) вынесена за цикл, чтобы цепочка из 4 ступенчатых дат (`today+1..+4` в `daily_day`/`tasks`/`pet`/`login`) не могла протолкнуть `last_key` на 4 дня вперёд. Добавлен тест `A-02d` в `core_audit_selftest.gd`.
+- **SR-02 (`game/shell/tw_bus.gd`):** в `subscribe()` используется `is_instance_valid(owner)` вместо `owner != null` при чтении `get_instance_id()`.
+- **Повторная проверка (`res://tests/core_audit/core_audit_selftest.tscn` + `python tools/tw_test.py -s state,meta,twnav,twmodal,twboard,twassets,core_purity,ux_lint,asset_id_only -j 2 --fast`):**
+```text
+PASS A-02d: V10Save._latest_key blocks stepping-stone ratchet past tomorrow
+CORE_AUDIT_SELFTEST 35/35
+state        pass     182/182        40.9  ok          STATE_SELFTEST 182/182
+meta         pass     190/190         7.8  ok          META_SELFTEST 190/190 (meta 23/23, bond 13/13, notify 25/25, entry 7/7
+twnav        pass     132/132        10.4  ok          TWNAV_SELFTEST 132/132
+twmodal      pass     83/83           8.5  ok          TWMODAL_SELFTEST 83/83
+twboard      pass     2006/2006      16.8  improved    TWBOARD_SELFTEST 2006/2006  (8.9 s)
+twassets     pass     69/69          18.2  ok          TWASSETS_SELFTEST 69/69
+core_purity  pass     6/6             0.6  ok          CORE_PURITY RESULT: PASS (565 violations, baseline 565, +0 new)
+ux_lint      pass     -               2.8  ok          UX_LINT RESULT: OK (0 violations)
+asset_id_only pass     13/13           1.4  ok          ASSET_ID_ONLY SELFTEST 13/13 PASS
+
+[tw_test] 9/9 pass, 0 skipped, known-fail none, improved ['twboard'], wall 58s (j=2); logs: C:\Users\ADMIN\AppData\Local\Temp\tw_test_logs
+[tw_test] no regression vs baseline
+SRA_RC=0
+```
+

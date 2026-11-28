@@ -99,6 +99,21 @@ func _test_a02_invalid_dates_and_now() -> void:
 	check("A-02c: V10Save.migrate uses explicit `now` and rejects garbage dates",
 		got_key == "2026-11-18",
 		"got last_key='%s'" % got_key)
+	# SR-01: stepping-stone future dates (today+1, +2, +3, +4) must NEVER ratchet last_key past today+1!
+	V10Meta.set_tz(0)
+	var s_step: = {
+		"ver": 7, "gems": 10, "unlocked": 1,
+		"daily_day": "2026-11-19",
+		"tasks": {"day": "2026-11-20"},
+		"pet": {"day": "2026-11-21"},
+		"login": {"n": 3, "last": "2026-11-22"},
+	}
+	V10Save.migrate(s_step, AUDIT_NOW)
+	V10Meta.clear_tz()
+	var step_key: String = str(s_step.get("v10_meta", {}).get("last_key", ""))
+	check("A-02d: V10Save._latest_key blocks stepping-stone ratchet past tomorrow",
+		step_key == "2026-11-19",
+		"got last_key='%s'" % step_key)
 
 
 # ── A-03: TWSave UTF-8 byte budget + validated backup rotation ──────────────────────────────────────────────

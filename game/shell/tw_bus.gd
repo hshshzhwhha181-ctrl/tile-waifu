@@ -34,7 +34,7 @@ var published: = 0
 func subscribe(kind: String, cb: Callable, owner: Object = null) -> int:
 	var tok: = _next_token
 	_next_token += 1
-	var oid: int = owner.get_instance_id() if owner != null else 0
+	var oid: int = owner.get_instance_id() if is_instance_valid(owner) else 0
 	_by_token[tok] = {"kind": kind, "cb": cb, "owner": owner, "owner_id": oid}
 	if not _subs.has(kind):
 		_subs[kind] = []

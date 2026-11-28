@@ -60,7 +60,7 @@ static func ensure(S: Dictionary) -> Array:
 
 static func _latest_key(S: Dictionary, now: int = -1) -> String:
 	var best: String = Time.get_date_string_from_unix_time(V10Meta.local_unix(now)) if now >= 0 else V10Meta.legacy_today()
-	var best_idx: int = V10Meta.day_index(best)
+	var max_idx: int = V10Meta.day_index(best) + 1
 	var cands: = [str(S.get("daily_day", ""))]
 	for k in ["tasks", "pet"]:
 		var d = S.get(k)
@@ -71,9 +71,8 @@ static func _latest_key(S: Dictionary, now: int = -1) -> String:
 		cands.append(str(lg.get("last", "")))
 	for c in cands:
 		# only well-formed calendar ISO dates, and never ahead of tomorrow (a damaged date must not freeze the day)
-		if c != "" and TWClock._valid_key(c) and c > best and V10Meta.day_index(c) <= best_idx + 1:
+		if c != "" and TWClock._valid_key(c) and c > best and V10Meta.day_index(c) <= max_idx:
 			best = c
-			best_idx = V10Meta.day_index(best)
 	return best
 
 
