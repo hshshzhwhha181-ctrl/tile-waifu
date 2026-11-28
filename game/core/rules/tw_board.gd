@@ -156,6 +156,15 @@ func deal(cfg: Dictionary, with_plan: bool = true) -> void:
 	code = str(cfg.get("code", ""))
 	deal_seed = int(cfg.get("deal_seed", cfg.get("seed", 1)))
 	shard_hero = str(cfg.get("shard", ""))
+	face0.fill(0)
+	step0.fill(0)
+	gold0.fill(0)
+	ice0.fill(0)
+	secret0.fill(0)
+	shard0.fill(0)
+	kind.fill(0)
+	arg.fill(0)
+	mate.fill(-1)
 	rng = TWRng.make(deal_seed, 2)
 	var r: = TWRng.make(deal_seed, 1)
 	_deal(cfg, r)
@@ -880,11 +889,11 @@ func _pair_gone(a: int, b: int, by_match: bool, ev: Array) -> void:
 			ev.append(E.make(E.UNLOCK, {"group": g, "ids": ids}))
 	if kind[a] == K_GIFT or kind[b] == K_GIFT:
 		ev.append(E.make(E.GIFT, {"a": a, "b": b}))
-	if by_match and blasts and (kind[a] == K_BOMB or kind[b] == K_BOMB):
-		_blast(a, b, ev)
 	for t in n:
 		if kind_now[t] == K_CHAIN and alive[t] == 1 and arg[t] == pairs_done and t != a and t != b:
 			ev.append(E.make(E.UNCHAIN, {"id": t}))
+	if by_match and blasts and (kind[a] == K_BOMB or kind[b] == K_BOMB):
+		_blast(a, b, ev)
 
 
 # V6SpecialBoard._blast: up to 3 nearby pairs (table distance < 1.75 tiles from the bomb pair) go with it
