@@ -10,3 +10,4 @@ date,batch_id,task_id,quote_ref,quoted_cr,actual_cr,balance_after,note
 2026-11-28,H0,height re-rolls nova x5 + yue x5 (new body table prompts),,10,10,,P50b round 2; 9:16 1k medium x1 each
 2026-11-28,P50b,round 2 total,,25.5,25.5,,P50b round 2; session total 76.5 cr (51 + 25.5)
 2026-11-28,H2,round 3 pilots x4 (fuller thighs, leg and bust focus: mc_base D, miel_evening D, hana_base D, yue_base E),,4,4,,P50b round 3; 2:3 1k medium; 0 refusals; session total 80.5 cr
+2026-11-28,P50b-bakeoff,pose anatomy bake-off MC: V0 24 + V1n 24 + V1o 12 + V2 24 + V1h 18 gpt_image_2_6 1k medium (102 cr); scout 14 (nano_banana_2_1/seedream_5_5/flux_3_image(2 refused)/kling_image_4_0/grok_image_2_0/seedream_v5_pro/gpt_image_2_5) ~18.5 cr; V3 kling x18 36 cr; V3 seedream_5_5 x12 18 cr; V4 edits x12 12 cr,,187.5,187.5,,balance 16960.38 -> 16772.88; 0 gpt refusals; flux_3_image 2 nsfw refusals (not charged)
