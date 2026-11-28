@@ -1,0 +1,5969 @@
+{
+ "schema": 1,
+ "generated_by": "design/specs/sim/gen_catalogue.py",
+ "tiers": {
+  "BASE": {
+   "len": 3.0,
+   "beats": 8,
+   "poses": 4,
+   "plates": 1,
+   "voice": 3,
+   "impact": 1,
+   "size": 2.0,
+   "cr": 80,
+   "hours": 39,
+   "hud": "лента→окно",
+   "heat": 2
+  },
+  "VOW": {
+   "len": 2.5,
+   "beats": 6,
+   "poses": 2,
+   "plates": 0,
+   "voice": 3,
+   "impact": 0,
+   "size": 0.7,
+   "cr": 30,
+   "hours": 22,
+   "hud": "окно",
+   "heat": 1
+  },
+  "S": {
+   "len": 3.0,
+   "beats": 8,
+   "poses": 2,
+   "plates": 0,
+   "voice": 2,
+   "impact": 1,
+   "size": 0.45,
+   "cr": 30,
+   "hours": 14,
+   "hud": "лента→окно",
+   "heat": 2
+  },
+  "SSR": {
+   "len": 3.6,
+   "beats": 10,
+   "poses": 4,
+   "plates": 2,
+   "voice": 3,
+   "impact": 2,
+   "size": 2.8,
+   "cr": 105,
+   "hours": 52,
+   "hud": "окно→полный",
+   "heat": 3
+  },
+  "FLAG": {
+   "len": 4.0,
+   "beats": 12,
+   "poses": 5,
+   "plates": 3,
+   "voice": 4,
+   "impact": 3,
+   "size": 4.1,
+   "cr": 170,
+   "hours": 85,
+   "hud": "полный экран",
+   "heat": 5
+  }
+ },
+ "trigger_s": 0.8,
+ "release_s": 0.5,
+ "twists": {
+  "T1": {
+   "name": "Эхо",
+   "rule": "ульта снимает +1 пару с доски (ульта-пара, без энергии и такта)"
+  },
+  "T2": {
+   "name": "Ожог",
+   "rule": "горение: 1,0×ATK за каждую из следующих 4 пар (FLAG/SSR: 1,6×ATK, 6 пар)"
+  },
+  "T3": {
+   "name": "Обереги",
+   "rule": "барьер на 8% max HP команды до следующего каста босса (SSR: 12%)"
+  },
+  "T4": {
+   "name": "Заряд",
+   "rule": "всем союзникам +12 энергии (SSR: +20)"
+  },
+  "T5": {
+   "name": "Лечение",
+   "rule": "лечит 6% max HP команды (SSR: 10%)"
+  },
+  "T6": {
+   "name": "Пробой",
+   "rule": "щит босса −25% (SSR: −50%)"
+  },
+  "T7": {
+   "name": "Азарт",
+   "rule": "Азарт +2 пары (SSR: +3 пары)"
+  },
+  "T8": {
+   "name": "Метка",
+   "rule": "следующие 3 пары ×1,15 (SSR: 5 пар ×1,2)"
+  }
+ },
+ "heroes": {
+  "mc": {
+   "name": "Маджонг-тян",
+   "role": "SUP",
+   "aura": "sou",
+   "tags": "Сакура+Чай",
+   "core": "снимает 1 пару (цель: пара)",
+   "battle_ult": "Ветер хозяйки",
+   "battle": "урон 3,0×ATK; 8 пар: команда +25% урона пар, союзникам +20 энергии, ветры и драконы считаются резонансными для всех"
+  },
+  "rin": {
+   "name": "Рин",
+   "role": "HEAL",
+   "aura": "sou",
+   "tags": "Ветер+Клинок",
+   "core": "возвращает лоток на стол (пуст: снимает 1 пару)",
+   "battle_ult": "Чайная пауза",
+   "battle": "урон 2,5×ATK; лечит 25% max HP команды, снимает все печати/туман/лёд с фишек, +1 чашка пассива"
+  },
+  "hana": {
+   "name": "Хана",
+   "role": "ATK",
+   "aura": "man",
+   "tags": "Огонь+Ветер",
+   "core": "снимает 2 пары подряд (свайп-рывок)",
+   "battle_ult": "Рывок",
+   "battle": "урон 9,0×ATK (×1,25, если щит сломан); две «ульта-пары» с доски; комбо +3 ступени"
+  },
+  "yue": {
+   "name": "Юэ",
+   "role": "ATK",
+   "aura": "pin",
+   "tags": "Луна+Клинок",
+   "core": "открывает закрытые фишки и показывает пару (луч по ряду)",
+   "battle_ult": "Лунный свет",
+   "battle": "урон 9,0×ATK; луч открывает все закрытые фишки ряда; следующие 3 пары становятся золотыми (крит ×2,2)"
+  },
+  "nova": {
+   "name": "Нова",
+   "role": "BRK",
+   "aura": "pin",
+   "tags": "Огонь+Луна",
+   "core": "снимает самую глубокую пару (тап по ярусу)",
+   "battle_ult": "Взлом",
+   "battle": "урон 5,5×ATK; щит босса −100% (мгновенный пробой, ×2 на 3 удара); снимает самую глубокую пару"
+  },
+  "tsubame": {
+   "name": "Цубамэ",
+   "role": "BRK",
+   "aura": "sou",
+   "tags": "Ветер+Чай",
+   "core": "снимает пару, зажатую соседями сбоку",
+   "battle_ult": "Теневой шаг",
+   "battle": "урон 5,5×ATK; босс оглушён на 2 каста (вместо 1); щит −50%; снимает зажатую пару"
+  },
+  "miel": {
+   "name": "Миэль",
+   "role": "HEAL",
+   "aura": "pin",
+   "tags": "Чай+Луна",
+   "core": "кладёт в лоток печенье-джокер",
+   "battle_ult": "Печенье-джокер",
+   "battle": "урон 2,5×ATK; лечит 20% max HP; союзнику с наименьшей энергией +25; печенье-джокер в лоток"
+  },
+  "kohaku": {
+   "name": "Кохаку",
+   "role": "GRD",
+   "aura": "man",
+   "tags": "Сакура+Огонь",
+   "core": "оберег на лоток (спасает от переполнения)",
+   "battle_ult": "Лисий оберег",
+   "battle": "урон 3,0×ATK; барьер 20% max HP на 2 каста босса, иммунитет к печатям 2 каста; оберег на лоток"
+  },
+  "shirin": {
+   "name": "Ширин",
+   "role": "SUP",
+   "aura": "pin",
+   "tags": "Клинок+Чай",
+   "core": "снимает 1 пару и зажигает Азарт",
+   "battle_ult": "Танец монет",
+   "battle": "урон 3,0×ATK; зажигает Азарт (6 пар) и продлевает его на +3; команде +15 энергии"
+  },
+  "zlata": {
+   "name": "Злата",
+   "role": "ATK",
+   "aura": "man",
+   "tags": "Луна+Сакура",
+   "core": "снимает пару и растапливает лёд на линии",
+   "battle_ult": "Огненный шлейф",
+   "battle": "урон 9,0×ATK; горение: 1,2×ATK за каждую следующую пару 6 пар; растапливает весь лёд/замки на линии"
+  }
+ },
+ "shared_sfx": [
+  "ult_ring_pop",
+  "ult_trigger_stamp",
+  "ult_whoosh_in",
+  "ult_cloth_snap",
+  "ult_step_heel",
+  "ult_inhale",
+  "ult_hit_low",
+  "ult_hit_high",
+  "ult_sweep_fx",
+  "ult_board_resolve",
+  "ult_tail_air",
+  "ult_skip_swish",
+  "ult_assist_pop"
+ ],
+ "ults": [
+  {
+   "id": "mc_base",
+   "hero": "mc",
+   "tier": "BASE",
+   "slot": "base",
+   "name_ru": "Восточный ветер",
+   "name_jp": "東風 (Tōfū)",
+   "status": "launch",
+   "legacy_outfit": "o_base",
+   "legacy_video": "ult_video/mc_base.ogv, ult_video/mc.ogv",
+   "hem_class": "knee",
+   "twist": "",
+   "concept": "Хозяйка салона щелчком отправляет фишку 東 в камеру и подмигивает; лепестковый вихрь складывает пару в сердце.",
+   "vfx": [
+    "mc.accent",
+    "mc.glow",
+    "JADE_300",
+    "PAPER_100",
+    "NIGHT_900"
+   ],
+   "heat": "лепестковый вихрь, тёплое свечение по лаку ципао, пар от чайника на столе (фон)",
+   "voice": [
+    "Восточный ветер!",
+    "Партия окончена~",
+    "Лови 東!"
+   ],
+   "poses": [
+    "опора на край стола, рука на бедре, взгляд через плечо",
+    "вытянутая рука с фишкой к камере, наклон бёдер, хвосты в полёте",
+    "разворот с веером разреза ципао (вид сбоку, камера на уровне бедра)",
+    "подмигивание, фишка у губ, лёгкий воздушный поцелуй в камеру"
+   ],
+   "sfx": [
+    "ult_mc_hit",
+    "ult_mc_fx"
+   ],
+   "cutscene_s": 3.0,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 4.3,
+   "beats_n": 8,
+   "poses_n": 4,
+   "plates_n": 1,
+   "impact_frames": 1,
+   "voice_cues": [
+    "mc_base_ult_cast_1",
+    "mc_base_ult_cast_2",
+    "mc_base_ult_cast_3"
+   ],
+   "sfx_cues": [
+    "ult_mc_hit",
+    "ult_mc_fx"
+   ],
+   "atk_pct_star0": 0,
+   "atk_pct_per_star": 0,
+   "hud_format": "лента→окно",
+   "credits": 48,
+   "hours": 23,
+   "size_mb": 2.0,
+   "pack": "pack_ult_mc",
+   "needs_video": true,
+   "needs_rig": true,
+   "storyboard": true,
+   "assets": [
+    "assets/v11/ult/mc/mc_base/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/mc/mc_base/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/mc/mc_base/cutin_pose_3.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/mc/mc_base/cutin_pose_4.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/mc/mc_base/plate_1.ogv (540x960, 24 fps, Theora q6, <=0.9 MB)",
+    "assets/v11/ult/mc/mc_base/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/mc/mc_base/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/mc/mc_base/voice/ 3 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/mc/mc_base/gallery_thumb.webp (512x768)"
+   ],
+   "beats": [
+    {
+     "t0": 0.0,
+     "t1": 0.35,
+     "shot": "Глаз",
+     "what": "макро-кадр глаз, наезд 1,00→1,12; блик нефрита в зрачке; VFX: пылинка-лепесток; звук: ult_blink_tick"
+    },
+    {
+     "t0": 0.35,
+     "t1": 0.8,
+     "shot": "Поза 1",
+     "what": "3/4 в рост, въезд слева по диагонали; МС опирается на стол, рука на бедре, хвосты качаются; VFX: ветер по ткани; голос: «Восточный ветер!»"
+    },
+    {
+     "t0": 0.8,
+     "t1": 1.2,
+     "shot": "Вставка",
+     "what": "крупно: пальцы сжимают 東, фишка горит нефритом, на краю кадра лицо; VFX: pulse JADE_300; звук: ult_tile_glow"
+    },
+    {
+     "t0": 1.2,
+     "t1": 1.6,
+     "shot": "Поза 2",
+     "what": "облёт 90° камера на уровне бедра, тангаж 0°; разворот, разрез ципао раскрывается, хвосты по дуге; VFX: лента лепестков mc.accent; звук: ult_cloth_snap"
+    },
+    {
+     "t0": 1.6,
+     "t1": 1.95,
+     "shot": "УДАР",
+     "what": "щелчок: фишка летит в камеру; impact frame 2 кадра (NIGHT_900 + mc.accent), hit-stop 3 кадра, радиальное размытие; поза 3 вытянутая рука + подмигивание; звук: ult_mc_hit + ult_hit_low"
+    },
+    {
+     "t0": 1.95,
+     "t1": 2.45,
+     "shot": "Эффект",
+     "what": "общий план: фишка превращается в восточный ветер из лепестков и нефритовой ленты, закручивается на доске, пара улетает сердцем; match-cut в доску; звук: ult_mc_fx + ult_sweep_fx"
+    },
+    {
+     "t0": 2.45,
+     "t1": 2.8,
+     "shot": "Взгляд",
+     "what": "через плечо, взгляд в камеру, воздушный поцелуй (поза 4), вторичное движение волос и ткани; голос: «Партия окончена~»; пар от чая на фоне"
+    },
+    {
+     "t0": 2.8,
+     "t1": 3.0,
+     "shot": "Выход",
+     "what": "ink-wash стирает кадр в сторону доски; печать 東風 на 0,2 с; звук: ult_tail_air"
+    }
+   ]
+  },
+  {
+   "id": "rin_base",
+   "hero": "rin",
+   "tier": "BASE",
+   "slot": "base",
+   "name_ru": "Чайная пауза",
+   "name_jp": "茶の間 (Cha no Ma)",
+   "status": "launch",
+   "legacy_outfit": "r_base",
+   "legacy_video": "ult_video/rin.ogv",
+   "hem_class": "knee",
+   "twist": "",
+   "concept": "Рин одним движением ставит чашку на стол и «останавливает время»: струя чая уносит фишки лотка обратно на стол.",
+   "vfx": [
+    "rin.accent",
+    "rin.deep",
+    "rin.glow",
+    "JADE_300",
+    "PAPER_100"
+   ],
+   "heat": "пар над чашкой, струя горячего чая, влажный блик на чулке (мягкий, 0,6 с)",
+   "voice": [
+    "Позволь.",
+    "Чайная пауза.",
+    "Не торопись."
+   ],
+   "poses": [
+    "нога на ногу сидя на краю стола, чашка у губ, взгляд поверх оправы",
+    "наклон вперёд к камере, чашка на блюдце, рука поправляет очки",
+    "встаёт, юбка-карандаш, высокий разрез, ладонь вперёд (остановка)",
+    "через плечо с лёгкой улыбкой, коса перекинута вперёд"
+   ],
+   "sfx": [
+    "ult_rin_hit",
+    "ult_rin_fx"
+   ],
+   "cutscene_s": 3.0,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 4.3,
+   "beats_n": 8,
+   "poses_n": 4,
+   "plates_n": 1,
+   "impact_frames": 1,
+   "voice_cues": [
+    "rin_base_ult_cast_1",
+    "rin_base_ult_cast_2",
+    "rin_base_ult_cast_3"
+   ],
+   "sfx_cues": [
+    "ult_rin_hit",
+    "ult_rin_fx"
+   ],
+   "atk_pct_star0": 0,
+   "atk_pct_per_star": 0,
+   "hud_format": "лента→окно",
+   "credits": 48,
+   "hours": 23,
+   "size_mb": 2.0,
+   "pack": "pack_ult_rin",
+   "needs_video": true,
+   "needs_rig": true,
+   "storyboard": true,
+   "assets": [
+    "assets/v11/ult/rin/rin_base/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/rin/rin_base/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/rin/rin_base/cutin_pose_3.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/rin/rin_base/cutin_pose_4.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/rin/rin_base/plate_1.ogv (540x960, 24 fps, Theora q6, <=0.9 MB)",
+    "assets/v11/ult/rin/rin_base/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/rin/rin_base/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/rin/rin_base/voice/ 3 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/rin/rin_base/gallery_thumb.webp (512x768)"
+   ],
+   "beats": [
+    {
+     "t0": 0.0,
+     "t1": 0.35,
+     "shot": "Глаз",
+     "what": "макро: глаза за золотой оправой, отражение пара; наезд 1,00→1,10; звук: ult_blink_tick"
+    },
+    {
+     "t0": 0.35,
+     "t1": 0.8,
+     "shot": "Поза 1",
+     "what": "3/4, въезд справа; Рин сидит нога на ногу, чашка у губ, пар идёт на камеру; голос: «Позволь.»"
+    },
+    {
+     "t0": 0.8,
+     "t1": 1.2,
+     "shot": "Вставка",
+     "what": "крупно: чашка опускается на блюдце, рябь по чаю замирает; фон теряет цвет (desat 60%); звук: ult_cup_set"
+    },
+    {
+     "t0": 1.2,
+     "t1": 1.6,
+     "shot": "Поза 2",
+     "what": "камера на уровне бедра (юбка до колена, разрез не поднимается выше бедра), Рин встаёт, коса перелетает через плечо; VFX: нити пара rin.glow"
+    },
+    {
+     "t0": 1.6,
+     "t1": 1.95,
+     "shot": "УДАР",
+     "what": "ладонь вперёд: время останавливается; impact frame (NIGHT_900 + rin.accent) 2 кадра; фон мгновенно в сепию; звук: ult_rin_hit + ult_hit_high"
+    },
+    {
+     "t0": 1.95,
+     "t1": 2.45,
+     "shot": "Эффект",
+     "what": "общий план: чайная струя течёт по доске, подхватывает фишки лотка и укладывает их ровной линией; match-cut в лоток; звук: ult_rin_fx"
+    },
+    {
+     "t0": 2.45,
+     "t1": 2.8,
+     "shot": "Взгляд",
+     "what": "поза 4: через плечо, поправляет очки, смущённая полуулыбка; голос: «Не торопись.»"
+    },
+    {
+     "t0": 2.8,
+     "t1": 3.0,
+     "shot": "Выход",
+     "what": "ink-wash в сторону лотка; печать 茶の間; звук: ult_tail_air"
+    }
+   ]
+  },
+  {
+   "id": "hana_base",
+   "hero": "hana",
+   "tier": "BASE",
+   "slot": "base",
+   "name_ru": "Рывок",
+   "name_jp": "疾走 (Shissō)",
+   "status": "launch",
+   "legacy_outfit": "h_base",
+   "legacy_video": "ult_video/hana.ogv",
+   "hem_class": "pants",
+   "twist": "",
+   "concept": "Хана взлетает со старта и пролетает по столу оранжевым следом, снимая две пары на одном выдохе.",
+   "vfx": [
+    "hana.accent",
+    "hana.deep",
+    "hana.glow",
+    "EMBER",
+    "PAPER_100"
+   ],
+   "heat": "горячий пар от разгорячённой кожи, искры из-под кроссовок, блеск пота (art-side wet glow)",
+   "voice": [
+    "На старт!",
+    "Рывок!",
+    "Не отставай!"
+   ],
+   "poses": [
+    "низкий старт, ладонь у земли, взгляд в камеру через плечо",
+    "бег в профиль, куртка на поясе, волосы по ветру",
+    "прыжок: колено вперёд, рука вперёд, подсолнух на заколке",
+    "победный «дай пять» к камере с подмигиванием и язычком"
+   ],
+   "sfx": [
+    "ult_hana_hit",
+    "ult_hana_fx"
+   ],
+   "cutscene_s": 3.0,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 4.3,
+   "beats_n": 8,
+   "poses_n": 4,
+   "plates_n": 1,
+   "impact_frames": 1,
+   "voice_cues": [
+    "hana_base_ult_cast_1",
+    "hana_base_ult_cast_2",
+    "hana_base_ult_cast_3"
+   ],
+   "sfx_cues": [
+    "ult_hana_hit",
+    "ult_hana_fx"
+   ],
+   "atk_pct_star0": 0,
+   "atk_pct_per_star": 0,
+   "hud_format": "лента→окно",
+   "credits": 48,
+   "hours": 23,
+   "size_mb": 2.0,
+   "pack": "pack_ult_hana",
+   "needs_video": true,
+   "needs_rig": true,
+   "storyboard": true,
+   "assets": [
+    "assets/v11/ult/hana/hana_base/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/hana/hana_base/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/hana/hana_base/cutin_pose_3.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/hana/hana_base/cutin_pose_4.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/hana/hana_base/plate_1.ogv (540x960, 24 fps, Theora q6, <=0.9 MB)",
+    "assets/v11/ult/hana/hana_base/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/hana/hana_base/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/hana/hana_base/voice/ 3 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/hana/hana_base/gallery_thumb.webp (512x768)"
+   ],
+   "beats": [
+    {
+     "t0": 0.0,
+     "t1": 0.35,
+     "shot": "Глаз",
+     "what": "макро: прищур, капля пота у виска; наезд 1,00→1,15; звук: ult_blink_tick"
+    },
+    {
+     "t0": 0.35,
+     "t1": 0.8,
+     "shot": "Поза 1",
+     "what": "низкий старт, камера сбоку на уровне бедра; бёдра приподняты, лопатки, взгляд назад на камеру; голос: «На старт!»"
+    },
+    {
+     "t0": 0.8,
+     "t1": 1.2,
+     "shot": "Вставка",
+     "what": "подошва кроссовка упирается в блок, пыль и искры; в кадре нога и блок целиком, без панорамы по телу; звук: ult_step_heel"
+    },
+    {
+     "t0": 1.2,
+     "t1": 1.6,
+     "shot": "Поза 2",
+     "what": "трекинг-камера сбоку: бег в профиль, волосы и куртка по ветру, оранжевый след hana.accent тянется за ней; звук: ult_whoosh_in"
+    },
+    {
+     "t0": 1.6,
+     "t1": 1.95,
+     "shot": "УДАР",
+     "what": "прыжок через доску: impact frame (NIGHT_900 + hana.accent), hit-stop 3 кадра, радиальные линии скорости; поза 3 колено вперёд; звук: ult_hana_hit"
+    },
+    {
+     "t0": 1.95,
+     "t1": 2.45,
+     "shot": "Эффект",
+     "what": "общий план: оранжевая полоса прорезает доску, две пары вспыхивают и исчезают, комбо-счётчик +3 ступени; звук: ult_hana_fx"
+    },
+    {
+     "t0": 2.45,
+     "t1": 2.8,
+     "shot": "Взгляд",
+     "what": "приземление, разворот к камере, «дай пять» ладонью в объектив, подмигивание; голос: «Не отставай!»; грудь и волосы реагируют на посадку (вторичное движение ≤0,8% роста)"
+    },
+    {
+     "t0": 2.8,
+     "t1": 3.0,
+     "shot": "Выход",
+     "what": "ink-wash; печать 疾走; звук: ult_tail_air"
+    }
+   ]
+  },
+  {
+   "id": "yue_base",
+   "hero": "yue",
+   "tier": "BASE",
+   "slot": "base",
+   "name_ru": "Лунный свет",
+   "name_jp": "月光 (Gekkō)",
+   "status": "launch",
+   "legacy_outfit": "y_base",
+   "legacy_video": "ult_video/yue.ogv",
+   "hem_class": "long",
+   "twist": "",
+   "concept": "Юэ раскрывает веер, и серебряная волна лунного света проходит по ряду, открывая скрытое; три пары загораются золотом.",
+   "vfx": [
+    "yue.accent",
+    "yue.deep",
+    "yue.glow",
+    "PAPER_100",
+    "NIGHT_900"
+   ],
+   "heat": "лунная дымка по полу, серебряная пыль, холодное свечение на чулках и шёлке (размер 3/4: вальс)",
+   "voice": [
+    "Любопытно…",
+    "Лунный свет.",
+    "Смотри внимательнее."
+   ],
+   "poses": [
+    "строго фас, веер у губ, взгляд сверху вниз",
+    "лёгкий разворот, открытое плечо, веер раскрыт на уровне лица",
+    "полушаг вперёд, шлейф, рука с веером вытянута к камере",
+    "через плечо, лунная тиара в блике, едва заметная улыбка"
+   ],
+   "sfx": [
+    "ult_yue_hit",
+    "ult_yue_fx"
+   ],
+   "cutscene_s": 3.0,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 4.3,
+   "beats_n": 8,
+   "poses_n": 4,
+   "plates_n": 1,
+   "impact_frames": 1,
+   "voice_cues": [
+    "yue_base_ult_cast_1",
+    "yue_base_ult_cast_2",
+    "yue_base_ult_cast_3"
+   ],
+   "sfx_cues": [
+    "ult_yue_hit",
+    "ult_yue_fx"
+   ],
+   "atk_pct_star0": 0,
+   "atk_pct_per_star": 0,
+   "hud_format": "лента→окно",
+   "credits": 48,
+   "hours": 23,
+   "size_mb": 2.0,
+   "pack": "pack_ult_yue",
+   "needs_video": true,
+   "needs_rig": true,
+   "storyboard": true,
+   "assets": [
+    "assets/v11/ult/yue/yue_base/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/yue/yue_base/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/yue/yue_base/cutin_pose_3.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/yue/yue_base/cutin_pose_4.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/yue/yue_base/plate_1.ogv (540x960, 24 fps, Theora q6, <=0.9 MB)",
+    "assets/v11/ult/yue/yue_base/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/yue/yue_base/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/yue/yue_base/voice/ 3 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/yue/yue_base/gallery_thumb.webp (512x768)"
+   ],
+   "beats": [
+    {
+     "t0": 0.0,
+     "t1": 0.35,
+     "shot": "Глаз",
+     "what": "макро: веки, серебряные ресницы, блик луны; наезд 1,00→1,10; звук: ult_blink_tick"
+    },
+    {
+     "t0": 0.35,
+     "t1": 0.8,
+     "shot": "Поза 1",
+     "what": "анфас, медленный подъём камеры от пояса к лицу (не ниже бедра); веер у губ; голос: «Любопытно…»"
+    },
+    {
+     "t0": 0.8,
+     "t1": 1.2,
+     "shot": "Вставка",
+     "what": "веер раскрывается, на нём вспыхивает полумесяц; в кадре веер и лицо; звук: ult_fan_open"
+    },
+    {
+     "t0": 1.2,
+     "t1": 1.6,
+     "shot": "Поза 2",
+     "what": "размер 3/4: облёт на 1,5 такта, полушаг, шлейф вихрем; открытое плечо и шея в рим-свете; VFX: серебряная пыль yue.glow"
+    },
+    {
+     "t0": 1.6,
+     "t1": 1.95,
+     "shot": "УДАР",
+     "what": "взмах веера: impact frame (NIGHT_900 + yue.accent) 2 кадра; серебряная волна по кадру; звук: ult_yue_hit"
+    },
+    {
+     "t0": 1.95,
+     "t1": 2.45,
+     "shot": "Эффект",
+     "what": "общий план: луч проходит по ряду доски, закрытые фишки открываются, три пары вспыхивают золотым контуром; звук: ult_yue_fx"
+    },
+    {
+     "t0": 2.45,
+     "t1": 2.8,
+     "shot": "Взгляд",
+     "what": "поза 4: через плечо, тиара в блике, рука с веером к губам; голос: «Смотри внимательнее.»"
+    },
+    {
+     "t0": 2.8,
+     "t1": 3.0,
+     "shot": "Выход",
+     "what": "ink-wash; печать 月光; звук: ult_tail_air"
+    }
+   ]
+  },
+  {
+   "id": "nova_base",
+   "hero": "nova",
+   "tier": "BASE",
+   "slot": "base",
+   "name_ru": "Взлом",
+   "name_jp": "侵入 (Shin'nyū)",
+   "status": "launch",
+   "legacy_outfit": "n_base",
+   "legacy_video": "ult_video/nova.ogv",
+   "hem_class": "mini",
+   "twist": "",
+   "concept": "Нова «взламывает» босса: неоновая нить выдёргивает самую глубокую пару и ломает щит, по стенам бежит код.",
+   "vfx": [
+    "nova.accent",
+    "nova.deep",
+    "nova.glow",
+    "PAPER_100",
+    "NIGHT_900"
+   ],
+   "heat": "неоновая дымка, перегрев схем (тепловая рябь), пар от радиаторов на крыше",
+   "voice": [
+    "Скачано.",
+    "Взлом!",
+    "Доступ получен."
+   ],
+   "poses": [
+    "присед в три четверти, колени вместе, голографическая фишка на ладони",
+    "растяжка вверх, руки над головой, визор поднят",
+    "шаг вперёд, ботфорты, рука «когти» к камере, подмигивание",
+    "поворот бёдрами, взгляд через плечо, неоновый шов по спине"
+   ],
+   "sfx": [
+    "ult_nova_hit",
+    "ult_nova_fx"
+   ],
+   "cutscene_s": 3.0,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 4.3,
+   "beats_n": 8,
+   "poses_n": 4,
+   "plates_n": 1,
+   "impact_frames": 1,
+   "voice_cues": [
+    "nova_base_ult_cast_1",
+    "nova_base_ult_cast_2",
+    "nova_base_ult_cast_3"
+   ],
+   "sfx_cues": [
+    "ult_nova_hit",
+    "ult_nova_fx"
+   ],
+   "atk_pct_star0": 0,
+   "atk_pct_per_star": 0,
+   "hud_format": "лента→окно",
+   "credits": 48,
+   "hours": 23,
+   "size_mb": 2.0,
+   "pack": "pack_ult_nova",
+   "needs_video": true,
+   "needs_rig": true,
+   "storyboard": true,
+   "assets": [
+    "assets/v11/ult/nova/nova_base/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/nova/nova_base/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/nova/nova_base/cutin_pose_3.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/nova/nova_base/cutin_pose_4.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/nova/nova_base/plate_1.ogv (540x960, 24 fps, Theora q6, <=0.9 MB)",
+    "assets/v11/ult/nova/nova_base/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/nova/nova_base/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/nova/nova_base/voice/ 3 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/nova/nova_base/gallery_thumb.webp (512x768)"
+   ],
+   "beats": [
+    {
+     "t0": 0.0,
+     "t1": 0.35,
+     "shot": "Глаз",
+     "what": "макро: глаза за поднятым визором, строки кода в зрачках; наезд 1,00→1,15; звук: ult_blink_tick"
+    },
+    {
+     "t0": 0.35,
+     "t1": 0.8,
+     "shot": "Поза 1",
+     "what": "присед в 3/4 (колени вместе), голографическая фишка над ладонью; камера на высоте бедра, тангаж 0°; голос: «Скачано.»"
+    },
+    {
+     "t0": 0.8,
+     "t1": 1.2,
+     "shot": "Вставка",
+     "what": "ладонь и голофишка, пальцы набирают команду, сетка кода по краям; звук: ult_data_burst"
+    },
+    {
+     "t0": 1.2,
+     "t1": 1.6,
+     "shot": "Поза 2",
+     "what": "растяжка вверх, неоновые нити расходятся от кончиков пальцев; камера отъезжает; VFX: глитч-полосы ≤2 px"
+    },
+    {
+     "t0": 1.6,
+     "t1": 1.95,
+     "shot": "УДАР",
+     "what": "«когти» к камере: impact frame (NIGHT_900 + nova.accent) 2 кадра, цветовой разброс RGB ≤2 px; щит босса трескается; звук: ult_nova_hit"
+    },
+    {
+     "t0": 1.95,
+     "t1": 2.45,
+     "shot": "Эффект",
+     "what": "общий план: неоновая нить пробивает ярус, самая глубокая пара вырвана, по доске бежит код; звук: ult_nova_fx"
+    },
+    {
+     "t0": 2.45,
+     "t1": 2.8,
+     "shot": "Взгляд",
+     "what": "поза 4: бёдра в поворот, взгляд через плечо, подмигивание; голос: «Доступ получен.»"
+    },
+    {
+     "t0": 2.8,
+     "t1": 3.0,
+     "shot": "Выход",
+     "what": "глитч-вайп; печать 侵入; звук: ult_tail_air"
+    }
+   ]
+  },
+  {
+   "id": "tsubame_base",
+   "hero": "tsubame",
+   "tier": "BASE",
+   "slot": "base",
+   "name_ru": "Теневой шаг",
+   "name_jp": "影渡り (Kagewatari)",
+   "status": "launch",
+   "legacy_outfit": "tb_base",
+   "legacy_video": "ult_video/tsubame.ogv",
+   "hem_class": "mini",
+   "twist": "",
+   "concept": "Цубамэ растворяется в дыму и проходит сквозь ряд теней; фишки, зажатые соседями, исчезают вместе с щитом босса.",
+   "vfx": [
+    "tsubame.accent",
+    "tsubame.deep",
+    "tsubame.glow",
+    "PAPER_300",
+    "NIGHT_900"
+   ],
+   "heat": "дымовая завеса (ink-smoke), тлеющие края писем, пар из чайника ночного квартала",
+   "voice": [
+    "Доставлено.",
+    "Не подкрадывайся.",
+    "Тень пройдёт."
+   ],
+   "poses": [
+    "шаг по коньку крыши, носок перед пяткой, письмо в руке",
+    "прыжок между крышами в профиль, шарф по ветру",
+    "приземление на одно колено, письма опускаются",
+    "шарф до носа, взгляд поверх шарфа в камеру"
+   ],
+   "sfx": [
+    "ult_tsubame_hit",
+    "ult_tsubame_fx"
+   ],
+   "cutscene_s": 3.0,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 4.3,
+   "beats_n": 8,
+   "poses_n": 4,
+   "plates_n": 1,
+   "impact_frames": 1,
+   "voice_cues": [
+    "tsubame_base_ult_cast_1",
+    "tsubame_base_ult_cast_2",
+    "tsubame_base_ult_cast_3"
+   ],
+   "sfx_cues": [
+    "ult_tsubame_hit",
+    "ult_tsubame_fx"
+   ],
+   "atk_pct_star0": 0,
+   "atk_pct_per_star": 0,
+   "hud_format": "лента→окно",
+   "credits": 48,
+   "hours": 23,
+   "size_mb": 2.0,
+   "pack": "pack_ult_tsubame",
+   "needs_video": true,
+   "needs_rig": true,
+   "storyboard": true,
+   "assets": [
+    "assets/v11/ult/tsubame/tsubame_base/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/tsubame/tsubame_base/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/tsubame/tsubame_base/cutin_pose_3.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/tsubame/tsubame_base/cutin_pose_4.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/tsubame/tsubame_base/plate_1.ogv (540x960, 24 fps, Theora q6, <=0.9 MB)",
+    "assets/v11/ult/tsubame/tsubame_base/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/tsubame/tsubame_base/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/tsubame/tsubame_base/voice/ 3 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/tsubame/tsubame_base/gallery_thumb.webp (512x768)"
+   ],
+   "beats": [
+    {
+     "t0": 0.0,
+     "t1": 0.35,
+     "shot": "Глаз",
+     "what": "макро: стальные глаза, красный градиент радужки; наезд 1,00→1,12; звук: ult_blink_tick"
+    },
+    {
+     "t0": 0.35,
+     "t1": 0.8,
+     "shot": "Поза 1",
+     "what": "3/4, камера на уровне бедра, идёт по коньку крыши, как по канату; хвост и шарф плывут; голос: «Доставлено.»"
+    },
+    {
+     "t0": 0.8,
+     "t1": 1.2,
+     "shot": "Вставка",
+     "what": "кунай-ласточка вращается между пальцами, письмо в другой руке; звук: ult_kunai_spin"
+    },
+    {
+     "t0": 1.2,
+     "t1": 1.6,
+     "shot": "Поза 2",
+     "what": "прыжок в профиль между крышами, трекинг-камера, тень за ней рвётся в стаю ласточек; VFX: shadow swallows tsubame.deep"
+    },
+    {
+     "t0": 1.6,
+     "t1": 1.95,
+     "shot": "УДАР",
+     "what": "растворение в дыму: impact frame (NIGHT_900 + tsubame.accent), силуэт проходит сквозь кадр; звук: ult_tsubame_hit + ult_hit_low"
+    },
+    {
+     "t0": 1.95,
+     "t1": 2.45,
+     "shot": "Эффект",
+     "what": "общий план: силуэт пронзает ряд, зажатая пара исчезает, щит босса раскалывается, босс оглушён; звук: ult_tsubame_fx"
+    },
+    {
+     "t0": 2.45,
+     "t1": 2.8,
+     "shot": "Взгляд",
+     "what": "поза 3–4: приземление на колено, затем шарф до носа, румянец, взгляд в камеру; голос: «Не подкрадывайся.»"
+    },
+    {
+     "t0": 2.8,
+     "t1": 3.0,
+     "shot": "Выход",
+     "what": "дымовой вайп; печать 影渡り; звук: ult_tail_air"
+    }
+   ]
+  },
+  {
+   "id": "miel_base",
+   "hero": "miel",
+   "tier": "BASE",
+   "slot": "base",
+   "name_ru": "Печенье-джокер",
+   "name_jp": "ジョーカークッキー",
+   "status": "launch",
+   "legacy_outfit": "me_base",
+   "legacy_video": "ult_video/miel.ogv",
+   "hem_class": "mini",
+   "twist": "",
+   "concept": "Миэль подбрасывает золотое печенье-джокер: оно прыгает в лоток, сахарная пудра вспыхивает, команда получает порцию сладкой энергии.",
+   "vfx": [
+    "miel.accent",
+    "miel.deep",
+    "miel.glow",
+    "PAPER_100",
+    "NIGHT_900"
+   ],
+   "heat": "пар из духовки, горячий сахар (карамельный блеск), облако пудры",
+   "voice": [
+    "Попробуй!",
+    "Секрет рецепта~",
+    "Горячее!"
+   ],
+   "poses": [
+    "миска на бедре, взбивает крем, бёдра покачиваются",
+    "кондитерский реверанс с подносом пирожных",
+    "тянется через стойку с ложкой сливок («скажи а-а»)",
+    "подмигивание, палец у губ («секрет рецепта»)"
+   ],
+   "sfx": [
+    "ult_miel_hit",
+    "ult_miel_fx"
+   ],
+   "cutscene_s": 3.0,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 4.3,
+   "beats_n": 8,
+   "poses_n": 4,
+   "plates_n": 1,
+   "impact_frames": 1,
+   "voice_cues": [
+    "miel_base_ult_cast_1",
+    "miel_base_ult_cast_2",
+    "miel_base_ult_cast_3"
+   ],
+   "sfx_cues": [
+    "ult_miel_hit",
+    "ult_miel_fx"
+   ],
+   "atk_pct_star0": 0,
+   "atk_pct_per_star": 0,
+   "hud_format": "лента→окно",
+   "credits": 48,
+   "hours": 23,
+   "size_mb": 2.0,
+   "pack": "pack_ult_miel",
+   "needs_video": true,
+   "needs_rig": true,
+   "storyboard": true,
+   "assets": [
+    "assets/v11/ult/miel/miel_base/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/miel/miel_base/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/miel/miel_base/cutin_pose_3.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/miel/miel_base/cutin_pose_4.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/miel/miel_base/plate_1.ogv (540x960, 24 fps, Theora q6, <=0.9 MB)",
+    "assets/v11/ult/miel/miel_base/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/miel/miel_base/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/miel/miel_base/voice/ 3 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/miel/miel_base/gallery_thumb.webp (512x768)"
+   ],
+   "beats": [
+    {
+     "t0": 0.0,
+     "t1": 0.35,
+     "shot": "Глаз",
+     "what": "макро: тёплые янтарные глаза, родинка у губ в кадре; наезд 1,00→1,10; звук: ult_blink_tick"
+    },
+    {
+     "t0": 0.35,
+     "t1": 0.8,
+     "shot": "Поза 1",
+     "what": "3/4, миска прижата к бедру, бёдра в такт музыке, кремовая блуза; голос: «Попробуй!»"
+    },
+    {
+     "t0": 0.8,
+     "t1": 1.2,
+     "shot": "Вставка",
+     "what": "крупно: золотое печенье подброшено вверх, на нём искра; звук: ult_cookie_toss"
+    },
+    {
+     "t0": 1.2,
+     "t1": 1.6,
+     "shot": "Поза 2",
+     "what": "реверанс с подносом, камера на уровне бедра, юбка-корсаж качается; пар из духовки на фоне; VFX: сахарная пудра miel.glow"
+    },
+    {
+     "t0": 1.6,
+     "t1": 1.95,
+     "shot": "УДАР",
+     "what": "печенье падает в лоток: impact frame (NIGHT_900 + miel.accent), пудра взрывом; звук: ult_miel_hit"
+    },
+    {
+     "t0": 1.95,
+     "t1": 2.45,
+     "shot": "Эффект",
+     "what": "общий план: печенье катится по лотку, превращается в джокер, лечебные сердечки к команде; звук: ult_miel_fx"
+    },
+    {
+     "t0": 2.45,
+     "t1": 2.8,
+     "shot": "Взгляд",
+     "what": "поза 4: подмигивание, палец у губ, наклон вперёд к камере; голос: «Секрет рецепта~»"
+    },
+    {
+     "t0": 2.8,
+     "t1": 3.0,
+     "shot": "Выход",
+     "what": "ink-wash сахарной пудрой; печать クッキー; звук: ult_tail_air"
+    }
+   ]
+  },
+  {
+   "id": "kohaku_base",
+   "hero": "kohaku",
+   "tier": "BASE",
+   "slot": "base",
+   "name_ru": "Лисий оберег",
+   "name_jp": "狐の御守 (Kitsune no Omamori)",
+   "status": "launch",
+   "legacy_outfit": "ko_base",
+   "legacy_video": "ult_video/kohaku.ogv",
+   "hem_class": "knee",
+   "twist": "",
+   "concept": "Кохаку подбрасывает офуду; оно вспыхивает лисьим огнём на лотке и берёт на себя удар, пока босс бьёт.",
+   "vfx": [
+    "kohaku.accent",
+    "kohaku.deep",
+    "kohaku.glow",
+    "CINNABAR",
+    "PAPER_100"
+   ],
+   "heat": "лисий огонь (холодное пламя с алыми кончиками), дымка храмовых курений, тлеющие талисманы",
+   "voice": [
+    "Удача любит меня.",
+    "Оберег!",
+    "Не гладь!"
+   ],
+   "poses": [
+    "на лестнице тории, гохэй поперёк плеч, хитрая ухмылка",
+    "выглядывает из-за столба, хвост выдаёт",
+    "«лисичка» из пальцев, пятка подброшена",
+    "поворот, девять огоньков за спиной, поправляет маску у виска"
+   ],
+   "sfx": [
+    "ult_kohaku_hit",
+    "ult_kohaku_fx"
+   ],
+   "cutscene_s": 3.0,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 4.3,
+   "beats_n": 8,
+   "poses_n": 4,
+   "plates_n": 1,
+   "impact_frames": 1,
+   "voice_cues": [
+    "kohaku_base_ult_cast_1",
+    "kohaku_base_ult_cast_2",
+    "kohaku_base_ult_cast_3"
+   ],
+   "sfx_cues": [
+    "ult_kohaku_hit",
+    "ult_kohaku_fx"
+   ],
+   "atk_pct_star0": 0,
+   "atk_pct_per_star": 0,
+   "hud_format": "лента→окно",
+   "credits": 48,
+   "hours": 23,
+   "size_mb": 2.0,
+   "pack": "pack_ult_kohaku",
+   "needs_video": true,
+   "needs_rig": true,
+   "storyboard": true,
+   "assets": [
+    "assets/v11/ult/kohaku/kohaku_base/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/kohaku/kohaku_base/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/kohaku/kohaku_base/cutin_pose_3.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/kohaku/kohaku_base/cutin_pose_4.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/kohaku/kohaku_base/plate_1.ogv (540x960, 24 fps, Theora q6, <=0.9 MB)",
+    "assets/v11/ult/kohaku/kohaku_base/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/kohaku/kohaku_base/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/kohaku/kohaku_base/voice/ 3 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/kohaku/kohaku_base/gallery_thumb.webp (512x768)"
+   ],
+   "beats": [
+    {
+     "t0": 0.0,
+     "t1": 0.35,
+     "shot": "Глаз",
+     "what": "макро: янтарные глаза, киноварные стрелки, клычок; наезд 1,00→1,12; звук: ult_blink_tick"
+    },
+    {
+     "t0": 0.35,
+     "t1": 0.8,
+     "shot": "Поза 1",
+     "what": "3/4, камера на уровне бедра, лестница тории, гохэй на плечах, левая нога на ступень выше; голос: «Удача любит меня.»"
+    },
+    {
+     "t0": 0.8,
+     "t1": 1.2,
+     "shot": "Вставка",
+     "what": "офуду зажато между пальцев, на нём вспыхивает печать; уши дёргаются на краю кадра; звук: ult_bell_suzu"
+    },
+    {
+     "t0": 1.2,
+     "t1": 1.6,
+     "shot": "Поза 2",
+     "what": "выглядывает из-за столба, хвост выдаёт её, колокольчик у колена звенит; VFX: огоньки kohaku.accent"
+    },
+    {
+     "t0": 1.6,
+     "t1": 1.95,
+     "shot": "УДАР",
+     "what": "офуду летит: impact frame (NIGHT_900 + kohaku.accent), лисья печать расходится кольцом; звук: ult_kohaku_hit"
+    },
+    {
+     "t0": 1.95,
+     "t1": 2.45,
+     "shot": "Эффект",
+     "what": "общий план: офуду прикипает к лотку, вокруг вспыхивает барьер из лисьего огня, босс отшатывается; звук: ult_kohaku_fx"
+    },
+    {
+     "t0": 2.45,
+     "t1": 2.8,
+     "shot": "Взгляд",
+     "what": "поза 3–4: «лисичка» пальцами и подброшенная пятка, затем маска у виска; голос: «Не гладь!»"
+    },
+    {
+     "t0": 2.8,
+     "t1": 3.0,
+     "shot": "Выход",
+     "what": "ink-wash с огоньками; печать 狐の御守; звук: ult_tail_air"
+    }
+   ]
+  },
+  {
+   "id": "shirin_base",
+   "hero": "shirin",
+   "tier": "BASE",
+   "slot": "base",
+   "name_ru": "Танец монет",
+   "name_jp": "銭の舞 (Zeni no Mai)",
+   "status": "launch",
+   "legacy_outfit": "sh_base",
+   "legacy_video": "ult_video/shirin.ogv",
+   "hem_class": "knee",
+   "twist": "",
+   "concept": "Ширин вихрем танца поднимает дождь монет: монеты кружат, уносят пару и зажигают Азарт.",
+   "vfx": [
+    "shirin.accent",
+    "shirin.deep",
+    "shirin.glow",
+    "GOLD_300",
+    "PAPER_100"
+   ],
+   "heat": "марево пустыни (heat haze), золотая пыль, масляная лампа с живым пламенем",
+   "voice": [
+    "Звёзды не лгут.",
+    "Танец монет!",
+    "Лови удачу."
+   ],
+   "poses": [
+    "танец с лампой на голове, змеиные руки",
+    "променад, вуаль отводит, как занавес",
+    "стоп-кадр пируэта с веером монет",
+    "полупоклон с лёгкой улыбкой, браслеты звенят"
+   ],
+   "sfx": [
+    "ult_shirin_hit",
+    "ult_shirin_fx"
+   ],
+   "cutscene_s": 3.0,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 4.3,
+   "beats_n": 8,
+   "poses_n": 4,
+   "plates_n": 1,
+   "impact_frames": 1,
+   "voice_cues": [
+    "shirin_base_ult_cast_1",
+    "shirin_base_ult_cast_2",
+    "shirin_base_ult_cast_3"
+   ],
+   "sfx_cues": [
+    "ult_shirin_hit",
+    "ult_shirin_fx"
+   ],
+   "atk_pct_star0": 0,
+   "atk_pct_per_star": 0,
+   "hud_format": "лента→окно",
+   "credits": 48,
+   "hours": 23,
+   "size_mb": 2.0,
+   "pack": "pack_ult_shirin",
+   "needs_video": true,
+   "needs_rig": true,
+   "storyboard": true,
+   "assets": [
+    "assets/v11/ult/shirin/shirin_base/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/shirin/shirin_base/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/shirin/shirin_base/cutin_pose_3.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/shirin/shirin_base/cutin_pose_4.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/shirin/shirin_base/plate_1.ogv (540x960, 24 fps, Theora q6, <=0.9 MB)",
+    "assets/v11/ult/shirin/shirin_base/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/shirin/shirin_base/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/shirin/shirin_base/voice/ 3 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/shirin/shirin_base/gallery_thumb.webp (512x768)"
+   ],
+   "beats": [
+    {
+     "t0": 0.0,
+     "t1": 0.35,
+     "shot": "Глаз",
+     "what": "макро: тёмные глаза с кохлом, цепочка на лбу; наезд 1,00→1,10; звук: ult_blink_tick"
+    },
+    {
+     "t0": 0.35,
+     "t1": 0.8,
+     "shot": "Поза 1",
+     "what": "3/4, танцевальный шаг, лампа на голове, змеиные руки, бёдра в плавном ритме; голос: «Звёзды не лгут.»"
+    },
+    {
+     "t0": 0.8,
+     "t1": 1.2,
+     "shot": "Вставка",
+     "what": "браслеты и пояс-монисто, монеты звенят в крупном плане; в кадре руки и часть лица; звук: ult_coin_chime"
+    },
+    {
+     "t0": 1.2,
+     "t1": 1.6,
+     "shot": "Поза 2",
+     "what": "променад камерой на уровне бедра, вуаль плывёт по дуге; VFX: золотая пыль + heat haze"
+    },
+    {
+     "t0": 1.6,
+     "t1": 1.95,
+     "shot": "УДАР",
+     "what": "пируэт: impact frame (NIGHT_900 + shirin.accent) 2 кадра, веер монет; поза 3; звук: ult_shirin_hit"
+    },
+    {
+     "t0": 1.95,
+     "t1": 2.45,
+     "shot": "Эффект",
+     "what": "общий план: монеты кружат по доске, уносят пару; шкала Азарта вспыхивает; звук: ult_shirin_fx"
+    },
+    {
+     "t0": 2.45,
+     "t1": 2.8,
+     "shot": "Взгляд",
+     "what": "поза 4: полупоклон, взгляд в камеру, браслеты звенят; голос: «Лови удачу.»"
+    },
+    {
+     "t0": 2.8,
+     "t1": 3.0,
+     "shot": "Выход",
+     "what": "песчаный вихрь-вайп; печать 銭の舞; звук: ult_tail_air"
+    }
+   ]
+  },
+  {
+   "id": "zlata_base",
+   "hero": "zlata",
+   "tier": "BASE",
+   "slot": "base",
+   "name_ru": "Огненный шлейф",
+   "name_jp": "火の尾羽 (Hi no Obane)",
+   "status": "launch",
+   "legacy_outfit": "zl_base",
+   "legacy_video": "ult_video/zlata.ogv",
+   "hem_class": "knee",
+   "twist": "",
+   "concept": "Злата раскрывает крылья-плащ и ведёт огненную косу, как ленту: огонь бежит по доске от фишки к фишке и растапливает лёд.",
+   "vfx": [
+    "zlata.accent",
+    "zlata.deep",
+    "zlata.glow",
+    "EMBER",
+    "GOLD_300"
+   ],
+   "heat": "жар (heat haze), угли и перья-искры, пар от тающего льда на доске",
+   "voice": [
+    "Весна пришла!",
+    "Огненный шлейф!",
+    "Пепел — только начало."
+   ],
+   "poses": [
+    "строго фас, коса как свеча, тлеющий кончик",
+    "плясовой «каблучок» с махом рукава-крыла",
+    "ведёт косой, как лентой (поза tease)",
+    "крылья раскрыты, подбородок вверх, величественная улыбка"
+   ],
+   "sfx": [
+    "ult_zlata_hit",
+    "ult_zlata_fx"
+   ],
+   "cutscene_s": 3.0,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 4.3,
+   "beats_n": 8,
+   "poses_n": 4,
+   "plates_n": 1,
+   "impact_frames": 1,
+   "voice_cues": [
+    "zlata_base_ult_cast_1",
+    "zlata_base_ult_cast_2",
+    "zlata_base_ult_cast_3"
+   ],
+   "sfx_cues": [
+    "ult_zlata_hit",
+    "ult_zlata_fx"
+   ],
+   "atk_pct_star0": 0,
+   "atk_pct_per_star": 0,
+   "hud_format": "лента→окно",
+   "credits": 48,
+   "hours": 23,
+   "size_mb": 2.0,
+   "pack": "pack_ult_zlata",
+   "needs_video": true,
+   "needs_rig": true,
+   "storyboard": true,
+   "assets": [
+    "assets/v11/ult/zlata/zlata_base/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/zlata/zlata_base/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/zlata/zlata_base/cutin_pose_3.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/zlata/zlata_base/cutin_pose_4.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/zlata/zlata_base/plate_1.ogv (540x960, 24 fps, Theora q6, <=0.9 MB)",
+    "assets/v11/ult/zlata/zlata_base/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/zlata/zlata_base/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/zlata/zlata_base/voice/ 3 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/zlata/zlata_base/gallery_thumb.webp (512x768)"
+   ],
+   "beats": [
+    {
+     "t0": 0.0,
+     "t1": 0.35,
+     "shot": "Глаз",
+     "what": "макро: золото-янтарные глаза с огненными бликами, бровь вверх; наезд 1,00→1,12; звук: ult_blink_tick"
+    },
+    {
+     "t0": 0.35,
+     "t1": 0.8,
+     "shot": "Поза 1",
+     "what": "анфас, симметрия; коса — свеча, на кончике тлеет огонь; камера медленно вверх; голос: «Весна пришла!»"
+    },
+    {
+     "t0": 0.8,
+     "t1": 1.2,
+     "shot": "Вставка",
+     "what": "перо Жар-птицы на ладони вспыхивает; звук: ult_feather_ignite"
+    },
+    {
+     "t0": 1.2,
+     "t1": 1.6,
+     "shot": "Поза 2",
+     "what": "плясовой «каблучок», рукав-крыло взмахом по кадру, облёт камеры на уровне бедра; VFX: перья zlata.accent"
+    },
+    {
+     "t0": 1.6,
+     "t1": 1.95,
+     "shot": "УДАР",
+     "what": "крылья раскрыты: impact frame (NIGHT_900 + zlata.accent) 2 кадра, тепловая волна; поза 4; звук: ult_zlata_hit"
+    },
+    {
+     "t0": 1.95,
+     "t1": 2.45,
+     "shot": "Эффект",
+     "what": "общий план: огонь бежит от фишки к фишке, лёд тает паром, пара вспыхивает и исчезает; звук: ult_zlata_fx"
+    },
+    {
+     "t0": 2.45,
+     "t1": 2.8,
+     "shot": "Взгляд",
+     "what": "ведёт косой, как лентой, к камере, величественная полуулыбка; голос: «Пепел — только начало.»"
+    },
+    {
+     "t0": 2.8,
+     "t1": 3.0,
+     "shot": "Выход",
+     "what": "огненный вайп; печать 火の尾羽; звук: ult_tail_air"
+    }
+   ]
+  },
+  {
+   "id": "mc_vow",
+   "hero": "mc",
+   "tier": "VOW",
+   "slot": "vow",
+   "name_ru": "Обещание",
+   "name_jp": "約束 (Yakusoku)",
+   "status": "launch",
+   "legacy_outfit": "",
+   "legacy_video": "",
+   "hem_class": "long",
+   "twist": "",
+   "concept": "Белое ципао с закрытым воротом и фатой, рассвет; ладонь тянется к камере.",
+   "vfx": [
+    "mc.accent",
+    "JADE_300",
+    "PAPER_100",
+    "NIGHT_900"
+   ],
+   "heat": "мягкий рассвет, тёплый пар, без вспышек",
+   "voice": [
+    "Только с тобой.",
+    "Я рядом."
+   ],
+   "poses": [
+    "портрет T3, взгляд на игрока",
+    "крупный план рук/кольца-значка"
+   ],
+   "sfx": [],
+   "cutscene_s": 2.5,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 3.8,
+   "beats_n": 6,
+   "poses_n": 2,
+   "plates_n": 0,
+   "impact_frames": 0,
+   "voice_cues": [
+    "mc_vow_ult_cast_1",
+    "mc_vow_ult_cast_2",
+    "mc_vow_ult_finish_1"
+   ],
+   "sfx_cues": [],
+   "atk_pct_star0": 0,
+   "atk_pct_per_star": 0,
+   "hud_format": "окно",
+   "credits": 30,
+   "hours": 22,
+   "size_mb": 0.7,
+   "pack": "pack_ult_mc",
+   "needs_video": false,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/mc/mc_vow/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/mc/mc_vow/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/mc/mc_vow/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/mc/mc_vow/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/mc/mc_vow/voice/ 3 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/mc/mc_vow/gallery_thumb.webp (512x768)"
+   ]
+  },
+  {
+   "id": "rin_vow",
+   "hero": "rin",
+   "tier": "VOW",
+   "slot": "vow",
+   "name_ru": "Нефритовая тишина",
+   "name_jp": "翠の静寂 (Sui no Seijaku)",
+   "status": "launch",
+   "legacy_outfit": "",
+   "legacy_video": "",
+   "hem_class": "long",
+   "twist": "",
+   "concept": "Рин впервые снимает очки и смотрит прямо; пар над чашкой превращается в нефритовый свет.",
+   "vfx": [
+    "rin.accent",
+    "rin.glow",
+    "PAPER_100",
+    "NIGHT_900"
+   ],
+   "heat": "мягкий рассвет, тёплый пар, без вспышек",
+   "voice": [
+    "Позволь остаться.",
+    "Ещё одну чашку?"
+   ],
+   "poses": [
+    "портрет T3, взгляд на игрока",
+    "крупный план рук/кольца-значка"
+   ],
+   "sfx": [],
+   "cutscene_s": 2.5,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 3.8,
+   "beats_n": 6,
+   "poses_n": 2,
+   "plates_n": 0,
+   "impact_frames": 0,
+   "voice_cues": [
+    "rin_vow_ult_cast_1",
+    "rin_vow_ult_cast_2",
+    "rin_vow_ult_finish_1"
+   ],
+   "sfx_cues": [],
+   "atk_pct_star0": 0,
+   "atk_pct_per_star": 0,
+   "hud_format": "окно",
+   "credits": 30,
+   "hours": 22,
+   "size_mb": 0.7,
+   "pack": "pack_ult_rin",
+   "needs_video": false,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/rin/rin_vow/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/rin/rin_vow/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/rin/rin_vow/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/rin/rin_vow/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/rin/rin_vow/voice/ 3 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/rin/rin_vow/gallery_thumb.webp (512x768)"
+   ]
+  },
+  {
+   "id": "hana_vow",
+   "hero": "hana",
+   "tier": "VOW",
+   "slot": "vow",
+   "name_ru": "Финишная лента",
+   "name_jp": "ゴール (Gōru)",
+   "status": "launch",
+   "legacy_outfit": "",
+   "legacy_video": "",
+   "hem_class": "long",
+   "twist": "",
+   "concept": "Хана ловит финишную ленту у самой камеры, не убегает от взгляда.",
+   "vfx": [
+    "hana.accent",
+    "hana.glow",
+    "PAPER_100",
+    "NIGHT_900"
+   ],
+   "heat": "мягкий рассвет, тёплый пар, без вспышек",
+   "voice": [
+    "Я дошла.",
+    "Побежим вместе?"
+   ],
+   "poses": [
+    "портрет T3, взгляд на игрока",
+    "крупный план рук/кольца-значка"
+   ],
+   "sfx": [],
+   "cutscene_s": 2.5,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 3.8,
+   "beats_n": 6,
+   "poses_n": 2,
+   "plates_n": 0,
+   "impact_frames": 0,
+   "voice_cues": [
+    "hana_vow_ult_cast_1",
+    "hana_vow_ult_cast_2",
+    "hana_vow_ult_finish_1"
+   ],
+   "sfx_cues": [],
+   "atk_pct_star0": 0,
+   "atk_pct_per_star": 0,
+   "hud_format": "окно",
+   "credits": 30,
+   "hours": 22,
+   "size_mb": 0.7,
+   "pack": "pack_ult_hana",
+   "needs_video": false,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/hana/hana_vow/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/hana/hana_vow/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/hana/hana_vow/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/hana/hana_vow/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/hana/hana_vow/voice/ 3 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/hana/hana_vow/gallery_thumb.webp (512x768)"
+   ]
+  },
+  {
+   "id": "yue_vow",
+   "hero": "yue",
+   "tier": "VOW",
+   "slot": "vow",
+   "name_ru": "Лунный обет",
+   "name_jp": "月の誓い (Tsuki no Chikai)",
+   "status": "launch",
+   "legacy_outfit": "",
+   "legacy_video": "",
+   "hem_class": "long",
+   "twist": "",
+   "concept": "Юэ спускается с трона на шаг ближе; луна отражается в чашке сливового чая.",
+   "vfx": [
+    "yue.accent",
+    "yue.glow",
+    "PAPER_100",
+    "NIGHT_900"
+   ],
+   "heat": "мягкий рассвет, тёплый пар, без вспышек",
+   "voice": [
+    "Останься.",
+    "Мне не скучно с тобой."
+   ],
+   "poses": [
+    "портрет T3, взгляд на игрока",
+    "крупный план рук/кольца-значка"
+   ],
+   "sfx": [],
+   "cutscene_s": 2.5,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 3.8,
+   "beats_n": 6,
+   "poses_n": 2,
+   "plates_n": 0,
+   "impact_frames": 0,
+   "voice_cues": [
+    "yue_vow_ult_cast_1",
+    "yue_vow_ult_cast_2",
+    "yue_vow_ult_finish_1"
+   ],
+   "sfx_cues": [],
+   "atk_pct_star0": 0,
+   "atk_pct_per_star": 0,
+   "hud_format": "окно",
+   "credits": 30,
+   "hours": 22,
+   "size_mb": 0.7,
+   "pack": "pack_ult_yue",
+   "needs_video": false,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/yue/yue_vow/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/yue/yue_vow/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/yue/yue_vow/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/yue/yue_vow/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/yue/yue_vow/voice/ 3 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/yue/yue_vow/gallery_thumb.webp (512x768)"
+   ]
+  },
+  {
+   "id": "nova_vow",
+   "hero": "nova",
+   "tier": "VOW",
+   "slot": "vow",
+   "name_ru": "Свет без визора",
+   "name_jp": "バイザーなし (Baizā Nashi)",
+   "status": "launch",
+   "legacy_outfit": "",
+   "legacy_video": "",
+   "hem_class": "long",
+   "twist": "",
+   "concept": "Нова снимает визор: впервые видно лицо; интерфейс гаснет.",
+   "vfx": [
+    "nova.accent",
+    "nova.glow",
+    "PAPER_100",
+    "NIGHT_900"
+   ],
+   "heat": "мягкий рассвет, тёплый пар, без вспышек",
+   "voice": [
+    "…давай посидим.",
+    "Логи подождут."
+   ],
+   "poses": [
+    "портрет T3, взгляд на игрока",
+    "крупный план рук/кольца-значка"
+   ],
+   "sfx": [],
+   "cutscene_s": 2.5,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 3.8,
+   "beats_n": 6,
+   "poses_n": 2,
+   "plates_n": 0,
+   "impact_frames": 0,
+   "voice_cues": [
+    "nova_vow_ult_cast_1",
+    "nova_vow_ult_cast_2",
+    "nova_vow_ult_finish_1"
+   ],
+   "sfx_cues": [],
+   "atk_pct_star0": 0,
+   "atk_pct_per_star": 0,
+   "hud_format": "окно",
+   "credits": 30,
+   "hours": 22,
+   "size_mb": 0.7,
+   "pack": "pack_ult_nova",
+   "needs_video": false,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/nova/nova_vow/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/nova/nova_vow/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/nova/nova_vow/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/nova/nova_vow/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/nova/nova_vow/voice/ 3 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/nova/nova_vow/gallery_thumb.webp (512x768)"
+   ]
+  },
+  {
+   "id": "tsubame_vow",
+   "hero": "tsubame",
+   "tier": "VOW",
+   "slot": "vow",
+   "name_ru": "Письмо без подписи",
+   "name_jp": "無署名の手紙 (Mushomei no Tegami)",
+   "status": "launch",
+   "legacy_outfit": "",
+   "legacy_video": "",
+   "hem_class": "long",
+   "twist": "",
+   "concept": "Цубамэ протягивает письмо, подписанное её рукой, и прячет лицо в шарф.",
+   "vfx": [
+    "tsubame.accent",
+    "tsubame.glow",
+    "PAPER_100",
+    "NIGHT_900"
+   ],
+   "heat": "мягкий рассвет, тёплый пар, без вспышек",
+   "voice": [
+    "Это тебе.",
+    "Не читай при мне."
+   ],
+   "poses": [
+    "портрет T3, взгляд на игрока",
+    "крупный план рук/кольца-значка"
+   ],
+   "sfx": [],
+   "cutscene_s": 2.5,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 3.8,
+   "beats_n": 6,
+   "poses_n": 2,
+   "plates_n": 0,
+   "impact_frames": 0,
+   "voice_cues": [
+    "tsubame_vow_ult_cast_1",
+    "tsubame_vow_ult_cast_2",
+    "tsubame_vow_ult_finish_1"
+   ],
+   "sfx_cues": [],
+   "atk_pct_star0": 0,
+   "atk_pct_per_star": 0,
+   "hud_format": "окно",
+   "credits": 30,
+   "hours": 22,
+   "size_mb": 0.7,
+   "pack": "pack_ult_tsubame",
+   "needs_video": false,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/tsubame/tsubame_vow/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/tsubame/tsubame_vow/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/tsubame/tsubame_vow/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/tsubame/tsubame_vow/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/tsubame/tsubame_vow/voice/ 3 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/tsubame/tsubame_vow/gallery_thumb.webp (512x768)"
+   ]
+  },
+  {
+   "id": "miel_vow",
+   "hero": "miel",
+   "tier": "VOW",
+   "slot": "vow",
+   "name_ru": "Рецепт твоего имени",
+   "name_jp": "君の名のレシピ (Kimi no Na no Reshipi)",
+   "status": "launch",
+   "legacy_outfit": "",
+   "legacy_video": "",
+   "hem_class": "long",
+   "twist": "",
+   "concept": "Миэль ставит торт, на котором выведено имя игрока; сахарная пудра падает как снег.",
+   "vfx": [
+    "miel.accent",
+    "miel.glow",
+    "PAPER_100",
+    "NIGHT_900"
+   ],
+   "heat": "мягкий рассвет, тёплый пар, без вспышек",
+   "voice": [
+    "Попробуй первым.",
+    "Я старалась."
+   ],
+   "poses": [
+    "портрет T3, взгляд на игрока",
+    "крупный план рук/кольца-значка"
+   ],
+   "sfx": [],
+   "cutscene_s": 2.5,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 3.8,
+   "beats_n": 6,
+   "poses_n": 2,
+   "plates_n": 0,
+   "impact_frames": 0,
+   "voice_cues": [
+    "miel_vow_ult_cast_1",
+    "miel_vow_ult_cast_2",
+    "miel_vow_ult_finish_1"
+   ],
+   "sfx_cues": [],
+   "atk_pct_star0": 0,
+   "atk_pct_per_star": 0,
+   "hud_format": "окно",
+   "credits": 30,
+   "hours": 22,
+   "size_mb": 0.7,
+   "pack": "pack_ult_miel",
+   "needs_video": false,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/miel/miel_vow/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/miel/miel_vow/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/miel/miel_vow/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/miel/miel_vow/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/miel/miel_vow/voice/ 3 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/miel/miel_vow/gallery_thumb.webp (512x768)"
+   ]
+  },
+  {
+   "id": "kohaku_vow",
+   "hero": "kohaku",
+   "tier": "VOW",
+   "slot": "vow",
+   "name_ru": "Лисья свадьба",
+   "name_jp": "狐の嫁入り (Kitsune no Yomeiri)",
+   "status": "launch",
+   "legacy_outfit": "ko_vow",
+   "legacy_video": "",
+   "hem_class": "long",
+   "twist": "",
+   "concept": "Кохаку в белом свадебном кимоно, слепой дождь, девять хвостов позади.",
+   "vfx": [
+    "kohaku.accent",
+    "kohaku.glow",
+    "PAPER_100",
+    "NIGHT_900"
+   ],
+   "heat": "мягкий рассвет, тёплый пар, без вспышек",
+   "voice": [
+    "Удача — это ты.",
+    "Теперь не отпущу."
+   ],
+   "poses": [
+    "портрет T3, взгляд на игрока",
+    "крупный план рук/кольца-значка"
+   ],
+   "sfx": [],
+   "cutscene_s": 2.5,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 3.8,
+   "beats_n": 6,
+   "poses_n": 2,
+   "plates_n": 0,
+   "impact_frames": 0,
+   "voice_cues": [
+    "kohaku_vow_ult_cast_1",
+    "kohaku_vow_ult_cast_2",
+    "kohaku_vow_ult_finish_1"
+   ],
+   "sfx_cues": [],
+   "atk_pct_star0": 0,
+   "atk_pct_per_star": 0,
+   "hud_format": "окно",
+   "credits": 30,
+   "hours": 22,
+   "size_mb": 0.7,
+   "pack": "pack_ult_kohaku",
+   "needs_video": false,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/kohaku/kohaku_vow/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/kohaku/kohaku_vow/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/kohaku/kohaku_vow/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/kohaku/kohaku_vow/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/kohaku/kohaku_vow/voice/ 3 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/kohaku/kohaku_vow/gallery_thumb.webp (512x768)"
+   ]
+  },
+  {
+   "id": "shirin_vow",
+   "hero": "shirin",
+   "tier": "VOW",
+   "slot": "vow",
+   "name_ru": "Звёздный танец",
+   "name_jp": "星の舞 (Hoshi no Mai)",
+   "status": "launch",
+   "legacy_outfit": "",
+   "legacy_video": "",
+   "hem_class": "long",
+   "twist": "",
+   "concept": "Ширин танцует одна под звёздами, взгляд в камеру, без сексуализации.",
+   "vfx": [
+    "shirin.accent",
+    "shirin.glow",
+    "PAPER_100",
+    "NIGHT_900"
+   ],
+   "heat": "мягкий рассвет, тёплый пар, без вспышек",
+   "voice": [
+    "Звёзды сказали.",
+    "Танцуй со мной."
+   ],
+   "poses": [
+    "портрет T3, взгляд на игрока",
+    "крупный план рук/кольца-значка"
+   ],
+   "sfx": [],
+   "cutscene_s": 2.5,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 3.8,
+   "beats_n": 6,
+   "poses_n": 2,
+   "plates_n": 0,
+   "impact_frames": 0,
+   "voice_cues": [
+    "shirin_vow_ult_cast_1",
+    "shirin_vow_ult_cast_2",
+    "shirin_vow_ult_finish_1"
+   ],
+   "sfx_cues": [],
+   "atk_pct_star0": 0,
+   "atk_pct_per_star": 0,
+   "hud_format": "окно",
+   "credits": 30,
+   "hours": 22,
+   "size_mb": 0.7,
+   "pack": "pack_ult_shirin",
+   "needs_video": false,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/shirin/shirin_vow/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/shirin/shirin_vow/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/shirin/shirin_vow/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/shirin/shirin_vow/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/shirin/shirin_vow/voice/ 3 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/shirin/shirin_vow/gallery_thumb.webp (512x768)"
+   ]
+  },
+  {
+   "id": "zlata_vow",
+   "hero": "zlata",
+   "tier": "VOW",
+   "slot": "vow",
+   "name_ru": "Перо на счастье",
+   "name_jp": "幸運の羽 (Kōun no Hane)",
+   "status": "launch",
+   "legacy_outfit": "zl_vow",
+   "legacy_video": "",
+   "hem_class": "long",
+   "twist": "",
+   "concept": "Злата в бело-золотом платье с кокошником и фатой на рассвете; перо находит игрока.",
+   "vfx": [
+    "zlata.accent",
+    "zlata.glow",
+    "PAPER_100",
+    "NIGHT_900"
+   ],
+   "heat": "мягкий рассвет, тёплый пар, без вспышек",
+   "voice": [
+    "Весна — это ты.",
+    "Я выбрала тебя."
+   ],
+   "poses": [
+    "портрет T3, взгляд на игрока",
+    "крупный план рук/кольца-значка"
+   ],
+   "sfx": [],
+   "cutscene_s": 2.5,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 3.8,
+   "beats_n": 6,
+   "poses_n": 2,
+   "plates_n": 0,
+   "impact_frames": 0,
+   "voice_cues": [
+    "zlata_vow_ult_cast_1",
+    "zlata_vow_ult_cast_2",
+    "zlata_vow_ult_finish_1"
+   ],
+   "sfx_cues": [],
+   "atk_pct_star0": 0,
+   "atk_pct_per_star": 0,
+   "hud_format": "окно",
+   "credits": 30,
+   "hours": 22,
+   "size_mb": 0.7,
+   "pack": "pack_ult_zlata",
+   "needs_video": false,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/zlata/zlata_vow/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/zlata/zlata_vow/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/zlata/zlata_vow/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/zlata/zlata_vow/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/zlata/zlata_vow/voice/ 3 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/zlata/zlata_vow/gallery_thumb.webp (512x768)"
+   ]
+  },
+  {
+   "id": "mc_cafe",
+   "hero": "mc",
+   "tier": "S",
+   "slot": "service",
+   "name_ru": "Комплимент от заведения",
+   "name_jp": "お店から (Omise kara)",
+   "status": "launch",
+   "legacy_outfit": "o_cafe",
+   "legacy_video": "",
+   "hem_class": "knee",
+   "twist": "T5",
+   "concept": "блуза-ципао, длинный фартук: струя чая уносит пару, лечит команду",
+   "vfx": [
+    "mc.accent",
+    "mc.glow",
+    "JADE_300",
+    "PAPER_100"
+   ],
+   "heat": "лепестковый вихрь",
+   "voice": [
+    "Чай подан~",
+    "За счёт салона!"
+   ],
+   "poses": [
+    "поднос с чайником у бедра, наклон к камере",
+    "налив струи чая, взгляд через плечо"
+   ],
+   "sfx": [],
+   "cutscene_s": 3.0,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 4.3,
+   "beats_n": 8,
+   "poses_n": 2,
+   "plates_n": 0,
+   "impact_frames": 1,
+   "voice_cues": [
+    "mc_cafe_ult_cast_1",
+    "mc_cafe_ult_cast_2"
+   ],
+   "sfx_cues": [
+    "ult_mc_hit",
+    "ult_mc_fx"
+   ],
+   "atk_pct_star0": 0.04,
+   "atk_pct_per_star": 0.01,
+   "hud_format": "лента→окно",
+   "credits": 30,
+   "hours": 14,
+   "size_mb": 0.45,
+   "pack": "pack_ult_mc",
+   "needs_video": false,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/mc/mc_cafe/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/mc/mc_cafe/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/mc/mc_cafe/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/mc/mc_cafe/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/mc/mc_cafe/voice/ 2 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/mc/mc_cafe/gallery_thumb.webp (512x768)"
+   ]
+  },
+  {
+   "id": "mc_bunny",
+   "hero": "mc",
+   "tier": "S",
+   "slot": "bunny",
+   "name_ru": "Королевская раздача",
+   "name_jp": "ロイヤルディール (Roiyaru Dīru)",
+   "status": "launch",
+   "legacy_outfit": "",
+   "legacy_video": "",
+   "hem_class": "pants",
+   "twist": "T7",
+   "concept": "лейтотард-банни с сердечным вырезом (ткань закрывает), казино; карты веером превращаются в фишки",
+   "vfx": [
+    "mc.accent",
+    "mc.glow",
+    "JADE_300",
+    "PAPER_100"
+   ],
+   "heat": "лепестковый вихрь",
+   "voice": [
+    "Делайте ставки.",
+    "Банк мой~"
+   ],
+   "poses": [
+    "раздача карт веером, наклон вперёд к камере",
+    "подмигивание, ушки, рука на бедре"
+   ],
+   "sfx": [],
+   "cutscene_s": 3.0,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 4.3,
+   "beats_n": 8,
+   "poses_n": 2,
+   "plates_n": 0,
+   "impact_frames": 1,
+   "voice_cues": [
+    "mc_bunny_ult_cast_1",
+    "mc_bunny_ult_cast_2"
+   ],
+   "sfx_cues": [
+    "ult_mc_hit",
+    "ult_mc_fx"
+   ],
+   "atk_pct_star0": 0.04,
+   "atk_pct_per_star": 0.01,
+   "hud_format": "лента→окно",
+   "credits": 30,
+   "hours": 14,
+   "size_mb": 0.45,
+   "pack": "pack_ult_mc",
+   "needs_video": false,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/mc/mc_bunny/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/mc/mc_bunny/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/mc/mc_bunny/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/mc/mc_bunny/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/mc/mc_bunny/voice/ 2 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/mc/mc_bunny/gallery_thumb.webp (512x768)"
+   ]
+  },
+  {
+   "id": "rin_maid",
+   "hero": "rin",
+   "tier": "S",
+   "slot": "service",
+   "name_ru": "Безупречный сервис",
+   "name_jp": "完璧な奉仕 (Kanpeki na Hōshi)",
+   "status": "launch",
+   "legacy_outfit": "r_maid",
+   "legacy_video": "",
+   "hem_class": "long",
+   "twist": "T3",
+   "concept": "викторианское платье, клош: фишки встают ровной линией, барьер",
+   "vfx": [
+    "rin.accent",
+    "rin.deep",
+    "rin.glow",
+    "PAPER_100"
+   ],
+   "heat": "пар над чашкой",
+   "voice": [
+    "Позволь, гость.",
+    "Безупречно."
+   ],
+   "poses": [
+    "клош в руках, лёгкий реверанс",
+    "поправляет перчатку, взгляд через плечо"
+   ],
+   "sfx": [],
+   "cutscene_s": 3.0,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 4.3,
+   "beats_n": 8,
+   "poses_n": 2,
+   "plates_n": 0,
+   "impact_frames": 1,
+   "voice_cues": [
+    "rin_maid_ult_cast_1",
+    "rin_maid_ult_cast_2"
+   ],
+   "sfx_cues": [
+    "ult_rin_hit",
+    "ult_rin_fx"
+   ],
+   "atk_pct_star0": 0.04,
+   "atk_pct_per_star": 0.01,
+   "hud_format": "лента→окно",
+   "credits": 30,
+   "hours": 14,
+   "size_mb": 0.45,
+   "pack": "pack_ult_rin",
+   "needs_video": false,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/rin/rin_maid/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/rin/rin_maid/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/rin/rin_maid/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/rin/rin_maid/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/rin/rin_maid/voice/ 2 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/rin/rin_maid/gallery_thumb.webp (512x768)"
+   ]
+  },
+  {
+   "id": "rin_agent",
+   "hero": "rin",
+   "tier": "S",
+   "slot": "battle",
+   "name_ru": "Чистая операция",
+   "name_jp": "クリーンオペ (Kurīn Ope)",
+   "status": "launch",
+   "legacy_outfit": "r_agent",
+   "legacy_video": "",
+   "hem_class": "knee",
+   "twist": "T8",
+   "concept": "городской агент: очки-прицел, лазерная сетка метит пары",
+   "vfx": [
+    "rin.accent",
+    "rin.deep",
+    "rin.glow",
+    "PAPER_100"
+   ],
+   "heat": "пар над чашкой",
+   "voice": [
+    "Цель в прицеле.",
+    "Чистая операция."
+   ],
+   "poses": [
+    "прицел из очков, тренч распахнут, нога вперёд",
+    "поворот, неоновая сетка на лице"
+   ],
+   "sfx": [],
+   "cutscene_s": 3.0,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 4.3,
+   "beats_n": 8,
+   "poses_n": 2,
+   "plates_n": 0,
+   "impact_frames": 1,
+   "voice_cues": [
+    "rin_agent_ult_cast_1",
+    "rin_agent_ult_cast_2"
+   ],
+   "sfx_cues": [
+    "ult_rin_hit",
+    "ult_rin_fx"
+   ],
+   "atk_pct_star0": 0.04,
+   "atk_pct_per_star": 0.01,
+   "hud_format": "лента→окно",
+   "credits": 30,
+   "hours": 14,
+   "size_mb": 0.45,
+   "pack": "pack_ult_rin",
+   "needs_video": false,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/rin/rin_agent/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/rin/rin_agent/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/rin/rin_agent/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/rin/rin_agent/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/rin/rin_agent/voice/ 2 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/rin/rin_agent/gallery_thumb.webp (512x768)"
+   ]
+  },
+  {
+   "id": "hana_beach",
+   "hero": "hana",
+   "tier": "S",
+   "slot": "swim",
+   "name_ru": "Подача на вылет",
+   "name_jp": "サーブ (Sābu)",
+   "status": "launch",
+   "legacy_outfit": "h_beach",
+   "legacy_video": "",
+   "hem_class": "swim",
+   "twist": "T4",
+   "concept": "купальник-галтер с прозрачной рубашкой, пляж: мяч-метеор бьёт по доске",
+   "vfx": [
+    "hana.accent",
+    "hana.deep",
+    "hana.glow",
+    "PAPER_100"
+   ],
+   "heat": "горячий пар от разгорячённой кожи",
+   "voice": [
+    "Лови, если сможешь!",
+    "Подача!"
+   ],
+   "poses": [
+    "подброс мяча, подмигивание",
+    "приземление после подачи, рубашка по ветру"
+   ],
+   "sfx": [],
+   "cutscene_s": 3.0,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 4.3,
+   "beats_n": 8,
+   "poses_n": 2,
+   "plates_n": 0,
+   "impact_frames": 1,
+   "voice_cues": [
+    "hana_beach_ult_cast_1",
+    "hana_beach_ult_cast_2"
+   ],
+   "sfx_cues": [
+    "ult_hana_hit",
+    "ult_hana_fx"
+   ],
+   "atk_pct_star0": 0.04,
+   "atk_pct_per_star": 0.01,
+   "hud_format": "лента→окно",
+   "credits": 30,
+   "hours": 14,
+   "size_mb": 0.45,
+   "pack": "pack_ult_hana",
+   "needs_video": false,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/hana/hana_beach/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/hana/hana_beach/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/hana/hana_beach/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/hana/hana_beach/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/hana/hana_beach/voice/ 2 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/hana/hana_beach/gallery_thumb.webp (512x768)"
+   ]
+  },
+  {
+   "id": "yue_robe",
+   "hero": "yue",
+   "tier": "S",
+   "slot": "robe",
+   "name_ru": "Лунное окно",
+   "name_jp": "月窓 (Gekisō)",
+   "status": "launch",
+   "legacy_outfit": "",
+   "legacy_video": "",
+   "hem_class": "long",
+   "twist": "T1",
+   "concept": "прозрачный лавандовый халат-платье поверх атласного мини, лунное окно: свет сквозь ткань прорезает доску",
+   "vfx": [
+    "yue.accent",
+    "yue.deep",
+    "yue.glow",
+    "PAPER_100"
+   ],
+   "heat": "лунная дымка по полу",
+   "voice": [
+    "Любопытно…",
+    "Окно открыто."
+   ],
+   "poses": [
+    "полулёжа у лунного окна, веер у губ",
+    "приподнимается на локте, взгляд сверху вниз"
+   ],
+   "sfx": [],
+   "cutscene_s": 3.0,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 4.3,
+   "beats_n": 8,
+   "poses_n": 2,
+   "plates_n": 0,
+   "impact_frames": 1,
+   "voice_cues": [
+    "yue_robe_ult_cast_1",
+    "yue_robe_ult_cast_2"
+   ],
+   "sfx_cues": [
+    "ult_yue_hit",
+    "ult_yue_fx"
+   ],
+   "atk_pct_star0": 0.04,
+   "atk_pct_per_star": 0.01,
+   "hud_format": "лента→окно",
+   "credits": 30,
+   "hours": 14,
+   "size_mb": 0.45,
+   "pack": "pack_ult_yue",
+   "needs_video": false,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/yue/yue_robe/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/yue/yue_robe/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/yue/yue_robe/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/yue/yue_robe/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/yue/yue_robe/voice/ 2 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/yue/yue_robe/gallery_thumb.webp (512x768)"
+   ]
+  },
+  {
+   "id": "nova_offline",
+   "hero": "nova",
+   "tier": "S",
+   "slot": "evening",
+   "name_ru": "Режим офлайн",
+   "name_jp": "オフライン (Ofurain)",
+   "status": "launch",
+   "legacy_outfit": "n_offline",
+   "legacy_video": "",
+   "hem_class": "knee",
+   "twist": "T5",
+   "concept": "платье до колена, кардиган, без визора; интерфейс гаснет, тёплый свет",
+   "vfx": [
+    "nova.accent",
+    "nova.deep",
+    "nova.glow",
+    "PAPER_100"
+   ],
+   "heat": "неоновая дымка",
+   "voice": [
+    "…давай посидим.",
+    "Логи подождут."
+   ],
+   "poses": [
+    "сидит на подоконнике, наушники на шее",
+    "без визора, подмигивание"
+   ],
+   "sfx": [],
+   "cutscene_s": 3.0,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 4.3,
+   "beats_n": 8,
+   "poses_n": 2,
+   "plates_n": 0,
+   "impact_frames": 1,
+   "voice_cues": [
+    "nova_offline_ult_cast_1",
+    "nova_offline_ult_cast_2"
+   ],
+   "sfx_cues": [
+    "ult_nova_hit",
+    "ult_nova_fx"
+   ],
+   "atk_pct_star0": 0.04,
+   "atk_pct_per_star": 0.01,
+   "hud_format": "лента→окно",
+   "credits": 30,
+   "hours": 14,
+   "size_mb": 0.45,
+   "pack": "pack_ult_nova",
+   "needs_video": false,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/nova/nova_offline/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/nova/nova_offline/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/nova/nova_offline/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/nova/nova_offline/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/nova/nova_offline/voice/ 2 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/nova/nova_offline/gallery_thumb.webp (512x768)"
+   ]
+  },
+  {
+   "id": "tsubame_post",
+   "hero": "tsubame",
+   "tier": "S",
+   "slot": "service",
+   "name_ru": "Срочная доставка",
+   "name_jp": "速達 (Sokutatsu)",
+   "status": "launch",
+   "legacy_outfit": "tb_post",
+   "legacy_video": "",
+   "hem_class": "mini",
+   "twist": "T6",
+   "concept": "облегающее платье курьера с разрезом: конверт уносит пару, щит трескается",
+   "vfx": [
+    "tsubame.accent",
+    "tsubame.deep",
+    "tsubame.glow",
+    "PAPER_100"
+   ],
+   "heat": "дымовая завеса (ink-smoke)",
+   "voice": [
+    "Срочная доставка!",
+    "Подпишись здесь."
+   ],
+   "poses": [
+    "конверт у губ, разрез платья курьера в движении",
+    "бег по карнизу, письма вихрем"
+   ],
+   "sfx": [],
+   "cutscene_s": 3.0,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 4.3,
+   "beats_n": 8,
+   "poses_n": 2,
+   "plates_n": 0,
+   "impact_frames": 1,
+   "voice_cues": [
+    "tsubame_post_ult_cast_1",
+    "tsubame_post_ult_cast_2"
+   ],
+   "sfx_cues": [
+    "ult_tsubame_hit",
+    "ult_tsubame_fx"
+   ],
+   "atk_pct_star0": 0.04,
+   "atk_pct_per_star": 0.01,
+   "hud_format": "лента→окно",
+   "credits": 30,
+   "hours": 14,
+   "size_mb": 0.45,
+   "pack": "pack_ult_tsubame",
+   "needs_video": false,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/tsubame/tsubame_post/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/tsubame/tsubame_post/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/tsubame/tsubame_post/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/tsubame/tsubame_post/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/tsubame/tsubame_post/voice/ 2 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/tsubame/tsubame_post/gallery_thumb.webp (512x768)"
+   ]
+  },
+  {
+   "id": "miel_parlor",
+   "hero": "miel",
+   "tier": "S",
+   "slot": "evening",
+   "name_ru": "Чайная пара",
+   "name_jp": "ティーペア (Tī Pea)",
+   "status": "launch",
+   "legacy_outfit": "me_parlor",
+   "legacy_video": "",
+   "hem_class": "mini",
+   "twist": "T4",
+   "concept": "облегающее платье с кружевным воротом: пара уплывает на подносе",
+   "vfx": [
+    "miel.accent",
+    "miel.deep",
+    "miel.glow",
+    "PAPER_100"
+   ],
+   "heat": "пар из духовки",
+   "voice": [
+    "Чайная пара~",
+    "С пылу с жару!"
+   ],
+   "poses": [
+    "поднос с чашками, наклон вперёд",
+    "реверанс, кружевной воротник"
+   ],
+   "sfx": [],
+   "cutscene_s": 3.0,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 4.3,
+   "beats_n": 8,
+   "poses_n": 2,
+   "plates_n": 0,
+   "impact_frames": 1,
+   "voice_cues": [
+    "miel_parlor_ult_cast_1",
+    "miel_parlor_ult_cast_2"
+   ],
+   "sfx_cues": [
+    "ult_miel_hit",
+    "ult_miel_fx"
+   ],
+   "atk_pct_star0": 0.04,
+   "atk_pct_per_star": 0.01,
+   "hud_format": "лента→окно",
+   "credits": 30,
+   "hours": 14,
+   "size_mb": 0.45,
+   "pack": "pack_ult_miel",
+   "needs_video": false,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/miel/miel_parlor/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/miel/miel_parlor/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/miel/miel_parlor/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/miel/miel_parlor/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/miel/miel_parlor/voice/ 2 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/miel/miel_parlor/gallery_thumb.webp (512x768)"
+   ]
+  },
+  {
+   "id": "kohaku_matsuri",
+   "hero": "kohaku",
+   "tier": "S",
+   "slot": "seasonal",
+   "name_ru": "Огни мацури",
+   "name_jp": "祭りの灯 (Matsuri no Hi)",
+   "status": "launch",
+   "legacy_outfit": "ko_matsuri",
+   "legacy_video": "",
+   "hem_class": "mini",
+   "twist": "T8",
+   "concept": "короткая юката, ночной мацури: фонарики уносят пару",
+   "vfx": [
+    "kohaku.accent",
+    "kohaku.deep",
+    "kohaku.glow",
+    "PAPER_100"
+   ],
+   "heat": "лисий огонь (холодное пламя с алыми кончиками)",
+   "voice": [
+    "Огни мацури!",
+    "Смотри вверх!"
+   ],
+   "poses": [
+    "маска лисы на виске, юката в движении, веер",
+    "подброс фонарика"
+   ],
+   "sfx": [],
+   "cutscene_s": 3.0,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 4.3,
+   "beats_n": 8,
+   "poses_n": 2,
+   "plates_n": 0,
+   "impact_frames": 1,
+   "voice_cues": [
+    "kohaku_matsuri_ult_cast_1",
+    "kohaku_matsuri_ult_cast_2"
+   ],
+   "sfx_cues": [
+    "ult_kohaku_hit",
+    "ult_kohaku_fx"
+   ],
+   "atk_pct_star0": 0.04,
+   "atk_pct_per_star": 0.01,
+   "hud_format": "лента→окно",
+   "credits": 30,
+   "hours": 14,
+   "size_mb": 0.45,
+   "pack": "pack_ult_kohaku",
+   "needs_video": false,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/kohaku/kohaku_matsuri/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/kohaku/kohaku_matsuri/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/kohaku/kohaku_matsuri/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/kohaku/kohaku_matsuri/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/kohaku/kohaku_matsuri/voice/ 2 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/kohaku/kohaku_matsuri/gallery_thumb.webp (512x768)"
+   ]
+  },
+  {
+   "id": "shirin_oasis",
+   "hero": "shirin",
+   "tier": "S",
+   "slot": "seasonal",
+   "name_ru": "Мираж",
+   "name_jp": "蜃気楼 (Shinkirō)",
+   "status": "launch",
+   "legacy_outfit": "sh_oasis",
+   "legacy_video": "",
+   "hem_class": "pants",
+   "twist": "T7",
+   "concept": "туника-халат поверх шаровар, базар: пара тает в мареве",
+   "vfx": [
+    "shirin.accent",
+    "shirin.deep",
+    "shirin.glow",
+    "PAPER_100"
+   ],
+   "heat": "марево пустыни (heat haze)",
+   "voice": [
+    "Мираж…",
+    "Не гонись за ним."
+   ],
+   "poses": [
+    "шаровары, шарф вьётся, лёгкий прогиб",
+    "взгляд через плечо на базаре"
+   ],
+   "sfx": [],
+   "cutscene_s": 3.0,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 4.3,
+   "beats_n": 8,
+   "poses_n": 2,
+   "plates_n": 0,
+   "impact_frames": 1,
+   "voice_cues": [
+    "shirin_oasis_ult_cast_1",
+    "shirin_oasis_ult_cast_2"
+   ],
+   "sfx_cues": [
+    "ult_shirin_hit",
+    "ult_shirin_fx"
+   ],
+   "atk_pct_star0": 0.04,
+   "atk_pct_per_star": 0.01,
+   "hud_format": "лента→окно",
+   "credits": 30,
+   "hours": 14,
+   "size_mb": 0.45,
+   "pack": "pack_ult_shirin",
+   "needs_video": false,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/shirin/shirin_oasis/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/shirin/shirin_oasis/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/shirin/shirin_oasis/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/shirin/shirin_oasis/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/shirin/shirin_oasis/voice/ 2 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/shirin/shirin_oasis/gallery_thumb.webp (512x768)"
+   ]
+  },
+  {
+   "id": "zlata_fair",
+   "hero": "zlata",
+   "tier": "S",
+   "slot": "seasonal",
+   "name_ru": "Блинное солнце",
+   "name_jp": "ブリヌイの陽 (Burinui no Hi)",
+   "status": "launch",
+   "legacy_outfit": "zl_fair",
+   "legacy_video": "",
+   "hem_class": "knee",
+   "twist": "T5",
+   "concept": "душегрея, платок, ярмарка: блин-солнце уносит фишку",
+   "vfx": [
+    "zlata.accent",
+    "zlata.deep",
+    "zlata.glow",
+    "PAPER_100"
+   ],
+   "heat": "жар (heat haze)",
+   "voice": [
+    "Блинное солнце!",
+    "Ещё один?"
+   ],
+   "poses": [
+    "душегрея с мехом, блин как солнце, смех",
+    "облизывает палец, смущённая улыбка"
+   ],
+   "sfx": [],
+   "cutscene_s": 3.0,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 4.3,
+   "beats_n": 8,
+   "poses_n": 2,
+   "plates_n": 0,
+   "impact_frames": 1,
+   "voice_cues": [
+    "zlata_fair_ult_cast_1",
+    "zlata_fair_ult_cast_2"
+   ],
+   "sfx_cues": [
+    "ult_zlata_hit",
+    "ult_zlata_fx"
+   ],
+   "atk_pct_star0": 0.04,
+   "atk_pct_per_star": 0.01,
+   "hud_format": "лента→окно",
+   "credits": 30,
+   "hours": 14,
+   "size_mb": 0.45,
+   "pack": "pack_ult_zlata",
+   "needs_video": false,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/zlata/zlata_fair/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/zlata/zlata_fair/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/zlata/zlata_fair/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/zlata/zlata_fair/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/zlata/zlata_fair/voice/ 2 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/zlata/zlata_fair/gallery_thumb.webp (512x768)"
+   ]
+  },
+  {
+   "id": "hana_street",
+   "hero": "hana",
+   "tier": "S",
+   "slot": "seasonal",
+   "name_ru": "Граффити-спринт",
+   "name_jp": "落書きスプリント (Rakugaki Supurinto)",
+   "status": "m6",
+   "legacy_outfit": "h_street",
+   "legacy_video": "",
+   "hem_class": "pants",
+   "twist": "T8",
+   "concept": "стрелка из баллончика ведёт к паре",
+   "vfx": [
+    "hana.accent",
+    "hana.deep",
+    "hana.glow",
+    "PAPER_100"
+   ],
+   "heat": "горячий пар от разгорячённой кожи",
+   "voice": [
+    "Метка!",
+    "Мой стол."
+   ],
+   "poses": [
+    "бомбер, баллончик, разворот",
+    "кепка в руке, подмигивание"
+   ],
+   "sfx": [],
+   "cutscene_s": 3.0,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 4.3,
+   "beats_n": 8,
+   "poses_n": 2,
+   "plates_n": 0,
+   "impact_frames": 1,
+   "voice_cues": [
+    "hana_street_ult_cast_1",
+    "hana_street_ult_cast_2"
+   ],
+   "sfx_cues": [
+    "ult_hana_hit",
+    "ult_hana_fx"
+   ],
+   "atk_pct_star0": 0.04,
+   "atk_pct_per_star": 0.01,
+   "hud_format": "лента→окно",
+   "credits": 30,
+   "hours": 14,
+   "size_mb": 0.45,
+   "pack": "pack_ult_hana",
+   "needs_video": false,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/hana/hana_street/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/hana/hana_street/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/hana/hana_street/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/hana/hana_street/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/hana/hana_street/voice/ 2 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/hana/hana_street/gallery_thumb.webp (512x768)"
+   ]
+  },
+  {
+   "id": "hana_winter",
+   "hero": "hana",
+   "tier": "S",
+   "slot": "seasonal",
+   "name_ru": "Тройной аксель",
+   "name_jp": "トリプルアクセル (Toripuru Akuseru)",
+   "status": "m6",
+   "legacy_outfit": "h_winter",
+   "legacy_video": "",
+   "hem_class": "knee",
+   "twist": "T6",
+   "concept": "ледяная дуга ломает щит",
+   "vfx": [
+    "hana.accent",
+    "hana.deep",
+    "hana.glow",
+    "PAPER_100"
+   ],
+   "heat": "горячий пар от разгорячённой кожи",
+   "voice": [
+    "Тройной аксель!",
+    "Лёд мой."
+   ],
+   "poses": [
+    "прыжок на льду, юбка для катания, колготки",
+    "приземление, руки в стороны"
+   ],
+   "sfx": [],
+   "cutscene_s": 3.0,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 4.3,
+   "beats_n": 8,
+   "poses_n": 2,
+   "plates_n": 0,
+   "impact_frames": 1,
+   "voice_cues": [
+    "hana_winter_ult_cast_1",
+    "hana_winter_ult_cast_2"
+   ],
+   "sfx_cues": [
+    "ult_hana_hit",
+    "ult_hana_fx"
+   ],
+   "atk_pct_star0": 0.04,
+   "atk_pct_per_star": 0.01,
+   "hud_format": "лента→окно",
+   "credits": 30,
+   "hours": 14,
+   "size_mb": 0.45,
+   "pack": "pack_ult_hana",
+   "needs_video": false,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/hana/hana_winter/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/hana/hana_winter/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/hana/hana_winter/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/hana/hana_winter/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/hana/hana_winter/voice/ 2 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/hana/hana_winter/gallery_thumb.webp (512x768)"
+   ]
+  },
+  {
+   "id": "mc_cozy",
+   "hero": "mc",
+   "tier": "S",
+   "slot": "robe",
+   "name_ru": "Тёплый плед",
+   "name_jp": "あったかブランケット (Attaka Buranketto)",
+   "status": "m6",
+   "legacy_outfit": "o_cozy",
+   "legacy_video": "",
+   "hem_class": "knee",
+   "twist": "T3",
+   "concept": "вязаное сердце накрывает пару",
+   "vfx": [
+    "mc.accent",
+    "mc.glow",
+    "JADE_300",
+    "PAPER_100"
+   ],
+   "heat": "лепестковый вихрь",
+   "voice": [
+    "Тёплый плед!",
+    "Не мёрзни~"
+   ],
+   "poses": [
+    "свитер-платье с открытым плечом, какао",
+    "плед накинут на плечи, прищур"
+   ],
+   "sfx": [],
+   "cutscene_s": 3.0,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 4.3,
+   "beats_n": 8,
+   "poses_n": 2,
+   "plates_n": 0,
+   "impact_frames": 1,
+   "voice_cues": [
+    "mc_cozy_ult_cast_1",
+    "mc_cozy_ult_cast_2"
+   ],
+   "sfx_cues": [
+    "ult_mc_hit",
+    "ult_mc_fx"
+   ],
+   "atk_pct_star0": 0.04,
+   "atk_pct_per_star": 0.01,
+   "hud_format": "лента→окно",
+   "credits": 30,
+   "hours": 14,
+   "size_mb": 0.45,
+   "pack": "pack_ult_mc",
+   "needs_video": false,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/mc/mc_cozy/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/mc/mc_cozy/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/mc/mc_cozy/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/mc/mc_cozy/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/mc/mc_cozy/voice/ 2 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/mc/mc_cozy/gallery_thumb.webp (512x768)"
+   ]
+  },
+  {
+   "id": "rin_yukata",
+   "hero": "rin",
+   "tier": "S",
+   "slot": "seasonal",
+   "name_ru": "Ханаби",
+   "name_jp": "花火 (Hanabi)",
+   "status": "m6",
+   "legacy_outfit": "r_yukata",
+   "legacy_video": "",
+   "hem_class": "long",
+   "twist": "T4",
+   "concept": "фишки возвращаются фонариками",
+   "vfx": [
+    "rin.accent",
+    "rin.deep",
+    "rin.glow",
+    "PAPER_100"
+   ],
+   "heat": "пар над чашкой",
+   "voice": [
+    "Ханаби!",
+    "Смотри, огни…"
+   ],
+   "poses": [
+    "юката с карпами, веер у плеча",
+    "смотрит вверх на салют"
+   ],
+   "sfx": [],
+   "cutscene_s": 3.0,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 4.3,
+   "beats_n": 8,
+   "poses_n": 2,
+   "plates_n": 0,
+   "impact_frames": 1,
+   "voice_cues": [
+    "rin_yukata_ult_cast_1",
+    "rin_yukata_ult_cast_2"
+   ],
+   "sfx_cues": [
+    "ult_rin_hit",
+    "ult_rin_fx"
+   ],
+   "atk_pct_star0": 0.04,
+   "atk_pct_per_star": 0.01,
+   "hud_format": "лента→окно",
+   "credits": 30,
+   "hours": 14,
+   "size_mb": 0.45,
+   "pack": "pack_ult_rin",
+   "needs_video": false,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/rin/rin_yukata/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/rin/rin_yukata/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/rin/rin_yukata/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/rin/rin_yukata/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/rin/rin_yukata/voice/ 2 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/rin/rin_yukata/gallery_thumb.webp (512x768)"
+   ]
+  },
+  {
+   "id": "yue_duel",
+   "hero": "yue",
+   "tier": "S",
+   "slot": "battle",
+   "name_ru": "Выпад полумесяца",
+   "name_jp": "三日月の突き (Mikazuki no Tsuki)",
+   "status": "m6",
+   "legacy_outfit": "y_duel",
+   "legacy_video": "",
+   "hem_class": "knee",
+   "twist": "T6",
+   "concept": "серп прорезает всю доску",
+   "vfx": [
+    "yue.accent",
+    "yue.deep",
+    "yue.glow",
+    "PAPER_100"
+   ],
+   "heat": "лунная дымка по полу",
+   "voice": [
+    "Выпад.",
+    "Защищайся."
+   ],
+   "poses": [
+    "ботфорты, цзянь на изготовку",
+    "выпад вперёд, ципао с разрезом в движении"
+   ],
+   "sfx": [],
+   "cutscene_s": 3.0,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 4.3,
+   "beats_n": 8,
+   "poses_n": 2,
+   "plates_n": 0,
+   "impact_frames": 1,
+   "voice_cues": [
+    "yue_duel_ult_cast_1",
+    "yue_duel_ult_cast_2"
+   ],
+   "sfx_cues": [
+    "ult_yue_hit",
+    "ult_yue_fx"
+   ],
+   "atk_pct_star0": 0.04,
+   "atk_pct_per_star": 0.01,
+   "hud_format": "лента→окно",
+   "credits": 30,
+   "hours": 14,
+   "size_mb": 0.45,
+   "pack": "pack_ult_yue",
+   "needs_video": false,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/yue/yue_duel/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/yue/yue_duel/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/yue/yue_duel/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/yue/yue_duel/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/yue/yue_duel/voice/ 2 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/yue/yue_duel/gallery_thumb.webp (512x768)"
+   ]
+  },
+  {
+   "id": "nova_diva",
+   "hero": "nova",
+   "tier": "S",
+   "slot": "idol",
+   "name_ru": "Дроп",
+   "name_jp": "ドロップ (Doroppu)",
+   "status": "m6",
+   "legacy_outfit": "n_diva",
+   "legacy_video": "",
+   "hem_class": "mini",
+   "twist": "T4",
+   "concept": "бас-волна по доске, ≤3 вспышки в секунду",
+   "vfx": [
+    "nova.accent",
+    "nova.deep",
+    "nova.glow",
+    "PAPER_100"
+   ],
+   "heat": "неоновая дымка",
+   "voice": [
+    "Дроп!",
+    "Бас пошёл."
+   ],
+   "poses": [
+    "корсет с неоновой окантовкой, микрофон, подмигивание",
+    "фишнет-бёдра, ботфорты, поза на сцене"
+   ],
+   "sfx": [],
+   "cutscene_s": 3.0,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 4.3,
+   "beats_n": 8,
+   "poses_n": 2,
+   "plates_n": 0,
+   "impact_frames": 1,
+   "voice_cues": [
+    "nova_diva_ult_cast_1",
+    "nova_diva_ult_cast_2"
+   ],
+   "sfx_cues": [
+    "ult_nova_hit",
+    "ult_nova_fx"
+   ],
+   "atk_pct_star0": 0.04,
+   "atk_pct_per_star": 0.01,
+   "hud_format": "лента→окно",
+   "credits": 30,
+   "hours": 14,
+   "size_mb": 0.45,
+   "pack": "pack_ult_nova",
+   "needs_video": false,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/nova/nova_diva/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/nova/nova_diva/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/nova/nova_diva/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/nova/nova_diva/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/nova/nova_diva/voice/ 2 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/nova/nova_diva/gallery_thumb.webp (512x768)"
+   ]
+  },
+  {
+   "id": "miel_swim",
+   "hero": "miel",
+   "tier": "S",
+   "slot": "swim",
+   "name_ru": "Сладкий прилив",
+   "name_jp": "スイートタイド (Suīto Taido)",
+   "status": "m6",
+   "legacy_outfit": "",
+   "legacy_video": "",
+   "hem_class": "swim",
+   "twist": "T5",
+   "concept": "волна из крема уносит пару и лечит",
+   "vfx": [
+    "miel.accent",
+    "miel.deep",
+    "miel.glow",
+    "PAPER_100"
+   ],
+   "heat": "пар из духовки",
+   "voice": [
+    "Сладкий прилив~",
+    "Холодное!"
+   ],
+   "poses": [
+    "купальник и парео, мороженое, наклон к камере",
+    "брызги, подмигивание"
+   ],
+   "sfx": [],
+   "cutscene_s": 3.0,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 4.3,
+   "beats_n": 8,
+   "poses_n": 2,
+   "plates_n": 0,
+   "impact_frames": 1,
+   "voice_cues": [
+    "miel_swim_ult_cast_1",
+    "miel_swim_ult_cast_2"
+   ],
+   "sfx_cues": [
+    "ult_miel_hit",
+    "ult_miel_fx"
+   ],
+   "atk_pct_star0": 0.04,
+   "atk_pct_per_star": 0.01,
+   "hud_format": "лента→окно",
+   "credits": 30,
+   "hours": 14,
+   "size_mb": 0.45,
+   "pack": "pack_ult_miel",
+   "needs_video": false,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/miel/miel_swim/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/miel/miel_swim/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/miel/miel_swim/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/miel/miel_swim/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/miel/miel_swim/voice/ 2 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/miel/miel_swim/gallery_thumb.webp (512x768)"
+   ]
+  },
+  {
+   "id": "kohaku_onsen",
+   "hero": "kohaku",
+   "tier": "S",
+   "slot": "swim",
+   "name_ru": "Горячий источник",
+   "name_jp": "温泉 (Onsen)",
+   "status": "m6",
+   "legacy_outfit": "",
+   "legacy_video": "",
+   "hem_class": "swim",
+   "twist": "T3",
+   "concept": "пар обволакивает лоток, оберег вспыхивает",
+   "vfx": [
+    "kohaku.accent",
+    "kohaku.deep",
+    "kohaku.glow",
+    "PAPER_100"
+   ],
+   "heat": "лисий огонь (холодное пламя с алыми кончиками)",
+   "voice": [
+    "Горячо!",
+    "Не смотри!"
+   ],
+   "poses": [
+    "сидит у края онсэна в закрытом купальнике, хвост мокрый",
+    "лисья улыбка, пар"
+   ],
+   "sfx": [],
+   "cutscene_s": 3.0,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 4.3,
+   "beats_n": 8,
+   "poses_n": 2,
+   "plates_n": 0,
+   "impact_frames": 1,
+   "voice_cues": [
+    "kohaku_onsen_ult_cast_1",
+    "kohaku_onsen_ult_cast_2"
+   ],
+   "sfx_cues": [
+    "ult_kohaku_hit",
+    "ult_kohaku_fx"
+   ],
+   "atk_pct_star0": 0.04,
+   "atk_pct_per_star": 0.01,
+   "hud_format": "лента→окно",
+   "credits": 30,
+   "hours": 14,
+   "size_mb": 0.45,
+   "pack": "pack_ult_kohaku",
+   "needs_video": false,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/kohaku/kohaku_onsen/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/kohaku/kohaku_onsen/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/kohaku/kohaku_onsen/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/kohaku/kohaku_onsen/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/kohaku/kohaku_onsen/voice/ 2 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/kohaku/kohaku_onsen/gallery_thumb.webp (512x768)"
+   ]
+  },
+  {
+   "id": "tsubame_robe",
+   "hero": "tsubame",
+   "tier": "S",
+   "slot": "robe",
+   "name_ru": "Ночное письмо",
+   "name_jp": "夜文 (Yobumi)",
+   "status": "m6",
+   "legacy_outfit": "",
+   "legacy_video": "",
+   "hem_class": "long",
+   "twist": "T1",
+   "concept": "письмо разворачивается в стаю ласточек",
+   "vfx": [
+    "tsubame.accent",
+    "tsubame.deep",
+    "tsubame.glow",
+    "PAPER_100"
+   ],
+   "heat": "дымовая завеса (ink-smoke)",
+   "voice": [
+    "Тише.",
+    "Письмо готово."
+   ],
+   "poses": [
+    "атласный халат, свеча, письмо",
+    "накидывает шарф, взгляд через плечо"
+   ],
+   "sfx": [],
+   "cutscene_s": 3.0,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 4.3,
+   "beats_n": 8,
+   "poses_n": 2,
+   "plates_n": 0,
+   "impact_frames": 1,
+   "voice_cues": [
+    "tsubame_robe_ult_cast_1",
+    "tsubame_robe_ult_cast_2"
+   ],
+   "sfx_cues": [
+    "ult_tsubame_hit",
+    "ult_tsubame_fx"
+   ],
+   "atk_pct_star0": 0.04,
+   "atk_pct_per_star": 0.01,
+   "hud_format": "лента→окно",
+   "credits": 30,
+   "hours": 14,
+   "size_mb": 0.45,
+   "pack": "pack_ult_tsubame",
+   "needs_video": false,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/tsubame/tsubame_robe/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/tsubame/tsubame_robe/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/tsubame/tsubame_robe/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/tsubame/tsubame_robe/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/tsubame/tsubame_robe/voice/ 2 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/tsubame/tsubame_robe/gallery_thumb.webp (512x768)"
+   ]
+  },
+  {
+   "id": "mc_swim",
+   "hero": "mc",
+   "tier": "S",
+   "slot": "swim",
+   "name_ru": "Прилив хозяйки",
+   "name_jp": "ご主人の潮 (Goshujin no Shio)",
+   "status": "m12",
+   "legacy_outfit": "",
+   "legacy_video": "",
+   "hem_class": "swim",
+   "twist": "T4",
+   "concept": "волна несёт пару",
+   "vfx": [
+    "mc.accent",
+    "mc.glow",
+    "JADE_300",
+    "PAPER_100"
+   ],
+   "heat": "лепестковый вихрь",
+   "voice": [
+    "Прилив!",
+    "Иди сюда~"
+   ],
+   "poses": [
+    "бикини-галтер с тонкими завязками и парео, нефритовое море",
+    "брызги, подмигивание"
+   ],
+   "sfx": [],
+   "cutscene_s": 3.0,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 4.3,
+   "beats_n": 8,
+   "poses_n": 2,
+   "plates_n": 0,
+   "impact_frames": 1,
+   "voice_cues": [
+    "mc_swim_ult_cast_1",
+    "mc_swim_ult_cast_2"
+   ],
+   "sfx_cues": [
+    "ult_mc_hit",
+    "ult_mc_fx"
+   ],
+   "atk_pct_star0": 0.04,
+   "atk_pct_per_star": 0.01,
+   "hud_format": "лента→окно",
+   "credits": 30,
+   "hours": 14,
+   "size_mb": 0.45,
+   "pack": "pack_ult_mc",
+   "needs_video": false,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/mc/mc_swim/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/mc/mc_swim/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/mc/mc_swim/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/mc/mc_swim/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/mc/mc_swim/voice/ 2 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/mc/mc_swim/gallery_thumb.webp (512x768)"
+   ]
+  },
+  {
+   "id": "rin_robe",
+   "hero": "rin",
+   "tier": "S",
+   "slot": "robe",
+   "name_ru": "Тихий вечер",
+   "name_jp": "静かな夜 (Shizuka na Yoru)",
+   "status": "m12",
+   "legacy_outfit": "",
+   "legacy_video": "",
+   "hem_class": "long",
+   "twist": "T5",
+   "concept": "чайный пар лечит",
+   "vfx": [
+    "rin.accent",
+    "rin.deep",
+    "rin.glow",
+    "PAPER_100"
+   ],
+   "heat": "пар над чашкой",
+   "voice": [
+    "Тихий вечер.",
+    "Ещё чашку?"
+   ],
+   "poses": [
+    "шёлковый халат-платье, чай",
+    "на диване, нога на ногу"
+   ],
+   "sfx": [],
+   "cutscene_s": 3.0,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 4.3,
+   "beats_n": 8,
+   "poses_n": 2,
+   "plates_n": 0,
+   "impact_frames": 1,
+   "voice_cues": [
+    "rin_robe_ult_cast_1",
+    "rin_robe_ult_cast_2"
+   ],
+   "sfx_cues": [
+    "ult_rin_hit",
+    "ult_rin_fx"
+   ],
+   "atk_pct_star0": 0.04,
+   "atk_pct_per_star": 0.01,
+   "hud_format": "лента→окно",
+   "credits": 30,
+   "hours": 14,
+   "size_mb": 0.45,
+   "pack": "pack_ult_rin",
+   "needs_video": false,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/rin/rin_robe/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/rin/rin_robe/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/rin/rin_robe/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/rin/rin_robe/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/rin/rin_robe/voice/ 2 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/rin/rin_robe/gallery_thumb.webp (512x768)"
+   ]
+  },
+  {
+   "id": "hana_bunny",
+   "hero": "hana",
+   "tier": "S",
+   "slot": "bunny",
+   "name_ru": "Ставка на старт",
+   "name_jp": "スタートに賭けろ (Sutāto ni Kakero)",
+   "status": "m12",
+   "legacy_outfit": "",
+   "legacy_video": "",
+   "hem_class": "pants",
+   "twist": "T7",
+   "concept": "карты-стрелы на старт",
+   "vfx": [
+    "hana.accent",
+    "hana.deep",
+    "hana.glow",
+    "PAPER_100"
+   ],
+   "heat": "горячий пар от разгорячённой кожи",
+   "voice": [
+    "Ставка на старт!",
+    "Не отставай!"
+   ],
+   "poses": [
+    "ушки, фрак, подмигивание",
+    "наклон к камере, рука на бедре"
+   ],
+   "sfx": [],
+   "cutscene_s": 3.0,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 4.3,
+   "beats_n": 8,
+   "poses_n": 2,
+   "plates_n": 0,
+   "impact_frames": 1,
+   "voice_cues": [
+    "hana_bunny_ult_cast_1",
+    "hana_bunny_ult_cast_2"
+   ],
+   "sfx_cues": [
+    "ult_hana_hit",
+    "ult_hana_fx"
+   ],
+   "atk_pct_star0": 0.04,
+   "atk_pct_per_star": 0.01,
+   "hud_format": "лента→окно",
+   "credits": 30,
+   "hours": 14,
+   "size_mb": 0.45,
+   "pack": "pack_ult_hana",
+   "needs_video": false,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/hana/hana_bunny/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/hana/hana_bunny/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/hana/hana_bunny/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/hana/hana_bunny/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/hana/hana_bunny/voice/ 2 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/hana/hana_bunny/gallery_thumb.webp (512x768)"
+   ]
+  },
+  {
+   "id": "yue_swim",
+   "hero": "yue",
+   "tier": "S",
+   "slot": "swim",
+   "name_ru": "Лунный бассейн",
+   "name_jp": "月のプール (Tsuki no Pūru)",
+   "status": "m12",
+   "legacy_outfit": "",
+   "legacy_video": "",
+   "hem_class": "swim",
+   "twist": "T1",
+   "concept": "лунная рябь по доске",
+   "vfx": [
+    "yue.accent",
+    "yue.deep",
+    "yue.glow",
+    "PAPER_100"
+   ],
+   "heat": "лунная дымка по полу",
+   "voice": [
+    "Любопытно…",
+    "Вода тёплая."
+   ],
+   "poses": [
+    "бикини с парео, бассейн под луной",
+    "полулёжа на шезлонге, веер"
+   ],
+   "sfx": [],
+   "cutscene_s": 3.0,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 4.3,
+   "beats_n": 8,
+   "poses_n": 2,
+   "plates_n": 0,
+   "impact_frames": 1,
+   "voice_cues": [
+    "yue_swim_ult_cast_1",
+    "yue_swim_ult_cast_2"
+   ],
+   "sfx_cues": [
+    "ult_yue_hit",
+    "ult_yue_fx"
+   ],
+   "atk_pct_star0": 0.04,
+   "atk_pct_per_star": 0.01,
+   "hud_format": "лента→окно",
+   "credits": 30,
+   "hours": 14,
+   "size_mb": 0.45,
+   "pack": "pack_ult_yue",
+   "needs_video": false,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/yue/yue_swim/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/yue/yue_swim/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/yue/yue_swim/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/yue/yue_swim/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/yue/yue_swim/voice/ 2 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/yue/yue_swim/gallery_thumb.webp (512x768)"
+   ]
+  },
+  {
+   "id": "nova_bunny",
+   "hero": "nova",
+   "tier": "S",
+   "slot": "bunny",
+   "name_ru": "Читерский ход",
+   "name_jp": "チートムーブ (Chīto Mūbu)",
+   "status": "m12",
+   "legacy_outfit": "",
+   "legacy_video": "",
+   "hem_class": "pants",
+   "twist": "T6",
+   "concept": "глитч-карты ломают щит",
+   "vfx": [
+    "nova.accent",
+    "nova.deep",
+    "nova.glow",
+    "PAPER_100"
+   ],
+   "heat": "неоновая дымка",
+   "voice": [
+    "Читерский ход.",
+    "Скачано."
+   ],
+   "poses": [
+    "неоновые ушки, боди, голограмма карт",
+    "присед в 3/4, колени вместе, подмигивание"
+   ],
+   "sfx": [],
+   "cutscene_s": 3.0,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 4.3,
+   "beats_n": 8,
+   "poses_n": 2,
+   "plates_n": 0,
+   "impact_frames": 1,
+   "voice_cues": [
+    "nova_bunny_ult_cast_1",
+    "nova_bunny_ult_cast_2"
+   ],
+   "sfx_cues": [
+    "ult_nova_hit",
+    "ult_nova_fx"
+   ],
+   "atk_pct_star0": 0.04,
+   "atk_pct_per_star": 0.01,
+   "hud_format": "лента→окно",
+   "credits": 30,
+   "hours": 14,
+   "size_mb": 0.45,
+   "pack": "pack_ult_nova",
+   "needs_video": false,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/nova/nova_bunny/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/nova/nova_bunny/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/nova/nova_bunny/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/nova/nova_bunny/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/nova/nova_bunny/voice/ 2 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/nova/nova_bunny/gallery_thumb.webp (512x768)"
+   ]
+  },
+  {
+   "id": "tsubame_swim",
+   "hero": "tsubame",
+   "tier": "S",
+   "slot": "swim",
+   "name_ru": "Тень на волне",
+   "name_jp": "波の影 (Nami no Kage)",
+   "status": "m12",
+   "legacy_outfit": "",
+   "legacy_video": "",
+   "hem_class": "swim",
+   "twist": "T8",
+   "concept": "кунай-рябь метит пары",
+   "vfx": [
+    "tsubame.accent",
+    "tsubame.deep",
+    "tsubame.glow",
+    "PAPER_100"
+   ],
+   "heat": "дымовая завеса (ink-smoke)",
+   "voice": [
+    "Тень на волне.",
+    "Доставлено."
+   ],
+   "poses": [
+    "закрытый купальник, шарф как парео",
+    "бросок куная в воду"
+   ],
+   "sfx": [],
+   "cutscene_s": 3.0,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 4.3,
+   "beats_n": 8,
+   "poses_n": 2,
+   "plates_n": 0,
+   "impact_frames": 1,
+   "voice_cues": [
+    "tsubame_swim_ult_cast_1",
+    "tsubame_swim_ult_cast_2"
+   ],
+   "sfx_cues": [
+    "ult_tsubame_hit",
+    "ult_tsubame_fx"
+   ],
+   "atk_pct_star0": 0.04,
+   "atk_pct_per_star": 0.01,
+   "hud_format": "лента→окно",
+   "credits": 30,
+   "hours": 14,
+   "size_mb": 0.45,
+   "pack": "pack_ult_tsubame",
+   "needs_video": false,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/tsubame/tsubame_swim/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/tsubame/tsubame_swim/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/tsubame/tsubame_swim/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/tsubame/tsubame_swim/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/tsubame/tsubame_swim/voice/ 2 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/tsubame/tsubame_swim/gallery_thumb.webp (512x768)"
+   ]
+  },
+  {
+   "id": "miel_robe",
+   "hero": "miel",
+   "tier": "S",
+   "slot": "robe",
+   "name_ru": "Сладкое утро",
+   "name_jp": "甘い朝 (Amai Asa)",
+   "status": "m12",
+   "legacy_outfit": "",
+   "legacy_video": "",
+   "hem_class": "long",
+   "twist": "T4",
+   "concept": "тёплый свет лечит",
+   "vfx": [
+    "miel.accent",
+    "miel.deep",
+    "miel.glow",
+    "PAPER_100"
+   ],
+   "heat": "пар из духовки",
+   "voice": [
+    "Сладкое утро~",
+    "Ещё минутку."
+   ],
+   "poses": [
+    "халат поверх атласного мини, кофе и круассан",
+    "потягивается"
+   ],
+   "sfx": [],
+   "cutscene_s": 3.0,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 4.3,
+   "beats_n": 8,
+   "poses_n": 2,
+   "plates_n": 0,
+   "impact_frames": 1,
+   "voice_cues": [
+    "miel_robe_ult_cast_1",
+    "miel_robe_ult_cast_2"
+   ],
+   "sfx_cues": [
+    "ult_miel_hit",
+    "ult_miel_fx"
+   ],
+   "atk_pct_star0": 0.04,
+   "atk_pct_per_star": 0.01,
+   "hud_format": "лента→окно",
+   "credits": 30,
+   "hours": 14,
+   "size_mb": 0.45,
+   "pack": "pack_ult_miel",
+   "needs_video": false,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/miel/miel_robe/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/miel/miel_robe/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/miel/miel_robe/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/miel/miel_robe/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/miel/miel_robe/voice/ 2 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/miel/miel_robe/gallery_thumb.webp (512x768)"
+   ]
+  },
+  {
+   "id": "kohaku_bunny",
+   "hero": "kohaku",
+   "tier": "S",
+   "slot": "bunny",
+   "name_ru": "Лисья ставка",
+   "name_jp": "狐の賭け (Kitsune no Kake)",
+   "status": "m12",
+   "legacy_outfit": "",
+   "legacy_video": "",
+   "hem_class": "pants",
+   "twist": "T7",
+   "concept": "оберег-кости",
+   "vfx": [
+    "kohaku.accent",
+    "kohaku.deep",
+    "kohaku.glow",
+    "PAPER_100"
+   ],
+   "heat": "лисий огонь (холодное пламя с алыми кончиками)",
+   "voice": [
+    "Лисья ставка!",
+    "Удача моя."
+   ],
+   "poses": [
+    "лисьи ушки + ушки банни, хвост",
+    "подбрасывает фишку, подмигивание"
+   ],
+   "sfx": [],
+   "cutscene_s": 3.0,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 4.3,
+   "beats_n": 8,
+   "poses_n": 2,
+   "plates_n": 0,
+   "impact_frames": 1,
+   "voice_cues": [
+    "kohaku_bunny_ult_cast_1",
+    "kohaku_bunny_ult_cast_2"
+   ],
+   "sfx_cues": [
+    "ult_kohaku_hit",
+    "ult_kohaku_fx"
+   ],
+   "atk_pct_star0": 0.04,
+   "atk_pct_per_star": 0.01,
+   "hud_format": "лента→окно",
+   "credits": 30,
+   "hours": 14,
+   "size_mb": 0.45,
+   "pack": "pack_ult_kohaku",
+   "needs_video": false,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/kohaku/kohaku_bunny/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/kohaku/kohaku_bunny/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/kohaku/kohaku_bunny/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/kohaku/kohaku_bunny/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/kohaku/kohaku_bunny/voice/ 2 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/kohaku/kohaku_bunny/gallery_thumb.webp (512x768)"
+   ]
+  },
+  {
+   "id": "shirin_swim",
+   "hero": "shirin",
+   "tier": "S",
+   "slot": "swim",
+   "name_ru": "Тысяча брызг",
+   "name_jp": "千の飛沫 (Sen no Shibuki)",
+   "status": "m12",
+   "legacy_outfit": "",
+   "legacy_video": "",
+   "hem_class": "swim",
+   "twist": "T3",
+   "concept": "дождь монет и барьер",
+   "vfx": [
+    "shirin.accent",
+    "shirin.deep",
+    "shirin.glow",
+    "PAPER_100"
+   ],
+   "heat": "марево пустыни (heat haze)",
+   "voice": [
+    "Тысяча брызг!",
+    "Звёзды видят."
+   ],
+   "poses": [
+    "купальник с монистом, вуаль-парео",
+    "брызги монет"
+   ],
+   "sfx": [],
+   "cutscene_s": 3.0,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 4.3,
+   "beats_n": 8,
+   "poses_n": 2,
+   "plates_n": 0,
+   "impact_frames": 1,
+   "voice_cues": [
+    "shirin_swim_ult_cast_1",
+    "shirin_swim_ult_cast_2"
+   ],
+   "sfx_cues": [
+    "ult_shirin_hit",
+    "ult_shirin_fx"
+   ],
+   "atk_pct_star0": 0.04,
+   "atk_pct_per_star": 0.01,
+   "hud_format": "лента→окно",
+   "credits": 30,
+   "hours": 14,
+   "size_mb": 0.45,
+   "pack": "pack_ult_shirin",
+   "needs_video": false,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/shirin/shirin_swim/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/shirin/shirin_swim/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/shirin/shirin_swim/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/shirin/shirin_swim/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/shirin/shirin_swim/voice/ 2 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/shirin/shirin_swim/gallery_thumb.webp (512x768)"
+   ]
+  },
+  {
+   "id": "mc_dragon",
+   "hero": "mc",
+   "tier": "FLAG",
+   "slot": "evening",
+   "name_ru": "Пробуждение дракона",
+   "name_jp": "龍覚 (Ryūkaku)",
+   "status": "launch",
+   "legacy_outfit": "o_dragon",
+   "legacy_video": "ult_video/o_dragon.ogv",
+   "hem_class": "knee",
+   "twist": "T2",
+   "concept": "Чёрно-золотое ципао с вышитым драконом: МС «будит» его щелчком по 東, нефритовый дракон встаёт из стола и проглатывает пару.",
+   "vfx": [
+    "mc.accent",
+    "mc.glow",
+    "JADE_300",
+    "GOLD_300",
+    "GOLD_500",
+    "EMBER",
+    "NIGHT_900"
+   ],
+   "heat": "тепловая рябь над столом, дыхание дракона (жар + пар), тлеющая вышивка, влажный блик на коже и чулках",
+   "voice": [
+    "Пробудись, дракон!",
+    "Партия окончена~",
+    "Нефрит и пламя!",
+    "Всё — твоё."
+   ],
+   "poses": [
+    "рука на бедре и рука в волосах, бёдра в наклоне (поза эталона 12)",
+    "лёгкая перчатка к губам, взгляд сверху вниз",
+    "шаг шпилькой вперёд, разрез в движении, рука к камере",
+    "финальный сплеш: разворот, рука на бедре, лицо через плечо, румянец",
+    "воздушный поцелуй + подмигивание"
+   ],
+   "sfx": [],
+   "cutscene_s": 4.0,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 5.3,
+   "beats_n": 12,
+   "poses_n": 5,
+   "plates_n": 3,
+   "impact_frames": 3,
+   "voice_cues": [
+    "mc_dragon_ult_cast_1",
+    "mc_dragon_ult_cast_2",
+    "mc_dragon_ult_cast_3",
+    "mc_dragon_ult_cast_4"
+   ],
+   "sfx_cues": [
+    "ult_mc_hit",
+    "ult_mc_fx"
+   ],
+   "atk_pct_star0": 0.1,
+   "atk_pct_per_star": 0.025,
+   "hud_format": "полный экран",
+   "credits": 170,
+   "hours": 85,
+   "size_mb": 4.1,
+   "pack": "pack_ult_mc",
+   "needs_video": true,
+   "needs_rig": true,
+   "storyboard": true,
+   "assets": [
+    "assets/v11/ult/mc/mc_dragon/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/mc/mc_dragon/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/mc/mc_dragon/cutin_pose_3.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/mc/mc_dragon/cutin_pose_4.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/mc/mc_dragon/cutin_pose_5.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/mc/mc_dragon/plate_1.ogv (540x960, 24 fps, Theora q6, <=0.9 MB)",
+    "assets/v11/ult/mc/mc_dragon/plate_2.ogv (540x960, 24 fps, Theora q6, <=0.9 MB)",
+    "assets/v11/ult/mc/mc_dragon/plate_3.ogv (540x960, 24 fps, Theora q6, <=0.9 MB)",
+    "assets/v11/ult/mc/mc_dragon/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/mc/mc_dragon/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/mc/mc_dragon/voice/ 4 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/mc/mc_dragon/gallery_thumb.webp (512x768)",
+    "assets/v11/ult/mc/mc_dragon/gallery_splash.webp (1080x1620)",
+    "assets/v11/ult/mc/mc_dragon/takeover_skin.json + takeover_frame.webp (table skin 6 s)"
+   ],
+   "beats": [
+    {
+     "t0": 0.0,
+     "t1": 0.3,
+     "shot": "Глаз",
+     "what": "макро: золотая подводка, в зрачке отражается нефритовый дракон; наезд 1,00→1,15; ult_blink_tick"
+    },
+    {
+     "t0": 0.3,
+     "t1": 0.75,
+     "shot": "Поза 1",
+     "what": "медленный подъём камеры от пояса к лицу (не ниже бедра), рука на бедре, рука в волосах, бёдра в наклоне; вышитый дракон начинает светиться"
+    },
+    {
+     "t0": 0.75,
+     "t1": 1.1,
+     "shot": "Вставка",
+     "what": "кружевная перчатка и фишка 東, фишка трескается золотым светом; на краю кадра лицо"
+    },
+    {
+     "t0": 1.1,
+     "t1": 1.5,
+     "shot": "Поза 2",
+     "what": "облёт 120° на уровне бедра (тангаж 0°); вышивка оживает, чешуя бежит по ципао"
+    },
+    {
+     "t0": 1.5,
+     "t1": 1.9,
+     "shot": "Смена кадра",
+     "what": "общий план: зал превращается в ночной лак, из стола поднимается голова нефритового дракона за её спиной; шаг шпилькой; ult_step_heel"
+    },
+    {
+     "t0": 1.9,
+     "t1": 2.15,
+     "shot": "УДАР",
+     "what": "жест рукой в перчатке к камере: impact frame ×2 (NIGHT_900 + mc.accent, затем GOLD_500), hit-stop 4 кадра, радиальное размытие; ult_mc_hit + ult_hit_low"
+    },
+    {
+     "t0": 2.15,
+     "t1": 2.45,
+     "shot": "Дыхание",
+     "what": "дракон бросается в камеру, жар и пар заполняют кадр (heat haze + bloom)"
+    },
+    {
+     "t0": 2.45,
+     "t1": 2.95,
+     "shot": "Эффект",
+     "what": "доска: дракон проглатывает пару, щит босса раскалывается, горение по боссу; match-cut; ult_mc_fx"
+    },
+    {
+     "t0": 2.95,
+     "t1": 3.4,
+     "shot": "Сплеш",
+     "what": "финальная поза: разворот, рука на бедре, рука в волосах, румянец и влажный блеск; удержание 0,35 с (кадр Галереи)"
+    },
+    {
+     "t0": 3.4,
+     "t1": 3.7,
+     "shot": "Взгляд",
+     "what": "воздушный поцелуй и подмигивание в камеру; голос: «Всё — твоё.»"
+    },
+    {
+     "t0": 3.7,
+     "t1": 3.9,
+     "shot": "Takeover",
+     "what": "скин стола «Нефритовый дракон» вспыхивает по краям поля на 6 с (без пульсаций)"
+    },
+    {
+     "t0": 3.9,
+     "t1": 4.0,
+     "shot": "Выход",
+     "what": "ink-wash, печать 龍覚"
+    }
+   ]
+  },
+  {
+   "id": "zlata_ember",
+   "hero": "zlata",
+   "tier": "FLAG",
+   "slot": "evening",
+   "name_ru": "Купальский костёр",
+   "name_jp": "夏至の焚火 (Geshi no Takibi)",
+   "status": "launch",
+   "legacy_outfit": "zl_ember",
+   "legacy_video": "ult_video/zlata.ogv",
+   "hem_class": "knee",
+   "twist": "T2",
+   "concept": "Чёрно-золотое платье в духе лаковой миниатюры: Злата поджигает ночь купальских костров; огненный шлейф становится костром, освещающим пару.",
+   "vfx": [
+    "zlata.accent",
+    "zlata.glow",
+    "EMBER",
+    "GOLD_300",
+    "GOLD_500",
+    "CINNABAR",
+    "NIGHT_900"
+   ],
+   "heat": "костры на заднем плане (heat haze), горячие угли и перья-искры, пар от росы, влажный блик на чулках",
+   "voice": [
+    "Купальская ночь!",
+    "Огонь — мой.",
+    "Пепел — только начало.",
+    "Весна пришла!"
+   ],
+   "poses": [
+    "фас, коса-свеча, перчатки до локтей",
+    "плясовой каблучок, разрез до бедра, рукав-крыло",
+    "ведёт косой, как лентой, наклон к камере",
+    "крылья раскрыты, подбородок вверх, влажный блеск кожи",
+    "через плечо, огонь отражается в глазах"
+   ],
+   "sfx": [],
+   "cutscene_s": 4.0,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 5.3,
+   "beats_n": 12,
+   "poses_n": 5,
+   "plates_n": 3,
+   "impact_frames": 3,
+   "voice_cues": [
+    "zlata_ember_ult_cast_1",
+    "zlata_ember_ult_cast_2",
+    "zlata_ember_ult_cast_3",
+    "zlata_ember_ult_cast_4"
+   ],
+   "sfx_cues": [
+    "ult_zlata_hit",
+    "ult_zlata_fx"
+   ],
+   "atk_pct_star0": 0.1,
+   "atk_pct_per_star": 0.025,
+   "hud_format": "полный экран",
+   "credits": 170,
+   "hours": 85,
+   "size_mb": 4.1,
+   "pack": "pack_ult_zlata",
+   "needs_video": true,
+   "needs_rig": true,
+   "storyboard": true,
+   "assets": [
+    "assets/v11/ult/zlata/zlata_ember/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/zlata/zlata_ember/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/zlata/zlata_ember/cutin_pose_3.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/zlata/zlata_ember/cutin_pose_4.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/zlata/zlata_ember/cutin_pose_5.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/zlata/zlata_ember/plate_1.ogv (540x960, 24 fps, Theora q6, <=0.9 MB)",
+    "assets/v11/ult/zlata/zlata_ember/plate_2.ogv (540x960, 24 fps, Theora q6, <=0.9 MB)",
+    "assets/v11/ult/zlata/zlata_ember/plate_3.ogv (540x960, 24 fps, Theora q6, <=0.9 MB)",
+    "assets/v11/ult/zlata/zlata_ember/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/zlata/zlata_ember/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/zlata/zlata_ember/voice/ 4 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/zlata/zlata_ember/gallery_thumb.webp (512x768)",
+    "assets/v11/ult/zlata/zlata_ember/gallery_splash.webp (1080x1620)",
+    "assets/v11/ult/zlata/zlata_ember/takeover_skin.json + takeover_frame.webp (table skin 6 s)"
+   ],
+   "beats": [
+    {
+     "t0": 0.0,
+     "t1": 0.3,
+     "shot": "Глаз",
+     "what": "макро: янтарные глаза, огонь в зрачках, бровь вверх; наезд 1,00→1,15"
+    },
+    {
+     "t0": 0.3,
+     "t1": 0.75,
+     "shot": "Поза 1",
+     "what": "анфас, симметрия, коса-свеча тлеет; камера подъём от пояса к лицу; перчатки до локтей"
+    },
+    {
+     "t0": 0.75,
+     "t1": 1.1,
+     "shot": "Вставка",
+     "what": "перо Жар-птицы вспыхивает в руке в перчатке; искры"
+    },
+    {
+     "t0": 1.1,
+     "t1": 1.5,
+     "shot": "Поза 2",
+     "what": "плясовой каблучок, высокий разрез в движении, рукав-крыло взмахом; камера на уровне бедра, облёт"
+    },
+    {
+     "t0": 1.5,
+     "t1": 1.9,
+     "shot": "Смена кадра",
+     "what": "общий план: купальская ночь, цепочка костров на поле, Злата в центре; ветер несёт перья"
+    },
+    {
+     "t0": 1.9,
+     "t1": 2.15,
+     "shot": "УДАР",
+     "what": "крылья раскрыты: impact frame ×2 (NIGHT_900 + zlata.accent, затем GOLD_500), тепловая волна"
+    },
+    {
+     "t0": 2.15,
+     "t1": 2.45,
+     "shot": "Жар",
+     "what": "огненный шлейф-коса хлещет по кадру, heat haze + bloom на весь экран (≤45% площади)"
+    },
+    {
+     "t0": 2.45,
+     "t1": 2.95,
+     "shot": "Эффект",
+     "what": "доска: огонь бежит от фишки к фишке, лёд тает, пара вспыхивает костром и исчезает; горение по боссу"
+    },
+    {
+     "t0": 2.95,
+     "t1": 3.4,
+     "shot": "Сплеш",
+     "what": "поза: крылья раскрыты, подбородок вверх, влажный блеск; удержание 0,35 с"
+    },
+    {
+     "t0": 3.4,
+     "t1": 3.7,
+     "shot": "Взгляд",
+     "what": "ведёт косой, как лентой, к камере, величественная улыбка; голос: «Весна пришла!»"
+    },
+    {
+     "t0": 3.7,
+     "t1": 3.9,
+     "shot": "Takeover",
+     "what": "скин стола «Лаковая миниатюра» по краям на 6 с: угольки по рамке, без пульсаций"
+    },
+    {
+     "t0": 3.9,
+     "t1": 4.0,
+     "shot": "Выход",
+     "what": "огненный вайп, печать 夏至の焚火"
+    }
+   ]
+  },
+  {
+   "id": "rin_idol",
+   "hero": "rin",
+   "tier": "SSR",
+   "slot": "battle",
+   "name_ru": "Бис!",
+   "name_jp": "アンコール (Ankōru)",
+   "status": "launch",
+   "legacy_outfit": "r_idol",
+   "legacy_video": "",
+   "hem_class": "knee",
+   "twist": "T4",
+   "concept": "«Дива нефритового зала»: джаз-сцена, прожектор; фишки возвращаются на стол звёздами, команда заряжена овацией.",
+   "vfx": [
+    "rin.accent",
+    "rin.glow",
+    "JADE_300",
+    "GOLD_300",
+    "PAPER_100",
+    "NIGHT_900"
+   ],
+   "heat": "дымовая машина сцены, горячий свет софитов, блеск лака и атласа",
+   "voice": [
+    "Бис!",
+    "Свет на сцену!",
+    "Это для тебя."
+   ],
+   "poses": [
+    "платье-миди со шлейфом, микрофон у губ, взгляд поверх очков",
+    "наклон к камере, рука к залу",
+    "поворот спиной, шлейф, взгляд через плечо",
+    "поклон с улыбкой"
+   ],
+   "sfx": [],
+   "cutscene_s": 3.6,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 4.9,
+   "beats_n": 10,
+   "poses_n": 4,
+   "plates_n": 2,
+   "impact_frames": 2,
+   "voice_cues": [
+    "rin_idol_ult_cast_1",
+    "rin_idol_ult_cast_2",
+    "rin_idol_ult_cast_3"
+   ],
+   "sfx_cues": [
+    "ult_rin_hit",
+    "ult_rin_fx"
+   ],
+   "atk_pct_star0": 0.08,
+   "atk_pct_per_star": 0.02,
+   "hud_format": "окно→полный",
+   "credits": 105,
+   "hours": 52,
+   "size_mb": 2.8,
+   "pack": "pack_ult_rin",
+   "needs_video": true,
+   "needs_rig": true,
+   "storyboard": true,
+   "assets": [
+    "assets/v11/ult/rin/rin_idol/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/rin/rin_idol/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/rin/rin_idol/cutin_pose_3.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/rin/rin_idol/cutin_pose_4.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/rin/rin_idol/plate_1.ogv (540x960, 24 fps, Theora q6, <=0.9 MB)",
+    "assets/v11/ult/rin/rin_idol/plate_2.ogv (540x960, 24 fps, Theora q6, <=0.9 MB)",
+    "assets/v11/ult/rin/rin_idol/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/rin/rin_idol/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/rin/rin_idol/voice/ 3 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/rin/rin_idol/gallery_thumb.webp (512x768)",
+    "assets/v11/ult/rin/rin_idol/gallery_splash.webp (1080x1620)"
+   ],
+   "beats": [
+    {
+     "t0": 0.0,
+     "t1": 0.3,
+     "shot": "Глаз",
+     "what": "макро: глаза поверх золотой оправы, блик софита"
+    },
+    {
+     "t0": 0.3,
+     "t1": 0.75,
+     "shot": "Поза 1",
+     "what": "подъём камеры от шлейфа к лицу (не ниже бедра), микрофон у губ"
+    },
+    {
+     "t0": 0.75,
+     "t1": 1.1,
+     "shot": "Вставка",
+     "what": "микрофон и перчатка, дыхание в капсулу; звук: ult_inhale"
+    },
+    {
+     "t0": 1.1,
+     "t1": 1.5,
+     "shot": "Поза 2",
+     "what": "облёт на уровне бедра, наклон к залу, шлейф по сцене"
+    },
+    {
+     "t0": 1.5,
+     "t1": 1.9,
+     "shot": "Смена кадра",
+     "what": "общий план: джаз-зал, прожектор, силуэты публики"
+    },
+    {
+     "t0": 1.9,
+     "t1": 2.25,
+     "shot": "УДАР",
+     "what": "последняя нота: impact frame ×2 (NIGHT_900 + rin.accent, затем GOLD_300)"
+    },
+    {
+     "t0": 2.25,
+     "t1": 2.85,
+     "shot": "Эффект",
+     "what": "звёзды-фишки летят из лотка на стол, овация сыплет золото; команда заряжена"
+    },
+    {
+     "t0": 2.85,
+     "t1": 3.2,
+     "shot": "Сплеш",
+     "what": "поза через плечо, шлейф, удержание 0,3 с"
+    },
+    {
+     "t0": 3.2,
+     "t1": 3.5,
+     "shot": "Взгляд",
+     "what": "поклон и улыбка; голос: «Это для тебя.»"
+    },
+    {
+     "t0": 3.5,
+     "t1": 3.6,
+     "shot": "Выход",
+     "what": "занавес-вайп, печать アンコール"
+    }
+   ]
+  },
+  {
+   "id": "hana_champion",
+   "hero": "hana",
+   "tier": "SSR",
+   "slot": "battle",
+   "name_ru": "Рекорд зала",
+   "name_jp": "記録更新 (Kiroku Kōshin)",
+   "status": "launch",
+   "legacy_outfit": "h_gym",
+   "legacy_video": "",
+   "hem_class": "pants",
+   "twist": "T1",
+   "concept": "Чемпионка зала в кроп-топе и полосатых шортах: разрыв финишной ленты, конфетти, «дай пять» зрителям.",
+   "vfx": [
+    "hana.accent",
+    "hana.glow",
+    "EMBER",
+    "GOLD_300",
+    "PAPER_100",
+    "NIGHT_900"
+   ],
+   "heat": "пар от разгорячённой кожи на холодном воздухе арены, блеск пота, горячий свет прожекторов",
+   "voice": [
+    "Рекорд зала!",
+    "Дай пять!",
+    "Я первая!"
+   ],
+   "poses": [
+    "кроп-топ с глубоким вырезом, шорты в полоску, гольфы со звездой",
+    "финишная лента на груди, победный рывок",
+    "прыжок, колено вперёд",
+    "«дай пять» с подмигиванием и язычком"
+   ],
+   "sfx": [],
+   "cutscene_s": 3.6,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 4.9,
+   "beats_n": 10,
+   "poses_n": 4,
+   "plates_n": 2,
+   "impact_frames": 2,
+   "voice_cues": [
+    "hana_champion_ult_cast_1",
+    "hana_champion_ult_cast_2",
+    "hana_champion_ult_cast_3"
+   ],
+   "sfx_cues": [
+    "ult_hana_hit",
+    "ult_hana_fx"
+   ],
+   "atk_pct_star0": 0.08,
+   "atk_pct_per_star": 0.02,
+   "hud_format": "окно→полный",
+   "credits": 105,
+   "hours": 52,
+   "size_mb": 2.8,
+   "pack": "pack_ult_hana",
+   "needs_video": true,
+   "needs_rig": true,
+   "storyboard": true,
+   "assets": [
+    "assets/v11/ult/hana/hana_champion/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/hana/hana_champion/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/hana/hana_champion/cutin_pose_3.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/hana/hana_champion/cutin_pose_4.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/hana/hana_champion/plate_1.ogv (540x960, 24 fps, Theora q6, <=0.9 MB)",
+    "assets/v11/ult/hana/hana_champion/plate_2.ogv (540x960, 24 fps, Theora q6, <=0.9 MB)",
+    "assets/v11/ult/hana/hana_champion/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/hana/hana_champion/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/hana/hana_champion/voice/ 3 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/hana/hana_champion/gallery_thumb.webp (512x768)",
+    "assets/v11/ult/hana/hana_champion/gallery_splash.webp (1080x1620)"
+   ],
+   "beats": [
+    {
+     "t0": 0.0,
+     "t1": 0.3,
+     "shot": "Глаз",
+     "what": "макро: прищур, капля пота"
+    },
+    {
+     "t0": 0.3,
+     "t1": 0.75,
+     "shot": "Поза 1",
+     "what": "3/4, камера на уровне бедра, кроп-топ, руки на бёдрах, дыхание"
+    },
+    {
+     "t0": 0.75,
+     "t1": 1.1,
+     "shot": "Вставка",
+     "what": "кроссовок и линия старта, искры"
+    },
+    {
+     "t0": 1.1,
+     "t1": 1.5,
+     "shot": "Поза 2",
+     "what": "рывок в профиль, трекинг, лента впереди"
+    },
+    {
+     "t0": 1.5,
+     "t1": 1.9,
+     "shot": "Смена кадра",
+     "what": "общий план арены, свет прожекторов, трибуны"
+    },
+    {
+     "t0": 1.9,
+     "t1": 2.25,
+     "shot": "УДАР",
+     "what": "грудью рвёт ленту: impact frame ×2 (NIGHT_900 + hana.accent, затем GOLD_300)"
+    },
+    {
+     "t0": 2.25,
+     "t1": 2.85,
+     "shot": "Эффект",
+     "what": "конфетти-ядро по доске, снимает +1 пару (T1 «Эхо»), комбо +3"
+    },
+    {
+     "t0": 2.85,
+     "t1": 3.2,
+     "shot": "Сплеш",
+     "what": "победная поза, поднятые руки, прогиб; удержание 0,3 с"
+    },
+    {
+     "t0": 3.2,
+     "t1": 3.5,
+     "shot": "Взгляд",
+     "what": "«дай пять» ладонью в камеру, подмигивание; голос: «Дай пять!»"
+    },
+    {
+     "t0": 3.5,
+     "t1": 3.6,
+     "shot": "Выход",
+     "what": "конфетти-вайп, печать 記録更新"
+    }
+   ]
+  },
+  {
+   "id": "yue_queen",
+   "hero": "yue",
+   "tier": "SSR",
+   "slot": "evening",
+   "name_ru": "Затмение",
+   "name_jp": "日食 (Nisshoku)",
+   "status": "launch",
+   "legacy_outfit": "y_queen",
+   "legacy_video": "ult_video/yue_queen.ogv",
+   "hem_class": "long",
+   "twist": "T6",
+   "concept": "Королева лунной ночи на троне: луна закрывает солнце, созвездие связывает пару, щит босса меркнет.",
+   "vfx": [
+    "yue.accent",
+    "yue.glow",
+    "PAPER_100",
+    "GOLD_300",
+    "NIGHT_900"
+   ],
+   "heat": "лунная дымка, холодный пар, серебряная пыль; контрастный рим-свет по плечам и чулкам",
+   "voice": [
+    "Затмение.",
+    "Склонись.",
+    "Любопытно…"
+   ],
+   "poses": [
+    "трон, открытые плечи, перчатки, нога на ногу",
+    "встаёт, шлейф, рука с веером к кадру",
+    "полушаг к камере, взгляд сверху вниз",
+    "через плечо, тиара в блике"
+   ],
+   "sfx": [],
+   "cutscene_s": 3.6,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 4.9,
+   "beats_n": 10,
+   "poses_n": 4,
+   "plates_n": 2,
+   "impact_frames": 2,
+   "voice_cues": [
+    "yue_queen_ult_cast_1",
+    "yue_queen_ult_cast_2",
+    "yue_queen_ult_cast_3"
+   ],
+   "sfx_cues": [
+    "ult_yue_hit",
+    "ult_yue_fx"
+   ],
+   "atk_pct_star0": 0.08,
+   "atk_pct_per_star": 0.02,
+   "hud_format": "окно→полный",
+   "credits": 105,
+   "hours": 52,
+   "size_mb": 2.8,
+   "pack": "pack_ult_yue",
+   "needs_video": true,
+   "needs_rig": true,
+   "storyboard": true,
+   "assets": [
+    "assets/v11/ult/yue/yue_queen/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/yue/yue_queen/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/yue/yue_queen/cutin_pose_3.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/yue/yue_queen/cutin_pose_4.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/yue/yue_queen/plate_1.ogv (540x960, 24 fps, Theora q6, <=0.9 MB)",
+    "assets/v11/ult/yue/yue_queen/plate_2.ogv (540x960, 24 fps, Theora q6, <=0.9 MB)",
+    "assets/v11/ult/yue/yue_queen/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/yue/yue_queen/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/yue/yue_queen/voice/ 3 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/yue/yue_queen/gallery_thumb.webp (512x768)",
+    "assets/v11/ult/yue/yue_queen/gallery_splash.webp (1080x1620)"
+   ],
+   "beats": [
+    {
+     "t0": 0.0,
+     "t1": 0.3,
+     "shot": "Глаз",
+     "what": "макро: серебряные ресницы, отражение затмения"
+    },
+    {
+     "t0": 0.3,
+     "t1": 0.75,
+     "shot": "Поза 1",
+     "what": "анфас, трон, нога на ногу, камера подъёмом (не ниже бедра)"
+    },
+    {
+     "t0": 0.75,
+     "t1": 1.1,
+     "shot": "Вставка",
+     "what": "веер и перчатка, на веере тёмный диск"
+    },
+    {
+     "t0": 1.1,
+     "t1": 1.5,
+     "shot": "Поза 2",
+     "what": "размер 3/4: встаёт, шлейф вихрем"
+    },
+    {
+     "t0": 1.5,
+     "t1": 1.9,
+     "shot": "Смена кадра",
+     "what": "общий план: тронный зал, небо, луна наползает на солнце"
+    },
+    {
+     "t0": 1.9,
+     "t1": 2.25,
+     "shot": "УДАР",
+     "what": "затмение: impact frame ×2 (NIGHT_900 + yue.accent, затем GOLD_300)"
+    },
+    {
+     "t0": 2.25,
+     "t1": 2.85,
+     "shot": "Эффект",
+     "what": "созвездие связывает пару и боса, щит −50% (T6), пара исчезает"
+    },
+    {
+     "t0": 2.85,
+     "t1": 3.2,
+     "shot": "Сплеш",
+     "what": "полушаг к камере, взгляд сверху вниз; удержание 0,3 с"
+    },
+    {
+     "t0": 3.2,
+     "t1": 3.5,
+     "shot": "Взгляд",
+     "what": "через плечо, тиара в блике; голос: «Склонись.»"
+    },
+    {
+     "t0": 3.5,
+     "t1": 3.6,
+     "shot": "Выход",
+     "what": "серебряный вайп, печать 日食"
+    }
+   ]
+  },
+  {
+   "id": "nova_neon",
+   "hero": "nova",
+   "tier": "SSR",
+   "slot": "seasonal",
+   "name_ru": "Форсаж",
+   "name_jp": "ブースト (Būsuto)",
+   "status": "launch",
+   "legacy_outfit": "n_ssr",
+   "legacy_video": "ult_video/nova_roof.ogv",
+   "hem_class": "pants",
+   "twist": "T7",
+   "concept": "Неоновый форсаж: Нова в закрытом комбинезоне уходит в занос на байке по ночному городу; неоновый след рисует по доске линию.",
+   "vfx": [
+    "nova.accent",
+    "nova.glow",
+    "nova.deep",
+    "PAPER_100",
+    "GOLD_300",
+    "NIGHT_900"
+   ],
+   "heat": "перегрев двигателя (тепловая рябь), пар из люка на мокром асфальте, неоновые блики в лужах",
+   "voice": [
+    "Форсаж!",
+    "Скачано.",
+    "Держись крепче."
+   ],
+   "poses": [
+    "комбинезон с молнией до ключиц, ракурс сбоку",
+    "присед в 3/4 на байке, колени вместе",
+    "растяжка вверх на крыше, подмигивание",
+    "поворот бёдрами, взгляд через плечо"
+   ],
+   "sfx": [],
+   "cutscene_s": 3.6,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 4.9,
+   "beats_n": 10,
+   "poses_n": 4,
+   "plates_n": 2,
+   "impact_frames": 2,
+   "voice_cues": [
+    "nova_neon_ult_cast_1",
+    "nova_neon_ult_cast_2",
+    "nova_neon_ult_cast_3"
+   ],
+   "sfx_cues": [
+    "ult_nova_hit",
+    "ult_nova_fx"
+   ],
+   "atk_pct_star0": 0.08,
+   "atk_pct_per_star": 0.02,
+   "hud_format": "окно→полный",
+   "credits": 105,
+   "hours": 52,
+   "size_mb": 2.8,
+   "pack": "pack_ult_nova",
+   "needs_video": true,
+   "needs_rig": true,
+   "storyboard": true,
+   "assets": [
+    "assets/v11/ult/nova/nova_neon/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/nova/nova_neon/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/nova/nova_neon/cutin_pose_3.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/nova/nova_neon/cutin_pose_4.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/nova/nova_neon/plate_1.ogv (540x960, 24 fps, Theora q6, <=0.9 MB)",
+    "assets/v11/ult/nova/nova_neon/plate_2.ogv (540x960, 24 fps, Theora q6, <=0.9 MB)",
+    "assets/v11/ult/nova/nova_neon/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/nova/nova_neon/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/nova/nova_neon/voice/ 3 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/nova/nova_neon/gallery_thumb.webp (512x768)",
+    "assets/v11/ult/nova/nova_neon/gallery_splash.webp (1080x1620)"
+   ],
+   "beats": [
+    {
+     "t0": 0.0,
+     "t1": 0.3,
+     "shot": "Глаз",
+     "what": "макро: глаза за визором, бегущие строки"
+    },
+    {
+     "t0": 0.3,
+     "t1": 0.75,
+     "shot": "Поза 1",
+     "what": "сбоку, камера на уровне бедра, комбинезон, молния до ключиц"
+    },
+    {
+     "t0": 0.75,
+     "t1": 1.1,
+     "shot": "Вставка",
+     "what": "перчатка на руле, газ, тахометр в красной зоне"
+    },
+    {
+     "t0": 1.1,
+     "t1": 1.5,
+     "shot": "Поза 2",
+     "what": "заносит: камера трекинг сбоку, искры из-под колёс"
+    },
+    {
+     "t0": 1.5,
+     "t1": 1.9,
+     "shot": "Смена кадра",
+     "what": "общий план: ночной город, неоновые вывески, она в центре"
+    },
+    {
+     "t0": 1.9,
+     "t1": 2.25,
+     "shot": "УДАР",
+     "what": "занос на 180°: impact frame ×2 (NIGHT_900 + nova.accent, затем GOLD_300), RGB-разброс ≤2 px"
+    },
+    {
+     "t0": 2.25,
+     "t1": 2.85,
+     "shot": "Эффект",
+     "what": "неоновый след рисует линию по доске, Азарт +3 пары (T7), пары вспыхивают"
+    },
+    {
+     "t0": 2.85,
+     "t1": 3.2,
+     "shot": "Сплеш",
+     "what": "растяжка вверх на крыше, подмигивание; удержание 0,3 с"
+    },
+    {
+     "t0": 3.2,
+     "t1": 3.5,
+     "shot": "Взгляд",
+     "what": "поворот бёдрами, взгляд через плечо; голос: «Держись крепче.»"
+    },
+    {
+     "t0": 3.5,
+     "t1": 3.6,
+     "shot": "Выход",
+     "what": "глитч-вайп, печать ブースト"
+    }
+   ]
+  },
+  {
+   "id": "kohaku_kyubi",
+   "hero": "kohaku",
+   "tier": "FLAG",
+   "slot": "evening",
+   "name_ru": "Девять огней",
+   "name_jp": "九つの炎 (Kokonotsu no Hono)",
+   "status": "m6",
+   "legacy_outfit": "ko_kyubi",
+   "legacy_video": "",
+   "hem_class": "knee",
+   "twist": "T2",
+   "concept": "заготовка: сторибоард по шаблону FLAG, делается за 6 недель до релиза",
+   "vfx": [
+    "kohaku.accent",
+    "kohaku.deep",
+    "kohaku.glow",
+    "GOLD_300",
+    "GOLD_500",
+    "NIGHT_900"
+   ],
+   "heat": "лисий огонь (холодное пламя с алыми кончиками), дымка храмовых курений, тлеющие талисманы",
+   "voice": [],
+   "poses": [],
+   "sfx": [],
+   "cutscene_s": 4.0,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 5.3,
+   "beats_n": 12,
+   "poses_n": 5,
+   "plates_n": 3,
+   "impact_frames": 3,
+   "voice_cues": [
+    "kohaku_kyubi_ult_cast_1",
+    "kohaku_kyubi_ult_cast_2",
+    "kohaku_kyubi_ult_cast_3",
+    "kohaku_kyubi_ult_cast_4"
+   ],
+   "sfx_cues": [
+    "ult_kohaku_hit",
+    "ult_kohaku_fx"
+   ],
+   "atk_pct_star0": 0.1,
+   "atk_pct_per_star": 0.025,
+   "hud_format": "полный экран",
+   "credits": 170,
+   "hours": 85,
+   "size_mb": 4.1,
+   "pack": "pack_ult_kohaku",
+   "needs_video": true,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/kohaku/kohaku_kyubi/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/kohaku/kohaku_kyubi/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/kohaku/kohaku_kyubi/cutin_pose_3.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/kohaku/kohaku_kyubi/cutin_pose_4.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/kohaku/kohaku_kyubi/cutin_pose_5.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/kohaku/kohaku_kyubi/plate_1.ogv (540x960, 24 fps, Theora q6, <=0.9 MB)",
+    "assets/v11/ult/kohaku/kohaku_kyubi/plate_2.ogv (540x960, 24 fps, Theora q6, <=0.9 MB)",
+    "assets/v11/ult/kohaku/kohaku_kyubi/plate_3.ogv (540x960, 24 fps, Theora q6, <=0.9 MB)",
+    "assets/v11/ult/kohaku/kohaku_kyubi/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/kohaku/kohaku_kyubi/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/kohaku/kohaku_kyubi/voice/ 4 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/kohaku/kohaku_kyubi/gallery_thumb.webp (512x768)",
+    "assets/v11/ult/kohaku/kohaku_kyubi/gallery_splash.webp (1080x1620)",
+    "assets/v11/ult/kohaku/kohaku_kyubi/takeover_skin.json + takeover_frame.webp (table skin 6 s)"
+   ]
+  },
+  {
+   "id": "tsubame_crimson",
+   "hero": "tsubame",
+   "tier": "FLAG",
+   "slot": "battle",
+   "name_ru": "Танец ласточек",
+   "name_jp": "燕の舞 (Tsubame no Mai)",
+   "status": "m6",
+   "legacy_outfit": "tb_crimson",
+   "legacy_video": "",
+   "hem_class": "mini",
+   "twist": "T6",
+   "concept": "заготовка: сторибоард по шаблону FLAG, делается за 6 недель до релиза",
+   "vfx": [
+    "tsubame.accent",
+    "tsubame.deep",
+    "tsubame.glow",
+    "GOLD_300",
+    "GOLD_500",
+    "NIGHT_900"
+   ],
+   "heat": "дымовая завеса (ink-smoke), тлеющие края писем, пар из чайника ночного квартала",
+   "voice": [],
+   "poses": [],
+   "sfx": [],
+   "cutscene_s": 4.0,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 5.3,
+   "beats_n": 12,
+   "poses_n": 5,
+   "plates_n": 3,
+   "impact_frames": 3,
+   "voice_cues": [
+    "tsubame_crimson_ult_cast_1",
+    "tsubame_crimson_ult_cast_2",
+    "tsubame_crimson_ult_cast_3",
+    "tsubame_crimson_ult_cast_4"
+   ],
+   "sfx_cues": [
+    "ult_tsubame_hit",
+    "ult_tsubame_fx"
+   ],
+   "atk_pct_star0": 0.1,
+   "atk_pct_per_star": 0.025,
+   "hud_format": "полный экран",
+   "credits": 170,
+   "hours": 85,
+   "size_mb": 4.1,
+   "pack": "pack_ult_tsubame",
+   "needs_video": true,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/tsubame/tsubame_crimson/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/tsubame/tsubame_crimson/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/tsubame/tsubame_crimson/cutin_pose_3.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/tsubame/tsubame_crimson/cutin_pose_4.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/tsubame/tsubame_crimson/cutin_pose_5.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/tsubame/tsubame_crimson/plate_1.ogv (540x960, 24 fps, Theora q6, <=0.9 MB)",
+    "assets/v11/ult/tsubame/tsubame_crimson/plate_2.ogv (540x960, 24 fps, Theora q6, <=0.9 MB)",
+    "assets/v11/ult/tsubame/tsubame_crimson/plate_3.ogv (540x960, 24 fps, Theora q6, <=0.9 MB)",
+    "assets/v11/ult/tsubame/tsubame_crimson/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/tsubame/tsubame_crimson/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/tsubame/tsubame_crimson/voice/ 4 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/tsubame/tsubame_crimson/gallery_thumb.webp (512x768)",
+    "assets/v11/ult/tsubame/tsubame_crimson/gallery_splash.webp (1080x1620)",
+    "assets/v11/ult/tsubame/tsubame_crimson/takeover_skin.json + takeover_frame.webp (table skin 6 s)"
+   ]
+  },
+  {
+   "id": "shirin_sun",
+   "hero": "shirin",
+   "tier": "FLAG",
+   "slot": "evening",
+   "name_ru": "Солнечный диск",
+   "name_jp": "太陽の円盤 (Taiyō no Enban)",
+   "status": "m6",
+   "legacy_outfit": "sh_sun",
+   "legacy_video": "",
+   "hem_class": "knee",
+   "twist": "T5",
+   "concept": "заготовка: сторибоард по шаблону FLAG, делается за 6 недель до релиза",
+   "vfx": [
+    "shirin.accent",
+    "shirin.deep",
+    "shirin.glow",
+    "GOLD_300",
+    "GOLD_500",
+    "NIGHT_900"
+   ],
+   "heat": "марево пустыни (heat haze), золотая пыль, масляная лампа с живым пламенем",
+   "voice": [],
+   "poses": [],
+   "sfx": [],
+   "cutscene_s": 4.0,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 5.3,
+   "beats_n": 12,
+   "poses_n": 5,
+   "plates_n": 3,
+   "impact_frames": 3,
+   "voice_cues": [
+    "shirin_sun_ult_cast_1",
+    "shirin_sun_ult_cast_2",
+    "shirin_sun_ult_cast_3",
+    "shirin_sun_ult_cast_4"
+   ],
+   "sfx_cues": [
+    "ult_shirin_hit",
+    "ult_shirin_fx"
+   ],
+   "atk_pct_star0": 0.1,
+   "atk_pct_per_star": 0.025,
+   "hud_format": "полный экран",
+   "credits": 170,
+   "hours": 85,
+   "size_mb": 4.1,
+   "pack": "pack_ult_shirin",
+   "needs_video": true,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/shirin/shirin_sun/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/shirin/shirin_sun/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/shirin/shirin_sun/cutin_pose_3.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/shirin/shirin_sun/cutin_pose_4.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/shirin/shirin_sun/cutin_pose_5.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/shirin/shirin_sun/plate_1.ogv (540x960, 24 fps, Theora q6, <=0.9 MB)",
+    "assets/v11/ult/shirin/shirin_sun/plate_2.ogv (540x960, 24 fps, Theora q6, <=0.9 MB)",
+    "assets/v11/ult/shirin/shirin_sun/plate_3.ogv (540x960, 24 fps, Theora q6, <=0.9 MB)",
+    "assets/v11/ult/shirin/shirin_sun/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/shirin/shirin_sun/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/shirin/shirin_sun/voice/ 4 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/shirin/shirin_sun/gallery_thumb.webp (512x768)",
+    "assets/v11/ult/shirin/shirin_sun/gallery_splash.webp (1080x1620)",
+    "assets/v11/ult/shirin/shirin_sun/takeover_skin.json + takeover_frame.webp (table skin 6 s)"
+   ]
+  },
+  {
+   "id": "miel_gala",
+   "hero": "miel",
+   "tier": "FLAG",
+   "slot": "evening",
+   "name_ru": "Многоярусный торт",
+   "name_jp": "三段ケーキ (Sandan Kēki)",
+   "status": "m12",
+   "legacy_outfit": "me_gala",
+   "legacy_video": "",
+   "hem_class": "long",
+   "twist": "T4",
+   "concept": "заготовка: сторибоард по шаблону FLAG, делается за 6 недель до релиза",
+   "vfx": [
+    "miel.accent",
+    "miel.deep",
+    "miel.glow",
+    "GOLD_300",
+    "GOLD_500",
+    "NIGHT_900"
+   ],
+   "heat": "пар из духовки, горячий сахар (карамельный блеск), облако пудры",
+   "voice": [],
+   "poses": [],
+   "sfx": [],
+   "cutscene_s": 4.0,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 5.3,
+   "beats_n": 12,
+   "poses_n": 5,
+   "plates_n": 3,
+   "impact_frames": 3,
+   "voice_cues": [
+    "miel_gala_ult_cast_1",
+    "miel_gala_ult_cast_2",
+    "miel_gala_ult_cast_3",
+    "miel_gala_ult_cast_4"
+   ],
+   "sfx_cues": [
+    "ult_miel_hit",
+    "ult_miel_fx"
+   ],
+   "atk_pct_star0": 0.1,
+   "atk_pct_per_star": 0.025,
+   "hud_format": "полный экран",
+   "credits": 170,
+   "hours": 85,
+   "size_mb": 4.1,
+   "pack": "pack_ult_miel",
+   "needs_video": true,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/miel/miel_gala/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/miel/miel_gala/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/miel/miel_gala/cutin_pose_3.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/miel/miel_gala/cutin_pose_4.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/miel/miel_gala/cutin_pose_5.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/miel/miel_gala/plate_1.ogv (540x960, 24 fps, Theora q6, <=0.9 MB)",
+    "assets/v11/ult/miel/miel_gala/plate_2.ogv (540x960, 24 fps, Theora q6, <=0.9 MB)",
+    "assets/v11/ult/miel/miel_gala/plate_3.ogv (540x960, 24 fps, Theora q6, <=0.9 MB)",
+    "assets/v11/ult/miel/miel_gala/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/miel/miel_gala/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/miel/miel_gala/voice/ 4 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/miel/miel_gala/gallery_thumb.webp (512x768)",
+    "assets/v11/ult/miel/miel_gala/gallery_splash.webp (1080x1620)",
+    "assets/v11/ult/miel/miel_gala/takeover_skin.json + takeover_frame.webp (table skin 6 s)"
+   ]
+  },
+  {
+   "id": "shirin_night",
+   "hero": "shirin",
+   "tier": "FLAG",
+   "slot": "evening",
+   "name_ru": "Звёздный шатёр",
+   "name_jp": "星の天幕 (Hoshi no Tenmaku)",
+   "status": "m12",
+   "legacy_outfit": "sh_night",
+   "legacy_video": "",
+   "hem_class": "long",
+   "twist": "T8",
+   "concept": "заготовка: сторибоард по шаблону FLAG, делается за 6 недель до релиза",
+   "vfx": [
+    "shirin.accent",
+    "shirin.deep",
+    "shirin.glow",
+    "GOLD_300",
+    "GOLD_500",
+    "NIGHT_900"
+   ],
+   "heat": "марево пустыни (heat haze), золотая пыль, масляная лампа с живым пламенем",
+   "voice": [],
+   "poses": [],
+   "sfx": [],
+   "cutscene_s": 4.0,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 5.3,
+   "beats_n": 12,
+   "poses_n": 5,
+   "plates_n": 3,
+   "impact_frames": 3,
+   "voice_cues": [
+    "shirin_night_ult_cast_1",
+    "shirin_night_ult_cast_2",
+    "shirin_night_ult_cast_3",
+    "shirin_night_ult_cast_4"
+   ],
+   "sfx_cues": [
+    "ult_shirin_hit",
+    "ult_shirin_fx"
+   ],
+   "atk_pct_star0": 0.1,
+   "atk_pct_per_star": 0.025,
+   "hud_format": "полный экран",
+   "credits": 170,
+   "hours": 85,
+   "size_mb": 4.1,
+   "pack": "pack_ult_shirin",
+   "needs_video": true,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/shirin/shirin_night/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/shirin/shirin_night/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/shirin/shirin_night/cutin_pose_3.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/shirin/shirin_night/cutin_pose_4.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/shirin/shirin_night/cutin_pose_5.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/shirin/shirin_night/plate_1.ogv (540x960, 24 fps, Theora q6, <=0.9 MB)",
+    "assets/v11/ult/shirin/shirin_night/plate_2.ogv (540x960, 24 fps, Theora q6, <=0.9 MB)",
+    "assets/v11/ult/shirin/shirin_night/plate_3.ogv (540x960, 24 fps, Theora q6, <=0.9 MB)",
+    "assets/v11/ult/shirin/shirin_night/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/shirin/shirin_night/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/shirin/shirin_night/voice/ 4 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/shirin/shirin_night/gallery_thumb.webp (512x768)",
+    "assets/v11/ult/shirin/shirin_night/gallery_splash.webp (1080x1620)",
+    "assets/v11/ult/shirin/shirin_night/takeover_skin.json + takeover_frame.webp (table skin 6 s)"
+   ]
+  },
+  {
+   "id": "yue_dragon",
+   "hero": "yue",
+   "tier": "FLAG",
+   "slot": "battle",
+   "name_ru": "Пробуждение луны",
+   "name_jp": "月の目覚め (Tsuki no Mezame)",
+   "status": "m12",
+   "legacy_outfit": "y_dragon",
+   "legacy_video": "",
+   "hem_class": "knee",
+   "twist": "T3",
+   "concept": "заготовка: сторибоард по шаблону FLAG, делается за 6 недель до релиза",
+   "vfx": [
+    "yue.accent",
+    "yue.deep",
+    "yue.glow",
+    "GOLD_300",
+    "GOLD_500",
+    "NIGHT_900"
+   ],
+   "heat": "лунная дымка по полу, серебряная пыль, холодное свечение на чулках и шёлке (размер 3/4: вальс)",
+   "voice": [],
+   "poses": [],
+   "sfx": [],
+   "cutscene_s": 4.0,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 5.3,
+   "beats_n": 12,
+   "poses_n": 5,
+   "plates_n": 3,
+   "impact_frames": 3,
+   "voice_cues": [
+    "yue_dragon_ult_cast_1",
+    "yue_dragon_ult_cast_2",
+    "yue_dragon_ult_cast_3",
+    "yue_dragon_ult_cast_4"
+   ],
+   "sfx_cues": [
+    "ult_yue_hit",
+    "ult_yue_fx"
+   ],
+   "atk_pct_star0": 0.1,
+   "atk_pct_per_star": 0.025,
+   "hud_format": "полный экран",
+   "credits": 170,
+   "hours": 85,
+   "size_mb": 4.1,
+   "pack": "pack_ult_yue",
+   "needs_video": true,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/yue/yue_dragon/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/yue/yue_dragon/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/yue/yue_dragon/cutin_pose_3.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/yue/yue_dragon/cutin_pose_4.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/yue/yue_dragon/cutin_pose_5.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/yue/yue_dragon/plate_1.ogv (540x960, 24 fps, Theora q6, <=0.9 MB)",
+    "assets/v11/ult/yue/yue_dragon/plate_2.ogv (540x960, 24 fps, Theora q6, <=0.9 MB)",
+    "assets/v11/ult/yue/yue_dragon/plate_3.ogv (540x960, 24 fps, Theora q6, <=0.9 MB)",
+    "assets/v11/ult/yue/yue_dragon/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/yue/yue_dragon/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/yue/yue_dragon/voice/ 4 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/yue/yue_dragon/gallery_thumb.webp (512x768)",
+    "assets/v11/ult/yue/yue_dragon/gallery_splash.webp (1080x1620)",
+    "assets/v11/ult/yue/yue_dragon/takeover_skin.json + takeover_frame.webp (table skin 6 s)"
+   ]
+  },
+  {
+   "id": "mari_base",
+   "hero": "mari",
+   "tier": "BASE",
+   "slot": "base",
+   "name_ru": "(по паспорту героини)",
+   "name_jp": "",
+   "status": "m6",
+   "legacy_outfit": "",
+   "legacy_video": "",
+   "hem_class": "knee",
+   "twist": "",
+   "concept": "сигнатурная ульта новой героини (Страж, 萬 Багрянец): сторибоард по шаблону BASE",
+   "vfx": [
+    "mari.accent",
+    "mari.glow"
+   ],
+   "heat": "",
+   "voice": [],
+   "poses": [],
+   "sfx": [],
+   "cutscene_s": 3.0,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 4.3,
+   "beats_n": 8,
+   "poses_n": 4,
+   "plates_n": 1,
+   "impact_frames": 1,
+   "voice_cues": [
+    "mari_base_ult_cast_1",
+    "mari_base_ult_cast_2",
+    "mari_base_ult_cast_3"
+   ],
+   "sfx_cues": [
+    "ult_mari_hit",
+    "ult_mari_fx"
+   ],
+   "atk_pct_star0": 0,
+   "atk_pct_per_star": 0,
+   "hud_format": "лента→окно",
+   "credits": 80,
+   "hours": 39,
+   "size_mb": 2.0,
+   "pack": "pack_ult_mari",
+   "needs_video": true,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/mari/mari_base/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/mari/mari_base/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/mari/mari_base/cutin_pose_3.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/mari/mari_base/cutin_pose_4.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/mari/mari_base/plate_1.ogv (540x960, 24 fps, Theora q6, <=0.9 MB)",
+    "assets/v11/ult/mari/mari_base/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/mari/mari_base/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/mari/mari_base/voice/ 3 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/mari/mari_base/gallery_thumb.webp (512x768)"
+   ]
+  },
+  {
+   "id": "mari_vow",
+   "hero": "mari",
+   "tier": "VOW",
+   "slot": "vow",
+   "name_ru": "Обет",
+   "name_jp": "",
+   "status": "m6",
+   "legacy_outfit": "",
+   "legacy_video": "",
+   "hem_class": "long",
+   "twist": "",
+   "concept": "тихий кат-ин клятвы по шаблону VOW",
+   "vfx": [
+    "mari.accent",
+    "PAPER_100"
+   ],
+   "heat": "",
+   "voice": [],
+   "poses": [],
+   "sfx": [],
+   "cutscene_s": 2.5,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 3.8,
+   "beats_n": 6,
+   "poses_n": 2,
+   "plates_n": 0,
+   "impact_frames": 0,
+   "voice_cues": [
+    "mari_vow_ult_cast_1",
+    "mari_vow_ult_cast_2",
+    "mari_vow_ult_finish_1"
+   ],
+   "sfx_cues": [],
+   "atk_pct_star0": 0,
+   "atk_pct_per_star": 0,
+   "hud_format": "окно",
+   "credits": 30,
+   "hours": 22,
+   "size_mb": 0.7,
+   "pack": "pack_ult_mari",
+   "needs_video": false,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/mari/mari_vow/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/mari/mari_vow/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/mari/mari_vow/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/mari/mari_vow/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/mari/mari_vow/voice/ 3 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/mari/mari_vow/gallery_thumb.webp (512x768)"
+   ]
+  },
+  {
+   "id": "minamo_base",
+   "hero": "minamo",
+   "tier": "BASE",
+   "slot": "base",
+   "name_ru": "(по паспорту героини)",
+   "name_jp": "",
+   "status": "m6",
+   "legacy_outfit": "",
+   "legacy_video": "",
+   "hem_class": "knee",
+   "twist": "",
+   "concept": "сигнатурная ульта новой героини (Поддержка, 筒 Диск): сторибоард по шаблону BASE",
+   "vfx": [
+    "minamo.accent",
+    "minamo.glow"
+   ],
+   "heat": "",
+   "voice": [],
+   "poses": [],
+   "sfx": [],
+   "cutscene_s": 3.0,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 4.3,
+   "beats_n": 8,
+   "poses_n": 4,
+   "plates_n": 1,
+   "impact_frames": 1,
+   "voice_cues": [
+    "minamo_base_ult_cast_1",
+    "minamo_base_ult_cast_2",
+    "minamo_base_ult_cast_3"
+   ],
+   "sfx_cues": [
+    "ult_minamo_hit",
+    "ult_minamo_fx"
+   ],
+   "atk_pct_star0": 0,
+   "atk_pct_per_star": 0,
+   "hud_format": "лента→окно",
+   "credits": 80,
+   "hours": 39,
+   "size_mb": 2.0,
+   "pack": "pack_ult_minamo",
+   "needs_video": true,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/minamo/minamo_base/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/minamo/minamo_base/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/minamo/minamo_base/cutin_pose_3.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/minamo/minamo_base/cutin_pose_4.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/minamo/minamo_base/plate_1.ogv (540x960, 24 fps, Theora q6, <=0.9 MB)",
+    "assets/v11/ult/minamo/minamo_base/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/minamo/minamo_base/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/minamo/minamo_base/voice/ 3 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/minamo/minamo_base/gallery_thumb.webp (512x768)"
+   ]
+  },
+  {
+   "id": "minamo_vow",
+   "hero": "minamo",
+   "tier": "VOW",
+   "slot": "vow",
+   "name_ru": "Обет",
+   "name_jp": "",
+   "status": "m6",
+   "legacy_outfit": "",
+   "legacy_video": "",
+   "hem_class": "long",
+   "twist": "",
+   "concept": "тихий кат-ин клятвы по шаблону VOW",
+   "vfx": [
+    "minamo.accent",
+    "PAPER_100"
+   ],
+   "heat": "",
+   "voice": [],
+   "poses": [],
+   "sfx": [],
+   "cutscene_s": 2.5,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 3.8,
+   "beats_n": 6,
+   "poses_n": 2,
+   "plates_n": 0,
+   "impact_frames": 0,
+   "voice_cues": [
+    "minamo_vow_ult_cast_1",
+    "minamo_vow_ult_cast_2",
+    "minamo_vow_ult_finish_1"
+   ],
+   "sfx_cues": [],
+   "atk_pct_star0": 0,
+   "atk_pct_per_star": 0,
+   "hud_format": "окно",
+   "credits": 30,
+   "hours": 22,
+   "size_mb": 0.7,
+   "pack": "pack_ult_minamo",
+   "needs_video": false,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/minamo/minamo_vow/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/minamo/minamo_vow/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/minamo/minamo_vow/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/minamo/minamo_vow/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/minamo/minamo_vow/voice/ 3 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/minamo/minamo_vow/gallery_thumb.webp (512x768)"
+   ]
+  },
+  {
+   "id": "kira_base",
+   "hero": "kira",
+   "tier": "BASE",
+   "slot": "base",
+   "name_ru": "(по паспорту героини)",
+   "name_jp": "",
+   "status": "m6",
+   "legacy_outfit": "",
+   "legacy_video": "",
+   "hem_class": "knee",
+   "twist": "",
+   "concept": "сигнатурная ульта новой героини (Атака, 筒 Диск): сторибоард по шаблону BASE",
+   "vfx": [
+    "kira.accent",
+    "kira.glow"
+   ],
+   "heat": "",
+   "voice": [],
+   "poses": [],
+   "sfx": [],
+   "cutscene_s": 3.0,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 4.3,
+   "beats_n": 8,
+   "poses_n": 4,
+   "plates_n": 1,
+   "impact_frames": 1,
+   "voice_cues": [
+    "kira_base_ult_cast_1",
+    "kira_base_ult_cast_2",
+    "kira_base_ult_cast_3"
+   ],
+   "sfx_cues": [
+    "ult_kira_hit",
+    "ult_kira_fx"
+   ],
+   "atk_pct_star0": 0,
+   "atk_pct_per_star": 0,
+   "hud_format": "лента→окно",
+   "credits": 80,
+   "hours": 39,
+   "size_mb": 2.0,
+   "pack": "pack_ult_kira",
+   "needs_video": true,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/kira/kira_base/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/kira/kira_base/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/kira/kira_base/cutin_pose_3.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/kira/kira_base/cutin_pose_4.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/kira/kira_base/plate_1.ogv (540x960, 24 fps, Theora q6, <=0.9 MB)",
+    "assets/v11/ult/kira/kira_base/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/kira/kira_base/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/kira/kira_base/voice/ 3 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/kira/kira_base/gallery_thumb.webp (512x768)"
+   ]
+  },
+  {
+   "id": "kira_vow",
+   "hero": "kira",
+   "tier": "VOW",
+   "slot": "vow",
+   "name_ru": "Обет",
+   "name_jp": "",
+   "status": "m6",
+   "legacy_outfit": "",
+   "legacy_video": "",
+   "hem_class": "long",
+   "twist": "",
+   "concept": "тихий кат-ин клятвы по шаблону VOW",
+   "vfx": [
+    "kira.accent",
+    "PAPER_100"
+   ],
+   "heat": "",
+   "voice": [],
+   "poses": [],
+   "sfx": [],
+   "cutscene_s": 2.5,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 3.8,
+   "beats_n": 6,
+   "poses_n": 2,
+   "plates_n": 0,
+   "impact_frames": 0,
+   "voice_cues": [
+    "kira_vow_ult_cast_1",
+    "kira_vow_ult_cast_2",
+    "kira_vow_ult_finish_1"
+   ],
+   "sfx_cues": [],
+   "atk_pct_star0": 0,
+   "atk_pct_per_star": 0,
+   "hud_format": "окно",
+   "credits": 30,
+   "hours": 22,
+   "size_mb": 0.7,
+   "pack": "pack_ult_kira",
+   "needs_video": false,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/kira/kira_vow/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/kira/kira_vow/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/kira/kira_vow/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/kira/kira_vow/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/kira/kira_vow/voice/ 3 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/kira/kira_vow/gallery_thumb.webp (512x768)"
+   ]
+  },
+  {
+   "id": "lian_base",
+   "hero": "lian",
+   "tier": "BASE",
+   "slot": "base",
+   "name_ru": "(по паспорту героини)",
+   "name_jp": "",
+   "status": "m12",
+   "legacy_outfit": "",
+   "legacy_video": "",
+   "hem_class": "knee",
+   "twist": "",
+   "concept": "сигнатурная ульта новой героини (Лекарь, 索 Бамбук): сторибоард по шаблону BASE",
+   "vfx": [
+    "lian.accent",
+    "lian.glow"
+   ],
+   "heat": "",
+   "voice": [],
+   "poses": [],
+   "sfx": [],
+   "cutscene_s": 3.0,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 4.3,
+   "beats_n": 8,
+   "poses_n": 4,
+   "plates_n": 1,
+   "impact_frames": 1,
+   "voice_cues": [
+    "lian_base_ult_cast_1",
+    "lian_base_ult_cast_2",
+    "lian_base_ult_cast_3"
+   ],
+   "sfx_cues": [
+    "ult_lian_hit",
+    "ult_lian_fx"
+   ],
+   "atk_pct_star0": 0,
+   "atk_pct_per_star": 0,
+   "hud_format": "лента→окно",
+   "credits": 80,
+   "hours": 39,
+   "size_mb": 2.0,
+   "pack": "pack_ult_lian",
+   "needs_video": true,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/lian/lian_base/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/lian/lian_base/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/lian/lian_base/cutin_pose_3.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/lian/lian_base/cutin_pose_4.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/lian/lian_base/plate_1.ogv (540x960, 24 fps, Theora q6, <=0.9 MB)",
+    "assets/v11/ult/lian/lian_base/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/lian/lian_base/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/lian/lian_base/voice/ 3 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/lian/lian_base/gallery_thumb.webp (512x768)"
+   ]
+  },
+  {
+   "id": "lian_vow",
+   "hero": "lian",
+   "tier": "VOW",
+   "slot": "vow",
+   "name_ru": "Обет",
+   "name_jp": "",
+   "status": "m12",
+   "legacy_outfit": "",
+   "legacy_video": "",
+   "hem_class": "long",
+   "twist": "",
+   "concept": "тихий кат-ин клятвы по шаблону VOW",
+   "vfx": [
+    "lian.accent",
+    "PAPER_100"
+   ],
+   "heat": "",
+   "voice": [],
+   "poses": [],
+   "sfx": [],
+   "cutscene_s": 2.5,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 3.8,
+   "beats_n": 6,
+   "poses_n": 2,
+   "plates_n": 0,
+   "impact_frames": 0,
+   "voice_cues": [
+    "lian_vow_ult_cast_1",
+    "lian_vow_ult_cast_2",
+    "lian_vow_ult_finish_1"
+   ],
+   "sfx_cues": [],
+   "atk_pct_star0": 0,
+   "atk_pct_per_star": 0,
+   "hud_format": "окно",
+   "credits": 30,
+   "hours": 22,
+   "size_mb": 0.7,
+   "pack": "pack_ult_lian",
+   "needs_video": false,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/lian/lian_vow/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/lian/lian_vow/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/lian/lian_vow/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/lian/lian_vow/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/lian/lian_vow/voice/ 3 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/lian/lian_vow/gallery_thumb.webp (512x768)"
+   ]
+  },
+  {
+   "id": "jess_base",
+   "hero": "jess",
+   "tier": "BASE",
+   "slot": "base",
+   "name_ru": "(по паспорту героини)",
+   "name_jp": "",
+   "status": "m12",
+   "legacy_outfit": "",
+   "legacy_video": "",
+   "hem_class": "knee",
+   "twist": "",
+   "concept": "сигнатурная ульта новой героини (Атака, 萬 Багрянец): сторибоард по шаблону BASE",
+   "vfx": [
+    "jess.accent",
+    "jess.glow"
+   ],
+   "heat": "",
+   "voice": [],
+   "poses": [],
+   "sfx": [],
+   "cutscene_s": 3.0,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 4.3,
+   "beats_n": 8,
+   "poses_n": 4,
+   "plates_n": 1,
+   "impact_frames": 1,
+   "voice_cues": [
+    "jess_base_ult_cast_1",
+    "jess_base_ult_cast_2",
+    "jess_base_ult_cast_3"
+   ],
+   "sfx_cues": [
+    "ult_jess_hit",
+    "ult_jess_fx"
+   ],
+   "atk_pct_star0": 0,
+   "atk_pct_per_star": 0,
+   "hud_format": "лента→окно",
+   "credits": 80,
+   "hours": 39,
+   "size_mb": 2.0,
+   "pack": "pack_ult_jess",
+   "needs_video": true,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/jess/jess_base/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/jess/jess_base/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/jess/jess_base/cutin_pose_3.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/jess/jess_base/cutin_pose_4.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/jess/jess_base/plate_1.ogv (540x960, 24 fps, Theora q6, <=0.9 MB)",
+    "assets/v11/ult/jess/jess_base/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/jess/jess_base/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/jess/jess_base/voice/ 3 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/jess/jess_base/gallery_thumb.webp (512x768)"
+   ]
+  },
+  {
+   "id": "jess_vow",
+   "hero": "jess",
+   "tier": "VOW",
+   "slot": "vow",
+   "name_ru": "Обет",
+   "name_jp": "",
+   "status": "m12",
+   "legacy_outfit": "",
+   "legacy_video": "",
+   "hem_class": "long",
+   "twist": "",
+   "concept": "тихий кат-ин клятвы по шаблону VOW",
+   "vfx": [
+    "jess.accent",
+    "PAPER_100"
+   ],
+   "heat": "",
+   "voice": [],
+   "poses": [],
+   "sfx": [],
+   "cutscene_s": 2.5,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 3.8,
+   "beats_n": 6,
+   "poses_n": 2,
+   "plates_n": 0,
+   "impact_frames": 0,
+   "voice_cues": [
+    "jess_vow_ult_cast_1",
+    "jess_vow_ult_cast_2",
+    "jess_vow_ult_finish_1"
+   ],
+   "sfx_cues": [],
+   "atk_pct_star0": 0,
+   "atk_pct_per_star": 0,
+   "hud_format": "окно",
+   "credits": 30,
+   "hours": 22,
+   "size_mb": 0.7,
+   "pack": "pack_ult_jess",
+   "needs_video": false,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/jess/jess_vow/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/jess/jess_vow/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/jess/jess_vow/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/jess/jess_vow/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/jess/jess_vow/voice/ 3 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/jess/jess_vow/gallery_thumb.webp (512x768)"
+   ]
+  },
+  {
+   "id": "vesper_base",
+   "hero": "vesper",
+   "tier": "BASE",
+   "slot": "base",
+   "name_ru": "(по паспорту героини)",
+   "name_jp": "",
+   "status": "m12",
+   "legacy_outfit": "",
+   "legacy_video": "",
+   "hem_class": "knee",
+   "twist": "",
+   "concept": "сигнатурная ульта новой героини (Пробой, 萬 Багрянец): сторибоард по шаблону BASE",
+   "vfx": [
+    "vesper.accent",
+    "vesper.glow"
+   ],
+   "heat": "",
+   "voice": [],
+   "poses": [],
+   "sfx": [],
+   "cutscene_s": 3.0,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 4.3,
+   "beats_n": 8,
+   "poses_n": 4,
+   "plates_n": 1,
+   "impact_frames": 1,
+   "voice_cues": [
+    "vesper_base_ult_cast_1",
+    "vesper_base_ult_cast_2",
+    "vesper_base_ult_cast_3"
+   ],
+   "sfx_cues": [
+    "ult_vesper_hit",
+    "ult_vesper_fx"
+   ],
+   "atk_pct_star0": 0,
+   "atk_pct_per_star": 0,
+   "hud_format": "лента→окно",
+   "credits": 80,
+   "hours": 39,
+   "size_mb": 2.0,
+   "pack": "pack_ult_vesper",
+   "needs_video": true,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/vesper/vesper_base/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/vesper/vesper_base/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/vesper/vesper_base/cutin_pose_3.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/vesper/vesper_base/cutin_pose_4.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/vesper/vesper_base/plate_1.ogv (540x960, 24 fps, Theora q6, <=0.9 MB)",
+    "assets/v11/ult/vesper/vesper_base/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/vesper/vesper_base/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/vesper/vesper_base/voice/ 3 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/vesper/vesper_base/gallery_thumb.webp (512x768)"
+   ]
+  },
+  {
+   "id": "vesper_vow",
+   "hero": "vesper",
+   "tier": "VOW",
+   "slot": "vow",
+   "name_ru": "Обет",
+   "name_jp": "",
+   "status": "m12",
+   "legacy_outfit": "",
+   "legacy_video": "",
+   "hem_class": "long",
+   "twist": "",
+   "concept": "тихий кат-ин клятвы по шаблону VOW",
+   "vfx": [
+    "vesper.accent",
+    "PAPER_100"
+   ],
+   "heat": "",
+   "voice": [],
+   "poses": [],
+   "sfx": [],
+   "cutscene_s": 2.5,
+   "trigger_s": 0.8,
+   "release_s": 0.5,
+   "total_s": 3.8,
+   "beats_n": 6,
+   "poses_n": 2,
+   "plates_n": 0,
+   "impact_frames": 0,
+   "voice_cues": [
+    "vesper_vow_ult_cast_1",
+    "vesper_vow_ult_cast_2",
+    "vesper_vow_ult_finish_1"
+   ],
+   "sfx_cues": [],
+   "atk_pct_star0": 0,
+   "atk_pct_per_star": 0,
+   "hud_format": "окно",
+   "credits": 30,
+   "hours": 22,
+   "size_mb": 0.7,
+   "pack": "pack_ult_vesper",
+   "needs_video": false,
+   "needs_rig": true,
+   "storyboard": false,
+   "assets": [
+    "assets/v11/ult/vesper/vesper_vow/cutin_pose_1.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/vesper/vesper_vow/cutin_pose_2.webp (1024x1536, <=170 KB)",
+    "assets/v11/ult/vesper/vesper_vow/timeline.json (cue sheet, spec 7.4)",
+    "assets/v11/ult/vesper/vesper_vow/vfx_preset.json (tokens only, spec 5.5)",
+    "assets/v11/ult/vesper/vesper_vow/voice/ 3 x ogg mono q4 (JP) + subtitles RU in lines.json",
+    "assets/v11/ult/vesper/vesper_vow/gallery_thumb.webp (512x768)"
+   ]
+  }
+ ]
+}
