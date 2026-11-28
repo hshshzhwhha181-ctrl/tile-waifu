@@ -119,6 +119,8 @@ CATALOG: list[Suite] = [
       note="P28: TWButton/TWPlate/TWSheet/TWHeader/TWTabBar/TWToast/TWCurrencyChip/TWSkin: carried hud2 suite (854) + press curve per tick, p95 tap response, skins, 3 resolutions"),
     S("twpresence", "TWPRESENCE_SELFTEST", "res://shell/stage/presence_selftest.tscn", group="core", timeout=600,
       note="P34: TWPresence over V10LiveRig: strip <= 28% on 3 aspects, 160 px medallion, never over the board, touches off, 7 reactions from core events < 100 ms, stub for heroines without a rig, draw/texture budget"),
+    S("twaudio", "TWAUDIO_SELFTEST", "res://shell/audio/audio_selftest.tscn", group="core", timeout=300,
+      note="P30: TWAudio buses SFX/Music/Voice/UI (-2 dB UI), TWDuck (-8 dB / 80 ms / 400 ms measured on a rendered WAV), TWVoiceQueue (<=1 voice, ron>tsumo>riichi>meld>other, depth 1, line 4 s / category 60 s / rare 1/20 / touch_spam), TWSfxPool (weak Mali <= 8 voices under a load simulator), gates, haptics, cue contract"),
     S("twboardview", "TWBOARDVIEW_SELFTEST", "res://shell/screens/match/board_view_selftest.tscn", group="core", render=True, res="720x1280",
       timeout=900, fast_args=["--games_n=40"],
       note="P31: TWBoardView + TWMatchScreen: layout (field >= 92% x 60%, tile 56/64/72/80), 20/20 events animated, 100 games with and without the view = same events and state hash, mirror == board, pixel contrast, 60-tile frame cost, screen API"),
