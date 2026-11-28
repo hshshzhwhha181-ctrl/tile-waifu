@@ -906,6 +906,22 @@
     "total": 144
    }
   },
+  "round": {
+   "fast": {
+    "marker": "ROUND_SELFTEST 2383/2383",
+    "ok": 2383,
+    "secs": 6.0,
+    "status": "pass",
+    "total": 2383
+   },
+   "full": {
+    "marker": "ROUND_SELFTEST 2383/2383",
+    "ok": 2383,
+    "secs": 6.0,
+    "status": "pass",
+    "total": 2383
+   }
+  },
   "salon": {
    "fast": {
     "marker": "SALON_SELFTEST 348/348",

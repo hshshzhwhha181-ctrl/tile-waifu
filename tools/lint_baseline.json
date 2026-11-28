@@ -1,15 +1,15 @@
 {
  "version": 1,
- "N": 565,
+ "N": 564,
  "by_rule": {
   "NODE_BASE": 0,
   "NODE_API": 57,
   "AUDIO_FX": 0,
-  "AUTOLOAD_G": 465,
+  "AUTOLOAD_G": 464,
   "ROOT_PATH": 1,
   "SHELL_DEP": 42
  },
- "core_files": 260,
+ "core_files": 268,
  "files": {
   "game/core/auth/auth.gd": {
    "AUTOLOAD_G": 19,
@@ -235,7 +235,7 @@
    "AUTOLOAD_G": 12
   },
   "game/core/v08/core/recovery_selftest.gd": {
-   "AUTOLOAD_G": 112
+   "AUTOLOAD_G": 111
   },
   "game/core/v08/league/league.gd": {
    "AUTOLOAD_G": 19,

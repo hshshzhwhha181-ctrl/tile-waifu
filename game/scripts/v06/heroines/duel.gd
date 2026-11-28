@@ -367,27 +367,34 @@ func finish() -> void :
 	finished = true
 	_clear_marks()
 	board.input_on = false
-	var win: = me > her
-	var draw: = me == her
 	var d: = V6Heroines.save_data()
-	var gems: = 60 if win else (30 if draw else 15)
+	# core: crystals, bond, pass xp, rank points and the payload of the finished duel (what the old code computed here)
+	var st: Dictionary = play._round_state()
+	st["rival_first_win"] = V6Heroines.duel_wins(rival) == 0
+	var stats: Dictionary = play._round_stats("finish", play.now() - play.start_t)
+	stats["me"] = me
+	stats["her"] = her
+	stats["rival"] = rival
+	var rr: = TWRound.resolve(st, "duel", play.cfg, stats)
+	var win: = rr.win
+	var draw: = rr.outcome == "draw"
+	var gems: = rr.reward
 	var shard: = false
 	if win:
-		if V6Heroines.duel_wins(rival) == 0:
-			gems += 100
 		d.duel_wins[rival] = V6Heroines.duel_wins(rival) + 1
 		if not G.hero_unlocked(rival) and String(d.duel_day.get(rival, "")) != G.today():
 			d.duel_day[rival] = G.today()
 			G.S.shards[rival] = int(G.S.shards.get(rival, 0)) + 1
 			shard = true
-	V10Money.grant({"gems": gems}, "duel")
-	V10Bond.gain(rival, 20 if win else (10 if draw else 5), "duel")
-	V10Bond.gain(play.partner, 10, "duel")
-	G.add_pass_xp(60)
-	award = V8PlayRules.award("duel", V8PlayRules.duel_rp(win, draw), win)
+	for g in rr.grants:
+		V10Money.grant({String(g.cur): int(g.n)}, String(g.reason))
+	for b in rr.bond:
+		V10Bond.gain(String(b.hero), int(b.n), String(b.src))
+	G.add_pass_xp(rr.pass_xp)
+	award = V8PlayRules.apply_award(rr.source, rr.rp_gain, bool(rr.record.won))
 	# 0.8: saved: leaving during the pause below goes straight out and counts no extra lost game
 	play._v8_saved = true
-	play._v10_ended(win, 0, 0, play.now() - play.start_t, false)  # 0.10 hook
+	play._v10_emit(rr.hook)  # 0.10 hook
 	stage.react("deny" if win else "win")
 	_end_line = V6Heroines.line(rival, "lose" if win else ("draw" if draw else "win"))
 	stage.say_text(_end_line, 3.0)
