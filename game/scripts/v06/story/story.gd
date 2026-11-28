@@ -58,7 +58,7 @@ func _world_size(loc: int) -> int:
 func scenes_before(i: int) -> Array:
 	if i < 0 or i >= G.LEVELS.size():
 		return []
-	var lv: Dictionary = G.LEVELS[i]
+	var lv: Dictionary = TWLevels.at(i)
 	var loc: = int(lv.get("loc", 0))
 	var stage: = int(lv.get("stage", 0))
 	var n: = _world_size(loc)
@@ -75,7 +75,7 @@ func scenes_before(i: int) -> Array:
 func scenes_after(i: int) -> Array:
 	if i < 0 or i >= G.LEVELS.size():
 		return []
-	var lv: Dictionary = G.LEVELS[i]
+	var lv: Dictionary = TWLevels.at(i)
 	var loc: = int(lv.get("loc", 0))
 	var stage: = int(lv.get("stage", 0))
 	var out: = []

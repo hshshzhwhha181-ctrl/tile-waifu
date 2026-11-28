@@ -105,7 +105,7 @@ func build(m, args: Dictionary) -> void :
 		mode = "daily"
 		var d: = int(G.today().substr(8, 2))
 		lvl = d % G.LEVELS.size()
-		cfg = G.LEVELS[lvl].duplicate(true)
+		cfg = TWLevels.at(lvl).duplicate(true)
 		cfg.name = V6Txt.s("play.daily_name")
 		cfg.seed = int(G.today().replace("-", ""))
 		cfg.reward = {"gems": 100}
@@ -122,11 +122,8 @@ func build(m, args: Dictionary) -> void :
 	elif args.has("trial"):
 		mode = "trial"
 		partner = args.trial
-		lvl = 0
-		for i in G.LEVELS.size():
-			if G.LEVELS[i].hero == partner:
-				lvl = i
-		cfg = G.LEVELS[lvl].duplicate(true)
+		lvl = TWLevels.trial_index(partner)
+		cfg = TWLevels.trial_cfg(partner)   # the Path board of that level (the lazy stub played as a plain rect board)
 		cfg.name = V6Txt.s("play.trial_name_pre") + G.HEROES[partner].name
 		cfg.reward = {"gems": 0}
 		cfg.erase("shard")

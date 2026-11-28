@@ -117,57 +117,19 @@ const LOCS: = [
 const SHAPE_NAMES: = {"rect": "Плато", "heart": "Сердце", "diamond": "Ромб", "butterfly": "Бабочка", "cross": "Крест", "ring": "Кольцо", "pyramid": "Пагода", "towers": "Две башни"}
 const HARD_NAMES: = ["", "Сложный", "Очень сложный"]
 var LEVELS: = []
-var _arcs_built: = {}
 
 # 0.10 W2: 1000-level Path via V10LevelGen, materialized lazily by 100-level arc (Arc 0 built at startup in ~65 ms;
 # Arcs 1..9 hold light stubs until ensure_arc/level_at touches them).
 func _build_levels() -> void :
-	LEVELS.clear()
-	_arcs_built.clear()
-	for i in V10LevelGen.TOTAL:
-		var w: = i / V10LevelGen.PER_WORLD
-		var Wd: Dictionary = V10LevelGen.WORLD[w]
-		var tier: = V10LevelGen.tier_of(i)
-		LEVELS.append({
-			"v10_id": i, "code": V10LevelGen.code(i), "world": w, "num": i % V10LevelGen.PER_WORLD + 1,
-			"name": str(Wd.name), "loc": mini(w, LOCS.size() - 1), "world_loc": w, "stage": i % V10LevelGen.PER_WORLD,
-			"bg": str(Wd.bg), "fx": str(Wd.fx), "tint": LOCS[mini(w, LOCS.size() - 1)].tint,
-			"hero": V10LevelGen.ready_hero(str(Wd.hero), w), "shard": V10LevelGen.ready_hero(str(Wd.shard), w),
-			"tier": tier, "tier_name": str(V10LevelGen.TIER_NAMES.get(tier, "")), "hard": int(V10LevelGen.TIER_HARD.get(tier, 0)),
-			"boss": V10LevelGen.is_boss(i), "peak": V10LevelGen.is_peak(i), "legend": tier == "legendary",
-			"shape": "rect", "cols": 6, "rows": 8, "layers": 3, "fill": 0.7, "faces": 12, "seed": 11 + i * 11,
-			"mech": "", "gold": 0, "ice": 0, "hidden": false, "reward": {"gems": 2, "per_star": 2, "first_only": true},
-			"goal": "Очисти стол", "intro": str(LOCS[mini(w, LOCS.size() - 1)].intro), "_lazy": true,
-		})
-	ensure_arc(0)
+	TWLevels.reset(LOCS, LEVELS)
 
 
 func ensure_arc(w: int) -> void :
-	w = clampi(w, 0, V10LevelGen.WORLDS - 1)
-	if _arcs_built.has(w):
-		return
-	_arcs_built[w] = true
-	var base: = w * V10LevelGen.PER_WORLD
-	for k in V10LevelGen.PER_WORLD:
-		var i: = base + k
-		var lv: Dictionary = V10PathState._lv_cache.get(i, V10LevelGen.level(i))
-		V10PathState._lv_cache[i] = lv
-		var copy: = lv.duplicate(true)
-		copy["world_loc"] = int(lv.get("loc", w))
-		copy["loc"] = mini(int(lv.get("loc", w)), LOCS.size() - 1)
-		copy["tint"] = LOCS[int(copy.loc)].tint
-		if not copy.has("goal"):
-			copy["goal"] = "Очисти стол"
-		if not copy.has("intro") or str(copy.intro).length() < 12:
-			var il: = str(copy.get("intro_line", ""))
-			copy["intro"] = il if il != "" else str(LOCS[int(copy.loc)].intro)
-		LEVELS[i] = copy
+	TWLevels.ensure_arc(w)
 
 
 func level_at(i: int) -> Dictionary:
-	i = clampi(i, 0, V10LevelGen.TOTAL - 1)
-	ensure_arc(i / V10LevelGen.PER_WORLD)
-	return LEVELS[i]
+	return TWLevels.at(i)
 
 
 func loc_name(w: int) -> String:

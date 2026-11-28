@@ -18,7 +18,7 @@ func _run() -> void :
 	var kinds: = {}
 	for li in mini(48, G.LEVELS.size()):
 		for rep in 6:
-			var cfg: Dictionary = G.LEVELS[li].duplicate(true)
+			var cfg: Dictionary = TWLevels.at(li).duplicate(true)
 			cfg.seed = int(cfg.seed) + rep * 7919
 			seed(int(cfg.seed))
 			var plan: = V6Specials.plan_for(cfg, "")

@@ -133,6 +133,10 @@ Anything with a UI token, a Node base class, an autoload, or living in a present
   `tools/lint_baseline.json` (total N); any growth or any new violating file is red, fewer is fine, then lower N with `--update-baseline`
   (it refuses to raise N without `--allow-raise`). `--selftest` = 6 synthetic files with one violation each must give exactly 6 findings (+1 clean look-alike).
   Runs as suite `core_purity` (group `lint`, fast) in `tools/tw_test.py` and as the first step of `.github/workflows/qa.yml`.
+* `python3 tools/lint_no_direct_levels.py [--selftest] [--check]` (P19) — the Path table is read through `TWLevels.at(n)` (`game/core/levels/tw_levels.gd`) only;
+  `G.LEVELS[i]` / `gg.LEVELS[i]` / bare `LEVELS[i]` / `= G.LEVELS` aliases outside tw_levels.gd are red (`.size()` and iteration stay allowed). Direct indexing
+  returns a lazy stub for arcs not built yet - that is how trial mode played the boss levels 499/699/799/899/999 as plain rectangles.
+  Runs as suite `no_direct_levels` (group `lint`, fast) and as a CI step; the `tw_levels` suite proves the trial cfg of those levels equals the Path board.
 * Registry (P07): `registry_list.gd` is gone. Each of the 43 modules is `game/core/**/module.gd` (`static func spec() -> Dictionary`, same ids, explicit `order` = old line order) and `V10Registry` finds them by scanning `res://core`; callbacks that used to sit between the list lines are a module's `"wire"` Callable. A new module is ONE new `module.gd`; the `registry` suite (`REGISTRY_SELFTEST`) guards the 43 legacy ids and their order.
 * Selftests that source-scan a module directory now scan `scripts/v10/<m>/` **and** `core/<m>/` (so nothing silently stops being checked).
 * After pulling this change run `python3 tools/tw_test.py --import` once: `game/.godot/global_script_class_cache.cfg` must be regenerated for the new paths.

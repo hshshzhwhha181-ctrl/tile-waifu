@@ -151,7 +151,7 @@ func _all(host: Node) -> void:
 	# 5. pairing rule: identical faces only (TrayBoard.tap: x.face == t.face) — no flower/season groups
 	var b: = TrayBoard.new()
 	host.add_child(b)
-	var cfg: Dictionary = G.LEVELS[min(8, G.LEVELS.size() - 1)].duplicate(true)
+	var cfg: Dictionary = TWLevels.at(min(8, G.LEVELS.size() - 1)).duplicate(true)
 	b.setup(cfg)
 	var by_face: = {}
 	for t in b.tiles:

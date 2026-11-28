@@ -613,6 +613,22 @@
     "total": 2736
    }
   },
+  "no_direct_levels": {
+   "fast": {
+    "marker": "NO_DIRECT_LEVELS RESULT: PASS (0 violations)",
+    "ok": 10,
+    "secs": 1.1,
+    "status": "pass",
+    "total": 10
+   },
+   "full": {
+    "marker": "NO_DIRECT_LEVELS RESULT: PASS (0 violations)",
+    "ok": 10,
+    "secs": 1.1,
+    "status": "pass",
+    "total": 10
+   }
+  },
   "online": {
    "fast": {
     "marker": "ONLINE_SELFTEST 83/83 PASS",
@@ -1013,6 +1029,22 @@
     "secs": 8.8,
     "status": "pass",
     "total": 2757
+   }
+  },
+  "tw_levels": {
+   "fast": {
+    "marker": "TW_LEVELS_SELFTEST 64/64",
+    "ok": 64,
+    "secs": 7.3,
+    "status": "pass",
+    "total": 64
+   },
+   "full": {
+    "marker": "TW_LEVELS_SELFTEST 64/64",
+    "ok": 64,
+    "secs": 7.2,
+    "status": "pass",
+    "total": 64
    }
   },
   "ult_rin": {

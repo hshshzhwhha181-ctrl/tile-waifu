@@ -7,7 +7,7 @@ extends RefCounted
 # ONE CODE ⇒ ONE DEAL. The deal is fully defined by the resolved cfg:
 #   · Путь / Пик on the 0.10 generator (gen = V10LevelGen.VERSION): V10LevelGen.build(index, salt, null, assist) —
 #     faces, steps, gold, ice, secret tiles and specials come from the level payload (V10LevelBoard), no RNG at all;
-#   · Путь on the 0.9 table list (gen 0, before the integrator switches G.LEVELS to V10LevelGen): G.LEVELS[i];
+#   · Путь on the 0.9 table list (gen 0, before the integrator switches G.LEVELS to V10LevelGen): TWLevels.at(i);
 #   · Партия дня: the day formula of play.gd (level = day of month % levels, seed = YYYYMMDD);
 #   · Странствие: V10Journey.board_cfg_for(week, board) with the theme of the week and no blessings or curses.
 # The face deal of the non-payload tables is drawn by TrayBoard._assign from the GLOBAL generator, so play.gd seeds
@@ -50,8 +50,7 @@ static func v10_levels() -> bool:
 	var gg: = U.g()
 	if gg == null:
 		return false
-	var L: Array = gg.LEVELS
-	return not L.is_empty() and (L[0] as Dictionary).has("v10_id") and levelgen() != null
+	return not (gg.LEVELS as Array).is_empty() and TWLevels.at(0).has("v10_id") and levelgen() != null
 
 
 static func cur_gen(mode_id: String) -> int:
@@ -195,7 +194,7 @@ static func resolve(p: Dictionary) -> Dictionary:
 			if gen == 0:
 				if int(k.salt) != 0 or bool(k.assist) or int(k.idx) >= (gg.LEVELS as Array).size():
 					return _err("key")
-				cfg = (gg.LEVELS[int(k.idx)] as Dictionary).duplicate(true)
+				cfg = (TWLevels.at(int(k.idx)) as Dictionary).duplicate(true)
 			else:
 				var LG: = levelgen()
 				if int(k.idx) >= int(LG.call("count")):
@@ -212,9 +211,8 @@ static func resolve(p: Dictionary) -> Dictionary:
 			if key > today + 1:
 				return _err("future")
 			var day: = U.date_of_index(key)
-			var L: Array = gg.LEVELS
-			var lvl: = int(day.substr(8, 2)) % L.size()
-			cfg = (L[lvl] as Dictionary).duplicate(true)
+			var lvl: = int(day.substr(8, 2)) % (gg.LEVELS as Array).size()
+			cfg = TWLevels.at(lvl).duplicate(true)
 			# the same formula as play.gd build() for args.daily
 			cfg.name = V6Txt.s("play.daily_name")
 			cfg.seed = int(day.replace("-", ""))

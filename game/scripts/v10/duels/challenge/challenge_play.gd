@@ -50,7 +50,7 @@ func _v6_setup(args: Dictionary) -> bool:
 	mode = "challenge"
 	if not r.ok:
 		# the screen resolves the code before it starts a run; a stale call falls back to the first table
-		cfg = (G.LEVELS[0] as Dictionary).duplicate(true)
+		cfg = (TWLevels.at(0) as Dictionary).duplicate(true)
 		cfg.name = "Вызов"
 		return true
 	cfg = r.cfg

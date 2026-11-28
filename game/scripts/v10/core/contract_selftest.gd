@@ -151,7 +151,7 @@ static func _parity_invariants() -> void:
 	if tree != null and tree.root != null:
 		var b: = V6SpecialBoard.new()
 		tree.root.add_child(b)
-		var cfg: Dictionary = G.LEVELS[min(14, G.LEVELS.size() - 1)].duplicate(true)
+		var cfg: Dictionary = TWLevels.at(min(14, G.LEVELS.size() - 1)).duplicate(true)
 		b.setup(cfg)
 		b.slot_pos = [Vector2(100, 900), Vector2(200, 900), Vector2(300, 900), Vector2(400, 900), Vector2(500, 900)]
 		b.slot_size = 80.0
@@ -194,7 +194,7 @@ static func _parity_invariants() -> void:
 	if tree != null and tree.root != null:
 		var tb: = V6SpecialBoard.new()
 		tree.root.add_child(tb)
-		var tcfg: Dictionary = G.LEVELS[min(14, G.LEVELS.size() - 1)].duplicate(true)
+		var tcfg: Dictionary = TWLevels.at(min(14, G.LEVELS.size() - 1)).duplicate(true)
 		tb.setup(tcfg)
 		tb.apply_specials({"joker": 1})
 		var j_before: Array = []
