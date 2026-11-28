@@ -24,13 +24,17 @@ static func run() -> int:
 	_pass = 0
 	_fail = 0
 	var saved: Dictionary = G.S.duplicate(true)
+	TWUltRegistry.register_legacy_source("wave1", V10W1Ults.ULTS, V10W1Ults.CORES, V10W1Ults.RANKED_CORES, V10W1Ults.BASE)
 	_table()
 	_charge()
 	_cutin()
 	_settings()
 	_feel()
 	_audio()
+	var cov: Dictionary = _unified_registry()
+	TWUltRegistry.unregister_legacy_source("wave1")
 	G.S = saved
+	printerr("ULT COVERAGE ids=%d covered=%d" % [int(cov.get("ids", 0)), int(cov.get("covered", 0))])
 	printerr("ULTS SELFTEST %d/%d" % [_pass, _pass + _fail])
 	return _fail
 
@@ -50,6 +54,10 @@ static func _founders() -> Array:
 		if not V10W1Ults.is_hero(h):
 			out.append(h)
 	return out
+
+
+static func _sfx_path(sfx: String) -> String:
+	return "res://assets/sfx/%s.wav" % sfx
 
 
 static func _cyr(s: String) -> bool:
@@ -112,7 +120,7 @@ static func _table() -> void :
 		seen.append([m, String(it.get("rar", ""))])
 		mods_by_hero[h] = seen
 		var sfx: String = u.get("sfx", "")
-		_check("%s sfx exists" % id, ResourceLoader.exists("res://assets/sfx/%s.wav" % sfx), sfx)
+		_check("%s sfx exists" % id, ResourceLoader.exists(_sfx_path(sfx)), sfx)
 		_check("%s fx key" % id, String(u.get("fx", "")) != "")
 	# §5 names spot-check
 	_check("names: o_base", V9Ults.get_ult("o_base").name == "Восточный ветер")
@@ -331,6 +339,31 @@ static func _audio() -> void :
 	_check("duck_hold release", is_equal_approx(Sfx.duck_db(), 0.0))
 	var bi: = AudioServer.get_bus_index(Sfx.MUSIC_BUS)
 	_check("bus volume back to 0 dB", is_equal_approx(AudioServer.get_bus_volume_db(bi), 0.0))
+
+
+static func _unified_registry() -> Dictionary:
+	# P87 / BATTLE_ULT_SPEC §7.3, §7.8: unified TWUltRegistry + 58-id catalogue schema + TWUltPolicy + wave-1 fields.
+	var cov: Dictionary = TWUltSelftest.run_checks(_check, G.ITEM)
+	for id in _outfits():
+		var h: String = String(G.ITEM[id].get("hero", ""))
+		_check("TWUltRegistry has %s" % id, TWUltRegistry.has(id))
+		var eq: String = TWUltRegistry.equipped(h, id)
+		_check("TWUltRegistry equipped(%s, %s) -> valid canonical" % [h, id],
+			TWUltRegistry.has_catalogue(eq) and str(TWUltRegistry.entry(eq).get("hero", "")) == h, eq)
+		if V10W1Ults.has(id):
+			var u: Dictionary = TWUltRegistry.legacy_entry(id)
+			_check("W1 %s name Russian" % id, _cyr(String(u.get("name", ""))))
+			var lines: Array = u.get("lines", [])
+			_check("W1 %s 2-3 lines" % id, lines.size() >= 2 and lines.size() <= 3, str(lines.size()))
+			for ln in lines:
+				_check("W1 %s line short Russian" % id, _cyr(String(ln)) and String(ln).length() <= 28, str(ln))
+			var pal: Dictionary = u.get("palette", {})
+			_check("W1 %s palette main = heroine colour" % id, pal.get("main") is Color and pal.main.is_equal_approx(G.HEROES[h].color))
+			_check("W1 %s palette accent + ink" % id, pal.get("accent") is Color and pal.get("ink") is Color and pal.ink.get_luminance() < 0.3)
+			var sfx: String = String(u.get("sfx", ""))
+			_check("W1 %s sfx exists" % id, ResourceLoader.exists(_sfx_path(sfx)), sfx)
+			_check("W1 %s fx key" % id, String(u.get("fx", "")) != "")
+	return cov
 
 
 # ── dev overlay ──────────────────────────────────────────────────────────────
