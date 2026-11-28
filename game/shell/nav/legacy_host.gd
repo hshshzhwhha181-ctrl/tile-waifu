@@ -39,6 +39,7 @@ func _shell_redirect() -> bool:
 func _ready() -> void:
 	var uargs: = OS.get_cmdline_user_args()
 	var selftest: = "--legacy_selftest=1" in uargs
+	var slice: = _slice_mode(uargs) != ""
 	if selftest:
 		_prepare_selftest_save()
 	_load_catalogue()
@@ -46,6 +47,8 @@ func _ready() -> void:
 	_build_v11()
 	if selftest:
 		_selftest.call_deferred()
+	elif slice:
+		TWSlice.run.call_deferred(self)   # P37: --slice=play|goldens|perf (shell/tests/slice_playthrough.gd)
 	elif "--legacy_dump=1" in uargs:
 		_dump.call_deferred()
 
@@ -72,8 +75,15 @@ func _prepare_selftest_save() -> void:
 	_v6_opt("v6_story.on", false)  # story scenes before a level wait for a tap
 
 
+func _slice_mode(uargs: PackedStringArray) -> String:
+	for a in uargs:
+		if a.begins_with("--slice="):
+			return a.substr(8)
+	return ""
+
+
 func _splash() -> void:
-	if "--legacy_selftest=1" in OS.get_cmdline_user_args():
+	if "--legacy_selftest=1" in OS.get_cmdline_user_args() or _slice_mode(OS.get_cmdline_user_args()) != "":
 		return
 	await super._splash()
 

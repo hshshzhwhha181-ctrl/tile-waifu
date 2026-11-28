@@ -120,6 +120,9 @@ CATALOG: list[Suite] = [
       note="P31: TWBoardView + TWMatchScreen: layout (field >= 92% x 60%, tile 56/64/72/80), 20/20 events animated, 100 games with and without the view = same events and state hash, mirror == board, pixel contrast, 60-tile frame cost, screen API"),
     S("twresult", "TWRESULT_SELFTEST", "res://shell/screens/match/match_selftest.tscn", group="core", render=True, res="720x1280", timeout=600,
       note="P33: victory screen: TWResultChain (milestones, fast <= 3 s / chain <= 20 s timeline, tap + Skip state machine, 500 random sequences) + TWResultModal on the ModalStack (fixed button rects, one primary, Skip always visible, 0 banned words) + real-time <= 3 s + pixels + TWMatchScreen hook"),
+    S("slice", "SLICE_SELFTEST", "res://shell/main_v11.tscn", ["--slice=play"], fast_args=["--slice=play", "--slice_games=20"], group="core",
+      render=True, res="720x1280", timeout=1200,
+      note="P37: vertical slice: N bot games (100; --fast 20) through the screen API: Home -> TWMatchScreen (solver / hint / random / mixed bot) -> victory modal -> Collection -> Wish -> Shop on the LegacyHost, 0 SCRIPT ERROR / engine ERROR, no modal leak, no stage > 10 s without an event"),
     S("ults", "ULTS", args=["--ults_selftest=1"], group="core"),
     S("letters", "LETTERS", args=["--letters_selftest=1"], group="core"),
     # ---- v10 registry modules (docs/INTEGRATION_0.10.md; ids == V10RegistryList ids) -----------------
@@ -226,6 +229,14 @@ EXTERNAL: list[Suite] = [
     Suite(id="asset_id_only", kind="python", group="lint", marker="ASSET_ID_ONLY SELFTEST", timeout=60, fast=True,
           script="tools/lint_asset_id_only.py", args=["--selftest", "--check"],
           note="ASSET_ID_ONLY: 13 synthetic cases + game/shell has 0 res://assets literals + legacy literals (report mode, 493) within tools/lint_asset_id_baseline.json"),
+    # P37: the six slice screens x 3 sizes against game/tests/goldens (1.5 % of the pixels), rendered by the game under xvfb
+    Suite(id="slice_goldens", kind="python", group="lint", marker="SLICE_GOLDENS", timeout=900, fast=False,
+          script="tools/slice_goldens.py", args=[],
+          note="P37: home/match/result/collection/wish/shop at 720x1280, 720x1600, 1536x2048 vs game/tests/goldens (<= 1.5 % of pixels differ); `python tools/slice_goldens.py --update` re-records"),
+    # P37: 60-tile frame cost (headless + software GL) and the exported pack size (the PCK step is `python tools/perf_budget.py`, off here)
+    Suite(id="perf_budget", kind="python", group="lint", marker="PERF_BUDGET", timeout=600, fast=False,
+          script="tools/perf_budget.py", args=["--no-pck"],
+          note="P37: p95 frame cost of a live 60-tile round <= 16.6 ms (headless and xvfb; device not verified); the 135 MB pack check runs with `python tools/perf_budget.py` (no --no-pck)"),
     # P45: loudness meter self-test on synthetic signals (python + numpy + ffmpeg; the corpus scan is a separate CLI run)
     Suite(id="audio_gate", kind="python", group="lint", marker="AUDIO_GATE SELFTEST", timeout=120, fast=True,
           script="tools/audio/lufs_gate.py", args=["--selftest", "--no-write"],
