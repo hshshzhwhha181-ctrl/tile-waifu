@@ -11,7 +11,7 @@ func _ready() -> void:
 			var kv: = s.substr(2).split("=", true, 1)
 			a[kv[0]] = kv[1]
 	G.S = G.default_state()
-	G.S["gems"] = 640
+	V10Money.set_balance("gems", 640)
 	var vp: = get_viewport().get_visible_rect().size
 	size = vp
 	var scr: Control

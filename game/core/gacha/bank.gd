@@ -18,14 +18,14 @@ func _init(state: Dictionary = {}) -> void:
 func balance(cur: String) -> int:
 	if live_money:
 		return V10Money.bal(cur)
-	return int(S.get(cur, 0))
+	return TWWallet.for_state(S).bal(cur)
 
 
 func add(cur: String, n: int) -> void:
 	if live_money:
 		V10Money.grant({cur: n}, "gacha")
 		return
-	S[cur] = int(S.get(cur, 0)) + n
+	TWWallet.for_state(S).grant({cur: n}, "gacha")
 
 
 func spend(cur: String, n: int) -> bool:
@@ -33,10 +33,7 @@ func spend(cur: String, n: int) -> bool:
 		return true
 	if live_money:
 		return V10Money.spend({cur: n}, "gacha")
-	if balance(cur) < n:
-		return false
-	S[cur] = balance(cur) - n
-	return true
+	return bool(TWWallet.for_state(S).spend({cur: n}, "gacha").ok)
 
 
 func owns(id: String) -> bool:

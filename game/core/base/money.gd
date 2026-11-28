@@ -1,24 +1,21 @@
 class_name V10Money
 extends RefCounted
 
-# V10Money — the ONE money facade of the game (docs/INTEGRATION_0.10.md §3.1). The truth is the economy wallet
-# G.econ.wallet (V10Econ, saved as S.econ with an HMAC seal: refunds, debt, audit). The 0.9 top-level fields
-# S.gems / S.coins / S.tickets / S.petals / S.moon stay as MIRRORS for the old UI: only this file writes them.
+# V10Money — the ONE money facade of the game (docs/INTEGRATION_0.10.md §3.1), a thin layer over TWWallet (P10 / WP6). The truth is the
+# economy wallet G.econ.wallet (V10Econ, saved as S.econ with an HMAC seal: refunds, debt, audit). S.gems / S.coins / S.tickets /
+# S.petals / S.moon are a DERIVED SNAPSHOT kept in the save for older builds and recovery: only TWWallet writes them, nothing reads them as
+# input, and a direct write is undone and counted (TWWallet.direct_writes), never turned into money (the old _absorb path is gone).
 #
 #   V10Money.bal("gems") -> int                         keys of the glossary (spec §2.1): gems coins moon tickets petals
 #   V10Money.can({"gems": 30}) -> bool
 #   V10Money.spend({"gems": 30, "coins": 5}, src) -> bool    all or nothing
-#   V10Money.grant({"gems": 15}, src, from = Vector2(-1, -1))
+#   V10Money.grant({"gems": 15}, src, from = Vector2(-1, -1))   a negative amount is an error (TWWallet.last_error), not a clamp
+#   V10Money.set_balance("gems", 12450, src)             fixtures / dev args / shots: the balance becomes n through wallet operations
 #   V10Money.pull_split(n, each) -> {tickets, gems, moon, ok}  how an n-wish price is paid (tickets → crystals → moon)
-#   V10Money.attach(S)                                   G: after every load/import (builds G.econ, mirrors)
-#   V10Money.sync(S)                                     G.save(): a leftover direct write of a mirror becomes a
-#                                                        wallet operation (src "legacy"), then the mirrors are rewritten
+#   V10Money.attach(S)                                   G: after every load/import (builds G.econ, writes the snapshot)
+#   V10Money.sync(S)                                     G.save(): the snapshot is rewritten from the wallet (a direct write is undone)
 # A grant of "items" passes through to the economy inventory (V10Econ.grant).
 
-const WALLET_KEY: = {"gems": "crystal", "moon": "moon", "coins": "coin", "tickets": "wish", "petals": "petal"}
-const MIRRORS: = ["gems", "coins", "moon", "tickets", "petals"]
-
-static var _mirror: = {}   # what the mirrors read after our last write (a difference = someone wrote S.gems directly)
 static var _attaching: = false
 
 
@@ -36,39 +33,34 @@ static func econ() -> V10Econ:
 	if e is V10Econ and not is_same(g.S.get("econ"), (e as V10Econ).st) and not _attaching:
 		attach(g.S)
 		e = g.get("econ")
-	if e is V10Econ and not _attaching:
-		_absorb(e, g.S)
 	return e as V10Econ if e is V10Econ else null
 
 
-# a direct write of a mirror (old code, dev args, selftests) since our last write becomes a wallet operation
-static func _absorb(e: V10Econ, S: Dictionary) -> void:
-	for k in MIRRORS:
-		if not _mirror.has(k) or not S.has(k):
-			continue
-		var d: = int(S[k]) - int(_mirror[k])
-		if d == 0:
-			continue
-		_mirror[k] = int(S[k])
-		if d > 0:
-			e.wallet.add(_wkey(k), d, "legacy")
-		else:
-			e.wallet.spend(_wkey(k), mini(-d, e.wallet.balance(_wkey(k))), "legacy")
+# the live wallet (null before G has one)
+static func _tw() -> TWWallet:
+	var e: = econ()
+	var g = _g()
+	if e == null or g == null:
+		return null
+	return TWWallet.live_of(g.S, e.wallet)
 
 
 static func _wkey(key: String) -> String:
-	return str(WALLET_KEY.get(key, key))
+	return TWWallet.wkey(key)
 
 
 static func bal(key: String) -> int:
-	var e: = econ()
-	if e:
-		return e.wallet.balance(_wkey(key))
+	var t: = _tw()
+	if t:
+		return t.bal(key)
 	var g = _g()
 	return int(g.S.get(key, 0)) if g else 0
 
 
 static func can(cost: Dictionary) -> bool:
+	var t: = _tw()
+	if t:
+		return t.can(cost)
 	for k in cost:
 		if int(cost[k]) > 0 and bal(k) < int(cost[k]):
 			return false
@@ -76,45 +68,31 @@ static func can(cost: Dictionary) -> bool:
 
 
 static func spend(cost: Dictionary, src: = "") -> bool:
-	if not can(cost):
+	var t: = _tw()
+	if t == null:
 		return false
-	var e: = econ()
-	var g = _g()
-	for k in cost:
-		var n: = int(cost[k])
-		if n <= 0:
-			continue
-		if e:
-			e.wallet.spend(_wkey(k), n, src)
-		elif g:
-			g.S[k] = int(g.S.get(k, 0)) - n
-	_write_mirrors()
-	return true
+	return bool(t.spend(cost, src).ok)
 
 
 static func grant(d: Dictionary, src: = "", _from: = Vector2(-1, -1)) -> void:
-	var e: = econ()
-	var g = _g()
+	var t: = _tw()
+	if t == null:
+		return
+	var cur: = {}
 	for k in d:
 		if k == "items":
+			var e: = econ()
 			if e:
 				e.grant({"items": d[k]}, src)
-			continue
-		var n: = int(d[k])
-		if n == 0:
-			continue
-		if n < 0:
-			# a negative grant is a correction (dev tools, a refund in the old code): take what is there
-			if e:
-				e.wallet.spend(_wkey(k), mini(-n, e.wallet.balance(_wkey(k))), src)
-			elif g:
-				g.S[k] = maxi(0, int(g.S.get(k, 0)) + n)
-			continue
-		if e:
-			e.wallet.add(_wkey(k), n, src)
-		elif g:
-			g.S[k] = int(g.S.get(k, 0)) + n
-	_write_mirrors()
+		else:
+			cur[k] = d[k]
+	t.grant(cur, src)
+
+
+static func set_balance(key: String, n: int, src: = "dev") -> void:
+	var t: = _tw()
+	if t:
+		t.set_balance(key, n, src)
 
 
 # n wishes at `each` crystals: tickets first, then crystals, then moonstone (spec §2.1, UX §5.3)
@@ -159,9 +137,10 @@ static func attach(S: Dictionary) -> void:
 	e.owns = func(id: String) -> bool: return g.owns(id)
 	S["econ"] = e.st
 	g.set("econ", e)
+	TWWallet.live_econ = e
 	# the day's grants (month card) and store receipts; NOT e.tick(): it pays «Воск» for ended banners (spec: no wax)
 	e.shop.reconcile()
-	_mirror.clear()
+	TWWallet.forget()          # the snapshot is rewritten from the wallet below: whatever S.gems held on load is not input
 	_attaching = false
 	_write_mirrors()
 
@@ -176,20 +155,13 @@ static func on_resumed() -> void:
 
 
 static func sync(S: Dictionary) -> void:
-	var e: = econ()   # absorbs a direct write of the mirrors
+	var e: = econ()
 	if e == null or not is_same(S.get("econ"), e.st):
 		return
-	_write_mirrors()
+	TWWallet.live_of(S, e.wallet).sync()
 
 
 static func _write_mirrors() -> void:
-	var g = _g()
-	var e: = econ()
-	if g == null or e == null:
-		return
-	for k in MIRRORS:
-		var v: = e.wallet.balance(_wkey(k))
-		# tickets/petals/moon appear in the save only once they exist (old readers never saw them)
-		if k in ["gems", "coins"] or v != 0 or g.S.has(k):
-			g.S[k] = v
-			_mirror[k] = v
+	var t: = _tw()
+	if t:
+		t.sync()

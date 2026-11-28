@@ -14,10 +14,10 @@ static func spec() -> Dictionary:
 			"seven": {"days": [], "claimed": [false, false, false, false, false, false, false]}, "v10_gacha": {}},
 		"migrator": func(S: Dictionary, _now: int) -> void:
 			if int(S.get("ex", 0)) > 0:
-				S["petals"] = int(S.get("petals", 0)) + int(S.ex)
+				S["petals"] = int(S.get("petals", 0)) + int(S.ex)   # wallet-lint: ok legacy migrator, raw 0.9 dict before any wallet
 				S["ex"] = 0
 			if bool(S.get("free10", false)):
-				S["tickets"] = int(S.get("tickets", 0)) + 10
+				S["tickets"] = int(S.get("tickets", 0)) + 10   # wallet-lint: ok legacy migrator, raw 0.9 dict before any wallet
 				S["free10"] = false,
 		"ensure": func(S: Dictionary) -> void:
 			var bk: = V10GachaBank.new(S)

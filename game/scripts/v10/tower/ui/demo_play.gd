@@ -129,7 +129,7 @@ func _grant_hook(reward: Dictionary, src: String) -> void:
 	grants.append([reward.duplicate(), src])
 	for k in ["gems", "coins", "petals", "tickets"]:
 		if int(reward.get(k, 0)) > 0:
-			G.S[k] = int(G.S.get(k, 0)) + int(reward[k])
+			V10Money.grant({k: int(reward[k])}, src)
 
 
 func _record(kind: String, data: Dictionary, id: int) -> void:
@@ -340,7 +340,7 @@ func _autoplay(s, max_taps: = 900, step: = 0.1) -> int:
 			if t:
 				s.board.tap(t)
 				taps += 1
-		gem_peak = maxi(gem_peak, int(G.S.gems))
+		gem_peak = maxi(gem_peak, V10Money.bal("gems"))
 		await get_tree().create_timer(step).timeout
 	return taps
 
@@ -492,7 +492,7 @@ func _t_pagoda() -> void:
 	randomize()
 	_check(TPS.deal_signature(b2) == s.deal_sig, "the deal comes from the floor seed")
 	b2.free()
-	var g0: = int(G.S.gems)
+	var g0: = V10Money.bal("gems")
 	var rp0: = int(G.S.rp)
 	var n_grants: = grants.size()
 	gem_peak = g0
@@ -502,7 +502,7 @@ func _t_pagoda() -> void:
 	var res: Dictionary = s.last_res
 	var rw: Dictionary = res.get("reward", {})
 	_check(grants.size() - n_grants == (0 if rw.is_empty() else 1), "the floor reward is granted once")
-	_check(int(G.S.gems) - g0 == int(rw.get("gems", 0)) + int(s.last_award.get("gems", 0)), "crystals = reward + rank-up only")
+	_check(V10Money.bal("gems") - g0 == int(rw.get("gems", 0)) + int(s.last_award.get("gems", 0)), "crystals = reward + rank-up only")
 	_check(int(G.S.rp) == rp0 + V8PlayRules.climb_rp(1), "rank points like the climb (+%d)" % V8PlayRules.climb_rp(1))
 	var dr: = _disk_run("v10_pagoda")
 	_check(int(dr.get("floor", 0)) == 2 and int(dr.get("cleared", 0)) == 1, "saved right after the clear (floor 2, cleared 1)")
@@ -576,7 +576,7 @@ func _t_journey() -> void:
 	_check(j1.board.slots == j1.tr.slot_count(V7Passives.slots(j1.partner, 4)) and j1.slot_rects.size() == j1.board.slots, "journey: tray size matches slot_count and slot_rects")
 	var vz: = (j1.tr.veils as Dictionary).values().filter(func(v): return is_instance_valid(v) and (v as CanvasItem).z_index != 0)
 	_check(vz.is_empty(), "veils stay in their tile's place in the stack (%d veils)" % (j1.tr.veils as Dictionary).size())
-	var g0: = int(G.S.gems)
+	var g0: = V10Money.bal("gems")
 	var n_grants: = grants.size()
 	gem_peak = g0
 	await _autoplay(j1)

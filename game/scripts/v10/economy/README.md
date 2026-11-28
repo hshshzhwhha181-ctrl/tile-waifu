@@ -138,6 +138,25 @@ SSR-наряд сезона (`econ.season_outfit`), но не SSR-богиня.
 
 Локальный ключ — только сдерживание: настоящий ключ выдаёт сервер (IDEAS 5.9).
 
+## Кошелёк как единственная истина (P10 / WP6, `TWWallet`)
+
+Все деньги живут в `S.econ.wallet` (`V10Wallet`: bal / debt / earned / spent / revoked, печать HMAC на `S.econ`). Верхнеуровневые `S.gems`, `S.coins`
+(и `S.tickets` / `S.petals` / `S.moon`, как только появились) больше не второй счёт, а **производный снимок** для старых сборок, восстановления
+(`TWMigrate.check` требует `S.gems`) и облачной копии. Пишет их только `game/core/economy/tw_wallet.gd`; никто не читает их как вход.
+
+* `TWWallet.for_state(S)` -> `bal(key)`, `can(cost)`, `spend(cost, src)`, `grant(cost, src)`, `set_balance(key, n)` (для фикстур/dev). `spend` / `grant` возвращают
+  `{ok, error, events}`, события — `WALLET_CHANGED {cur, delta, bal, src}` (словарь событий GDD 3.5). Живой `G.S` получает кошелёк `G.econ.wallet`;
+  любой другой словарь (selftest, модуль) — кошелёк поверх своего `S.econ.wallet`, созданный из 0.9-балансов.
+* `V10Money` — тонкий фасад над ним (`bal/can/spend/grant/set_balance/pull_split/attach/sync`). `V10Money._absorb` («прямая запись зеркала = операция
+  `legacy`») **удалён**: прямая запись `S.gems` откатывается при следующем обращении к кошельку, считается в `TWWallet.direct_writes` и пишет ошибку.
+* **Отрицательный `grant` и неизвестная валюта — ошибка** (`push_error`, `TWWallet.last_error`, счётчик `errors`; `V10Wallet.add(-n)` — `V10Wallet.errors`),
+  а не молчаливый зажим. Пачка валидируется целиком: ни одна строка не применяется, если есть плохая.
+* Линт `tools/lint_no_direct_wallet.py` (suite `no_direct_wallet`): 0 прямых записей `S.gems|coins|tickets|petals|moon` вне `tw_wallet.gd`.
+  Исключения помечаются `# wallet-lint: ok <причина>` в той же строке (миграторы сырого 0.9-словаря, тест самого охранника).
+* Тесты: `ECON_SELFTEST` (типизированный API, ошибки, **12 000 случайных операций** против независимого теневого журнала, инвариант
+  `balance - debt == earned - spent - revoked` после каждой), `RECOVERY` (кошельки золотых сейвов v4..v8 против записанных **до** P10:
+  `game/tests/fixtures/saves/wallet_golden.json`).
+
 ## Формат сохранения
 
 Один ключ `S.econ` в `save.json` (рядом со старыми ключами, `SAVE_VER` 7 → 8):

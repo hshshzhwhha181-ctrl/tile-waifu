@@ -700,13 +700,13 @@ static func confirm(main, title: String, text: String, price_icon: String, price
 	var has_price: = price_icon != "" and price > 0
 	var balance: = -1
 	if has_price and opts.has("balance"):
-		# a currency outside G.S.gems / coins (event currency): the caller passes the balance
+		# a currency outside V10Money.bal("gems") / coins (event currency): the caller passes the balance
 		balance = int(opts.balance)
 	elif has_price and opts.get("balance_check", true):
 		if price_icon == "gem":
-			balance = int(G.S.gems)
+			balance = V10Money.bal("gems")
 		elif price_icon == "coin":
-			balance = int(G.S.coins)
+			balance = V10Money.bal("coins")
 	var short: = balance >= 0 and balance < price
 	var h: = 64.0 + text_h + 24.0
 	if has_price:

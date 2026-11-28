@@ -18,6 +18,9 @@ signal changed(cur: String)
 
 const LOG_MAX: = 120
 
+static var errors: = 0               # refused credits since start (negative amount / unknown currency)
+static var last_error: = ""
+
 var st: Dictionary
 var clock: V10Clock
 
@@ -64,7 +67,13 @@ func _log(c: String, d: int, src: String) -> void:
 
 
 func add(c: String, n: int, src: String = "") -> int:
-	if n <= 0 or not st.bal.has(c):
+	# a negative credit or an unknown currency is a programming error: reported, never clamped silently (P10)
+	if n < 0 or (n > 0 and not st.bal.has(c)):
+		errors += 1
+		last_error = "add %s %d (%s)" % [c, n, src]
+		push_error("V10Wallet: refused " + last_error)
+		return 0
+	if n == 0:
 		return 0
 	st.earned[c] = int(st.earned[c]) + n
 	var pay: = mini(int(st.debt[c]), n)

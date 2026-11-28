@@ -490,6 +490,7 @@ func _ready() -> void :
 
 
 func _recovery_selftest() -> void :
+	V8RecoverySelftest.extra = V10WalletGoldenSelftest.run
 	var fails: int = V8RecoverySelftest.run()
 	get_tree().quit(1 if fails > 0 else 0)
 
@@ -599,7 +600,7 @@ func load_game() -> void :
 
 
 # 0.10: the save keys of the modules (V10Save + V10Registry, idempotent) and the economy wallet behind the 0.9
-# currency fields (V10Money mirrors S.gems/S.coins). Runs after every load and every accepted import.
+# currency fields (V10Money / TWWallet; S.gems/S.coins are a snapshot only TWWallet writes). Runs after every load and every accepted import.
 var econ = null
 
 func v10_attach() -> void :
@@ -781,7 +782,7 @@ func _bak_path() -> String:
 func save() -> void :
 	if demo:
 		return
-	# 0.10: a leftover direct write of S.gems/S.coins becomes a wallet operation; the wallet is sealed into S.econ
+	# 0.10: a leftover direct write of S.gems/S.coins is undone (the wallet is the truth, P10); the wallet is sealed into S.econ
 	V10Money.sync(S)
 	if econ != null and is_same(S.get("econ"), econ.st):
 		S.econ = econ.save_dict()

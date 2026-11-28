@@ -120,7 +120,7 @@ func _test_wheel() -> void:
 	_check(V10LuckyWheelScreen.free_spin_ready() and V10LuckyWheelScreen.paid_left() == 5, "wheel: next day resets free spin and limit")
 	# poor player cannot pay
 	_fresh()
-	G.S["gems"] = 10
+	V10Money.set_balance("gems", 10)
 	V10LuckyWheelScreen.spin(2)
 	var rg: = V10LuckyWheelScreen.spin(2)
 	_check(not bool(rg.ok) and str(rg.reason) == "gems", "wheel: not enough crystals refused")
@@ -206,7 +206,7 @@ func _test_oaths() -> void:
 	_fresh()
 	_check(not V10VipBoudoirScreen.is_oath("yue") and V10VipBoudoirScreen.oath_count() == 0, "oath: fresh state has 0 oaths")
 	# Affection < 4 and insufficient crystals -> refused
-	G.S["gems"] = 100
+	V10Money.set_balance("gems", 100)
 	V10Money.attach(G.S)
 	var r_poor: = V10VipBoudoirScreen.pledge_oath("yue")
 	_check(not bool(r_poor.ok) and String(r_poor.reason) == "gems" and not V10VipBoudoirScreen.is_oath("yue"), "oath: <500 gems and aff < 4 refused")

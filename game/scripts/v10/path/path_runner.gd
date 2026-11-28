@@ -72,8 +72,8 @@ func preset(kind: String) -> void:
 	var S: Dictionary = G.S
 	S.intro_done = true
 	S.profile_done = true
-	S.gems = 1200
-	S.coins = 3400
+	V10Money.set_balance("gems", 1200)
+	V10Money.set_balance("coins", 3400)
 	S.stars = {}
 	S.unlocked = 1
 	S.erase("v10_levels")

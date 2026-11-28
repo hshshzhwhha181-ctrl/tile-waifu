@@ -692,9 +692,9 @@ func _build_topbar() -> void :
 	prof_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	topbar.add_child(prof_root)
 	_build_profile_chip()
-	var gp: = _currency(Rect2(W - 344, 32, 160, 54), "gem", G.S.gems)
+	var gp: = _currency(Rect2(W - 344, 32, 160, 54), "gem", V10Money.bal("gems"))
 	gems_lbl = gp
-	var cp: = _currency(Rect2(W - 176, 32, 160, 54), "coin", G.S.coins)
+	var cp: = _currency(Rect2(W - 176, 32, 160, 54), "coin", V10Money.bal("coins"))
 	coins_lbl = cp
 	for sig in [G.profile_changed, G.rank_changed, G.rp_changed]:
 		if not (sig as Signal).is_connected(_on_profile_signal):
@@ -823,9 +823,9 @@ func _fit_currency(l: Label) -> void :
 func refresh_currency(punch: = false) -> void :
 	if is_inside_tree():
 		get_tree().call_group("v10_money", "refresh_money")  # 0.10: the header S-plates (V8Header.show_money)
-	gems_lbl.text = UI.fmt(G.S.gems)
+	gems_lbl.text = UI.fmt(V10Money.bal("gems"))
 	_refresh_profile_chip()
-	coins_lbl.text = UI.fmt(G.S.coins)
+	coins_lbl.text = UI.fmt(V10Money.bal("coins"))
 	_fit_currency(gems_lbl)
 	_fit_currency(coins_lbl)
 	if punch:

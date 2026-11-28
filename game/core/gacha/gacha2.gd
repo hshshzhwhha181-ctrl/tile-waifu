@@ -69,8 +69,9 @@ func item(id: String) -> Dictionary:
 
 func ensure() -> void:
 	var st: = V10Banners.state(S)
-	for k in ["tickets", "petals", "candles", "pity_std", "s_pity_std", "pity", "sr_pity", "pulls"]:
+	for k in ["candles", "pity_std", "s_pity_std", "pity", "sr_pity", "pulls"]:
 		S[k] = int(S.get(k, 0))
+	TWWallet.ensure_keys(S, ["tickets", "petals"])   # the wallet snapshot keys the 0.9 readers expect (integers)
 	S["guar"] = bool(S.get("guar", false))
 	for k in ["ostars", "targets", "mastery"]:
 		if not (S.get(k) is Dictionary):

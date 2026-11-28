@@ -563,12 +563,12 @@ func _selftest() -> int:
 		themes[String(info.theme.id)] = true
 		bosses[String(info.boss)] = true
 		var fin: Dictionary = a.result
-		var gems0: = int(G.S.get("gems", 0))
+		var gems0: = V10Money.bal("gems")
 		m = await _mount(sz, a)
 		scr = m.scr
 		await get_tree().create_timer(0.3).timeout
 		check(scr.sheet != null and scr.sheet_kind == "result", tag0 + " result: the window is shown over the hub")
-		check(int(G.S.get("gems", 0)) - gems0 == int(fin.reward.get("gems", 0)) and bool(fin.get("granted", false)), tag0 + " result: reward granted")
+		check(V10Money.bal("gems") - gems0 == int(fin.reward.get("gems", 0)) and bool(fin.get("granted", false)), tag0 + " result: reward granted")
 		var c_win: = ResourceLoader.exists("res://scripts/v10/tower/ui/tower_sheets.gd") and scr.call("_sheets_script") != null
 		if scr.sheet:
 			strict = true
@@ -585,7 +585,7 @@ func _selftest() -> int:
 			check(_has_text(af.texts, "Странствие пройдено") and _has_text(af.texts, "билет желания"), tag0 + " result fallback: title and ticket")
 		_unmount(m)
 		var m2: = await _mount(sz, a)
-		check(int(G.S.get("gems", 0)) - gems0 == int(fin.reward.get("gems", 0)), tag0 + " result: a second build never grants again")
+		check(V10Money.bal("gems") - gems0 == int(fin.reward.get("gems", 0)), tag0 + " result: a second build never grants again")
 		_unmount(m2)
 	check(themes.size() >= 3, "at least 3 week themes covered (%d)" % themes.size())
 	check(bosses.size() >= 2, "at least 2 bosses covered (%d)" % bosses.size())

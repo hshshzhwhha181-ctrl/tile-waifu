@@ -316,7 +316,7 @@ func _level_up(lv: int) -> void :
 func _gift_popup() -> void :
 	var p: = Common.popup(main, "Подарок · %s" % G.HEROES[h].name, 890, "cream", 680)
 	var left: = V7RoomData.gifts_left(h)
-	var info: = UI.center_label(UI.label("Сегодня можно подарить ещё %d · монеты: %s" % [left, UI.fmt(int(G.S.coins))], 18, Color("e9dcff")), Rect2(0, 48, 680, 30))
+	var info: = UI.center_label(UI.label("Сегодня можно подарить ещё %d · монеты: %s" % [left, UI.fmt(V10Money.bal("coins"))], 18, Color("e9dcff")), Rect2(0, 48, 680, 30))
 	p.add_child(info)
 	var cw: = 200.0
 	var ch: = 172.0
@@ -349,7 +349,7 @@ func _gift_popup() -> void :
 			var q: = UI.label("?", 24, Color("ffe7a6"), UI.DARK, 3, "body", 900)
 			q.position = Vector2(cw - 30, 2)
 			card.add_child(q)
-		var can: bool = left > 0 and int(G.S.coins) >= int(gd.price)
+		var can: bool = left > 0 and V10Money.bal("coins") >= int(gd.price)
 		if not can:
 			card.modulate = Color(0.6, 0.58, 0.62)
 		var gid: String = gd.id
@@ -358,7 +358,7 @@ func _gift_popup() -> void :
 				if left <= 0:
 					V9Feel.deny(card)
 					main.toast("На сегодня подарков хватит. Завтра она будет ждать снова.", "gift")
-				elif int(G.S.coins) < int(gd.price):
+				elif V10Money.bal("coins") < int(gd.price):
 					V9Feel.deny(card)
 					main.toast("Не хватает монет. Их дают за партии и поручения.", "coin")
 				else:
@@ -455,7 +455,7 @@ func _date_popup() -> void :
 		var buy: = JButton.make("Ещё приглашение · %d" % V7RoomData.EXTRA_INVITE_GEMS, "gold", Rect2(150, yb, 380, 72), V8Art.cur("gem"), 22)
 		buy.pressed.connect( func():
 			Common.confirm(main, "Ещё приглашение", "Купить ещё одно приглашение на свидание на сегодня?", "gem", V7RoomData.EXTRA_INVITE_GEMS, func():
-				if int(G.S.gems) < V7RoomData.EXTRA_INVITE_GEMS:
+				if V10Money.bal("gems") < V7RoomData.EXTRA_INVITE_GEMS:
 					Sfx.play("deny")
 					main.toast("Не хватает кристаллов.", "gem")
 					return

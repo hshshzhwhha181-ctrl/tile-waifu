@@ -175,7 +175,7 @@ func _pull_cost(n: int) -> int:
 
 # the pull buttons' gate: false only for a real refusal (not enough gems); a pull already running stays silent
 func _can_pull(n: int) -> bool:
-	return seq != null or int(G.S.gems) >= _pull_cost(n)
+	return seq != null or V10Money.bal("gems") >= _pull_cost(n)
 
 func _pull(n: int) -> void :
 	if seq != null:
@@ -184,7 +184,7 @@ func _pull(n: int) -> void :
 	var newbie: bool = b.get("newbie", false)
 	var free: bool = n == 10 and G.S.free10 and not newbie
 	var cost: = _pull_cost(n)
-	if G.S.gems < cost:
+	if V10Money.bal("gems") < cost:
 		V9Feel.deny(pull1_btn if n == 1 else pull10_btn)
 		main.toast(V6Txt.s("summon.no_gems"), "gem")
 		return

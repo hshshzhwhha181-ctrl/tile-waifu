@@ -153,13 +153,13 @@ func _model() -> void:
 	var f2: = State.on_fail(lv)
 	check(f2.offer_assist, "offer after 2 fails")
 	var a_rich: = State.offer_assist(lv)
-	State.S().gems = 999999
-	State.S()["moon"] = 5000
+	TWWallet.for_state(State.S()).set_balance("gems", 999999)
+	TWWallet.for_state(State.S()).set_balance("moon", 5000)
 	State.S()["spent_rub"] = 99999
 	State.S()["purchases"] = [{"sku": "pack_1190"}]
 	var a_spent: = State.offer_assist(lv)
-	State.S().gems = 0
-	State.S().erase("moon")
+	TWWallet.for_state(State.S()).set_balance("gems", 0)
+	TWWallet.for_state(State.S()).set_balance("moon", 0)
 	State.S().erase("spent_rub")
 	State.S().erase("purchases")
 	check(a_rich == a_spent and State.offer_assist(lv) == a_rich, "assist does not depend on spending")
@@ -323,7 +323,7 @@ func _boosters() -> void:
 	var sel: = Boost.initial_selection(i)
 	check(sel.has("lantern") and sel.has("wind") and not sel.has("scroll"), "card starts with the free ones on")
 	check(Boost.toggle(sel, "scroll", i) == "buy", "empty stock asks to buy")
-	State.S().gems = 100
+	TWWallet.for_state(State.S()).set_balance("gems", 100)
 	check(Boost.buy("scroll") and int(State.S().gems) == 40 and Boost.stock("scroll") == 1, "buy: −60 crystals, +1 stock")
 	check(not Boost.buy("scroll") and int(State.S().gems) == 40, "cannot buy without crystals")
 	check(Boost.toggle(sel, "scroll", i) == "stock", "stock booster switches on")
@@ -757,7 +757,7 @@ func _ux() -> void:
 			break
 	check(buy_kind != "", "fixture: an empty-stock booster to buy")
 	if buy_kind != "":
-		State.S().gems = 100
+		TWWallet.for_state(State.S()).set_balance("gems", 100)
 		var slot: Control = c.find_child("Boost_" + buy_kind, true, false)
 		var ev: = InputEventMouseButton.new()
 		ev.button_index = MOUSE_BUTTON_LEFT
@@ -772,7 +772,7 @@ func _ux() -> void:
 			yes.pressed.emit()
 			await get_tree().process_frame
 		check(int(State.S().gems) == 40 and str(sel.get(buy_kind, "")) == "stock", "«Купить за 60»: −60 crystals, the booster is on")
-		State.S().gems = 10
+		TWWallet.for_state(State.S()).set_balance("gems", 10)
 		sel.erase(buy_kind)
 		Boost.st()[buy_kind] = 0
 		Card._slot_input(ev, m, slot, buy_kind, sel, false, cur, "")

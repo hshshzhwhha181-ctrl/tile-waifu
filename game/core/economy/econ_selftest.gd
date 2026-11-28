@@ -40,6 +40,8 @@ static func run(scale: float = 1.0) -> int:
 	_catalog()
 	_clock()
 	_wallet()
+	_tw_wallet()
+	_tw_wallet_property()
 	_gacha_rules()
 	_monte_carlo()
 	_odds()
@@ -175,6 +177,171 @@ static func _wallet() -> void:
 	w.st.bal.crystal = 99999
 	_check(not w.audit().is_empty(), "edited balance breaks the invariant")
 	_check(w.st.log.size() > 0 and w.st.log.size() <= V10Wallet.LOG_MAX, "operation log kept and capped")
+
+
+# ================================================================= TWWallet (P10): the typed API, errors, the property test
+static func _tw_wallet() -> void:
+	var S: = {"gems": 100, "coins": 50, "unlocked": 3}
+	var tw: = TWWallet.for_state(S)
+	_check(tw.bal("gems") == 100 and tw.bal("coins") == 50 and tw.bal("crystal") == 100, "TWWallet: opens with the 0.9 balances (glossary and wallet keys)")
+	_check(S.econ is Dictionary and V10Wallet.new(S.econ.wallet).audit().is_empty(), "TWWallet: the wallet lives in S.econ.wallet, invariant holds")
+	var g: = tw.grant({"gems": 25, "tickets": 2}, "t")
+	_check(bool(g.ok) and g.events.size() == 2 and str(g.events[0].type) == "WALLET_CHANGED" and int(g.events[0].delta) == 25 and int(g.events[0].bal) == 125,
+		"TWWallet.grant returns WALLET_CHANGED events {cur, delta, bal, src}")
+	_check(int(S.gems) == 125 and int(S.tickets) == 2, "TWWallet: the snapshot S.gems / S.tickets follows the wallet")
+	var sp: = tw.spend({"gems": 25, "coins": 10}, "t")
+	_check(bool(sp.ok) and sp.events.size() == 2 and int(sp.events[1].delta) == -10 and tw.bal("gems") == 100 and tw.bal("coins") == 40, "TWWallet.spend pays all lines")
+	var snap: = JSON.stringify(S.econ.wallet)
+	var ins: = tw.spend({"gems": 10, "coins": 41}, "t")
+	_check(not bool(ins.ok) and str(ins.error) == "insufficient" and ins.events.is_empty() and JSON.stringify(S.econ.wallet) == snap, "TWWallet.spend is all or nothing (insufficient: nothing moved)")
+	var e0: = TWWallet.errors
+	var ng: = tw.grant({"gems": -5}, "t")
+	_check(not bool(ng.ok) and str(ng.error) == "negative_amount" and TWWallet.errors == e0 + 1 and TWWallet.last_error.begins_with("negative_amount"),
+		"a NEGATIVE grant is an error (reported, counted), not a silent clamp")
+	_check(JSON.stringify(S.econ.wallet) == snap and int(S.gems) == 100, "...and it changes nothing")
+	var mix: = tw.grant({"gems": 7, "coins": -1}, "t")
+	_check(not bool(mix.ok) and JSON.stringify(S.econ.wallet) == snap, "a bundle with one negative line applies none of it")
+	_check(str(tw.grant({"nope": 5}, "t").error) == "unknown_currency" and JSON.stringify(S.econ.wallet) == snap, "an unknown currency is an error, nothing changes")
+	_check(bool(tw.grant({"gems": 0}, "t").ok) and bool(tw.grant({"tea": 3}, "t").ok) and JSON.stringify(S.econ.wallet) == snap, "zero and the legacy 'tea' key are no-ops")
+	_check(str(tw.spend({"gems": -5}, "t").error) == "negative_amount" and JSON.stringify(S.econ.wallet) == snap, "a negative spend is an error too (it would be a grant in disguise)")
+	var w0: = V10Wallet.errors
+	_check(tw.w.add("crystal", -9, "t") == 0 and V10Wallet.errors == w0 + 1 and tw.bal("gems") == 100, "V10Wallet.add(-n) is refused and counted, not clamped")
+	var sb: = tw.set_balance("gems", 12450, "dev")
+	_check(bool(sb.ok) and tw.bal("gems") == 12450 and int(S.gems) == 12450 and tw.audit().is_empty(), "set_balance moves the balance through wallet operations")
+	_check(bool(tw.set_balance("gems", 3, "dev").ok) and tw.bal("gems") == 3 and tw.audit().is_empty() and not bool(tw.set_balance("gems", -1).ok), "set_balance down is a spend; a negative target is refused")
+	# a direct write of the snapshot is undone and counted, never turned into money
+	var dw0: = TWWallet.direct_writes
+	S.gems = 99999   # wallet-lint: ok the test of the guard itself
+	_check(tw.bal("gems") == 3 and int(S.gems) == 3 and TWWallet.direct_writes == dw0 + 1, "a direct write of S.gems is undone (wallet is the truth) and counted")
+	# the save round trip keeps the wallet (JSON in, JSON out)
+	var back = JSON.parse_string(JSON.stringify(S))
+	TWWallet.forget()
+	var tw2: = TWWallet.for_state(back)
+	_check(tw2.bal("gems") == 3 and tw2.bal("coins") == 40 and tw2.bal("tickets") == 2 and tw2.audit().is_empty(), "save -> load: the same balances, invariant holds")
+	TWWallet.forget()
+
+
+# 12000 random operations on one wallet against an independent shadow ledger. After EVERY operation:
+#   balance - debt == earned - spent - revoked (audit), no negative number, the snapshot == the wallet, the shadow == the wallet;
+#   an invalid operation (negative, unknown currency) changes nothing.
+static func _tw_wallet_property() -> void:
+	var rng: = RandomNumberGenerator.new()
+	rng.seed = 20261128
+	var S: = {"gems": 500, "coins": 200}
+	var tw: = TWWallet.for_state(S)
+	var keys: = ["gems", "coins", "moon", "tickets", "petals"]
+	var wk: = {"gems": "crystal", "coins": "coin", "moon": "moon", "tickets": "wish", "petals": "petal"}
+	var sh_b: = {}      # shadow balance / debt / earned / spent / revoked
+	var sh_d: = {}
+	var sh_e: = {}
+	var sh_s: = {}
+	var sh_r: = {}
+	for k in keys:
+		var c: String = wk[k]
+		sh_b[c] = tw.bal(k)
+		sh_d[c] = 0
+		sh_e[c] = int(tw.w.st.earned[c])
+		sh_s[c] = 0
+		sh_r[c] = 0
+	var n_ops: = 12000
+	var bad_inv: = 0
+	var bad_shadow: = 0
+	var bad_snap: = 0
+	var bad_invalid: = 0
+	var denied: = 0
+	var done_by: = {"grant": 0, "spend": 0, "revoke": 0, "premium": 0, "set": 0, "invalid": 0}
+	for i in n_ops:
+		var op: = rng.randi_range(0, 99)
+		var k: String = keys[rng.randi_range(0, keys.size() - 1)]
+		var c: String = wk[k]
+		var n: = rng.randi_range(0, 400) if rng.randi_range(0, 9) != 0 else rng.randi_range(0, 100000)
+		if op < 34:
+			done_by.grant += 1
+			var r: = tw.grant({k: n}, "p")
+			var pay: = mini(int(sh_d[c]), n)
+			sh_d[c] -= pay
+			sh_b[c] += n - pay
+			sh_e[c] += n
+			if not bool(r.ok):
+				bad_shadow += 1
+		elif op < 62:
+			done_by.spend += 1
+			var r2: = tw.spend({k: n}, "p")
+			if int(sh_b[c]) >= n:
+				sh_b[c] -= n
+				sh_s[c] += n
+				if not bool(r2.ok):
+					bad_shadow += 1
+			else:
+				denied += 1
+				if bool(r2.ok) or str(r2.error) != "insufficient":
+					bad_shadow += 1
+		elif op < 72:
+			done_by.revoke += 1
+			tw.w.revoke(c, n, "refund")
+			var take: = mini(int(sh_b[c]), n)
+			sh_b[c] -= take
+			sh_d[c] += n - take
+			sh_r[c] += n
+			tw.write_mirrors()
+		elif op < 80:
+			done_by.premium += 1
+			var pr: = tw.w.spend_premium(n, "p")
+			if int(sh_b["crystal"]) + int(sh_b["moon"]) >= n:
+				var a: = mini(int(sh_b["crystal"]), n)
+				sh_b["crystal"] -= a
+				sh_s["crystal"] += a
+				sh_b["moon"] -= n - a
+				sh_s["moon"] += n - a
+				if pr.is_empty() and n > 0:
+					bad_shadow += 1
+			elif not pr.is_empty():
+				bad_shadow += 1
+			tw.write_mirrors()
+		elif op < 88:
+			done_by.set += 1
+			var target: = rng.randi_range(0, 3000)
+			tw.set_balance(k, target, "p")
+			var d: = target - int(sh_b[c])
+			if d > 0:
+				var pay2: = mini(int(sh_d[c]), d)
+				sh_d[c] -= pay2
+				sh_b[c] += d - pay2
+				sh_e[c] += d
+			elif d < 0:
+				sh_b[c] += d
+				sh_s[c] -= d
+		else:
+			done_by.invalid += 1
+			var before: = JSON.stringify(tw.w.st)
+			var inv: Dictionary
+			match rng.randi_range(0, 3):
+				0: inv = tw.grant({k: -rng.randi_range(1, 500)}, "p")
+				1: inv = tw.grant({"bogus": rng.randi_range(1, 500)}, "p")
+				2: inv = tw.spend({k: -rng.randi_range(1, 500)}, "p")
+				_: inv = tw.grant({k: n, "coins": -1}, "p")
+			if bool(inv.ok) or JSON.stringify(tw.w.st) != before:
+				bad_invalid += 1
+		# the invariants, after every operation
+		if not tw.audit().is_empty():
+			bad_inv += 1
+		for k2 in keys:
+			var c2: String = wk[k2]
+			if tw.bal(k2) != int(sh_b[c2]) or tw.w.debt(c2) != int(sh_d[c2]) or int(tw.w.st.earned[c2]) != int(sh_e[c2]) \
+					or int(tw.w.st.spent[c2]) != int(sh_s[c2]) or int(tw.w.st.revoked[c2]) != int(sh_r[c2]):
+				bad_shadow += 1
+			if tw.bal(k2) < 0 or tw.w.debt(c2) < 0:
+				bad_inv += 1
+			if (k2 in ["gems", "coins"] or S.has(k2)) and int(S[k2]) != tw.bal(k2):
+				bad_snap += 1
+	_check(n_ops >= 10000, "wallet property test: %d random operations (grant %d, spend %d [%d denied], revoke %d, premium %d, set_balance %d, invalid %d)" % [
+		n_ops, done_by.grant, done_by.spend, denied, done_by.revoke, done_by.premium, done_by.set, done_by.invalid])
+	_check(bad_inv == 0, "wallet property test: balance - debt == earned - spent - revoked and no negative number after every operation (%d violations)" % bad_inv)
+	_check(bad_shadow == 0, "wallet property test: the wallet equals an independent shadow ledger after every operation (%d differences)" % bad_shadow)
+	_check(bad_snap == 0, "wallet property test: the S.gems / S.coins snapshot equals the wallet after every operation (%d differences)" % bad_snap)
+	_check(bad_invalid == 0, "wallet property test: every negative / unknown-currency operation was refused and changed nothing (%d leaks)" % bad_invalid)
+	_check(int(done_by.revoke) > 500 and int(done_by.premium) > 500 and denied > 500, "wallet property test: refund, premium-spend and denied-spend paths were all exercised")
+	TWWallet.forget()
 
 
 # ================================================================= gacha rules

@@ -41,12 +41,12 @@ static func constellation(gacha: V10Gacha2, it: Dictionary, r: Rect2, on_change:
 		t.position = Vector2(18, y)
 		p.add_child(t)
 		y += t.get_minimum_size().y + 6
-	var petals: = int(G.S.get("petals", 0))
+	var petals: = V10Money.bal("petals")
 	var can: = V10Stars.can_add(G.S, id, petals)
 	var btn_t: = "Добавить звезду · %d ❀" % V10Stars.STAR_PETALS if lv < 5 and lv >= 1 else ("Созвездие полное" if lv >= 5 else "Сначала получи наряд")
 	var b: = JButton.make(btn_t, "lav" if can else "graphite", Rect2(16, y + 8, r.size.x - 32, 80), null, 22)
 	b.set_meta("ux_role", "secondary")
-	b.set_gate(func(): return V10Stars.can_add(G.S, id, int(G.S.get("petals", 0))), func(): V9Feel.deny(b))
+	b.set_gate(func(): return V10Stars.can_add(G.S, id, V10Money.bal("petals")), func(): V9Feel.deny(b))
 	b.pressed.connect(func():
 		if gacha.add_star(id):
 			G.save()

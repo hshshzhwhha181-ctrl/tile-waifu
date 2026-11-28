@@ -1,0 +1,1147 @@
+{
+  "v4": {
+    "after_load": {
+      "audit": [],
+      "bal": {
+        "coin": 15800,
+        "crystal": 4200,
+        "moon": 0,
+        "petal": 0,
+        "wax": 0,
+        "wish": 0
+      },
+      "coins": 15800,
+      "debt": {
+        "coin": 0,
+        "crystal": 0,
+        "moon": 0,
+        "petal": 0,
+        "wax": 0,
+        "wish": 0
+      },
+      "earned": {
+        "coin": 15800,
+        "crystal": 4200,
+        "moon": 0,
+        "petal": 0,
+        "wax": 0,
+        "wish": 0
+      },
+      "gems": 4200,
+      "log": [],
+      "moon": "-",
+      "petals": 0,
+      "revoked": {
+        "coin": 0,
+        "crystal": 0,
+        "moon": 0,
+        "petal": 0,
+        "wax": 0,
+        "wish": 0
+      },
+      "spent": {
+        "coin": 0,
+        "crystal": 0,
+        "moon": 0,
+        "petal": 0,
+        "wax": 0,
+        "wish": 0
+      },
+      "tickets": 0
+    },
+    "after_ops": {
+      "audit": [],
+      "bal": {
+        "coin": 15798,
+        "crystal": 4110,
+        "moon": 0,
+        "petal": 3,
+        "wax": 0,
+        "wish": 2
+      },
+      "coins": 15798,
+      "debt": {
+        "coin": 0,
+        "crystal": 0,
+        "moon": 0,
+        "petal": 0,
+        "wax": 0,
+        "wish": 0
+      },
+      "earned": {
+        "coin": 15805,
+        "crystal": 4210,
+        "moon": 0,
+        "petal": 3,
+        "wax": 0,
+        "wish": 2
+      },
+      "gems": 4110,
+      "log": [
+        [
+          "crystal",
+          10,
+          "golden"
+        ],
+        [
+          "coin",
+          5,
+          "golden"
+        ],
+        [
+          "wish",
+          2,
+          "golden"
+        ],
+        [
+          "petal",
+          3,
+          "golden"
+        ],
+        [
+          "crystal",
+          -100,
+          "golden"
+        ],
+        [
+          "coin",
+          -7,
+          "golden"
+        ]
+      ],
+      "moon": "-",
+      "petals": 3,
+      "revoked": {
+        "coin": 0,
+        "crystal": 0,
+        "moon": 0,
+        "petal": 0,
+        "wax": 0,
+        "wish": 0
+      },
+      "spent": {
+        "coin": 7,
+        "crystal": 100,
+        "moon": 0,
+        "petal": 0,
+        "wax": 0,
+        "wish": 0
+      },
+      "tickets": 2
+    },
+    "apply": true,
+    "can_all": true,
+    "disk": {
+      "coins": 15798.0,
+      "gems": 4110.0,
+      "has_tickets": true,
+      "petals": 3.0,
+      "sealed": true,
+      "tickets": 2.0
+    },
+    "pull_split": {
+      "gems": 1200,
+      "moon": 0,
+      "ok": true,
+      "tickets": 2
+    },
+    "reloaded": {
+      "audit": [],
+      "bal": {
+        "coin": 15798,
+        "crystal": 4110,
+        "moon": 0,
+        "petal": 3,
+        "wax": 0,
+        "wish": 2
+      },
+      "coins": 15798,
+      "debt": {
+        "coin": 0,
+        "crystal": 0,
+        "moon": 0,
+        "petal": 0,
+        "wax": 0,
+        "wish": 0
+      },
+      "earned": {
+        "coin": 15805,
+        "crystal": 4210,
+        "moon": 0,
+        "petal": 3,
+        "wax": 0,
+        "wish": 2
+      },
+      "gems": 4110,
+      "log": [
+        [
+          "crystal",
+          10.0,
+          "golden"
+        ],
+        [
+          "coin",
+          5.0,
+          "golden"
+        ],
+        [
+          "wish",
+          2.0,
+          "golden"
+        ],
+        [
+          "petal",
+          3.0,
+          "golden"
+        ],
+        [
+          "crystal",
+          -100.0,
+          "golden"
+        ],
+        [
+          "coin",
+          -7.0,
+          "golden"
+        ]
+      ],
+      "moon": "-",
+      "petals": 3,
+      "revoked": {
+        "coin": 0,
+        "crystal": 0,
+        "moon": 0,
+        "petal": 0,
+        "wax": 0,
+        "wish": 0
+      },
+      "spent": {
+        "coin": 7,
+        "crystal": 100,
+        "moon": 0,
+        "petal": 0,
+        "wax": 0,
+        "wish": 0
+      },
+      "tickets": 2
+    },
+    "spend_ok": true,
+    "spend_too_much": false
+  },
+  "v5": {
+    "after_load": {
+      "audit": [],
+      "bal": {
+        "coin": 15800,
+        "crystal": 4200,
+        "moon": 0,
+        "petal": 0,
+        "wax": 0,
+        "wish": 0
+      },
+      "coins": 15800,
+      "debt": {
+        "coin": 0,
+        "crystal": 0,
+        "moon": 0,
+        "petal": 0,
+        "wax": 0,
+        "wish": 0
+      },
+      "earned": {
+        "coin": 15800,
+        "crystal": 4200,
+        "moon": 0,
+        "petal": 0,
+        "wax": 0,
+        "wish": 0
+      },
+      "gems": 4200,
+      "log": [],
+      "moon": "-",
+      "petals": 0,
+      "revoked": {
+        "coin": 0,
+        "crystal": 0,
+        "moon": 0,
+        "petal": 0,
+        "wax": 0,
+        "wish": 0
+      },
+      "spent": {
+        "coin": 0,
+        "crystal": 0,
+        "moon": 0,
+        "petal": 0,
+        "wax": 0,
+        "wish": 0
+      },
+      "tickets": 0
+    },
+    "after_ops": {
+      "audit": [],
+      "bal": {
+        "coin": 15798,
+        "crystal": 4110,
+        "moon": 0,
+        "petal": 3,
+        "wax": 0,
+        "wish": 2
+      },
+      "coins": 15798,
+      "debt": {
+        "coin": 0,
+        "crystal": 0,
+        "moon": 0,
+        "petal": 0,
+        "wax": 0,
+        "wish": 0
+      },
+      "earned": {
+        "coin": 15805,
+        "crystal": 4210,
+        "moon": 0,
+        "petal": 3,
+        "wax": 0,
+        "wish": 2
+      },
+      "gems": 4110,
+      "log": [
+        [
+          "crystal",
+          10,
+          "golden"
+        ],
+        [
+          "coin",
+          5,
+          "golden"
+        ],
+        [
+          "wish",
+          2,
+          "golden"
+        ],
+        [
+          "petal",
+          3,
+          "golden"
+        ],
+        [
+          "crystal",
+          -100,
+          "golden"
+        ],
+        [
+          "coin",
+          -7,
+          "golden"
+        ]
+      ],
+      "moon": "-",
+      "petals": 3,
+      "revoked": {
+        "coin": 0,
+        "crystal": 0,
+        "moon": 0,
+        "petal": 0,
+        "wax": 0,
+        "wish": 0
+      },
+      "spent": {
+        "coin": 7,
+        "crystal": 100,
+        "moon": 0,
+        "petal": 0,
+        "wax": 0,
+        "wish": 0
+      },
+      "tickets": 2
+    },
+    "apply": true,
+    "can_all": true,
+    "disk": {
+      "coins": 15798.0,
+      "gems": 4110.0,
+      "has_tickets": true,
+      "petals": 3.0,
+      "sealed": true,
+      "tickets": 2.0
+    },
+    "pull_split": {
+      "gems": 1200,
+      "moon": 0,
+      "ok": true,
+      "tickets": 2
+    },
+    "reloaded": {
+      "audit": [],
+      "bal": {
+        "coin": 15798,
+        "crystal": 4110,
+        "moon": 0,
+        "petal": 3,
+        "wax": 0,
+        "wish": 2
+      },
+      "coins": 15798,
+      "debt": {
+        "coin": 0,
+        "crystal": 0,
+        "moon": 0,
+        "petal": 0,
+        "wax": 0,
+        "wish": 0
+      },
+      "earned": {
+        "coin": 15805,
+        "crystal": 4210,
+        "moon": 0,
+        "petal": 3,
+        "wax": 0,
+        "wish": 2
+      },
+      "gems": 4110,
+      "log": [
+        [
+          "crystal",
+          10.0,
+          "golden"
+        ],
+        [
+          "coin",
+          5.0,
+          "golden"
+        ],
+        [
+          "wish",
+          2.0,
+          "golden"
+        ],
+        [
+          "petal",
+          3.0,
+          "golden"
+        ],
+        [
+          "crystal",
+          -100.0,
+          "golden"
+        ],
+        [
+          "coin",
+          -7.0,
+          "golden"
+        ]
+      ],
+      "moon": "-",
+      "petals": 3,
+      "revoked": {
+        "coin": 0,
+        "crystal": 0,
+        "moon": 0,
+        "petal": 0,
+        "wax": 0,
+        "wish": 0
+      },
+      "spent": {
+        "coin": 7,
+        "crystal": 100,
+        "moon": 0,
+        "petal": 0,
+        "wax": 0,
+        "wish": 0
+      },
+      "tickets": 2
+    },
+    "spend_ok": true,
+    "spend_too_much": false
+  },
+  "v6": {
+    "after_load": {
+      "audit": [],
+      "bal": {
+        "coin": 15800,
+        "crystal": 4200,
+        "moon": 0,
+        "petal": 0,
+        "wax": 0,
+        "wish": 0
+      },
+      "coins": 15800,
+      "debt": {
+        "coin": 0,
+        "crystal": 0,
+        "moon": 0,
+        "petal": 0,
+        "wax": 0,
+        "wish": 0
+      },
+      "earned": {
+        "coin": 15800,
+        "crystal": 4200,
+        "moon": 0,
+        "petal": 0,
+        "wax": 0,
+        "wish": 0
+      },
+      "gems": 4200,
+      "log": [],
+      "moon": "-",
+      "petals": 0,
+      "revoked": {
+        "coin": 0,
+        "crystal": 0,
+        "moon": 0,
+        "petal": 0,
+        "wax": 0,
+        "wish": 0
+      },
+      "spent": {
+        "coin": 0,
+        "crystal": 0,
+        "moon": 0,
+        "petal": 0,
+        "wax": 0,
+        "wish": 0
+      },
+      "tickets": 0
+    },
+    "after_ops": {
+      "audit": [],
+      "bal": {
+        "coin": 15798,
+        "crystal": 4110,
+        "moon": 0,
+        "petal": 3,
+        "wax": 0,
+        "wish": 2
+      },
+      "coins": 15798,
+      "debt": {
+        "coin": 0,
+        "crystal": 0,
+        "moon": 0,
+        "petal": 0,
+        "wax": 0,
+        "wish": 0
+      },
+      "earned": {
+        "coin": 15805,
+        "crystal": 4210,
+        "moon": 0,
+        "petal": 3,
+        "wax": 0,
+        "wish": 2
+      },
+      "gems": 4110,
+      "log": [
+        [
+          "crystal",
+          10,
+          "golden"
+        ],
+        [
+          "coin",
+          5,
+          "golden"
+        ],
+        [
+          "wish",
+          2,
+          "golden"
+        ],
+        [
+          "petal",
+          3,
+          "golden"
+        ],
+        [
+          "crystal",
+          -100,
+          "golden"
+        ],
+        [
+          "coin",
+          -7,
+          "golden"
+        ]
+      ],
+      "moon": "-",
+      "petals": 3,
+      "revoked": {
+        "coin": 0,
+        "crystal": 0,
+        "moon": 0,
+        "petal": 0,
+        "wax": 0,
+        "wish": 0
+      },
+      "spent": {
+        "coin": 7,
+        "crystal": 100,
+        "moon": 0,
+        "petal": 0,
+        "wax": 0,
+        "wish": 0
+      },
+      "tickets": 2
+    },
+    "apply": true,
+    "can_all": true,
+    "disk": {
+      "coins": 15798.0,
+      "gems": 4110.0,
+      "has_tickets": true,
+      "petals": 3.0,
+      "sealed": true,
+      "tickets": 2.0
+    },
+    "pull_split": {
+      "gems": 1200,
+      "moon": 0,
+      "ok": true,
+      "tickets": 2
+    },
+    "reloaded": {
+      "audit": [],
+      "bal": {
+        "coin": 15798,
+        "crystal": 4110,
+        "moon": 0,
+        "petal": 3,
+        "wax": 0,
+        "wish": 2
+      },
+      "coins": 15798,
+      "debt": {
+        "coin": 0,
+        "crystal": 0,
+        "moon": 0,
+        "petal": 0,
+        "wax": 0,
+        "wish": 0
+      },
+      "earned": {
+        "coin": 15805,
+        "crystal": 4210,
+        "moon": 0,
+        "petal": 3,
+        "wax": 0,
+        "wish": 2
+      },
+      "gems": 4110,
+      "log": [
+        [
+          "crystal",
+          10.0,
+          "golden"
+        ],
+        [
+          "coin",
+          5.0,
+          "golden"
+        ],
+        [
+          "wish",
+          2.0,
+          "golden"
+        ],
+        [
+          "petal",
+          3.0,
+          "golden"
+        ],
+        [
+          "crystal",
+          -100.0,
+          "golden"
+        ],
+        [
+          "coin",
+          -7.0,
+          "golden"
+        ]
+      ],
+      "moon": "-",
+      "petals": 3,
+      "revoked": {
+        "coin": 0,
+        "crystal": 0,
+        "moon": 0,
+        "petal": 0,
+        "wax": 0,
+        "wish": 0
+      },
+      "spent": {
+        "coin": 7,
+        "crystal": 100,
+        "moon": 0,
+        "petal": 0,
+        "wax": 0,
+        "wish": 0
+      },
+      "tickets": 2
+    },
+    "spend_ok": true,
+    "spend_too_much": false
+  },
+  "v7": {
+    "after_load": {
+      "audit": [],
+      "bal": {
+        "coin": 98765,
+        "crystal": 23456,
+        "moon": 0,
+        "petal": 0,
+        "wax": 0,
+        "wish": 0
+      },
+      "coins": 98765,
+      "debt": {
+        "coin": 0,
+        "crystal": 0,
+        "moon": 0,
+        "petal": 0,
+        "wax": 0,
+        "wish": 0
+      },
+      "earned": {
+        "coin": 98765,
+        "crystal": 23456,
+        "moon": 0,
+        "petal": 0,
+        "wax": 0,
+        "wish": 0
+      },
+      "gems": 23456,
+      "log": [],
+      "moon": "-",
+      "petals": 0,
+      "revoked": {
+        "coin": 0,
+        "crystal": 0,
+        "moon": 0,
+        "petal": 0,
+        "wax": 0,
+        "wish": 0
+      },
+      "spent": {
+        "coin": 0,
+        "crystal": 0,
+        "moon": 0,
+        "petal": 0,
+        "wax": 0,
+        "wish": 0
+      },
+      "tickets": 0
+    },
+    "after_ops": {
+      "audit": [],
+      "bal": {
+        "coin": 98763,
+        "crystal": 23366,
+        "moon": 0,
+        "petal": 3,
+        "wax": 0,
+        "wish": 2
+      },
+      "coins": 98763,
+      "debt": {
+        "coin": 0,
+        "crystal": 0,
+        "moon": 0,
+        "petal": 0,
+        "wax": 0,
+        "wish": 0
+      },
+      "earned": {
+        "coin": 98770,
+        "crystal": 23466,
+        "moon": 0,
+        "petal": 3,
+        "wax": 0,
+        "wish": 2
+      },
+      "gems": 23366,
+      "log": [
+        [
+          "crystal",
+          10,
+          "golden"
+        ],
+        [
+          "coin",
+          5,
+          "golden"
+        ],
+        [
+          "wish",
+          2,
+          "golden"
+        ],
+        [
+          "petal",
+          3,
+          "golden"
+        ],
+        [
+          "crystal",
+          -100,
+          "golden"
+        ],
+        [
+          "coin",
+          -7,
+          "golden"
+        ]
+      ],
+      "moon": "-",
+      "petals": 3,
+      "revoked": {
+        "coin": 0,
+        "crystal": 0,
+        "moon": 0,
+        "petal": 0,
+        "wax": 0,
+        "wish": 0
+      },
+      "spent": {
+        "coin": 7,
+        "crystal": 100,
+        "moon": 0,
+        "petal": 0,
+        "wax": 0,
+        "wish": 0
+      },
+      "tickets": 2
+    },
+    "apply": true,
+    "can_all": true,
+    "disk": {
+      "coins": 98763.0,
+      "gems": 23366.0,
+      "has_tickets": true,
+      "petals": 3.0,
+      "sealed": true,
+      "tickets": 2.0
+    },
+    "pull_split": {
+      "gems": 1200,
+      "moon": 0,
+      "ok": true,
+      "tickets": 2
+    },
+    "reloaded": {
+      "audit": [],
+      "bal": {
+        "coin": 98763,
+        "crystal": 23366,
+        "moon": 0,
+        "petal": 3,
+        "wax": 0,
+        "wish": 2
+      },
+      "coins": 98763,
+      "debt": {
+        "coin": 0,
+        "crystal": 0,
+        "moon": 0,
+        "petal": 0,
+        "wax": 0,
+        "wish": 0
+      },
+      "earned": {
+        "coin": 98770,
+        "crystal": 23466,
+        "moon": 0,
+        "petal": 3,
+        "wax": 0,
+        "wish": 2
+      },
+      "gems": 23366,
+      "log": [
+        [
+          "crystal",
+          10.0,
+          "golden"
+        ],
+        [
+          "coin",
+          5.0,
+          "golden"
+        ],
+        [
+          "wish",
+          2.0,
+          "golden"
+        ],
+        [
+          "petal",
+          3.0,
+          "golden"
+        ],
+        [
+          "crystal",
+          -100.0,
+          "golden"
+        ],
+        [
+          "coin",
+          -7.0,
+          "golden"
+        ]
+      ],
+      "moon": "-",
+      "petals": 3,
+      "revoked": {
+        "coin": 0,
+        "crystal": 0,
+        "moon": 0,
+        "petal": 0,
+        "wax": 0,
+        "wish": 0
+      },
+      "spent": {
+        "coin": 7,
+        "crystal": 100,
+        "moon": 0,
+        "petal": 0,
+        "wax": 0,
+        "wish": 0
+      },
+      "tickets": 2
+    },
+    "spend_ok": true,
+    "spend_too_much": false
+  },
+  "v8": {
+    "after_load": {
+      "audit": [],
+      "bal": {
+        "coin": 98765,
+        "crystal": 23456,
+        "moon": 0,
+        "petal": 0,
+        "wax": 0,
+        "wish": 0
+      },
+      "coins": 98765,
+      "debt": {
+        "coin": 0,
+        "crystal": 0,
+        "moon": 0,
+        "petal": 0,
+        "wax": 0,
+        "wish": 0
+      },
+      "earned": {
+        "coin": 98765,
+        "crystal": 23456,
+        "moon": 0,
+        "petal": 0,
+        "wax": 0,
+        "wish": 0
+      },
+      "gems": 23456,
+      "log": [],
+      "moon": "-",
+      "petals": 0,
+      "revoked": {
+        "coin": 0,
+        "crystal": 0,
+        "moon": 0,
+        "petal": 0,
+        "wax": 0,
+        "wish": 0
+      },
+      "spent": {
+        "coin": 0,
+        "crystal": 0,
+        "moon": 0,
+        "petal": 0,
+        "wax": 0,
+        "wish": 0
+      },
+      "tickets": 0
+    },
+    "after_ops": {
+      "audit": [],
+      "bal": {
+        "coin": 98763,
+        "crystal": 23366,
+        "moon": 0,
+        "petal": 3,
+        "wax": 0,
+        "wish": 2
+      },
+      "coins": 98763,
+      "debt": {
+        "coin": 0,
+        "crystal": 0,
+        "moon": 0,
+        "petal": 0,
+        "wax": 0,
+        "wish": 0
+      },
+      "earned": {
+        "coin": 98770,
+        "crystal": 23466,
+        "moon": 0,
+        "petal": 3,
+        "wax": 0,
+        "wish": 2
+      },
+      "gems": 23366,
+      "log": [
+        [
+          "crystal",
+          10,
+          "golden"
+        ],
+        [
+          "coin",
+          5,
+          "golden"
+        ],
+        [
+          "wish",
+          2,
+          "golden"
+        ],
+        [
+          "petal",
+          3,
+          "golden"
+        ],
+        [
+          "crystal",
+          -100,
+          "golden"
+        ],
+        [
+          "coin",
+          -7,
+          "golden"
+        ]
+      ],
+      "moon": "-",
+      "petals": 3,
+      "revoked": {
+        "coin": 0,
+        "crystal": 0,
+        "moon": 0,
+        "petal": 0,
+        "wax": 0,
+        "wish": 0
+      },
+      "spent": {
+        "coin": 7,
+        "crystal": 100,
+        "moon": 0,
+        "petal": 0,
+        "wax": 0,
+        "wish": 0
+      },
+      "tickets": 2
+    },
+    "apply": true,
+    "can_all": true,
+    "disk": {
+      "coins": 98763.0,
+      "gems": 23366.0,
+      "has_tickets": true,
+      "petals": 3.0,
+      "sealed": true,
+      "tickets": 2.0
+    },
+    "pull_split": {
+      "gems": 1200,
+      "moon": 0,
+      "ok": true,
+      "tickets": 2
+    },
+    "reloaded": {
+      "audit": [],
+      "bal": {
+        "coin": 98763,
+        "crystal": 23366,
+        "moon": 0,
+        "petal": 3,
+        "wax": 0,
+        "wish": 2
+      },
+      "coins": 98763,
+      "debt": {
+        "coin": 0,
+        "crystal": 0,
+        "moon": 0,
+        "petal": 0,
+        "wax": 0,
+        "wish": 0
+      },
+      "earned": {
+        "coin": 98770,
+        "crystal": 23466,
+        "moon": 0,
+        "petal": 3,
+        "wax": 0,
+        "wish": 2
+      },
+      "gems": 23366,
+      "log": [
+        [
+          "crystal",
+          10.0,
+          "golden"
+        ],
+        [
+          "coin",
+          5.0,
+          "golden"
+        ],
+        [
+          "wish",
+          2.0,
+          "golden"
+        ],
+        [
+          "petal",
+          3.0,
+          "golden"
+        ],
+        [
+          "crystal",
+          -100.0,
+          "golden"
+        ],
+        [
+          "coin",
+          -7.0,
+          "golden"
+        ]
+      ],
+      "moon": "-",
+      "petals": 3,
+      "revoked": {
+        "coin": 0,
+        "crystal": 0,
+        "moon": 0,
+        "petal": 0,
+        "wax": 0,
+        "wish": 0
+      },
+      "spent": {
+        "coin": 7,
+        "crystal": 100,
+        "moon": 0,
+        "petal": 0,
+        "wax": 0,
+        "wish": 0
+      },
+      "tickets": 2
+    },
+    "spend_ok": true,
+    "spend_too_much": false
+  }
+}

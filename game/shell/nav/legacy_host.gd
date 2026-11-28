@@ -66,8 +66,8 @@ func _prepare_selftest_save() -> void:
 	G.S.intro_done = true
 	G.S.tut_done = true
 	G.S.unlocked = mini(40, G.LEVELS.size())
-	G.S.gems = 12450
-	G.S.coins = 38200
+	V10Money.set_balance("gems", 12450)
+	V10Money.set_balance("coins", 38200)
 	G.S.free10 = true
 	_v6_opt("v6_story.on", false)  # story scenes before a level wait for a tap
 
