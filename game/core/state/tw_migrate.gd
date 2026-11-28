@@ -79,6 +79,19 @@ static func apply(d: Dictionary, ctx: Dictionary = {}) -> Dictionary:
 
 # in place; `df` = the defaults used for type repair (apply passes the ones it merged over)
 static func run(S: Dictionary, ctx: Dictionary = {}, df: Dictionary = {}) -> Dictionary:
+	# determinism: an explicit ctx.now also freezes the module clock (V10TutState.t0/first_day and friends read
+	# V10Meta.now_unix()), so the same save + the same ctx always migrates to the same state, whatever the wall clock says.
+	var explicit_now: int = int(ctx.get("now", -1))
+	if explicit_now < 0:
+		return _run(S, ctx, df)
+	var prev_now: int = V10Meta._fixed_now
+	V10Meta.set_now(explicit_now)
+	var rep: Dictionary = _run(S, ctx, df)
+	V10Meta._fixed_now = prev_now
+	return rep
+
+
+static func _run(S: Dictionary, ctx: Dictionary = {}, df: Dictionary = {}) -> Dictionary:
 	var rep: = {"from": int(S.get("ver", 0)), "to": SAVE_VER, "steps": [], "repaired": []}
 	var now: int = int(ctx.get("now", -1))
 	if now < 0:

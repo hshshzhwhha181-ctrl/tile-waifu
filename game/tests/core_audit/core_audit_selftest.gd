@@ -54,6 +54,7 @@ func run(p_host: Node) -> Array:
 	_test_a10_clock_monotonic_nonnegative()
 	_prop_twboard_solvability_and_replay()
 	_prop_twsave_migrate_roundtrip()
+	_migrate_wall_clock_independent()
 	var total: = _pass + _fail
 	print("CORE_AUDIT_SELFTEST %d/%d" % [_pass, total])
 	return [_pass, total]
@@ -560,3 +561,19 @@ func _prop_twsave_migrate_roundtrip() -> void:
 	sv_clean.remove_all()
 	check("prop(TWSave+TWMigrate): %d/%d random v0..v8 saves pass deterministic migration, idempotency, and disk round-trip" % [n_cases - bad, n_cases],
 		bad == 0, first_err)
+
+# G1 fuzz found a flake (case v6): modules stamped V10TutState.t0/first_day from the wall clock, so two migrations of
+# the same save straddling a second boundary differed. TWMigrate.run now freezes the module clock at ctx.now.
+func _migrate_wall_clock_independent() -> void:
+	var heroes: = ["mc", "rin", "hana", "yue", "nova"]
+	var save: = {"ver": 6, "gems": 100, "coins": 50, "unlocked": 10, "stars": {"1": 2}, "owned": {"o_base": true}, "partner": "rin",
+		"profile": {"nick": "x", "avatar": "mc", "frame": "", "created": AUDIT_NOW - 86400, "id": "00000001"}, "profile_done": true}
+	var ctx: = {"now": AUDIT_NOW, "modules": true, "levels_size": 1000, "heroes": heroes}
+	V10Meta.unbind()
+	V10Meta.set_tz(0)
+	var a1: = TWMigrate.apply(save, ctx)
+	OS.delay_msec(1100)
+	var a2: = TWMigrate.apply(save, ctx)
+	check("migrate: same save + same ctx.now = same hash across a wall-clock second boundary",
+		bool(a1.ok) and bool(a2.ok) and TWState.state_hash_of(a1.state) == TWState.state_hash_of(a2.state))
+	check("migrate: frozen module clock restored after apply (system clock back in use)", V10Meta.now_unix() != AUDIT_NOW)
