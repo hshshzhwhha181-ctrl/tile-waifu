@@ -113,6 +113,9 @@ CATALOG: list[Suite] = [
       note="P28: TWButton/TWPlate/TWSheet/TWHeader/TWTabBar/TWToast/TWCurrencyChip/TWSkin: carried hud2 suite (854) + press curve per tick, p95 tap response, skins, 3 resolutions"),
     S("twpresence", "TWPRESENCE_SELFTEST", "res://shell/stage/presence_selftest.tscn", group="core", timeout=600,
       note="P34: TWPresence over V10LiveRig: strip <= 28% on 3 aspects, 160 px medallion, never over the board, touches off, 7 reactions from core events < 100 ms, stub for heroines without a rig, draw/texture budget"),
+    S("skin_soak", "TWSKINSOAK_SELFTEST", "res://tests/skin_swap_soak/skin_swap_soak.tscn", group="core", timeout=300,
+      note="QA plan T-SOAK-1: 61 synthetic+real skin manifests, 300 swaps through TWSkinHostStub -> TWSkin.apply -> tw_skinned group -> TWBus: no leak of the previous skin, "
+           "locked tokens untouched, atomic rejection of bad manifests (hex / locked / unknown / wrong level), replay hash, no object/memory growth; pending items printed as PENDING"),
     S("ults", "ULTS", args=["--ults_selftest=1"], group="core"),
     S("letters", "LETTERS", args=["--letters_selftest=1"], group="core"),
     # ---- v10 registry modules (docs/INTEGRATION_0.10.md; ids == V10RegistryList ids) -----------------
@@ -215,6 +218,10 @@ EXTERNAL: list[Suite] = [
     Suite(id="asset_id_only", kind="python", group="lint", marker="ASSET_ID_ONLY SELFTEST", timeout=60, fast=True,
           script="tools/lint_asset_id_only.py", args=["--selftest", "--check"],
           note="ASSET_ID_ONLY: 13 synthetic cases + game/shell has 0 res://assets literals + legacy literals (report mode, 493) within tools/lint_asset_id_baseline.json"),
+    # QA plan: tools/qa tool-belt (palette_audit on synthetic images, skin_lint + schema + 3 sample manifests, fuzz, ramps/schema in sync); numpy+Pillow optional (palette tests skip without them)
+    Suite(id="qa_tools", kind="python", group="lint", marker="QA_TOOLS RESULT", timeout=120, fast=True,
+          script="tools/qa/run_qa_tools.py",
+          note="QA_TOOLS: unittest discover tools/qa + palette_ramps.json / skin schema in sync + skin_lint valid/invalid/missing-slot samples"),
     # P45: loudness meter self-test on synthetic signals (python + numpy + ffmpeg; the corpus scan is a separate CLI run)
     Suite(id="audio_gate", kind="python", group="lint", marker="AUDIO_GATE SELFTEST", timeout=120, fast=True,
           script="tools/audio/lufs_gate.py", args=["--selftest", "--no-write"],

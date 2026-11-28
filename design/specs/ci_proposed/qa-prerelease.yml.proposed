@@ -1,0 +1,38 @@
+name: qa-prerelease
+# PROPOSAL (UNIFIED_QA_PLAN section 17.2, row "Pre-release"). Runs the nightly set on a release branch and prints the manual/device gates as an
+# explicit checklist so the run summary is the record. Device gates (perf/thermal soak, T-DEV-3, pack_chaos on device, FZ-6/7) are NOT automatable here.
+
+on:
+  workflow_dispatch:
+    inputs:
+      drop_id:
+        description: "drop id (design/drops/<drop_id>/CHECKLIST.md)"
+        required: true
+
+jobs:
+  gates:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - name: Every skin pack of the drop passes skin_lint in release mode
+        run: |
+          python -m pip install --quiet numpy pillow
+          python tools/qa/skin_lint.py game/skins --check-files --release
+      - name: Checklist file exists and has no unchecked S0 boxes
+        run: |
+          f="design/drops/${{ github.event.inputs.drop_id }}/CHECKLIST.md"
+          test -f "$f"
+          ! grep -nE '^\| [0-9]+ \|.*\*\*S0\*\*.*\[ \]' "$f"
+      - name: Print the device/human gates
+        run: |
+          {
+            echo "### Manual gates (UNIFIED_QA_PLAN section 16)";
+            echo "- [ ] red-line audit by 2 reviewers (S0)";
+            echo "- [ ] compliance screens byte-equal (S0)";
+            echo "- [ ] perf/thermal soak Ref-L/M/H/T, T-DEV-3 x50 mounts";
+            echo "- [ ] bug bash S0=S1=0, live panel >= 12";
+            echo "- [ ] staged rollout 5% -> 25% -> 100%, kill-switch armed";
+          } >> "$GITHUB_STEP_SUMMARY"

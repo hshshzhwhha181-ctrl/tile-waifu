@@ -1,0 +1,838 @@
+{
+ "schema": 1,
+ "id": "yue_ssr_hexrim",
+ "hero": "yue",
+ "tier": "ssr",
+ "name_ru": "Чешуйчатая броня",
+ "season": "S1",
+ "hud_level": 1,
+ "theme": "MOON",
+ "boldness": "B2",
+ "pack_ver": "1.0.0",
+ "engine": "4.5.x",
+ "min_game": "1.0.0",
+ "proportions": {
+  "heads": 7.5,
+  "height_cm": 168
+ },
+ "palette": {
+  "hero": "yue",
+  "theme": "MOON",
+  "slots": {
+   "rim": "#C99E54",
+   "rim_spark": "H100",
+   "plate_top": "#26212A",
+   "plate_bot": "NIGHT_800+T5@0.12",
+   "plate_sel_top": "NIGHT_600+T5@0.2",
+   "plate_sel_bot": "NIGHT_700+T5@0.2",
+   "btn_play_top": "H300",
+   "btn_play_mid": "H500",
+   "btn_play_bot": "H700",
+   "btn_play_down_top": "H500",
+   "btn_play_down_bot": "H900",
+   "btn_play_outline": "H900",
+   "btn_play_glow": "H100",
+   "tab_active": "T3",
+   "lantern_body": "T3",
+   "lantern_flame": "T2",
+   "tray_frame": "NIGHT_700+T5@0.1",
+   "tray_slot_bg": "NIGHT_800+T5@0.1",
+   "sheet_bg": "NIGHT_700+T5@0.08",
+   "window_bg": "NIGHT_800+H900@0.06",
+   "tile_select_ring": "H300",
+   "match_spark": "H100",
+   "ult_ring": "H300",
+   "fx_glow": "rgb(255, 0, 0)",
+   "sting_flash": "T1"
+  }
+ },
+ "dyes": [
+  {
+   "id": "dye_1",
+   "theme": "TIDE",
+   "slots": {
+    "rim": "T3",
+    "tab_active": "T2",
+    "fx_glow": "T2"
+   }
+  }
+ ],
+ "presence": {
+  "full": {
+   "crop": [
+    0.05,
+    0.02,
+    0.9,
+    0.96
+   ]
+  },
+  "std": {
+   "crop": [
+    0.12,
+    0.1,
+    0.76,
+    0.42
+   ]
+  },
+  "min": {
+   "medallion": "art/medallion.webp"
+  }
+ },
+ "rig": {
+  "scene": "rig/rig.tscn",
+  "bones": 34,
+  "polys": 24,
+  "verts": 1900,
+  "spring_chains": 4,
+  "spring_bones": 20,
+  "fps_full": 60,
+  "fps_std": 30
+ },
+ "faces": [
+  "neutral",
+  "smile",
+  "shy",
+  "surprised",
+  "pout",
+  "wink"
+ ],
+ "touch": {
+  "zones": 6,
+  "reactions": 18,
+  "gestures": 3
+ },
+ "ult": {
+  "beats": 6,
+  "full": "ult/ult_full.ogv",
+  "short": "ult/ult_short.ogv",
+  "rig_clip": "ult/ult_rig.res",
+  "name_key": "ult.ssr.hexrim"
+ },
+ "voice": {
+  "lines": [
+   {
+    "id": "yue_ssr_scalearmor_greet",
+    "bond": 0,
+    "tags": [
+     "menu"
+    ],
+    "subtitle_key": "vo.yue_ssr_scalearmor.greet"
+   },
+   {
+    "id": "yue_ssr_scalearmor_equip",
+    "bond": 0,
+    "tags": [
+     "equip"
+    ],
+    "subtitle_key": "vo.yue_ssr_scalearmor.equip"
+   },
+   {
+    "id": "yue_ssr_scalearmor_touch_hand",
+    "bond": 1,
+    "tags": [
+     "touch"
+    ],
+    "subtitle_key": "vo.yue_ssr_scalearmor.touch_hand"
+   },
+   {
+    "id": "yue_ssr_scalearmor_touch_head",
+    "bond": 2,
+    "tags": [
+     "touch"
+    ],
+    "subtitle_key": "vo.yue_ssr_scalearmor.touch_head"
+   },
+   {
+    "id": "yue_ssr_scalearmor_win",
+    "bond": 3,
+    "tags": [
+     "win"
+    ],
+    "subtitle_key": "vo.yue_ssr_scalearmor.win"
+   },
+   {
+    "id": "yue_ssr_scalearmor_ult_cast",
+    "bond": 3,
+    "tags": [
+     "ult"
+    ],
+    "subtitle_key": "vo.yue_ssr_scalearmor.ult_cast"
+   },
+   {
+    "id": "yue_ssr_scalearmor_night",
+    "bond": 5,
+    "tags": [
+     "menu"
+    ],
+    "subtitle_key": "vo.yue_ssr_scalearmor.night"
+   },
+   {
+    "id": "yue_ssr_scalearmor_vow_hint",
+    "bond": 7,
+    "tags": [
+     "bond"
+    ],
+    "subtitle_key": "vo.yue_ssr_scalearmor.vow_hint"
+   }
+  ]
+ },
+ "slots": {
+  "art.card": {
+   "file": "art/card.webp",
+   "kind": "tex",
+   "fallback": "base"
+  },
+  "art.card_thumb": {
+   "file": "art/card_thumb.webp",
+   "kind": "tex",
+   "fallback": "base"
+  },
+  "art.medallion": {
+   "file": "art/medallion.webp",
+   "kind": "tex",
+   "fallback": "base"
+  },
+  "art.portrait": {
+   "file": "art/portrait.webp",
+   "kind": "tex",
+   "fallback": "base"
+  },
+  "art.splash_a": {
+   "file": "art/splash_a.webp",
+   "kind": "tex",
+   "fallback": "base"
+  },
+  "art.splash_b": {
+   "file": "art/splash_b.webp",
+   "kind": "tex",
+   "fallback": "base"
+  },
+  "art.tease": {
+   "file": "art/tease.webp",
+   "kind": "tex",
+   "fallback": "base"
+  },
+  "art.win": {
+   "file": "art/win.webp",
+   "kind": "tex",
+   "fallback": "base"
+  },
+  "au.sfx.charge": {
+   "file": "audio/sfx_charge.ogg",
+   "kind": "audio",
+   "fallback": "global"
+  },
+  "au.sfx.confirm": {
+   "file": "audio/sfx_confirm.ogg",
+   "kind": "audio",
+   "fallback": "global"
+  },
+  "au.sfx.deny": {
+   "file": "audio/sfx_deny.ogg",
+   "kind": "audio",
+   "fallback": "global"
+  },
+  "au.sfx.hit": {
+   "file": "audio/sfx_hit.ogg",
+   "kind": "audio",
+   "fallback": "global"
+  },
+  "au.sfx.open": {
+   "file": "audio/sfx_open.ogg",
+   "kind": "audio",
+   "fallback": "global"
+  },
+  "au.sfx.press": {
+   "file": "audio/sfx_press.ogg",
+   "kind": "audio",
+   "fallback": "global"
+  },
+  "au.sfx.tab": {
+   "file": "audio/sfx_tab.ogg",
+   "kind": "audio",
+   "fallback": "global"
+  },
+  "au.sting_equip": {
+   "file": "audio/sting_equip.ogg",
+   "kind": "audio",
+   "fallback": "global"
+  },
+  "au.sting_ult": {
+   "file": "audio/sting_ult.ogg",
+   "kind": "audio",
+   "fallback": "global"
+  },
+  "bg.board": {
+   "file": "bg/board.webp",
+   "kind": "tex",
+   "fallback": "vector"
+  },
+  "bg.menu": {
+   "file": "bg/menu.webp",
+   "kind": "tex",
+   "fallback": "vector"
+  },
+  "bg.menu_night": {
+   "file": "bg/menu_night.webp",
+   "kind": "tex",
+   "fallback": "vector"
+  },
+  "cf.frame": {
+   "file": "kit/frame.webp",
+   "kind": "tex9",
+   "fallback": "vector",
+   "w": 96,
+   "h": 96,
+   "nine": [
+    24,
+    24,
+    24,
+    24
+   ]
+  },
+  "fx.ambient_a": {
+   "file": "fx/ambient_a.webp",
+   "kind": "particles",
+   "fallback": "vector"
+  },
+  "fx.match": {
+   "file": "fx/match.webp",
+   "kind": "particles",
+   "fallback": "vector"
+  },
+  "fx.open": {
+   "file": "fx/open.webp",
+   "kind": "particles",
+   "fallback": "vector"
+  },
+  "fx.press": {
+   "file": "fx/press.webp",
+   "kind": "particles",
+   "fallback": "vector"
+  },
+  "fx.touch": {
+   "file": "fx/touch.webp",
+   "kind": "particles",
+   "fallback": "vector"
+  },
+  "kit.cta_overlay": {
+   "file": "kit/cta_overlay.webp",
+   "kind": "tex",
+   "fallback": "vector"
+  },
+  "kit.ic.nav_games_on": {
+   "file": "kit/ic_nav_games_on.webp",
+   "kind": "tex",
+   "fallback": "vector"
+  },
+  "kit.ic.nav_heroines_on": {
+   "file": "kit/ic_nav_heroines_on.webp",
+   "kind": "tex",
+   "fallback": "vector"
+  },
+  "kit.ic.nav_shop_on": {
+   "file": "kit/ic_nav_shop_on.webp",
+   "kind": "tex",
+   "fallback": "vector"
+  },
+  "kit.ic.nav_tea_on": {
+   "file": "kit/ic_nav_tea_on.webp",
+   "kind": "tex",
+   "fallback": "vector"
+  },
+  "kit.ic.nav_wishes_on": {
+   "file": "kit/ic_nav_wishes_on.webp",
+   "kind": "tex",
+   "fallback": "vector"
+  },
+  "kit.nine.header": {
+   "file": "kit/nine_header.webp",
+   "kind": "tex9",
+   "fallback": "vector",
+   "w": 96,
+   "h": 96,
+   "nine": [
+    24,
+    24,
+    24,
+    24
+   ]
+  },
+  "kit.nine.lantern_chip": {
+   "file": "kit/nine_lantern_chip.webp",
+   "kind": "tex9",
+   "fallback": "vector",
+   "w": 96,
+   "h": 96,
+   "nine": [
+    24,
+    24,
+    24,
+    24
+   ]
+  },
+  "kit.nine.plate_l": {
+   "file": "kit/nine_plate_l.webp",
+   "kind": "tex9",
+   "fallback": "vector",
+   "w": 96,
+   "h": 96,
+   "nine": [
+    24,
+    24,
+    24,
+    24
+   ]
+  },
+  "kit.nine.plate_m": {
+   "file": "kit/nine_plate_m.webp",
+   "kind": "tex9",
+   "fallback": "vector",
+   "w": 96,
+   "h": 96,
+   "nine": [
+    24,
+    24,
+    24,
+    24
+   ]
+  },
+  "kit.nine.plate_s": {
+   "file": "kit/nine_plate_s.webp",
+   "kind": "tex9",
+   "fallback": "vector",
+   "w": 96,
+   "h": 96,
+   "nine": [
+    24,
+    24,
+    24,
+    24
+   ]
+  },
+  "kit.nine.sheet": {
+   "file": "kit/nine_sheet.webp",
+   "kind": "tex9",
+   "fallback": "vector",
+   "w": 96,
+   "h": 96,
+   "nine": [
+    24,
+    24,
+    24,
+    24
+   ]
+  },
+  "kit.nine.tab_bar": {
+   "file": "kit/nine_tab_bar.webp",
+   "kind": "tex9",
+   "fallback": "vector",
+   "w": 96,
+   "h": 96,
+   "nine": [
+    24,
+    24,
+    24,
+    24
+   ]
+  },
+  "kit.nine.tray": {
+   "file": "kit/nine_tray.webp",
+   "kind": "tex9",
+   "fallback": "vector",
+   "w": 96,
+   "h": 96,
+   "nine": [
+    24,
+    24,
+    24,
+    24
+   ]
+  },
+  "kit.nine.window": {
+   "file": "kit/nine_window.webp",
+   "kind": "tex9",
+   "fallback": "vector",
+   "w": 96,
+   "h": 96,
+   "nine": [
+    24,
+    24,
+    24,
+    24
+   ]
+  },
+  "kit.ring_ult": {
+   "file": "kit/ring_ult.webp",
+   "kind": "tex",
+   "fallback": "vector"
+  },
+  "rig.faces": {
+   "file": "rig/faces.webp",
+   "kind": "tex",
+   "fallback": "base"
+  },
+  "rig.scene": {
+   "file": "rig/rig.tscn",
+   "kind": "rig",
+   "fallback": "base"
+  },
+  "rig.touchmap": {
+   "file": "rig/touchmap.png",
+   "kind": "tex",
+   "fallback": "base"
+  },
+  "ult.full": {
+   "file": "ult/ult_full.ogv",
+   "kind": "video",
+   "fallback": "base",
+   "w": 720,
+   "h": 1280,
+   "fps": 24,
+   "loop": false
+  },
+  "ult.rig_clip": {
+   "file": "ult/ult_rig.res",
+   "kind": "clip",
+   "fallback": "base"
+  },
+  "ult.short": {
+   "file": "ult/ult_short.ogv",
+   "kind": "video",
+   "fallback": "base"
+  }
+ },
+ "files": [
+  {
+   "path": "art/card.webp",
+   "bytes": 129024,
+   "sha256": "daf1524a653da1ddff10b2b9377f9694a6444d51a7b890d92b4c4c9af47ce776",
+   "status": "approved"
+  },
+  {
+   "path": "art/card_thumb.webp",
+   "bytes": 17203,
+   "sha256": "463985dfc3d7ab6dfb60f91ea969cd5c93fa0e00637dca2090ddb2f2fb9ddf63",
+   "status": "approved"
+  },
+  {
+   "path": "art/medallion.webp",
+   "bytes": 68812,
+   "sha256": "64da5c6927b6b9774fd590c5f8671a4fdc44129a6e8399572ff91b06c157b455",
+   "status": "approved"
+  },
+  {
+   "path": "art/portrait.webp",
+   "bytes": 430080,
+   "sha256": "6cb9451375ebd7559ec7a1b21948f5dd31f44167e7dfbbe2e35922d73df39397",
+   "status": "approved"
+  },
+  {
+   "path": "art/splash_a.webp",
+   "bytes": 430080,
+   "sha256": "85eba9ad78f6fbb974493b242c7638dbcaf7d3193f18eedbbe89806d70291e67",
+   "status": "approved"
+  },
+  {
+   "path": "art/splash_b.webp",
+   "bytes": 430080,
+   "sha256": "2a5803640c15f9754a3dfc81fbdbac279e5a29501bfaaba729b3ecaf757fd6d6",
+   "status": "approved"
+  },
+  {
+   "path": "art/tease.webp",
+   "bytes": 430080,
+   "sha256": "77c39a86b5e44a22d55648663b5e7b561bcba9df85b00bc581d8b90bc99d94df",
+   "status": "approved"
+  },
+  {
+   "path": "art/win.webp",
+   "bytes": 430080,
+   "sha256": "31dbc8bcf0d0f176ee2dc8ed78613c68ada1697d6626f2a42dcfb8183c15c3d3",
+   "status": "approved"
+  },
+  {
+   "path": "audio/sfx_charge.ogg",
+   "bytes": 17203,
+   "sha256": "431fe9cc315a82362b9a93e1a2b16081f0b109ab37fa0be29ded9bcf7b548b19",
+   "status": "approved"
+  },
+  {
+   "path": "audio/sfx_confirm.ogg",
+   "bytes": 17203,
+   "sha256": "5c64155b0ed32e66d6d62646a36e63bc25b7edd851a44b1a0a9fe64152ac8380",
+   "status": "approved"
+  },
+  {
+   "path": "audio/sfx_deny.ogg",
+   "bytes": 17203,
+   "sha256": "732bebf00617b0b9d153cd0d3f410994191c3bbb4769f1df127486db3628e84a",
+   "status": "approved"
+  },
+  {
+   "path": "audio/sfx_hit.ogg",
+   "bytes": 17203,
+   "sha256": "3777b77829b0d9d0c714fdc913d469e7b1e0be8b6d2e2e8094fa92ec750f789c",
+   "status": "approved"
+  },
+  {
+   "path": "audio/sfx_open.ogg",
+   "bytes": 17203,
+   "sha256": "c5cd200675e49180896a4d382dd2c09fb7de7e7f4cadcfbf3042de51c8390c7d",
+   "status": "approved"
+  },
+  {
+   "path": "audio/sfx_press.ogg",
+   "bytes": 17203,
+   "sha256": "43b36bc4cfc0146b295736660fd112e0679da99564f350c9ec22603ecace2854",
+   "status": "approved"
+  },
+  {
+   "path": "audio/sfx_tab.ogg",
+   "bytes": 17203,
+   "sha256": "6116405f0f1f96e0375c100f1f29960af201cf86f75a643497d0d809a389a410",
+   "status": "approved"
+  },
+  {
+   "path": "audio/sting_equip.ogg",
+   "bytes": 43008,
+   "sha256": "5ef13ca611152750021a32551af86eff68d498dfb21a5c54f38dcb609ba3d3e2",
+   "status": "approved"
+  },
+  {
+   "path": "audio/sting_ult.ogg",
+   "bytes": 43008,
+   "sha256": "d6377f70fe78dfc95cd141d70701b72d161ae1ae33201a14fcb8db8e5af6caf5",
+   "status": "approved"
+  },
+  {
+   "path": "bg/board.webp",
+   "bytes": 129024,
+   "sha256": "e9d59d0146ebe7812dc95c64fc774051a86efbec00b6ed7a821a2310fd5bd15e",
+   "status": "approved"
+  },
+  {
+   "path": "bg/menu.webp",
+   "bytes": 223641,
+   "sha256": "405230de954f6c0fa39673e396d142828f26cb66099873e8d872dba00d65c231",
+   "status": "approved"
+  },
+  {
+   "path": "bg/menu_night.webp",
+   "bytes": 223641,
+   "sha256": "5d61d015d1501fb5dde75d5def34cca9a9d5658d0ff11cc6411f2d7f1e8f0a84",
+   "status": "approved"
+  },
+  {
+   "path": "fx/ambient_a.webp",
+   "bytes": 129024,
+   "sha256": "a12c2d2862a1b6013f4f8fcca2449de7469390fb3b30dc8dff4581e61b3bd651",
+   "status": "approved"
+  },
+  {
+   "path": "fx/match.webp",
+   "bytes": 129024,
+   "sha256": "913e5455e9c2786940fe8fce3f57e0db95f6200110cd2852e746ab0de347bdd0",
+   "status": "approved"
+  },
+  {
+   "path": "fx/open.webp",
+   "bytes": 129024,
+   "sha256": "da3ef0a02c377a23394f30f767125253fa2e9f974ebae9ffe53eb138e876629a",
+   "status": "approved"
+  },
+  {
+   "path": "fx/press.webp",
+   "bytes": 129024,
+   "sha256": "546742a2d7997934a666110949df7560d8d811c941a50eb6db65cecf00708993",
+   "status": "approved"
+  },
+  {
+   "path": "fx/touch.webp",
+   "bytes": 129024,
+   "sha256": "8da93376524c95980280e6b30b2005d72b6d992b20f015126f5e5dc1a14527b4",
+   "status": "approved"
+  },
+  {
+   "path": "kit/cta_overlay.webp",
+   "bytes": 25804,
+   "sha256": "97affb821e920133eef5582c90c6832e94d41eed737ae24a8e04b2a7a227832b",
+   "status": "approved"
+  },
+  {
+   "path": "kit/frame.webp",
+   "bytes": 86016,
+   "sha256": "7317047ee0c6167e61c2cda717d3d323fec55b393c3b38e73255cd755c0047df",
+   "status": "approved"
+  },
+  {
+   "path": "kit/ic_nav_games_on.webp",
+   "bytes": 12902,
+   "sha256": "5c25bccbaf18d98673bf1ec8df9467274f906335aa4ba8be613821eb0f9969a5",
+   "status": "approved"
+  },
+  {
+   "path": "kit/ic_nav_heroines_on.webp",
+   "bytes": 12902,
+   "sha256": "d318ea403ff2b7a863e462cdf5bda9547a590eb95e0c98e0587fa38fbe462ac3",
+   "status": "approved"
+  },
+  {
+   "path": "kit/ic_nav_shop_on.webp",
+   "bytes": 12902,
+   "sha256": "e0cf4f5be6f2d6d65dadb2e288c7791d3a230a96b1f238b5ee20465a22d202fc",
+   "status": "approved"
+  },
+  {
+   "path": "kit/ic_nav_tea_on.webp",
+   "bytes": 12902,
+   "sha256": "6bca5c0fe1ad37df104578a6712eba28edeae4c28652ae9a1968d4120b791983",
+   "status": "approved"
+  },
+  {
+   "path": "kit/ic_nav_wishes_on.webp",
+   "bytes": 12902,
+   "sha256": "d02298abb9e543c77a91a943e83c92b6198e1cae29a08bb02528f6a081eb2529",
+   "status": "approved"
+  },
+  {
+   "path": "kit/nine_header.webp",
+   "bytes": 94617,
+   "sha256": "018e46f3875fe9d41863c97da47236d6247a3085502392b68d958fcf430089de",
+   "status": "approved"
+  },
+  {
+   "path": "kit/nine_lantern_chip.webp",
+   "bytes": 94617,
+   "sha256": "41705d76162371a0febb15f22a889c4b9eea78795ca97ad708eddf67b58a7891",
+   "status": "approved"
+  },
+  {
+   "path": "kit/nine_plate_l.webp",
+   "bytes": 51609,
+   "sha256": "f8e0f54ab272073b0494aac71814ac9cc4702dbfaf0391fcd2c9bb239ab06575",
+   "status": "approved"
+  },
+  {
+   "path": "kit/nine_plate_m.webp",
+   "bytes": 51609,
+   "sha256": "ae9a643cff41f7fc766acb391e337a21d7d34cec989e8b739fc68c2b2199e225",
+   "status": "approved"
+  },
+  {
+   "path": "kit/nine_plate_s.webp",
+   "bytes": 51609,
+   "sha256": "19eccaaba0900dcd5f38bad256a25a3310f231e35df0eefff77b1f54cd0579f7",
+   "status": "approved"
+  },
+  {
+   "path": "kit/nine_sheet.webp",
+   "bytes": 94617,
+   "sha256": "360f0b1348d9653ce5eabc53e7733814982381a3f96e6ca184114e7cce784815",
+   "status": "approved"
+  },
+  {
+   "path": "kit/nine_tab_bar.webp",
+   "bytes": 94617,
+   "sha256": "63242936c5054afd618c51a99fa40ad1cb0034b890f11a0d2d49d51d4eb0782c",
+   "status": "approved"
+  },
+  {
+   "path": "kit/nine_tray.webp",
+   "bytes": 94617,
+   "sha256": "3e61cee04148261e1cd259a4e13c395fc42786771a828dc4983600d262f19d3e",
+   "status": "approved"
+  },
+  {
+   "path": "kit/nine_window.webp",
+   "bytes": 94617,
+   "sha256": "bde9782f1e97f624be801e5165964b7e2ae5a5885d84fedf4bc89125644fd7b0",
+   "status": "approved"
+  },
+  {
+   "path": "kit/ring_ult.webp",
+   "bytes": 25804,
+   "sha256": "293022682a7ca5e72dd6c0c0b47dc1ae8c531ca9ca8cc61bd380986d0ab6a3c1",
+   "status": "approved"
+  },
+  {
+   "path": "rig/faces.webp",
+   "bytes": 387072,
+   "sha256": "6aaf2d72ccbe717510e0f1dee8af8c5dda189e21f5bb5e9f43064663c79d678b",
+   "status": "approved"
+  },
+  {
+   "path": "rig/rig.tscn",
+   "bytes": 1032192,
+   "sha256": "436452272c9b1a2b88f1211aca3da6e9814baa63471b8bb5e712c782274bf3cf",
+   "status": "approved"
+  },
+  {
+   "path": "rig/touchmap.png",
+   "bytes": 12902,
+   "sha256": "3e3a419a045167e7dee12350f851180881cabc96b4e6594df6c83514cdb94efa",
+   "status": "approved"
+  },
+  {
+   "path": "ult/ult_full.ogv",
+   "bytes": 1032192,
+   "sha256": "25f40e60d0839e1be2328e0d445d0c319a98f3747d8f922f67420cbb53d02b60",
+   "status": "approved"
+  },
+  {
+   "path": "ult/ult_rig.res",
+   "bytes": 64512,
+   "sha256": "f6069e76b71d550219b1c191f24f88f0ae42fd05ec080c9637f0157838117b8b",
+   "status": "approved"
+  },
+  {
+   "path": "ult/ult_short.ogv",
+   "bytes": 64512,
+   "sha256": "fec8153f2ba6cbd33e7b000953af53b21eb997763accec7a117c8e7cda33205a",
+   "status": "approved"
+  }
+ ],
+ "budget": {
+  "disk_mb": 6.97,
+  "vram_lobby_mb": 24,
+  "vram_match_mb": 14,
+  "particles_full": 64
+ },
+ "qa": {
+  "adult_face": {
+   "by": "ad_anna",
+   "date": "2026-11-20"
+  },
+  "red_line": {
+   "by": [
+    "qa_boris",
+    "qa_vera"
+   ],
+   "date": "2026-11-21"
+  },
+  "palette_lint": "pass",
+  "ocr": "pass",
+  "perf": {
+   "ref_l_fps_p5": 58,
+   "ref_l_ms_p95": 15.2
+  }
+ },
+ "provenance": {
+  "tool": "gpt_image_2_6",
+  "element": "yue_main",
+  "prompt_log_sha256": "1d11e987ea9732458eda7eb4121fa68f89f2ed2132dc4a9aec7ce04b89abc99a",
+  "ad_pass": [
+   {
+    "layer": "card",
+    "by": "ad_anna",
+    "date": "2026-11-19"
+   }
+  ],
+  "metadata_scrubbed": true
+ },
+ "fallbacks": {
+  "hero_base": "yue_base",
+  "global": "five_winds",
+  "vector": true
+ }
+}
