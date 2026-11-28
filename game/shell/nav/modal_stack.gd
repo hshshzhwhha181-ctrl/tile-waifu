@@ -124,17 +124,19 @@ func open(modal: TWModal, opts: Dictionary = {}) -> TWModal:
 	if _clearing or _dead or _popping > 0 or _stack.size() >= MAX_DEPTH:
 		refused_count += 1
 		modal._finish(null, "refused")
-		modal.queue_free()
+		if is_instance_valid(modal):
+			modal.queue_free()
 		return null
 	modal.stack = self
+	modal.life = TWModal.Life.OPEN
 	_stack.append(modal)
 	add_child(modal)
 	modal.tree_exiting.connect(_on_modal_exiting.bind(modal))
 	opened_count += 1
-	modal._opened(opts)
 	opened.emit(modal)
 	changed.emit(_stack.size())
-	return modal
+	modal._opened(opts)
+	return modal if is_instance_valid(modal) and modal.life == TWModal.Life.OPEN else null
 
 
 func close(modal: TWModal, result: Variant = null, reason: String = "close") -> bool:
@@ -151,7 +153,8 @@ func close(modal: TWModal, result: Variant = null, reason: String = "close") -> 
 	closed_count += 1
 	modal.stack = null
 	modal._finish(result, reason)
-	modal.queue_free()
+	if is_instance_valid(modal):
+		modal.queue_free()
 	closed.emit(modal, reason)
 	changed.emit(_stack.size())
 	return true
