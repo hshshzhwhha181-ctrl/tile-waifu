@@ -9,7 +9,7 @@
   "ROOT_PATH": 1,
   "SHELL_DEP": 51
  },
- "core_files": 209,
+ "core_files": 249,
  "files": {
   "game/core/auth/auth.gd": {
    "AUTOLOAD_G": 19,
@@ -27,11 +27,6 @@
   "game/core/base/rank.gd": {
    "NODE_API": 1
   },
-  "game/core/base/registry_list.gd": {
-   "AUTOLOAD_G": 16,
-   "NODE_API": 1,
-   "SHELL_DEP": 7
-  },
   "game/core/chat/chat_selftest.gd": {
    "NODE_API": 1
   },
@@ -42,17 +37,30 @@
    "NODE_API": 1,
    "AUTOLOAD_G": 1
   },
+  "game/core/economy/stamina/module.gd": {
+   "SHELL_DEP": 1
+  },
   "game/core/gacha/gacha_selftest.gd": {
    "AUTOLOAD_G": 2
   },
+  "game/core/gacha/module.gd": {
+   "AUTOLOAD_G": 12,
+   "SHELL_DEP": 1
+  },
   "game/core/levels/level_gen.gd": {
    "SHELL_DEP": 1
+  },
+  "game/core/levels/module.gd": {
+   "AUTOLOAD_G": 1
   },
   "game/core/look/kit_data.gd": {
    "NODE_API": 2
   },
   "game/core/look/look_cos.gd": {
    "SHELL_DEP": 3
+  },
+  "game/core/look/module.gd": {
+   "SHELL_DEP": 1
   },
   "game/core/meta/afisha.gd": {
    "AUTOLOAD_G": 1
@@ -164,8 +172,15 @@
   "game/core/online/online_cfg.gd": {
    "NODE_API": 6
   },
+  "game/core/path/module.gd": {
+   "SHELL_DEP": 1
+  },
   "game/core/path/path_state.gd": {
    "AUTOLOAD_G": 3
+  },
+  "game/core/phone/module.gd": {
+   "AUTOLOAD_G": 1,
+   "SHELL_DEP": 1
   },
   "game/core/profile/card_payload.gd": {
    "NODE_API": 1,
@@ -185,6 +200,11 @@
   },
   "game/core/rituals/rituals.gd": {
    "NODE_API": 1
+  },
+  "game/core/salon/module.gd": {
+   "AUTOLOAD_G": 2,
+   "NODE_API": 1,
+   "SHELL_DEP": 2
   },
   "game/core/salon/salon.gd": {
    "NODE_API": 2

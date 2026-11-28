@@ -8,3 +8,5 @@ mode engines, bots, text data). The shell (`game/scripts`) may depend on core, n
 Layout: `base/` (registry, money, rank, sku), `modes/<mode>/` (riichi, sanma, koikoi, triples, classic, connect, cube, garden, bridge, palm, tower, duels, adventure),
 `economy/ gacha/ levels/ meta/ shop/ rituals/ salon/ phone/ chat/ auth/ online/ path/ profile/ tutorial/ look/ wave1/`, and the legacy generations
 `v06/ v07/ v08/ v09/` (data tables, ladder, league, recovery, ults, letters, summon rules, riichi v08 engine).
+
+Modules: every game module is declared by ONE `module.gd` somewhere under `game/core/` (`static func spec() -> Dictionary` with `id`, `order`, `step`, selftest, save keys, screens, nav, ensure/migrator/wire; see `base/registry.gd`). `V10Registry` scans for them, so adding a module touches no existing file. UI-only modules keep their manifest under `shell_modules/<id>/`.

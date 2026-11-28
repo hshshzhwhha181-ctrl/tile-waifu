@@ -2,9 +2,14 @@ class_name V10Registry
 extends RefCounted
 
 # V10Registry — one table of every 0.10 module (docs/0.10-spec.md §2.8, docs/INTEGRATION_0.10.md §3.8).
-# Each module adds ONE line to registry_list.gd:
+# Each module is ONE file: game/core/<anywhere>/module.gd, found by scanning res://core (P07; no shared list):
 #
-#   V10Registry.module(id, {
+#   extends RefCounted
+#   static func spec() -> Dictionary:
+#       return {
+#       "id": "economy",                            the module id (unique)
+#       "order": 20,                                initialisation order: ascending, ties by id (explicit, so
+#                                                   directory listing order never matters)
 #       "step": 1..4,                               integration step (W1–W4) that wires it into the game
 #       "selftest": {scene, args, fast_args, needs_render, resolution, marker, static_only},
 #       "save": {key: defaults},                    top-level save keys (registered with V10Save once step <= STEP)
@@ -13,7 +18,10 @@ extends RefCounted
 #       "screens": {id: "res://…gd"},               merged into main.SCREENS (only for wired modules)
 #       "home_slot": {"id", "builder", "priority"}, a slot of the home screen (lanterns; W2+)
 #       "nav": {screen_id: [parent_screen_id, …]},  edges for depth_graph() (UX П-5)
-#   })
+#       "wire": Callable(),                         one-time boot wiring of callbacks/providers/tray sources; runs
+#                                                   once after every manifest is registered (only when step <= STEP)
+#       }
+#   (V10Registry.module(id, spec) stays available for tests and tools that register a module by hand.)
 #
 #   V10Registry.load_all()   idempotent; G._ready() calls it before the save is read
 #   screens() / selftests() / ensure_all(S) / depth_graph() / depth_of(id)
@@ -22,9 +30,13 @@ extends RefCounted
 # put keys into the save or screens into the navigation yet
 const STEP: = 4
 
+const SCAN_ROOT: = "res://core"
+const MANIFEST: = "module.gd"
+
 static var _mods: = {}
 static var _order: Array = []
 static var _loaded: = false
+static var _errors: Array = []
 
 
 static func module(id: String, spec: Dictionary) -> void:
@@ -37,7 +49,13 @@ static func load_all() -> void:
 	if _loaded:
 		return
 	_loaded = true
-	V10RegistryList.register_all()
+	_discover()
+	for id in _order:
+		var m: Dictionary = _mods[id]
+		if int(m.get("step", 1)) > STEP:
+			continue
+		if m.get("wire") is Callable:
+			(m.wire as Callable).call()
 	for id in _order:
 		var m: Dictionary = _mods[id]
 		if int(m.get("step", 1)) > STEP:
@@ -47,6 +65,65 @@ static func load_all() -> void:
 			V10Save.register(k, sv[k])
 		if m.get("migrator") is Callable:
 			V10Save.register_migrator(id, m.migrator)
+
+
+# every module.gd under SCAN_ROOT, sorted by ("order", "id"), registered through module()
+static func _discover() -> void:
+	var paths: Array = []
+	_scan(SCAN_ROOT, paths)
+	var found: Array = []
+	for p in paths:
+		var scr = load(p)
+		if not (scr is GDScript) or not _has_spec(scr):
+			_errors.append("%s: not a script with a static spec()" % p)
+			continue
+		var spec = scr.call("spec")
+		if not (spec is Dictionary) or String((spec as Dictionary).get("id", "")) == "":
+			_errors.append("%s: spec() must return a Dictionary with an \"id\"" % p)
+			continue
+		(spec as Dictionary)["_manifest"] = p
+		found.append(spec)
+	found.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		var oa: = int(a.get("order", 1000))
+		var ob: = int(b.get("order", 1000))
+		if oa != ob:
+			return oa < ob
+		return String(a.id) < String(b.id))
+	for spec in found:
+		if _mods.has(spec.id):
+			_errors.append("%s: duplicate module id %s (already from %s)" % [spec._manifest, spec.id, _mods[spec.id].get("_manifest", "module()")])
+			continue
+		module(spec.id, spec)
+
+
+static func _has_spec(scr) -> bool:
+	return scr is GDScript and (scr as GDScript).get_script_method_list().any(func(m: Dictionary) -> bool: return m.name == "spec")
+
+
+# exported builds list scripts as module.gd.remap / module.gdc: both load as res://…/module.gd
+static func _scan(dir: String, out: Array) -> void:
+	var d: = DirAccess.open(dir)
+	if d == null:
+		_errors.append("%s: cannot open" % dir)
+		return
+	var subs: Array = []
+	for f in d.get_files():
+		if f == MANIFEST or f == MANIFEST + ".remap" or f == MANIFEST + "c":
+			var p: = dir.path_join(MANIFEST)
+			if not (p in out):
+				out.append(p)
+	for sd in d.get_directories():
+		if not sd.begins_with("."):
+			subs.append(sd)
+	subs.sort()
+	for sd in subs:
+		_scan(dir.path_join(sd), out)
+
+
+# problems found while scanning (empty = healthy); the registry selftest asserts it is empty
+static func manifest_errors() -> Array:
+	load_all()
+	return _errors.duplicate()
 
 
 static func ids() -> Array:
