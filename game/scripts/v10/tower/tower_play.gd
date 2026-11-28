@@ -722,10 +722,10 @@ func _on_clear() -> void:
 		if not cos.is_empty():
 			run["new_cos"] = (run.get("new_cos", []) as Array) + cos
 		UIT.grant(res.get("reward", {}), "pagoda")
-		_award_win(V8PlayRules.climb_rp(int(res.get("floor", 1))))
+		_award_win(TWRewards.tower_rp("pagoda", int(res.get("floor", 1)), 1))   # core: the rank points of a cleared floor
 		_emit_tower_ended(true, int(res.get("floor", 1)), res.get("reward", {}), secs)
 	elif tmode == "journey":
-		_award_win(clampi(6 + 2 * (int(run.get("board", 1)) - 1), 5, 15))
+		_award_win(TWRewards.tower_rp("journey", 1, int(run.get("board", 1))))   # core: 6 + 2 per board, 5..15
 		_emit_tower_ended(true, int(res.get("score", 0)), {}, secs)
 	_save()
 	_v8_saved = true
@@ -741,7 +741,7 @@ func _on_clear() -> void:
 func _award_win(rp: int) -> void:
 	if tmode == "practice":
 		return
-	V10Bond.gain(partner, 4, "mode_win")
+	V10Bond.gain(partner, TWRewards.TOWER_BOND, "mode_win")
 	G.task_add("levels")
 	last_award = V8PlayRules.award("other", rp, true)
 

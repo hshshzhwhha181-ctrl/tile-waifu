@@ -96,6 +96,8 @@ CATALOG: list[Suite] = [
     S("recovery", "RECOVERY", args=["--recovery_selftest=1"], group="core"),
     S("state", "STATE_SELFTEST", SV + "state/state_selftest.tscn", group="core",
       note="P12: TWClock/TWSave/TWMigrate/TWState, golden saves v4..v8, 500-case save fuzz (+ parity with the legacy G.apply_state)"),
+    S("round", "ROUND_SELFTEST", SV + "round/round_selftest.tscn", group="core",
+      note="P20: TWRound.resolve + TWBoosters + TWModeCfg + TWRewards: 139-row table (independent python model of the legacy award code), 300-scenario diff vs the frozen play.gd transcription, ladder == G, bot rounds, outfit invariance, wallet payment, core purity"),
     S("twboard", "TWBOARD_SELFTEST", SV + "rules/tw_board_selftest.tscn", group="core",
       note="P16: TWRng, TWFree, TWBoardEvents, TWBoard (unified solitaire rules): scenarios, 1000 seeds, 200 Path levels (lockstep with V10LevelSim, certificate, solver bot), replay, shuffle, fuzz"),
     S("twparity", "TWPARITY_SELFTEST", SV + "rules/parity_selftest.tscn", group="core", timeout=900,

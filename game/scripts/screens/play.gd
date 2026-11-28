@@ -103,19 +103,12 @@ func build(m, args: Dictionary) -> void :
 		pass
 	elif args.get("daily", false):
 		mode = "daily"
-		var d: = int(G.today().substr(8, 2))
-		lvl = d % G.LEVELS.size()
-		cfg = TWLevels.at(lvl).duplicate(true)
-		cfg.name = V6Txt.s("play.daily_name")
-		cfg.seed = int(G.today().replace("-", ""))
-		cfg.reward = {"gems": 100}
-		cfg.erase("shard")
-		cfg.goal = V6Txt.s("play.goal_clear")
-		cfg.intro = V6Txt.s("play.daily_intro")
+		lvl = TWModeCfg.daily_level(int(G.today().substr(8, 2)), G.LEVELS.size())
+		cfg = TWModeCfg.daily_cfg(TWLevels.at(lvl), G.today(), _txt())
 	elif args.get("mode", "") in ["blitz", "zen"]:
 		mode = args.mode
 		cfg = _mode_cfg(0)
-		blitz_left = 120.0
+		blitz_left = TWModeCfg.BLITZ_SECS
 	elif args.get("mode", "") == "duel":
 		mode = "duel"
 		cfg = V6Heroines.duel_cfg(_v6_rival(args), partner)
@@ -123,25 +116,14 @@ func build(m, args: Dictionary) -> void :
 		mode = "trial"
 		partner = args.trial
 		lvl = TWLevels.trial_index(partner)
-		cfg = TWLevels.trial_cfg(partner)   # the Path board of that level (the lazy stub played as a plain rect board)
-		cfg.name = V6Txt.s("play.trial_name_pre") + G.HEROES[partner].name
-		cfg.reward = {"gems": 0}
-		cfg.erase("shard")
-		cfg.goal = V6Txt.s("play.trial_goal")
-		cfg.intro = V6Txt.s("play.trial_intro")
+		cfg = TWModeCfg.trial_cfg(TWLevels.trial_cfg(partner), G.HEROES[partner].name, _txt())   # the Path board of that level (the lazy stub played as a plain rect board)
 	else:
 		G.current_level = lvl
 		if args.get("v10_cfg") is Dictionary:
 			cfg = (args.v10_cfg as Dictionary).duplicate(true)
 		else:
 			cfg = V10PathState.play_cfg(lvl)
-		if not cfg.has("tint"):
-			cfg["tint"] = G.LOCS[clampi(int(cfg.get("loc", 0)), 0, G.LOCS.size() - 1)].tint
-		if not cfg.has("goal"):
-			cfg["goal"] = V6Txt.s("play.goal_clear")
-		if not cfg.has("intro") or str(cfg.intro).length() < 12:
-			var il: = str(cfg.get("intro_line", ""))
-			cfg["intro"] = il if il != "" else str(G.LOCS[clampi(int(cfg.get("loc", 0)), 0, G.LOCS.size() - 1)].intro)
+		cfg = TWModeCfg.path_fill(cfg, G.LOCS[clampi(int(cfg.get("loc", 0)), 0, G.LOCS.size() - 1)], _txt())
 	if not G.hero_unlocked(partner) and mode != "trial":
 		partner = "mc"
 	for a in OS.get_cmdline_user_args():
@@ -150,9 +132,7 @@ func build(m, args: Dictionary) -> void :
 	tut = lvl == 0 and mode == "" and not G.S.tut_done
 	if mode == "" and not tut:
 		fortune = G.draw_fortune(cfg)
-		if fortune.get("gold", 0) > 0 and not cfg.has("v10_id"):
-			cfg = cfg.duplicate(true)
-			cfg.gold = int(cfg.get("gold", 0)) + int(fortune.gold)
+		cfg = TWModeCfg.apply_fortune(cfg, fortune)
 	Sfx.music("play" if mode != "zen" else "menu")
 	Common.backdrop(self, cfg.bg, size, 1.6 if cfg.bg != "play" else 0.0, 0.85, cfg.tint, Vector2(0.5, 0.5))
 	Fx.ambient(self, cfg.fx, size)
@@ -236,7 +216,7 @@ func _v6_setup(_args: Dictionary) -> bool:
 	return false
 
 func _slot_count() -> int:
-	return V7Passives.slots(partner, 6 if mode == "zen" else 4)
+	return V7Passives.slots(partner, TWModeCfg.slot_base(mode))
 
 # a Node2D right under the board (above the backdrop and the table felt): decor that must stay behind the tiles
 func _v9_under_board_fx() -> Node2D:
@@ -308,19 +288,11 @@ func _make_board() -> void :
 
 
 func _mode_cfg(n: int) -> Dictionary:
-	var shapes: = ["rect", "heart", "diamond", "butterfly", "ring", "pyramid"]
-	var r: = RandomNumberGenerator.new()
-	r.randomize()
-	var zen: = mode == "zen"
-	return {
-		"name": V6Txt.s("play.blitz_name") if not zen else V6Txt.s("play.zen_name"), "code": "", "bg": ["play", "bg_teahouse", "bg_festival", "bg_palace", "bg_shrine"][n % 5] if zen else "bg_festival", 
-		"fx": "petals" if zen else "lanterns", "tint": Color(1, 1, 1), "hero": partner, 
-		"shape": shapes[r.randi() % shapes.size()], "cols": 5 if not zen else 6, "rows": 6 if not zen else 7, 
-		"layers": 2 + mini(n, 2) if not zen else 3, "fill": 0.65, "faces": 7 + mini(n, 4) if not zen else 12, 
-		"mech": "", "hard": 0, "seed": r.randi(), "gold": 2 if not zen else 0, "ice": 0, "hidden": false, 
-		"reward": {"gems": 0}, "goal": V6Txt.s("play.blitz_goal") if not zen else V6Txt.s("play.zen_goal"), 
-		"intro": V6Txt.s("play.blitz_intro") if not zen else V6Txt.s("play.zen_intro"), 
-	}
+	return TWModeCfg.blitz_zen_cfg(mode == "zen", n, partner, randi(), _txt())
+
+# texts for the core configs (core never reads V6Txt itself)
+func _txt() -> Callable:
+	return func(k: String) -> String: return V6Txt.s(k)
 
 
 func _place_gift() -> void :
@@ -335,24 +307,21 @@ func _place_gift() -> void :
 			return
 
 func _apply_perk() -> void :
-	match partner:
-		"mc": hint_n += 1
-		"rin": undo_n += 1
-		"hana": board.combo_window = 6.5
-		"yue": gold_mult = 8
-		"nova":
-			shuffle_n += 1
-			gem_bonus = 0.1
-	gem_bonus += 0.05 * (G.aff_level(partner) - 1)
-	V7Album.apply_bonuses(self)
-	match fortune.get("id", ""):
-		"great": gem_bonus += 0.5
-		"pairs": first_pairs_bonus = 3
-		"wind": shuffle_n += 1
-		"tea": board.combo_window += 1.5
-		"tray": free_rescue_left = 1
-		"small": hint_n += 1
-	hint_n += int(cfg.get("extra_hints", 0))
+	# TWBoosters.loadout: partner perk, affection, album sets, fortune, level extras, in the order the old code applied them, on top of
+	# the numbers this mode already set (a Climb run starts with its own helps)
+	var lo: = TWBoosters.loadout(partner, G.aff_level(partner), V7Album.active_keys(), str(fortune.get("id", "")), int(cfg.get("extra_hints", 0)),
+		{"hint_n": hint_n, "undo_n": undo_n, "shuffle_n": shuffle_n, "gold_mult": gold_mult, "gem_bonus": gem_bonus, "free_rescue_left": free_rescue_left,
+		"first_pairs_bonus": first_pairs_bonus})
+	hint_n = int(lo.hint_n)
+	undo_n = int(lo.undo_n)
+	shuffle_n = int(lo.shuffle_n)
+	gold_mult = int(lo.gold_mult)
+	gem_bonus = float(lo.gem_bonus)
+	first_pairs_bonus = int(lo.first_pairs_bonus)
+	free_rescue_left = int(lo.free_rescue_left)
+	if float(lo.combo_window_set) >= 0.0:
+		board.combo_window = float(lo.combo_window_set)
+	board.combo_window += float(lo.combo_window_add)
 	V7Passives.attach(self)
 	for c in get_children():
 		if c is V7PassiveRun and c.chip:
@@ -1048,19 +1017,13 @@ func _on_match(mid: Vector2, combo: int, gold: bool, shard: String) -> void :
 		if sp > 1:
 			_v10_rested_bar.set_value(V10Comeback.rested())
 	var fever: = now() < fever_until
-	var mult: = 1 + (combo - 1) / 2
-	var gain: = int(round(mult * (2 if fever else 1) * (gold_mult if gold else 1) * (1.0 + gem_bonus)))
-	if first_pairs_bonus > 0:
-		first_pairs_bonus -= 1
-		gain *= 3
-	if mode == "trial":
-		gain = 0
+	var pg: = TWRewards.pair_gain(combo, fever, gold, gold_mult, gem_bonus, first_pairs_bonus, mode)   # core: the gain formula
+	var gain: int = int(pg.gain)
+	first_pairs_bonus = int(pg.first_pairs_bonus)
+	var pts: = TWRewards.pair_score(mode, combo)
+	blitz_score += pts
 	if mode == "blitz":
-		var pts: = 10 * maxi(1, combo)
-		blitz_score += pts
 		Fx.float_text(fx_layer, mid + Vector2(0, -10), "+%d" % pts, Color("9fe8d0"), 30)
-	elif mode == "zen":
-		blitz_score += 1
 	if not skill_ready and not from_ult and not (ult and ult.busy):
 		skill_charge = V9Ults.add(skill_charge, SKILL_NEED)
 		if skill_charge >= SKILL_NEED:
@@ -1334,14 +1297,15 @@ func _on_fail() -> void :
 	_v6_clear_tips()
 	if stage:
 		stage.flash_emotion("sad")
-	if mode == "zen" or mode == "blitz" or mode == "duel" or free_rescue_left > 0:
+	var od: = TWBoosters.overflow(mode, {"free_rescue_left": free_rescue_left})   # core: what a full tray does in this mode
+	if od.kind == "free_return":
 		if duel:
 			duel.on_overflow()
-		if free_rescue_left > 0 and mode == "":
+		if od.consume_rescue:
 			free_rescue_left -= 1
 			main.toast(V6Txt.s("play.omikuji_saved"), "gift")
 		if mode == "blitz":
-			blitz_left = maxf(0.0, blitz_left - 10.0)
+			blitz_left = maxf(0.0, blitz_left - float(od.blitz_penalty))
 			Fx.float_text(fx_layer, Vector2(W * 0.5, 260), "−10 с", Color("ff8a9a"), 36)
 			# the overflow ate the last seconds: the run ends here (the countdown only runs while time is left)
 			if blitz_left <= 0.0:
@@ -1406,7 +1370,7 @@ func _on_fail() -> void :
 	var l: = UI.label(V6Txt.s("play.full_d"), 21, UI.INK)
 	l.position = Vector2(170, 70)
 	p.add_child(l)
-	var price: = 0 if rescue_free else V8PlayRules.RESCUE_PRICE
+	var price: = TWBoosters.rescue_price({"rescue_free": rescue_free})
 	var rb: = JButton.make(V6Txt.s("play.return3") + ("" if price == 0 else " · %d" % price), "gold", Rect2(60, 210, 540, 92), V8Art.icon("undo") if price == 0 else V8Art.cur("gem"), 30)
 	rb.icon_rect.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	rb.shine_every = 2.0
@@ -1417,10 +1381,12 @@ func _on_fail() -> void :
 			if not _v8_can_pay(price):
 				return
 			_v8_spend(price)
-		rescue_free = false
-		boosters_used += 1
-		if riichi:
-			riichi = false
+		var rcn: = {"rescue_free": rescue_free, "boosters_used": boosters_used, "riichi": riichi}
+		var rc: = TWBoosters.rescue_commit(rcn)   # core: the rescue counts as a help, the free one is gone, «Ва-банк» burns
+		rescue_free = bool(rcn.rescue_free)
+		boosters_used = int(rcn.boosters_used)
+		riichi = bool(rcn.riichi)
+		if rc.riichi_burnt:
 			main.toast(V6Txt.s("play.riichi_burnt"), "heart")
 		Common.close_popup(p)
 		_v8_modal_close()
@@ -1456,20 +1422,15 @@ var _v8_loss_done: = false
 func _v8_record_loss() -> void :
 	if _v8_loss_done or _v8_over or _v8_saved:
 		return
-	_v10_ended(false, 0, 0, now() - start_t, false)  # 0.10 hook
-	var src: = _v8_source()
-	if src in ["path", "daily", "duel", "blitz"]:
+	var lr: = TWRound.resolve(_round_state(), mode, cfg, _round_stats("leave", now() - start_t))
+	_v10_emit(lr.hook)  # 0.10 hook
+	if not lr.record.is_empty():
 		_v8_loss_done = true
-		G.record_game(src, false)
+		G.record_game(String(lr.record.source), false)
 		G.save()
 
 func _v8_source() -> String:
-	match mode:
-		"":
-			return "path"
-		"daily", "duel", "blitz", "zen":
-			return mode
-	return "other"
+	return TWModeCfg.source(mode)
 
 # false when a help tap will be refused (subclasses add their own rules); the handler's toast then says why
 func _help_ok(kind: String) -> bool:
@@ -1482,99 +1443,110 @@ func _help_ok(kind: String) -> bool:
 			return not board.history.is_empty()
 	return true
 
+# the round's help counters as the core sees them
+func _booster_counters() -> Dictionary:
+	return {"hint_n": hint_n, "undo_n": undo_n, "shuffle_n": shuffle_n, "boosters_used": boosters_used, "riichi": riichi, "rescue_free": rescue_free}
+
+func _booster_take(cn: Dictionary) -> void:
+	hint_n = int(cn.hint_n)
+	undo_n = int(cn.undo_n)
+	shuffle_n = int(cn.shuffle_n)
+	boosters_used = int(cn.boosters_used)
+
 func _hint() -> void :
-	if riichi:
-		V9Feel.deny(btn_hint)
-		main.toast(V6Txt.s("play.riichi_locked"), "lock")
-		return
-	if not board.input_on:
-		V9Feel.deny(btn_hint)
-		return
-	if _v8_hint_active():
-		V9Feel.deny(btn_hint)
-		main.toast(V8PlayRules.T.hint_on, "hint")
-		return
-	if board.best_move() == null:
-		V9Feel.deny(btn_hint)
-		return
-	if hint_n <= 0:
-		_v8_pay("hint", V8PlayRules.T.hint_t, V8PlayRules.T.hint_d, V8PlayRules.HELP_PRICE, func(): _v8_do_hint(true))
-		return
-	_v8_do_hint(false)
+	var ha: = false
+	var hm: = true
+	if not riichi and board.input_on:
+		ha = _v8_hint_active()
+		if not ha:
+			hm = board.best_move() != null
+	var d: = TWBoosters.decide("hint", _booster_counters(), {"input_on": board.input_on, "hint_active": ha, "has_move": hm})   # core: the decision
+	match d["do"]:
+		"locked":
+			V9Feel.deny(btn_hint)
+			main.toast(V6Txt.s("play.riichi_locked"), "lock")
+		"deny":
+			V9Feel.deny(btn_hint)
+		"active":
+			V9Feel.deny(btn_hint)
+			main.toast(V8PlayRules.T.hint_on, "hint")
+		"pay":
+			_v8_pay("hint", V8PlayRules.T.hint_t, V8PlayRules.T.hint_d, int(d.price), func(): _v8_do_hint(true))
+		_:
+			_v8_do_hint(false)
 
 func _v8_do_hint(paid: bool) -> void :
 	if not is_inside_tree() or not board.input_on or riichi or _v8_hint_active():
 		return
-	if paid and not _v8_can_pay(V8PlayRules.HELP_PRICE):
+	if paid and not _v8_can_pay(TWBoosters.HELP_PRICE):
 		return
 	if not board.hint():
 		V9Feel.deny(btn_hint)
 		_refresh()
 		return
-	if paid:
-		_v8_spend(V8PlayRules.HELP_PRICE)
-	else:
-		hint_n -= 1
-	boosters_used += 1
+	var cn: = _booster_counters()
+	var price: = TWBoosters.commit("hint", cn, paid)
+	_booster_take(cn)
+	if price > 0:
+		_v8_spend(price)
 	_bubble(Sfx.say(partner, "hint"))
 	_refresh()
 
 func _undo() -> void :
-	if riichi:
-		V9Feel.deny(btn_undo)
-		main.toast(V6Txt.s("play.riichi_locked"), "lock")
-		return
-	if not board.input_on:
-		V9Feel.deny(btn_undo)
-		return
-	if board.history.is_empty():
-		V9Feel.deny(btn_undo)
-		main.toast(V8PlayRules.T.undo_none, "undo")
-		return
-	if undo_n <= 0:
-		_v8_pay("undo", V8PlayRules.T.undo_t, V8PlayRules.T.undo_d, V8PlayRules.HELP_PRICE, func(): _v8_do_undo(true))
-		return
-	_v8_do_undo(false)
+	var d: = TWBoosters.decide("undo", _booster_counters(), {"input_on": board.input_on, "history_empty": board.history.is_empty()})
+	match d["do"]:
+		"locked":
+			V9Feel.deny(btn_undo)
+			main.toast(V6Txt.s("play.riichi_locked"), "lock")
+		"deny":
+			V9Feel.deny(btn_undo)
+		"none":
+			V9Feel.deny(btn_undo)
+			main.toast(V8PlayRules.T.undo_none, "undo")
+		"pay":
+			_v8_pay("undo", V8PlayRules.T.undo_t, V8PlayRules.T.undo_d, int(d.price), func(): _v8_do_undo(true))
+		_:
+			_v8_do_undo(false)
 
 func _v8_do_undo(paid: bool) -> void :
 	if not is_inside_tree() or not board.input_on or riichi:
 		return
-	if paid and not _v8_can_pay(V8PlayRules.HELP_PRICE):
+	if paid and not _v8_can_pay(TWBoosters.HELP_PRICE):
 		return
 	if board.undo():
-		if paid:
-			_v8_spend(V8PlayRules.HELP_PRICE)
-		else:
-			undo_n -= 1
-		boosters_used += 1
+		var cn: = _booster_counters()
+		var price: = TWBoosters.commit("undo", cn, paid)
+		_booster_take(cn)
+		if price > 0:
+			_v8_spend(price)
 		Sfx.play("whoosh", 1.3)
 	else:
 		V9Feel.deny(btn_undo)
 	_refresh()
 
 func _shuffle() -> void :
-	if riichi:
-		V9Feel.deny(btn_shuffle)
-		main.toast(V6Txt.s("play.riichi_locked"), "lock")
-		return
-	if not board.input_on:
-		V9Feel.deny(btn_shuffle)
-		return
-	if shuffle_n <= 0:
-		_v8_pay("shuffle", V8PlayRules.T.shuffle_t, V8PlayRules.T.shuffle_d, V8PlayRules.HELP_PRICE, func(): _v8_do_shuffle(true))
-		return
-	_v8_do_shuffle(false)
+	var d: = TWBoosters.decide("shuffle", _booster_counters(), {"input_on": board.input_on})
+	match d["do"]:
+		"locked":
+			V9Feel.deny(btn_shuffle)
+			main.toast(V6Txt.s("play.riichi_locked"), "lock")
+		"deny":
+			V9Feel.deny(btn_shuffle)
+		"pay":
+			_v8_pay("shuffle", V8PlayRules.T.shuffle_t, V8PlayRules.T.shuffle_d, int(d.price), func(): _v8_do_shuffle(true))
+		_:
+			_v8_do_shuffle(false)
 
 func _v8_do_shuffle(paid: bool) -> void :
 	if not is_inside_tree() or not board.input_on or riichi:
 		return
-	if paid:
-		if not _v8_can_pay(V8PlayRules.HELP_PRICE):
-			return
-		_v8_spend(V8PlayRules.HELP_PRICE)
-	else:
-		shuffle_n -= 1
-	boosters_used += 1
+	if paid and not _v8_can_pay(TWBoosters.HELP_PRICE):
+		return
+	var cn: = _booster_counters()
+	var price: = TWBoosters.commit("shuffle", cn, paid)
+	_booster_take(cn)
+	if price > 0:
+		_v8_spend(price)
 	board.shuffle_board()
 	_refresh()
 
@@ -1592,7 +1564,7 @@ func _v8_pay(kind: String, title: String, text: String, price: int, on_yes: Call
 	Common.confirm(main, title, text, "gem", price, on_yes, {"skip_key": _v8_skip_prefix() + kind})
 
 func _v8_can_pay(price: int) -> bool:
-	if V10Money.bal("gems") < price:
+	if not TWBoosters.afford(V10Money.bal("gems"), price).ok:
 		var sm: = V10ShopHub.model()
 		if sm != null and main != null:
 			var top_cb: = func() -> void:
@@ -1881,13 +1853,14 @@ func _blitz_end() -> void :
 	_blitz_done = true
 	board.input_on = false
 	var best: = int(G.S.get("blitz_best", 0))
-	var record: = blitz_score > best
+	var r: = TWRound.resolve(_round_state(), "blitz", cfg, _round_stats("end", now() - start_t))   # core: crystals, record, rank points, payload
+	var record: = r.writes.has("blitz_best")
 	if record:
 		G.S.blitz_best = blitz_score
-	var gems: = mini(150, blitz_score / 20)
+	var gems: = r.reward
 	V10Money.grant({"gems": gems}, "play")
-	_v10_ended(true, 0, gems, now() - start_t, false, blitz_score)  # 0.10 hook
-	var ba: = V8PlayRules.award("blitz", V8PlayRules.blitz_rp(blitz_score), boards_done > 0)
+	_v10_emit(r.hook)  # 0.10 hook
+	var ba: = V8PlayRules.apply_award(r.source, r.rp_gain, bool(r.record.won))
 	_v8_saved = true
 	_v8_end_overlays()
 	Sfx.play("win")
@@ -1898,20 +1871,16 @@ func _blitz_end() -> void :
 func _track_set(mid: Vector2) -> void :
 	var f: int = board.last_face
 	var c: = G.face_cat(f)
-	if c == cat_last:
-		cat_streak += 1
-	else:
-		cat_streak = 1
-		cat_last = c
-	if cat_streak == 3 and c >= 0:
-		cat_streak = 0
-		cat_last = -1
-		sets_done.append(c)
+	var sst: = {"cat_streak": cat_streak, "cat_last": cat_last, "sets_done": sets_done}
+	var set_gems: = TWRewards.set_step(sst, c)   # core: three pairs of one suit in a row
+	cat_streak = int(sst.cat_streak)
+	cat_last = int(sst.cat_last)
+	if set_gems > 0:
 		var nm: String = V10Glossary.label("set.%d" % c)  # v10-clarity hook: «Тройка: цветы», not the bare suit name
-		_yaku_banner(nm, "3 пары подряд · +15")
-		V10Money.grant({"gems": 15}, "play")
-		gained += 15
-		Fx.float_text(fx_layer, mid + Vector2(0, -50), "+15", Color("ffd34d"), 36)
+		_yaku_banner(nm, "3 пары подряд · +%d" % set_gems)
+		V10Money.grant({"gems": set_gems}, "play")
+		gained += set_gems
+		Fx.float_text(fx_layer, mid + Vector2(0, -50), "+%d" % set_gems, Color("ffd34d"), 36)
 
 func _yaku_banner(name: String, sub: String) -> void :
 	# one slim line in the band slot: the set name (Playfair) + what it was (Nunito)
@@ -2008,26 +1977,7 @@ func _declare_riichi() -> void :
 	_refresh()
 
 func _collect_yaku(secs: float) -> Array:
-	var ys: = []
-	if riichi:
-		ys.append("riichi")
-	if boosters_used == 0 and fails == 0:
-		ys.append("clean")
-	if board.max_tray <= 2:
-		ys.append("calm")
-	if denies == 0:
-		ys.append("sharp")
-	if secs < board.tiles.size() * 1.1:
-		ys.append("swift")
-	if max_combo >= 7:
-		ys.append("dragon")
-	if gold_total > 0 and gold_got >= gold_total:
-		ys.append("goldvein")
-	if last_combo >= 3:
-		ys.append("finale")
-	for c in sets_done:
-		ys.append("set:%d" % c)
-	return ys
+	return TWRewards.collect_yaku(_round_stats("clear", secs))
 
 func _yaku_name(y: String) -> String:
 	if y.begins_with("set:"):
@@ -2057,14 +2007,15 @@ func _on_clear() -> void :
 	if mode in ["blitz", "zen"]:
 		boards_done += 1
 		if mode == "blitz":
-			blitz_left += 10.0
-			blitz_score += 100
+			blitz_left += TWRewards.BLITZ_CLEAR_SECS
+			blitz_score += TWRewards.BLITZ_CLEAR_SCORE
 			Fx.float_text(fx_layer, Vector2(W * 0.5, 600), V6Txt.s("play.clear10"), Color("ffe7a6"), 40)
 		else:
-			V10Money.grant({"gems": 30}, "play")
-			gained += 30
+			var zr: = TWRound.resolve(_round_state(), "zen", cfg, _round_stats("board"))   # core: 30 crystals + rank points of the streak
+			V10Money.grant({"gems": zr.reward}, "play")
+			gained += zr.reward
 			Fx.float_text(fx_layer, Vector2(W * 0.5, 600), V6Txt.s("play.clear30"), Color("ffe7a6"), 40)
-			var za: = V8PlayRules.award("zen", V8PlayRules.zen_rp(boards_done), true)
+			var za: = V8PlayRules.apply_award(zr.source, zr.rp_gain, bool(zr.record.won))
 			Fx.float_text(fx_layer, Vector2(W * 0.5, 660), V8PlayRules.award_text(za), Color("a9d9c4"), 30)
 			_v8_rank_float(za, Vector2(W * 0.5, 720))
 		Sfx.play("win", 1.2, -6)
@@ -2081,82 +2032,60 @@ func _on_clear() -> void :
 		_refresh()
 		return
 	var secs: = now() - start_t
-	var stars: = V8PlayRules.story_stars(fails, boosters_used)
-	if G.demo:
-		stars = 3
 	if riichi_btn:
 		riichi_btn.queue_free()
-	yaku_list = _collect_yaku(secs)
-	var first: = false
-	var reward: = 0
-	var path_paid: = false
 	_v10_stars_before = V10Salon.stars_total()
 	_v10_path_res = {}
 	var wins_before_win: = V9Letters.total_wins()
-	var combo_prev_best: = int(V9Letters.st().get("best_combo", 0))
-	if mode == "":
-		first = G.level_stars(lvl) == 0
-		if cfg.has("v10_id"):
-			_v10_path_res = V10PathState.on_win(lvl, stars, int(secs * 1000.0))
-			V10PathBoosters.on_win(str(cfg.get("mode", "")), str(cfg.get("tier", "normal")), bool(cfg.get("peak", false)))
-			reward = int(_v10_path_res.get("gems", 0))
-			path_paid = true
-		else:
-			G.S.stars[str(lvl)] = max(G.level_stars(lvl), stars)
-			G.S.unlocked = max(int(G.S.unlocked), min(lvl + 2, G.LEVELS.size()))
-			reward = cfg.reward.gems + stars * 20
-		if first and cfg.reward.has("item"):
-			G.give(cfg.reward.item)
-		if first and lvl == 2:
-			first_unlock_summon = true
-			V10Money.grant({"tickets": 10}, "unlock_summon")
-	elif mode == "daily":
-		reward = cfg.reward.gems + stars * 20
-		var dm: = G.dailymap()
-		var d: = int(G.today().substr(8, 2))
-		if not d in dm.done.map( func(x): return int(x)):
-			dm.done.append(d)
-	var riichi_extra: = 0
-	if riichi:
-		riichi_extra = reward + gained
-		reward = reward * 2 + gained
+	# the whole award math is TWRound's: stars, yaku, crystals, rank points, tasks, the game_ended payload. What follows applies it.
+	var r: = TWRound.resolve(_round_state(), mode, cfg, _round_stats("clear", secs))
+	var stars: = r.stars
+	var first: = r.first
+	var reward: = r.reward
+	yaku_list = r.yaku
+	if r.writes.has("stars"):
+		G.S.stars[str(lvl)] = int(r.writes.stars.stars)
+	if r.writes.has("unlocked"):
+		G.S.unlocked = int(r.writes.unlocked)
+	if r.writes.has("item"):
+		G.give(r.writes.item)
+	if r.flags.get("first_unlock_summon", false):
+		first_unlock_summon = true
+	for g in r.grants:
+		if String(g.reason) != "play":
+			V10Money.grant({String(g.cur): int(g.n)}, String(g.reason))
+	if r.writes.has("daily_done_day"):
+		G.dailymap().done.append(int(r.writes.daily_done_day))
 	rp_before = int(G.S.rp)
-	if mode != "trial":
-		var yrp: = 0
-		for y in yaku_list:
-			yrp += _yaku_rp(y)
-			if not y.begins_with("set:"):
-				G.S.yaku_seen[y] = int(G.S.yaku_seen.get(y, 0)) + 1
-		rp_gain = V8PlayRules.path_rp(stars, int(cfg.get("hard", 0)) if mode == "" else 0, yrp)
-		var src: = "daily" if mode == "daily" else "path"
-		rank_ups = G.add_rp(rp_gain, src)
-		G.record_game(src, true)
-		if src == "path":
+	if not r.record.is_empty():
+		for y in r.yaku_seen:
+			G.S.yaku_seen[y] = int(G.S.yaku_seen.get(y, 0)) + 1
+		rp_gain = r.rp_gain
+		rank_ups = G.add_rp(rp_gain, r.source)
+		G.record_game(r.source, true)
+		if r.flags.get("starter_path_win", false):
 			V8Starter.on_path_win()
-	if mode != "trial":
-		V10Bond.gain(partner, 10, "level_win")
-		G.task_add("levels")
-		G.add_pass_xp(100)
-		G.S.xp = int(G.S.xp) + 40
-	if path_paid:
-		if riichi_extra > 0:
-			V10Money.grant({"gems": riichi_extra}, "play")
-	else:
-		V10Money.grant({"gems": reward}, "play")
+	for b in r.bond:
+		V10Bond.gain(String(b.hero), int(b.n), String(b.src))
+	for t in r.tasks:
+		G.task_add(String(t.key), int(t.n))
+	if r.pass_xp > 0:
+		G.add_pass_xp(r.pass_xp)
+	if r.xp > 0:
+		G.S.xp = int(G.S.xp) + r.xp
+	for g in r.grants:
+		if String(g.reason) == "play":
+			V10Money.grant({String(g.cur): int(g.n)}, "play")
 	G.S.tut_done = true
 	G.save()
 	# 0.8: the win is saved: leaving now goes straight out, without «прогресс не сохранится» or a counted loss
 	_v8_saved = true
 	var first_win_day: = wins_before_win == int(V9Letters.st().get("wins0", 0))
-	var combo_rec: = max_combo >= V9Letters.COMBO_MIN and max_combo > combo_prev_best
-	_v10_ended(true, stars, reward, secs, first, 0, {
-		"stars_delta": maxi(0, V10Salon.stars_total() - _v10_stars_before),
-		"first_win_day": first_win_day,
-		"combo_rec": combo_rec,
-		"max_combo": max_combo,
-		"rank_up": not rank_ups.is_empty(),
-		"rank_title": str(G.rank_of(int(G.S.rp)).title) if not rank_ups.is_empty() else "",
-	})  # 0.10 hook
+	var hook: = r.hook.duplicate()
+	hook["stars_delta"] = maxi(0, V10Salon.stars_total() - _v10_stars_before)
+	hook["first_win_day"] = first_win_day
+	hook["rank_title"] = str(G.rank_of(int(G.S.rp)).title) if not rank_ups.is_empty() else ""
+	_v10_emit(hook)  # 0.10 hook
 	board.input_on = false
 	if v10_fx_hud:
 		v10_fx_hud.on_victory()
@@ -3388,7 +3317,7 @@ var _v10_end_sent: = false
 var _v10_fever_on: = false
 
 func _v10_mode() -> String:
-	return "path" if mode == "" else mode
+	return TWModeCfg.hook_mode(mode)
 
 
 func _v10_ended(win: bool, stars: int, reward: int, secs: float, first: bool, score: = 0, extra: = {}) -> void :
@@ -3402,6 +3331,39 @@ func _v10_ended(win: bool, stars: int, reward: int, secs: float, first: bool, sc
 		"dragons": 1 if win and max_combo >= 7 else 0}
 	pl.merge(extra, true)
 	V10Hooks.emit_game_ended(pl)
+
+
+# the game_ended payload TWRound built (same keys and values as _v10_ended); once per round
+func _v10_emit(payload: Dictionary) -> void:
+	if _v10_end_sent:
+		return
+	_v10_end_sent = true
+	V10Hooks.emit_game_ended(payload)
+
+
+# ── the read-only view of the player and the counters of this round for TWRound.resolve()
+func _round_state() -> Dictionary:
+	var st: = {"rp": int(G.S.get("rp", 0)), "partner": partner, "demo": G.demo, "levels_size": G.LEVELS.size(), "unlocked": int(G.S.get("unlocked", 0)),
+		"blitz_best": int(G.S.get("blitz_best", 0)), "combo_min": V9Letters.COMBO_MIN, "best_combo_prev": int(V9Letters.st().get("best_combo", 0))}
+	if mode == "":
+		st["level_stars"] = G.level_stars(lvl)
+		st["hooks"] = {"path_on_win": func(stars: int, ms: int) -> Dictionary:
+			_v10_path_res = V10PathState.on_win(lvl, stars, ms)
+			V10PathBoosters.on_win(str(cfg.get("mode", "")), str(cfg.get("tier", "normal")), bool(cfg.get("peak", false)))
+			return _v10_path_res}
+	elif mode == "daily":
+		st["day"] = int(G.today().substr(8, 2))
+		st["daily_done"] = (G.dailymap().done as Array).duplicate()
+	if mode in ["blitz", "zen", "duel"] or TWModeCfg.is_tower(mode):
+		st["afisha_mult"] = V10Afisha.mult(TWModeCfg.source(mode), "rank")
+	return st
+
+
+func _round_stats(event: String, secs: = 0.0) -> Dictionary:
+	return {"event": event, "secs": secs, "level": lvl, "seed": int(cfg.get("seed", 0)), "hero": partner, "tiles": board.tiles.size() if board else 0,
+		"fails": fails, "boosters_used": boosters_used, "max_combo": max_combo, "last_combo": last_combo, "denies": denies,
+		"max_tray": board.max_tray if board else 0, "gold_total": gold_total, "gold_got": gold_got, "sets_done": sets_done.duplicate(),
+		"riichi": riichi, "gained": gained, "blitz_score": blitz_score, "boards_done": boards_done}
 
 
 # Path: clean AAA Victory bottom action panel — strictly below plate, never overlaps bonuses or screen edges

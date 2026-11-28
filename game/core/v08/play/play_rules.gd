@@ -6,8 +6,8 @@ extends RefCounted
 # Rank points (spec 5): duel win +20 / loss 0, blitz and zen 5–15 by result, etudes by stars,
 # event and tourney by stars / points / place; Path and the daily table keep the 0.7 formula.
 
-const HELP_PRICE: = 30
-const RESCUE_PRICE: = 60
+const HELP_PRICE: = TWBoosters.HELP_PRICE      # P20: the price table lives in core/round/tw_boosters.gd
+const RESCUE_PRICE: = TWBoosters.RESCUE_PRICE
 
 const DUEL_WIN: = 20
 const DUEL_DRAW: = 5
@@ -118,6 +118,11 @@ static func story_stars(fails: int, boosters: int) -> int:
 # G.add_rp + G.record_game + G.save in one call. Returns {rp, ups, gems, title}.
 static func award(source: String, rp: int, won: bool) -> Dictionary:
 	rp *= V10Afisha.mult(source, "rank")  # 0.10 (meta Ф6): «Режим дня ×2» doubles rank points (never crystals)
+	return apply_award(source, rp, won)
+
+
+# the same with the multiplier already inside `rp` (TWRound.resolve applies it: RoundResult.rp_gain is final)
+static func apply_award(source: String, rp: int, won: bool) -> Dictionary:
 	var ups: Array = []
 	if rp != 0:
 		ups = G.add_rp(rp, source)
